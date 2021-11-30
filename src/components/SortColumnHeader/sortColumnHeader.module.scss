@@ -1,0 +1,19 @@
+.sortColumn {
+  cursor: pointer;
+
+  i {
+    margin-left: 5px;
+    opacity: .7;
+  }
+
+  &:hover {
+    i.hoverOnly {
+      display: inline;
+      opacity: .4;
+    }
+  }
+}
+
+.hoverOnly {
+  display: none;
+}

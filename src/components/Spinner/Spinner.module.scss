@@ -1,0 +1,29 @@
+.container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity .8s;
+  background-color: #fff;
+  opacity: 0;
+  pointer-events: none;
+
+  .spinner {
+    height: 4rem;
+    width: 4rem;
+    display: none;
+  }
+
+  &.active {
+    opacity: .5;
+    pointer-events: all;
+
+    .spinner {
+      display: block;
+    }
+  }
+}

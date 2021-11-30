@@ -1,0 +1,46 @@
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.detailRow {
+  max-height: 200px;
+  transition: all 0.3s;
+
+  td {
+    ul {
+      list-style-type: none;
+
+      li {
+        overflow-wrap: anywhere;
+      }
+    }
+  }
+}
+
+.hidden {
+  max-height: 0;
+  overflow: hidden;
+
+  td {
+    padding: 0;
+    border: none;
+  }
+}
+
+.showMore {
+  cursor: pointer;
+  color: #3754a5;
+}
+
+.logs {
+  min-width: 712px;
+}
+
+.logsTable {
+  min-width: 100%;
+}
+
+.dateCell {
+  overflow-wrap: anywhere;
+}
