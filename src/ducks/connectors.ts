@@ -6,7 +6,6 @@ import {
   AllAttributeResponse,
   Connector,
   ConnectorDetails,
-  ConnectorFunctionGroup,
   ConnectorHealth,
   ErrorDeleteObject,
 } from "models";
@@ -153,16 +152,12 @@ export const actions = {
     (
       name: string,
       url: string,
-      status: string,
-      functionGroups: ConnectorFunctionGroup[],
       authType: string,
       authAttributes: any,
       history: History<unknown>
     ) => ({
       name,
       url,
-      status,
-      functionGroups,
       authType,
       authAttributes,
       history,
@@ -208,8 +203,6 @@ export const actions = {
       uuid: string,
       name: string,
       url: string,
-      status,
-      functionGroups,
       authType: string,
       authAttributes: any,
       history: History<unknown>
@@ -217,8 +210,6 @@ export const actions = {
       uuid,
       name,
       url,
-      status,
-      functionGroups,
       authType,
       authAttributes,
       history,

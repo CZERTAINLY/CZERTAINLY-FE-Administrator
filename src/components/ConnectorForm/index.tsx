@@ -49,8 +49,6 @@ interface Props {
     uuid: string,
     name: string,
     url: string,
-    status: string,
-    functionGroups: any,
     authType: string,
     authAttributes: any
   ) => void;
@@ -74,27 +72,11 @@ function ConnectorForm({
   onSubmit,
   onConnect,
 }: Props) {
-  const getConnectorFunctionGroups = useCallback((): any => {
-    let functionGroup: any = [];
-    for (let i of connectionDetails) {
-      functionGroup.push(i.functionGroup);
-    }
-    return functionGroup;
-  }, [connectionDetails]);
-
   const submitCallback = useCallback(
     (values: FormValues) => {
-      onSubmit(
-        values.uuid,
-        values.name,
-        values.url,
-        "CONNECTED",
-        getConnectorFunctionGroups(),
-        "NONE",
-        []
-      );
+      onSubmit(values.uuid, values.name, values.url, "NONE", []);
     },
-    [onSubmit, getConnectorFunctionGroups]
+    [onSubmit]
   );
 
   const connectCallback = (values: FormValues) => {
@@ -342,7 +324,7 @@ function ConnectorForm({
                           </thead>
                           <tbody>
                             {getEndPointInfo(
-                              name.endpoints,
+                              name.functionGroup?.endPoints,
                               name.functionGroup
                             )}
                           </tbody>

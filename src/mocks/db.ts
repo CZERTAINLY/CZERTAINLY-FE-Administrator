@@ -1631,26 +1631,6 @@ export function connectConnector(
           },
         ],
       },
-      endPoints: [
-        {
-          name: "listSupportedFunctions",
-          context: "/v1",
-          method: "GET",
-          required: false,
-        },
-        {
-          name: "validateAttributes",
-          context: "/v1/attributes/validate",
-          method: "POST",
-          required: false,
-        },
-        {
-          name: "listAttributeDefinitions",
-          context: "/v1/attributes",
-          method: "GET",
-          required: false,
-        },
-      ],
     },
     {
       functionGroup: {
@@ -1682,26 +1662,6 @@ export function connectConnector(
           },
         ],
       },
-      endPoints: [
-        {
-          name: "listSupportedFunctions",
-          context: "/v1",
-          method: "GET",
-          required: false,
-        },
-        {
-          name: "validateAttributes",
-          context: "/v1/attributes/validate",
-          method: "POST",
-          required: false,
-        },
-        {
-          name: "listAttributeDefinitions",
-          context: "/v1/attributes",
-          method: "GET",
-          required: false,
-        },
-      ],
     },
   ];
 }

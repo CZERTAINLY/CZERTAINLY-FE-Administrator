@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { actions, selectors } from "ducks/connectors";
 import ConnectorForm from "components/ConnectorForm";
-import { ConnectorFunctionGroup } from "models";
 import { Container } from "reactstrap";
 
 function ConnectorAdd() {
@@ -20,8 +19,6 @@ function ConnectorAdd() {
       uuid: string,
       name: string,
       url: string,
-      status: string,
-      functionGroups: ConnectorFunctionGroup[],
       authType: string,
       authAttributes: any
     ) => {
@@ -29,8 +26,6 @@ function ConnectorAdd() {
         actions.requestCreateConnector(
           name,
           url,
-          status,
-          functionGroups,
           authType,
           authAttributes,
           history

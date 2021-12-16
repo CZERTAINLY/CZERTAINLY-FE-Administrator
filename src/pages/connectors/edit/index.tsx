@@ -7,7 +7,6 @@ import ConfirmEditDialog from "components/ConfirmActionDialog";
 import Spinner from "components/Spinner";
 import { actions, selectors } from "ducks/connectors";
 import ConnectorForm from "components/ConnectorForm";
-import { ConnectorFunctionGroup } from "models";
 
 function ConnectorEdit() {
   const dispatch = useDispatch();
@@ -39,8 +38,6 @@ function ConnectorEdit() {
       uuid: string,
       name: string,
       url: string,
-      status: string,
-      functionGroups: ConnectorFunctionGroup[],
       authType: string,
       authAttributes: any
     ) => {
@@ -49,8 +46,6 @@ function ConnectorEdit() {
           uuid,
           name,
           url,
-          status,
-          functionGroups,
           authType,
           authAttributes,
           history
