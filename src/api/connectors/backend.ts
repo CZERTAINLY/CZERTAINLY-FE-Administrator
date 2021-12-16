@@ -1,6 +1,5 @@
 import {
   AllAttributeResponse,
-  ConnectorFunctionGroup,
   ConnectorHealth,
   ErrorDeleteObject,
 } from "models";
@@ -26,21 +25,27 @@ export class ConnectorManagementBackend
   createNewConnector(
     name: string,
     url: string,
-    status: string,
-    functionGroups: ConnectorFunctionGroup[],
     authType: string,
     authAttributes: any
   ): Observable<string> {
-    return createNewResource(baseUrl, {
-      name,
-      url,
-      status,
-      functionGroups,
-      authType,
-      authAttributes,
-    }).pipe(
-      map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-    );
+    if (authType === "NONE") {
+      return createNewResource(baseUrl, {
+        name,
+        url,
+        authType,
+      }).pipe(
+        map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+      );
+    } else {
+      return createNewResource(baseUrl, {
+        name,
+        url,
+        authType,
+        authAttributes,
+      }).pipe(
+        map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+      );
+    }
   }
 
   connectNewConnector(
@@ -50,15 +55,26 @@ export class ConnectorManagementBackend
     authAttributes: any,
     uuid: string
   ): Observable<model.ConnectorConnectionResponse[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
-        uuid,
-        name,
-        url,
-        authType,
-        authAttributes,
-      })
-    );
+    if (authType === "NONE") {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
+          uuid,
+          name,
+          url,
+          authType,
+        })
+      );
+    } else {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
+          uuid,
+          name,
+          url,
+          authType,
+          authAttributes,
+        })
+      );
+    }
   }
 
   getConnectorsList(): Observable<model.ConnectorInfoResponse[]> {
@@ -150,21 +166,27 @@ export class ConnectorManagementBackend
     uuid: string,
     name: string,
     url: string,
-    status: string,
-    functionGroups: ConnectorFunctionGroup[],
     authType: string,
     authAttributes: any
   ): Observable<string> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-        name,
-        url,
-        status,
-        functionGroups,
-        authType,
-        authAttributes,
-      })
-    );
+    if (authType === "NONE") {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+          name,
+          url,
+          authType,
+        })
+      );
+    } else {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+          name,
+          url,
+          authType,
+          authAttributes,
+        })
+      );
+    }
   }
 
   getCallback(connectorUuid: string, request: any): Observable<any> {

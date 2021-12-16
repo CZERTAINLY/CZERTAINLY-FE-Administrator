@@ -314,38 +314,22 @@ const createConnector: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.CreateRequest)),
-    switchMap(
-      ({
-        name,
-        url,
-        status,
-        functionGroups,
-        authType,
-        authAttributes,
-        history,
-      }) =>
-        apiClients.connectors
-          .createNewConnector(
-            name,
-            url,
-            status,
-            functionGroups,
-            authType,
-            authAttributes
-          )
-          .pipe(
-            map((uuid) => {
-              history.push(".");
-              return actions.receiveCreateConnector(uuid);
-            }),
-            catchError((err) =>
-              of(
-                actions.failCreateConnector(
-                  extractError(err, "Failed to create connector")
-                )
+    switchMap(({ name, url, authType, authAttributes, history }) =>
+      apiClients.connectors
+        .createNewConnector(name, url, authType, authAttributes)
+        .pipe(
+          map((uuid) => {
+            history.push(".");
+            return actions.receiveCreateConnector(uuid);
+          }),
+          catchError((err) =>
+            of(
+              actions.failCreateConnector(
+                extractError(err, "Failed to create connector")
               )
             )
           )
+        )
     ),
     catchError(() =>
       of(actions.failCreateConnector("Failed to create connector"))
@@ -411,40 +395,22 @@ const updateConnector: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.UpdateRequest)),
-    switchMap(
-      ({
-        uuid,
-        name,
-        url,
-        status,
-        functionGroups,
-        authType,
-        authAttributes,
-        history,
-      }) =>
-        apiClients.connectors
-          .updateConnector(
-            uuid,
-            name,
-            url,
-            status,
-            functionGroups,
-            authType,
-            authAttributes
-          )
-          .pipe(
-            map((uuid) => {
-              history.push("..");
-              return actions.receiveUpdateConnector(uuid);
-            }),
-            catchError((err) =>
-              of(
-                actions.failUpdateConnector(
-                  extractError(err, "Failed to update connector")
-                )
+    switchMap(({ uuid, name, url, authType, authAttributes, history }) =>
+      apiClients.connectors
+        .updateConnector(uuid, name, url, authType, authAttributes)
+        .pipe(
+          map((uuid) => {
+            history.push("..");
+            return actions.receiveUpdateConnector(uuid);
+          }),
+          catchError((err) =>
+            of(
+              actions.failUpdateConnector(
+                extractError(err, "Failed to update connector")
               )
             )
           )
+        )
     )
   );
 
