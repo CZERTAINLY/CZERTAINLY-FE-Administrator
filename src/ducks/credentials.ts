@@ -374,9 +374,17 @@ export function reducer(state: State = initialState, action: Action): State {
     case getType(actions.requestCreateCredential):
       return { ...state, isCreatingCredential: true };
     case getType(actions.receiveCreateCredential):
-      return { ...state, isCreatingCredential: false };
+      return {
+        ...state,
+        isCreatingCredential: false,
+        credentialProviderAttributes: [],
+      };
     case getType(actions.failCreateCredential):
-      return { ...state, isCreatingCredential: false };
+      return {
+        ...state,
+        isCreatingCredential: false,
+        credentialProviderAttributes: [],
+      };
     case getType(actions.requestCredentialDetail):
       return {
         ...state,
