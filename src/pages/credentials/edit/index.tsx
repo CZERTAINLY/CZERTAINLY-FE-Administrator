@@ -26,10 +26,10 @@ function CredentialEdit() {
   };
 
   const onCancelEdit = useCallback(() => toggleConfirmDialog(false), []);
-  const onConfirmEdit = useCallback(
-    () => dispatch(editAction),
-    [dispatch, editAction]
-  );
+  const onConfirmEdit = useCallback(() => {
+    toggleConfirmDialog(true);
+    dispatch(editAction);
+  }, [dispatch, editAction]);
 
   const onCancel = useCallback(() => history.goBack(), [history]);
   const onSubmit = useCallback(

@@ -30,7 +30,6 @@ export class CredentialManagementBackend
       credentialType,
       connectorUuid,
       attributes,
-      enabled: true,
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -111,7 +110,6 @@ export class CredentialManagementBackend
         credentialType,
         connectorUuid,
         attributes,
-        enabled: true,
       })
     );
   }
