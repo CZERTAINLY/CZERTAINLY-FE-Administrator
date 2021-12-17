@@ -9,6 +9,7 @@ import ConfirmEditDialog from "components/ConfirmActionDialog";
 import Spinner from "components/Spinner";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/ra-profiles";
+import { selectors as callbackSelectors } from "ducks/connectors";
 import { AttributeResponse } from "models/attributes";
 
 function RaProfileEdit() {
@@ -17,6 +18,9 @@ function RaProfileEdit() {
   const isFetching = useSelector(selectors.isFetching);
   const isEditing = useSelector(selectors.isEditing);
   const raProfile = useSelector(selectors.selectProfileDetail);
+  const isFetchingAttributes = useSelector(
+    callbackSelectors.isFetchingCallback
+  );
   const { params } = useRouteMatch();
   const uuid = (params as any).id as string;
   const [showConfirm, toggleConfirmDialog] = useState(false);
@@ -77,7 +81,7 @@ function RaProfileEdit() {
         onCancel={onCancelEdit}
         onConfirm={onConfirmEdit}
       />
-      <Spinner active={isFetching} />
+      <Spinner active={isFetching || isFetchingAttributes} />
     </Container>
   );
 }

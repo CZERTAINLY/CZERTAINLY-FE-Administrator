@@ -26,6 +26,8 @@ import {
 
 import { AuthorityProviderAttributes } from "api/authorities";
 import { ConnectorInfoResponse } from "api/connectors";
+import { attributeCombiner } from "utils/commons";
+import { Authority, AuthorityDetails } from "models";
 
 export interface DefaultValues {
   name?: string;
@@ -46,6 +48,7 @@ interface FormValues {
 interface Props {
   editMode?: boolean;
   defaultValues?: DefaultValues;
+  authority?: Authority & AuthorityDetails;
   isSubmitting: boolean;
   onCancel: () => void;
   onSubmit: (
@@ -61,6 +64,7 @@ interface Props {
 function AuthorityForm({
   defaultValues,
   editMode,
+  authority,
   isSubmitting,
   onCancel,
   onSubmit,
@@ -89,12 +93,14 @@ function AuthorityForm({
   const [passAttributes, setPassAttributes] = useState(
     authorityProviderAttributes
   );
-  const [passEditAttributes, setPassEditAttributes] = useState(
+  const [passEditAttributes, setPassEditAttributes]: any = useState(
     authorityProviderAttributes
   );
+  const [editableAttributes, setEditableAttributes]: any = useState([]);
 
   useEffect(() => {
     setPassAttributes(authorityProviderAttributes);
+    setPassEditAttributes(authorityProviderAttributes);
   }, [authorityProviderAttributes]);
 
   useEffect(() => {
@@ -107,8 +113,21 @@ function AuthorityForm({
 
   useEffect(() => {
     setPassAttributes(authorityProviderAttributes);
+    setPassEditAttributes(authorityProviderAttributes);
     setAttributes(authorityProviderAttributes);
   }, [authorityProviderAttributes]);
+
+  useEffect(() => {
+    const raLength = authority?.attributes || [];
+    if (raLength.length > 0 && editMode) {
+      const edtAttributes = attributeCombiner(
+        authority?.attributes || [],
+        authorityProviderAttributes
+      );
+      setEditableAttributes(edtAttributes);
+      setPassEditAttributes(edtAttributes);
+    }
+  }, [authorityProviderAttributes, authority, editMode]);
 
   useEffect(() => {
     if (
@@ -145,6 +164,19 @@ function AuthorityForm({
       }
     }
     setAttributes(updatedAttributes);
+  }
+
+  function updateAttributesEdit(formAttributes: AuthorityProviderAttributes) {
+    let updated = attributes.length !== 0 ? attributes : editableAttributes;
+    let updateAttributes: AuthorityProviderAttributes[] = [];
+    for (let i of updated) {
+      if (i.id === formAttributes.id) {
+        updateAttributes.push(formAttributes);
+      } else {
+        updateAttributes.push(i);
+      }
+    }
+    setAttributes(updateAttributes);
   }
 
   const fetchAttributes = (selectedKind: string) => {
@@ -359,8 +391,8 @@ function AuthorityForm({
             ) : null}
             {editMode && kind ? (
               <DynamicForm
-                fieldInfo={passEditAttributes}
-                attributeFunction={updateAttributes}
+                fieldInfo={JSON.parse(JSON.stringify(passEditAttributes))}
+                attributeFunction={updateAttributesEdit}
                 actions={callbackActions}
                 connectorUuid={connectorUuid}
                 callbackSelector={callbackResponse}

@@ -144,6 +144,16 @@ function RaProfileForm({
   }, [raProfile]);
 
   useEffect(() => {
+    if (editMode && authorities.length > 0) {
+      for (let i of authorities) {
+        if (i.uuid === raProfile?.caInstanceUuid) {
+          setConnectorUuid(i.connectorUuid);
+        }
+      }
+    }
+  }, [editMode, authorities, raProfile]);
+
+  useEffect(() => {
     const raLength = raProfile?.attributes || [];
     if (raLength.length > 0 && editMode) {
       const edtAttributes = attributeCombiner(
