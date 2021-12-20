@@ -27,7 +27,7 @@ import {
 import { AuthorityProviderAttributes } from "api/authorities";
 import { ConnectorInfoResponse } from "api/connectors";
 import { attributeCombiner } from "utils/commons";
-import { Authority, AuthorityDetails } from "models";
+import { AuthorityDetails } from "models";
 
 export interface DefaultValues {
   name?: string;
@@ -48,7 +48,7 @@ interface FormValues {
 interface Props {
   editMode?: boolean;
   defaultValues?: DefaultValues;
-  authority?: Authority & AuthorityDetails;
+  authority?: AuthorityDetails | null;
   isSubmitting: boolean;
   onCancel: () => void;
   onSubmit: (
@@ -116,6 +116,29 @@ function AuthorityForm({
     setPassEditAttributes(authorityProviderAttributes);
     setAttributes(authorityProviderAttributes);
   }, [authorityProviderAttributes]);
+
+  useEffect(() => {
+    if (editMode && authority?.uuid) {
+      for (let i of authorityProviders) {
+        if (i.uuid === authority.connectorUuid) {
+          for (let j of connectorDetails?.functionGroups || []) {
+            if (
+              "caConnector" === j.functionGroupCode ||
+              "legacyCaConnector" === j.functionGroupCode
+            ) {
+              dispatch(
+                actions.requestAuthorityProviderAttributeList(
+                  connectorDetails?.uuid || "",
+                  authority.authorityType,
+                  j.functionGroupCode
+                )
+              );
+            }
+          }
+        }
+      }
+    }
+  }, [authority, editMode, authorityProviders, connectorDetails, dispatch]);
 
   useEffect(() => {
     const raLength = authority?.attributes || [];

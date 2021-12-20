@@ -18,9 +18,7 @@ function RaProfileEdit() {
   const isFetching = useSelector(selectors.isFetching);
   const isEditing = useSelector(selectors.isEditing);
   const raProfile = useSelector(selectors.selectProfileDetail);
-  const isFetchingAttributes = useSelector(
-    callbackSelectors.isFetchingCallback
-  );
+  const isFetchingCallback = useSelector(callbackSelectors.isFetchingCallback);
   const { params } = useRouteMatch();
   const uuid = (params as any).id as string;
   const [showConfirm, toggleConfirmDialog] = useState(false);
@@ -81,7 +79,7 @@ function RaProfileEdit() {
         onCancel={onCancelEdit}
         onConfirm={onConfirmEdit}
       />
-      <Spinner active={isFetching || isFetchingAttributes} />
+      <Spinner active={isFetching || isFetchingCallback} />
     </Container>
   );
 }
