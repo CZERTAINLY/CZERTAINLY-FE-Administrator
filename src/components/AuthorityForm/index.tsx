@@ -409,7 +409,7 @@ function AuthorityForm({
             ) : null}
             {editMode && kind ? (
               <DynamicForm
-                fieldInfo={JSON.parse(JSON.stringify(passEditAttributes))}
+                fieldInfo={passEditAttributes}
                 attributeFunction={updateAttributesEdit}
                 actions={callbackActions}
                 connectorUuid={connectorUuid}

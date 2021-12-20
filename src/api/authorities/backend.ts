@@ -3,6 +3,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
@@ -31,7 +32,7 @@ export class AuthorityManagementBackend
       name,
       connectorUuid,
       status,
-      attributes,
+      attributes: attributeSimplifier(attributes),
       authorityType,
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
@@ -114,7 +115,7 @@ export class AuthorityManagementBackend
         connectorUuid,
         credential,
         status,
-        attributes,
+        attributes: attributeSimplifier(attributes),
         authorityType,
       })
     );
