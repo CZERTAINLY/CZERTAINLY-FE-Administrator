@@ -99,11 +99,6 @@ function AuthorityForm({
   const [editableAttributes, setEditableAttributes]: any = useState([]);
 
   useEffect(() => {
-    setPassAttributes(authorityProviderAttributes);
-    setPassEditAttributes(authorityProviderAttributes);
-  }, [authorityProviderAttributes]);
-
-  useEffect(() => {
     dispatch(actions.requestAuthorityProviderList());
   }, [dispatch]);
 
