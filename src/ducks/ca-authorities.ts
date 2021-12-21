@@ -392,8 +392,8 @@ export function reducer(state: State = initialState, action: Action): State {
       const providers: any = [];
       for (let i of action.authorityProviders) {
         if (
-          functionGroupChecker("caConnector", i.functionGroups) ||
-          functionGroupChecker("legacyCaConnector", i.functionGroups)
+          functionGroupChecker("authorityProvider", i.functionGroups) ||
+          functionGroupChecker("legacyAuthorityProvider", i.functionGroups)
         ) {
           providers.push(i);
         }

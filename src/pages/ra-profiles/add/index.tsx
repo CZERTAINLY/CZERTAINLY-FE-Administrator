@@ -21,14 +21,14 @@ function RaProfileAdd() {
   const onCancel = useCallback(() => history.goBack(), [history]);
   const onSubmit = useCallback(
     (
-      caInstanceUuid: string,
+      authorityInstanceUuid: string,
       name: string,
       description: string,
       attributes: AttributeResponse[]
     ) => {
       dispatch(
         actions.requestCreateRaProfile(
-          caInstanceUuid,
+          authorityInstanceUuid,
           name,
           description,
           attributes,

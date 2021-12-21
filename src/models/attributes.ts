@@ -16,3 +16,9 @@ export interface AttributeResponse {
   validationRegex?: any;
   attributeCallback?: AttributeCallback;
 }
+
+export interface SimplifiedAttributes {
+  id?: string | number;
+  name: string;
+  value: any;
+}

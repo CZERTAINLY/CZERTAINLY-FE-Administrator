@@ -26,6 +26,8 @@ import {
 
 import { AuthorityProviderAttributes } from "api/authorities";
 import { ConnectorInfoResponse } from "api/connectors";
+import { attributeCombiner } from "utils/commons";
+import { AuthorityDetails } from "models";
 
 export interface DefaultValues {
   name?: string;
@@ -46,6 +48,7 @@ interface FormValues {
 interface Props {
   editMode?: boolean;
   defaultValues?: DefaultValues;
+  authority?: AuthorityDetails | null;
   isSubmitting: boolean;
   onCancel: () => void;
   onSubmit: (
@@ -61,6 +64,7 @@ interface Props {
 function AuthorityForm({
   defaultValues,
   editMode,
+  authority,
   isSubmitting,
   onCancel,
   onSubmit,
@@ -89,13 +93,10 @@ function AuthorityForm({
   const [passAttributes, setPassAttributes] = useState(
     authorityProviderAttributes
   );
-  const [passEditAttributes, setPassEditAttributes] = useState(
+  const [passEditAttributes, setPassEditAttributes]: any = useState(
     authorityProviderAttributes
   );
-
-  useEffect(() => {
-    setPassAttributes(authorityProviderAttributes);
-  }, [authorityProviderAttributes]);
+  const [editableAttributes, setEditableAttributes]: any = useState([]);
 
   useEffect(() => {
     dispatch(actions.requestAuthorityProviderList());
@@ -107,8 +108,44 @@ function AuthorityForm({
 
   useEffect(() => {
     setPassAttributes(authorityProviderAttributes);
+    setPassEditAttributes(authorityProviderAttributes);
     setAttributes(authorityProviderAttributes);
   }, [authorityProviderAttributes]);
+
+  useEffect(() => {
+    if (editMode && authority?.uuid) {
+      for (let i of authorityProviders) {
+        if (i.uuid === authority.connectorUuid) {
+          for (let j of connectorDetails?.functionGroups || []) {
+            if (
+              "authorityProvider" === j.functionGroupCode ||
+              "legacyAuthorityProvider" === j.functionGroupCode
+            ) {
+              dispatch(
+                actions.requestAuthorityProviderAttributeList(
+                  connectorDetails?.uuid || "",
+                  authority.authorityType,
+                  j.functionGroupCode
+                )
+              );
+            }
+          }
+        }
+      }
+    }
+  }, [authority, editMode, authorityProviders, connectorDetails, dispatch]);
+
+  useEffect(() => {
+    const raLength = authority?.attributes || [];
+    if (raLength.length > 0 && editMode) {
+      const edtAttributes = attributeCombiner(
+        authority?.attributes || [],
+        authorityProviderAttributes
+      );
+      setEditableAttributes(edtAttributes);
+      setPassEditAttributes(edtAttributes);
+    }
+  }, [authorityProviderAttributes, authority, editMode]);
 
   useEffect(() => {
     if (
@@ -147,13 +184,26 @@ function AuthorityForm({
     setAttributes(updatedAttributes);
   }
 
+  function updateAttributesEdit(formAttributes: AuthorityProviderAttributes) {
+    let updated = attributes.length !== 0 ? attributes : editableAttributes;
+    let updateAttributes: AuthorityProviderAttributes[] = [];
+    for (let i of updated) {
+      if (i.id === formAttributes.id) {
+        updateAttributes.push(formAttributes);
+      } else {
+        updateAttributes.push(i);
+      }
+    }
+    setAttributes(updateAttributes);
+  }
+
   const fetchAttributes = (selectedKind: string) => {
     setKind(selectedKind);
     if (selectedKind !== "select") {
       for (let i of connectorDetails?.functionGroups || []) {
         if (
-          "caConnector" === i.functionGroupCode ||
-          "legacyCaConnector" === i.functionGroupCode
+          "authorityProvider" === i.functionGroupCode ||
+          "legacyAuthorityProvider" === i.functionGroupCode
         ) {
           dispatch(
             actions.requestAuthorityProviderAttributeList(
@@ -177,8 +227,8 @@ function AuthorityForm({
         setConnector(providerUuid);
         for (let j of i.functionGroups) {
           if (
-            j.functionGroupCode === "caConnector" ||
-            j.functionGroupCode === "legacyCaConnector"
+            j.functionGroupCode === "authorityProvider" ||
+            j.functionGroupCode === "legacyAuthorityProvider"
           ) {
             setAvailableKinds(j.kinds);
           }
@@ -360,7 +410,7 @@ function AuthorityForm({
             {editMode && kind ? (
               <DynamicForm
                 fieldInfo={passEditAttributes}
-                attributeFunction={updateAttributes}
+                attributeFunction={updateAttributesEdit}
                 actions={callbackActions}
                 connectorUuid={connectorUuid}
                 callbackSelector={callbackResponse}

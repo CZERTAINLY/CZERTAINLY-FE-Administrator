@@ -328,8 +328,8 @@ export const dbData = {
       uuid: "26",
       name: "localhostProfile",
       description: "localhostProfile",
-      caInstanceName: "Name1",
-      caInstanceUuid: "19",
+      authorityInstanceName: "Name1",
+      authorityInstanceUuid: "19",
       attributes: [
         {
           id: "72498bd8-37f9-4fcb-86cb-d23570cf916f",
@@ -471,17 +471,17 @@ export const dbData = {
     {
       uuid: "23",
       name: "DEMO-PROFILE",
-      caInstanceName: "Name1",
+      authorityInstanceName: "Name1",
       description: "DEMO RA Profile",
-      caInstanceUuid: "18",
+      authorityInstanceUuid: "18",
       enabled: true,
     },
     {
       uuid: "24",
       name: "DEMO-RA-PROFILE2",
-      caInstanceName: "Name1",
+      authorityInstanceName: "Name1",
       description: "",
-      caInstanceUuid: "17",
+      authorityInstanceUuid: "17",
       enabled: false,
     },
   ],
@@ -790,8 +790,8 @@ export const dbData = {
       functionGroups: [
         {
           id: 1,
-          name: "caConnector",
-          code: "caConnector",
+          name: "authorityProvider",
+          code: "authorityProvider",
           kinds: ["default", "T1", "t2", "t3", "t4"],
           endPoints: [
             {
@@ -1459,7 +1459,7 @@ export const dbData = {
     },
   ],
   allAttributeResponse: {
-    caConnector: {
+    authorityProvider: {
       ADCS: [
         {
           id: "93ca0ba2-3863-4ffa-a469-fd14ab3992bf",
@@ -1635,8 +1635,8 @@ export function connectConnector(
     {
       functionGroup: {
         id: 2,
-        name: "caConnector",
-        functionGroupCode: "caConnector",
+        name: "authorityProvider",
+        functionGroupCode: "authorityProvider",
         kinds: ["default"],
         endPoints: [
           {
@@ -1749,8 +1749,8 @@ export function createRaProfile(name: string, description: string): string {
     enabled: true,
     name: name,
     description,
-    caInstanceUuid: "21",
-    caInstanceName: "Name2",
+    authorityInstanceUuid: "21",
+    authorityInstanceName: "Name2",
   });
 
   return id;

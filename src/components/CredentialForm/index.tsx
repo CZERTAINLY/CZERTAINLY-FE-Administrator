@@ -289,7 +289,7 @@ function CredentialForm({
                           value: provider.uuid,
                         };
                       })}
-                      placeholder="Select Authority Provider"
+                      placeholder="Select Credential Provider"
                       onChange={(event) =>
                         fetchAvailableKinds(event?.value.toString() || "")
                       }

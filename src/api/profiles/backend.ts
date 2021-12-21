@@ -3,6 +3,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
@@ -18,16 +19,16 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   private _fetchService: FetchHttpService;
 
   createRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     name: string,
     description: string,
     attributes: AttributeResponse[]
   ): Observable<string> {
     return createNewResource(baseUrl, {
-      caInstanceUuid,
+      authorityInstanceUuid,
       name: name,
       description,
-      attributes,
+      attributes: attributeSimplifier(attributes),
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -82,7 +83,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   getAttributes(authorityUuid: string): Observable<AttributeResponse[]> {
     return this._fetchService.request(
       new HttpRequestOptions(
-        `${baseUrlAuthorities}/${authorityUuid}/raProfiles/attributes`,
+        `${baseUrlAuthorities}/${authorityUuid}/raProfile/attributes`,
         "GET"
       )
     );
@@ -97,7 +98,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   }
 
   updateRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     uuid: string,
     name: string,
     description: string,
@@ -105,11 +106,11 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   ): Observable<model.RaProfileDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-        caInstanceUuid,
+        authorityInstanceUuid,
         description,
         uuid,
         name: name,
-        attributes,
+        attributes: attributeSimplifier(attributes),
       })
     );
   }
