@@ -33,14 +33,14 @@ function RaProfileEdit() {
   const onCancel = useCallback(() => history.goBack(), [history]);
   const onSubmit = useCallback(
     (
-      caInstanceUuid: string,
+      authorityInstanceUuid: string,
       name: string,
       description: string,
       attributes: AttributeResponse[]
     ) => {
       setEditAction(
         actions.requestUpdateProfile(
-          caInstanceUuid,
+          authorityInstanceUuid,
           uuid,
           name,
           description,

@@ -328,8 +328,8 @@ export const dbData = {
       uuid: "26",
       name: "localhostProfile",
       description: "localhostProfile",
-      caInstanceName: "Name1",
-      caInstanceUuid: "19",
+      authorityInstanceName: "Name1",
+      authorityInstanceUuid: "19",
       attributes: [
         {
           id: "72498bd8-37f9-4fcb-86cb-d23570cf916f",
@@ -471,17 +471,17 @@ export const dbData = {
     {
       uuid: "23",
       name: "DEMO-PROFILE",
-      caInstanceName: "Name1",
+      authorityInstanceName: "Name1",
       description: "DEMO RA Profile",
-      caInstanceUuid: "18",
+      authorityInstanceUuid: "18",
       enabled: true,
     },
     {
       uuid: "24",
       name: "DEMO-RA-PROFILE2",
-      caInstanceName: "Name1",
+      authorityInstanceName: "Name1",
       description: "",
-      caInstanceUuid: "17",
+      authorityInstanceUuid: "17",
       enabled: false,
     },
   ],
@@ -1749,8 +1749,8 @@ export function createRaProfile(name: string, description: string): string {
     enabled: true,
     name: name,
     description,
-    caInstanceUuid: "21",
-    caInstanceName: "Name2",
+    authorityInstanceUuid: "21",
+    authorityInstanceName: "Name2",
   });
 
   return id;

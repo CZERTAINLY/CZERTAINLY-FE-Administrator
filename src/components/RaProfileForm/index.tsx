@@ -33,7 +33,7 @@ interface Props {
   isSubmitting?: boolean;
   onCancel: () => void;
   onSubmit: (
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     name: string,
     description: string,
     attributes: AttributeResponse[]
@@ -119,11 +119,11 @@ function RaProfileForm({
     dispatch(authorityActions.requestAuthoritiesList());
     if (editMode) {
       if (
-        typeof raProfile?.caInstanceUuid == "string" ||
-        typeof raProfile?.caInstanceUuid == "number"
+        typeof raProfile?.authorityInstanceUuid == "string" ||
+        typeof raProfile?.authorityInstanceUuid == "number"
       ) {
-        setAuthorityId(raProfile?.caInstanceUuid);
-        dispatch(actions.requestAttribute(raProfile?.caInstanceUuid));
+        setAuthorityId(raProfile?.authorityInstanceUuid);
+        dispatch(actions.requestAttribute(raProfile?.authorityInstanceUuid));
       }
     }
   }, [dispatch, raProfile, editMode]);
@@ -131,7 +131,9 @@ function RaProfileForm({
   useEffect(() => {
     if (authorities.length > 0) {
       for (let i of authorities) {
-        if (i?.uuid?.toString() === raProfile?.caInstanceUuid?.toString()) {
+        if (
+          i?.uuid?.toString() === raProfile?.authorityInstanceUuid?.toString()
+        ) {
           setCaAuthorityName(i.name);
         }
       }
@@ -146,7 +148,7 @@ function RaProfileForm({
   useEffect(() => {
     if (editMode && authorities.length > 0) {
       for (let i of authorities) {
-        if (i.uuid === raProfile?.caInstanceUuid) {
+        if (i.uuid === raProfile?.authorityInstanceUuid) {
           setConnectorUuid(i.connectorUuid);
         }
       }

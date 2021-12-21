@@ -19,13 +19,13 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   private _fetchService: FetchHttpService;
 
   createRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     name: string,
     description: string,
     attributes: AttributeResponse[]
   ): Observable<string> {
     return createNewResource(baseUrl, {
-      caInstanceUuid,
+      authorityInstanceUuid,
       name: name,
       description,
       attributes: attributeSimplifier(attributes),
@@ -83,7 +83,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   getAttributes(authorityUuid: string): Observable<AttributeResponse[]> {
     return this._fetchService.request(
       new HttpRequestOptions(
-        `${baseUrlAuthorities}/${authorityUuid}/raProfiles/attributes`,
+        `${baseUrlAuthorities}/${authorityUuid}/raProfile/attributes`,
         "GET"
       )
     );
@@ -98,7 +98,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   }
 
   updateRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     uuid: string,
     name: string,
     description: string,
@@ -106,7 +106,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   ): Observable<model.RaProfileDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-        caInstanceUuid,
+        authorityInstanceUuid,
         description,
         uuid,
         name: name,

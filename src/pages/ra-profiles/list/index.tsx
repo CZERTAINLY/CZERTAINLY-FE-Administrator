@@ -133,9 +133,9 @@ function RaProfileList() {
         lineBreak: true,
       };
       column["authority"] = {
-        content: profile.caInstanceName,
+        content: profile.authorityInstanceName,
         styledContent: (
-          <MDBBadge color="info">{profile.caInstanceName}</MDBBadge>
+          <MDBBadge color="info">{profile.authorityInstanceName}</MDBBadge>
         ),
         lineBreak: true,
       };

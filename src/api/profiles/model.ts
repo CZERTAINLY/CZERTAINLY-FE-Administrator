@@ -5,19 +5,19 @@ export interface RaProfileResponse {
   uuid: string;
   name: string;
   enabled: boolean;
-  caInstanceUuid: string;
+  authorityInstanceUuid: string;
   description: string;
-  caInstanceName: string;
+  authorityInstanceName: string;
 }
 
 export interface RaProfileDetailResponse {
   uuid: string;
   name: string;
   description?: string;
-  caInstanceUuid: string;
+  authorityInstanceUuid: string;
   attributes?: AttributeResponse[];
   enabled: boolean;
-  caInstanceName: string;
+  authorityInstanceName: string;
 }
 
 export interface RaProfileAuthorizationsReponse {
@@ -31,7 +31,7 @@ export interface EntityProfileResponse {
 
 export interface ProfilesManagementApi {
   createRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     name: string,
     description: string,
     attributes: AttributeResponse[]
@@ -49,7 +49,7 @@ export interface ProfilesManagementApi {
     uuid: string
   ): Observable<RaProfileAuthorizationsReponse[]>;
   updateRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     uuid: string,
     name: string,
     description: string,
