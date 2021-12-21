@@ -790,8 +790,8 @@ export const dbData = {
       functionGroups: [
         {
           id: 1,
-          name: "caConnector",
-          code: "caConnector",
+          name: "authorityProvider",
+          code: "authorityProvider",
           kinds: ["default", "T1", "t2", "t3", "t4"],
           endPoints: [
             {
@@ -1459,7 +1459,7 @@ export const dbData = {
     },
   ],
   allAttributeResponse: {
-    caConnector: {
+    authorityProvider: {
       ADCS: [
         {
           id: "93ca0ba2-3863-4ffa-a469-fd14ab3992bf",
@@ -1635,8 +1635,8 @@ export function connectConnector(
     {
       functionGroup: {
         id: 2,
-        name: "caConnector",
-        functionGroupCode: "caConnector",
+        name: "authorityProvider",
+        functionGroupCode: "authorityProvider",
         kinds: ["default"],
         endPoints: [
           {

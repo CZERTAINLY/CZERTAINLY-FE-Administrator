@@ -303,10 +303,11 @@ function ConnectorDetail() {
     for (let key of currentFunctionGroupDisplay?.endPoints || []) {
       let searchKey = "";
       if (
-        currentFunctionGroupDisplay?.functionGroupCode === "legacyCaConnector"
+        currentFunctionGroupDisplay?.functionGroupCode ===
+        "legacyAuthorityProvider"
       ) {
         if (
-          key.context.includes("caConnector") ||
+          key.context.includes("authorityProvider") ||
           key.context.includes(currentFunctionGroupDisplay?.functionGroupCode)
         ) {
           endPoints.push(

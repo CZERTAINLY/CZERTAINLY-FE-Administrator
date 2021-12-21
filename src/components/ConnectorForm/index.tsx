@@ -114,9 +114,9 @@ function ConnectorForm({
     let returnData: any = [];
     for (let key of endpoints) {
       let searchKey = "";
-      if (functionGroup?.functionGroupCode === "legacyCaConnector") {
+      if (functionGroup?.functionGroupCode === "legacyAuthorityProvider") {
         if (
-          key.context.includes("caConnector") ||
+          key.context.includes("authorityProvider") ||
           key.context.includes(functionGroup.functionGroupCode)
         ) {
           returnData.push(

@@ -118,8 +118,8 @@ function AuthorityForm({
         if (i.uuid === authority.connectorUuid) {
           for (let j of connectorDetails?.functionGroups || []) {
             if (
-              "caConnector" === j.functionGroupCode ||
-              "legacyCaConnector" === j.functionGroupCode
+              "authorityProvider" === j.functionGroupCode ||
+              "legacyAuthorityProvider" === j.functionGroupCode
             ) {
               dispatch(
                 actions.requestAuthorityProviderAttributeList(
@@ -202,8 +202,8 @@ function AuthorityForm({
     if (selectedKind !== "select") {
       for (let i of connectorDetails?.functionGroups || []) {
         if (
-          "caConnector" === i.functionGroupCode ||
-          "legacyCaConnector" === i.functionGroupCode
+          "authorityProvider" === i.functionGroupCode ||
+          "legacyAuthorityProvider" === i.functionGroupCode
         ) {
           dispatch(
             actions.requestAuthorityProviderAttributeList(
@@ -227,8 +227,8 @@ function AuthorityForm({
         setConnector(providerUuid);
         for (let j of i.functionGroups) {
           if (
-            j.functionGroupCode === "caConnector" ||
-            j.functionGroupCode === "legacyCaConnector"
+            j.functionGroupCode === "authorityProvider" ||
+            j.functionGroupCode === "legacyAuthorityProvider"
           ) {
             setAvailableKinds(j.kinds);
           }

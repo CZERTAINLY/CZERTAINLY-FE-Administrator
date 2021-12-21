@@ -47,7 +47,7 @@ export class AuthorityManagementBackend
     return this._fetchService.request(
       new HttpRequestOptions(
         `${baseUrlAuthorityProvider}?functionGroup=${encodeURIComponent(
-          "CA_CONNECTOR"
+          "AUTHORITY_PROVIDER"
         )}`,
         "GET"
       )
