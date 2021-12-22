@@ -1,4 +1,4 @@
-import { AttributeResponse, SimplifiedAttributes } from "models/attributes";
+import { SimplifiedAttributes } from "models/attributes";
 
 export function attributeSimplifier(attributes: any): SimplifiedAttributes[] {
   return attributes.map(function (attribute: any) {

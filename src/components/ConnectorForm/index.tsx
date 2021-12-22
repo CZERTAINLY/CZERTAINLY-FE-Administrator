@@ -74,13 +74,13 @@ function ConnectorForm({
 }: Props) {
   const submitCallback = useCallback(
     (values: FormValues) => {
-      onSubmit(values.uuid, values.name, values.url, "NONE", []);
+      onSubmit(values.uuid, values.name, values.url, "none", []);
     },
     [onSubmit]
   );
 
   const connectCallback = (values: FormValues) => {
-    onConnect(values.uuid, values.name, values.url, "NONE", []);
+    onConnect(values.uuid, values.name, values.url, "none", []);
   };
 
   const title = (
