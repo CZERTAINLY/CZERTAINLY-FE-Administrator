@@ -30,7 +30,7 @@ export interface AuthorityProviderResponse {
 }
 
 export interface AuthorityProviderAttributes {
-  id: string | number;
+  uuid: string | number;
   name: string;
   label: string;
   type: string;

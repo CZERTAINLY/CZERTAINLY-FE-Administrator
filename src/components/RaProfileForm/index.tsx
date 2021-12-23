@@ -171,7 +171,7 @@ function RaProfileForm({
     let updated = attributes.length !== 0 ? attributes : profileAttributes;
     let updateAttributes: AttributeResponse[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);
@@ -184,7 +184,7 @@ function RaProfileForm({
     let updated = attributes.length !== 0 ? attributes : editableAttributes;
     let updateAttributes: AttributeResponse[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);

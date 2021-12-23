@@ -303,7 +303,7 @@ function mapCredentialProviderAttributes(
 ): CredentialProviderAttributes {
   return {
     ...credentialProviderAttributes,
-    id: credentialProviderAttributes.id,
+    uuid: credentialProviderAttributes.uuid,
     name: credentialProviderAttributes.name.toString(),
     type: credentialProviderAttributes.type.toString(),
     required: credentialProviderAttributes.required,

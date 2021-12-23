@@ -147,7 +147,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
       map((authorityProviderAttributes) =>
         authorityProviderAttributes.map(
           ({
-            id,
+            uuid,
             name,
             label,
             type,
@@ -162,7 +162,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
             value,
             attributeCallback,
           }) => ({
-            id,
+            uuid,
             name,
             label,
             type,

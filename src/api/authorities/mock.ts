@@ -74,7 +74,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
       map((authorityProviderAttributes) =>
         authorityProviderAttributes.map(
           ({
-            id,
+            uuid,
             name,
             label,
             type,
@@ -88,7 +88,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
             dependsOn,
             value,
           }) => ({
-            id,
+            uuid,
             name,
             label,
             type,

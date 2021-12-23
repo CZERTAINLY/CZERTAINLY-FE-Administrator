@@ -198,7 +198,7 @@ function ClientDetail() {
               </thead>
               <tbody>
                 <tr>
-                  <td>ID</td>
+                  <td>UUID</td>
                   <td>{clientDetails?.uuid}</td>
                 </tr>
                 <tr>

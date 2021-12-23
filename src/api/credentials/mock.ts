@@ -62,7 +62,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
       map((credentialProviderAttributes) =>
         credentialProviderAttributes.map(
           ({
-            id,
+            uuid,
             name,
             type,
             label,
@@ -76,7 +76,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
             dependsOn,
             value,
           }) => ({
-            id,
+            uuid,
             name,
             type,
             label,

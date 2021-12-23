@@ -228,7 +228,7 @@ function RaProfileDetail() {
               </thead>
               <tbody>
                 <tr>
-                  <td>ID</td>
+                  <td>UUID</td>
                   <td>{profileDetails?.uuid}</td>
                 </tr>
                 <tr>
@@ -240,7 +240,7 @@ function RaProfileDetail() {
                   <td>{profileDetails?.description}</td>
                 </tr>
                 <tr>
-                  <td>Authority Instance Id</td>
+                  <td>Authority Instance UUID</td>
                   <td>
                     {profileDetails?.authorityInstanceUuid ||
                       "Authority not found"}

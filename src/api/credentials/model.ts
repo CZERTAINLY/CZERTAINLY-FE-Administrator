@@ -29,7 +29,7 @@ export interface CredentialProviderResponse {
 }
 
 export interface CredentialProviderAttributes {
-  id: string | number;
+  uuid: string | number;
   name: string;
   label: string;
   type: string;

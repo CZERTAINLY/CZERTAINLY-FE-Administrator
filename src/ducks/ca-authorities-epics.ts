@@ -345,7 +345,7 @@ function mapAuthorityProviderAttributes(
 ): AuthorityProviderAttributes {
   return {
     ...authorityProviderAttributes,
-    id: authorityProviderAttributes.id,
+    uuid: authorityProviderAttributes.uuid,
     name: authorityProviderAttributes.name.toString(),
     type: authorityProviderAttributes.type.toString(),
     required: authorityProviderAttributes.required,
