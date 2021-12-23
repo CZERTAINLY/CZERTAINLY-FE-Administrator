@@ -330,13 +330,13 @@ function ConnectorForm({
                           </tbody>
                         </Table>
                         <p>
-                          <b>Implemented Types</b>
+                          <b>Implemented Kinds</b>
                         </p>
-                        {name.functionGroup?.kinds?.map(function (types) {
+                        {name.functionGroup?.kinds?.map(function (kinds) {
                           return (
                             <div>
                               <Badge style={{ backgroundColor: "Bronze" }} pill>
-                                {types}
+                                {kinds}
                               </Badge>
                               &nbsp;
                             </div>

@@ -29,7 +29,7 @@ export class ConnectorManagementBackend
     authType: string,
     authAttributes: any
   ): Observable<string> {
-    if (authType === "NONE") {
+    if (authType === "none") {
       return createNewResource(baseUrl, {
         name,
         url,
@@ -56,7 +56,7 @@ export class ConnectorManagementBackend
     authAttributes: any,
     uuid: string
   ): Observable<model.ConnectorConnectionResponse[]> {
-    if (authType === "NONE") {
+    if (authType === "none") {
       return this._fetchService.request(
         new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
           uuid,
@@ -170,7 +170,7 @@ export class ConnectorManagementBackend
     authType: string,
     authAttributes: any
   ): Observable<string> {
-    if (authType === "NONE") {
+    if (authType === "none") {
       return this._fetchService.request(
         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
           name,

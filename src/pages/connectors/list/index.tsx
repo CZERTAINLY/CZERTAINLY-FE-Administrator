@@ -253,7 +253,7 @@ function ConnectorList() {
       width: "15%",
     },
     {
-      styledContent: <MDBColumnName columnName="Functional Groups & Types" />,
+      styledContent: <MDBColumnName columnName="Function Groups & Kinds" />,
       content: "functions",
       sort: false,
       id: "connectorFunctions",

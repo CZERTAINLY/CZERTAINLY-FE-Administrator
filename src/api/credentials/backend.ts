@@ -22,13 +22,13 @@ export class CredentialManagementBackend
 
   createNewCredential(
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<string> {
     return createNewResource(baseUrl, {
       name,
-      credentialType,
+      kind,
       connectorUuid,
       attributes: attributeSimplifier(attributes),
     }).pipe(
@@ -101,14 +101,14 @@ export class CredentialManagementBackend
   updateCredential(
     uuid: string,
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: number | string,
     attributes: any
   ): Observable<model.CredentialDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
         name,
-        credentialType,
+        kind,
         connectorUuid,
         attributes: attributeSimplifier(attributes),
       })

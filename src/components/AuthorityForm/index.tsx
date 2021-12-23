@@ -31,7 +31,7 @@ import { AuthorityDetails } from "models";
 
 export interface DefaultValues {
   name?: string;
-  authorityType?: string;
+  kind?: string;
   connectorUuid?: number | string;
   attributes?: any;
 }
@@ -42,7 +42,7 @@ interface FormValues {
   credential: any;
   status: string;
   attributes: any;
-  authorityType: string;
+  kind: string;
 }
 
 interface Props {
@@ -57,7 +57,7 @@ interface Props {
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ) => void;
 }
 
@@ -124,7 +124,7 @@ function AuthorityForm({
               dispatch(
                 actions.requestAuthorityProviderAttributeList(
                   connectorDetails?.uuid || "",
-                  authority.authorityType,
+                  authority.kind,
                   j.functionGroupCode
                 )
               );
@@ -157,7 +157,7 @@ function AuthorityForm({
       setConnectorId(existingAuthorityProviderId);
       setAttributes(defaultValues?.attributes);
       setCredential(credentialProviderId);
-      setKind(defaultValues?.authorityType);
+      setKind(defaultValues?.kind);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -346,7 +346,7 @@ function AuthorityForm({
               <Field name="authorityKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="authorityKind">Type</Label>
+                    <Label for="authorityKind">Kind</Label>
                     <Select
                       maxMenuHeight={140}
                       menuPlacement="auto"
@@ -369,7 +369,7 @@ function AuthorityForm({
               <Field name="connectorKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="connectorKind">Type</Label>
+                    <Label for="connectorKind">Connector Kind</Label>
                     <Select
                       maxMenuHeight={140}
                       options={availableKinds?.map(function (kind) {

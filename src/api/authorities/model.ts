@@ -7,7 +7,7 @@ export interface AuthorityInfoResponse {
   uuid: string;
   name: string;
   connectorUuid: string;
-  authorityType: string;
+  kind: string;
   connectorName: string;
 }
 
@@ -17,7 +17,7 @@ export interface AuthorityDetailResponse {
   attributes?: AttributeResponse[];
   connectorUuid: string;
   credential?: any;
-  authorityType: string;
+  kind: string;
   connectorName: string;
 }
 
@@ -52,7 +52,7 @@ export interface AuthorityManagementApi {
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<string>;
   getAuthoritiesList(): Observable<AuthorityInfoResponse[]>;
   getAuthorityDetail(uuid: string): Observable<AuthorityDetailResponse>;
@@ -75,6 +75,6 @@ export interface AuthorityManagementApi {
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<AuthorityDetailResponse>;
 }

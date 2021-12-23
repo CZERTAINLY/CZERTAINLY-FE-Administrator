@@ -118,7 +118,7 @@ export const actions = {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string,
+      kind: string,
       history: History<unknown>
     ) => ({
       name,
@@ -126,7 +126,7 @@ export const actions = {
       credential,
       status,
       attributes,
-      authorityType,
+      kind,
       history,
     })
   ),
@@ -147,7 +147,7 @@ export const actions = {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string,
+      kind: string,
       history: History<unknown>
     ) => ({
       uuid,
@@ -156,7 +156,7 @@ export const actions = {
       credential,
       status,
       attributes,
-      authorityType,
+      kind,
       history,
     })
   ),

@@ -41,7 +41,7 @@ function AuthorityEdit() {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string
+      kind: string
     ) => {
       setEditAction(
         actions.requestUpdateAuthority(
@@ -51,7 +51,7 @@ function AuthorityEdit() {
           credential,
           status,
           attributes,
-          authorityType,
+          kind,
           history
         )
       );

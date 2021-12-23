@@ -23,7 +23,7 @@ function AuthorityAdd() {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string
+      kind: string
     ) => {
       dispatch(
         actions.requestCreateAuthority(
@@ -32,7 +32,7 @@ function AuthorityAdd() {
           credential,
           status,
           attributes,
-          authorityType,
+          kind,
           history
         )
       );

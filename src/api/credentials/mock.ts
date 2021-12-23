@@ -10,15 +10,13 @@ import { ErrorDeleteObject } from "models";
 export class CredentialManagementMock implements model.CredentialManagementApi {
   createNewCredential(
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<string> {
     return of(null).pipe(
       delay(randomDelay()),
-      map(() =>
-        createCredential(name, credentialType, connectorUuid, attributes)
-      )
+      map(() => createCredential(name, kind, connectorUuid, attributes))
     );
   }
 
@@ -27,10 +25,10 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
       delay(randomDelay()),
       map((credentials) =>
         credentials.map(
-          ({ uuid, name, credentialType, connectorUuid, connectorName }) => ({
+          ({ uuid, name, kind, connectorUuid, connectorName }) => ({
             uuid,
             name,
-            credentialType,
+            kind,
             connectorUuid,
             connectorName,
           })
@@ -108,7 +106,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         if (detail) {
           return {
             uuid: detail.uuid,
-            credentialType: detail.credentialType,
+            kind: detail.kind,
             name: detail.name,
             attributes: detail.attributes,
             connectorUuid: detail.connectorUuid,
@@ -192,7 +190,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
   updateCredential(
     uuid: string,
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<model.CredentialDetailResponse> {

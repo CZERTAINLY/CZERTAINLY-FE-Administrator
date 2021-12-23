@@ -131,12 +131,12 @@ function CredentialDetail() {
               <td>{credentialDetails?.uuid}</td>
             </tr>
             <tr>
-              <td>Credential Name</td>
+              <td>Name</td>
               <td>{credentialDetails?.name}</td>
             </tr>
             <tr>
-              <td>Type</td>
-              <td>{credentialDetails?.credentialType}</td>
+              <td>Kind</td>
+              <td>{credentialDetails?.kind}</td>
             </tr>
             <tr>
               <td>Credential Provider Name</td>

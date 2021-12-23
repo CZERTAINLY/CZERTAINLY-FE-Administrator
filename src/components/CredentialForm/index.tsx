@@ -25,14 +25,14 @@ import { ConnectorInfoResponse } from "api/connectors";
 
 export interface DefaultValues {
   name?: string;
-  credentialType?: string;
+  kind?: string;
   connectorUuid?: string;
   attributes?: any;
 }
 
 interface FormValues {
   name: string;
-  credentialType: string;
+  kind: string;
   connectorUuid: string;
   attributes: any;
 }
@@ -44,7 +44,7 @@ interface Props {
   onCancel: () => void;
   onSubmit: (
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ) => void;
@@ -98,12 +98,12 @@ function CredentialForm({
       credentialProviders.length > 0
     ) {
       setConnector(connectorUuidCred);
-      setKind(defaultValues?.credentialType);
+      setKind(defaultValues?.kind);
       dispatch(
         actions.requestCredentialProviderAttributeList(
           connectorUuidCred,
           "credentialProvider",
-          defaultValues?.credentialType || ""
+          defaultValues?.kind || ""
         )
       );
     }
@@ -228,7 +228,7 @@ function CredentialForm({
       }
       onSubmit(
         values.name,
-        kind || values.credentialType,
+        kind || values.kind,
         connectorUuidSub || "",
         changedAttributes
       );
@@ -325,7 +325,7 @@ function CredentialForm({
               <Field name="connectorKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="connectorKind">Type</Label>
+                    <Label for="connectorKind">Kind</Label>
                     <Select
                       maxMenuHeight={140}
                       menuPlacement="auto"
@@ -348,7 +348,7 @@ function CredentialForm({
               <Field name="connectorKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="connectorKind">Type</Label>
+                    <Label for="connectorKind">Kind</Label>
                     <Select
                       maxMenuHeight={140}
                       menuPlacement="auto"

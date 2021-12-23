@@ -26,14 +26,14 @@ export class AuthorityManagementBackend
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<string> {
     return createNewResource(baseUrl, {
       name,
       connectorUuid,
       status,
       attributes: attributeSimplifier(attributes),
-      authorityType,
+      kind,
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -106,7 +106,7 @@ export class AuthorityManagementBackend
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<model.AuthorityDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
@@ -116,7 +116,7 @@ export class AuthorityManagementBackend
         credential,
         status,
         attributes: attributeSimplifier(attributes),
-        authorityType,
+        kind,
       })
     );
   }

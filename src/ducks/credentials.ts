@@ -158,11 +158,11 @@ export const actions = {
     Actions.CreateRequest,
     (
       name: string,
-      credentialType: string,
+      kind: string,
       connectorUuid: string,
       attributes: any,
       history: History<unknown>
-    ) => ({ name, credentialType, connectorUuid, attributes, history })
+    ) => ({ name, kind, connectorUuid, attributes, history })
   ),
   receiveCreateCredential: createCustomAction(
     Actions.CreateSuccess,
@@ -177,11 +177,11 @@ export const actions = {
     (
       uuid: string,
       name: string,
-      credentialType: string,
+      kind: string,
       connectorUuid: string,
       attributes: any,
       history: History<unknown>
-    ) => ({ uuid, name, credentialType, connectorUuid, attributes, history })
+    ) => ({ uuid, name, kind, connectorUuid, attributes, history })
   ),
   receiveUpdateCredential: createCustomAction(
     Actions.UpdateSuccess,
