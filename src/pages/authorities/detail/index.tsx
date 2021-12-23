@@ -128,12 +128,12 @@ function AuthorityDetail() {
               <td>{authorityDetails?.uuid}</td>
             </tr>
             <tr>
-              <td>Authority Name</td>
+              <td>Name</td>
               <td>{authorityDetails?.name}</td>
             </tr>
             <tr>
-              <td>Authority Type</td>
-              <td>{authorityDetails?.authorityType}</td>
+              <td>Kind</td>
+              <td>{authorityDetails?.kind}</td>
             </tr>
             <tr>
               <td>Authority Provider Id</td>

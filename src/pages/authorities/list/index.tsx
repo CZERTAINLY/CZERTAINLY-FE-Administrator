@@ -120,11 +120,9 @@ function AuthorityList() {
         ),
         lineBreak: true,
       };
-      column["authorityType"] = {
-        content: authority.authorityType,
-        styledContent: (
-          <MDBBadge color="secondary">{authority.authorityType}</MDBBadge>
-        ),
+      column["kind"] = {
+        content: authority.kind,
+        styledContent: <MDBBadge color="secondary">{authority.kind}</MDBBadge>,
         lineBreak: true,
       };
       rows.push({
@@ -152,8 +150,8 @@ function AuthorityList() {
       width: "10%",
     },
     {
-      styledContent: <MDBColumnName columnName="Authority Type" />,
-      content: "authorityType",
+      styledContent: <MDBColumnName columnName="Kind" />,
+      content: "kind",
       sort: false,
       id: "adminAuthorityType",
       width: "15%",

@@ -169,7 +169,7 @@ export const dbData = {
       uuid: "3",
       name: "ejbca-client-cert",
       connectorName: "Name1",
-      credentialType: "certificate",
+      kind: "certificate",
       attributes: [
         {
           id: "f369cc23-f7cf-4027-8598-9f9453c25ce5",
@@ -1294,7 +1294,7 @@ export const dbData = {
       name: "ejbca-ca-instance1",
       connectorUuid: "2",
       connectorName: "Name1",
-      authorityType: "default",
+      kind: "default",
       attributes: [
         {
           id: "hashgdh",
@@ -1491,7 +1491,7 @@ export const dbData = {
         },
         {
           id: "d9f79ba6-47e5-437b-a7bc-82dbafa9cf02",
-          name: "credentialType",
+          name: "kind",
           type: "STRING",
           label: "Credential Type",
           required: true,
@@ -1668,7 +1668,7 @@ export function connectConnector(
 
 export function createCredential(
   name: string,
-  credentialType: string,
+  kind: string,
   connectorUuid: string,
   attributes: any
 ): string {
@@ -1679,7 +1679,7 @@ export function createCredential(
   const id = idSegments.join("");
   dbData.credentials.push({
     uuid: "12",
-    credentialType: credentialType,
+    kind: kind,
     name: name,
     attributes: [],
     connectorUuid: "1212",
@@ -1694,7 +1694,7 @@ export function createAuthority(
   credentialUuid: string,
   status: string,
   connectorUuid: string,
-  authorityType: string
+  kind: string
 ): string {
   const idSegments = [];
   for (let i = 0; i < 8; ++i) {
@@ -1707,7 +1707,7 @@ export function createAuthority(
     name: name,
     connectorUuid: "59",
     attributes: [],
-    authorityType: authorityType,
+    kind: kind,
     credential: { attributes: [] },
     connectorName: "Name2",
   });

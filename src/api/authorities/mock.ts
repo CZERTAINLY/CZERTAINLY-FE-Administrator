@@ -14,7 +14,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<string> {
     return of(null).pipe(
       delay(randomDelay()),
@@ -25,7 +25,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
           credential,
           status,
           connectorUuid,
-          authorityType
+          kind
         )
       )
     );
@@ -36,11 +36,11 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
       delay(randomDelay()),
       map((authorities) =>
         authorities.map(
-          ({ uuid, name, connectorUuid, authorityType, connectorName }) => ({
+          ({ uuid, name, connectorUuid, kind, connectorName }) => ({
             uuid,
             name,
             connectorUuid,
-            authorityType,
+            kind,
             connectorName,
           })
         )
@@ -120,7 +120,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
             connectorUuid: detail.connectorUuid,
             attributes: detail.attributes,
             credential: detail.credential,
-            authorityType: detail.authorityType,
+            kind: detail.kind,
             connectorName: detail.connectorName,
           };
         }
@@ -202,7 +202,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
     uuid: string,
     connectorUuid: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<model.AuthorityDetailResponse> {
     return of(
       dbData.authorities.findIndex((c) => c.uuid.toString() === uuid.toString())

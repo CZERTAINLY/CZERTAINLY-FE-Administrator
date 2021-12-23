@@ -17,16 +17,11 @@ function CredentialAdd() {
 
   const onCancel = useCallback(() => history.goBack(), [history]);
   const onSubmit = useCallback(
-    (
-      name: string,
-      credentialType: string,
-      connectorUuid: string,
-      attributes: any
-    ) => {
+    (name: string, kind: string, connectorUuid: string, attributes: any) => {
       dispatch(
         actions.requestCreateCredential(
           name,
-          credentialType,
+          kind,
           connectorUuid,
           attributes,
           history
