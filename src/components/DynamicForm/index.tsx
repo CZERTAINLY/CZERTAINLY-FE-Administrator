@@ -258,7 +258,7 @@ function DynamicForm({
             placeholder="Select"
             menuPlacement="auto"
             onChange={(event) => onValueChange(event, field)}
-            key={field.id}
+            key={field.uuid}
             isMulti={field.multiValue}
             defaultValue={editMode ? defaultSelectValue : null}
           />
@@ -266,7 +266,7 @@ function DynamicForm({
       } else if (fieldTypeTransform[field.type] === "checkbox") {
         inputField = (
           <Input
-            key={field.id}
+            key={field.uuid}
             type={(fieldTypeTransform[field.type] || field.type) as InputType}
             placeholder={field.description}
             name={field.name.toString()}
@@ -279,7 +279,7 @@ function DynamicForm({
       } else {
         inputField = (
           <Input
-            key={field.id}
+            key={field.uuid}
             type={(fieldTypeTransform[field.type] || field.type) as InputType}
             placeholder={field.description}
             name={field.name.toString()}

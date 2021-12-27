@@ -47,7 +47,7 @@ export interface ConnectorConnectionResponse {
 }
 
 export interface ConnectorAttributes {
-  id: string | number;
+  uuid: string | number;
   name: string;
   type: string;
   label: string;

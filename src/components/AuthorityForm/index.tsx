@@ -175,7 +175,7 @@ function AuthorityForm({
         : JSON.parse(JSON.stringify(authorityProviderAttributes));
     let updatedAttributes: AuthorityProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updatedAttributes.push(formAttributes);
       } else {
         updatedAttributes.push(i);
@@ -188,7 +188,7 @@ function AuthorityForm({
     let updated = attributes.length !== 0 ? attributes : editableAttributes;
     let updateAttributes: AuthorityProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);

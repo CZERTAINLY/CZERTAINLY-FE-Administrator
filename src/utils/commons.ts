@@ -29,12 +29,12 @@ export function attributeCombiner(
   let noFillType = ["SECRET", "FILE"];
   let editAttributes: AttributeResponse[] = [];
   let attribIds = attribute.map(function (name: AttributeResponse) {
-    return name.id;
+    return name.uuid;
   });
   for (let connAttrib of connectorAttributes) {
-    if (attribIds.includes(connAttrib.id)) {
+    if (attribIds.includes(connAttrib.uuid)) {
       for (let attrib of attribute) {
-        if (attrib.id === connAttrib.id) {
+        if (attrib.uuid === connAttrib.uuid) {
           if (!noFillType.includes(attrib.type)) {
             if (attrib.value !== connAttrib.value) {
               if (

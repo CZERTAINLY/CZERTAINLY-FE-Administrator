@@ -179,7 +179,7 @@ function AuditLogs() {
       <Widget title={auditLogsTitle}>
         <Table className={cx("table-hover", styles.logsTable)} size="sm">
           <SortTableHeader onSortChange={onSortChange}>
-            <SortColumnHeader id="id" text={lineBreakFormatter("ID")} />
+            <SortColumnHeader id="id" text={lineBreakFormatter("UUID")} />
             <SortColumnHeader id="author" text={lineBreakFormatter("Author")} />
             <SortColumnHeader
               id="created"

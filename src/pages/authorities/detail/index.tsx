@@ -124,7 +124,7 @@ function AuthorityDetail() {
           </thead>
           <tbody>
             <tr>
-              <td>ID</td>
+              <td>UUID</td>
               <td>{authorityDetails?.uuid}</td>
             </tr>
             <tr>
@@ -136,7 +136,7 @@ function AuthorityDetail() {
               <td>{authorityDetails?.kind}</td>
             </tr>
             <tr>
-              <td>Authority Provider Id</td>
+              <td>Authority Provider UUID</td>
               <td>
                 {authorityDetails?.connectorUuid || "Connector Not Found"}
               </td>

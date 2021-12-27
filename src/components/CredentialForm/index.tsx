@@ -125,7 +125,7 @@ function CredentialForm({
         : JSON.parse(JSON.stringify(credentialProviderAttributes));
     let updateAttributes: CredentialProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);
@@ -141,7 +141,7 @@ function CredentialForm({
         : JSON.parse(JSON.stringify(editableAttributes));
     let updateAttributes: CredentialProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);

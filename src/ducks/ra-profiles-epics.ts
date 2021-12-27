@@ -367,7 +367,7 @@ const getAttributes: Epic<Action, Action, AppState, EpicDependencies> = (
 function mapAttributes(attributes: AttributeResponse): AttributeResponse {
   return {
     ...attributes,
-    id: attributes.id,
+    uuid: attributes.uuid,
     name: attributes.name.toString(),
     type: attributes.type.toString(),
     required: attributes.required,

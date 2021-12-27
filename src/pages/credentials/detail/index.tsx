@@ -127,7 +127,7 @@ function CredentialDetail() {
           </thead>
           <tbody>
             <tr>
-              <td>ID</td>
+              <td>UUID</td>
               <td>{credentialDetails?.uuid}</td>
             </tr>
             <tr>
@@ -153,7 +153,7 @@ function CredentialDetail() {
               </td>
             </tr>
             <tr>
-              <td>Credential Provider Id</td>
+              <td>Credential Provider UUID</td>
               <td>
                 {credentialDetails?.connectorUuid || "Connector Not Found"}
               </td>
