@@ -1,6 +1,6 @@
 export enum Role {
-  Admin = 'ADMINISTRATOR',
-  SuperAdmin = 'SUPERADMINISTRATOR',
+  Admin = "administrator",
+  SuperAdmin = "superAdministrator",
 }
 
 export interface Profile {
