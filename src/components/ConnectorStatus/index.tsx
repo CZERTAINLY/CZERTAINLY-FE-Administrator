@@ -9,17 +9,15 @@ function InventoryStatusBadge({ status }: Props) {
   switch (status) {
     case "Success":
       return <MDBBadge color="success">{status}</MDBBadge>;
-    case "REGISTERED":
+    case "registered":
       return <MDBBadge color="success">Registered</MDBBadge>;
-    case "CONNECTED":
+    case "connected":
       return <MDBBadge color="success">Connected</MDBBadge>;
-    case "FAILED":
+    case "failed":
       return <MDBBadge color="danger">Failed</MDBBadge>;
-    case "Failed":
-      return <MDBBadge color="danger">Failed</MDBBadge>;
-    case "OFFLINE":
+    case "offline":
       return <MDBBadge color="danger">Offline</MDBBadge>;
-    case "WAITING_FOR_APPROVAL":
+    case "waitingForApproval":
       return <MDBBadge color="warning">Awaiting Authorization</MDBBadge>;
     default:
       return <MDBBadge color="dark">{status || "Unknown"}</MDBBadge>;

@@ -105,7 +105,7 @@ function DynamicForm({
                 isCallback = false;
                 break;
               }
-              if (target === "PATH_VARIABLE") {
+              if (target === "pathVariable") {
                 if (typeof valueMapFull.get(mapping.from || "") === "string") {
                   pathVariables[mapping.to] =
                     mapping.value || valueMapFull.get(mapping.from || "");
@@ -114,11 +114,11 @@ function DynamicForm({
                     mapping.value || valueMapFull.get(mapping.from || "").id;
                 }
               }
-              if (target === "REQUEST_PARAMETER") {
+              if (target === "requestParameter") {
                 queryParameters[mapping.to] =
                   mapping.value || valueMapFull.get(mapping.from || "");
               }
-              if (target === "BODY") {
+              if (target === "body") {
                 requestBody[mapping.to] =
                   mapping.value || valueMapFull.get(mapping.from || "");
               }

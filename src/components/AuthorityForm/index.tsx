@@ -319,23 +319,13 @@ function AuthorityForm({
                   <FormGroup>
                     <Label for="connectorUuid">Authority Provider</Label>
 
-                    <Select
-                      maxMenuHeight={140}
-                      options={authorityProviders?.map(function (provider) {
-                        return {
-                          label: provider.name,
-                          value: provider.uuid,
-                        };
-                      })}
-                      menuPlacement="auto"
-                      value={{
-                        label: connectorDetails?.name,
-                        value: connectorDetails?.uuid,
-                      }}
-                      placeholder="Select Authority Provider"
-                      onChange={(event) =>
-                        fetchAvailableKinds(event?.value?.toString() || "")
-                      }
+                    <Input
+                      value={connectorDetails?.name}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Authority Provider Name"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}
@@ -370,23 +360,13 @@ function AuthorityForm({
                 {({ input, meta }) => (
                   <FormGroup>
                     <Label for="connectorKind">Connector Kind</Label>
-                    <Select
-                      maxMenuHeight={140}
-                      options={availableKinds?.map(function (kind) {
-                        return {
-                          label: kind,
-                          value: kind,
-                        };
-                      })}
-                      menuPlacement="auto"
-                      placeholder="Select Kind"
-                      value={{
-                        label: kind,
-                        value: kind,
-                      }}
-                      onChange={(event) =>
-                        fetchAttributes(event?.value?.toString() || "default")
-                      }
+                    <Input
+                      value={kind}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Authority Kind"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}

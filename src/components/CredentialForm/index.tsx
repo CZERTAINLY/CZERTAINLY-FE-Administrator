@@ -302,20 +302,13 @@ function CredentialForm({
                 {({ input, meta }) => (
                   <FormGroup>
                     <Label for="connectorUuid">Credential Provider</Label>
-                    <Select
-                      maxMenuHeight={140}
-                      menuPlacement="auto"
-                      options={credentialProviders?.map(function (provider) {
-                        return {
-                          label: provider.name,
-                          value: provider.uuid,
-                        };
-                      })}
-                      value={providerDefault}
-                      placeholder="Select Authority Provider"
-                      onChange={(event) =>
-                        fetchAvailableKinds(event?.value?.toString() || "")
-                      }
+                    <Input
+                      value={connectorDetails?.name}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Credential Name"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}
@@ -349,23 +342,13 @@ function CredentialForm({
                 {({ input, meta }) => (
                   <FormGroup>
                     <Label for="connectorKind">Kind</Label>
-                    <Select
-                      maxMenuHeight={140}
-                      menuPlacement="auto"
-                      options={availableKinds?.map(function (kind) {
-                        return {
-                          label: kind,
-                          value: kind,
-                        };
-                      })}
-                      placeholder="Select Kind"
-                      value={{
-                        label: kind,
-                        value: kind,
-                      }}
-                      onChange={(event) =>
-                        fetchAttributes(event?.value?.toString() || "default")
-                      }
+                    <Input
+                      value={kind}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Credential Kind"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}

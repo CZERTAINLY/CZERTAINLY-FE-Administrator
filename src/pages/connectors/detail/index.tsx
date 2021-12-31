@@ -211,7 +211,7 @@ function ConnectorDetail() {
   );
 
   const healthCheckTitle = () => {
-    if (["UP", "OK", "HEALTHY"].includes(selectConnectorHealth["status"])) {
+    if (["up", "ok", "healthy"].includes(selectConnectorHealth["status"])) {
       return (
         <div>
           <h5>
@@ -226,7 +226,7 @@ function ConnectorDetail() {
         </div>
       );
     } else if (
-      ["DOWN", "FAILED", "NOTOK", "NOK"].includes(
+      ["down", "failed", "notOk", "nok", "nOk"].includes(
         selectConnectorHealth["status"]
       )
     ) {
