@@ -74,6 +74,7 @@ function CredentialForm({
   const [kind, setKind] = useState<string>();
   const [connectorDetails, setConnectorDetails] =
     useState<ConnectorInfoResponse>();
+  // eslint-disable-next-line
   const [providerDefault, setProviderDefault]: any = useState();
 
   useEffect(() => {

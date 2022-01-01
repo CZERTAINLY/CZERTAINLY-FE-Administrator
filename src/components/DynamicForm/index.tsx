@@ -187,7 +187,11 @@ function DynamicForm({
     } else if (e.target?.type === "checkbox") {
       field["value"] = e.target?.checked;
     } else {
-      field["value"] = e.target?.value || e.value;
+      if (fieldTypeTransform[field.type] === "number") {
+        field["value"] = Number(e.target?.value || e.value);
+      } else {
+        field["value"] = e.target?.value || e.value;
+      }
     }
     let updValueMap = valueMapFull;
     updValueMap.set(field["name"], field["value"]);
