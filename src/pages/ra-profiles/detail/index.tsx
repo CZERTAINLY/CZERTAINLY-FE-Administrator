@@ -52,6 +52,7 @@ function RaProfileDetail() {
 
   const allowedAttributeTypeForDetail = [
     "STRING",
+    "NUMBER",
     "DROPDOWN",
     "LIST",
     "BOOLEAN",

@@ -28,6 +28,7 @@ function AuthorityDetail() {
   const uuid = (params as any).id as string;
   const allowedAttributeTypeForDetail = [
     "STRING",
+    "NUMBER",
     "DROPDOWN",
     "LIST",
     "BOOLEAN",
