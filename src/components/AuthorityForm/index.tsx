@@ -86,6 +86,7 @@ function AuthorityForm({
   const [credential, setCredential]: any = useState(null);
   const [availableKinds, setAvailableKinds] = useState<string[]>();
   const [kind, setKind] = useState<string>();
+  const [functionGroup, setFunctiongroup] = useState<string>();
   const [connectorDetails, setConnectorDetails] =
     useState<ConnectorInfoResponse>();
   const callbackResponse = useSelector(callbackSelectors.callbackResponse);
@@ -128,6 +129,7 @@ function AuthorityForm({
                   j.functionGroupCode
                 )
               );
+              setFunctiongroup(j.functionGroupCode);
             }
           }
         }
@@ -212,6 +214,7 @@ function AuthorityForm({
               i.functionGroupCode
             )
           );
+          setFunctiongroup(i.functionGroupCode);
         }
       }
 
@@ -385,6 +388,8 @@ function AuthorityForm({
                 connectorUuid={connectorUuid}
                 callbackSelector={callbackResponse}
                 setPassAttribute={setPassAttributes}
+                functionGroup={functionGroup || ""}
+                kind={kind}
               />
             ) : null}
             {editMode && kind ? (
@@ -396,6 +401,8 @@ function AuthorityForm({
                 callbackSelector={callbackResponse}
                 setPassAttribute={setPassEditAttributes}
                 editMode={true}
+                kind={kind}
+                functionGroup={functionGroup || ""}
               />
             ) : null}
             <div className="d-flex justify-content-end">

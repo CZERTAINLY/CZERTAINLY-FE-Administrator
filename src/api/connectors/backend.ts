@@ -13,6 +13,7 @@ import { createNewResource } from "utils/net";
 import * as model from "./model";
 
 const baseUrl = "/api/v1/connectors";
+const baseUrlCallback = "/api/v1";
 
 export class ConnectorManagementBackend
   implements model.ConnectorManagementApi
@@ -190,13 +191,29 @@ export class ConnectorManagementBackend
     }
   }
 
-  getCallback(connectorUuid: string, request: any): Observable<any> {
-    return this._fetchService.request(
-      new HttpRequestOptions(
-        `${baseUrl}/${connectorUuid}/callback`,
-        "POST",
-        request
-      )
-    );
+  getCallback(
+    connectorUuid: string,
+    request: any,
+    functionGroup: string,
+    kind: string,
+    authorityUuid: string
+  ): Observable<any> {
+    if (authorityUuid) {
+      return this._fetchService.request(
+        new HttpRequestOptions(
+          `${baseUrlCallback}/${authorityUuid}/callback`,
+          "POST",
+          request
+        )
+      );
+    } else {
+      return this._fetchService.request(
+        new HttpRequestOptions(
+          `${baseUrl}/${connectorUuid}/${functionGroup}/${kind}/callback`,
+          "POST",
+          request
+        )
+      );
+    }
   }
 }

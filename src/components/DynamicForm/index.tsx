@@ -21,6 +21,9 @@ interface Props {
   actions?: any;
   connectorUuid?: string;
   setPassAttribute?: any;
+  functionGroup?: string;
+  kind?: string;
+  authorityUuid?: string;
 }
 
 function DynamicForm({
@@ -31,6 +34,9 @@ function DynamicForm({
   actions,
   connectorUuid,
   setPassAttribute,
+  functionGroup = "",
+  kind = "",
+  authorityUuid = "",
 }: Props) {
   const [valueMap, setValueMap] = useState(new Map<string, any>());
   const [valueMapFull, setValueMapFull] = useState(new Map<string, any>());
@@ -80,9 +86,14 @@ function DynamicForm({
       if (fieldName === i.name) {
         start = true;
       }
-      if (i.attributeCallback !== undefined && start && fieldName !== i.name) {
+      if (
+        i.attributeCallback !== undefined &&
+        i.attributeCallback &&
+        start &&
+        fieldName !== i.name
+      ) {
         let isCallback = true;
-        for (let key of Object.keys(i.attributeCallback.mappings)) {
+        for (let key of Object.keys(i.attributeCallback?.mappings || [])) {
           if (Array.isArray(valueMapFull.get(key))) {
             isCallback = false;
           }
@@ -96,7 +107,7 @@ function DynamicForm({
             any
           >();
 
-          for (let mapping of i.attributeCallback.mappings) {
+          for (let mapping of i.attributeCallback?.mappings || []) {
             for (let target of mapping.targets) {
               if (
                 valueMapFull.get(mapping.from || "") === undefined &&
@@ -129,8 +140,24 @@ function DynamicForm({
             updatedCallback.pathVariables = pathVariables;
             updatedCallback.queryParameters = queryParameters;
             updatedCallback.requestBody = requestBody;
+
+            let requestCallback = JSON.parse(JSON.stringify(updatedCallback));
             setCallbackField(i.name);
-            dispatch(actions.requestCallback(connectorUuid, updatedCallback));
+            requestCallback.name = i.name;
+            requestCallback.uuid = i.uuid;
+            requestCallback.mappings = undefined;
+            requestCallback.callbackMethod = undefined;
+            requestCallback.callbackContext = undefined;
+
+            dispatch(
+              actions.requestCallback(
+                connectorUuid,
+                requestCallback,
+                functionGroup,
+                kind,
+                authorityUuid
+              )
+            );
             return updatedCallback;
           }
           return null;

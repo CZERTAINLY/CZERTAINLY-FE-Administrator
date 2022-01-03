@@ -268,6 +268,7 @@ function RaProfileForm({
               connectorUuid={connectorUuid}
               callbackSelector={callbackResponse}
               setPassAttribute={setPassAttributes}
+              authorityUuid={authorityUuid}
             />
           ) : (
             <DynamicForm
@@ -282,6 +283,7 @@ function RaProfileForm({
               connectorUuid={connectorUuid}
               callbackSelector={callbackResponse}
               setPassAttribute={setPassEditAttributes}
+              authorityUuid={authorityUuid}
             />
           )}
         </Col>

@@ -363,6 +363,8 @@ function CredentialForm({
                     : []
                 }
                 attributeFunction={updateAttributes}
+                kind=""
+                functionGroup=""
               />
             ) : null}
             {editMode && kind ? (
@@ -370,6 +372,8 @@ function CredentialForm({
                 fieldInfo={JSON.parse(JSON.stringify(editableAttributes))}
                 attributeFunction={updateAttributesEdit}
                 editMode={true}
+                kind=""
+                functionGroup=""
               />
             ) : null}
             <div className="d-flex justify-content-end">
