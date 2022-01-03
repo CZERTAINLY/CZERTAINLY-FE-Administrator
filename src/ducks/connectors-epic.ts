@@ -374,17 +374,26 @@ const getCallback: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.CallbackRequest)),
-    switchMap(({ connectorUuid, request }) =>
-      apiClients.connectors.getCallback(connectorUuid, request).pipe(
-        map((response) => actions.receiveCallback(response)),
-        catchError((err) =>
-          of(
-            actions.failCallback(
-              extractError(err, "Failed to retrieve callback response")
+    switchMap(
+      ({ connectorUuid, request, functionGroup, kind, authorityUuid }) =>
+        apiClients.connectors
+          .getCallback(
+            connectorUuid,
+            request,
+            functionGroup,
+            kind,
+            authorityUuid
+          )
+          .pipe(
+            map((response) => actions.receiveCallback(response)),
+            catchError((err) =>
+              of(
+                actions.failCallback(
+                  extractError(err, "Failed to retrieve callback response")
+                )
+              )
             )
           )
-        )
-      )
     )
   );
 

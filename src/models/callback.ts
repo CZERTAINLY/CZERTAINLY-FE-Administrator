@@ -19,9 +19,12 @@ export interface CallbackQueryParameterDict {
 }
 
 export interface AttributeCallback {
-  callbackMethod: string;
-  mappings: CallbackMapping[];
+  callbackMethod?: string;
+  callbackContext?: string;
+  mappings?: CallbackMapping[];
   pathVariables?: CallbackPathVariableDict;
   queryParameters?: CallbackQueryParameterDict;
   requestBody?: CallbackRequestBodyDict;
+  name?: string;
+  uuid?: string | number;
 }

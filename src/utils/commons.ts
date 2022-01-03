@@ -35,6 +35,15 @@ export function attributeCombiner(
     if (attribIds.includes(connAttrib.uuid)) {
       for (let attrib of attribute) {
         if (attrib.uuid === connAttrib.uuid) {
+          attrib.required = connAttrib.required;
+          attrib.attributeCallback = connAttrib.attributeCallback;
+          attrib.dependsOn = connAttrib.dependsOn;
+          attrib.description = connAttrib.description;
+          attrib.editable = connAttrib.editable;
+          attrib.multiValue = connAttrib.multiValue;
+          attrib.readOnly = connAttrib.readOnly;
+          attrib.validationRegex = connAttrib.validationRegex;
+          attrib.visible = connAttrib.visible;
           if (!noFillType.includes(attrib.type)) {
             if (attrib.value !== connAttrib.value) {
               if (

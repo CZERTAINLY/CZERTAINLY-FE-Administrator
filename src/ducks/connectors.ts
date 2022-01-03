@@ -314,9 +314,18 @@ export const actions = {
 
   requestCallback: createCustomAction(
     Actions.CallbackRequest,
-    (connectorUuid: string, request: any) => ({
+    (
+      connectorUuid: string,
+      request: any,
+      functionGroup: string,
+      kind: string,
+      authorityUuid: string
+    ) => ({
       connectorUuid,
       request,
+      functionGroup,
+      kind,
+      authorityUuid,
     })
   ),
   receiveCallback: createCustomAction(

@@ -105,5 +105,11 @@ export interface ConnectorManagementApi {
     kinds: string
   ): Observable<ConnectorAttributes[]>;
   getConnectorAllAttributes(uuid: string): Observable<AllAttributeResponse>;
-  getCallback(connectorUuid: string, request: any): Observable<any>;
+  getCallback(
+    connectorUuid: string,
+    request: any,
+    functionGroup: string,
+    kind: string,
+    authorityUuid: string
+  ): Observable<any>;
 }
