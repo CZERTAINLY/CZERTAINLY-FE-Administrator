@@ -120,10 +120,8 @@ function CredentialList() {
         lineBreak: true,
       };
       column["type"] = {
-        content: credential.credentialType,
-        styledContent: (
-          <MDBBadge color="primary">{credential.credentialType}</MDBBadge>
-        ),
+        content: credential.kind,
+        styledContent: <MDBBadge color="primary">{credential.kind}</MDBBadge>,
         lineBreak: true,
       };
       column["credentialProvider"] = {
@@ -152,10 +150,10 @@ function CredentialList() {
       width: "15%",
     },
     {
-      styledContent: <MDBColumnName columnName="Credential Type" />,
+      styledContent: <MDBColumnName columnName="Kind" />,
       content: "type",
       sort: false,
-      id: "credentialType",
+      id: "kind",
       width: "20%",
     },
     {

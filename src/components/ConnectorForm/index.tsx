@@ -49,8 +49,6 @@ interface Props {
     uuid: string,
     name: string,
     url: string,
-    status: string,
-    functionGroups: any,
     authType: string,
     authAttributes: any
   ) => void;
@@ -74,31 +72,15 @@ function ConnectorForm({
   onSubmit,
   onConnect,
 }: Props) {
-  const getConnectorFunctionGroups = useCallback((): any => {
-    let functionGroup: any = [];
-    for (let i of connectionDetails) {
-      functionGroup.push(i.functionGroup);
-    }
-    return functionGroup;
-  }, [connectionDetails]);
-
   const submitCallback = useCallback(
     (values: FormValues) => {
-      onSubmit(
-        values.uuid,
-        values.name,
-        values.url,
-        "CONNECTED",
-        getConnectorFunctionGroups(),
-        "NONE",
-        []
-      );
+      onSubmit(values.uuid, values.name, values.url, "none", []);
     },
-    [onSubmit, getConnectorFunctionGroups]
+    [onSubmit]
   );
 
   const connectCallback = (values: FormValues) => {
-    onConnect(values.uuid, values.name, values.url, "NONE", []);
+    onConnect(values.uuid, values.name, values.url, "none", []);
   };
 
   const title = (
@@ -132,9 +114,9 @@ function ConnectorForm({
     let returnData: any = [];
     for (let key of endpoints) {
       let searchKey = "";
-      if (functionGroup?.functionGroupCode === "legacyCaConnector") {
+      if (functionGroup?.functionGroupCode === "legacyAuthorityProvider") {
         if (
-          key.context.includes("caConnector") ||
+          key.context.includes("authorityProvider") ||
           key.context.includes(functionGroup.functionGroupCode)
         ) {
           returnData.push(
@@ -342,19 +324,19 @@ function ConnectorForm({
                           </thead>
                           <tbody>
                             {getEndPointInfo(
-                              name.endpoints,
+                              name.functionGroup?.endPoints,
                               name.functionGroup
                             )}
                           </tbody>
                         </Table>
                         <p>
-                          <b>Implemented Types</b>
+                          <b>Implemented Kinds</b>
                         </p>
-                        {name.functionGroup?.kinds?.map(function (types) {
+                        {name.functionGroup?.kinds?.map(function (kinds) {
                           return (
                             <div>
                               <Badge style={{ backgroundColor: "Bronze" }} pill>
-                                {types}
+                                {kinds}
                               </Badge>
                               &nbsp;
                             </div>

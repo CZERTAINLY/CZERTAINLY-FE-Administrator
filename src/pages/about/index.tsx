@@ -15,7 +15,6 @@ function About() {
       >
         <p>CZERTAINLY for certificate management and automation.</p>
         <ul>
-          <li>Version: 2.0.0</li>
           <li>
             Developer:{" "}
             <a

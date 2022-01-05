@@ -21,6 +21,9 @@ interface Props {
   actions?: any;
   connectorUuid?: string;
   setPassAttribute?: any;
+  functionGroup?: string;
+  kind?: string;
+  authorityUuid?: string;
 }
 
 function DynamicForm({
@@ -31,6 +34,9 @@ function DynamicForm({
   actions,
   connectorUuid,
   setPassAttribute,
+  functionGroup = "",
+  kind = "",
+  authorityUuid = "",
 }: Props) {
   const [valueMap, setValueMap] = useState(new Map<string, any>());
   const [valueMapFull, setValueMapFull] = useState(new Map<string, any>());
@@ -80,9 +86,14 @@ function DynamicForm({
       if (fieldName === i.name) {
         start = true;
       }
-      if (i.attributeCallback !== undefined && start && fieldName !== i.name) {
+      if (
+        i.attributeCallback !== undefined &&
+        i.attributeCallback &&
+        start &&
+        fieldName !== i.name
+      ) {
         let isCallback = true;
-        for (let key of Object.keys(i.attributeCallback.mappings)) {
+        for (let key of Object.keys(i.attributeCallback?.mappings || [])) {
           if (Array.isArray(valueMapFull.get(key))) {
             isCallback = false;
           }
@@ -96,7 +107,7 @@ function DynamicForm({
             any
           >();
 
-          for (let mapping of i.attributeCallback.mappings) {
+          for (let mapping of i.attributeCallback?.mappings || []) {
             for (let target of mapping.targets) {
               if (
                 valueMapFull.get(mapping.from || "") === undefined &&
@@ -105,7 +116,7 @@ function DynamicForm({
                 isCallback = false;
                 break;
               }
-              if (target === "PATH_VARIABLE") {
+              if (target === "pathVariable") {
                 if (typeof valueMapFull.get(mapping.from || "") === "string") {
                   pathVariables[mapping.to] =
                     mapping.value || valueMapFull.get(mapping.from || "");
@@ -114,11 +125,11 @@ function DynamicForm({
                     mapping.value || valueMapFull.get(mapping.from || "").id;
                 }
               }
-              if (target === "REQUEST_PARAMETER") {
+              if (target === "requestParameter") {
                 queryParameters[mapping.to] =
                   mapping.value || valueMapFull.get(mapping.from || "");
               }
-              if (target === "BODY") {
+              if (target === "body") {
                 requestBody[mapping.to] =
                   mapping.value || valueMapFull.get(mapping.from || "");
               }
@@ -129,8 +140,24 @@ function DynamicForm({
             updatedCallback.pathVariables = pathVariables;
             updatedCallback.queryParameters = queryParameters;
             updatedCallback.requestBody = requestBody;
+
+            let requestCallback = JSON.parse(JSON.stringify(updatedCallback));
             setCallbackField(i.name);
-            dispatch(actions.requestCallback(connectorUuid, updatedCallback));
+            requestCallback.name = i.name;
+            requestCallback.uuid = i.uuid;
+            requestCallback.mappings = undefined;
+            requestCallback.callbackMethod = undefined;
+            requestCallback.callbackContext = undefined;
+
+            dispatch(
+              actions.requestCallback(
+                connectorUuid,
+                requestCallback,
+                functionGroup,
+                kind,
+                authorityUuid
+              )
+            );
             return updatedCallback;
           }
           return null;
@@ -187,7 +214,11 @@ function DynamicForm({
     } else if (e.target?.type === "checkbox") {
       field["value"] = e.target?.checked;
     } else {
-      field["value"] = e.target?.value || e.value;
+      if (fieldTypeTransform[field.type] === "number") {
+        field["value"] = Number(e.target?.value || e.value);
+      } else {
+        field["value"] = e.target?.value || e.value;
+      }
     }
     let updValueMap = valueMapFull;
     updValueMap.set(field["name"], field["value"]);
@@ -258,7 +289,7 @@ function DynamicForm({
             placeholder="Select"
             menuPlacement="auto"
             onChange={(event) => onValueChange(event, field)}
-            key={field.id}
+            key={field.uuid}
             isMulti={field.multiValue}
             defaultValue={editMode ? defaultSelectValue : null}
           />
@@ -266,7 +297,7 @@ function DynamicForm({
       } else if (fieldTypeTransform[field.type] === "checkbox") {
         inputField = (
           <Input
-            key={field.id}
+            key={field.uuid}
             type={(fieldTypeTransform[field.type] || field.type) as InputType}
             placeholder={field.description}
             name={field.name.toString()}
@@ -279,7 +310,7 @@ function DynamicForm({
       } else {
         inputField = (
           <Input
-            key={field.id}
+            key={field.uuid}
             type={(fieldTypeTransform[field.type] || field.type) as InputType}
             placeholder={field.description}
             name={field.name.toString()}

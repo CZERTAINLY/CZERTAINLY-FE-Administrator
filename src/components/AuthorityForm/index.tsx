@@ -26,10 +26,12 @@ import {
 
 import { AuthorityProviderAttributes } from "api/authorities";
 import { ConnectorInfoResponse } from "api/connectors";
+import { attributeCombiner } from "utils/commons";
+import { AuthorityDetails } from "models";
 
 export interface DefaultValues {
   name?: string;
-  authorityType?: string;
+  kind?: string;
   connectorUuid?: number | string;
   attributes?: any;
 }
@@ -40,12 +42,13 @@ interface FormValues {
   credential: any;
   status: string;
   attributes: any;
-  authorityType: string;
+  kind: string;
 }
 
 interface Props {
   editMode?: boolean;
   defaultValues?: DefaultValues;
+  authority?: AuthorityDetails | null;
   isSubmitting: boolean;
   onCancel: () => void;
   onSubmit: (
@@ -54,13 +57,14 @@ interface Props {
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ) => void;
 }
 
 function AuthorityForm({
   defaultValues,
   editMode,
+  authority,
   isSubmitting,
   onCancel,
   onSubmit,
@@ -82,6 +86,7 @@ function AuthorityForm({
   const [credential, setCredential]: any = useState(null);
   const [availableKinds, setAvailableKinds] = useState<string[]>();
   const [kind, setKind] = useState<string>();
+  const [functionGroup, setFunctiongroup] = useState<string>();
   const [connectorDetails, setConnectorDetails] =
     useState<ConnectorInfoResponse>();
   const callbackResponse = useSelector(callbackSelectors.callbackResponse);
@@ -89,13 +94,10 @@ function AuthorityForm({
   const [passAttributes, setPassAttributes] = useState(
     authorityProviderAttributes
   );
-  const [passEditAttributes, setPassEditAttributes] = useState(
+  const [passEditAttributes, setPassEditAttributes]: any = useState(
     authorityProviderAttributes
   );
-
-  useEffect(() => {
-    setPassAttributes(authorityProviderAttributes);
-  }, [authorityProviderAttributes]);
+  const [editableAttributes, setEditableAttributes]: any = useState([]);
 
   useEffect(() => {
     dispatch(actions.requestAuthorityProviderList());
@@ -107,8 +109,45 @@ function AuthorityForm({
 
   useEffect(() => {
     setPassAttributes(authorityProviderAttributes);
+    setPassEditAttributes(authorityProviderAttributes);
     setAttributes(authorityProviderAttributes);
   }, [authorityProviderAttributes]);
+
+  useEffect(() => {
+    if (editMode && authority?.uuid) {
+      for (let i of authorityProviders) {
+        if (i.uuid === authority.connectorUuid) {
+          for (let j of connectorDetails?.functionGroups || []) {
+            if (
+              "authorityProvider" === j.functionGroupCode ||
+              "legacyAuthorityProvider" === j.functionGroupCode
+            ) {
+              dispatch(
+                actions.requestAuthorityProviderAttributeList(
+                  connectorDetails?.uuid || "",
+                  authority.kind,
+                  j.functionGroupCode
+                )
+              );
+              setFunctiongroup(j.functionGroupCode);
+            }
+          }
+        }
+      }
+    }
+  }, [authority, editMode, authorityProviders, connectorDetails, dispatch]);
+
+  useEffect(() => {
+    const raLength = authority?.attributes || [];
+    if (raLength.length > 0 && editMode) {
+      const edtAttributes = attributeCombiner(
+        authority?.attributes || [],
+        authorityProviderAttributes
+      );
+      setEditableAttributes(edtAttributes);
+      setPassEditAttributes(edtAttributes);
+    }
+  }, [authorityProviderAttributes, authority, editMode]);
 
   useEffect(() => {
     if (
@@ -120,7 +159,7 @@ function AuthorityForm({
       setConnectorId(existingAuthorityProviderId);
       setAttributes(defaultValues?.attributes);
       setCredential(credentialProviderId);
-      setKind(defaultValues?.authorityType);
+      setKind(defaultValues?.kind);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -138,7 +177,7 @@ function AuthorityForm({
         : JSON.parse(JSON.stringify(authorityProviderAttributes));
     let updatedAttributes: AuthorityProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updatedAttributes.push(formAttributes);
       } else {
         updatedAttributes.push(i);
@@ -147,13 +186,26 @@ function AuthorityForm({
     setAttributes(updatedAttributes);
   }
 
+  function updateAttributesEdit(formAttributes: AuthorityProviderAttributes) {
+    let updated = attributes.length !== 0 ? attributes : editableAttributes;
+    let updateAttributes: AuthorityProviderAttributes[] = [];
+    for (let i of updated) {
+      if (i.uuid === formAttributes.uuid) {
+        updateAttributes.push(formAttributes);
+      } else {
+        updateAttributes.push(i);
+      }
+    }
+    setAttributes(updateAttributes);
+  }
+
   const fetchAttributes = (selectedKind: string) => {
     setKind(selectedKind);
     if (selectedKind !== "select") {
       for (let i of connectorDetails?.functionGroups || []) {
         if (
-          "caConnector" === i.functionGroupCode ||
-          "legacyCaConnector" === i.functionGroupCode
+          "authorityProvider" === i.functionGroupCode ||
+          "legacyAuthorityProvider" === i.functionGroupCode
         ) {
           dispatch(
             actions.requestAuthorityProviderAttributeList(
@@ -162,6 +214,7 @@ function AuthorityForm({
               i.functionGroupCode
             )
           );
+          setFunctiongroup(i.functionGroupCode);
         }
       }
 
@@ -177,8 +230,8 @@ function AuthorityForm({
         setConnector(providerUuid);
         for (let j of i.functionGroups) {
           if (
-            j.functionGroupCode === "caConnector" ||
-            j.functionGroupCode === "legacyCaConnector"
+            j.functionGroupCode === "authorityProvider" ||
+            j.functionGroupCode === "legacyAuthorityProvider"
           ) {
             setAvailableKinds(j.kinds);
           }
@@ -269,23 +322,13 @@ function AuthorityForm({
                   <FormGroup>
                     <Label for="connectorUuid">Authority Provider</Label>
 
-                    <Select
-                      maxMenuHeight={140}
-                      options={authorityProviders?.map(function (provider) {
-                        return {
-                          label: provider.name,
-                          value: provider.uuid,
-                        };
-                      })}
-                      menuPlacement="auto"
-                      value={{
-                        label: connectorDetails?.name,
-                        value: connectorDetails?.uuid,
-                      }}
-                      placeholder="Select Authority Provider"
-                      onChange={(event) =>
-                        fetchAvailableKinds(event?.value?.toString() || "")
-                      }
+                    <Input
+                      value={connectorDetails?.name}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Authority Provider Name"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}
@@ -296,7 +339,7 @@ function AuthorityForm({
               <Field name="authorityKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="authorityKind">Type</Label>
+                    <Label for="authorityKind">Kind</Label>
                     <Select
                       maxMenuHeight={140}
                       menuPlacement="auto"
@@ -319,24 +362,14 @@ function AuthorityForm({
               <Field name="connectorKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="connectorKind">Type</Label>
-                    <Select
-                      maxMenuHeight={140}
-                      options={availableKinds?.map(function (kind) {
-                        return {
-                          label: kind,
-                          value: kind,
-                        };
-                      })}
-                      menuPlacement="auto"
-                      placeholder="Select Kind"
-                      value={{
-                        label: kind,
-                        value: kind,
-                      }}
-                      onChange={(event) =>
-                        fetchAttributes(event?.value?.toString() || "default")
-                      }
+                    <Label for="connectorKind">Connector Kind</Label>
+                    <Input
+                      value={kind}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Authority Kind"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}
@@ -355,17 +388,21 @@ function AuthorityForm({
                 connectorUuid={connectorUuid}
                 callbackSelector={callbackResponse}
                 setPassAttribute={setPassAttributes}
+                functionGroup={functionGroup || ""}
+                kind={kind}
               />
             ) : null}
             {editMode && kind ? (
               <DynamicForm
                 fieldInfo={passEditAttributes}
-                attributeFunction={updateAttributes}
+                attributeFunction={updateAttributesEdit}
                 actions={callbackActions}
                 connectorUuid={connectorUuid}
                 callbackSelector={callbackResponse}
                 setPassAttribute={setPassEditAttributes}
                 editMode={true}
+                kind={kind}
+                functionGroup={functionGroup || ""}
               />
             ) : null}
             <div className="d-flex justify-content-end">

@@ -3,6 +3,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
@@ -25,14 +26,14 @@ export class AuthorityManagementBackend
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<string> {
     return createNewResource(baseUrl, {
       name,
       connectorUuid,
       status,
-      attributes,
-      authorityType,
+      attributes: attributeSimplifier(attributes),
+      kind,
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -46,7 +47,7 @@ export class AuthorityManagementBackend
     return this._fetchService.request(
       new HttpRequestOptions(
         `${baseUrlAuthorityProvider}?functionGroup=${encodeURIComponent(
-          "CA_CONNECTOR"
+          "AUTHORITY_PROVIDER"
         )}`,
         "GET"
       )
@@ -105,7 +106,7 @@ export class AuthorityManagementBackend
     credential: any,
     status: string,
     attributes: any,
-    authorityType: string
+    kind: string
   ): Observable<model.AuthorityDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
@@ -114,8 +115,8 @@ export class AuthorityManagementBackend
         connectorUuid,
         credential,
         status,
-        attributes,
-        authorityType,
+        attributes: attributeSimplifier(attributes),
+        kind,
       })
     );
   }

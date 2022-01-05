@@ -202,13 +202,13 @@ export const actions = {
   requestCreateRaProfile: createCustomAction(
     Actions.CreateRequest,
     (
-      caInstanceUuid: string,
+      authorityInstanceUuid: string,
       name: string,
       description: string,
       attributes: AttributeResponse[],
       history: History<unknown>
     ) => ({
-      caInstanceUuid,
+      authorityInstanceUuid,
       name,
       description,
       attributes,
@@ -226,14 +226,14 @@ export const actions = {
   requestUpdateProfile: createCustomAction(
     Actions.UpdateProfileRequest,
     (
-      caInstanceUuid: string,
+      authorityInstanceUuid: string,
       uuid: string,
       name: string,
       description: string,
       attributes: AttributeResponse[],
       history: History<unknown>
     ) => ({
-      caInstanceUuid,
+      authorityInstanceUuid,
       uuid,
       name,
       description,

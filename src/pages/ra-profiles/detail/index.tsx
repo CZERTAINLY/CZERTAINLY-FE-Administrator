@@ -52,6 +52,7 @@ function RaProfileDetail() {
 
   const allowedAttributeTypeForDetail = [
     "STRING",
+    "NUMBER",
     "DROPDOWN",
     "LIST",
     "BOOLEAN",
@@ -228,7 +229,7 @@ function RaProfileDetail() {
               </thead>
               <tbody>
                 <tr>
-                  <td>ID</td>
+                  <td>UUID</td>
                   <td>{profileDetails?.uuid}</td>
                 </tr>
                 <tr>
@@ -240,22 +241,23 @@ function RaProfileDetail() {
                   <td>{profileDetails?.description}</td>
                 </tr>
                 <tr>
-                  <td>CA Instance Id</td>
+                  <td>Authority Instance UUID</td>
                   <td>
-                    {profileDetails?.caInstanceUuid || "Authority not found"}
+                    {profileDetails?.authorityInstanceUuid ||
+                      "Authority not found"}
                   </td>
                 </tr>
                 <tr>
-                  <td>Certificate Instance Name</td>
+                  <td>Authority Instance Name</td>
                   <td>
-                    {profileDetails?.caInstanceUuid ? (
+                    {profileDetails?.authorityInstanceUuid ? (
                       <Link
-                        to={`../../authorities/detail/${profileDetails?.caInstanceUuid}`}
+                        to={`../../authorities/detail/${profileDetails?.authorityInstanceUuid}`}
                       >
-                        {profileDetails.caInstanceName}
+                        {profileDetails.authorityInstanceName}
                       </Link>
                     ) : (
-                      profileDetails?.caInstanceName
+                      profileDetails?.authorityInstanceName
                     )}
                   </td>
                 </tr>

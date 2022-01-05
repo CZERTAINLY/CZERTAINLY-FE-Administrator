@@ -2,17 +2,17 @@ export function inventoryStatus(status: String) {
   switch (status) {
     case "Success":
       return ["Success", "success"];
-    case "REGISTERED":
+    case "registered":
       return ["Reistered", "success"];
-    case "CONNECTED":
+    case "connected":
       return ["Connected", "success"];
-    case "FAILED":
+    case "failed":
       return ["Failed", "danger"];
     case "Failed":
       return ["Failed", "danger"];
-    case "OFFLINE":
+    case "offline":
       return ["Offline", "danger"];
-    case "WAITING_FOR_APPROVAL":
+    case "waitingForApproval":
       return ["Waiting for Approval", "warning"];
     default:
       return [status || "Unknown", "dark"];

@@ -243,7 +243,7 @@ const createAuthority: Epic<Action, Action, AppState, EpicDependencies> = (
         credential,
         status,
         attributes,
-        authorityType,
+        kind,
         history,
       }) =>
         apiClients.authorities
@@ -253,7 +253,7 @@ const createAuthority: Epic<Action, Action, AppState, EpicDependencies> = (
             credential,
             status,
             attributes,
-            authorityType
+            kind
           )
           .pipe(
             map((uuid) => {
@@ -286,7 +286,7 @@ const updateAuthority: Epic<Action, Action, AppState, EpicDependencies> = (
         credential,
         status,
         attributes,
-        authorityType,
+        kind,
         history,
       }) =>
         apiClients.authorities
@@ -297,7 +297,7 @@ const updateAuthority: Epic<Action, Action, AppState, EpicDependencies> = (
             credential,
             status,
             attributes,
-            authorityType
+            kind
           )
           .pipe(
             map((authority) => {
@@ -345,7 +345,7 @@ function mapAuthorityProviderAttributes(
 ): AuthorityProviderAttributes {
   return {
     ...authorityProviderAttributes,
-    id: authorityProviderAttributes.id,
+    uuid: authorityProviderAttributes.uuid,
     name: authorityProviderAttributes.name.toString(),
     type: authorityProviderAttributes.type.toString(),
     required: authorityProviderAttributes.required,
@@ -370,7 +370,7 @@ function mapAuthorityDetail(
     attributes: data.attributes,
     connectorUuid: data.connectorUuid,
     credential: data.credential,
-    authorityType: data.authorityType,
+    kind: data.kind,
     connectorName: data.connectorName,
   };
 }

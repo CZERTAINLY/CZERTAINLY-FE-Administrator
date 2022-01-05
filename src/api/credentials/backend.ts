@@ -3,6 +3,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
@@ -21,16 +22,15 @@ export class CredentialManagementBackend
 
   createNewCredential(
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<string> {
     return createNewResource(baseUrl, {
       name,
-      credentialType,
+      kind,
       connectorUuid,
-      attributes,
-      enabled: true,
+      attributes: attributeSimplifier(attributes),
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -101,17 +101,16 @@ export class CredentialManagementBackend
   updateCredential(
     uuid: string,
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: number | string,
     attributes: any
   ): Observable<model.CredentialDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
         name,
-        credentialType,
+        kind,
         connectorUuid,
-        attributes,
-        enabled: true,
+        attributes: attributeSimplifier(attributes),
       })
     );
   }

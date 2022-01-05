@@ -124,22 +124,23 @@ const createRaProfile: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.CreateRequest)),
-    switchMap(({ caInstanceUuid, name, description, attributes, history }) =>
-      apiClients.profiles
-        .createRaProfile(caInstanceUuid, name, description, attributes)
-        .pipe(
-          map((uuid) => {
-            history.push(`./detail/${uuid}`);
-            return actions.receiveCreateRaProfile(uuid);
-          }),
-          catchError((err) =>
-            of(
-              actions.failCreateRaProfile(
-                extractError(err, "Failed to create RA Profile")
+    switchMap(
+      ({ authorityInstanceUuid, name, description, attributes, history }) =>
+        apiClients.profiles
+          .createRaProfile(authorityInstanceUuid, name, description, attributes)
+          .pipe(
+            map((uuid) => {
+              history.push(`./detail/${uuid}`);
+              return actions.receiveCreateRaProfile(uuid);
+            }),
+            catchError((err) =>
+              of(
+                actions.failCreateRaProfile(
+                  extractError(err, "Failed to create RA Profile")
+                )
               )
             )
           )
-        )
     )
   );
 
@@ -306,9 +307,22 @@ const updateRaProfile: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.UpdateProfileRequest)),
     switchMap(
-      ({ caInstanceUuid, uuid, name, description, attributes, history }) =>
+      ({
+        authorityInstanceUuid,
+        uuid,
+        name,
+        description,
+        attributes,
+        history,
+      }) =>
         apiClients.profiles
-          .updateRaProfile(caInstanceUuid, uuid, name, description, attributes)
+          .updateRaProfile(
+            authorityInstanceUuid,
+            uuid,
+            name,
+            description,
+            attributes
+          )
           .pipe(
             map((profile) => {
               history.push(`../detail/${uuid}`);
@@ -353,7 +367,7 @@ const getAttributes: Epic<Action, Action, AppState, EpicDependencies> = (
 function mapAttributes(attributes: AttributeResponse): AttributeResponse {
   return {
     ...attributes,
-    id: attributes.id,
+    uuid: attributes.uuid,
     name: attributes.name.toString(),
     type: attributes.type.toString(),
     required: attributes.required,
@@ -374,9 +388,9 @@ function mapProfile(profile: RaProfileResponse): RaProfile {
     uuid: profile.uuid.toString(),
     name: profile.name,
     enabled: profile.enabled,
-    caInstanceUuid: profile.caInstanceUuid,
+    authorityInstanceUuid: profile.authorityInstanceUuid,
     description: profile.description,
-    caInstanceName: profile.caInstanceName,
+    authorityInstanceName: profile.authorityInstanceName,
   };
 }
 

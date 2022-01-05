@@ -211,7 +211,7 @@ function ConnectorDetail() {
   );
 
   const healthCheckTitle = () => {
-    if (["UP", "OK", "HEALTHY"].includes(selectConnectorHealth["status"])) {
+    if (["up", "ok", "healthy"].includes(selectConnectorHealth["status"])) {
       return (
         <div>
           <h5>
@@ -226,7 +226,7 @@ function ConnectorDetail() {
         </div>
       );
     } else if (
-      ["DOWN", "FAILED", "NOTOK", "NOK"].includes(
+      ["down", "failed", "notOk", "nok", "nOk"].includes(
         selectConnectorHealth["status"]
       )
     ) {
@@ -303,10 +303,11 @@ function ConnectorDetail() {
     for (let key of currentFunctionGroupDisplay?.endPoints || []) {
       let searchKey = "";
       if (
-        currentFunctionGroupDisplay?.functionGroupCode === "legacyCaConnector"
+        currentFunctionGroupDisplay?.functionGroupCode ===
+        "legacyAuthorityProvider"
       ) {
         if (
-          key.context.includes("caConnector") ||
+          key.context.includes("authorityProvider") ||
           key.context.includes(currentFunctionGroupDisplay?.functionGroupCode)
         ) {
           endPoints.push(

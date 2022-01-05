@@ -7,6 +7,7 @@ import ConfirmEditDialog from "components/ConfirmActionDialog";
 import Spinner from "components/Spinner";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/ca-authorities";
+import { selectors as callbackSelectors } from "ducks/connectors";
 import AuthorityForm from "components/AuthorityForm";
 
 function AuthorityEdit() {
@@ -15,6 +16,7 @@ function AuthorityEdit() {
   const isFetching = useSelector(selectors.isFetching);
   const isEditing = useSelector(selectors.isEditing);
   const authority = useSelector(selectors.selectAuthorityDetails);
+  const isFetchingCallback = useSelector(callbackSelectors.isFetchingCallback);
   const { params } = useRouteMatch();
   const uuid = (params as any).id as string;
   const [showConfirm, toggleConfirmDialog] = useState(false);
@@ -39,7 +41,7 @@ function AuthorityEdit() {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string
+      kind: string
     ) => {
       setEditAction(
         actions.requestUpdateAuthority(
@@ -49,7 +51,7 @@ function AuthorityEdit() {
           credential,
           status,
           attributes,
-          authorityType,
+          kind,
           history
         )
       );
@@ -90,6 +92,7 @@ function AuthorityEdit() {
         <AuthorityForm
           defaultValues={getAttributes()}
           isSubmitting={isEditing}
+          authority={authority}
           onCancel={onCancel}
           onSubmit={onSubmit}
           editMode={true}
@@ -100,7 +103,7 @@ function AuthorityEdit() {
         onCancel={onCancelEdit}
         onConfirm={onConfirmEdit}
       />
-      <Spinner active={isFetching} />
+      <Spinner active={isFetching || isFetchingCallback} />
     </Container>
   );
 }

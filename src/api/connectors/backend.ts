@@ -1,6 +1,5 @@
 import {
   AllAttributeResponse,
-  ConnectorFunctionGroup,
   ConnectorHealth,
   ErrorDeleteObject,
 } from "models";
@@ -8,11 +7,13 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
 
 const baseUrl = "/api/v1/connectors";
+const baseUrlCallback = "/api/v1";
 
 export class ConnectorManagementBackend
   implements model.ConnectorManagementApi
@@ -26,21 +27,27 @@ export class ConnectorManagementBackend
   createNewConnector(
     name: string,
     url: string,
-    status: string,
-    functionGroups: ConnectorFunctionGroup[],
     authType: string,
     authAttributes: any
   ): Observable<string> {
-    return createNewResource(baseUrl, {
-      name,
-      url,
-      status,
-      functionGroups,
-      authType,
-      authAttributes,
-    }).pipe(
-      map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-    );
+    if (authType === "none") {
+      return createNewResource(baseUrl, {
+        name,
+        url,
+        authType,
+      }).pipe(
+        map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+      );
+    } else {
+      return createNewResource(baseUrl, {
+        name,
+        url,
+        authType,
+        authAttributes: attributeSimplifier(authAttributes),
+      }).pipe(
+        map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+      );
+    }
   }
 
   connectNewConnector(
@@ -50,15 +57,26 @@ export class ConnectorManagementBackend
     authAttributes: any,
     uuid: string
   ): Observable<model.ConnectorConnectionResponse[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
-        uuid,
-        name,
-        url,
-        authType,
-        authAttributes,
-      })
-    );
+    if (authType === "none") {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
+          uuid,
+          name,
+          url,
+          authType,
+        })
+      );
+    } else {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
+          uuid,
+          name,
+          url,
+          authType,
+          authAttributes,
+        })
+      );
+    }
   }
 
   getConnectorsList(): Observable<model.ConnectorInfoResponse[]> {
@@ -150,30 +168,52 @@ export class ConnectorManagementBackend
     uuid: string,
     name: string,
     url: string,
-    status: string,
-    functionGroups: ConnectorFunctionGroup[],
     authType: string,
     authAttributes: any
   ): Observable<string> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-        name,
-        url,
-        status,
-        functionGroups,
-        authType,
-        authAttributes,
-      })
-    );
+    if (authType === "none") {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+          name,
+          url,
+          authType,
+        })
+      );
+    } else {
+      return this._fetchService.request(
+        new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+          name,
+          url,
+          authType,
+          authAttributes: attributeSimplifier(authAttributes),
+        })
+      );
+    }
   }
 
-  getCallback(connectorUuid: string, request: any): Observable<any> {
-    return this._fetchService.request(
-      new HttpRequestOptions(
-        `${baseUrl}/${connectorUuid}/callback`,
-        "POST",
-        request
-      )
-    );
+  getCallback(
+    connectorUuid: string,
+    request: any,
+    functionGroup: string,
+    kind: string,
+    authorityUuid: string
+  ): Observable<any> {
+    if (authorityUuid) {
+      return this._fetchService.request(
+        new HttpRequestOptions(
+          `${baseUrlCallback}/${authorityUuid}/callback`,
+          "POST",
+          request
+        )
+      );
+    } else {
+      return this._fetchService.request(
+        new HttpRequestOptions(
+          `${baseUrl}/${connectorUuid}/${functionGroup}/${kind}/callback`,
+          "POST",
+          request
+        )
+      );
+    }
   }
 }

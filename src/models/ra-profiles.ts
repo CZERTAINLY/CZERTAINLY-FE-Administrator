@@ -4,17 +4,17 @@ export interface RaProfile {
   uuid: string;
   name: string;
   enabled: boolean;
-  caInstanceUuid: string;
+  authorityInstanceUuid: string;
   description?: string;
-  caInstanceName: string;
+  authorityInstanceName: string;
 }
 
 export interface RaProfileDetail {
   uuid: string;
   name: string;
   description?: string;
-  caInstanceUuid: string;
+  authorityInstanceUuid: string;
   attributes?: AttributeResponse[];
   enabled: boolean;
-  caInstanceName: string;
+  authorityInstanceName: string;
 }

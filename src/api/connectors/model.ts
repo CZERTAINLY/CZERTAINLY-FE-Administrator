@@ -1,6 +1,5 @@
 import {
   AllAttributeResponse,
-  ConnectorFunctionGroup,
   ConnectorHealth,
   ErrorDeleteObject,
 } from "models";
@@ -45,12 +44,10 @@ export interface FunctionGroup {
 
 export interface ConnectorConnectionResponse {
   functionGroup?: FunctionGroup;
-  endPoints?: FunctionalityListResponse[];
-  endpoints?: FunctionalityListResponse[];
 }
 
 export interface ConnectorAttributes {
-  id: string | number;
+  uuid: string | number;
   name: string;
   type: string;
   label: string;
@@ -69,8 +66,6 @@ export interface ConnectorManagementApi {
   createNewConnector(
     name: string,
     url: string,
-    status: string,
-    functionGroups: ConnectorFunctionGroup[],
     authType: string,
     authAttributes: any
   ): Observable<string>;
@@ -101,8 +96,6 @@ export interface ConnectorManagementApi {
     uuid: string,
     name: string,
     url: string,
-    status: string,
-    functionGroups: ConnectorFunctionGroup[],
     authType: string,
     authAttributes: any
   ): Observable<string>;
@@ -112,5 +105,11 @@ export interface ConnectorManagementApi {
     kinds: string
   ): Observable<ConnectorAttributes[]>;
   getConnectorAllAttributes(uuid: string): Observable<AllAttributeResponse>;
-  getCallback(connectorUuid: string, request: any): Observable<any>;
+  getCallback(
+    connectorUuid: string,
+    request: any,
+    functionGroup: string,
+    kind: string,
+    authorityUuid: string
+  ): Observable<any>;
 }

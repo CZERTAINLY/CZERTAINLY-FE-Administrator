@@ -9,7 +9,7 @@ import { AttributeResponse } from "models/attributes";
 
 export class ProfilesManagementMock implements model.ProfilesManagementApi {
   createRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     name: string,
     description: string,
     attributes: AttributeResponse[]
@@ -126,15 +126,15 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
             name,
             description,
             enabled,
-            caInstanceUuid,
-            caInstanceName,
+            authorityInstanceUuid,
+            authorityInstanceName,
           }) => ({
             uuid,
             name,
             description,
             enabled,
-            caInstanceUuid,
-            caInstanceName,
+            authorityInstanceUuid,
+            authorityInstanceName,
           })
         )
       )
@@ -147,7 +147,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
       map((authorityProviderAttributes) =>
         authorityProviderAttributes.map(
           ({
-            id,
+            uuid,
             name,
             label,
             type,
@@ -162,7 +162,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
             value,
             attributeCallback,
           }) => ({
-            id,
+            uuid,
             name,
             label,
             type,
@@ -242,7 +242,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
   }
 
   updateRaProfile(
-    caInstanceUuid: string,
+    authorityInstanceUuid: string,
     uuid: string,
     name: string,
     description: string,

@@ -33,6 +33,7 @@ function CredentialDetail() {
   const uuid = (params as any).id as string;
   const allowedAttributeTypeForDetail = [
     "STRING",
+    "NUMBER",
     "DROPDOWN",
     "LIST",
     "CREDENTIAL",
@@ -127,16 +128,16 @@ function CredentialDetail() {
           </thead>
           <tbody>
             <tr>
-              <td>ID</td>
+              <td>UUID</td>
               <td>{credentialDetails?.uuid}</td>
             </tr>
             <tr>
-              <td>Credential Name</td>
+              <td>Name</td>
               <td>{credentialDetails?.name}</td>
             </tr>
             <tr>
-              <td>Type</td>
-              <td>{credentialDetails?.credentialType}</td>
+              <td>Kind</td>
+              <td>{credentialDetails?.kind}</td>
             </tr>
             <tr>
               <td>Credential Provider Name</td>
@@ -153,7 +154,7 @@ function CredentialDetail() {
               </td>
             </tr>
             <tr>
-              <td>Credential Provider Id</td>
+              <td>Credential Provider UUID</td>
               <td>
                 {credentialDetails?.connectorUuid || "Connector Not Found"}
               </td>

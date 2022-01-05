@@ -26,24 +26,19 @@ function CredentialEdit() {
   };
 
   const onCancelEdit = useCallback(() => toggleConfirmDialog(false), []);
-  const onConfirmEdit = useCallback(
-    () => dispatch(editAction),
-    [dispatch, editAction]
-  );
+  const onConfirmEdit = useCallback(() => {
+    toggleConfirmDialog(true);
+    dispatch(editAction);
+  }, [dispatch, editAction]);
 
   const onCancel = useCallback(() => history.goBack(), [history]);
   const onSubmit = useCallback(
-    (
-      name: string,
-      credentialType: string,
-      connectorUuid: string,
-      attributes: any
-    ) => {
+    (name: string, kind: string, connectorUuid: string, attributes: any) => {
       setEditAction(
         actions.requestUpdateCredential(
           uuid,
           name,
-          credentialType,
+          kind,
           connectorUuid,
           attributes,
           history

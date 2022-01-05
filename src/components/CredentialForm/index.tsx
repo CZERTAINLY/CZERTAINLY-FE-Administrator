@@ -25,14 +25,14 @@ import { ConnectorInfoResponse } from "api/connectors";
 
 export interface DefaultValues {
   name?: string;
-  credentialType?: string;
+  kind?: string;
   connectorUuid?: string;
   attributes?: any;
 }
 
 interface FormValues {
   name: string;
-  credentialType: string;
+  kind: string;
   connectorUuid: string;
   attributes: any;
 }
@@ -44,7 +44,7 @@ interface Props {
   onCancel: () => void;
   onSubmit: (
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ) => void;
@@ -74,6 +74,7 @@ function CredentialForm({
   const [kind, setKind] = useState<string>();
   const [connectorDetails, setConnectorDetails] =
     useState<ConnectorInfoResponse>();
+  // eslint-disable-next-line
   const [providerDefault, setProviderDefault]: any = useState();
 
   useEffect(() => {
@@ -98,12 +99,12 @@ function CredentialForm({
       credentialProviders.length > 0
     ) {
       setConnector(connectorUuidCred);
-      setKind(defaultValues?.credentialType);
+      setKind(defaultValues?.kind);
       dispatch(
         actions.requestCredentialProviderAttributeList(
           connectorUuidCred,
           "credentialProvider",
-          defaultValues?.credentialType || ""
+          defaultValues?.kind || ""
         )
       );
     }
@@ -125,7 +126,7 @@ function CredentialForm({
         : JSON.parse(JSON.stringify(credentialProviderAttributes));
     let updateAttributes: CredentialProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);
@@ -141,7 +142,7 @@ function CredentialForm({
         : JSON.parse(JSON.stringify(editableAttributes));
     let updateAttributes: CredentialProviderAttributes[] = [];
     for (let i of updated) {
-      if (i.id === formAttributes.id) {
+      if (i.uuid === formAttributes.uuid) {
         updateAttributes.push(formAttributes);
       } else {
         updateAttributes.push(i);
@@ -228,7 +229,7 @@ function CredentialForm({
       }
       onSubmit(
         values.name,
-        kind || values.credentialType,
+        kind || values.kind,
         connectorUuidSub || "",
         changedAttributes
       );
@@ -289,7 +290,7 @@ function CredentialForm({
                           value: provider.uuid,
                         };
                       })}
-                      placeholder="Select Authority Provider"
+                      placeholder="Select Credential Provider"
                       onChange={(event) =>
                         fetchAvailableKinds(event?.value.toString() || "")
                       }
@@ -302,20 +303,13 @@ function CredentialForm({
                 {({ input, meta }) => (
                   <FormGroup>
                     <Label for="connectorUuid">Credential Provider</Label>
-                    <Select
-                      maxMenuHeight={140}
-                      menuPlacement="auto"
-                      options={credentialProviders?.map(function (provider) {
-                        return {
-                          label: provider.name,
-                          value: provider.uuid,
-                        };
-                      })}
-                      value={providerDefault}
-                      placeholder="Select Authority Provider"
-                      onChange={(event) =>
-                        fetchAvailableKinds(event?.value?.toString() || "")
-                      }
+                    <Input
+                      value={connectorDetails?.name}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Credential Name"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}
@@ -325,7 +319,7 @@ function CredentialForm({
               <Field name="connectorKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="connectorKind">Type</Label>
+                    <Label for="connectorKind">Kind</Label>
                     <Select
                       maxMenuHeight={140}
                       menuPlacement="auto"
@@ -348,24 +342,14 @@ function CredentialForm({
               <Field name="connectorKind">
                 {({ input, meta }) => (
                   <FormGroup>
-                    <Label for="connectorKind">Type</Label>
-                    <Select
-                      maxMenuHeight={140}
-                      menuPlacement="auto"
-                      options={availableKinds?.map(function (kind) {
-                        return {
-                          label: kind,
-                          value: kind,
-                        };
-                      })}
-                      placeholder="Select Kind"
-                      value={{
-                        label: kind,
-                        value: kind,
-                      }}
-                      onChange={(event) =>
-                        fetchAttributes(event?.value?.toString() || "default")
-                      }
+                    <Label for="connectorKind">Kind</Label>
+                    <Input
+                      value={kind}
+                      valid={!meta.error && meta.touched}
+                      invalid={!!meta.error && meta.touched}
+                      type="text"
+                      placeholder="Credential Kind"
+                      disabled={editMode}
                     />
                   </FormGroup>
                 )}
@@ -379,6 +363,8 @@ function CredentialForm({
                     : []
                 }
                 attributeFunction={updateAttributes}
+                kind=""
+                functionGroup=""
               />
             ) : null}
             {editMode && kind ? (
@@ -386,6 +372,8 @@ function CredentialForm({
                 fieldInfo={JSON.parse(JSON.stringify(editableAttributes))}
                 attributeFunction={updateAttributesEdit}
                 editMode={true}
+                kind=""
+                functionGroup=""
               />
             ) : null}
             <div className="d-flex justify-content-end">

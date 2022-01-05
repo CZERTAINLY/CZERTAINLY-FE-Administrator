@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
 export interface CredentialInfoResponse {
   uuid: string;
   name: string;
-  credentialType: string;
+  kind: string;
   connectorUuid: string;
   connectorName: string;
 }
@@ -14,7 +14,7 @@ export interface CredentialInfoResponse {
 export interface CredentialDetailResponse {
   uuid: string;
   name?: string;
-  credentialType: string;
+  kind: string;
   attributes: AttributeResponse[];
   connectorUuid: string;
   connectorName: string;
@@ -29,7 +29,7 @@ export interface CredentialProviderResponse {
 }
 
 export interface CredentialProviderAttributes {
-  id: string | number;
+  uuid: string | number;
   name: string;
   label: string;
   type: string;
@@ -47,7 +47,7 @@ export interface CredentialProviderAttributes {
 export interface CredentialManagementApi {
   createNewCredential(
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<string>;
@@ -68,7 +68,7 @@ export interface CredentialManagementApi {
   updateCredential(
     uuid: string,
     name: string,
-    credentialType: string,
+    kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<CredentialDetailResponse>;

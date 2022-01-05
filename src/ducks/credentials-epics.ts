@@ -227,9 +227,9 @@ const createCredential: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.CreateRequest)),
-    switchMap(({ name, credentialType, connectorUuid, attributes, history }) =>
+    switchMap(({ name, kind, connectorUuid, attributes, history }) =>
       apiClients.credentials
-        .createNewCredential(name, credentialType, connectorUuid, attributes)
+        .createNewCredential(name, kind, connectorUuid, attributes)
         .pipe(
           map((uuid) => {
             history.push(".");
@@ -253,31 +253,24 @@ const updateCredential: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.UpdateRequest)),
-    switchMap(
-      ({ uuid, name, credentialType, connectorUuid, attributes, history }) =>
-        apiClients.credentials
-          .updateCredential(
-            uuid,
-            name,
-            credentialType,
-            connectorUuid,
-            attributes
-          )
-          .pipe(
-            map((credential) => {
-              history.push(`..`);
-              return actions.receiveUpdateCredential(
-                mapCredentialDetail(uuid, credential)
-              );
-            }),
-            catchError((err) =>
-              of(
-                actions.failUpdateCredential(
-                  extractError(err, "Failed to update client")
-                )
+    switchMap(({ uuid, name, kind, connectorUuid, attributes, history }) =>
+      apiClients.credentials
+        .updateCredential(uuid, name, kind, connectorUuid, attributes)
+        .pipe(
+          map((credential) => {
+            history.push(`..`);
+            return actions.receiveUpdateCredential(
+              mapCredentialDetail(uuid, credential)
+            );
+          }),
+          catchError((err) =>
+            of(
+              actions.failUpdateCredential(
+                extractError(err, "Failed to update client")
               )
             )
           )
+        )
     )
   );
 
@@ -286,7 +279,7 @@ function mapCredential(credentials: CredentialInfoResponse): Credential {
     ...credentials,
     uuid: credentials.uuid,
     name: credentials.name.toString(),
-    credentialType: credentials.credentialType.toString(),
+    kind: credentials.kind.toString(),
     connectorUuid: credentials.connectorUuid,
     connectorName: credentials.connectorName,
   };
@@ -310,7 +303,7 @@ function mapCredentialProviderAttributes(
 ): CredentialProviderAttributes {
   return {
     ...credentialProviderAttributes,
-    id: credentialProviderAttributes.id,
+    uuid: credentialProviderAttributes.uuid,
     name: credentialProviderAttributes.name.toString(),
     type: credentialProviderAttributes.type.toString(),
     required: credentialProviderAttributes.required,
@@ -332,7 +325,7 @@ function mapCredentialDetail(
   return {
     uuid,
     name: data.name,
-    credentialType: data.credentialType,
+    kind: data.kind,
     attributes: data.attributes,
     connectorUuid: data.connectorUuid,
     connectorName: data.connectorName,

@@ -1,7 +1,7 @@
 import { AttributeCallback } from "./callback";
 
 export interface AttributeResponse {
-  id: string | number;
+  uuid: string | number;
   name: string;
   type: string;
   label: string;
@@ -15,4 +15,10 @@ export interface AttributeResponse {
   dependsOn?: any;
   validationRegex?: any;
   attributeCallback?: AttributeCallback;
+}
+
+export interface SimplifiedAttributes {
+  id?: string | number;
+  name: string;
+  value: any;
 }

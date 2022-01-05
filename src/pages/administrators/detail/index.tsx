@@ -134,7 +134,7 @@ function AdministratorDetail() {
               </thead>
               <tbody>
                 <tr>
-                  <td>ID</td>
+                  <td>UUID</td>
                   <td>{details?.uuid}</td>
                 </tr>
                 <tr>

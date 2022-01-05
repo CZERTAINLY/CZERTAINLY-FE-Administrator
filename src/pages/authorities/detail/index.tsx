@@ -28,6 +28,7 @@ function AuthorityDetail() {
   const uuid = (params as any).id as string;
   const allowedAttributeTypeForDetail = [
     "STRING",
+    "NUMBER",
     "DROPDOWN",
     "LIST",
     "BOOLEAN",
@@ -124,19 +125,19 @@ function AuthorityDetail() {
           </thead>
           <tbody>
             <tr>
-              <td>ID</td>
+              <td>UUID</td>
               <td>{authorityDetails?.uuid}</td>
             </tr>
             <tr>
-              <td>Authority Name</td>
+              <td>Name</td>
               <td>{authorityDetails?.name}</td>
             </tr>
             <tr>
-              <td>Authority Type</td>
-              <td>{authorityDetails?.authorityType}</td>
+              <td>Kind</td>
+              <td>{authorityDetails?.kind}</td>
             </tr>
             <tr>
-              <td>Authority Provider Id</td>
+              <td>Authority Provider UUID</td>
               <td>
                 {authorityDetails?.connectorUuid || "Connector Not Found"}
               </td>

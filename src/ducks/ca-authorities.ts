@@ -118,7 +118,7 @@ export const actions = {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string,
+      kind: string,
       history: History<unknown>
     ) => ({
       name,
@@ -126,7 +126,7 @@ export const actions = {
       credential,
       status,
       attributes,
-      authorityType,
+      kind,
       history,
     })
   ),
@@ -147,7 +147,7 @@ export const actions = {
       credential: any,
       status: string,
       attributes: any,
-      authorityType: string,
+      kind: string,
       history: History<unknown>
     ) => ({
       uuid,
@@ -156,7 +156,7 @@ export const actions = {
       credential,
       status,
       attributes,
-      authorityType,
+      kind,
       history,
     })
   ),
@@ -392,8 +392,8 @@ export function reducer(state: State = initialState, action: Action): State {
       const providers: any = [];
       for (let i of action.authorityProviders) {
         if (
-          functionGroupChecker("caConnector", i.functionGroups) ||
-          functionGroupChecker("legacyCaConnector", i.functionGroups)
+          functionGroupChecker("authorityProvider", i.functionGroups) ||
+          functionGroupChecker("legacyAuthorityProvider", i.functionGroups)
         ) {
           providers.push(i);
         }

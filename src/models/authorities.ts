@@ -5,7 +5,7 @@ export interface Authority {
   uuid: string;
   name: string;
   connectorUuid: string;
-  authorityType: string;
+  kind: string;
   connectorName: string;
 }
 
@@ -23,6 +23,6 @@ export interface AuthorityDetails {
   attributes?: AttributeResponse[];
   connectorUuid: string;
   credential?: any;
-  authorityType: string;
+  kind: string;
   connectorName: string;
 }
