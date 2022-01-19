@@ -1,3 +1,4 @@
+import { RaAcmeLink } from "models";
 import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 
@@ -55,4 +56,16 @@ export interface ProfilesManagementApi {
     description: string,
     attributes: AttributeResponse[]
   ): Observable<RaProfileDetailResponse>;
+  getIssuanceAttributes(raProfileUuid: string): Observable<AttributeResponse[]>;
+  getRevocationAttributes(
+    raProfileUuid: string
+  ): Observable<AttributeResponse[]>;
+  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink>;
+  activateAcme(
+    uuid: string,
+    acmeProfileUuid: string,
+    issueCertificateAttributes: AttributeResponse[],
+    revokeCertificateAttributes: AttributeResponse[]
+  ): Observable<RaAcmeLink>;
+  deactivateAcme(uuid: string): Observable<void>;
 }

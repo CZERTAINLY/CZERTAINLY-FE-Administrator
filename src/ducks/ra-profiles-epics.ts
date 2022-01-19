@@ -364,6 +364,136 @@ const getAttributes: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
+const getIssuanceAttributes: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.IssuanceAttributesRequest)),
+    switchMap(({ raProfileUuid }) =>
+      apiClients.profiles.getIssuanceAttributes(raProfileUuid).pipe(
+        map((attributes) => actions.recieveIssuanceAttributes(attributes)),
+        catchError((err) =>
+          of(
+            actions.failIssuanceAttributes(
+              extractError(
+                err,
+                "Failed to retrieve certificates Issuance attributes"
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+
+const getRevocationAttributes: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.RevokeAttributesRequest)),
+    switchMap(({ raProfileUuid }) =>
+      apiClients.profiles.getRevocationAttributes(raProfileUuid).pipe(
+        map((attributes) => actions.recieveRevokeAttributes(attributes)),
+        catchError((err) =>
+          of(
+            actions.failRevokeAttributes(
+              extractError(
+                err,
+                "Failed to retrieve certificate revocation attributes"
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+
+const getAcmeDetails: Epic<Action, Action, AppState, EpicDependencies> = (
+  action$,
+  _,
+  { apiClients }
+) =>
+  action$.pipe(
+    filter(isOfType(Actions.AcmeDetailsRequest)),
+    switchMap(({ uuid }) =>
+      apiClients.profiles.getRaAcmeProfile(uuid).pipe(
+        map((acmeDetails) => actions.receiveAcmeDetails(acmeDetails)),
+        catchError((err) =>
+          of(
+            actions.failAcmeDetails(
+              extractError(err, "Failed to retrieve ACME Profile")
+            )
+          )
+        )
+      )
+    )
+  );
+
+const activateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
+  action$,
+  _,
+  { apiClients }
+) =>
+  action$.pipe(
+    filter(isOfType(Actions.ActivateAcmeRequest)),
+    switchMap(
+      ({
+        uuid,
+        acmeProfileUuid,
+        issueCertificateAttributes,
+        revokeCertificateAttributes,
+      }) =>
+        apiClients.profiles
+          .activateAcme(
+            uuid,
+            acmeProfileUuid,
+            issueCertificateAttributes,
+            revokeCertificateAttributes
+          )
+          .pipe(
+            map((acmeDetails) => {
+              return actions.receiveActivateAcme(acmeDetails);
+            }),
+            catchError((err) =>
+              of(
+                actions.failActivateAcme(
+                  extractError(err, "Failed to activate ACME.")
+                )
+              )
+            )
+          )
+    )
+  );
+
+const deactivateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
+  action$,
+  _,
+  { apiClients }
+) =>
+  action$.pipe(
+    filter(isOfType(Actions.DeactivateAcmeRequest)),
+    switchMap(({ uuid }) =>
+      apiClients.profiles.deactivateAcme(uuid).pipe(
+        map(() => {
+          return actions.receiveDeactivateAcme();
+        }),
+        catchError((err) =>
+          of(
+            actions.failDeactivateAcme(
+              extractError(err, "Failed to deactivate ACME.")
+            )
+          )
+        )
+      )
+    )
+  );
+
 function mapAttributes(attributes: AttributeResponse): AttributeResponse {
   return {
     ...attributes,
@@ -408,7 +538,12 @@ const epics = [
   getProfileDetail,
   getProfileClients,
   getAttributes,
+  getIssuanceAttributes,
+  getRevocationAttributes,
   updateRaProfile,
+  getAcmeDetails,
+  activateAcme,
+  deactivateAcme,
 ];
 
 export default epics;

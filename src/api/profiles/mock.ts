@@ -6,8 +6,23 @@ import { dbData, createRaProfile } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
 import { AttributeResponse } from "models/attributes";
+import { RaAcmeLink } from "models";
 
 export class ProfilesManagementMock implements model.ProfilesManagementApi {
+  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink> {
+    return of();
+  }
+  activateAcme(
+    uuid: string,
+    acmeProfileUuid: string,
+    issueCertificateAttributes: AttributeResponse[],
+    revokeCertificateAttributes: AttributeResponse[]
+  ): Observable<RaAcmeLink> {
+    return of();
+  }
+  deactivateAcme(uuid: string): Observable<void> {
+    return of();
+  }
   createRaProfile(
     authorityInstanceUuid: string,
     name: string,
@@ -263,5 +278,16 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
         };
       })
     );
+  }
+  getIssuanceAttributes(
+    raProfileUuid: string
+  ): Observable<AttributeResponse[]> {
+    return of([] as AttributeResponse[]);
+  }
+
+  getRevocationAttributes(
+    raProfileUuid: string
+  ): Observable<AttributeResponse[]> {
+    return of([] as AttributeResponse[]);
   }
 }

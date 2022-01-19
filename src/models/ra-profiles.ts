@@ -18,3 +18,12 @@ export interface RaProfileDetail {
   enabled: boolean;
   authorityInstanceName: string;
 }
+
+export interface RaAcmeLink {
+  directoryUrl?: string;
+  uuid: string;
+  name: string;
+  acmeAvailable: boolean;
+  issueCertificateAttributes: any;
+  revokeCertificateAttributes: any;
+}

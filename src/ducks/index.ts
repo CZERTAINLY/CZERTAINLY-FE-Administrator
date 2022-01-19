@@ -41,6 +41,16 @@ import {
   statePath as certificatesStatePath,
 } from "./certificates";
 
+import {
+  reducer as acmeAccountReducer,
+  statePath as acmeAccountStatePath,
+} from "./acme-accounts";
+
+import {
+  reducer as acmeProfilesReducer,
+  statePath as acmeProfilesStatePath,
+} from "./acme-profiles";
+
 import adminEpics from "./administrators-epics";
 import authEpics from "./auth-epics";
 import clientsEpics from "./clients-epics";
@@ -50,6 +60,8 @@ import credentialsEpic from "./credentials-epics";
 import connectorsEpic from "./connectors-epic";
 import authoritiesEpic from "./ca-authorities-epics";
 import certificateEpics from "./certificates-epic";
+import acmeAccountEpics from "./acme-accounts-epics";
+import acmeProfileEpics from "./acme-profiles-epics";
 
 export const reducers = combineReducers<State, any>({
   [certificatesStatePath]: certificatesReducer,
@@ -61,6 +73,8 @@ export const reducers = combineReducers<State, any>({
   [credentialsStatePath]: credentialsReducer,
   [connectorsStatePath]: connectorsReducer,
   [authoritiesStatePath]: authoritiesReducer,
+  [acmeAccountStatePath]: acmeAccountReducer,
+  [acmeProfilesStatePath]: acmeProfilesReducer,
 });
 
 export const epics = combineEpics(
@@ -72,5 +86,7 @@ export const epics = combineEpics(
   ...credentialsEpic,
   ...connectorsEpic,
   ...authoritiesEpic,
-  ...certificateEpics
+  ...certificateEpics,
+  ...acmeAccountEpics,
+  ...acmeProfileEpics
 );
