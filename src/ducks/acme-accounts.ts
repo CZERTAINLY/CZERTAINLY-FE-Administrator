@@ -224,7 +224,6 @@ export function reducer(state: State = initialState, action: Action): State {
     case getType(actions.failDisableAccount):
       return { ...state };
     case getType(actions.receiveEnableAccount):
-      debugger;
       let detailEnable =
         state.selectedAccount || ({} as AcmeAccountDetailResponse);
       detailEnable["enabled"] = true;
@@ -234,7 +233,6 @@ export function reducer(state: State = initialState, action: Action): State {
         selectedAccount: detailEnable,
       };
     case getType(actions.receiveDisableAccount):
-      debugger;
       let detailDisable =
         state.selectedAccount || ({} as AcmeAccountDetailResponse);
       detailDisable["enabled"] = false;

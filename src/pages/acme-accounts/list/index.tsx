@@ -64,17 +64,17 @@ function AcmeAccountList() {
           className="btn btn-link"
           color="white"
           onClick={onDeleteAccount}
-          data-for="delete"
+          data-for="revoke"
           data-tip
           disabled={!(checkedRows.length !== 0)}
         >
           {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-trash" />
+            <i className="fa fa-battery-empty" />
           ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
+            <i className="fa fa-battery-empty" style={{ color: "red" }} />
           )}
 
-          <ToolTip id="delete" message="Delete" />
+          <ToolTip id="revoke" message="Revoke" />
         </Button>
 
         <Button
@@ -228,14 +228,14 @@ function AcmeAccountList() {
       >
         <MDBModalHeader toggle={onCancelDelete}>Delete Account</MDBModalHeader>
         <MDBModalBody>
-          You are about to delete ACME Account that may still be used by some
+          You are about to Revoke ACME Account that may still be used by some
           ACME clients. Deleting these accounts will invalidate the account.
           Existing orders from this account will not be disturbed however, any
           orders which are not yet completed will be deactivated.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>
-            Yes, delete
+            Yes, Revoke
           </Button>
           <Button color="secondary" onClick={onCancelDelete}>
             Cancel

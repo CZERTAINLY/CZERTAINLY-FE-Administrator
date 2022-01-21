@@ -63,17 +63,19 @@ function AcmeAccountDetail() {
           className="btn btn-link"
           color="white"
           onClick={onDeleteAccount}
-          data-for="delete"
+          data-for="revoke"
           data-tip
-          disabled={accountDetails?.enabled}
+          disabled={
+            accountDetails?.status === "revoked" || accountDetails?.enabled
+          }
         >
-          {accountDetails?.enabled ? (
-            <i className="fa fa-trash" />
+          {accountDetails?.enabled || accountDetails?.status === "revoked" ? (
+            <i className="fa fa-battery-empty" />
           ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
+            <i className="fa fa-battery-empty" style={{ color: "red" }} />
           )}
 
-          <ToolTip id="delete" message="Delete" />
+          <ToolTip id="revoke" message="Revoke" />
         </Button>
 
         <Button
@@ -82,9 +84,11 @@ function AcmeAccountDetail() {
           onClick={onEnableAccount}
           data-for="enable"
           data-tip
-          disabled={accountDetails?.enabled}
+          disabled={
+            accountDetails?.status === "revoked" || accountDetails?.enabled
+          }
         >
-          {accountDetails?.enabled ? (
+          {accountDetails?.enabled || accountDetails?.status === "revoked" ? (
             <i className="fa fa-check" />
           ) : (
             <i className="fa fa-check" style={{ color: "green" }} />
@@ -99,9 +103,13 @@ function AcmeAccountDetail() {
           onClick={onDisableAccount}
           data-for="disable"
           data-tip
-          disabled={!accountDetails?.enabled}
+          disabled={
+            accountDetails?.status === "revoked" || !accountDetails?.enabled
+          }
         >
-          {!accountDetails?.enabled ? (
+          {!(
+            accountDetails?.enabled || accountDetails?.status === "revoked"
+          ) ? (
             <i className="fa fa-times" />
           ) : (
             <i className="fa fa-times" style={{ color: "red" }} />
@@ -219,14 +227,14 @@ function AcmeAccountDetail() {
       >
         <MDBModalHeader toggle={onCancelDelete}>Delete Account</MDBModalHeader>
         <MDBModalBody>
-          You are about to delete ACME Account that may still be used by some
+          You are about to Revoke ACME Account that may still be used by some
           ACME clients. Deleting these accounts will invalidate the account.
           Existing orders from this account will not be disturbed however, any
           orders which are not yet completed will be deactivated.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>
-            Yes, delete
+            Yes, Revoke
           </Button>
           <Button color="secondary" onClick={onCancelDelete}>
             Cancel
