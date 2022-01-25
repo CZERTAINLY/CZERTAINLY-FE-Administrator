@@ -37,7 +37,8 @@ function RaProfileAdd() {
       issueCertificateAttributes: AttributeResponse[],
       revokeCertificateAttributes: AttributeResponse[],
       insistContact,
-      insistTermsOfServiceUrl
+      insistTermsOfService,
+      changeTermsOfServiceUrl
     ) => {
       dispatch(
         actions.requestCreateAcmeProfile(
@@ -54,7 +55,8 @@ function RaProfileAdd() {
           issueCertificateAttributes,
           revokeCertificateAttributes,
           insistContact,
-          insistTermsOfServiceUrl,
+          insistTermsOfService,
+          changeTermsOfServiceUrl,
           history
         )
       );

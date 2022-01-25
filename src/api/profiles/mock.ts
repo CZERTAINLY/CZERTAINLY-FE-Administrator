@@ -218,7 +218,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
   getAuthorizedClients(
     uuid: string
-  ): Observable<model.RaProfileAuthorizationsReponse[]> {
+  ): Observable<model.RaProfileAuthorizationsResponse[]> {
     const profile = dbData.raProfiles.find(
       (p) => p.uuid.toString() === uuid.toString()
     );

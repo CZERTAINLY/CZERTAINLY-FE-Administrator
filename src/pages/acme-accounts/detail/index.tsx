@@ -58,66 +58,62 @@ function AcmeAccountDetail() {
 
   const detailsTitle = (
     <div>
-      <div className="pull-right mt-n-xs">
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDeleteAccount}
-          data-for="revoke"
-          data-tip
-          disabled={
-            accountDetails?.status === "revoked" || accountDetails?.enabled
-          }
-        >
-          {accountDetails?.enabled || accountDetails?.status === "revoked" ? (
-            <i className="fa fa-battery-empty" />
-          ) : (
-            <i className="fa fa-battery-empty" style={{ color: "red" }} />
-          )}
+      {accountDetails?.status === "valid" ? (
+        <div>
+          <div className="pull-right mt-n-xs">
+            <Button
+              className="btn btn-link"
+              color="white"
+              onClick={onDeleteAccount}
+              data-for="revoke"
+              data-tip
+              disabled={accountDetails?.enabled}
+            >
+              {accountDetails?.enabled ? (
+                <i className="fa fa-battery-empty" />
+              ) : (
+                <i className="fa fa-battery-empty" style={{ color: "red" }} />
+              )}
 
-          <ToolTip id="revoke" message="Revoke" />
-        </Button>
+              <ToolTip id="revoke" message="Revoke" />
+            </Button>
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnableAccount}
-          data-for="enable"
-          data-tip
-          disabled={
-            accountDetails?.status === "revoked" || accountDetails?.enabled
-          }
-        >
-          {accountDetails?.enabled || accountDetails?.status === "revoked" ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
+            <Button
+              className="btn btn-link"
+              color="white"
+              onClick={onEnableAccount}
+              data-for="enable"
+              data-tip
+              disabled={accountDetails?.enabled}
+            >
+              {accountDetails?.enabled ? (
+                <i className="fa fa-check" />
+              ) : (
+                <i className="fa fa-check" style={{ color: "green" }} />
+              )}
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+              <ToolTip id="enable" message="Enable" />
+            </Button>
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisableAccount}
-          data-for="disable"
-          data-tip
-          disabled={
-            accountDetails?.status === "revoked" || !accountDetails?.enabled
-          }
-        >
-          {!(
-            accountDetails?.enabled || accountDetails?.status === "revoked"
-          ) ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
+            <Button
+              className="btn btn-link"
+              color="white"
+              onClick={onDisableAccount}
+              data-for="disable"
+              data-tip
+              disabled={!accountDetails?.enabled}
+            >
+              {!accountDetails?.enabled ? (
+                <i className="fa fa-times" />
+              ) : (
+                <i className="fa fa-times" style={{ color: "red" }} />
+              )}
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
+              <ToolTip id="disable" message="Disable" />
+            </Button>
+          </div>
+        </div>
+      ) : null}
       <h5>
         ACME Account <span className="fw-semi-bold">Details</span>
       </h5>
@@ -186,6 +182,30 @@ function AcmeAccountDetail() {
               <td>{accountDetails?.status}</td>
             </tr>
             <tr>
+              <td>Terms of Service Agreed</td>
+              <td>{accountDetails?.termsOfServiceAgreed ? "Yes" : "No"}</td>
+            </tr>
+            <tr>
+              <td>Contacts</td>
+              <td>
+                {accountDetails?.contact.map(function (contact) {
+                  return <span>{contact}</span>;
+                })}
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+      </Widget>
+      <Widget title={"Order Summary"}>
+        <Table className="table-hover" size="sm">
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
               <td>Successful Orders</td>
               <td>{accountDetails?.successfulOrders}</td>
             </tr>
@@ -204,18 +224,6 @@ function AcmeAccountDetail() {
             <tr>
               <td>Processing Orders</td>
               <td>{accountDetails?.processingOrders}</td>
-            </tr>
-            <tr>
-              <td>Terms of Service Agreed</td>
-              <td>{accountDetails?.termsOfServiceAgreed ? "Yes" : "No"}</td>
-            </tr>
-            <tr>
-              <td>Contacts</td>
-              <td>
-                {accountDetails?.contact.map(function (contact) {
-                  return <span>contact</span>;
-                })}
-              </td>
             </tr>
           </tbody>
         </Table>

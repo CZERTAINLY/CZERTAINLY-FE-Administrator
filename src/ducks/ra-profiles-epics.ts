@@ -521,6 +521,7 @@ function mapProfile(profile: RaProfileResponse): RaProfile {
     authorityInstanceUuid: profile.authorityInstanceUuid,
     description: profile.description,
     authorityInstanceName: profile.authorityInstanceName,
+    enabledProtocols: profile.enabledProtocols,
   };
 }
 

@@ -33,7 +33,8 @@ export class AcmeProfilesManagementBackend
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
     insistContact: boolean,
-    insistTermsOfServiceUrl: boolean
+    insistTermsOfService: boolean,
+    changeTermsOfServiceUrl: string
   ): Observable<string> {
     return createNewResource(baseUrl, {
       name,
@@ -53,7 +54,8 @@ export class AcmeProfilesManagementBackend
         revokeCertificateAttributes
       ),
       insistContact,
-      insistTermsOfServiceUrl,
+      insistTermsOfService,
+      changeTermsOfServiceUrl,
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -121,10 +123,11 @@ export class AcmeProfilesManagementBackend
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
     insistContact: boolean,
-    insistTermsOfServiceUrl: boolean
+    insistTermsOfService: boolean,
+    changeTermsOfServiceUrl: string
   ): Observable<model.AcmeProfileDetailResponse> {
     return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+      new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
         description,
         termsOfServiceUrl,
         dnsResolverIp,
@@ -141,7 +144,8 @@ export class AcmeProfilesManagementBackend
           revokeCertificateAttributes
         ),
         insistContact,
-        insistTermsOfServiceUrl,
+        insistTermsOfService,
+        changeTermsOfServiceUrl,
       })
     );
   }

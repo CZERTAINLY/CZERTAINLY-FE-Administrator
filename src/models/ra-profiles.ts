@@ -7,6 +7,7 @@ export interface RaProfile {
   authorityInstanceUuid: string;
   description?: string;
   authorityInstanceName: string;
+  enabledProtocols?: string[];
 }
 
 export interface RaProfileDetail {

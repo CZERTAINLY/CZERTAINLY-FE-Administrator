@@ -18,6 +18,7 @@ export interface AcmeProfileDetailResponse {
   enabled: boolean;
   description?: string;
   termsOfServiceUrl?: string;
+  websiteUrl?: string;
   dnsResolverIp?: string;
   dnsResolverPort?: string;
   raProfile?: RaProfile;
@@ -28,7 +29,8 @@ export interface AcmeProfileDetailResponse {
   issueCertificateAttributes?: AttributeResponse[];
   revokeCertificateAttributes?: AttributeResponse[];
   insistContact: boolean;
-  insistTermsOfServiceUrl: boolean;
+  insistTermsOfService: boolean;
+  changeTermsOfServiceUrl: string;
 }
 
 export interface AcmeProfilesManagementApi {
@@ -46,7 +48,8 @@ export interface AcmeProfilesManagementApi {
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
     insistContact: boolean,
-    insistTermsOfServiceUrl: boolean
+    insistTermsOfService: boolean,
+    changeTermsOfServiceUrl: string
   ): Observable<string>;
   deleteAcmeProfile(uuid: string | number): Observable<void>;
   enableAcmeProfile(uuid: string | number): Observable<void>;
@@ -70,6 +73,7 @@ export interface AcmeProfilesManagementApi {
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
     insistContact: boolean,
-    insistTermsOfServiceUrl: boolean
+    insistTermsOfService: boolean,
+    changeTermsOfServiceUrl: string
   ): Observable<AcmeProfileDetailResponse>;
 }

@@ -191,6 +191,40 @@ function AcmeProfileDetail() {
                   <td>{profileDetails?.description}</td>
                 </tr>
                 <tr>
+                  <td>Status</td>
+                  <td>
+                    <StatusBadge enabled={profileDetails?.enabled} />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Website</td>
+                  <td>{profileDetails?.websiteUrl}</td>
+                </tr>
+                <tr>
+                  <td>Retry Interval</td>
+                  <td>{profileDetails?.retryInterval || "30"} (Seconds)</td>
+                </tr>
+                <tr>
+                  <td>Order Validity</td>
+                  <td>{profileDetails?.validity || "36000"} (Seconds)</td>
+                </tr>
+                <tr>
+                  <td>Directory URL</td>
+                  <td>{profileDetails?.directoryUrl}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </Widget>
+          <Widget title={"RA Profile"}>
+            <Table className="table-hover" size="sm">
+              <thead>
+                <tr>
+                  <th>Attribute</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
                   <td>RA Profile Name</td>
                   <td>
                     {profileDetails?.raProfile?.name ? (
@@ -200,42 +234,67 @@ function AcmeProfileDetail() {
                         {profileDetails.raProfile.name}
                       </Link>
                     ) : (
-                      profileDetails?.raProfile?.name
+                      profileDetails?.raProfile?.name || "No RA Profile tagged"
                     )}
                   </td>
                 </tr>
                 <tr>
-                  <td>Status</td>
+                  <td>RA Profile UUID</td>
+                  <td>{profileDetails?.raProfile?.uuid}</td>
+                </tr>
+                <tr>
+                  <td>RA Profile Status</td>
                   <td>
-                    <StatusBadge enabled={profileDetails?.enabled} />
+                    <StatusBadge enabled={profileDetails?.raProfile?.enabled} />
                   </td>
                 </tr>
+              </tbody>
+            </Table>
+          </Widget>
+        </Col>
+        <Col>
+          <Widget title={"DNS"}>
+            <Table className="table-hover" size="sm">
+              <thead>
+                <tr>
+                  <th>Attribute</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DNS Resolver IP</td>
+                  <td>{profileDetails?.dnsResolverIp || "System Default"}</td>
+                </tr>
+                <tr>
+                  <td>DNS Resolver Port</td>
+                  <td>{profileDetails?.dnsResolverPort || "System Default"}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </Widget>
+          <Widget title={"Terms of Service"}>
+            <Table className="table-hover" size="sm">
+              <thead>
+                <tr>
+                  <th>Attribute</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
                 <tr>
                   <td>Terms of Service Url</td>
                   <td>{profileDetails?.termsOfServiceUrl}</td>
                 </tr>
                 <tr>
-                  <td>DNS Resolver IP</td>
-                  <td>{profileDetails?.dnsResolverIp}</td>
+                  <td>Changes in Terms of Service URL</td>
+                  <td>{profileDetails?.changeTermsOfServiceUrl}</td>
                 </tr>
                 <tr>
-                  <td>DNS Resolver Port</td>
-                  <td>{profileDetails?.dnsResolverPort}</td>
-                </tr>
-                <tr>
-                  <td>Retry Interval</td>
-                  <td>{profileDetails?.retryInterval} (Seconds)</td>
-                </tr>
-                <tr>
-                  <td>validity</td>
-                  <td>{profileDetails?.validity} (Seconds)</td>
-                </tr>
-                <tr>
-                  <td>Directory URL</td>
-                  <td>{profileDetails?.directoryUrl}</td>
-                </tr>
-                <tr>
-                  <td>Terms of Service Change Approval Needed</td>
+                  <td>
+                    Disable new Order placement? (due to change in Terms of
+                    Service)
+                  </td>
                   <td>
                     {profileDetails?.termsOfServiceChangeApproval
                       ? "Yes"
@@ -245,8 +304,6 @@ function AcmeProfileDetail() {
               </tbody>
             </Table>
           </Widget>
-        </Col>
-        <Col>
           <Widget title={issueAttributeTitle}>
             <Table className="table-hover" size="sm">
               <thead>

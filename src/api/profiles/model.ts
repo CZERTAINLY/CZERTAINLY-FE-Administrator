@@ -9,6 +9,7 @@ export interface RaProfileResponse {
   authorityInstanceUuid: string;
   description: string;
   authorityInstanceName: string;
+  enabledProtocols?: string[];
 }
 
 export interface RaProfileDetailResponse {
@@ -21,7 +22,7 @@ export interface RaProfileDetailResponse {
   authorityInstanceName: string;
 }
 
-export interface RaProfileAuthorizationsReponse {
+export interface RaProfileAuthorizationsResponse {
   uuid: string;
 }
 
@@ -48,7 +49,7 @@ export interface ProfilesManagementApi {
   getRaProfileDetail(uuid: string): Observable<RaProfileDetailResponse>;
   getAuthorizedClients(
     uuid: string
-  ): Observable<RaProfileAuthorizationsReponse[]>;
+  ): Observable<RaProfileAuthorizationsResponse[]>;
   updateRaProfile(
     authorityInstanceUuid: string,
     uuid: string,

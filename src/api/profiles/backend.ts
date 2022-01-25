@@ -121,7 +121,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
   getAuthorizedClients(
     uuid: string
-  ): Observable<model.RaProfileAuthorizationsReponse[]> {
+  ): Observable<model.RaProfileAuthorizationsResponse[]> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}/listclients`, "GET")
     );
