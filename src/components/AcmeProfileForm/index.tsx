@@ -274,7 +274,7 @@ function AcmeProfileForm({
       setRaProfileOptions(raProf);
       setRaProfileUuid(acmeProfile?.raProfile?.uuid || "NONE");
     }
-  }, [acmeProfile, raProfiles]);
+  }, [acmeProfile, raProfiles, editMode]);
 
   useEffect(() => {
     const raLength = acmeProfile?.issueCertificateAttributes || [];
@@ -503,7 +503,7 @@ function AcmeProfileForm({
                     name="changeTermsOfServiceUrl"
                     placeholder="New Terms of Service URL"
                     value={changeTermsOfServiceUrl}
-                    onChange={onWebsiteUrl}
+                    onChange={onChangeTermsOfServiceUrl}
                     valid={validateCustomUrl(changeTermsOfServiceUrl)}
                     invalid={
                       changeTermsOfServiceUrl
