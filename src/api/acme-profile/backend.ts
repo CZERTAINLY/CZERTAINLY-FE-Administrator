@@ -28,7 +28,7 @@ export class AcmeProfilesManagementBackend
     raProfileUuid: string,
     websiteUrl: string,
     retryInterval: number,
-    termsOfServiceChangeApproval: boolean,
+    termsOfServiceChangeDisable: boolean,
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
@@ -45,7 +45,7 @@ export class AcmeProfilesManagementBackend
       raProfileUuid,
       websiteUrl,
       retryInterval,
-      termsOfServiceChangeApproval,
+      termsOfServiceChangeDisable,
       validity,
       issueCertificateAttributes: attributeSimplifier(
         issueCertificateAttributes
@@ -118,7 +118,7 @@ export class AcmeProfilesManagementBackend
     raProfileUuid: string,
     websiteUrl: string,
     retryInterval: number,
-    termsOfServiceChangeApproval: boolean,
+    termsOfServiceChangeDisable: boolean,
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
@@ -135,7 +135,7 @@ export class AcmeProfilesManagementBackend
         raProfileUuid,
         websiteUrl,
         retryInterval,
-        termsOfServiceChangeApproval,
+        termsOfServiceChangeDisable,
         validity,
         issueCertificateAttributes: attributeSimplifier(
           issueCertificateAttributes

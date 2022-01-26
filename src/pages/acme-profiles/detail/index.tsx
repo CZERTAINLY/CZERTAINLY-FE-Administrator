@@ -287,7 +287,7 @@ function AcmeProfileDetail() {
                   <td>{profileDetails?.termsOfServiceUrl}</td>
                 </tr>
                 <tr>
-                  <td>Changes in Terms of Service URL</td>
+                  <td>Changes of Terms of Service URL</td>
                   <td>{profileDetails?.changeTermsOfServiceUrl}</td>
                 </tr>
                 <tr>
@@ -296,9 +296,7 @@ function AcmeProfileDetail() {
                     Service)
                   </td>
                   <td>
-                    {profileDetails?.termsOfServiceChangeApproval
-                      ? "Yes"
-                      : "No"}
+                    {profileDetails?.termsOfServiceChangeDisable ? "Yes" : "No"}
                   </td>
                 </tr>
               </tbody>

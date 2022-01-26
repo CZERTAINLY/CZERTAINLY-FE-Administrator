@@ -1634,7 +1634,7 @@ export const dbData = {
       enabled: true,
     },
     retryInterval: 30,
-    termsOfServiceChangeApproval: false,
+    termsOfServiceChangeDisable: false,
     changeTermsOfServiceUrl: "sample.org",
     validity: 3000,
     directoryUrl: "https://localhost:8443/api/acme/asqwered1/directory",

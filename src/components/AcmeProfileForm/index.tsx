@@ -47,7 +47,7 @@ interface Props {
     raProfileUuid: string,
     websiteUrl: string,
     retryInterval: number,
-    termsOfServiceChangeApproval: boolean,
+    termsOfServiceChangeDisable: boolean,
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
@@ -90,7 +90,7 @@ function AcmeProfileForm({
   const [validity, setValidity] = useState("5000");
   const [insistContact, setInsistContact] = useState(false);
   const [insistTermsOfService, setInsistTermsOfServiceUrl] = useState(false);
-  const [termsOfServiceChangeApproval, setTermsOfServiceChangeApproval] =
+  const [termsOfServiceChangeDisable, setTermsOfServiceChangeApproval] =
     useState(false);
 
   const [issueEditableAttributes, setIssueEditableAttributes]: any = useState(
@@ -214,7 +214,7 @@ function AcmeProfileForm({
         raProfileUuid,
         websiteUrl,
         Number(retryInterval),
-        termsOfServiceChangeApproval,
+        termsOfServiceChangeDisable,
         Number(validity),
         changedIssueAttributes,
         changedRevokeAttributes,
@@ -232,7 +232,7 @@ function AcmeProfileForm({
       dnsResolverPort,
       raProfileUuid,
       retryInterval,
-      termsOfServiceChangeApproval,
+      termsOfServiceChangeDisable,
       validity,
       issueAttributes,
       revokeAttributes,
@@ -253,7 +253,7 @@ function AcmeProfileForm({
     setRetryInterval(acmeProfile?.retryInterval?.toString() || "");
     setValidity(acmeProfile?.validity?.toString() || "");
     setTermsOfServiceChangeApproval(
-      acmeProfile?.termsOfServiceChangeApproval || false
+      acmeProfile?.termsOfServiceChangeDisable || false
     );
     setWebsiteUrl(acmeProfile?.websiteUrl || "");
     setChangeTermsOfServiceUrl(acmeProfile?.changeTermsOfServiceUrl || "");
@@ -496,12 +496,12 @@ function AcmeProfileForm({
               <Col>
                 <FormGroup>
                   <Label for="changeTermsOfServiceUrl">
-                    New Terms of Service URL
+                    Changes of Terms of Service URL
                   </Label>
                   <Input
                     type="text"
                     name="changeTermsOfServiceUrl"
-                    placeholder="New Terms of Service URL"
+                    placeholder="Changes of Terms of Service URL"
                     value={changeTermsOfServiceUrl}
                     onChange={onChangeTermsOfServiceUrl}
                     valid={validateCustomUrl(changeTermsOfServiceUrl)}
@@ -515,14 +515,14 @@ function AcmeProfileForm({
               </Col>
               <Col className="align-items-center">
                 <FormGroup>
-                  <Label for="termsOfServiceChangeApproval">
+                  <Label for="termsOfServiceChangeDisable">
                     Disable new Order (Changes in Terms of Service)
                   </Label>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   <Input
                     type="checkbox"
-                    name="termsOfServiceChangeApproval"
-                    defaultChecked={acmeProfile?.termsOfServiceChangeApproval}
+                    name="termsOfServiceChangeDisable"
+                    defaultChecked={acmeProfile?.termsOfServiceChangeDisable}
                     onChange={(event) =>
                       setTermsOfServiceChangeApproval(event.target.checked)
                     }

@@ -23,7 +23,7 @@ export interface AcmeProfileDetailResponse {
   dnsResolverPort?: string;
   raProfile?: RaProfile;
   retryInterval?: number;
-  termsOfServiceChangeApproval?: boolean;
+  termsOfServiceChangeDisable?: boolean;
   validity?: number;
   directoryUrl: string;
   issueCertificateAttributes?: AttributeResponse[];
@@ -43,7 +43,7 @@ export interface AcmeProfilesManagementApi {
     raProfileUuid: string,
     websiteUrl: string,
     retryInterval: number,
-    termsOfServiceChangeApproval: boolean,
+    termsOfServiceChangeDisable: boolean,
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
@@ -68,7 +68,7 @@ export interface AcmeProfilesManagementApi {
     raProfileUuid: string,
     websiteUrl: string,
     retryInterval: number,
-    termsOfServiceChangeApproval: boolean,
+    termsOfServiceChangeDisable: boolean,
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
