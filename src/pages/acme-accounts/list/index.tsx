@@ -230,7 +230,7 @@ function AcmeAccountList() {
         <MDBModalBody>
           You are about to revoke ACME Account(s). Any new Orders will not be
           processed for this Account(s). After revoking you cannot re-enable the
-          Account.
+          Account(s).
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>

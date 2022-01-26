@@ -220,7 +220,7 @@ function AcmeProfileList() {
         <MDBModalHeader toggle={onCancelDelete}>Delete Profile</MDBModalHeader>
         <MDBModalBody>
           You are about to delete ACME Profile(s) which may have associated ACME
-          Account(s). When deleted the ACME Accounts will be revoked.
+          Account(s). When deleted the ACME Account(s) will be revoked.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>
