@@ -514,7 +514,7 @@ function RaProfileDetail() {
               </Widget>
             </Col>
             <Col>
-              <Widget title={"ACME Issue Certificate Attributes"}>
+              <Widget title={"List of Attributes to issue Certificate"}>
                 <Table className="table-hover" size="sm">
                   <thead>
                     <tr>
@@ -541,7 +541,7 @@ function RaProfileDetail() {
                   </tbody>
                 </Table>
               </Widget>
-              <Widget title="ACME Revoke Certificate Attributes">
+              <Widget title="List of Attributes to revoke Certificate">
                 <Table className="table-hover" size="sm">
                   <thead>
                     <tr>

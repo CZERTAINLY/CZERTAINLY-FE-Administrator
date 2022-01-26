@@ -228,10 +228,9 @@ function AcmeAccountList() {
       >
         <MDBModalHeader toggle={onCancelDelete}>Delete Account</MDBModalHeader>
         <MDBModalBody>
-          You are about to Revoke ACME Account that may still be used by some
-          ACME clients. Deleting these accounts will invalidate the account.
-          Existing orders from this account will not be disturbed however, any
-          orders which are not yet completed will be deactivated.
+          You are about to revoke ACME Account(s). Any new Orders will not be
+          processed for this Account(s). After revoking you cannot re-enable the
+          Account.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>

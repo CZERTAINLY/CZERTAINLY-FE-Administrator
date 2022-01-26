@@ -356,7 +356,7 @@ const getAttributes: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failAttribute(
-              extractError(err, "Failed to retrieve attributes list")
+              extractError(err, "Failed to retrieve Attributes list")
             )
           )
         )
@@ -380,7 +380,7 @@ const getIssuanceAttributes: Epic<
             actions.failIssuanceAttributes(
               extractError(
                 err,
-                "Failed to retrieve certificates Issuance attributes"
+                "Failed to retrieve Attributes to issue Certificate"
               )
             )
           )
@@ -405,7 +405,7 @@ const getRevocationAttributes: Epic<
             actions.failRevokeAttributes(
               extractError(
                 err,
-                "Failed to retrieve certificate revocation attributes"
+                "Failed to retrieve Attributes to revoke Certificate"
               )
             )
           )
@@ -427,7 +427,7 @@ const getAcmeDetails: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failAcmeDetails(
-              extractError(err, "Failed to retrieve ACME Profile")
+              extractError(err, "Failed to retrieve ACME Profile details")
             )
           )
         )
@@ -463,7 +463,7 @@ const activateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
             catchError((err) =>
               of(
                 actions.failActivateAcme(
-                  extractError(err, "Failed to activate ACME.")
+                  extractError(err, "Failed to activate ACME Profile.")
                 )
               )
             )
@@ -486,7 +486,7 @@ const deactivateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failDeactivateAcme(
-              extractError(err, "Failed to deactivate ACME.")
+              extractError(err, "Failed to deactivate ACME Profile.")
             )
           )
         )

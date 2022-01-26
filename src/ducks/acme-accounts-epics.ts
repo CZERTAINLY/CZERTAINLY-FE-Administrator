@@ -19,12 +19,12 @@ const getAccountsList: Epic<Action, Action, AppState, EpicDependencies> = (
         map((accounts) =>
           Array.isArray(accounts)
             ? actions.receiveAcmeAccountList(accounts)
-            : actions.failAcmeAccountList("Failed to get ACME Account list")
+            : actions.failAcmeAccountList("Failed to get ACME Accounts list")
         ),
         catchError((err) =>
           of(
             actions.failAcmeAccountList(
-              extractError(err, "Failed to get ACME Account list")
+              extractError(err, "Failed to get ACME Accounts list")
             )
           )
         )
@@ -46,14 +46,14 @@ const getAccountDetail: Epic<Action, Action, AppState, EpicDependencies> = (
             return actions.receiveAccountDetail(detail);
           } catch (err) {
             return actions.failAccountDetail(
-              "Failed to get ACME Account detail"
+              "Failed to get ACME Account details"
             );
           }
         }),
         catchError((err) =>
           of(
             actions.failAccountDetail(
-              extractError(err, "Failed to get ACME account detail")
+              extractError(err, "Failed to get ACME Account details")
             )
           )
         )
@@ -77,7 +77,7 @@ const deleteAccount: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failAccountDetail(
-              extractError(err, "Failed to delete account")
+              extractError(err, "Failed to delete Account")
             )
           )
         )
@@ -98,7 +98,7 @@ const enableAccount: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failEnableAccount(
-              extractError(err, "Failed to enable account")
+              extractError(err, "Failed to enable Account")
             )
           )
         )
@@ -119,7 +119,7 @@ const disableAccount: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failDisableAccount(
-              extractError(err, "Failed to disable account")
+              extractError(err, "Failed to disable Account")
             )
           )
         )
@@ -140,7 +140,7 @@ const bulkDeleteAccount: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failBulkDeleteAccount(
-              extractError(err, "Failed to delete accounts")
+              extractError(err, "Failed to delete Accounts")
             )
           )
         )
@@ -161,7 +161,7 @@ const bulkEnableAccount: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failBulkEnableAccount(
-              extractError(err, "Failed to enable accounts")
+              extractError(err, "Failed to enable Accounts")
             )
           )
         )
@@ -182,7 +182,7 @@ const bulkDisableAccount: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failBulkDisableAccount(
-              extractError(err, "Failed to disable accounts")
+              extractError(err, "Failed to disable Accounts")
             )
           )
         )

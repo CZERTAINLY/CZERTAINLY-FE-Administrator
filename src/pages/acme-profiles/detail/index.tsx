@@ -136,17 +136,9 @@ function AcmeProfileDetail() {
     </div>
   );
 
-  const issueAttributeTitle = (
-    <h5>
-      List of New Certificate Issuance{" "}
-      <span className="fw-semi-bold">Attributes</span>
-    </h5>
-  );
+  const issueAttributeTitle = <h5>List of Attributes to issue Certificate</h5>;
   const revokeAttributeTitle = (
-    <h5>
-      List of Certificate Revocation{" "}
-      <span className="fw-semi-bold">Attributes</span>
-    </h5>
+    <h5>List of Attributes to revoke Certificate</h5>
   );
 
   const getAttributeValue = (attribute: AttributeResponse) => {
@@ -197,7 +189,7 @@ function AcmeProfileDetail() {
                   </td>
                 </tr>
                 <tr>
-                  <td>Website</td>
+                  <td>Website URL</td>
                   <td>{profileDetails?.websiteUrl}</td>
                 </tr>
                 <tr>
@@ -263,11 +255,11 @@ function AcmeProfileDetail() {
               </thead>
               <tbody>
                 <tr>
-                  <td>DNS Resolver IP</td>
+                  <td>DNS Resolver IP address</td>
                   <td>{profileDetails?.dnsResolverIp || "System Default"}</td>
                 </tr>
                 <tr>
-                  <td>DNS Resolver Port</td>
+                  <td>DNS Resolver port number</td>
                   <td>{profileDetails?.dnsResolverPort || "System Default"}</td>
                 </tr>
               </tbody>
@@ -283,7 +275,7 @@ function AcmeProfileDetail() {
               </thead>
               <tbody>
                 <tr>
-                  <td>Terms of Service Url</td>
+                  <td>Terms of Service URL</td>
                   <td>{profileDetails?.termsOfServiceUrl}</td>
                 </tr>
                 <tr>
@@ -366,9 +358,8 @@ function AcmeProfileDetail() {
       >
         <MDBModalHeader toggle={onCancelDelete}>Delete Profile</MDBModalHeader>
         <MDBModalBody>
-          You are about to delete ACME Profiles which may have existing ACME
-          Account from clients. If you continue, these accounts cannot be used.
-          Is this what you want to do?
+          You are about to delete ACME Profile which may have associated ACME
+          Account(s). When deleted the ACME Accounts will be revoked.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>

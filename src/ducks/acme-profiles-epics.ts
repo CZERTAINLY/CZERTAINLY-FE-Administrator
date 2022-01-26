@@ -53,7 +53,7 @@ const getProfileDetail: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failProfileDetail(
-              extractError(err, "Failed to get ACME Profile detail")
+              extractError(err, "Failed to get ACME Profile details")
             )
           )
         )
@@ -137,7 +137,7 @@ const deleteAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failDeleteProfile(
-              extractError(err, "Failed to delete profile")
+              extractError(err, "Failed to delete ACME Profile")
             )
           )
         )
@@ -158,7 +158,7 @@ const enableAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failEnableProfile(
-              extractError(err, "Failed to enable profile")
+              extractError(err, "Failed to enable ACME Profile")
             )
           )
         )
@@ -179,7 +179,7 @@ const disableAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failDisableProfile(
-              extractError(err, "Failed to disable profile")
+              extractError(err, "Failed to disable ACME Profile")
             )
           )
         )
@@ -201,7 +201,7 @@ const bulkDeleteAcmeProfile: Epic<
         catchError((err) =>
           of(
             actions.failBulkDeleteProfile(
-              extractError(err, "Failed to delete profile")
+              extractError(err, "Failed to delete ACME Profiles")
             )
           )
         )
@@ -223,7 +223,7 @@ const bulkEnableAcmeProfile: Epic<
         catchError((err) =>
           of(
             actions.failBulkEnableProfile(
-              extractError(err, "Failed to enable profile")
+              extractError(err, "Failed to enable ACME Profiles")
             )
           )
         )
@@ -245,7 +245,7 @@ const bulkDisableAcmeProfile: Epic<
         catchError((err) =>
           of(
             actions.failBulkDisableProfile(
-              extractError(err, "Failed to disable profile")
+              extractError(err, "Failed to disable ACME Profiles")
             )
           )
         )
@@ -305,7 +305,7 @@ const updateAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
             catchError((err) =>
               of(
                 actions.failUpdateProfile(
-                  extractError(err, "Failed to update profile")
+                  extractError(err, "Failed to update ACME Profile")
                 )
               )
             )

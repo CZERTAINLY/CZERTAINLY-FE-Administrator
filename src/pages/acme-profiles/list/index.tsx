@@ -219,9 +219,8 @@ function AcmeProfileList() {
       >
         <MDBModalHeader toggle={onCancelDelete}>Delete Profile</MDBModalHeader>
         <MDBModalBody>
-          You are about to delete RA Profiles which may have existing
-          authorizations from clients. If you continue, these authorizations
-          will be deleted as well. Is this what you want to do?
+          You are about to delete ACME Profile(s) which may have associated ACME
+          Account(s). When deleted the ACME Accounts will be revoked.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>
