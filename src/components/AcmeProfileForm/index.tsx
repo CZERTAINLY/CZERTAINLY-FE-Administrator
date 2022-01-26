@@ -393,11 +393,11 @@ function AcmeProfileForm({
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
               <Col>
                 <FormGroup>
-                  <Label for="dnsResolverIp">DNS Resolver IP</Label>
+                  <Label for="dnsResolverIp">DNS Resolver IP address</Label>
                   <Input
                     type="text"
                     name="dnsResolverIp"
-                    placeholder="DNS Resolver IP. If not provided system default will be used"
+                    placeholder="DNS Resolver IP address. If not provided system default will be used"
                     value={dnsResolverIp}
                     onChange={onDnsResolver}
                     valid={validateCustomIp(dnsResolverIp)}
@@ -409,11 +409,11 @@ function AcmeProfileForm({
               </Col>
               <Col>
                 <FormGroup>
-                  <Label for="dnsResolverPort">DNS Resolver Port</Label>
+                  <Label for="dnsResolverPort">DNS Resolver port number</Label>
                   <Input
                     type="number"
                     name="dnsResolverPort"
-                    placeholder="DNS Resolver Port"
+                    placeholder="DNS Resolver port number"
                     value={dnsResolverPort}
                     onChange={onDnsResolverPort}
                     valid={validateCustomPort(dnsResolverPort)}
@@ -516,9 +516,8 @@ function AcmeProfileForm({
               <Col className="align-items-center">
                 <FormGroup>
                   <Label for="termsOfServiceChangeDisable">
-                    Disable new Order (Changes in Terms of Service)
+                    Disable new Orders (Changes in Terms of Service)
                   </Label>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   <Input
                     type="checkbox"
                     name="termsOfServiceChangeDisable"
@@ -534,7 +533,6 @@ function AcmeProfileForm({
               <Label for="insistTermsOfService">
                 Require agree on Terms Of Service for new account
               </Label>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <Input
                 type="checkbox"
                 name="insistTermsOfService"
@@ -547,9 +545,8 @@ function AcmeProfileForm({
 
             <FormGroup>
               <Label for="insistContact">
-                Require Contact Information for new Accounts
+                Require contact information for new Accounts
               </Label>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <Input
                 type="checkbox"
                 name="insistContact"

@@ -284,7 +284,7 @@ function AcmeProfileDetail() {
                 </tr>
                 <tr>
                   <td>
-                    Disable new Order placement? (due to change in Terms of
+                    Disable new Orders placement? (due to change in Terms of
                     Service)
                   </td>
                   <td>
@@ -359,7 +359,7 @@ function AcmeProfileDetail() {
         <MDBModalHeader toggle={onCancelDelete}>Delete Profile</MDBModalHeader>
         <MDBModalBody>
           You are about to delete ACME Profile which may have associated ACME
-          Account(s). When deleted the ACME Accounts will be revoked.
+          Account(s). When deleted the ACME Account(s) will be revoked.
         </MDBModalBody>
         <MDBModalFooter>
           <Button color="danger" onClick={onConfirmDelete}>
