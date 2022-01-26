@@ -58,6 +58,19 @@ function RaProfileList() {
     setCheckedRows([]);
   };
 
+  const getProtocolsForDisplay = (protocols: string[]) => {
+    return protocols.map(function (protocol) {
+      return (
+        <>
+          <MDBBadge color="secondary" searchvalue={protocol}>
+            {protocol}
+          </MDBBadge>
+          &nbsp;
+        </>
+      );
+    });
+  };
+
   const title = (
     <div>
       <div className="pull-right mt-n-xs">
@@ -143,6 +156,13 @@ function RaProfileList() {
         content: profile.description,
         lineBreak: true,
       };
+      column["enabledProtocols"] = {
+        content: getProtocolsForDisplay(profile.enabledProtocols || []).join(
+          ""
+        ),
+        styledContent: getProtocolsForDisplay(profile.enabledProtocols || []),
+        lineBreak: true,
+      };
       column["status"] = {
         content: profile.enabled ? "enabled" : "disabled",
         styledContent: <StatusBadge enabled={profile.enabled} />,
@@ -178,6 +198,13 @@ function RaProfileList() {
       sort: false,
       id: "raProfileAuthority",
       width: "15%",
+    },
+    {
+      styledContent: <MDBColumnName columnName="Enabled Protocols" />,
+      content: "enabledProtocols",
+      sort: false,
+      id: "enabledProtocols",
+      width: "20%",
     },
     {
       styledContent: <MDBColumnName columnName="Status" />,

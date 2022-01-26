@@ -21,6 +21,8 @@ import Profile from "pages/profile";
 import Credentials from "pages/credentials";
 import Connectors from "pages/connectors";
 import Authorities from "pages/authorities";
+import AcmeAccounts from "pages/acme-accounts";
+import AcmeProfiles from "pages/acme-profiles";
 
 function Layout() {
   // eslint-disable-next-line
@@ -50,6 +52,8 @@ function Layout() {
             <Route path="/app/about" component={About} />
             <Route path="/app/audit" component={AuditLogs} />
             <Route path="/app/profile" component={Profile} />
+            <Route path="/app/acmeaccounts" component={AcmeAccounts} />
+            <Route path="/app/acmeprofiles" component={AcmeProfiles} />
           </Switch>
         </main>
         <Alerts />

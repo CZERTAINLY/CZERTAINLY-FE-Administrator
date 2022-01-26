@@ -7,6 +7,7 @@ export interface RaProfile {
   authorityInstanceUuid: string;
   description?: string;
   authorityInstanceName: string;
+  enabledProtocols?: string[];
 }
 
 export interface RaProfileDetail {
@@ -17,4 +18,13 @@ export interface RaProfileDetail {
   attributes?: AttributeResponse[];
   enabled: boolean;
   authorityInstanceName: string;
+}
+
+export interface RaAcmeLink {
+  directoryUrl?: string;
+  uuid: string;
+  name: string;
+  acmeAvailable: boolean;
+  issueCertificateAttributes: any;
+  revokeCertificateAttributes: any;
 }

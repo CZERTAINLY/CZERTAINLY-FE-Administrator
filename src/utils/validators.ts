@@ -38,3 +38,21 @@ export const validateUrl = () =>
 export const validateCustom = (pattern: string, value: string) => {
   return new RegExp(pattern).test(value);
 };
+
+export const validateCustomUrl = (value: string) => {
+  return new RegExp(
+    /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/g
+  ).test(value);
+};
+
+export const validateCustomIp = (value: string) => {
+  return new RegExp(
+    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+  ).test(value);
+};
+
+export const validateCustomPort = (value: string) => {
+  return new RegExp(
+    /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/
+  ).test(value);
+};

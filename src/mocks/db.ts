@@ -1554,6 +1554,94 @@ export const dbData = {
       ],
     },
   },
+  acmeAccount: [
+    {
+      accountId: "BeWgvKI160E",
+      uuid: "2ede4715-326d-4d71-86a8-6cf4bf6642be",
+      totalOrders: 42,
+      status: "valid",
+      raProfileName: "A",
+      acmeProfileName: "asqwered1",
+      enabled: true,
+    },
+    {
+      accountId: "ZnaucX7UOFs",
+      uuid: "5f8fd0f6-d7c4-4d09-b7da-0c5d4868ae8e",
+      totalOrders: 91,
+      status: "valid",
+      raProfileName: "A",
+      acmeProfileName: "asqwered1",
+      enabled: true,
+    },
+  ],
+  acmeAccountDetail: {
+    accountId: "BeWgvKI160E",
+    uuid: "2ede4715-326d-4d71-86a8-6cf4bf6642be",
+    totalOrders: 42,
+    successfulOrders: 1,
+    failedOrders: 10,
+    pendingOrders: 26,
+    validOrders: 5,
+    processingOrders: 0,
+    status: "valid",
+    contact: ["mailTo:demo@test.com", "mailTo:demo1@test.com"],
+    termsOfServiceAgreed: true,
+    raProfileName: "A",
+    raProfileUuid: "883ef2c3-c9e3-460f-b55b-e00e19fea7a8",
+    acmeProfileName: "asqwered1",
+    acmeProfileUuid: "6fae456b-57ee-4cbe-b308-106fc8db8b1a",
+    enabled: true,
+  },
+  acmeProfiles: [
+    {
+      uuid: "6fae456b-57ee-4cbe-b308-106fc8db8b1a",
+      name: "asqwered1",
+      description: "Demo Profile",
+      raProfileName: "A",
+      raProfileUuid: "883ef2c3-c9e3-460f-b55b-e00e19fea7a8",
+      directoryUrl: "https://localhost:8443/api/acme/asqwered1/directory",
+      enabled: false,
+    },
+  ],
+  acmeProfileDetail: {
+    uuid: "6fae456b-57ee-4cbe-b308-106fc8db8b1a",
+    name: "asqwered1",
+    description: "Demo Profile",
+    dnsResolverIp: "127.0.0.1",
+    dnsResolverPort: "53",
+    raProfile: {
+      uuid: "883ef2c3-c9e3-460f-b55b-e00e19fea7a8",
+      name: "A",
+      description: "",
+      authorityInstanceUuid: "8ce1cc98-2853-48bf-a6be-5815bfe26568",
+      authorityInstanceName: "A",
+      attributes: [
+        {
+          uuid: "87a94421-c5d8-4a23-bb2c-bbee76cb4ea9",
+          name: "template",
+          label: "Template",
+          type: "LIST",
+          value: "Copy of Web Server",
+        },
+        {
+          uuid: "1467ffaa-445c-11ec-81d3-0242ac130003",
+          name: "caAdcs",
+          label: "Certification Authority",
+          type: "LIST",
+          value: "vmi307469.3key.local\\Demo MS Sub CA",
+        },
+      ],
+      enabled: true,
+    },
+    retryInterval: 30,
+    termsOfServiceChangeDisable: false,
+    changeTermsOfServiceUrl: "sample.org",
+    validity: 3000,
+    directoryUrl: "https://localhost:8443/api/acme/asqwered1/directory",
+    enabled: false,
+    insistContact: false,
+    insistTermsOfService: true,
+  },
 };
 
 export function createAdministrator(
@@ -1751,6 +1839,26 @@ export function createRaProfile(name: string, description: string): string {
     description,
     authorityInstanceUuid: "21",
     authorityInstanceName: "Name2",
+  });
+
+  return id;
+}
+
+export function createAcmeProfile(name: string, description: string): string {
+  const idSegments = [];
+  for (let i = 0; i < 8; ++i) {
+    idSegments.push(randomChar());
+  }
+  const id = idSegments.join("");
+
+  dbData.acmeProfiles.push({
+    uuid: "6fae456b-57ee-4cbe-b308-106fc8db8b1" + id,
+    name: name,
+    description: description,
+    raProfileName: "A",
+    raProfileUuid: "883ef2c3-c9e3-460f-b55b-e00e19fea7a8",
+    directoryUrl: "https://localhost:8443/api/acme/asqwered1/directory",
+    enabled: false,
   });
 
   return id;
