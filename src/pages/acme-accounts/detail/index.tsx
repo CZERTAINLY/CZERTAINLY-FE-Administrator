@@ -71,9 +71,9 @@ function AcmeAccountDetail() {
               disabled={accountDetails?.enabled}
             >
               {accountDetails?.enabled ? (
-                <i className="fa fa-battery-empty" />
+                <i className="fa fa-times-circle" />
               ) : (
-                <i className="fa fa-battery-empty" style={{ color: "red" }} />
+                <i className="fa fa-times-circle" style={{ color: "red" }} />
               )}
 
               <ToolTip id="revoke" message="Revoke" />

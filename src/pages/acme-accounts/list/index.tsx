@@ -69,9 +69,13 @@ function AcmeAccountList() {
           disabled={!(checkedRows.length !== 0)}
         >
           {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-battery-empty" />
+            <i className="fa fa-times-circle" aria-hidden="true" />
           ) : (
-            <i className="fa fa-battery-empty" style={{ color: "red" }} />
+            <i
+              className="fa fa-times-circle"
+              aria-hidden="true"
+              style={{ color: "black" }}
+            />
           )}
 
           <ToolTip id="revoke" message="Revoke" />
