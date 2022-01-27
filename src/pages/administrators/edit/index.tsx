@@ -74,7 +74,7 @@ function AdminEdit() {
   );
 
   return (
-    <Container className="themed-container">
+    <Container className="themed-container" fluid>
       <Widget title={title}>
         <AdminForm
           isSubmitting={isEditing}

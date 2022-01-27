@@ -74,7 +74,7 @@ function RaProfileEdit() {
   );
 
   return (
-    <Container className="themed-container">
+    <Container className="themed-container" fluid>
       <Widget title={title}>
         <AcmeProfileForm
           isSubmitting={isEditing}
