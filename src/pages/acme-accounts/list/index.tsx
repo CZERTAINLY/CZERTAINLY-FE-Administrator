@@ -226,7 +226,7 @@ function AcmeAccountList() {
         isOpen={confirmDeleteId !== ""}
         toggle={onCancelDelete}
       >
-        <MDBModalHeader toggle={onCancelDelete}>Delete Account</MDBModalHeader>
+        <MDBModalHeader toggle={onCancelDelete}>Revoke Account</MDBModalHeader>
         <MDBModalBody>
           You are about to revoke ACME Account(s). Any new Orders will not be
           processed for this Account(s). After revoking you cannot re-enable the

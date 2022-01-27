@@ -82,9 +82,9 @@ const createAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
         validity,
         issueCertificateAttributes,
         revokeCertificateAttributes,
-        insistContact,
-        insistTermsOfService,
-        changeTermsOfServiceUrl,
+        requireContact,
+        requireTermsOfService,
+        termsOfServiceChangeUrl,
         history,
       }) =>
         apiClients.acmeProfiles
@@ -101,9 +101,9 @@ const createAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
             validity,
             issueCertificateAttributes,
             revokeCertificateAttributes,
-            insistContact,
-            insistTermsOfService,
-            changeTermsOfServiceUrl
+            requireContact,
+            requireTermsOfService,
+            termsOfServiceChangeUrl
           )
           .pipe(
             map((uuid) => {
@@ -274,9 +274,9 @@ const updateAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
         validity,
         issueCertificateAttributes,
         revokeCertificateAttributes,
-        insistContact,
-        insistTermsOfService,
-        changeTermsOfServiceUrl,
+        requireContact,
+        requireTermsOfService,
+        termsOfServiceChangeUrl,
         history,
       }) =>
         apiClients.acmeProfiles
@@ -293,9 +293,9 @@ const updateAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
             validity,
             issueCertificateAttributes,
             revokeCertificateAttributes,
-            insistContact,
-            insistTermsOfService,
-            changeTermsOfServiceUrl
+            requireContact,
+            requireTermsOfService,
+            termsOfServiceChangeUrl
           )
           .pipe(
             map((profile) => {

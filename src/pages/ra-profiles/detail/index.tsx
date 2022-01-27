@@ -57,7 +57,9 @@ function RaProfileDetail() {
   const authorizedClientIds = useSelector(selectors.selectAuthorizedClientIds);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
 
-  const [acmeProfileUuid, setAcmeProfileUuid] = useState(acmeDetails?.uuid);
+  const [acmeProfileUuid, setAcmeProfileUuid] = useState(
+    acmeDetails?.uuid || ""
+  );
   const [toggleActivateAcme, setToggleActivateAcme] = useState(false);
   const [toggleDeactivateAcme, setToggleDeactivateAcme] = useState(false);
 
@@ -642,12 +644,14 @@ function RaProfileDetail() {
             <Select
               maxMenuHeight={140}
               menuPlacement="auto"
-              options={acmeProfiles?.map(function (provider) {
-                return {
-                  label: provider.name,
-                  value: provider.uuid,
-                };
-              })}
+              options={acmeProfiles
+                ?.filter((profile) => !profile.raProfileUuid)
+                .map(function (provider) {
+                  return {
+                    label: provider.name,
+                    value: provider.uuid,
+                  };
+                })}
               placeholder="Select ACME Profile"
               onChange={(event) => setAcmeProfileUuid(event?.value || "")}
             />
@@ -665,7 +669,11 @@ function RaProfileDetail() {
           />
         </MDBModalBody>
         <MDBModalFooter>
-          <Button color="primary" onClick={onConfirmActivate}>
+          <Button
+            color="primary"
+            onClick={onConfirmActivate}
+            disabled={acmeProfileUuid === ""}
+          >
             Activate
           </Button>
           <Button

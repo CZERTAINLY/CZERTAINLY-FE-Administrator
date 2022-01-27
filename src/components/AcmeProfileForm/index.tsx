@@ -51,9 +51,9 @@ interface Props {
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
-    insistContact: boolean,
-    insistTermsOfService: boolean,
-    changeTermsOfServiceUrl: string
+    requireContact: boolean,
+    requireTermsOfService: boolean,
+    termsOfServiceChangeUrl: string
   ) => void;
 }
 
@@ -81,16 +81,16 @@ function AcmeProfileForm({
   const [description, setDescription] = useState(
     acmeProfile?.description || ""
   );
-  const [raProfileUuid, setRaProfileUuid] = useState("0");
+  const [raProfileUuid, setRaProfileUuid] = useState("");
   const [termsOfServiceUrl, setTermsOfServiceUrl] = useState("");
   const [dnsResolverIp, setDnsResolverIp] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [dnsResolverPort, setDnsResolverPort] = useState("");
   const [retryInterval, setRetryInterval] = useState("30");
-  const [validity, setValidity] = useState("5000");
-  const [insistContact, setInsistContact] = useState(false);
-  const [insistTermsOfService, setInsistTermsOfServiceUrl] = useState(false);
-  const [termsOfServiceChangeDisable, setTermsOfServiceChangeApproval] =
+  const [validity, setValidity] = useState("36000");
+  const [requireContact, setInsistContact] = useState(false);
+  const [requireTermsOfService, setInsistTermsOfServiceUrl] = useState(false);
+  const [termsOfServiceChangeDisable, setTermsOfServiceChangeDisable] =
     useState(false);
 
   const [issueEditableAttributes, setIssueEditableAttributes]: any = useState(
@@ -117,7 +117,7 @@ function AcmeProfileForm({
     selectRevokeAttributes
   );
   const [raProfileOptions, setRaProfileOptions] = useState<any>();
-  const [changeTermsOfServiceUrl, setChangeTermsOfServiceUrl] = useState<any>();
+  const [termsOfServiceChangeUrl, setChangeTermsOfServiceUrl] = useState<any>();
 
   const onName = useInputValue(setName);
   const onDescription = useInputValue(setDescription);
@@ -131,9 +131,15 @@ function AcmeProfileForm({
 
   const onRaProfile = useCallback(
     (id: string) => {
-      dispatch(raActions.requestIssuanceAttributes(id.toString()));
-      dispatch(raActions.requestRevokeAttributes(id.toString()));
-      setRaProfileUuid(id);
+      if (id !== "NONE") {
+        dispatch(raActions.requestIssuanceAttributes(id.toString()));
+        dispatch(raActions.requestRevokeAttributes(id.toString()));
+        setRaProfileUuid(id.toString());
+      } else {
+        setIssueAttributes([]);
+        setRevokeAttributes([]);
+        setRaProfileUuid("NONE");
+      }
     },
     [dispatch]
   );
@@ -218,9 +224,9 @@ function AcmeProfileForm({
         Number(validity),
         changedIssueAttributes,
         changedRevokeAttributes,
-        insistContact,
-        insistTermsOfService,
-        changeTermsOfServiceUrl
+        requireContact,
+        requireTermsOfService,
+        termsOfServiceChangeUrl
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -237,27 +243,30 @@ function AcmeProfileForm({
       issueAttributes,
       revokeAttributes,
       websiteUrl,
-      insistContact,
-      insistTermsOfService,
-      changeTermsOfServiceUrl,
+      requireContact,
+      requireTermsOfService,
+      termsOfServiceChangeUrl,
     ]
   );
 
   useEffect(() => {
-    setName(acmeProfile?.name || "");
-    setDescription(acmeProfile?.description || "");
-    setRaProfileUuid(acmeProfile?.raProfileUuid || "");
-    setTermsOfServiceUrl(acmeProfile?.termsOfServiceUrl || "");
-    setDnsResolverIp(acmeProfile?.dnsResolverIp || "");
-    setDnsResolverPort(acmeProfile?.dnsResolverPort || "");
-    setRetryInterval(acmeProfile?.retryInterval?.toString() || "");
-    setValidity(acmeProfile?.validity?.toString() || "");
-    setTermsOfServiceChangeApproval(
-      acmeProfile?.termsOfServiceChangeDisable || false
-    );
-    setWebsiteUrl(acmeProfile?.websiteUrl || "");
-    setChangeTermsOfServiceUrl(acmeProfile?.changeTermsOfServiceUrl || "");
     if (editMode) {
+      setName(acmeProfile?.name || "");
+      setDescription(acmeProfile?.description || "");
+      setRaProfileUuid(acmeProfile?.raProfileUuid || "");
+      setTermsOfServiceUrl(acmeProfile?.termsOfServiceUrl || "");
+      setDnsResolverIp(acmeProfile?.dnsResolverIp || "");
+      setDnsResolverPort(acmeProfile?.dnsResolverPort || "");
+      setRetryInterval(acmeProfile?.retryInterval?.toString() || "");
+      setValidity(acmeProfile?.validity?.toString() || "");
+      setTermsOfServiceChangeDisable(
+        acmeProfile?.termsOfServiceChangeDisable || false
+      );
+      setInsistContact(acmeProfile?.requireContact || false);
+      setInsistTermsOfServiceUrl(acmeProfile?.requireTermsOfService || false);
+      setWebsiteUrl(acmeProfile?.websiteUrl || "");
+      setChangeTermsOfServiceUrl(acmeProfile?.termsOfServiceChangeUrl || "");
+
       var raProf: any = [];
       if (acmeProfile?.raProfile?.name) {
         raProf.push({
@@ -492,67 +501,69 @@ function AcmeProfileForm({
               </Col>
             </Row>
 
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-              <Col>
-                <FormGroup>
-                  <Label for="changeTermsOfServiceUrl">
-                    Changes of Terms of Service URL
-                  </Label>
-                  <Input
-                    type="text"
-                    name="changeTermsOfServiceUrl"
-                    placeholder="Changes of Terms of Service URL"
-                    value={changeTermsOfServiceUrl}
-                    onChange={onChangeTermsOfServiceUrl}
-                    valid={validateCustomUrl(changeTermsOfServiceUrl)}
-                    invalid={
-                      changeTermsOfServiceUrl
-                        ? !validateCustomUrl(changeTermsOfServiceUrl)
-                        : false
-                    }
-                  />
-                </FormGroup>
-              </Col>
-              <Col className="align-items-center">
-                <FormGroup>
-                  <Label for="termsOfServiceChangeDisable">
-                    Disable new Orders (Changes in Terms of Service)
-                  </Label>
-                  <Input
-                    type="checkbox"
-                    name="termsOfServiceChangeDisable"
-                    defaultChecked={acmeProfile?.termsOfServiceChangeDisable}
-                    onChange={(event) =>
-                      setTermsOfServiceChangeApproval(event.target.checked)
-                    }
-                  />
-                </FormGroup>
-              </Col>
-            </Row>
+            {editMode ? (
+              <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
+                  <FormGroup>
+                    <Label for="termsOfServiceChangeUrl">
+                      Changes of Terms of Service URL
+                    </Label>
+                    <Input
+                      type="text"
+                      name="termsOfServiceChangeUrl"
+                      placeholder="Changes of Terms of Service URL"
+                      value={termsOfServiceChangeUrl}
+                      onChange={onChangeTermsOfServiceUrl}
+                      valid={validateCustomUrl(termsOfServiceChangeUrl)}
+                      invalid={
+                        termsOfServiceChangeUrl
+                          ? !validateCustomUrl(termsOfServiceChangeUrl)
+                          : false
+                      }
+                    />
+                  </FormGroup>
+                </Col>
+                <Col className="align-items-center">
+                  <FormGroup>
+                    <input
+                      type="checkbox"
+                      name="termsOfServiceChangeDisable"
+                      defaultChecked={acmeProfile?.termsOfServiceChangeDisable}
+                      onChange={(event) =>
+                        setTermsOfServiceChangeDisable(event.target.checked)
+                      }
+                    />
+                    <Label for="termsOfServiceChangeDisable">
+                      &nbsp;Disable new Orders (Changes in Terms of Service)
+                    </Label>
+                  </FormGroup>
+                </Col>
+              </Row>
+            ) : null}
             <FormGroup>
-              <Label for="insistTermsOfService">
-                Require agree on Terms Of Service for new account
-              </Label>
-              <Input
+              <input
                 type="checkbox"
-                name="insistTermsOfService"
-                defaultChecked={insistTermsOfService}
+                name="requireTermsOfService"
+                defaultChecked={acmeProfile?.requireTermsOfService}
                 onChange={(event) =>
                   setInsistTermsOfServiceUrl(event.target.checked)
                 }
               />
+              <Label for="requireTermsOfService">
+                &nbsp;Require agree on Terms Of Service for new account
+              </Label>
             </FormGroup>
 
             <FormGroup>
-              <Label for="insistContact">
-                Require contact information for new Accounts
-              </Label>
-              <Input
+              <input
                 type="checkbox"
-                name="insistContact"
-                defaultChecked={acmeProfile?.insistContact}
+                name="requireContact"
+                defaultChecked={acmeProfile?.requireContact}
                 onChange={(event) => setInsistContact(event.target.checked)}
               />
+              <Label for="requireContact">
+                &nbsp;Require contact information for new Accounts
+              </Label>
             </FormGroup>
           </Widget>
 
@@ -578,9 +589,8 @@ function AcmeProfileForm({
                 <Select
                   maxMenuHeight={140}
                   menuPlacement="auto"
-                  defaultInputValue={acmeProfile?.raProfile?.name || "NONE"}
                   options={raProfileOptions}
-                  placeholder="Select RA Profile. If not selected, ACME Profile will be created without RA Profile"
+                  placeholder="Select to change RA Profile if needed"
                   onChange={(event: any) => onRaProfile(event?.value || "")}
                 />
               )}
@@ -647,6 +657,7 @@ function AcmeProfileForm({
             title={submitTitle}
             inProgressTitle={inProgressTitle}
             inProgress={isSubmitting}
+            disabled={isSubmitting || name === ""}
           />
         </ButtonGroup>
       </div>

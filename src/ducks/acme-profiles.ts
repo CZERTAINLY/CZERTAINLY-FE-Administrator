@@ -185,9 +185,9 @@ export const actions = {
       validity: number,
       issueCertificateAttributes: AttributeResponse[],
       revokeCertificateAttributes: AttributeResponse[],
-      insistContact: boolean,
-      insistTermsOfService: boolean,
-      changeTermsOfServiceUrl: string,
+      requireContact: boolean,
+      requireTermsOfService: boolean,
+      termsOfServiceChangeUrl: string,
       history: History<unknown>
     ) => ({
       name,
@@ -202,9 +202,9 @@ export const actions = {
       validity,
       issueCertificateAttributes,
       revokeCertificateAttributes,
-      insistContact,
-      insistTermsOfService,
-      changeTermsOfServiceUrl,
+      requireContact,
+      requireTermsOfService,
+      termsOfServiceChangeUrl,
       history,
     })
   ),
@@ -231,9 +231,9 @@ export const actions = {
       validity: number,
       issueCertificateAttributes: AttributeResponse[],
       revokeCertificateAttributes: AttributeResponse[],
-      insistContact: boolean,
-      insistTermsOfService: boolean,
-      changeTermsOfServiceUrl: string,
+      requireContact: boolean,
+      requireTermsOfService: boolean,
+      termsOfServiceChangeUrl: string,
       history: History<unknown>
     ) => ({
       uuid,
@@ -248,9 +248,9 @@ export const actions = {
       validity,
       issueCertificateAttributes,
       revokeCertificateAttributes,
-      insistContact,
-      insistTermsOfService,
-      changeTermsOfServiceUrl,
+      requireContact,
+      requireTermsOfService,
+      termsOfServiceChangeUrl,
       history,
     })
   ),
