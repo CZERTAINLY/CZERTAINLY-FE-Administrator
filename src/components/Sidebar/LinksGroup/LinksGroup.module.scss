@@ -83,17 +83,17 @@
     font-size: $font-size-small;
 
     li {
-      padding: 3px 0;
+      //padding: 3px 0;
       list-style: none;
     }
 
     a {
-      padding: 4px 20px 4px 44px;
+      padding: 0 30px;
 
       &:hover,
       &:active,
       &:focus {
-        font-weight: $font-weight-semi-bold;
+        font-weight: $font-weight-thin;
       }
     }
   }
