@@ -21,6 +21,7 @@ function AcmeAccountDetail() {
   const isFetchingAccounts = useSelector(selectors.isFetching);
   const accountDetails = useSelector(selectors.selectSelectedAccount);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteAccountId);
+  const isRevoking = useSelector(selectors.isDeleting);
 
   const history = useHistory();
   const { params } = useRouteMatch();
@@ -70,9 +71,9 @@ function AcmeAccountDetail() {
               disabled={accountDetails?.enabled}
             >
               {accountDetails?.enabled ? (
-                <i className="fa fa-battery-empty" />
+                <i className="fa fa-times-circle" />
               ) : (
-                <i className="fa fa-battery-empty" style={{ color: "red" }} />
+                <i className="fa fa-times-circle" style={{ color: "red" }} />
               )}
 
               <ToolTip id="revoke" message="Revoke" />
@@ -168,7 +169,7 @@ function AcmeAccountDetail() {
               </td>
             </tr>
             <tr>
-              <td>Enabled</td>
+              <td>State</td>
               <td>
                 <StatusBadge enabled={accountDetails?.enabled} />
               </td>
@@ -248,7 +249,7 @@ function AcmeAccountDetail() {
           </Button>
         </MDBModalFooter>
       </MDBModal>
-      <Spinner active={isFetchingAccounts} />
+      <Spinner active={isFetchingAccounts || isRevoking} />
     </Container>
   );
 }

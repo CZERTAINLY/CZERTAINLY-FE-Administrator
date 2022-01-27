@@ -48,7 +48,7 @@ export class AcmeAccountManagementBackend
 
   bulkDeleteAcmeAccount(uuids: (string | number)[]): Observable<void> {
     return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/revoke`, "DELETE", uuids)
+      new HttpRequestOptions(`${baseUrl}/revoke`, "PUT", uuids)
     );
   }
 

@@ -1635,12 +1635,12 @@ export const dbData = {
     },
     retryInterval: 30,
     termsOfServiceChangeDisable: false,
-    changeTermsOfServiceUrl: "sample.org",
+    termsOfServiceChangeUrl: "sample.org",
     validity: 3000,
     directoryUrl: "https://localhost:8443/api/acme/asqwered1/directory",
     enabled: false,
-    insistContact: false,
-    insistTermsOfService: true,
+    requireContact: false,
+    requireTermsOfService: true,
   },
 };
 

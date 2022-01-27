@@ -32,9 +32,9 @@ export class AcmeProfilesManagementBackend
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
-    insistContact: boolean,
-    insistTermsOfService: boolean,
-    changeTermsOfServiceUrl: string
+    requireContact: boolean,
+    requireTermsOfService: boolean,
+    termsOfServiceChangeUrl: string
   ): Observable<string> {
     return createNewResource(baseUrl, {
       name,
@@ -53,9 +53,9 @@ export class AcmeProfilesManagementBackend
       revokeCertificateAttributes: attributeSimplifier(
         revokeCertificateAttributes
       ),
-      insistContact,
-      insistTermsOfService,
-      changeTermsOfServiceUrl,
+      requireContact,
+      requireTermsOfService,
+      termsOfServiceChangeUrl,
     }).pipe(
       map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
     );
@@ -122,9 +122,9 @@ export class AcmeProfilesManagementBackend
     validity: number,
     issueCertificateAttributes: AttributeResponse[],
     revokeCertificateAttributes: AttributeResponse[],
-    insistContact: boolean,
-    insistTermsOfService: boolean,
-    changeTermsOfServiceUrl: string
+    requireContact: boolean,
+    requireTermsOfService: boolean,
+    termsOfServiceChangeUrl: string
   ): Observable<model.AcmeProfileDetailResponse> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
@@ -143,9 +143,9 @@ export class AcmeProfilesManagementBackend
         revokeCertificateAttributes: attributeSimplifier(
           revokeCertificateAttributes
         ),
-        insistContact,
-        insistTermsOfService,
-        changeTermsOfServiceUrl,
+        requireContact,
+        requireTermsOfService,
+        termsOfServiceChangeUrl,
       })
     );
   }

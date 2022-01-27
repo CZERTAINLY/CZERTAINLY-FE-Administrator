@@ -11,7 +11,6 @@ import * as model from "./model";
 
 const baseUrl = "/api/v1/raprofiles";
 const baseUrlAuthorities = "/api/v1/authorities";
-const issueUrl = "/api/v2/operations/";
 
 export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   constructor() {
@@ -150,7 +149,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   ): Observable<AttributeResponse[]> {
     return this._fetchService.request(
       new HttpRequestOptions(
-        `${issueUrl}${raProfileUuid}/issue/attributes`,
+        `${baseUrl}/${raProfileUuid}/issue/attributes`,
         "GET"
       )
     );
@@ -161,7 +160,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   ): Observable<AttributeResponse[]> {
     return this._fetchService.request(
       new HttpRequestOptions(
-        `${issueUrl}${raProfileUuid}/revoke/attributes`,
+        `${baseUrl}/${raProfileUuid}/revoke/attributes`,
         "GET"
       )
     );

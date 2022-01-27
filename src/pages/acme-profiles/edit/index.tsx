@@ -35,9 +35,9 @@ function RaProfileEdit() {
       validity: number,
       issueCertificateAttributes: AttributeResponse[],
       revokeCertificateAttributes: AttributeResponse[],
-      insistContact,
-      insistTermsOfService,
-      changeTermsOfServiceUrl
+      requireContact,
+      requireTermsOfService,
+      termsOfServiceChangeUrl
     ) => {
       dispatch(
         actions.requestUpdateProfile(
@@ -53,9 +53,9 @@ function RaProfileEdit() {
           validity,
           issueCertificateAttributes,
           revokeCertificateAttributes,
-          insistContact,
-          insistTermsOfService,
-          changeTermsOfServiceUrl,
+          requireContact,
+          requireTermsOfService,
+          termsOfServiceChangeUrl,
           history
         )
       );
@@ -74,7 +74,7 @@ function RaProfileEdit() {
   );
 
   return (
-    <Container className="themed-container">
+    <Container className="themed-container" fluid>
       <Widget title={title}>
         <AcmeProfileForm
           isSubmitting={isEditing}

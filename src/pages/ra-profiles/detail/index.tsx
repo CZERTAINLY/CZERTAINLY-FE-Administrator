@@ -57,7 +57,9 @@ function RaProfileDetail() {
   const authorizedClientIds = useSelector(selectors.selectAuthorizedClientIds);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
 
-  const [acmeProfileUuid, setAcmeProfileUuid] = useState(acmeDetails?.uuid);
+  const [acmeProfileUuid, setAcmeProfileUuid] = useState(
+    acmeDetails?.uuid || ""
+  );
   const [toggleActivateAcme, setToggleActivateAcme] = useState(false);
   const [toggleDeactivateAcme, setToggleDeactivateAcme] = useState(false);
 
@@ -171,6 +173,7 @@ function RaProfileDetail() {
 
   const onConfirmDeactivate = () => {
     dispatch(actions.requestDeactivateAcme(profileDetails?.uuid || ""));
+    setAcmeProfileUuid("");
     setToggleDeactivateAcme(false);
   };
 
@@ -179,6 +182,12 @@ function RaProfileDetail() {
     dispatch(actions.requestIssuanceAttributes(profileDetails?.uuid || ""));
     dispatch(actions.requestRevokeAttributes(profileDetails?.uuid || ""));
     setToggleActivateAcme(true);
+  };
+
+  const closeAcmePopup = () => {
+    setToggleActivateAcme(false);
+    setToggleDeactivateAcme(false);
+    setAcmeProfileUuid("");
   };
 
   const detailsTitle = (
@@ -631,23 +640,23 @@ function RaProfileDetail() {
       <MDBModal
         overflowScroll={false}
         isOpen={toggleActivateAcme}
-        toggle={() => setToggleActivateAcme(false)}
+        toggle={closeAcmePopup}
       >
-        <MDBModalHeader toggle={() => setToggleActivateAcme(false)}>
-          Activate ACME
-        </MDBModalHeader>
+        <MDBModalHeader toggle={closeAcmePopup}>Activate ACME</MDBModalHeader>
         <MDBModalBody>
           <FormGroup>
             <Label for="raProfile">ACME Profile</Label>
             <Select
               maxMenuHeight={140}
               menuPlacement="auto"
-              options={acmeProfiles?.map(function (provider) {
-                return {
-                  label: provider.name,
-                  value: provider.uuid,
-                };
-              })}
+              options={acmeProfiles
+                ?.filter((profile) => !profile.raProfileUuid)
+                .map(function (provider) {
+                  return {
+                    label: provider.name,
+                    value: provider.uuid,
+                  };
+                })}
               placeholder="Select ACME Profile"
               onChange={(event) => setAcmeProfileUuid(event?.value || "")}
             />
@@ -665,13 +674,14 @@ function RaProfileDetail() {
           />
         </MDBModalBody>
         <MDBModalFooter>
-          <Button color="primary" onClick={onConfirmActivate}>
+          <Button
+            color="primary"
+            onClick={onConfirmActivate}
+            disabled={acmeProfileUuid === ""}
+          >
             Activate
           </Button>
-          <Button
-            color="secondary"
-            onClick={() => setToggleActivateAcme(false)}
-          >
+          <Button color="secondary" onClick={closeAcmePopup}>
             Cancel
           </Button>
         </MDBModalFooter>
@@ -680,11 +690,9 @@ function RaProfileDetail() {
       <MDBModal
         overflowScroll={false}
         isOpen={toggleDeactivateAcme}
-        toggle={() => setToggleDeactivateAcme(false)}
+        toggle={closeAcmePopup}
       >
-        <MDBModalHeader toggle={() => setToggleDeactivateAcme(false)}>
-          Deactivate ACME
-        </MDBModalHeader>
+        <MDBModalHeader toggle={closeAcmePopup}>Deactivate ACME</MDBModalHeader>
         <MDBModalBody>
           Are you sure you wish to deactivate ACME for this RA Profile?
         </MDBModalBody>
@@ -692,10 +700,7 @@ function RaProfileDetail() {
           <Button color="danger" onClick={onConfirmDeactivate}>
             Deactivate
           </Button>
-          <Button
-            color="secondary"
-            onClick={() => setToggleDeactivateAcme(false)}
-          >
+          <Button color="secondary" onClick={closeAcmePopup}>
             Cancel
           </Button>
         </MDBModalFooter>

@@ -427,7 +427,7 @@ const getAcmeDetails: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failAcmeDetails(
-              extractError(err, "Failed to retrieve ACME Profile details")
+              extractError(err, "Failed to retrieve ACME details")
             )
           )
         )
@@ -463,7 +463,7 @@ const activateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
             catchError((err) =>
               of(
                 actions.failActivateAcme(
-                  extractError(err, "Failed to activate ACME Profile.")
+                  extractError(err, "Failed to activate ACME.")
                 )
               )
             )
@@ -486,7 +486,7 @@ const deactivateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failDeactivateAcme(
-              extractError(err, "Failed to deactivate ACME Profile.")
+              extractError(err, "Failed to deactivate ACME.")
             )
           )
         )

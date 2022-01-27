@@ -69,9 +69,13 @@ function AcmeAccountList() {
           disabled={!(checkedRows.length !== 0)}
         >
           {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-battery-empty" />
+            <i className="fa fa-times-circle" aria-hidden="true" />
           ) : (
-            <i className="fa fa-battery-empty" style={{ color: "red" }} />
+            <i
+              className="fa fa-times-circle"
+              aria-hidden="true"
+              style={{ color: "black" }}
+            />
           )}
 
           <ToolTip id="revoke" message="Revoke" />
@@ -142,7 +146,7 @@ function AcmeAccountList() {
         ),
         lineBreak: true,
       };
-      column["enabled"] = {
+      column["state"] = {
         content: account.enabled ? "enabled" : "disabled",
         styledContent: <StatusBadge enabled={account.enabled} />,
         lineBreak: true,
@@ -187,10 +191,10 @@ function AcmeAccountList() {
       width: "15%",
     },
     {
-      styledContent: <MDBColumnName columnName="Enabled" />,
-      content: "enabled",
+      styledContent: <MDBColumnName columnName="State" />,
+      content: "state",
       sort: false,
-      id: "enabled",
+      id: "state",
       width: "10%",
     },
     {
@@ -226,7 +230,7 @@ function AcmeAccountList() {
         isOpen={confirmDeleteId !== ""}
         toggle={onCancelDelete}
       >
-        <MDBModalHeader toggle={onCancelDelete}>Delete Account</MDBModalHeader>
+        <MDBModalHeader toggle={onCancelDelete}>Revoke Account</MDBModalHeader>
         <MDBModalBody>
           You are about to revoke ACME Account(s). Any new Orders will not be
           processed for this Account(s). After revoking you cannot re-enable the

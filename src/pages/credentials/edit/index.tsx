@@ -76,7 +76,7 @@ function CredentialEdit() {
   };
 
   return (
-    <Container className="themed-container">
+    <Container className="themed-container" fluid>
       <Widget title={title}>
         <CredentialForm
           defaultValues={getAttributes()}
