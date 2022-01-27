@@ -142,7 +142,7 @@ function AcmeAccountList() {
         ),
         lineBreak: true,
       };
-      column["enabled"] = {
+      column["state"] = {
         content: account.enabled ? "enabled" : "disabled",
         styledContent: <StatusBadge enabled={account.enabled} />,
         lineBreak: true,
@@ -187,10 +187,10 @@ function AcmeAccountList() {
       width: "15%",
     },
     {
-      styledContent: <MDBColumnName columnName="Enabled" />,
-      content: "enabled",
+      styledContent: <MDBColumnName columnName="State" />,
+      content: "state",
       sort: false,
-      id: "enabled",
+      id: "state",
       width: "10%",
     },
     {

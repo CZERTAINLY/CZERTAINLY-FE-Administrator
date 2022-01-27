@@ -218,15 +218,16 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeleting: false,
       };
     case getType(actions.requestEnableAccount):
+      return { ...state, isFetchingDetail: true };
     case getType(actions.requestDisableAccount):
-      return { ...state };
+      return { ...state, isFetchingDetail: true };
     case getType(actions.failEnableAccount):
     case getType(actions.failDisableAccount):
       return { ...state };
     case getType(actions.receiveEnableAccount):
       let detailEnable =
         state.selectedAccount || ({} as AcmeAccountDetailResponse);
-      detailEnable["enabled"] = true;
+      detailEnable.enabled = true;
       return {
         ...state,
         isFetchingDetail: false,
@@ -235,7 +236,7 @@ export function reducer(state: State = initialState, action: Action): State {
     case getType(actions.receiveDisableAccount):
       let detailDisable =
         state.selectedAccount || ({} as AcmeAccountDetailResponse);
-      detailDisable["enabled"] = false;
+      detailDisable.enabled = false;
       return {
         ...state,
         isFetchingDetail: false,
@@ -253,16 +254,20 @@ export function reducer(state: State = initialState, action: Action): State {
     case getType(actions.failBulkDeleteAccount):
       return { ...state, isDeleting: false };
     case getType(actions.receiveBulkDeleteAccount):
-      let updated: AcmeAccountListResponse[] = [];
+      let updatedDelete: AcmeAccountListResponse[] = [];
       for (let i of state.accounts) {
         if (!action.uuid.includes(i.uuid)) {
-          updated.push(i);
+          updatedDelete.push(i);
+        } else {
+          i.enabled = false;
+          i.status = "revoked";
+          updatedDelete.push(i);
         }
       }
       return {
         ...state,
         isDeleting: false,
-        accounts: updated,
+        accounts: updatedDelete,
       };
     case getType(actions.requestBulkEnableAccount):
     case getType(actions.requestBulkDisableAccount):
