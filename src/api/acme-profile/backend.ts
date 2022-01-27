@@ -1,3 +1,4 @@
+import { ErrorDeleteObject } from "models";
 import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
@@ -61,7 +62,7 @@ export class AcmeProfilesManagementBackend
     );
   }
 
-  deleteAcmeProfile(uuid: string | number): Observable<void> {
+  deleteAcmeProfile(uuid: string | number): Observable<ErrorDeleteObject[]> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
     );
@@ -79,9 +80,17 @@ export class AcmeProfilesManagementBackend
     );
   }
 
-  bulkDeleteAcmeProfile(uuid: (string | number)[]): Observable<void> {
+  bulkDeleteAcmeProfile(
+    uuid: (string | number)[]
+  ): Observable<ErrorDeleteObject[]> {
     return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}`, "DELETE", uuid)
+      new HttpRequestOptions(`${baseUrl}/delete`, "DELETE", uuid)
+    );
+  }
+
+  bulkForceDeleteAcmeProfile(uuid: (string | number)[]): Observable<void> {
+    return this._fetchService.request(
+      new HttpRequestOptions(`${baseUrl}/delete/force`, "DELETE", uuid)
     );
   }
 

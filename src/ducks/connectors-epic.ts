@@ -80,7 +80,7 @@ const forceDeleteConnector: Epic<Action, Action, AppState, EpicDependencies> = (
       apiClients.connectors.forceDeleteConnector(uuid).pipe(
         map(() => {
           history.push("..");
-          return actions.recieveForceDeleteConnector(uuid);
+          return actions.receiveForceDeleteConnector(uuid);
         }),
         catchError((err) =>
           of(
@@ -123,7 +123,7 @@ const reconnectConnector: Epic<Action, Action, AppState, EpicDependencies> = (
     filter(isOfType(Actions.ReconnectRequest)),
     switchMap(({ uuid }) =>
       apiClients.connectors.reconnectConnector(uuid).pipe(
-        map(() => actions.recieveReconnectConnector(uuid)),
+        map(() => actions.receiveReconnectConnector(uuid)),
         catchError((err) =>
           of(
             actions.failReconnectConnector(
@@ -168,7 +168,7 @@ const bulkForceDeleteConnector: Epic<
     filter(isOfType(Actions.BulkForceDeleteRequest)),
     switchMap(({ uuid }) =>
       apiClients.connectors.bulkForceDeleteConnector(uuid).pipe(
-        map(() => actions.recieveBulkForceDeleteConnector(uuid)),
+        map(() => actions.receiveBulkForceDeleteConnector(uuid)),
         catchError((err) =>
           of(
             actions.failBulkForceDeleteConnector(
@@ -180,41 +180,49 @@ const bulkForceDeleteConnector: Epic<
     )
   );
 
-const bulkAuthorizeConnector: Epic<Action, Action, AppState, EpicDependencies> =
-  (action$, _, { apiClients }) =>
-    action$.pipe(
-      filter(isOfType(Actions.BulkAuthorizeConfirm)),
-      switchMap(({ uuid }) =>
-        apiClients.connectors.bulkAuthorizeConnector(uuid).pipe(
-          map(() => actions.receiveBulkAuthorizeConnector(uuid)),
-          catchError((err) =>
-            of(
-              actions.failBulkAuthorizeConnector(
-                extractError(err, "Failed to authorize connector")
-              )
+const bulkAuthorizeConnector: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.BulkAuthorizeConfirm)),
+    switchMap(({ uuid }) =>
+      apiClients.connectors.bulkAuthorizeConnector(uuid).pipe(
+        map(() => actions.receiveBulkAuthorizeConnector(uuid)),
+        catchError((err) =>
+          of(
+            actions.failBulkAuthorizeConnector(
+              extractError(err, "Failed to authorize connector")
             )
           )
         )
       )
-    );
+    )
+  );
 
-const bulkReconnectConnector: Epic<Action, Action, AppState, EpicDependencies> =
-  (action$, _, { apiClients }) =>
-    action$.pipe(
-      filter(isOfType(Actions.BulkReconnectRequest)),
-      switchMap(({ uuid }) =>
-        apiClients.connectors.bulkReconnectConnector(uuid).pipe(
-          map(() => actions.recieveBulkReconnectConnector(uuid)),
-          catchError((err) =>
-            of(
-              actions.failBulkReconnectConnector(
-                extractError(err, "Failed to reconnect connector")
-              )
+const bulkReconnectConnector: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.BulkReconnectRequest)),
+    switchMap(({ uuid }) =>
+      apiClients.connectors.bulkReconnectConnector(uuid).pipe(
+        map(() => actions.receiveBulkReconnectConnector(uuid)),
+        catchError((err) =>
+          of(
+            actions.failBulkReconnectConnector(
+              extractError(err, "Failed to reconnect connector")
             )
           )
         )
       )
-    );
+    )
+  );
 
 const getConnectorDetail: Epic<Action, Action, AppState, EpicDependencies> = (
   action$,
@@ -248,7 +256,7 @@ const getConnectorHealth: Epic<Action, Action, AppState, EpicDependencies> = (
     filter(isOfType(Actions.HealthRequest)),
     switchMap(({ uuid }) =>
       apiClients.connectors.getConnectorHealth(uuid).pipe(
-        map((health) => actions.recieveConnectorHealth(health)),
+        map((health) => actions.receiveConnectorHealth(health)),
         catchError((err) =>
           of(
             actions.failConnectorHealth(
@@ -263,29 +271,31 @@ const getConnectorHealth: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-const getConnectorAttributes: Epic<Action, Action, AppState, EpicDependencies> =
-  (action$, _, { apiClients }) =>
-    action$.pipe(
-      filter(isOfType(Actions.AttributeRequest)),
-      switchMap(({ uuid, code, kind }) =>
-        apiClients.connectors.getConnectorAttributes(uuid, code, kind).pipe(
-          map((attributes) =>
-            Array.isArray(attributes)
-              ? actions.receiveAttributeList(attributes)
-              : actions.failAttributeList(
-                  "Failed to retrieve connector attributes"
-                )
-          ),
-          catchError((err) =>
-            of(
-              actions.failAttributeList(
+const getConnectorAttributes: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.AttributeRequest)),
+    switchMap(({ uuid, code, kind }) =>
+      apiClients.connectors.getConnectorAttributes(uuid, code, kind).pipe(
+        map((attributes) =>
+          Array.isArray(attributes)
+            ? actions.receiveAttributeList(attributes)
+            : actions.failAttributeList(
                 "Failed to retrieve connector attributes"
               )
-            )
+        ),
+        catchError((err) =>
+          of(
+            actions.failAttributeList("Failed to retrieve connector attributes")
           )
         )
       )
-    );
+    )
+  );
 
 const getConnectorAllAttributes: Epic<
   Action,

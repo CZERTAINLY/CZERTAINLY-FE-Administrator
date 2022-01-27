@@ -649,14 +649,12 @@ function RaProfileDetail() {
             <Select
               maxMenuHeight={140}
               menuPlacement="auto"
-              options={acmeProfiles
-                ?.filter((profile) => !profile.raProfileUuid)
-                .map(function (provider) {
-                  return {
-                    label: provider.name,
-                    value: provider.uuid,
-                  };
-                })}
+              options={acmeProfiles.map(function (provider) {
+                return {
+                  label: provider.name,
+                  value: provider.uuid,
+                };
+              })}
               placeholder="Select ACME Profile"
               onChange={(event) => setAcmeProfileUuid(event?.value || "")}
             />

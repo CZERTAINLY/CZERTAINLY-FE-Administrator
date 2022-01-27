@@ -276,7 +276,7 @@ export const actions = {
       raProfileUuid,
     })
   ),
-  recieveIssuanceAttributes: createCustomAction(
+  receiveIssuanceAttributes: createCustomAction(
     Actions.IssuanceAttributesSuccess,
     (attributes: AttributeResponse[]) => ({ attributes })
   ),
@@ -291,7 +291,7 @@ export const actions = {
       raProfileUuid,
     })
   ),
-  recieveRevokeAttributes: createCustomAction(
+  receiveRevokeAttributes: createCustomAction(
     Actions.RevokeAttributesSuccess,
     (attributes: AttributeResponse[]) => ({ attributes })
   ),
@@ -632,7 +632,7 @@ export function reducer(
 
     case getType(actions.requestIssuanceAttributes):
       return { ...state, isFetchingAttributes: true, issuanceAttributes: [] };
-    case getType(actions.recieveIssuanceAttributes):
+    case getType(actions.receiveIssuanceAttributes):
       return {
         ...state,
         isFetchingAttributes: false,
@@ -643,7 +643,7 @@ export function reducer(
 
     case getType(actions.requestRevokeAttributes):
       return { ...state, isFetchingAttributes: true, revocationAttributes: [] };
-    case getType(actions.recieveRevokeAttributes):
+    case getType(actions.receiveRevokeAttributes):
       return {
         ...state,
         isFetchingAttributes: false,

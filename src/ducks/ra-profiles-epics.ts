@@ -374,7 +374,7 @@ const getIssuanceAttributes: Epic<
     filter(isOfType(Actions.IssuanceAttributesRequest)),
     switchMap(({ raProfileUuid }) =>
       apiClients.profiles.getIssuanceAttributes(raProfileUuid).pipe(
-        map((attributes) => actions.recieveIssuanceAttributes(attributes)),
+        map((attributes) => actions.receiveIssuanceAttributes(attributes)),
         catchError((err) =>
           of(
             actions.failIssuanceAttributes(
@@ -399,7 +399,7 @@ const getRevocationAttributes: Epic<
     filter(isOfType(Actions.RevokeAttributesRequest)),
     switchMap(({ raProfileUuid }) =>
       apiClients.profiles.getRevocationAttributes(raProfileUuid).pipe(
-        map((attributes) => actions.recieveRevokeAttributes(attributes)),
+        map((attributes) => actions.receiveRevokeAttributes(attributes)),
         catchError((err) =>
           of(
             actions.failRevokeAttributes(

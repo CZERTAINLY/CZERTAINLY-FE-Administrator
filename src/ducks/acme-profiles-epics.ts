@@ -130,9 +130,11 @@ const deleteAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
     filter(isOfType(Actions.ConfirmDelete)),
     switchMap(({ uuid, history }) =>
       apiClients.acmeProfiles.deleteAcmeProfile(uuid).pipe(
-        map(() => {
-          history.push("..");
-          return actions.receiveDeleteProfile(uuid);
+        map((errorMessage) => {
+          if (!errorMessage) {
+            history.push("..");
+          }
+          return actions.receiveDeleteProfile(uuid, errorMessage);
         }),
         catchError((err) =>
           of(
@@ -197,11 +199,40 @@ const bulkDeleteAcmeProfile: Epic<
     filter(isOfType(Actions.BulkConfirmDelete)),
     switchMap(({ uuid }) =>
       apiClients.acmeProfiles.bulkDeleteAcmeProfile(uuid).pipe(
-        map(() => actions.receiveBulkDeleteProfile(uuid)),
+        map((errorMessage) => {
+          return actions.receiveBulkDeleteProfile(uuid, errorMessage);
+        }),
         catchError((err) =>
           of(
             actions.failBulkDeleteProfile(
               extractError(err, "Failed to delete ACME Profiles")
+            )
+          )
+        )
+      )
+    )
+  );
+
+const bulkForceDeleteAcmeProfile: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.BulkForceDeleteRequest)),
+    switchMap(({ uuid, pushBack, history }) =>
+      apiClients.acmeProfiles.bulkForceDeleteAcmeProfile(uuid).pipe(
+        map(() => {
+          if (pushBack) {
+            history.push("..");
+          }
+          return actions.receiveBulkForceDeleteProfile(uuid);
+        }),
+        catchError((err) =>
+          of(
+            actions.failBulkForceDeleteProfile(
+              extractError(err, "Failed to force delete ACME Profiles")
             )
           )
         )
@@ -324,6 +355,7 @@ const epics = [
   getProfilesList,
   getProfileDetail,
   updateAcmeProfile,
+  bulkForceDeleteAcmeProfile,
 ];
 
 export default epics;

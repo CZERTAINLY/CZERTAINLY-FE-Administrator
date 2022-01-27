@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
@@ -24,9 +24,11 @@ function AcmeProfileDetail() {
   const isFetchingProfiles = useSelector(selectors.isFetching);
   const profileDetails = useSelector(selectors.selectSelectedProfile);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
+  const deleteErrorMessages = useSelector(selectors.selectDeleteProfileError);
 
   const history = useHistory();
   const { params } = useRouteMatch();
+  const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
   const uuid = (params as any).id as string;
 
   const allowedAttributeTypeForDetail = [
@@ -47,6 +49,14 @@ function AcmeProfileDetail() {
     [dispatch]
   );
 
+  useEffect(() => {
+    if (deleteErrorMessages?.length > 0) {
+      setDeleteErrorModalOpen(true);
+    } else {
+      setDeleteErrorModalOpen(false);
+    }
+  }, [deleteErrorMessages]);
+
   const onConfirmDelete = useCallback(() => {
     dispatch(actions.confirmDeleteProfile(profileDetails?.uuid || "", history));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,6 +74,22 @@ function AcmeProfileDetail() {
 
   const onDisableProfile = () => {
     dispatch(actions.requestDisableProfile(profileDetails?.uuid || ""));
+  };
+
+  const onForceDeleteCancel = useCallback(() => {
+    dispatch(actions.cancelBulkForceDeleteProfile());
+    setDeleteErrorModalOpen(false);
+  }, [dispatch]);
+
+  const onForceDeleteProfile = () => {
+    dispatch(
+      actions.requestBulkForceDeleteProfile(
+        [profileDetails?.uuid || ""] || [],
+        true,
+        history
+      )
+    );
+    setDeleteErrorModalOpen(false);
   };
 
   const detailsTitle = (
@@ -376,6 +402,35 @@ function AcmeProfileDetail() {
             Yes, delete
           </Button>
           <Button color="secondary" onClick={onCancelDelete}>
+            Cancel
+          </Button>
+        </MDBModalFooter>
+      </MDBModal>
+
+      <MDBModal
+        overflowScroll={false}
+        isOpen={deleteErrorModalOpen}
+        toggle={onForceDeleteCancel}
+      >
+        <MDBModalHeader toggle={onForceDeleteCancel}>
+          Delete ACME Profile
+        </MDBModalHeader>
+        <MDBModalBody>
+          <b>
+            Failed to delete ACME Profiles it has some dependent RA Profiles.
+            Please find the details below &nbsp;
+          </b>
+          <br />
+          <br />
+          {deleteErrorMessages?.map(function (message) {
+            return message.message;
+          })}
+        </MDBModalBody>
+        <MDBModalFooter>
+          <Button color="danger" onClick={onForceDeleteProfile}>
+            Force
+          </Button>
+          <Button color="secondary" onClick={onForceDeleteCancel}>
             Cancel
           </Button>
         </MDBModalFooter>

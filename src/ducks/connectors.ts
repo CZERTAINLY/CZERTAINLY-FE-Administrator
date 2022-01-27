@@ -238,7 +238,7 @@ export const actions = {
     Actions.ForceDeleteRequest,
     (uuid: string | number, history: History) => ({ uuid, history })
   ),
-  recieveForceDeleteConnector: createCustomAction(
+  receiveForceDeleteConnector: createCustomAction(
     Actions.ForceDeleteSuccess,
     (uuid: string | number) => ({ uuid })
   ),
@@ -286,7 +286,7 @@ export const actions = {
     Actions.ReconnectRequest,
     (uuid: string) => ({ uuid })
   ),
-  recieveReconnectConnector: createCustomAction(
+  receiveReconnectConnector: createCustomAction(
     Actions.ReconnectSuccess,
     (uuid: string) => ({ uuid })
   ),
@@ -303,7 +303,7 @@ export const actions = {
     Actions.HealthRequest,
     (uuid: string) => ({ uuid })
   ),
-  recieveConnectorHealth: createCustomAction(
+  receiveConnectorHealth: createCustomAction(
     Actions.HealthSuccess,
     (health: ConnectorHealth) => ({ health })
   ),
@@ -349,7 +349,7 @@ export const actions = {
     Actions.BulkForceDeleteRequest,
     (uuid: (string | number)[]) => ({ uuid })
   ),
-  recieveBulkForceDeleteConnector: createCustomAction(
+  receiveBulkForceDeleteConnector: createCustomAction(
     Actions.BulkForceDeleteSuccess,
     (uuid: (string | number)[]) => ({ uuid })
   ),
@@ -399,7 +399,7 @@ export const actions = {
     Actions.BulkReconnectRequest,
     (uuid: string[]) => ({ uuid })
   ),
-  recieveBulkReconnectConnector: createCustomAction(
+  receiveBulkReconnectConnector: createCustomAction(
     Actions.BulkReconnectSuccess,
     (uuid: string[]) => ({ uuid })
   ),
@@ -493,7 +493,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeletingConnector: false,
         deleteConnectorErrors: [],
       };
-    case getType(actions.recieveForceDeleteConnector):
+    case getType(actions.receiveForceDeleteConnector):
       return {
         ...state,
         isDeletingConnector: false,
@@ -540,7 +540,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeletingConnector: false,
         deleteConnectorErrors: [],
       };
-    case getType(actions.recieveBulkForceDeleteConnector):
+    case getType(actions.receiveBulkForceDeleteConnector):
       let updated: Connector[] = [];
       for (let i of state.connectors) {
         if (!action.uuid.includes(i.uuid)) {
@@ -677,7 +677,7 @@ export function reducer(state: State = initialState, action: Action): State {
 
     case getType(actions.requestReconnectConnector):
       return { ...state, isReconnecting: true };
-    case getType(actions.recieveReconnectConnector):
+    case getType(actions.receiveReconnectConnector):
       return { ...state, isReconnecting: false };
     case getType(actions.failReconnectConnector):
       return { ...state, isReconnecting: false };
@@ -693,7 +693,7 @@ export function reducer(state: State = initialState, action: Action): State {
 
     case getType(actions.requestBulkReconnectConnector):
       return { ...state, isReconnecting: true };
-    case getType(actions.recieveBulkReconnectConnector):
+    case getType(actions.receiveBulkReconnectConnector):
       return { ...state, isReconnecting: false };
     case getType(actions.failBulkReconnectConnector):
       return { ...state, isReconnecting: false };
@@ -704,7 +704,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isFetchingHealth: true,
         connectorHealth: { status: "Unknown" },
       };
-    case getType(actions.recieveConnectorHealth):
+    case getType(actions.receiveConnectorHealth):
       return {
         ...state,
         isFetchingHealth: false,

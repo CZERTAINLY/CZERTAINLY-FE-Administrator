@@ -6,10 +6,14 @@ import { dbData, createAcmeProfile } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
 import { AttributeResponse } from "models/attributes";
+import { ErrorDeleteObject } from "models";
 
 export class AcmeProfilesManagementMock
   implements model.AcmeProfilesManagementApi
 {
+  bulkForceDeleteAcmeProfile(uuid: (string | number)[]): Observable<void> {
+    return of();
+  }
   createAcmeProfile(name: string, description: string): Observable<string> {
     return of(null).pipe(
       delay(randomDelay()),
@@ -17,20 +21,8 @@ export class AcmeProfilesManagementMock
     );
   }
 
-  deleteAcmeProfile(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles.splice(profileIdx, 1);
-      })
-    );
+  deleteAcmeProfile(uuid: string | number): Observable<ErrorDeleteObject[]> {
+    return of([]);
   }
 
   enableAcmeProfile(uuid: string | number): Observable<void> {
@@ -65,20 +57,10 @@ export class AcmeProfilesManagementMock
     );
   }
 
-  bulkDeleteAcmeProfile(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles.splice(profileIdx, 1);
-      })
-    );
+  bulkDeleteAcmeProfile(
+    uuid: (string | number)[]
+  ): Observable<ErrorDeleteObject[]> {
+    return of([]);
   }
 
   bulkEnableAcmeProfile(uuid: (string | number)[]): Observable<void> {
