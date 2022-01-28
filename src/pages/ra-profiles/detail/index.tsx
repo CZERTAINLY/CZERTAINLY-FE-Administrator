@@ -169,6 +169,7 @@ function RaProfileDetail() {
       )
     );
     setToggleActivateAcme(false);
+    setAcmeProfileUuid("");
   };
 
   const onConfirmDeactivate = () => {
