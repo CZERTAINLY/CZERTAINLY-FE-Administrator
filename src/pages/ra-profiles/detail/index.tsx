@@ -169,6 +169,7 @@ function RaProfileDetail() {
       )
     );
     setToggleActivateAcme(false);
+    setAcmeProfileUuid("");
   };
 
   const onConfirmDeactivate = () => {
@@ -301,6 +302,19 @@ function RaProfileDetail() {
   useEffect(() => {
     setAuthorizedClient(availableClients[0]?.uuid);
   }, [availableClients]);
+
+  const getAcmeDisplay = () => {
+    let acmeProv: any = [];
+    for (let i of acmeProfiles) {
+      if (i.uuid !== acmeDetails?.uuid) {
+        acmeProv.push({
+          label: i.name,
+          value: i.uuid,
+        });
+      }
+    }
+    return acmeProv;
+  };
 
   const getAttributeValue = (attribute: AttributeResponse) => {
     if (allowedAttributeTypeForDetail.includes(attribute.type)) {
@@ -649,16 +663,9 @@ function RaProfileDetail() {
             <Select
               maxMenuHeight={140}
               menuPlacement="auto"
-              options={acmeProfiles
-                ?.filter((profile) => !profile.raProfileUuid)
-                .map(function (provider) {
-                  return {
-                    label: provider.name,
-                    value: provider.uuid,
-                  };
-                })}
+              options={getAcmeDisplay()}
               placeholder="Select ACME Profile"
-              onChange={(event) => setAcmeProfileUuid(event?.value || "")}
+              onChange={(event: any) => setAcmeProfileUuid(event?.value || "")}
             />
           </FormGroup>
           <DynamicForm

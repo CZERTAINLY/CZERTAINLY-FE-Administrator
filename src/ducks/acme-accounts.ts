@@ -281,7 +281,9 @@ export function reducer(state: State = initialState, action: Action): State {
         if (!action.uuid.includes(i.uuid)) {
           updatedEnable.push(i);
         } else {
-          i.enabled = true;
+          if (i.status !== "revoked") {
+            i.enabled = true;
+          }
           updatedEnable.push(i);
         }
       }
@@ -295,7 +297,9 @@ export function reducer(state: State = initialState, action: Action): State {
         if (!action.uuid.includes(i.uuid)) {
           updatedDisable.push(i);
         } else {
-          i.enabled = false;
+          if (i.status !== "revoked") {
+            i.enabled = false;
+          }
           updatedDisable.push(i);
         }
       }

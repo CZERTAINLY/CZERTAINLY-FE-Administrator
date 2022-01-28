@@ -1,4 +1,4 @@
-import { RaProfile } from "models";
+import { ErrorDeleteObject, RaProfile } from "models";
 import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 
@@ -51,10 +51,13 @@ export interface AcmeProfilesManagementApi {
     requireTermsOfService: boolean,
     termsOfServiceChangeUrl: string
   ): Observable<string>;
-  deleteAcmeProfile(uuid: string | number): Observable<void>;
+  deleteAcmeProfile(uuid: string | number): Observable<ErrorDeleteObject[]>;
   enableAcmeProfile(uuid: string | number): Observable<void>;
   disableAcmeProfile(uuid: string | number): Observable<void>;
-  bulkDeleteAcmeProfile(uuid: (string | number)[]): Observable<void>;
+  bulkDeleteAcmeProfile(
+    uuid: (string | number)[]
+  ): Observable<ErrorDeleteObject[]>;
+  bulkForceDeleteAcmeProfile(uuid: (string | number)[]): Observable<void>;
   bulkEnableAcmeProfile(uuid: (string | number)[]): Observable<void>;
   bulkDisableAcmeProfile(uuid: (string | number)[]): Observable<void>;
   getAcmeProfilesList(): Observable<AcmeProfileResponse[]>;

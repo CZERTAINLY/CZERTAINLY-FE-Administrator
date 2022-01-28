@@ -10,6 +10,7 @@ import {
   AcmeProfileDetailResponse,
   AcmeProfileResponse,
 } from "api/acme-profile";
+import { ErrorDeleteObject } from "models";
 
 export const statePath = "acmeProfiles";
 
@@ -36,6 +37,14 @@ export enum Actions {
   BulkCancelDelete = "@@acmeprofiles/BULK_CANCEL_DELETE",
   BulkDeleteSuccess = "@@acmeprofiles/BULK_DELETE_SUCCESS",
   BulkDeleteFailure = "@@acmeprofiles/BULK_DELETE_FAILURE",
+
+  BulkForceDeleteRequest = "@@acmeprofiles/BULK_FORCE_DELETE_REQUEST",
+  BulkForceConfirmDeleteRequest = "@@acmeprofiles/BULK_FORCE_CONFIRM_DELETE_REQUEST",
+  BulkForceConfirmDelete = "@@acmeprofiles/BULK_FORCE_CONFIRM_DELETE",
+  BulkForceCancelDelete = "@@acmeprofiles/BULK_FORCE_CANCEL_DELETE",
+  BulkForceDeleteSuccess = "@@acmeprofiles/BULK_FORCE_DELETE_SUCCESS",
+  BulkForceDeleteFailure = "@@acmeprofiles/BULK_FORCE_DELETE_FAILURE",
+
   BulkDisableRequest = "@@acmeprofiles/BULK_DISABLE_REQUEST",
   BulkEnableRequest = "@@acmeprofiles/BULK_ENABLE_REQUEST",
   BulkEnableSuccess = "@@acmeprofiles/BULK_ENABLE_SUCCESS",
@@ -80,7 +89,10 @@ export const actions = {
   cancelDeleteProfile: createCustomAction(Actions.CancelDelete),
   receiveDeleteProfile: createCustomAction(
     Actions.DeleteSuccess,
-    (uuid: string | number) => ({ uuid })
+    (uuid: string | number, errorMessage: ErrorDeleteObject[]) => ({
+      uuid,
+      errorMessage,
+    })
   ),
   failDeleteProfile: createCustomAction(
     Actions.DeleteFailure,
@@ -126,12 +138,46 @@ export const actions = {
   cancelBulkDeleteProfile: createCustomAction(Actions.BulkCancelDelete),
   receiveBulkDeleteProfile: createCustomAction(
     Actions.BulkDeleteSuccess,
-    (uuid: (string | number)[]) => ({ uuid })
+    (uuid: (string | number)[], errorMessage: ErrorDeleteObject[]) => ({
+      uuid,
+      errorMessage,
+    })
   ),
   failBulkDeleteProfile: createCustomAction(
     Actions.BulkDeleteFailure,
     (error?: string) => createErrorAlertAction(error)
   ),
+
+  requestBulkForceDeleteProfile: createCustomAction(
+    Actions.BulkForceDeleteRequest,
+    (uuid: (string | number)[], pushBack: boolean, history: History) => ({
+      uuid,
+      pushBack,
+      history,
+    })
+  ),
+  confirmBulkForceDeleteProfileRequest: createCustomAction(
+    Actions.BulkForceConfirmDeleteRequest,
+    (uuid: (string | number)[]) => ({ uuid })
+  ),
+  confirmBulkForceDeleteProfile: createCustomAction(
+    Actions.BulkForceConfirmDelete,
+    (uuid: (string | number)[]) => ({ uuid })
+  ),
+  cancelBulkForceDeleteProfile: createCustomAction(
+    Actions.BulkForceCancelDelete
+  ),
+  receiveBulkForceDeleteProfile: createCustomAction(
+    Actions.BulkForceDeleteSuccess,
+    (uuid: (string | number)[]) => ({
+      uuid,
+    })
+  ),
+  failBulkForceDeleteProfile: createCustomAction(
+    Actions.BulkForceDeleteFailure,
+    (error?: string) => createErrorAlertAction(error)
+  ),
+
   requestBulkEnableProfile: createCustomAction(
     Actions.BulkEnableRequest,
     (uuid: (string | number)[]) => ({ uuid })
@@ -275,6 +321,7 @@ export type State = {
   profiles: AcmeProfileResponse[];
   selectedProfile: AcmeProfileDetailResponse | null;
   confirmDeleteProfile: string;
+  deleteProfileErrors: ErrorDeleteObject[];
 };
 
 export const initialState: State = {
@@ -286,6 +333,7 @@ export const initialState: State = {
   profiles: [],
   selectedProfile: null,
   confirmDeleteProfile: "",
+  deleteProfileErrors: [],
 };
 
 export function reducer(
@@ -330,6 +378,7 @@ export function reducer(
     case getType(actions.receiveDeleteProfile):
       return {
         ...state,
+        deleteProfileErrors: action.errorMessage,
         isDeleting: false,
       };
     case getType(actions.requestEnableProfile):
@@ -368,6 +417,42 @@ export function reducer(
     case getType(actions.failBulkDeleteProfile):
       return { ...state, isDeleting: false };
     case getType(actions.receiveBulkDeleteProfile):
+      let upd: AcmeProfileResponse[] = [];
+      const failedDelete: (string | number)[] = action.errorMessage.map(
+        function (conn: ErrorDeleteObject) {
+          return conn.uuid;
+        }
+      );
+      for (let i of state.profiles) {
+        if (action.uuid.includes(i.uuid) && failedDelete.includes(i.uuid)) {
+          upd.push(i);
+        } else if (!action.uuid.includes(i.uuid)) {
+          upd.push(i);
+        }
+      }
+      return {
+        ...state,
+        deleteProfileErrors: action.errorMessage,
+        isDeleting: false,
+        profiles: upd,
+      };
+
+    case getType(actions.requestBulkForceDeleteProfile):
+      return { ...state, isDeleting: true };
+    case getType(actions.confirmBulkForceDeleteProfileRequest):
+      return { ...state, confirmDeleteProfile: action.uuid, isDeleting: true };
+    case getType(actions.cancelBulkForceDeleteProfile):
+      return {
+        ...state,
+        confirmDeleteProfile: "",
+        deleteProfileErrors: [],
+        isDeleting: false,
+      };
+    case getType(actions.confirmBulkForceDeleteProfile):
+      return { ...state, confirmDeleteProfile: "", isDeleting: true };
+    case getType(actions.failBulkForceDeleteProfile):
+      return { ...state, isDeleting: false };
+    case getType(actions.receiveBulkForceDeleteProfile):
       let updated: AcmeProfileResponse[] = [];
       for (let i of state.profiles) {
         if (!action.uuid.includes(i.uuid)) {
@@ -376,9 +461,11 @@ export function reducer(
       }
       return {
         ...state,
+        deleteProfileErrors: [],
         isDeleting: false,
         profiles: updated,
       };
+
     case getType(actions.requestBulkEnableProfile):
     case getType(actions.requestBulkDisableProfile):
       return { ...state, isEditing: true };
@@ -483,6 +570,11 @@ const selectConfirmDeleteProfileId = createSelector(
   (state) => state.confirmDeleteProfile
 );
 
+const selectDeleteProfileError = createSelector(
+  selectState,
+  (state) => state.deleteProfileErrors
+);
+
 export const selectors = {
   selectState,
   isCreating,
@@ -493,4 +585,5 @@ export const selectors = {
   selectSelectedProfile,
   selectProfileDetail,
   selectConfirmDeleteProfileId,
+  selectDeleteProfileError,
 };

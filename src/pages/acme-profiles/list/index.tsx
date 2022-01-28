@@ -7,6 +7,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/acme-profiles";
 import MDBColumnName from "components/MDBColumnName";
+import { useHistory } from "react-router";
 import {
   MDBBadge,
   MDBModal,
@@ -24,17 +25,30 @@ function AcmeProfileList() {
   const isEditing = useSelector(selectors.isEditing);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
   const [checkedRows, setCheckedRows] = useState<(string | number)[]>([]);
+  const [duplicateRows, setDuplicateRows] = useState<(string | number)[]>([]);
+  const deleteErrorMessages = useSelector(selectors.selectDeleteProfileError);
+  const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
 
   const dispatch = useDispatch();
   const { path } = useRouteMatch();
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(actions.requestAcmeProfilesList());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (deleteErrorMessages?.length > 0) {
+      setDeleteErrorModalOpen(true);
+    } else {
+      setDeleteErrorModalOpen(false);
+    }
+  }, [deleteErrorMessages]);
+
   const onConfirmDelete = useCallback(() => {
     dispatch(actions.confirmBulkDeleteProfile(checkedRows));
+    setDuplicateRows(checkedRows);
     setCheckedRows([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, confirmDeleteId]);
@@ -56,6 +70,19 @@ function AcmeProfileList() {
   const onDisableProfile = () => {
     dispatch(actions.requestBulkDisableProfile(checkedRows));
     setCheckedRows([]);
+  };
+
+  const onForceDeleteCancel = useCallback(() => {
+    dispatch(actions.cancelBulkForceDeleteProfile());
+    setDeleteErrorModalOpen(false);
+  }, [dispatch]);
+
+  const onForceDeleteProfile = (event: any) => {
+    dispatch(
+      actions.requestBulkForceDeleteProfile(duplicateRows, false, history)
+    );
+    setDuplicateRows([]);
+    setDeleteErrorModalOpen(false);
   };
 
   const title = (
@@ -116,7 +143,7 @@ function AcmeProfileList() {
         </Button>
       </div>
       <h5 className="mt-0">
-        List of <span className="fw-semi-bold">RA Profiles</span>
+        List of <span className="fw-semi-bold">ACME Profiles</span>
       </h5>
     </div>
   );
@@ -231,6 +258,36 @@ function AcmeProfileList() {
           </Button>
         </MDBModalFooter>
       </MDBModal>
+
+      <MDBModal
+        overflowScroll={false}
+        isOpen={deleteErrorModalOpen}
+        toggle={onForceDeleteCancel}
+      >
+        <MDBModalHeader toggle={onForceDeleteCancel}>
+          Delete ACME Profile
+        </MDBModalHeader>
+        <MDBModalBody>
+          <b>
+            Failed to delete ACME Profiles it has some dependent RA Profiles.
+            Please find the details below &nbsp;
+          </b>
+          <br />
+          <br />
+          {deleteErrorMessages?.map(function (message) {
+            return message.message;
+          })}
+        </MDBModalBody>
+        <MDBModalFooter>
+          <Button color="danger" onClick={onForceDeleteProfile}>
+            Force
+          </Button>
+          <Button color="secondary" onClick={onForceDeleteCancel}>
+            Cancel
+          </Button>
+        </MDBModalFooter>
+      </MDBModal>
+
       <Spinner active={isFetching || isDeleting || isEditing} />
     </Container>
   );

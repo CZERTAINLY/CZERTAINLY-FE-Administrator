@@ -223,7 +223,7 @@ export const actions = {
     Actions.ForceDeleteRequest,
     (uuid: string | number, history: History) => ({ uuid, history })
   ),
-  recieveForceDeleteAuthority: createCustomAction(
+  receiveForceDeleteAuthority: createCustomAction(
     Actions.ForceDeleteSuccess,
     (uuid: string | number) => ({ uuid })
   ),
@@ -238,7 +238,7 @@ export const actions = {
     Actions.BulkForceDeleteRequest,
     (uuid: (string | number)[]) => ({ uuid })
   ),
-  recieveBulkForceDeleteAuthority: createCustomAction(
+  receiveBulkForceDeleteAuthority: createCustomAction(
     Actions.BulkForceDeleteSuccess,
     (uuid: (string | number)[]) => ({ uuid })
   ),
@@ -443,7 +443,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeletingAuthority: false,
         deleteAuthorityErrors: [],
       };
-    case getType(actions.recieveForceDeleteAuthority):
+    case getType(actions.receiveForceDeleteAuthority):
       return {
         ...state,
         isDeletingAuthority: false,
@@ -460,7 +460,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeletingAuthority: false,
         deleteAuthorityErrors: [],
       };
-    case getType(actions.recieveBulkForceDeleteAuthority):
+    case getType(actions.receiveBulkForceDeleteAuthority):
       let updated: Authority[] = [];
       for (let i of state.authorities) {
         if (!action.uuid.includes(i.uuid)) {

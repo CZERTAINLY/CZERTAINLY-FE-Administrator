@@ -65,26 +65,30 @@ const deleteCredential: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-const forceDeleteCredential: Epic<Action, Action, AppState, EpicDependencies> =
-  (action$, _, { apiClients }) =>
-    action$.pipe(
-      filter(isOfType(Actions.ForceDeleteRequest)),
-      switchMap(({ uuid, history }) =>
-        apiClients.credentials.forceDeleteCredential(uuid).pipe(
-          map(() => {
-            history.push("..");
-            return actions.recieveForceDeleteCredential(uuid);
-          }),
-          catchError((err) =>
-            of(
-              actions.failForceDeleteCredential(
-                extractError(err, "Failed to force delete credentials")
-              )
+const forceDeleteCredential: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.ForceDeleteRequest)),
+    switchMap(({ uuid, history }) =>
+      apiClients.credentials.forceDeleteCredential(uuid).pipe(
+        map(() => {
+          history.push("..");
+          return actions.receiveForceDeleteCredential(uuid);
+        }),
+        catchError((err) =>
+          of(
+            actions.failForceDeleteCredential(
+              extractError(err, "Failed to force delete credentials")
             )
           )
         )
       )
-    );
+    )
+  );
 
 const bulkdeleteCredential: Epic<Action, Action, AppState, EpicDependencies> = (
   action$,
@@ -119,7 +123,7 @@ const bulkForceDeleteCredential: Epic<
     filter(isOfType(Actions.BulkForceDeleteRequest)),
     switchMap(({ uuid }) =>
       apiClients.credentials.bulkForceDeleteCredential(uuid).pipe(
-        map(() => actions.recieveBulkForceDeleteCredential(uuid)),
+        map(() => actions.receiveBulkForceDeleteCredential(uuid)),
         catchError((err) =>
           of(
             actions.failBulkForceDeleteCredential(

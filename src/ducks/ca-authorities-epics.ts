@@ -107,7 +107,7 @@ const forceDeleteAuthority: Epic<Action, Action, AppState, EpicDependencies> = (
       apiClients.authorities.forceDeleteAuthority(uuid).pipe(
         map(() => {
           history.push("..");
-          return actions.recieveForceDeleteAuthority(uuid);
+          return actions.receiveForceDeleteAuthority(uuid);
         }),
         catchError((err) =>
           of(
@@ -130,7 +130,7 @@ const bulkForceDeleteAuthority: Epic<
     filter(isOfType(Actions.BulkForceDeleteRequest)),
     switchMap(({ uuid }) =>
       apiClients.authorities.bulkForceDeleteAuthority(uuid).pipe(
-        map(() => actions.recieveBulkForceDeleteAuthority(uuid)),
+        map(() => actions.receiveBulkForceDeleteAuthority(uuid)),
         catchError((err) =>
           of(
             actions.failBulkForceDeleteAuthority(
