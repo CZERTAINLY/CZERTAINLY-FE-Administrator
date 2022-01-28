@@ -26,7 +26,9 @@ function LinksGroup({
   glyph,
   className,
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(
+    window.location.href.includes("/app/acme")
+  );
   const toggle = useCallback(() => setIsOpen(!isOpen), [isOpen]);
 
   if (!childrenLinks) {
