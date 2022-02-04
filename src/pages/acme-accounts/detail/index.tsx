@@ -10,11 +10,14 @@ import Widget from "components/Widget";
 import { actions, selectors } from "ducks/acme-accounts";
 import ToolTip from "components/ToolTip";
 import {
+  MDBBadge,
   MDBModal,
   MDBModalBody,
   MDBModalFooter,
   MDBModalHeader,
 } from "mdbreact";
+import {acmeAccountStatus} from "../../../utils/acmeAccount";
+import StatusCircle from "../../../components/StatusCircle";
 
 function AcmeAccountDetail() {
   const dispatch = useDispatch();
@@ -121,6 +124,8 @@ function AcmeAccountDetail() {
     </div>
   );
 
+  let accountStatus = acmeAccountStatus(accountDetails?.status || "");
+
   return (
     <Container className="themed-container" fluid>
       <Widget title={detailsTitle}>
@@ -159,7 +164,7 @@ function AcmeAccountDetail() {
               <td>
                 {accountDetails?.acmeProfileUuid ? (
                   <Link
-                    to={`../../acmeaccounts/detail/${accountDetails?.acmeProfileUuid}`}
+                    to={`../../acmeprofiles/detail/${accountDetails?.acmeProfileUuid}`}
                   >
                     {accountDetails.acmeProfileName}
                   </Link>
@@ -169,28 +174,26 @@ function AcmeAccountDetail() {
               </td>
             </tr>
             <tr>
-              <td>State</td>
+              <td>Internal State</td>
               <td>
                 <StatusBadge enabled={accountDetails?.enabled} />
               </td>
             </tr>
             <tr>
-              <td>Account Id</td>
-              <td>{accountDetails?.accountId}</td>
-            </tr>
-            <tr>
-              <td>Status</td>
-              <td>{accountDetails?.status}</td>
+              <td>Account Status</td>
+              <td>
+                <MDBBadge color={accountStatus[1]}>{accountStatus[0]}</MDBBadge>
+              </td>
             </tr>
             <tr>
               <td>Terms of Service Agreed</td>
-              <td>{accountDetails?.termsOfServiceAgreed ? "Yes" : "No"}</td>
+              <td>{accountDetails?.termsOfServiceAgreed ? <StatusCircle status={true} /> : <StatusCircle status={false} />}</td>
             </tr>
             <tr>
               <td>Contacts</td>
               <td>
                 {accountDetails?.contact.map(function (contact) {
-                  return <span>{contact}</span>;
+                  return <span>{contact}<br/></span>;
                 })}
               </td>
             </tr>

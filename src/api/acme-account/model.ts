@@ -4,7 +4,7 @@ export interface AcmeAccountListResponse {
   accountId: string;
   uuid: string;
   totalOrders: number;
-  status: string;
+  status?: string | "";
   raProfileName: string;
   acmeProfileName: string;
   enabled: boolean;

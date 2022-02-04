@@ -16,6 +16,7 @@ import {
 } from "mdbreact";
 import ToolTip from "components/ToolTip";
 import CustomTable from "components/CustomTable";
+import {acmeAccountStatus} from "../../../utils/acmeAccount";
 
 function AcmeAccountList() {
   const accounts = useSelector(selectors.selectAccounts);
@@ -124,6 +125,7 @@ function AcmeAccountList() {
   const accountsList = () => {
     let rows: any = [];
     for (let account of accounts) {
+      let accountStatus = acmeAccountStatus(account.status || "");
       let column: any = {};
       column["accountId"] = {
         content: account.accountId,
@@ -153,6 +155,9 @@ function AcmeAccountList() {
       };
       column["status"] = {
         content: account.status,
+        styledContent: (
+            <MDBBadge color={accountStatus[1]}>{accountStatus[0]}</MDBBadge>
+        ),
         lineBreak: true,
       };
       column["totalOrders"] = {
@@ -191,14 +196,14 @@ function AcmeAccountList() {
       width: "15%",
     },
     {
-      styledContent: <MDBColumnName columnName="State" />,
+      styledContent: <MDBColumnName columnName="Internal State" />,
       content: "state",
       sort: false,
       id: "state",
       width: "10%",
     },
     {
-      styledContent: <MDBColumnName columnName="Status" />,
+      styledContent: <MDBColumnName columnName="Account Status" />,
       content: "status",
       sort: false,
       id: "status",
