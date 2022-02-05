@@ -46,6 +46,17 @@ import {
   statePath as certificatesStatePath,
 } from "./certificates";
 
+import {
+  initialState as initialAcmeAccountState,
+  State as AcmeAccountState,
+  statePath as acmeAccountStatePath,
+} from "./acme-accounts";
+import {
+  initialState as initialAcmeProfilesState,
+  State as AcmeProfilesState,
+  statePath as acmeProfileStatePath,
+} from "./acme-profiles";
+
 export interface State {
   [certificatesStatePath]: CertificatesState;
   [administratorsStatePath]: AdministratorsState;
@@ -56,6 +67,8 @@ export interface State {
   [credentialStatePath]: CredentialsState;
   [connectorStatePath]: ConnectorsState;
   [authorityStatePath]: AuthoritiesState;
+  [acmeAccountStatePath]: AcmeAccountState;
+  [acmeProfileStatePath]: AcmeProfilesState;
 }
 
 export const initialState: State = {
@@ -68,6 +81,8 @@ export const initialState: State = {
   [credentialStatePath]: initialCredentialsState,
   [connectorStatePath]: initialConnectorsState,
   [authorityStatePath]: initialAuthoritiesState,
+  [acmeAccountStatePath]: initialAcmeAccountState,
+  [acmeProfileStatePath]: initialAcmeProfilesState,
 };
 
 export interface EpicDependencies {

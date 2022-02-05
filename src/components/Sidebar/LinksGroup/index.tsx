@@ -26,7 +26,9 @@ function LinksGroup({
   glyph,
   className,
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(
+    window.location.href.includes("/app/acme")
+  );
   const toggle = useCallback(() => setIsOpen(!isOpen), [isOpen]);
 
   if (!childrenLinks) {
@@ -34,7 +36,8 @@ function LinksGroup({
       <li className={cx(style.headerLink, className)}>
         <NavLink to={headerLink} activeClassName={style.headerLinkActive}>
           <div>
-            <i className={glyph} /> <span className={style.menuLabel}>{header}</span>
+            <i className={glyph} />{" "}
+            <span className={style.menuLabel}>{header}</span>
           </div>
         </NavLink>
       </li>
@@ -55,10 +58,11 @@ function LinksGroup({
             onClick={toggle}
           >
             <div>
-              <i className={glyph} /> <span>{header}</span>
+              <i className={glyph} />{" "}
+              <span className={style.menuLabel}>{header}</span>
             </div>
-            <b
-              className={cx("fa fa-angle-left arrow", style.arrow, {
+            <div
+              className={cx("fa fa-angle-down arrow", style.arrow, {
                 [style.arrowActive]: isOpen,
               })}
             />
@@ -66,7 +70,17 @@ function LinksGroup({
           <Collapse className={style.panel} isOpen={isOpen}>
             <ul>
               {childrenLinks.map((child) => (
-                <li key={child.name}>{child.name}</li>
+                <li className={cx(style.headerLink, className)}>
+                  <NavLink
+                    to={child.link}
+                    activeClassName={style.headerLinkActive}
+                  >
+                    <div>
+                      <i className={glyph} />{" "}
+                      <span className={style.menuLabel}>{child.name}</span>
+                    </div>
+                  </NavLink>
+                </li>
               ))}
             </ul>
           </Collapse>

@@ -77,6 +77,9 @@ function getResponseBody(response: Response): Promise<any> {
 export function extractError(err: HttpErrorResponse, headline: string): string {
   const errorBody = err.error;
   if (err.status === 422) {
+    if (typeof errorBody === "string") {
+      return `${headline} ${errorBody}`;
+    }
     return `${headline} ${errorBody.join(", ")}`;
   }
   if (!errorBody) {

@@ -34,6 +34,14 @@ function Sidebar() {
         <LinksGroup header="Credentials" headerLink="/app/credentials" />
         <LinksGroup header="Authorities" headerLink="/app/authorities" />
 
+        <LinksGroup
+          header="ACME"
+          childrenLinks={[
+            { name: "ACME Accounts", link: "/app/acmeaccounts" },
+            { name: "ACME Profiles", link: "/app/acmeprofiles" },
+          ]}
+        />
+
         <LinksGroup header="Audit Logs" headerLink="/app/audit" />
         {!inFrame ? (
           <LinksGroup header="About" headerLink="/app/about" />

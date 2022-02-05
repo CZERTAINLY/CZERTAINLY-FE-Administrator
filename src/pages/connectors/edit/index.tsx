@@ -90,7 +90,7 @@ function ConnectorEdit() {
   };
 
   return (
-    <Container className="themed-container">
+    <Container className="themed-container" fluid>
       <ConnectorForm
         defaultValues={getDefaultValues()}
         isSubmitting={isEditing}

@@ -356,7 +356,137 @@ const getAttributes: Epic<Action, Action, AppState, EpicDependencies> = (
         catchError((err) =>
           of(
             actions.failAttribute(
-              extractError(err, "Failed to retrieve attributes list")
+              extractError(err, "Failed to retrieve Attributes list")
+            )
+          )
+        )
+      )
+    )
+  );
+
+const getIssuanceAttributes: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.IssuanceAttributesRequest)),
+    switchMap(({ raProfileUuid }) =>
+      apiClients.profiles.getIssuanceAttributes(raProfileUuid).pipe(
+        map((attributes) => actions.receiveIssuanceAttributes(attributes)),
+        catchError((err) =>
+          of(
+            actions.failIssuanceAttributes(
+              extractError(
+                err,
+                "Failed to retrieve Attributes to issue Certificate"
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+
+const getRevocationAttributes: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicDependencies
+> = (action$, _, { apiClients }) =>
+  action$.pipe(
+    filter(isOfType(Actions.RevokeAttributesRequest)),
+    switchMap(({ raProfileUuid }) =>
+      apiClients.profiles.getRevocationAttributes(raProfileUuid).pipe(
+        map((attributes) => actions.receiveRevokeAttributes(attributes)),
+        catchError((err) =>
+          of(
+            actions.failRevokeAttributes(
+              extractError(
+                err,
+                "Failed to retrieve Attributes to revoke Certificate"
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+
+const getAcmeDetails: Epic<Action, Action, AppState, EpicDependencies> = (
+  action$,
+  _,
+  { apiClients }
+) =>
+  action$.pipe(
+    filter(isOfType(Actions.AcmeDetailsRequest)),
+    switchMap(({ uuid }) =>
+      apiClients.profiles.getRaAcmeProfile(uuid).pipe(
+        map((acmeDetails) => actions.receiveAcmeDetails(acmeDetails)),
+        catchError((err) =>
+          of(
+            actions.failAcmeDetails(
+              extractError(err, "Failed to retrieve ACME details")
+            )
+          )
+        )
+      )
+    )
+  );
+
+const activateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
+  action$,
+  _,
+  { apiClients }
+) =>
+  action$.pipe(
+    filter(isOfType(Actions.ActivateAcmeRequest)),
+    switchMap(
+      ({
+        uuid,
+        acmeProfileUuid,
+        issueCertificateAttributes,
+        revokeCertificateAttributes,
+      }) =>
+        apiClients.profiles
+          .activateAcme(
+            uuid,
+            acmeProfileUuid,
+            issueCertificateAttributes,
+            revokeCertificateAttributes
+          )
+          .pipe(
+            map((acmeDetails) => {
+              return actions.receiveActivateAcme(acmeDetails);
+            }),
+            catchError((err) =>
+              of(
+                actions.failActivateAcme(
+                  extractError(err, "Failed to activate ACME.")
+                )
+              )
+            )
+          )
+    )
+  );
+
+const deactivateAcme: Epic<Action, Action, AppState, EpicDependencies> = (
+  action$,
+  _,
+  { apiClients }
+) =>
+  action$.pipe(
+    filter(isOfType(Actions.DeactivateAcmeRequest)),
+    switchMap(({ uuid }) =>
+      apiClients.profiles.deactivateAcme(uuid).pipe(
+        map(() => {
+          return actions.receiveDeactivateAcme();
+        }),
+        catchError((err) =>
+          of(
+            actions.failDeactivateAcme(
+              extractError(err, "Failed to deactivate ACME.")
             )
           )
         )
@@ -391,6 +521,7 @@ function mapProfile(profile: RaProfileResponse): RaProfile {
     authorityInstanceUuid: profile.authorityInstanceUuid,
     description: profile.description,
     authorityInstanceName: profile.authorityInstanceName,
+    enabledProtocols: profile.enabledProtocols,
   };
 }
 
@@ -408,7 +539,12 @@ const epics = [
   getProfileDetail,
   getProfileClients,
   getAttributes,
+  getIssuanceAttributes,
+  getRevocationAttributes,
   updateRaProfile,
+  getAcmeDetails,
+  activateAcme,
+  deactivateAcme,
 ];
 
 export default epics;

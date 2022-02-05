@@ -19,11 +19,16 @@ import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
+import Select from "react-select";
 import {
   actions as clientActions,
   selectors as clientSelectors,
 } from "ducks/clients";
 import { actions, selectors } from "ducks/ra-profiles";
+import {
+  actions as acmeActions,
+  selectors as acmeSelectors,
+} from "ducks/acme-profiles";
 import { Client } from "models";
 import { fieldNameTransform } from "utils/fieldNameTransform";
 import ToolTip from "components/ToolTip";
@@ -34,9 +39,15 @@ import {
   MDBModalFooter,
   MDBModalHeader,
 } from "mdbreact";
+import DynamicForm from "components/DynamicForm";
 
 function RaProfileDetail() {
   const dispatch = useDispatch();
+  const isActivatingAcme = useSelector(selectors.isActivatingAcme);
+  const isDeactivatingAcme = useSelector(selectors.isDeactivatingAcme);
+  const acmeDetails = useSelector(selectors.selectAcmeDetails);
+
+  const acmeProfiles = useSelector(acmeSelectors.selectProfiles);
   const allClients = useSelector(clientSelectors.selectClients);
   const isFetchingClients = useSelector(clientSelectors.isFetching);
   const isAuthorizing = useSelector(clientSelectors.isAuthorizingProfile);
@@ -46,9 +57,31 @@ function RaProfileDetail() {
   const authorizedClientIds = useSelector(selectors.selectAuthorizedClientIds);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
 
+  const [acmeProfileUuid, setAcmeProfileUuid] = useState(
+    acmeDetails?.uuid || ""
+  );
+  const [toggleActivateAcme, setToggleActivateAcme] = useState(false);
+  const [toggleDeactivateAcme, setToggleDeactivateAcme] = useState(false);
+
   const history = useHistory();
   const { params } = useRouteMatch();
   const uuid = (params as any).id as string;
+
+  const selectIssueAttributes = useSelector(selectors.selectIssuanceAttributes);
+  const selectRevokeAttributes = useSelector(
+    selectors.selectRevocationAttributes
+  );
+
+  const [issueAttributes, setIssueAttributes] = useState(selectIssueAttributes);
+  const [passIssueAttributes, setIssuePassAttributes] = useState<any>(
+    selectIssueAttributes
+  );
+  const [revokeAttributes, setRevokeAttributes] = useState(
+    selectRevokeAttributes
+  );
+  const [passRevokeAttributes, setRevokePassAttributes] = useState<any>(
+    selectRevokeAttributes
+  );
 
   const allowedAttributeTypeForDetail = [
     "STRING",
@@ -60,8 +93,47 @@ function RaProfileDetail() {
   ];
 
   useEffect(() => {
+    setIssuePassAttributes(selectIssueAttributes);
+    setIssueAttributes(selectIssueAttributes);
+  }, [selectIssueAttributes]);
+
+  useEffect(() => {
+    setRevokePassAttributes(selectRevokeAttributes);
+    setRevokeAttributes(selectRevokeAttributes);
+  }, [selectRevokeAttributes]);
+
+  useEffect(() => {
     dispatch(actions.requestProfileDetail(uuid));
+    dispatch(actions.requestAcmeDetails(uuid));
   }, [uuid, dispatch]);
+
+  function updateAttributes(formAttributes: AttributeResponse) {
+    let updated =
+      issueAttributes.length !== 0 ? issueAttributes : selectIssueAttributes;
+    let updateAttributes: AttributeResponse[] = [];
+    for (let i of updated) {
+      if (i.uuid === formAttributes.uuid) {
+        updateAttributes.push(formAttributes);
+      } else {
+        updateAttributes.push(i);
+      }
+    }
+    setIssueAttributes(updateAttributes);
+  }
+
+  function updateRevokeAttributes(formAttributes: AttributeResponse) {
+    let updated =
+      revokeAttributes.length !== 0 ? revokeAttributes : selectRevokeAttributes;
+    let updateAttributes: AttributeResponse[] = [];
+    for (let i of updated) {
+      if (i.uuid === formAttributes.uuid) {
+        updateAttributes.push(formAttributes);
+      } else {
+        updateAttributes.push(i);
+      }
+    }
+    setRevokeAttributes(updateAttributes);
+  }
 
   const onCancelDelete = useCallback(
     () => dispatch(actions.cancelDeleteProfile()),
@@ -85,6 +157,38 @@ function RaProfileDetail() {
 
   const onDisableProfile = () => {
     dispatch(actions.requestDisableProfile(profileDetails?.uuid || ""));
+  };
+
+  const onConfirmActivate = () => {
+    dispatch(
+      actions.requestActivateAcme(
+        profileDetails?.uuid || "",
+        acmeProfileUuid || "",
+        issueAttributes,
+        revokeAttributes
+      )
+    );
+    setToggleActivateAcme(false);
+    setAcmeProfileUuid("");
+  };
+
+  const onConfirmDeactivate = () => {
+    dispatch(actions.requestDeactivateAcme(profileDetails?.uuid || ""));
+    setAcmeProfileUuid("");
+    setToggleDeactivateAcme(false);
+  };
+
+  const onActivate = () => {
+    dispatch(acmeActions.requestAcmeProfilesList());
+    dispatch(actions.requestIssuanceAttributes(profileDetails?.uuid || ""));
+    dispatch(actions.requestRevokeAttributes(profileDetails?.uuid || ""));
+    setToggleActivateAcme(true);
+  };
+
+  const closeAcmePopup = () => {
+    setToggleActivateAcme(false);
+    setToggleDeactivateAcme(false);
+    setAcmeProfileUuid("");
   };
 
   const detailsTitle = (
@@ -198,6 +302,19 @@ function RaProfileDetail() {
   useEffect(() => {
     setAuthorizedClient(availableClients[0]?.uuid);
   }, [availableClients]);
+
+  const getAcmeDisplay = () => {
+    let acmeProv: any = [];
+    for (let i of acmeProfiles) {
+      if (i.uuid !== acmeDetails?.uuid) {
+        acmeProv.push({
+          label: i.name,
+          value: i.uuid,
+        });
+      }
+    }
+    return acmeProv;
+  };
 
   const getAttributeValue = (attribute: AttributeResponse) => {
     if (allowedAttributeTypeForDetail.includes(attribute.type)) {
@@ -380,6 +497,138 @@ function RaProfileDetail() {
           </div>
         </Form>
       </Widget>
+      <Widget title="ACME Activation">
+        {acmeDetails?.acmeAvailable ? (
+          <Row xs="1" sm="1" md="2" lg="2" xl="2">
+            <Col>
+              <Widget title="ACME Profile Details">
+                <Table className="table-hover" size="sm">
+                  <thead>
+                    <tr>
+                      <th>Attribute</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>UUID</td>
+                      <td>{acmeDetails?.uuid}</td>
+                    </tr>
+                    <tr>
+                      <td>Name</td>
+                      <td>
+                        {acmeDetails?.name ? (
+                          <Link
+                            to={`../../acmeProfiles/detail/${acmeDetails?.uuid}`}
+                          >
+                            {acmeDetails.name}
+                          </Link>
+                        ) : (
+                          acmeDetails?.name
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Directory URL</td>
+                      <td>{acmeDetails?.directoryUrl}</td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Widget>
+            </Col>
+            <Col>
+              <Widget title={"List of Attributes to issue Certificate"}>
+                <Table className="table-hover" size="sm">
+                  <thead>
+                    <tr>
+                      <th>Attribute</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {acmeDetails?.issueCertificateAttributes?.map(function (
+                      attribute: any
+                    ) {
+                      return (
+                        <tr>
+                          <td>
+                            {attribute.label ||
+                              fieldNameTransform[attribute.name] ||
+                              attribute.name}
+                          </td>
+                          {}
+                          <td>{getAttributeValue(attribute)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </Widget>
+              <Widget title="List of Attributes to revoke Certificate">
+                <Table className="table-hover" size="sm">
+                  <thead>
+                    <tr>
+                      <th>Attribute</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {acmeDetails?.revokeCertificateAttributes?.map(function (
+                      attribute: any
+                    ) {
+                      return (
+                        <tr>
+                          <td>
+                            {attribute.label ||
+                              fieldNameTransform[attribute.name] ||
+                              attribute.name}
+                          </td>
+                          {}
+                          <td>{getAttributeValue(attribute)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </Widget>
+            </Col>
+            <Col>
+              <ButtonGroup>
+                <Button
+                  color="danger"
+                  onClick={() => {
+                    setToggleDeactivateAcme(true);
+                  }}
+                  disabled={isDeactivatingAcme}
+                >
+                  Deactivate
+                </Button>
+                &nbsp;&nbsp;
+                <Button
+                  color="primary"
+                  onClick={onActivate}
+                  disabled={isActivatingAcme}
+                >
+                  Update
+                </Button>
+              </ButtonGroup>
+            </Col>
+          </Row>
+        ) : (
+          <div>
+            <p>ACME is not activated for this RA Profile</p>
+            <ButtonGroup>
+              <Button
+                color="primary"
+                onClick={onActivate}
+                disabled={isActivatingAcme}
+              >
+                Activate ACME
+              </Button>
+            </ButtonGroup>
+          </div>
+        )}
+      </Widget>
 
       <MDBModal
         overflowScroll={false}
@@ -402,9 +651,76 @@ function RaProfileDetail() {
         </MDBModalFooter>
       </MDBModal>
 
+      <MDBModal
+        overflowScroll={false}
+        isOpen={toggleActivateAcme}
+        toggle={closeAcmePopup}
+      >
+        <MDBModalHeader toggle={closeAcmePopup}>Activate ACME</MDBModalHeader>
+        <MDBModalBody>
+          <FormGroup>
+            <Label for="raProfile">ACME Profile</Label>
+            <Select
+              maxMenuHeight={140}
+              menuPlacement="auto"
+              options={getAcmeDisplay()}
+              placeholder="Select ACME Profile"
+              onChange={(event: any) => setAcmeProfileUuid(event?.value || "")}
+            />
+          </FormGroup>
+          <DynamicForm
+            fieldInfo={JSON.parse(JSON.stringify(passIssueAttributes))}
+            attributeFunction={updateAttributes}
+            setPassAttribute={setIssuePassAttributes}
+          />
+
+          <DynamicForm
+            fieldInfo={JSON.parse(JSON.stringify(passRevokeAttributes))}
+            attributeFunction={updateRevokeAttributes}
+            setPassAttribute={setRevokePassAttributes}
+          />
+        </MDBModalBody>
+        <MDBModalFooter>
+          <Button
+            color="primary"
+            onClick={onConfirmActivate}
+            disabled={acmeProfileUuid === ""}
+          >
+            Activate
+          </Button>
+          <Button color="secondary" onClick={closeAcmePopup}>
+            Cancel
+          </Button>
+        </MDBModalFooter>
+      </MDBModal>
+
+      <MDBModal
+        overflowScroll={false}
+        isOpen={toggleDeactivateAcme}
+        toggle={closeAcmePopup}
+      >
+        <MDBModalHeader toggle={closeAcmePopup}>Deactivate ACME</MDBModalHeader>
+        <MDBModalBody>
+          Are you sure you wish to deactivate ACME for this RA Profile?
+        </MDBModalBody>
+        <MDBModalFooter>
+          <Button color="danger" onClick={onConfirmDeactivate}>
+            Deactivate
+          </Button>
+          <Button color="secondary" onClick={closeAcmePopup}>
+            Cancel
+          </Button>
+        </MDBModalFooter>
+      </MDBModal>
+
       <Spinner
         active={
-          isFetchingClients || isFetchingProfiles || isEditing || isAuthorizing
+          isFetchingClients ||
+          isFetchingProfiles ||
+          isEditing ||
+          isAuthorizing ||
+          isActivatingAcme ||
+          isDeactivatingAcme
         }
       />
     </Container>

@@ -1,3 +1,4 @@
+import { RaAcmeLink } from "models";
 import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 
@@ -8,6 +9,7 @@ export interface RaProfileResponse {
   authorityInstanceUuid: string;
   description: string;
   authorityInstanceName: string;
+  enabledProtocols?: string[];
 }
 
 export interface RaProfileDetailResponse {
@@ -20,7 +22,7 @@ export interface RaProfileDetailResponse {
   authorityInstanceName: string;
 }
 
-export interface RaProfileAuthorizationsReponse {
+export interface RaProfileAuthorizationsResponse {
   uuid: string;
 }
 
@@ -47,7 +49,7 @@ export interface ProfilesManagementApi {
   getRaProfileDetail(uuid: string): Observable<RaProfileDetailResponse>;
   getAuthorizedClients(
     uuid: string
-  ): Observable<RaProfileAuthorizationsReponse[]>;
+  ): Observable<RaProfileAuthorizationsResponse[]>;
   updateRaProfile(
     authorityInstanceUuid: string,
     uuid: string,
@@ -55,4 +57,16 @@ export interface ProfilesManagementApi {
     description: string,
     attributes: AttributeResponse[]
   ): Observable<RaProfileDetailResponse>;
+  getIssuanceAttributes(raProfileUuid: string): Observable<AttributeResponse[]>;
+  getRevocationAttributes(
+    raProfileUuid: string
+  ): Observable<AttributeResponse[]>;
+  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink>;
+  activateAcme(
+    uuid: string,
+    acmeProfileUuid: string,
+    issueCertificateAttributes: AttributeResponse[],
+    revokeCertificateAttributes: AttributeResponse[]
+  ): Observable<RaAcmeLink>;
+  deactivateAcme(uuid: string): Observable<void>;
 }

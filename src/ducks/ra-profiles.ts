@@ -2,7 +2,7 @@ import { History } from "history";
 import { createSelector } from "reselect";
 import { ActionType, createCustomAction, getType } from "typesafe-actions";
 
-import { RaProfile, RaProfileDetail } from "models";
+import { RaAcmeLink, RaProfile, RaProfileDetail } from "models";
 import { arrayReducer, createFeatureSelector } from "utils/ducks";
 import { createErrorAlertAction } from "./alerts";
 import { Action as ClientAction, actions as clientActions } from "./clients";
@@ -55,6 +55,26 @@ export enum Actions {
   UpdateProfileRequest = "@@profiles/UPDATE_PROFILE_REQUEST",
   UpdateProfileSuccess = "@@profiles/UPDATE_PROFILE_SUCCESS",
   UpdateProfileFailure = "@@profiles/UPDATE_PROFILE_FAILURE",
+
+  RevokeAttributesRequest = "@@profiles/REVOKE_ATTRIBUTES_REQUEST",
+  RevokeAttributesSuccess = "@@profiles/REVOKE_ATTRIBUTES_SUCCESS",
+  RevokeAttributesFailure = "@@profiles/REVOKE_ATTRIBUTES_FAILURE",
+
+  IssuanceAttributesRequest = "@@profiles/ISSUANCE_ATTRIBUTES_REQUEST",
+  IssuanceAttributesSuccess = "@@profiles/ISSUANCE_ATTRIBUTES_SUCCESS",
+  IssuanceAttributesFailure = "@@profiles/ISSUANCE_ATTRIBUTES_FAILURE",
+
+  ActivateAcmeRequest = "@@profiles/ACTIVATE_ACME_REQUEST",
+  ActivateAcmeSuccess = "@@profiles/ACTIVATE_ACME_SUCCESS",
+  ActivateAcmeFailure = "@@profiles/ACTIVATE_ACME_FAILURE",
+
+  DeactivateAcmeRequest = "@@profiles/DEACTIVATE_ACME_REQUEST",
+  DeactivateAcmeSuccess = "@@profiles/DEACTIVATE_ACME_SUCCESS",
+  DeactivateAcmeFailure = "@@profiles/DEACTIVATE_ACME_FAILURE",
+
+  AcmeDetailsRequest = "@@profiles/ACME_DETAILS_REQUEST",
+  AcmeDetailsSuccess = "@@profiles/ACME_DETAILS_SUCCESS",
+  AcmeDetailsFailure = "@@profiles/ACME_DETAILS_FAILURE",
 }
 
 export const actions = {
@@ -249,6 +269,89 @@ export const actions = {
     Actions.UpdateProfileFailure,
     (error?: string) => createErrorAlertAction(error)
   ),
+
+  requestIssuanceAttributes: createCustomAction(
+    Actions.IssuanceAttributesRequest,
+    (raProfileUuid: string) => ({
+      raProfileUuid,
+    })
+  ),
+  receiveIssuanceAttributes: createCustomAction(
+    Actions.IssuanceAttributesSuccess,
+    (attributes: AttributeResponse[]) => ({ attributes })
+  ),
+  failIssuanceAttributes: createCustomAction(
+    Actions.IssuanceAttributesFailure,
+    (error?: string) => createErrorAlertAction(error)
+  ),
+
+  requestRevokeAttributes: createCustomAction(
+    Actions.RevokeAttributesRequest,
+    (raProfileUuid: string) => ({
+      raProfileUuid,
+    })
+  ),
+  receiveRevokeAttributes: createCustomAction(
+    Actions.RevokeAttributesSuccess,
+    (attributes: AttributeResponse[]) => ({ attributes })
+  ),
+  failRevokeAttributes: createCustomAction(
+    Actions.RevokeAttributesFailure,
+    (error?: string) => createErrorAlertAction(error)
+  ),
+
+  requestAcmeDetails: createCustomAction(
+    Actions.AcmeDetailsRequest,
+    (uuid: string) => ({
+      uuid,
+    })
+  ),
+  receiveAcmeDetails: createCustomAction(
+    Actions.AcmeDetailsSuccess,
+    (acmeDetails: RaAcmeLink) => ({ acmeDetails })
+  ),
+  failAcmeDetails: createCustomAction(
+    Actions.AcmeDetailsFailure,
+    (error?: string) => createErrorAlertAction(error)
+  ),
+
+  requestActivateAcme: createCustomAction(
+    Actions.ActivateAcmeRequest,
+    (
+      uuid: string,
+      acmeProfileUuid: string,
+      issueCertificateAttributes: AttributeResponse[],
+      revokeCertificateAttributes: AttributeResponse[]
+    ) => ({
+      uuid,
+      acmeProfileUuid,
+      issueCertificateAttributes,
+      revokeCertificateAttributes,
+    })
+  ),
+  receiveActivateAcme: createCustomAction(
+    Actions.ActivateAcmeSuccess,
+    (acmeDetails: RaAcmeLink) => ({ acmeDetails })
+  ),
+  failActivateAcme: createCustomAction(
+    Actions.ActivateAcmeFailure,
+    (error?: string) => createErrorAlertAction(error)
+  ),
+
+  requestDeactivateAcme: createCustomAction(
+    Actions.DeactivateAcmeRequest,
+    (uuid: string) => ({
+      uuid,
+    })
+  ),
+  receiveDeactivateAcme: createCustomAction(
+    Actions.DeactivateAcmeSuccess,
+    () => ({})
+  ),
+  failDeactivateAcme: createCustomAction(
+    Actions.DeactivateAcmeFailure,
+    (error?: string) => createErrorAlertAction(error)
+  ),
 };
 
 export type Action = ActionType<typeof actions>;
@@ -266,6 +369,12 @@ export type State = {
   authorizedClients: string[];
   selectedProfile: RaProfileDetail | null;
   confirmDeleteProfile: string;
+  issuanceAttributes: AttributeResponse[];
+  revocationAttributes: AttributeResponse[];
+  isActivatingAcme: boolean;
+  isDeactivatingAcme: boolean;
+  isFetchingAcme: boolean;
+  acmeDetails: RaAcmeLink | null;
 };
 
 export const initialState: State = {
@@ -281,6 +390,12 @@ export const initialState: State = {
   authorizedClients: [],
   selectedProfile: null,
   confirmDeleteProfile: "",
+  issuanceAttributes: [],
+  revocationAttributes: [],
+  isActivatingAcme: false,
+  isDeactivatingAcme: false,
+  isFetchingAcme: false,
+  acmeDetails: null,
 };
 
 function authorizedProfile(
@@ -514,6 +629,77 @@ export function reducer(
       );
     case getType(clientActions.failUnauthorizeProfile):
       return unauthorizeFailed(state, action.clientId, action.profileId);
+
+    case getType(actions.requestIssuanceAttributes):
+      return { ...state, isFetchingAttributes: true, issuanceAttributes: [] };
+    case getType(actions.receiveIssuanceAttributes):
+      return {
+        ...state,
+        isFetchingAttributes: false,
+        issuanceAttributes: action.attributes,
+      };
+    case getType(actions.failIssuanceAttributes):
+      return { ...state, isFetchingAttributes: false, issuanceAttributes: [] };
+
+    case getType(actions.requestRevokeAttributes):
+      return { ...state, isFetchingAttributes: true, revocationAttributes: [] };
+    case getType(actions.receiveRevokeAttributes):
+      return {
+        ...state,
+        isFetchingAttributes: false,
+        revocationAttributes: action.attributes,
+      };
+    case getType(actions.failRevokeAttributes):
+      return {
+        ...state,
+        isFetchingAttributes: false,
+        revocationAttributes: [],
+      };
+
+    case getType(actions.requestAcmeDetails):
+      return { ...state, isFetchingAcme: true, acmeDetails: null };
+    case getType(actions.receiveAcmeDetails):
+      return {
+        ...state,
+        isFetchingAcme: false,
+        acmeDetails: action.acmeDetails,
+      };
+    case getType(actions.failAcmeDetails):
+      return {
+        ...state,
+        isFetchingAcme: false,
+        acmeDetails: null,
+      };
+
+    case getType(actions.requestActivateAcme):
+      return { ...state, isActivatingAcme: true };
+    case getType(actions.receiveActivateAcme):
+      return {
+        ...state,
+        isActivatingAcme: false,
+        acmeDetails: action.acmeDetails,
+      };
+    case getType(actions.failActivateAcme):
+      return {
+        ...state,
+        isActivatingAcme: false,
+        acmeDetails: action.acmeDetails,
+      };
+
+    case getType(actions.requestDeactivateAcme):
+      return { ...state, isDeactivatingAcme: true };
+    case getType(actions.receiveDeactivateAcme):
+      return {
+        ...state,
+        isDeactivatingAcme: false,
+        acmeDetails: null,
+      };
+    case getType(actions.failDeactivateAcme):
+      return {
+        ...state,
+        isDeactivatingAcme: false,
+      };
+
     default:
       return state;
   }
@@ -527,7 +713,10 @@ const isFetching = createSelector(
     state.isFetchingList ||
     state.isFetchingDetail ||
     state.isFetchingAttributes ||
-    state.isFetchingClient
+    state.isFetchingClient ||
+    state.isFetchingClient ||
+    state.isActivatingAcme ||
+    state.isDeactivatingAcme
 );
 
 const isCreating = createSelector(selectState, (state) => state.isCreating);
@@ -535,6 +724,21 @@ const isCreating = createSelector(selectState, (state) => state.isCreating);
 const isDeleting = createSelector(selectState, (state) => state.isDeleting);
 
 const isEditing = createSelector(selectState, (state) => state.isEditing);
+
+const isActivatingAcme = createSelector(
+  selectState,
+  (state) => state.isActivatingAcme
+);
+
+const isFetchingAcme = createSelector(
+  selectState,
+  (state) => state.isFetchingAcme
+);
+
+const isDeactivatingAcme = createSelector(
+  selectState,
+  (state) => state.isDeactivatingAcme
+);
 
 const isFetchingAttributes = createSelector(
   selectState,
@@ -587,6 +791,21 @@ const selectAttributes = createSelector(
   (state) => state.attributes
 );
 
+const selectIssuanceAttributes = createSelector(
+  selectState,
+  (state) => state.issuanceAttributes
+);
+
+const selectRevocationAttributes = createSelector(
+  selectState,
+  (state) => state.revocationAttributes
+);
+
+const selectAcmeDetails = createSelector(
+  selectState,
+  (state) => state.acmeDetails
+);
+
 export const selectors = {
   selectState,
   isCreating,
@@ -600,4 +819,10 @@ export const selectors = {
   selectProfileDetail,
   selectConfirmDeleteProfileId,
   selectAttributes,
+  selectIssuanceAttributes,
+  selectRevocationAttributes,
+  isActivatingAcme,
+  isDeactivatingAcme,
+  isFetchingAcme,
+  selectAcmeDetails,
 };

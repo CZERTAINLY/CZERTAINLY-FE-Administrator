@@ -15,6 +15,7 @@ Admin UI contains the following menu items:
 | Connectors     | Provides an overview of available `Connectors`, their details and status. Operations on the `Connectors` like `Approvals`, reconnection on each or multiple `Connectors` can be performed on this page                              |
 | Credentials    | List of all the `Credentials` added to the platform. These `Credentials` are used only for the `Connector` related operations and do not contain any platform authorization related items                                         |
 | Authorities    | List of Authority instances added and the action on each `Authority`. These `Authorities` can be added based on the `Connectors` available in the platform                                                                    |
+| ACME           | Management of `ACME Profiles` and `ACME Accounts`
 | Audit Logs     | Audit log records all operations on CZERTAINLY to reconstruct any event in case of investigation. It also proves the compliance with the various standards and regulations, such as PCI DSS, ISO 27k, GDPR, Web Trust, etc. |
 | About          | About CZERTAINLY, support contacts and other relevant information                                                                                                                                                            |
 

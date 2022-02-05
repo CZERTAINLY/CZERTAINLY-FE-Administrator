@@ -221,7 +221,7 @@ export const actions = {
     Actions.ForceDeleteRequest,
     (uuid: string | number, history: History) => ({ uuid, history })
   ),
-  recieveForceDeleteCredential: createCustomAction(
+  receiveForceDeleteCredential: createCustomAction(
     Actions.ForceDeleteSuccess,
     (uuid: string | number) => ({ uuid })
   ),
@@ -261,7 +261,7 @@ export const actions = {
     Actions.BulkForceDeleteRequest,
     (uuid: (string | number)[]) => ({ uuid })
   ),
-  recieveBulkForceDeleteCredential: createCustomAction(
+  receiveBulkForceDeleteCredential: createCustomAction(
     Actions.BulkForceDeleteSuccess,
     (uuid: (string | number)[]) => ({ uuid })
   ),
@@ -469,7 +469,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeletingCredential: false,
         deleteCredentialErrors: [],
       };
-    case getType(actions.recieveForceDeleteCredential):
+    case getType(actions.receiveForceDeleteCredential):
       return {
         ...state,
         isDeletingCredential: false,
@@ -486,7 +486,7 @@ export function reducer(state: State = initialState, action: Action): State {
         isDeletingCredential: false,
         deleteCredentialErrors: [],
       };
-    case getType(actions.recieveBulkForceDeleteCredential):
+    case getType(actions.receiveBulkForceDeleteCredential):
       let updated: Credential[] = [];
       for (let i of state.credentials) {
         if (!action.uuid.includes(i.uuid)) {

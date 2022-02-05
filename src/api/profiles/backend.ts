@@ -1,3 +1,4 @@
+import { RaAcmeLink } from "models";
 import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
@@ -14,6 +15,34 @@ const baseUrlAuthorities = "/api/v1/authorities";
 export class ProfilesManagementBackend implements model.ProfilesManagementApi {
   constructor() {
     this._fetchService = new FetchHttpService();
+  }
+  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink> {
+    return this._fetchService.request(
+      new HttpRequestOptions(`${baseUrl}/${uuid}/acme`, "GET")
+    );
+  }
+  activateAcme(
+    uuid: string,
+    acmeProfileUuid: string,
+    issueCertificateAttributes: AttributeResponse[],
+    revokeCertificateAttributes: AttributeResponse[]
+  ): Observable<RaAcmeLink> {
+    return this._fetchService.request(
+      new HttpRequestOptions(`${baseUrl}/${uuid}/activateAcme`, "POST", {
+        acmeProfileUuid,
+        issueCertificateAttributes: attributeSimplifier(
+          issueCertificateAttributes
+        ),
+        revokeCertificateAttributes: attributeSimplifier(
+          revokeCertificateAttributes
+        ),
+      })
+    );
+  }
+  deactivateAcme(uuid: string): Observable<void> {
+    return this._fetchService.request(
+      new HttpRequestOptions(`${baseUrl}/${uuid}/deactivateAcme`, "POST")
+    );
   }
 
   private _fetchService: FetchHttpService;
@@ -91,7 +120,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
   getAuthorizedClients(
     uuid: string
-  ): Observable<model.RaProfileAuthorizationsReponse[]> {
+  ): Observable<model.RaProfileAuthorizationsResponse[]> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}/listclients`, "GET")
     );
@@ -112,6 +141,28 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
         name: name,
         attributes: attributeSimplifier(attributes),
       })
+    );
+  }
+
+  getIssuanceAttributes(
+    raProfileUuid: string
+  ): Observable<AttributeResponse[]> {
+    return this._fetchService.request(
+      new HttpRequestOptions(
+        `${baseUrl}/${raProfileUuid}/issue/attributes`,
+        "GET"
+      )
+    );
+  }
+
+  getRevocationAttributes(
+    raProfileUuid: string
+  ): Observable<AttributeResponse[]> {
+    return this._fetchService.request(
+      new HttpRequestOptions(
+        `${baseUrl}/${raProfileUuid}/revoke/attributes`,
+        "GET"
+      )
     );
   }
 }
