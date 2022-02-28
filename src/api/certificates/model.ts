@@ -1,7 +1,13 @@
 import { CertificateDetailResponse } from "models";
+import {
+  CertificateRequestInfo,
+  CertificateResponseDto,
+} from "models/certificates";
 import { Observable } from "rxjs";
 
 export interface CertificateManagementApi {
-  getCertificatesList(): Observable<CertificateDetailResponse[]>;
+  getCertificatesList(
+    searchField: CertificateRequestInfo
+  ): Observable<CertificateResponseDto>;
   getCertificateDetail(uuid: string): Observable<CertificateDetailResponse>;
 }

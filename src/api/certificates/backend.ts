@@ -1,4 +1,8 @@
 import { CertificateDetailResponse } from "models";
+import {
+  CertificateRequestInfo,
+  CertificateResponseDto,
+} from "models/certificates";
 import { Observable } from "rxjs";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
@@ -15,8 +19,12 @@ export class CertificateManagementBackend
 
   private _fetchService: FetchHttpService;
 
-  getCertificatesList(): Observable<CertificateDetailResponse[]> {
-    return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
+  getCertificatesList(
+    searchField: CertificateRequestInfo
+  ): Observable<CertificateResponseDto> {
+    return this._fetchService.request(
+      new HttpRequestOptions(baseUrl, "POST", searchField)
+    );
   }
 
   getCertificateDetail(uuid: string): Observable<CertificateDetailResponse> {
