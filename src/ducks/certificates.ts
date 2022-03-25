@@ -1,4 +1,8 @@
 import { CertificateDetailResponse } from "models";
+import {
+  CertificateRequestInfo,
+  CertificateResponseDto,
+} from "models/certificates";
 import { createSelector } from "reselect";
 import { ActionType, createCustomAction, getType } from "typesafe-actions";
 import { createFeatureSelector } from "utils/ducks";
@@ -28,10 +32,15 @@ export const actions = {
     Actions.DetailFailure,
     (error?: string) => createErrorAlertAction(error)
   ),
-  requestCertificatesList: createCustomAction(Actions.ListRequest),
+  requestCertificatesList: createCustomAction(
+    Actions.ListRequest,
+    (searchField: CertificateRequestInfo) => ({
+      searchField,
+    })
+  ),
   receiveCertificatesList: createCustomAction(
     Actions.ListSuccess,
-    (certificates: CertificateDetailResponse[]) => ({ certificates })
+    (certificates: CertificateResponseDto) => ({ certificates })
   ),
   failCertificatesList: createCustomAction(
     Actions.ListFailure,
@@ -65,7 +74,7 @@ export function reducer(state: State = initialState, action: Action): State {
       return {
         ...state,
         isFetchingList: false,
-        certificates: action.certificates,
+        certificates: action.certificates.certificates,
       };
     case getType(actions.failCertificatesList):
       return { ...state, isFetchingList: false };
