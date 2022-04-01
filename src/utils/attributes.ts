@@ -3,15 +3,14 @@ import { fieldTypeTransform } from "./fieldTypeTransform";
 
 export function attributeSimplifier(attributes: any): SimplifiedAttributes[] {
   return attributes
-    .forEach(function (attribute: any) {
+    .map(function (attribute: any) {
       if (attribute.value) {
         return {
           name: attribute.name,
-          value:
-            fieldTypeTransform[attribute.type] === "number"
-              ? Number(attribute.value)
-              : attribute.value,
+          value: (fieldTypeTransform[attribute.type] === "number" ? Number(attribute.value) : attribute.value),
         } as SimplifiedAttributes;
+      } else {
+          return null;
       }
     })
     .filter(notEmpty);
