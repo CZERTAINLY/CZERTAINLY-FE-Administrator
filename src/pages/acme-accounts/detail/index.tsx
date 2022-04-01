@@ -16,7 +16,7 @@ import {
   MDBModalFooter,
   MDBModalHeader,
 } from "mdbreact";
-import {acmeAccountStatus} from "../../../utils/acmeAccount";
+import { acmeAccountStatus } from "../../../utils/acmeAccount";
 import StatusCircle from "../../../components/StatusCircle";
 
 function AcmeAccountDetail() {
@@ -29,8 +29,6 @@ function AcmeAccountDetail() {
   const history = useHistory();
   const { params } = useRouteMatch();
   const uuid = (params as any).id as string;
-
-  console.log(accountDetails?.enabled);
 
   useEffect(() => {
     dispatch(actions.requestAccountDetail(uuid));
@@ -187,13 +185,24 @@ function AcmeAccountDetail() {
             </tr>
             <tr>
               <td>Terms of Service Agreed</td>
-              <td>{accountDetails?.termsOfServiceAgreed ? <StatusCircle status={true} /> : <StatusCircle status={false} />}</td>
+              <td>
+                {accountDetails?.termsOfServiceAgreed ? (
+                  <StatusCircle status={true} />
+                ) : (
+                  <StatusCircle status={false} />
+                )}
+              </td>
             </tr>
             <tr>
               <td>Contacts</td>
               <td>
                 {accountDetails?.contact.map(function (contact) {
-                  return <span>{contact}<br/></span>;
+                  return (
+                    <span>
+                      {contact}
+                      <br />
+                    </span>
+                  );
                 })}
               </td>
             </tr>

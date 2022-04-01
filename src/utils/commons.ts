@@ -73,6 +73,11 @@ export function attributeCombiner(
         }
       }
     } else {
+      if (
+        ["DROPDOWN", "SELECT", "LIST", "CREDENTIAL"].includes(connAttrib.type)
+      ) {
+        connAttrib.value.unshift("NON_MANDATORY");
+      }
       editAttributes.push(connAttrib);
     }
   }

@@ -71,7 +71,11 @@ function DynamicForm({
           fieldTypeTransform[field.type] === "select" ||
           field.type === "select"
         ) {
-          dict.set(field.name, field.value[0]);
+          if (field.value[0] === "NON_MANDATORY") {
+            continue;
+          } else {
+            dict.set(field.name, field.value[0]);
+          }
         } else {
           dict.set(field.name, field.value);
         }
@@ -232,6 +236,7 @@ function DynamicForm({
     let fieldHtml = [];
 
     for (let field of fieldInfo) {
+      let noDefaultValue = true;
       let valueForDropdown = [];
       if (
         fieldTypeTransform[field.type] === "select" &&
@@ -239,6 +244,11 @@ function DynamicForm({
       ) {
         try {
           for (let option of field.value) {
+            // debugger;
+            if (option === "NON_MANDATORY") {
+              noDefaultValue = false;
+              continue;
+            }
             if (typeof option === "string") {
               valueForDropdown.push({ label: option, value: option });
             } else {
@@ -291,7 +301,9 @@ function DynamicForm({
             onChange={(event) => onValueChange(event, field)}
             key={field.uuid}
             isMulti={field.multiValue}
-            defaultValue={editMode ? defaultSelectValue : null}
+            defaultValue={
+              editMode && noDefaultValue ? defaultSelectValue : null
+            }
           />
         );
       } else if (fieldTypeTransform[field.type] === "checkbox") {
