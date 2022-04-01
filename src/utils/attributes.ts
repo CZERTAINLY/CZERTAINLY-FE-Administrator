@@ -3,7 +3,7 @@ import { fieldTypeTransform } from "./fieldTypeTransform";
 
 export function attributeSimplifier(attributes: any): SimplifiedAttributes[] {
   return attributes
-    .map(function (attribute: any) {
+    .forEach(function (attribute: any) {
       if (attribute.value) {
         return {
           name: attribute.name,
