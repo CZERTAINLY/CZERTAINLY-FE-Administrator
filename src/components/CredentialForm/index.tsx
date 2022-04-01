@@ -215,7 +215,11 @@ function CredentialForm({
               typeof i.value.id === "undefined"
             ) {
               try {
-                i.value = i.value[0];
+                if (i.value[0] !== "NON_MANDATORY") {
+                  i.value = i.value[0];
+                } else {
+                  i.value = undefined;
+                }
               } catch {
                 console.warn("Non List Items");
               }
