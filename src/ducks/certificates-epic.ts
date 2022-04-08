@@ -13,10 +13,10 @@ const getCertificatesList: Epic<Action, Action, AppState, EpicDependencies> = (
 ) =>
   action$.pipe(
     filter(isOfType(Actions.ListRequest)),
-    switchMap(() =>
-      apiClients.certificates.getCertificatesList().pipe(
+    switchMap(({ searchField }) =>
+      apiClients.certificates.getCertificatesList(searchField).pipe(
         map((certificates) =>
-          Array.isArray(certificates)
+          Array.isArray(certificates.certificates)
             ? actions.receiveCertificatesList(certificates)
             : actions.failCertificatesList(
                 "Failed to retrieve certificates list"

@@ -6,71 +6,19 @@ import { randomDelay } from "utils/mock";
 import * as model from "./model";
 import { HttpErrorResponse } from "ts-rest-client";
 import { CertificateDetailResponse } from "models";
+import { CertificateResponseDto } from "models/certificates";
 
 export class CertificateManagementMock
   implements model.CertificateManagementApi
 {
-  getCertificatesList(): Observable<CertificateDetailResponse[]> {
-    return of(dbData.certificates).pipe(
-      delay(randomDelay()),
-      map((certificates) =>
-        certificates.map(
-          ({
-            commonName,
-            serialNumber,
-            issuerCommonName,
-            certificateContent,
-            issuerDn,
-            subjectDn,
-            notAfter,
-            notBefore,
-            publicKeyAlgorithm,
-            signatureAlgorithm,
-            uuid,
-            fingerprint,
-            meta,
-            subjectAlternativeNames,
-            status,
-            entityId,
-            groupId,
-            owner,
-            keyUsage,
-            extendedKeyUsage,
-            keySize,
-            basicConstraints,
-            certificateType,
-            issuerSerialNumber,
-            certificateValidationResult,
-          }) => ({
-            commonName,
-            serialNumber,
-            issuerCommonName,
-            certificateContent,
-            issuerDn,
-            subjectDn,
-            notAfter,
-            notBefore,
-            publicKeyAlgorithm,
-            signatureAlgorithm,
-            uuid,
-            fingerprint,
-            meta,
-            subjectAlternativeNames,
-            status,
-            entityId,
-            groupId,
-            owner,
-            keyUsage,
-            extendedKeyUsage,
-            keySize,
-            basicConstraints,
-            certificateType,
-            issuerSerialNumber,
-            certificateValidationResult,
-          })
-        )
-      )
-    );
+  getCertificatesList(): Observable<CertificateResponseDto> {
+    return of({
+      certificates: dbData.certificates,
+      totalPages: 2,
+      pageNumber: 10,
+      itemsPerPage: 23,
+      totalItems: 123,
+    });
   }
 
   getCertificateDetail(uuid: string): Observable<CertificateDetailResponse> {

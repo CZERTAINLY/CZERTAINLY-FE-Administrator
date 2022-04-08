@@ -131,7 +131,7 @@ const deleteAcmeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
     switchMap(({ uuid, history }) =>
       apiClients.acmeProfiles.deleteAcmeProfile(uuid).pipe(
         map((errorMessage) => {
-          if (!errorMessage) {
+          if (!errorMessage.length) {
             history.push("..");
           }
           return actions.receiveDeleteProfile(uuid, errorMessage);

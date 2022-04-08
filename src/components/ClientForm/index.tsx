@@ -62,9 +62,32 @@ function ClientForm({
   const dispatch = useDispatch();
   const allCerts = useSelector(selectors.selectCertificates);
 
+  const [clientCerts, setClientCerts] = useState<any>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
-    dispatch(actions.requestCertificatesList());
+    dispatch(
+      actions.requestCertificatesList({
+        itemsPerPage: 100,
+        pageNumber: 1,
+        filters: [],
+      })
+    );
   }, [dispatch]);
+
+  useEffect(() => {
+    let tmpCerts: any = [...clientCerts];
+    const existingUuids = tmpCerts.map(function (e: any) {
+      return e.uuid;
+    });
+    for (let i of allCerts) {
+      if (!existingUuids.includes(i.uuid)) {
+        tmpCerts.push(i);
+      }
+    }
+    setClientCerts(tmpCerts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allCerts]);
 
   const submitCallback = useCallback(
     (values: FormValues) => {
@@ -79,16 +102,32 @@ function ClientForm({
     [onSubmit, certificateUuid]
   );
 
+  const loadNextCertificates = () => {
+    if (allCerts.length > 0) {
+      dispatch(
+        actions.requestCertificatesList({
+          itemsPerPage: 100,
+          pageNumber: currentPage,
+          filters: [],
+        })
+      );
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   const optionsForCertificate = () => {
     let validCertificateOptions = [];
-    for (let certificate of allCerts) {
+    for (let certificate of clientCerts) {
       if (
         !["EXPIRED", "REVOKED", "INVALID"].includes(
           certificate.status || "UNKNOWN"
         )
       ) {
         validCertificateOptions.push({
-          label: certificate.commonName + " (" + certificate.serialNumber + ")",
+          label:
+            certificate.commonName ||
+            // eslint-disable-next-line
+            "( empty )" + " (" + certificate.serialNumber + ")",
           value: certificate.uuid,
         });
       }
@@ -196,6 +235,7 @@ function ClientForm({
                     options={optionsForCertificate()}
                     placeholder="Select Certificate"
                     onChange={(event) => setCertId(event)}
+                    onMenuScrollToBottom={loadNextCertificates}
                   />
                 </FormGroup>
               )}
