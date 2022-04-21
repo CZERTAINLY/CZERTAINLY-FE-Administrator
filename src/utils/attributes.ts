@@ -2,9 +2,11 @@ import { SimplifiedAttributes } from "models/attributes";
 import { fieldTypeTransform } from "./fieldTypeTransform";
 
 export function attributeSimplifier(attributes: any): SimplifiedAttributes[] {
+
   return attributes
+
     .map(function (attribute: any) {
-      if (attribute.value) {
+      if (attribute.value !== undefined && attribute.value !== null) {
         return {
           name: attribute.name,
           value: (fieldTypeTransform[attribute.type] === "number" ? Number(attribute.value) : attribute.value),
@@ -14,6 +16,7 @@ export function attributeSimplifier(attributes: any): SimplifiedAttributes[] {
       }
     })
     .filter(notEmpty);
+
 }
 
 function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
