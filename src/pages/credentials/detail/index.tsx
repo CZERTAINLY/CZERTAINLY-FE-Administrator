@@ -6,7 +6,7 @@ import { Button, Container, Table } from "reactstrap";
 import Spinner from "components/Spinner";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/credentials";
-import { fieldNameTransform } from "utils/fieldNameTransform";
+import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import ToolTip from "components/ToolTip";
 import {
   MDBModal,
@@ -177,7 +177,7 @@ function CredentialDetail() {
                 <tr>
                   <td>
                     {attribute.label ||
-                      fieldNameTransform[attribute.name] ||
+                      FieldNameTransform[attribute.name] ||
                       attribute.name}
                   </td>
                   {}

@@ -1,6 +1,6 @@
 import {
-  AcmeAccountDetailResponse,
-  AcmeAccountListResponse,
+  AcmeAccountDTO,
+  AcmeAccountListItemDTO,
 } from "api/acme-account";
 import { History } from "history";
 import { createSelector } from "reselect";
@@ -50,7 +50,7 @@ export const actions = {
   requestAcmeAccountList: createCustomAction(Actions.ListRequest),
   receiveAcmeAccountList: createCustomAction(
     Actions.ListSuccess,
-    (accounts: AcmeAccountListResponse[]) => ({ accounts })
+    (accounts: AcmeAccountListItemDTO[]) => ({ accounts })
   ),
   failAcmeAccountList: createCustomAction(
     Actions.ListFailure,
@@ -155,7 +155,7 @@ export const actions = {
   ),
   receiveAccountDetail: createCustomAction(
     Actions.DetailSuccess,
-    (profile: AcmeAccountDetailResponse) => ({ profile })
+    (profile: AcmeAccountDTO) => ({ profile })
   ),
   failAccountDetail: createCustomAction(
     Actions.DetailFailure,
@@ -169,8 +169,8 @@ export type State = {
   isFetchingList: boolean;
   isFetchingDetail: boolean;
   isDeleting: boolean;
-  accounts: AcmeAccountListResponse[];
-  selectedAccount: AcmeAccountDetailResponse | null;
+  accounts: AcmeAccountListItemDTO[];
+  selectedAccount: AcmeAccountDTO | null;
   confirmDeleteAccount: string;
 };
 
@@ -226,7 +226,7 @@ export function reducer(state: State = initialState, action: Action): State {
       return { ...state };
     case getType(actions.receiveEnableAccount):
       let detailEnable =
-        state.selectedAccount || ({} as AcmeAccountDetailResponse);
+        state.selectedAccount || ({} as AcmeAccountDTO);
       detailEnable.enabled = true;
       return {
         ...state,
@@ -235,7 +235,7 @@ export function reducer(state: State = initialState, action: Action): State {
       };
     case getType(actions.receiveDisableAccount):
       let detailDisable =
-        state.selectedAccount || ({} as AcmeAccountDetailResponse);
+        state.selectedAccount || ({} as AcmeAccountDTO);
       detailDisable.enabled = false;
       return {
         ...state,
@@ -254,7 +254,7 @@ export function reducer(state: State = initialState, action: Action): State {
     case getType(actions.failBulkDeleteAccount):
       return { ...state, isDeleting: false };
     case getType(actions.receiveBulkDeleteAccount):
-      let updatedDelete: AcmeAccountListResponse[] = [];
+      let updatedDelete: AcmeAccountListItemDTO[] = [];
       for (let i of state.accounts) {
         if (!action.uuid.includes(i.uuid)) {
           updatedDelete.push(i);
@@ -276,7 +276,7 @@ export function reducer(state: State = initialState, action: Action): State {
     case getType(actions.failBulkDisableAccount):
       return { ...state };
     case getType(actions.receiveBulkEnableAccount):
-      let updatedEnable: AcmeAccountListResponse[] = [];
+      let updatedEnable: AcmeAccountListItemDTO[] = [];
       for (let i of state.accounts) {
         if (!action.uuid.includes(i.uuid)) {
           updatedEnable.push(i);
@@ -292,7 +292,7 @@ export function reducer(state: State = initialState, action: Action): State {
         accounts: updatedEnable,
       };
     case getType(actions.receiveBulkDisableAccount):
-      let updatedDisable: AcmeAccountListResponse[] = [];
+      let updatedDisable: AcmeAccountListItemDTO[] = [];
       for (let i of state.accounts) {
         if (!action.uuid.includes(i.uuid)) {
           updatedDisable.push(i);

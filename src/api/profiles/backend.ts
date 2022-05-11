@@ -99,7 +99,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
     );
   }
 
-  getRaProfilesList(): Observable<model.RaProfileResponse[]> {
+  getRaProfilesList(): Observable<model.RaProfileDTO[]> {
     return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
   }
 

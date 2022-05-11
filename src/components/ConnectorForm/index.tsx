@@ -19,7 +19,7 @@ import {
   validateUrl,
 } from "utils/validators";
 
-import { ConnectorConnectionResponse } from "api/connectors";
+import { ConnectorConnectionDTO } from "api/connectors";
 import InventoryStatusBadge from "components/ConnectorStatus";
 import Widget from "components/Widget";
 import Select from "react-select";
@@ -43,7 +43,7 @@ interface Props {
   isSubmitting: boolean;
   isConnecting: boolean;
   isConnected: boolean;
-  connectionDetails: ConnectorConnectionResponse[];
+  connectionDetails: ConnectorConnectionDTO[];
   onCancel: () => void;
   onSubmit: (
     uuid: string,

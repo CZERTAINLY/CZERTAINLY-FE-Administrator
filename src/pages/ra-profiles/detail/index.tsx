@@ -30,7 +30,7 @@ import {
   selectors as acmeSelectors,
 } from "ducks/acme-profiles";
 import { Client } from "models";
-import { fieldNameTransform } from "utils/fieldNameTransform";
+import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import ToolTip from "components/ToolTip";
 import { AttributeResponse } from "models/attributes";
 import {
@@ -42,7 +42,14 @@ import {
 import DynamicForm from "components/DynamicForm";
 
 function RaProfileDetail() {
+
+  const history = useHistory();
   const dispatch = useDispatch();
+
+  const { params } = useRouteMatch();
+
+  const uuid = (params as any).id as string;
+
   const isActivatingAcme = useSelector(selectors.isActivatingAcme);
   const isDeactivatingAcme = useSelector(selectors.isDeactivatingAcme);
   const acmeDetails = useSelector(selectors.selectAcmeDetails);
@@ -56,32 +63,17 @@ function RaProfileDetail() {
   const profileDetails = useSelector(selectors.selectSelectedProfile);
   const authorizedClientIds = useSelector(selectors.selectAuthorizedClientIds);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
+  const selectIssueAttributes = useSelector(selectors.selectIssuanceAttributes);
+  const selectRevokeAttributes = useSelector(selectors.selectRevocationAttributes);
 
-  const [acmeProfileUuid, setAcmeProfileUuid] = useState(
-    acmeDetails?.uuid || ""
-  );
+  const [acmeProfileUuid, setAcmeProfileUuid] = useState(acmeDetails?.uuid || "");
   const [toggleActivateAcme, setToggleActivateAcme] = useState(false);
   const [toggleDeactivateAcme, setToggleDeactivateAcme] = useState(false);
 
-  const history = useHistory();
-  const { params } = useRouteMatch();
-  const uuid = (params as any).id as string;
-
-  const selectIssueAttributes = useSelector(selectors.selectIssuanceAttributes);
-  const selectRevokeAttributes = useSelector(
-    selectors.selectRevocationAttributes
-  );
-
   const [issueAttributes, setIssueAttributes] = useState(selectIssueAttributes);
-  const [passIssueAttributes, setIssuePassAttributes] = useState<any>(
-    selectIssueAttributes
-  );
-  const [revokeAttributes, setRevokeAttributes] = useState(
-    selectRevokeAttributes
-  );
-  const [passRevokeAttributes, setRevokePassAttributes] = useState<any>(
-    selectRevokeAttributes
-  );
+  const [passIssueAttributes, setIssuePassAttributes] = useState<any>(selectIssueAttributes);
+  const [revokeAttributes, setRevokeAttributes] = useState(selectRevokeAttributes);
+  const [passRevokeAttributes, setRevokePassAttributes] = useState<any>(selectRevokeAttributes);
 
   const allowedAttributeTypeForDetail = [
     "STRING",
@@ -403,7 +395,7 @@ function RaProfileDetail() {
                     <tr>
                       <td>
                         {attribute.label ||
-                          fieldNameTransform[attribute.name] ||
+                          FieldNameTransform[attribute.name] ||
                           attribute.name}
                       </td>
                       {}
@@ -553,7 +545,7 @@ function RaProfileDetail() {
                         <tr>
                           <td>
                             {attribute.label ||
-                              fieldNameTransform[attribute.name] ||
+                              FieldNameTransform[attribute.name] ||
                               attribute.name}
                           </td>
                           {}
@@ -580,7 +572,7 @@ function RaProfileDetail() {
                         <tr>
                           <td>
                             {attribute.label ||
-                              fieldNameTransform[attribute.name] ||
+                              FieldNameTransform[attribute.name] ||
                               attribute.name}
                           </td>
                           {}

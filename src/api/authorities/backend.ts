@@ -1,123 +1,127 @@
-import { ErrorDeleteObject } from "models";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
-import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
+import { AttributeDTO } from "api/.common/AttributeDTO";
+
 import * as model from "./model";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 const baseUrl = "/api/v1/authorities";
 const baseUrlAuthorityProvider = "/api/v1/connectors";
 
-export class AuthorityManagementBackend
-  implements model.AuthorityManagementApi
-{
-  constructor() {
-    this._fetchService = new FetchHttpService();
-  }
 
-  private _fetchService: FetchHttpService;
+export class AuthorityManagementBackend implements model.AuthorityManagementApi {
 
-  createNewAuthority(
-    name: string,
-    connectorUuid: string,
-    credential: any,
-    status: string,
-    attributes: any,
-    kind: string
-  ): Observable<string> {
-    return createNewResource(baseUrl, {
-      name,
-      connectorUuid,
-      status,
-      attributes: attributeSimplifier(attributes),
-      kind,
-    }).pipe(
-      map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-    );
-  }
+   constructor() {
+      this._fetchService = new FetchHttpService();
+   }
 
-  getAuthoritiesList(): Observable<model.AuthorityInfoResponse[]> {
-    return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
-  }
+   private _fetchService: FetchHttpService;
 
-  getAuthorityProviderList(): Observable<model.AuthorityProviderResponse[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(
-        `${baseUrlAuthorityProvider}?functionGroup=${encodeURIComponent(
-          "AUTHORITY_PROVIDER"
-        )}`,
-        "GET"
+
+   validateRAProfileAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(
+            `${baseUrlAuthorityProvider}/${uuid}/raProfile/attributes/validate`,
+            "POST",
+            attributes
+         )
       )
-    );
-  }
 
-  getAuthorityProviderAttributes(
-    uuid: string,
-    kind: string,
-    functionGroup: string
-  ): Observable<model.AuthorityProviderAttributes[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(
-        `${baseUrlAuthorityProvider}/${uuid}/${functionGroup}/${kind}/attributes`,
-        "GET"
+   }
+
+
+   getAuthorityDetail(uuid: string): Observable<model.AuthorityDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
+      );
+
+   }
+
+
+   updateAuthority(
+      uuid: string,
+      attributes: AttributeDTO[],
+   ): Observable<model.AuthorityDTO> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+            uuid,
+            attributes
+         })
+      );
+
+   }
+
+
+   deleteAuthority(uuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+      );
+
+   }
+
+
+   getAuthoritiesList(): Observable<model.AuthorityDTO[]> {
+
+      return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
+
+   }
+
+
+
+   createNewAuthority(
+      name: string,
+      attributes: AttributeDTO[],
+      connectorUuid: string,
+      kind: string
+   ): Observable<string> {
+
+      return createNewResource(baseUrl, {
+         name,
+         connectorUuid,
+         attributes,
+         kind,
+      }).pipe(
+         map(response => response ? response : "")
       )
-    );
-  }
 
-  getAuthorityDetail(uuid: string): Observable<model.AuthorityDetailResponse> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
-    );
-  }
+   }
 
-  deleteBulkAuthority(
-    uuid: (number | string)[]
-  ): Observable<ErrorDeleteObject[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}`, "DELETE", uuid)
-    );
-  }
 
-  deleteAuthority(uuid: number | string): Observable<ErrorDeleteObject[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
-    );
-  }
+   bulkDeleteAuthority(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
-  forceDeleteAuthority(uuid: number | string): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/force`, "DELETE", [uuid])
-    );
-  }
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)
+      );
 
-  bulkForceDeleteAuthority(uuid: (number | string)[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/force`, "DELETE", uuid)
-    );
-  }
+   }
 
-  updateAuthority(
-    uuid: string,
-    name: string,
-    connectorUuid: string,
-    credential: any,
-    status: string,
-    attributes: any,
-    kind: string
-  ): Observable<model.AuthorityDetailResponse> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-        uuid,
-        name,
-        connectorUuid,
-        credential,
-        status,
-        attributes: attributeSimplifier(attributes),
-        kind,
-      })
-    );
-  }
+
+   listRAProfileAttributes(uuid: string): Observable<AttributeDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}`, "GET", uuid)
+      );
+
+   }
+
+
+   bulkForceDeleteAuthority(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)
+      );
+
+   }
+
+
 }

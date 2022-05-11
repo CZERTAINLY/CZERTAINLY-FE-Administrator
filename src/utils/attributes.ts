@@ -1,21 +1,39 @@
-import { SimplifiedAttributes } from "models/attributes";
-import { fieldTypeTransform } from "./fieldTypeTransform";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
 
-export function attributeSimplifier(attributes: any): SimplifiedAttributes[] {
-  return attributes
-    .map(function (attribute: any) {
-      if (attribute.value) {
-        return {
-          name: attribute.name,
-          value: (fieldTypeTransform[attribute.type] === "number" ? Number(attribute.value) : attribute.value),
-        } as SimplifiedAttributes;
-      } else {
-          return null;
+export enum FieldNameTransform {
+   name = "Name",
+   credentialProvider = "Credential Provider",
+   authorityProvider = "Authority Provider",
+   discoveryProvider = "Discovery Provider",
+   legacyAuthorityProvider = "Legacy Authority Provider",
+};
+
+export enum FieldTypeTransform {
+   STRING = "text",
+   NUMBER = "number",
+   SECRET = "password",
+   DROPDOWN = "select",
+   SELECT = "select",
+   LIST = "select",
+   FILE = "file",
+   BOOLEAN = "checkbox",
+   CREDENTIAL = "select"
+};
+
+
+export function attributeSimplifier(attributes: AttributeDescriptorDTO[]): AttributeDTO[] {
+
+   return attributes.map<AttributeDTO>(
+
+      attribute => {
+         return {
+            name: attribute.name,
+            value: (FieldTypeTransform[attribute.type] === "number" ? Number(attribute.value) : attribute.value),
+         }
       }
-    })
-    .filter(notEmpty);
-}
 
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined;
+   ).filter(
+      attribute => attribute.value !== null && attribute.value !== undefined
+   );
+
 }

@@ -1,25 +1,16 @@
+import { AttributeDescriptorDTO } from "api/.common/AttributeDTO";
 import { RaAcmeLink } from "models";
-import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 
-export interface RaProfileResponse {
+export interface RaProfileDTO {
   uuid: string;
   name: string;
   enabled: boolean;
-  authorityInstanceUuid: string;
   description: string;
-  authorityInstanceName: string;
-  enabledProtocols?: string[];
-}
-
-export interface RaProfileDetailResponse {
-  uuid: string;
-  name: string;
-  description?: string;
   authorityInstanceUuid: string;
-  attributes?: AttributeResponse[];
-  enabled: boolean;
   authorityInstanceName: string;
+  attributes?: AttributeDescriptorDTO[];
+  enabledProtocols?: string[];
 }
 
 export interface RaProfileAuthorizationsResponse {
@@ -32,41 +23,54 @@ export interface EntityProfileResponse {
 }
 
 export interface ProfilesManagementApi {
+
   createRaProfile(
     authorityInstanceUuid: string,
     name: string,
     description: string,
-    attributes: AttributeResponse[]
+    attributes: AttributeDescriptorDTO[]
   ): Observable<string>;
+
   deleteRaProfile(uuid: string | number): Observable<void>;
+
   enableRaProfile(uuid: string | number): Observable<void>;
+
   disableRaProfile(uuid: string | number): Observable<void>;
+
   bulkDeleteRaProfile(uuid: (string | number)[]): Observable<void>;
+
   bulkEnableRaProfile(uuid: (string | number)[]): Observable<void>;
+
   bulkDisableRaProfile(uuid: (string | number)[]): Observable<void>;
-  getRaProfilesList(): Observable<RaProfileResponse[]>;
-  getAttributes(authorityUuid: string): Observable<AttributeResponse[]>;
-  getRaProfileDetail(uuid: string): Observable<RaProfileDetailResponse>;
-  getAuthorizedClients(
-    uuid: string
-  ): Observable<RaProfileAuthorizationsResponse[]>;
+
+  getRaProfilesList(): Observable<RaProfileDTO[]>;
+
+  getAttributes(authorityUuid: string): Observable<AttributeDescriptorDTO[]>;
+
+  getRaProfileDetail(uuid: string): Observable<RaProfileDTO>;
+
+  getAuthorizedClients(uuid: string): Observable<RaProfileAuthorizationsResponse[]>;
+
   updateRaProfile(
     authorityInstanceUuid: string,
     uuid: string,
     name: string,
     description: string,
-    attributes: AttributeResponse[]
-  ): Observable<RaProfileDetailResponse>;
-  getIssuanceAttributes(raProfileUuid: string): Observable<AttributeResponse[]>;
-  getRevocationAttributes(
-    raProfileUuid: string
-  ): Observable<AttributeResponse[]>;
+    attributes: AttributeDescriptorDTO[]
+  ): Observable<RaProfileDTO>;
+
+  getIssuanceAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]>;
+
+  getRevocationAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]>;
+
   getRaAcmeProfile(uuid: string): Observable<RaAcmeLink>;
+
   activateAcme(
     uuid: string,
     acmeProfileUuid: string,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[]
+    issueCertificateAttributes: AttributeDescriptorDTO[],
+    revokeCertificateAttributes: AttributeDescriptorDTO[]
   ): Observable<RaAcmeLink>;
+
   deactivateAcme(uuid: string): Observable<void>;
 }

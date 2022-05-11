@@ -3,7 +3,7 @@ import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
-import { ClientDetailResponse, ClientInfoResponse } from "api/clients";
+import { ClientDTO, ClientInfoDTO } from "api/clients";
 import { Client, ClientDetails } from "models";
 import { readCertificate } from "utils/file";
 import { extractError } from "utils/net";
@@ -123,7 +123,7 @@ const authorizeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.AuthorizeProfileRequest)),
     switchMap(({ clientId, profileId }) =>
-      apiClients.clients.authorizeProfile(clientId, profileId).pipe(
+      apiClients.clients.authorizeClient(clientId, profileId).pipe(
         map(() => actions.receiveAuthorizeProfile(clientId, profileId)),
         catchError((err) =>
           of(
@@ -144,7 +144,7 @@ const unauthorizeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.UnauthorizeRequest)),
     switchMap(({ clientId, profileId }) =>
-      apiClients.clients.unauthorizeProfile(clientId, profileId).pipe(
+      apiClients.clients.unauthorizeClient(clientId, profileId).pipe(
         map(() => actions.receiveUnauthorizeProfile(clientId, profileId)),
         catchError(() =>
           of(
@@ -398,7 +398,7 @@ const updateClient: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-function mapClient(client: ClientInfoResponse): Client {
+function mapClient(client: ClientInfoDTO): Client {
   return {
     ...client,
     uuid: client.uuid.toString(),
@@ -410,7 +410,7 @@ function mapClient(client: ClientInfoResponse): Client {
 
 function mapClientDetail(
   uuid: string,
-  data: ClientDetailResponse
+  data: ClientDTO
 ): ClientDetails {
   return {
     uuid,

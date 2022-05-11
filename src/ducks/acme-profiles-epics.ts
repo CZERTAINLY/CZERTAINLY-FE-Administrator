@@ -198,7 +198,7 @@ const bulkDeleteAcmeProfile: Epic<
   action$.pipe(
     filter(isOfType(Actions.BulkConfirmDelete)),
     switchMap(({ uuid }) =>
-      apiClients.acmeProfiles.bulkDeleteAcmeProfile(uuid).pipe(
+      apiClients.acmeProfiles.bulkDeleteAcmeProfiles(uuid).pipe(
         map((errorMessage) => {
           return actions.receiveBulkDeleteProfile(uuid, errorMessage);
         }),
@@ -222,7 +222,7 @@ const bulkForceDeleteAcmeProfile: Epic<
   action$.pipe(
     filter(isOfType(Actions.BulkForceDeleteRequest)),
     switchMap(({ uuid, pushBack, history }) =>
-      apiClients.acmeProfiles.bulkForceDeleteAcmeProfile(uuid).pipe(
+      apiClients.acmeProfiles.bulkForceDeleteAcmeProfiles(uuid).pipe(
         map(() => {
           if (pushBack) {
             history.push("..");

@@ -3,7 +3,7 @@ import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
-import { AdminDetailResponse, AdminInfoResponse } from "api/administrators";
+import { AdministratorDetailDTO, AdminInfoResponse } from "api/administrators";
 import { Administrator, AdministratorDetail, Role } from "models";
 import { readCertificate } from "utils/file";
 import { extractError } from "utils/net";
@@ -334,7 +334,7 @@ function mapAdministrator(admin: AdminInfoResponse): Administrator {
 
 function mapAdminDetail(
   uuid: string,
-  data: AdminDetailResponse
+  data: AdministratorDetailDTO
 ): AdministratorDetail {
   return {
     uuid,

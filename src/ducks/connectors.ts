@@ -13,7 +13,7 @@ import { createFeatureSelector } from "utils/ducks";
 import { createErrorAlertAction } from "./alerts";
 import {
   ConnectorAttributes,
-  ConnectorConnectionResponse,
+  ConnectorConnectionDTO,
 } from "api/connectors";
 
 export const statePath = "connectors";
@@ -189,7 +189,7 @@ export const actions = {
   ),
   receiveConnectConnector: createCustomAction(
     Actions.ConnectSuccess,
-    (connectorConnectResponse: ConnectorConnectionResponse[]) => ({
+    (connectorConnectResponse: ConnectorConnectionDTO[]) => ({
       connectorConnectResponse,
     })
   ),
@@ -418,7 +418,7 @@ export type Action = ActionType<typeof actions>;
 
 export type State = {
   connectors: Connector[];
-  connectorConnectionDetails: ConnectorConnectionResponse[];
+  connectorConnectionDetails: ConnectorConnectionDTO[];
   attributes: ConnectorAttributes[];
   allAttributes: AllAttributeResponse | null;
   isConnected: boolean;

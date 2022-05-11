@@ -23,8 +23,8 @@ import DynamicForm from "components/DynamicForm";
 import { attributeCombiner } from "utils/commons";
 import { AttributeResponse } from "models/attributes";
 import {
-  AcmeProfileDetailResponse,
-  AcmeProfileResponse,
+  AcmeProfileDTO,
+  AcmeProfileListItemDTO,
 } from "api/acme-profile";
 import Widget from "components/Widget";
 import {
@@ -35,7 +35,7 @@ import {
 
 interface Props {
   editMode?: boolean;
-  acmeProfile?: (AcmeProfileResponse & AcmeProfileDetailResponse) | null;
+  acmeProfile?: (AcmeProfileListItemDTO & AcmeProfileDTO) | null;
   isSubmitting?: boolean;
   onCancel: () => void;
   onSubmit: (

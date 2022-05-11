@@ -3,7 +3,7 @@ import { of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { isOfType } from 'typesafe-actions';
 
-import { ProfileResponse } from 'api/auth';
+import { UserProfileDTO } from 'api/auth';
 import { Profile, Role } from 'models';
 import { extractError } from 'utils/net';
 import { EpicDependencies, State as AppState } from './app-state';
@@ -30,7 +30,7 @@ const updateProfile: Epic<Action, Action, AppState, EpicDependencies> = (action$
   )),
 );
 
-function mapProfile(profile: ProfileResponse): Profile {
+function mapProfile(profile: UserProfileDTO): Profile {
   return {
     name: profile.name,
     surname: profile.surname,

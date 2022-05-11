@@ -8,7 +8,7 @@ import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/acme-profiles";
-import { fieldNameTransform } from "utils/fieldNameTransform";
+import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import ToolTip from "components/ToolTip";
 import { AttributeResponse } from "models/attributes";
 import {
@@ -346,7 +346,7 @@ function AcmeProfileDetail() {
                     <tr>
                       <td>
                         {attribute.label ||
-                          fieldNameTransform[attribute.name] ||
+                          FieldNameTransform[attribute.name] ||
                           attribute.name}
                       </td>
                       {}
@@ -373,7 +373,7 @@ function AcmeProfileDetail() {
                     <tr>
                       <td>
                         {attribute.label ||
-                          fieldNameTransform[attribute.name] ||
+                          FieldNameTransform[attribute.name] ||
                           attribute.name}
                       </td>
                       {}

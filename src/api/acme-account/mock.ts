@@ -6,112 +6,204 @@ import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
 
-export class AcmeAccountManagementMock
-  implements model.AcmeAccountManagementApi
-{
-  getAcmeAccountList(): Observable<model.AcmeAccountListResponse[]> {
-    return of(dbData.acmeAccount);
-  }
+export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi {
 
-  getAcmeDetails(
-    uuid: string | number
-  ): Observable<model.AcmeAccountDetailResponse> {
-    return of(dbData.acmeAccountDetail);
-  }
+   getAcmeAccountList(): Observable<model.AcmeAccountListItemDTO[]> {
 
-  deleteAcmeAccount(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeAccount.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+      return of(
+         dbData.acmeAccounts
+      ).pipe(
 
-        dbData.acmeAccount.splice(profileIdx, 1);
-      })
-    );
-  }
+         delay(randomDelay()),
+         map(
 
-  enableAcmeAccount(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeAccount.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+            acmeAccounts => acmeAccounts.map<model.AcmeAccountListItemDTO>(
 
-        dbData.acmeAccount[profileIdx].enabled = true;
-      })
-    );
-  }
+               account => ({
+                  accountId: account.accountId,
+                  uuid: account.uuid,
+                  enabled: account.enabled,
+                  totalOrders: account.totalOrders,
+                  status: account.status,
+                  raProfileName: account.raProfileName,
+                  acmeProfileName: account.acmeProfileName
+               })
 
-  disableAcmeAccount(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeAccount.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+            )
+         )
 
-        dbData.acmeAccount[profileIdx].enabled = false;
-      })
-    );
-  }
+      );
 
-  bulkDeleteAcmeAccount(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeAccount.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+   }
 
-        dbData.acmeAccount.splice(profileIdx, 1);
-      })
-    );
-  }
 
-  bulkEnableAcmeAccount(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeAccount.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+   getAcmeAccountDetails(uuid: string): Observable<model.AcmeAccountDTO> {
 
-        dbData.acmeAccount[profileIdx].enabled = true;
-      })
-    );
-  }
+      return of(
+         dbData.acmeAccounts.find(acmeAccount => acmeAccount.uuid === uuid)
+      ).pipe(
+         delay(randomDelay()),
+         map(
 
-  bulkDisableAcmeAccount(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.acmeAccount.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+            acmeAccount => {
 
-        dbData.acmeAccount[profileIdx].enabled = false;
-      })
-    );
-  }
+               if (!acmeAccount) throw new HttpErrorResponse({ status: 404 });
+               return acmeAccount;
+
+            }
+
+         )
+      );
+
+   }
+
+   revokeAcmeAccount(uuid: string): Observable<void> {
+
+      return of(
+         dbData.acmeAccounts.findIndex(account => account.uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            acmeAccountIndex => {
+
+               if (acmeAccountIndex < 0) throw new HttpErrorResponse({ status: 404 });
+               dbData.acmeAccounts.splice(acmeAccountIndex, 1);
+
+            }
+
+         )
+      );
+
+   }
+
+
+   enableAcmeAccount(uuid: string): Observable<void> {
+
+      return of(
+         dbData.acmeAccounts.find(account => account.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            acmeAccount => {
+
+               if (!acmeAccount) throw new HttpErrorResponse({ status: 404 });
+               acmeAccount.enabled = true;
+
+            }
+
+         )
+      );
+
+   }
+
+
+   disableAcmeAccount(uuid: string): Observable<void> {
+
+      return of(
+         dbData.acmeAccounts.find(account => account.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            acmeAccount => {
+
+               if (!acmeAccount) throw new HttpErrorResponse({ status: 404 });
+               acmeAccount.enabled = false;
+
+            }
+
+         )
+      );
+
+   }
+
+
+   bulkRevokeAcmeAccount(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => uuids.forEach(
+
+               uuid => {
+
+                  const accountIndex = dbData.acmeAccounts.findIndex(account => account.uuid === uuid);
+                  if (accountIndex < 0) throw new HttpErrorResponse({ status: 404, statusText: `AcmeAccount ${uuid} not found.` });
+                  dbData.acmeAccounts.splice(accountIndex, 1);
+
+               }
+
+            )
+
+         )
+      );
+
+   }
+
+
+   bulkEnableAcmeAccount(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => uuids.forEach(
+
+               uuid => {
+
+                  const account = dbData.acmeAccounts.find(account => account.uuid === uuid);
+                  if (!account) throw new HttpErrorResponse({ status: 404, statusText: `AcmeAccount ${uuid} not found.` });
+                  account.enabled = true;
+
+
+               }
+
+            )
+
+         )
+
+      );
+
+   }
+
+
+   bulkDisableAcmeAccount(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => uuids.forEach(
+
+               uuid => {
+
+                  const account = dbData.acmeAccounts.find(account => account.uuid === uuid);
+                  if (!account) throw new HttpErrorResponse({ status: 404, statusText: `AcmeAccount ${uuid} not found.` });
+                  account.enabled = false;
+
+               }
+
+            )
+
+         )
+      );
+
+
+   }
+
 }

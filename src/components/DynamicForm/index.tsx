@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
-import { fieldTypeTransform } from "utils/fieldTypeTransform";
-import { fieldNameTransform } from "utils/fieldNameTransform";
+import { fieldTypeTransform } from "utils/attributes/fieldTypeTransform";
+import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import { InputType } from "reactstrap/es/Input";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
@@ -362,7 +362,7 @@ function DynamicForm({
               }
               key={field.name}
             >
-              {field.label || fieldNameTransform[field.name] || field.name}
+              {field.label || FieldNameTransform[field.name] || field.name}
             </Label>
             {(fieldTypeTransform[field.type] || field.type) !== "checkbox"
               ? inputField

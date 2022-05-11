@@ -1,26 +1,35 @@
 import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
+import { HttpErrorResponse } from "ts-rest-client";
 
 import { dbData, createCredential } from "mocks/db";
 import { randomDelay } from "utils/mock";
-import * as model from "./model";
-import { HttpErrorResponse } from "ts-rest-client";
+
 import { ErrorDeleteObject } from "models";
+import { AttributeDescriptorDTO } from "api/.common/AttributeDTO";
+
+import * as model from "./model";
+
 
 export class CredentialManagementMock implements model.CredentialManagementApi {
+
   createNewCredential(
     name: string,
     kind: string,
     connectorUuid: string,
     attributes: any
   ): Observable<string> {
+
     return of(null).pipe(
       delay(randomDelay()),
       map(() => createCredential(name, kind, connectorUuid, attributes))
     );
+
   }
 
-  getCredentialsList(): Observable<model.CredentialInfoResponse[]> {
+
+  getCredentialsList(): Observable<model.CredentialInfoDTO[]> {
+
     return of(dbData.credentials).pipe(
       delay(randomDelay()),
       map((credentials) =>
@@ -35,9 +44,11 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         )
       )
     );
+
   }
 
-  getCredentialProviderList(): Observable<model.CredentialProviderResponse[]> {
+  getCredentialProviderList(): Observable<model.CredentialProviderDTO[]> {
+
     return of(dbData.credentialProviders).pipe(
       delay(randomDelay()),
       map((credentialProviders) =>
@@ -52,11 +63,12 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         )
       )
     );
+
   }
 
-  getCredentialProviderAttributes(
-    uuid: string
-  ): Observable<model.CredentialProviderAttributes[]> {
+
+  getCredentialProviderAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+
     return of(dbData.credentialProviderAttributes).pipe(
       delay(randomDelay()),
       map((credentialProviderAttributes) =>
@@ -95,9 +107,11 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
     );
   }
 
+
   getCredentialDetail(
     uuid: string
-  ): Observable<model.CredentialDetailResponse> {
+  ): Observable<model.CredentialDetailDTO> {
+
     return of(
       dbData.credentials.find((c) => c.uuid.toString() === uuid.toString())
     ).pipe(
@@ -119,9 +133,12 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         });
       })
     );
+
   }
 
+
   deleteCredential(uuid: number | string): Observable<ErrorDeleteObject[]> {
+
     return of([]).pipe(
       delay(randomDelay()),
       map(function (): any {
@@ -135,9 +152,12 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         dbData.credentials.splice(credentialIdx, 1);
       })
     );
+
   }
 
+
   forceDeleteCredential(uuid: number | string): Observable<void> {
+
     return of([]).pipe(
       delay(randomDelay()),
       map(function (): void {
@@ -151,11 +171,14 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         dbData.credentials.splice(credentialIdx, 1);
       })
     );
+
   }
+
 
   bulkDeleteCredential(
     uuid: (number | string)[]
   ): Observable<ErrorDeleteObject[]> {
+
     return of([]).pipe(
       delay(randomDelay()),
       map(function (): any {
@@ -169,9 +192,12 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         dbData.credentials.splice(credentialIdx, 1);
       })
     );
+
   }
 
+
   bulkForceDeleteCredential(uuid: (number | string)[]): Observable<void> {
+
     return of([]).pipe(
       delay(randomDelay()),
       map(function (): void {
@@ -185,7 +211,9 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         dbData.credentials.splice(credentialIdx, 1);
       })
     );
+
   }
+
 
   updateCredential(
     uuid: string,
@@ -193,7 +221,8 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
     kind: string,
     connectorUuid: string,
     attributes: any
-  ): Observable<model.CredentialDetailResponse> {
+  ): Observable<model.CredentialDetailDTO> {
+
     return of(
       dbData.credentials.findIndex((c) => c.uuid.toString() === uuid.toString())
     ).pipe(
@@ -208,5 +237,8 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
         return detail;
       })
     );
+
   }
+
+
 }

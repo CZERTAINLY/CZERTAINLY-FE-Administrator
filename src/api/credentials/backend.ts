@@ -36,11 +36,11 @@ export class CredentialManagementBackend
     );
   }
 
-  getCredentialsList(): Observable<model.CredentialInfoResponse[]> {
+  getCredentialsList(): Observable<model.CredentialInfoDTO[]> {
     return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
   }
 
-  getCredentialProviderList(): Observable<model.CredentialProviderResponse[]> {
+  getCredentialProviderList(): Observable<model.CredentialProviderDTO[]> {
     return this._fetchService.request(
       new HttpRequestOptions(
         `${baseUrlCredentialProvider}?functionGroup=${encodeURIComponent(
@@ -66,7 +66,7 @@ export class CredentialManagementBackend
 
   getCredentialDetail(
     uuid: string
-  ): Observable<model.CredentialDetailResponse> {
+  ): Observable<model.CredentialDetailDTO> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
     );
@@ -104,7 +104,7 @@ export class CredentialManagementBackend
     kind: string,
     connectorUuid: number | string,
     attributes: any
-  ): Observable<model.CredentialDetailResponse> {
+  ): Observable<model.CredentialDetailDTO> {
     return this._fetchService.request(
       new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
         name,

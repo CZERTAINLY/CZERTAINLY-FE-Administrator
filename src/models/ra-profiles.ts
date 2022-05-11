@@ -1,4 +1,4 @@
-import { AttributeResponse } from "./attributes";
+import { AttributeDescriptorDTO } from "../api/.common/AttributeDTO";
 
 export interface RaProfile {
   uuid: string;
@@ -15,7 +15,7 @@ export interface RaProfileDetail {
   name: string;
   description?: string;
   authorityInstanceUuid: string;
-  attributes?: AttributeResponse[];
+  attributes?: AttributeDescriptorDTO[];
   enabled: boolean;
   authorityInstanceName: string;
 }

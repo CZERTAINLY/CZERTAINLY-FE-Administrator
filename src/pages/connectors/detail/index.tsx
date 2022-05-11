@@ -10,7 +10,7 @@ import { actions, selectors } from "ducks/connectors";
 
 import InventoryStatusBadge from "components/ConnectorStatus";
 import styles from "./connectorDetails.module.scss";
-import { fieldNameTransform } from "utils/fieldNameTransform";
+import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import Select from "react-select";
 import ToolTip from "components/ToolTip";
 import {
@@ -403,7 +403,7 @@ function ConnectorDetail() {
                     <tr>
                       <td>
                         <MDBBadge color="primary">
-                          {fieldNameTransform[name.name || ""] || name.name}
+                          {FieldNameTransform[name.name || ""] || name.name}
                         </MDBBadge>
                       </td>
                       <td>
@@ -515,7 +515,7 @@ function ConnectorDetail() {
                     <tr>
                       <td>
                         {attribute.label ||
-                          fieldNameTransform[attribute.name] ||
+                          FieldNameTransform[attribute.name] ||
                           attribute.name}
                       </td>
                       <td>{attribute.required ? "Yes" : "No"}</td>

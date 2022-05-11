@@ -1,5 +1,5 @@
-import { FunctionGroup } from "api/connectors";
-import { AttributeResponse } from "./attributes";
+import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { AttributeDescriptorDTO } from "../api/.common/AttributeDTO";
 
 export interface Credential {
   uuid: string;
@@ -14,14 +14,14 @@ export interface CredentialProviders {
   name: string;
   status?: string;
   url: string;
-  functionGroups: FunctionGroup[];
+  functionGroups: ConnectorFunctionGroupDTO[];
 }
 
 export interface CredentialDetails {
   uuid: string;
   name?: string;
   kind: string;
-  attributes: AttributeResponse[];
+  attributes: AttributeDescriptorDTO[];
   connectorUuid: string;
   connectorName: string;
 }

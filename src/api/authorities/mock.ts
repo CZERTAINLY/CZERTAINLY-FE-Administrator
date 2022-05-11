@@ -1,222 +1,287 @@
 import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 
-import { dbData, createAuthority } from "mocks/db";
-import { randomDelay } from "utils/mock";
 import * as model from "./model";
+
+import { dbData } from "mocks/db";
+import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
-import { ErrorDeleteObject } from "models";
+
+import { AttributeDTO } from "api/.common/AttributeDTO";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 export class AuthorityManagementMock implements model.AuthorityManagementApi {
-  createNewAuthority(
-    name: string,
-    connectorUuid: string,
-    credential: any,
-    status: string,
-    attributes: any,
-    kind: string
-  ): Observable<string> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(() =>
-        createAuthority(
-          name,
-          attributes,
-          credential,
-          status,
-          connectorUuid,
-          kind
-        )
+
+
+   validateRAProfileAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {
+
+      return of(
+         dbData.raProfiles.find(raProfile => raProfile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+            raProfile => {
+               // !!! This is not gonna be used by frontend
+            }
+         )
+
       )
-    );
-  }
 
-  getAuthoritiesList(): Observable<model.AuthorityInfoResponse[]> {
-    return of(dbData.authorities).pipe(
-      delay(randomDelay()),
-      map((authorities) =>
-        authorities.map(
-          ({ uuid, name, connectorUuid, kind, connectorName }) => ({
-            uuid,
-            name,
-            connectorUuid,
-            kind,
-            connectorName,
-          })
-        )
+   }
+
+
+   getAuthorityDetail(uuid: string): Observable<model.AuthorityDTO> {
+
+      return of(
+         dbData.authorities.find(authority => authority.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            authority => {
+               if (!authority) throw new HttpErrorResponse({ status: 404 });
+               return authority;
+            }
+
+         )
+
       )
-    );
-  }
+   }
 
-  getAuthorityProviderList(): Observable<model.AuthorityProviderResponse[]> {
-    return of(dbData.connectors).pipe(
-      delay(randomDelay()),
-      map((authorityProviders) =>
-        authorityProviders.map(
-          ({ uuid, name, status, url, functionGroups }) => ({
-            uuid,
-            name,
-            status,
-            url,
-            functionGroups,
-          })
-        )
+
+   updateAuthority(uuid: string, attributes: AttributeDTO[]): Observable<model.AuthorityDTO> {
+
+      return of(
+         dbData.authorities.find(authority => authority.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            authority => {
+
+               if (!authority) throw new HttpErrorResponse({ status: 404 });
+
+               attributes.forEach(
+
+                  attribute => {
+
+                     const authorityAttribute = authority.attributes?.find(authorityAttribute => authorityAttribute.uuid === attribute.uuid);
+
+                     if (authorityAttribute) {
+                        authorityAttribute.value = attribute.value;
+                     } else {
+
+                        authority.attributes = authority.attributes || [];
+
+                        authority.attributes.push({
+                           uuid: attribute.uuid,
+                           name: attribute.name,
+                           value: attribute.value
+                        });
+
+                     }
+
+                  }
+
+               )
+
+               return authority;
+
+            }
+
+         )
+      );
+
+   }
+
+
+   deleteAuthority(uuid: string): Observable<void> {
+
+      return of(
+         dbData.authorities.findIndex(authority => authority.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            authorityIndex => {
+
+               if (authorityIndex < 0) throw new HttpErrorResponse({ status: 404 });
+               dbData.authorities.splice(authorityIndex, 1);
+
+            }
+
+         )
+
       )
-    );
-  }
+   }
 
-  getAuthorityProviderAttributes(
-    uuid: string,
-    code: string
-  ): Observable<model.AuthorityProviderAttributes[]> {
-    return of(dbData.credentialProviderAttributes).pipe(
-      delay(randomDelay()),
-      map((authorityProviderAttributes) =>
-        authorityProviderAttributes.map(
-          ({
-            uuid,
-            name,
-            label,
-            type,
-            required,
-            readOnly,
-            editable,
-            visible,
-            multiValue,
-            description,
-            validationRegex,
-            dependsOn,
-            value,
-          }) => ({
-            uuid,
-            name,
-            label,
-            type,
-            required,
-            readOnly,
-            editable,
-            visible,
-            multiValue,
-            description,
-            validationRegex,
-            dependsOn,
-            value,
-          })
-        )
+
+   getAuthoritiesList(): Observable<model.AuthorityDTO[]> {
+
+      return of(
+         dbData.authorities
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+            authorities => authorities
+         )
+
+      );
+
+   }
+
+
+   createNewAuthority(
+      name: string,
+      attributes: AttributeDTO[],
+      connectorUuid: string,
+      kind: string
+   ): Observable<string> {
+
+      return of(
+         null
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            () => {
+
+               const uuid = crypto.randomUUID();
+
+               const connector = dbData.connectors.find(connector => connector.uuid === connectorUuid);
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
+
+               dbData.authorities.push({
+                  uuid,
+                  name,
+                  connectorName: connector.name,
+                  connectorUuid: connector.uuid,
+                  kind,
+                  attributes,
+                  status: ""
+               })
+
+               return uuid;
+            }
+
+         )
+      );
+
+   }
+
+
+   bulkDeleteAuthority(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               const errors: DeleteObjectErrorDTO[] = [];
+
+               uuids.forEach(
+
+                  uuid => {
+
+                     const authorityIndex = dbData.authorities.findIndex(authority => authority.uuid === uuid);
+
+                     if (authorityIndex < 0) {
+                        errors.push({ uuid, name: "", message: "Failed to delete specified authority." });
+                        return;
+                     }
+
+                     dbData.authorities.splice(authorityIndex, -1);
+
+                  }
+
+               )
+
+               return errors;
+
+            }
+         )
+
       )
-    );
-  }
 
-  getAuthorityDetail(uuid: string): Observable<model.AuthorityDetailResponse> {
-    return of(
-      dbData.authorities.find((c) => c.uuid.toString() === uuid.toString())
-    ).pipe(
-      delay(randomDelay()),
-      map((detail) => {
-        if (detail) {
-          return {
-            uuid: detail.uuid,
-            name: detail.name,
-            connectorUuid: detail.connectorUuid,
-            attributes: detail.attributes,
-            credential: detail.credential,
-            kind: detail.kind,
-            connectorName: detail.connectorName,
-          };
-        }
+   }
 
-        throw new HttpErrorResponse({
-          status: 404,
-        });
-      })
-    );
-  }
 
-  deleteAuthority(uuid: number | string): Observable<ErrorDeleteObject[]> {
-    return of([]).pipe(
-      delay(randomDelay()),
-      map(function (): any {
-        const authorityIdx = dbData.authorities.findIndex(
-          (c) => c.uuid.toString() === uuid.toString()
-        );
-        if (authorityIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+   listRAProfileAttributes(uuid: string): Observable<AttributeDTO[]> {
 
-        dbData.authorities.splice(authorityIdx, 1);
-      })
-    );
-  }
+      return of(
+         dbData.authorities.find(authority => authority.uuid === uuid)
+      ).pipe(
 
-  deleteBulkAuthority(
-    uuid: (number | string)[]
-  ): Observable<ErrorDeleteObject[]> {
-    return of([]).pipe(
-      delay(randomDelay()),
-      map(function (): any {
-        const authorityIdx = dbData.authorities.findIndex(
-          (c) => c.uuid.toString() === uuid.toString()
-        );
-        if (authorityIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+         delay(randomDelay()),
+         map(
 
-        dbData.authorities.splice(authorityIdx, 1);
-      })
-    );
-  }
+            authority => {
+               if (!authority) throw new HttpErrorResponse({ status: 404 });
+               return authority.attributes || [];
+            }
 
-  forceDeleteAuthority(uuid: number | string): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const authorityIdx = dbData.authorities.findIndex(
-          (c) => c.uuid.toString() === uuid.toString()
-        );
-        if (authorityIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+         )
 
-        dbData.authorities.splice(authorityIdx, 1);
-      })
-    );
-  }
+      )
 
-  bulkForceDeleteAuthority(uuid: (number | string)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const authorityIdx = dbData.authorities.findIndex(
-          (c) => c.uuid.toString() === uuid.toString()
-        );
-        if (authorityIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+   }
 
-        dbData.authorities.splice(authorityIdx, 1);
-      })
-    );
-  }
 
-  updateAuthority(
-    uuid: string,
-    connectorUuid: string,
-    attributes: any,
-    kind: string
-  ): Observable<model.AuthorityDetailResponse> {
-    return of(
-      dbData.authorities.findIndex((c) => c.uuid.toString() === uuid.toString())
-    ).pipe(
-      delay(randomDelay()),
-      map((idx) => {
-        if (idx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-        console.log(attributes);
-        console.log("Updated authorities");
-        let detail = dbData.authorities[idx];
-        return detail;
-      })
-    );
-  }
+   bulkForceDeleteAuthority(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+
+                  uuid => {
+
+                     const authorityIndex = dbData.authorities.findIndex(authority => authority.uuid === uuid);
+                     if (authorityIndex < 0) throw new HttpErrorResponse({ status: 404 });
+                     dbData.authorities.splice(authorityIndex, 1);
+
+                  }
+
+               )
+
+
+            }
+
+         )
+      )
+
+   }
+
+
+   getAuthorityProviderList(): Observable<model.AuthorityDTO[]> {
+
+      return of(
+         dbData.authorities
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+            authorityProviders => authorityProviders
+         )
+
+      );
+
+   }
+
 }

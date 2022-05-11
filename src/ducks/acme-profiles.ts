@@ -7,8 +7,8 @@ import { createErrorAlertAction } from "./alerts";
 import { Action as ClientAction } from "./clients";
 import { AttributeResponse } from "models/attributes";
 import {
-  AcmeProfileDetailResponse,
-  AcmeProfileResponse,
+  AcmeProfileDTO,
+  AcmeProfileListItemDTO,
 } from "api/acme-profile";
 import { ErrorDeleteObject } from "models";
 
@@ -67,7 +67,7 @@ export const actions = {
   requestAcmeProfilesList: createCustomAction(Actions.ListRequest),
   receiveAcmeProfilesList: createCustomAction(
     Actions.ListSuccess,
-    (profiles: AcmeProfileResponse[]) => ({ profiles })
+    (profiles: AcmeProfileListItemDTO[]) => ({ profiles })
   ),
   failAcmeProfilesList: createCustomAction(
     Actions.ListFailure,
@@ -209,7 +209,7 @@ export const actions = {
   ),
   receiveProfileDetail: createCustomAction(
     Actions.DetailSuccess,
-    (profile: AcmeProfileDetailResponse) => ({ profile })
+    (profile: AcmeProfileDTO) => ({ profile })
   ),
   failProfileDetail: createCustomAction(
     Actions.DetailFailure,
@@ -302,7 +302,7 @@ export const actions = {
   ),
   receiveUpdateProfile: createCustomAction(
     Actions.UpdateProfileSuccess,
-    (profile: AcmeProfileDetailResponse) => ({ profile })
+    (profile: AcmeProfileDTO) => ({ profile })
   ),
   failUpdateProfile: createCustomAction(
     Actions.UpdateProfileFailure,
@@ -318,8 +318,8 @@ export type State = {
   isCreating: boolean;
   isDeleting: boolean;
   isEditing: boolean;
-  profiles: AcmeProfileResponse[];
-  selectedProfile: AcmeProfileDetailResponse | null;
+  profiles: AcmeProfileListItemDTO[];
+  selectedProfile: AcmeProfileDTO | null;
   confirmDeleteProfile: string;
   deleteProfileErrors: ErrorDeleteObject[];
 };
@@ -389,7 +389,7 @@ export function reducer(
       return { ...state, isEditing: false };
     case getType(actions.receiveEnableProfile):
       let detailEnable =
-        state.selectedProfile || ({} as AcmeProfileDetailResponse);
+        state.selectedProfile || ({} as AcmeProfileDTO);
       detailEnable["enabled"] = true;
       return {
         ...state,
@@ -398,7 +398,7 @@ export function reducer(
       };
     case getType(actions.receiveDisableProfile):
       let detailDisable =
-        state.selectedProfile || ({} as AcmeProfileDetailResponse);
+        state.selectedProfile || ({} as AcmeProfileDTO);
       detailDisable["enabled"] = false;
       return {
         ...state,
@@ -417,7 +417,7 @@ export function reducer(
     case getType(actions.failBulkDeleteProfile):
       return { ...state, isDeleting: false };
     case getType(actions.receiveBulkDeleteProfile):
-      let upd: AcmeProfileResponse[] = [];
+      let upd: AcmeProfileListItemDTO[] = [];
       const failedDelete: (string | number)[] = action.errorMessage.map(
         function (conn: ErrorDeleteObject) {
           return conn.uuid;
@@ -453,7 +453,7 @@ export function reducer(
     case getType(actions.failBulkForceDeleteProfile):
       return { ...state, isDeleting: false };
     case getType(actions.receiveBulkForceDeleteProfile):
-      let updated: AcmeProfileResponse[] = [];
+      let updated: AcmeProfileListItemDTO[] = [];
       for (let i of state.profiles) {
         if (!action.uuid.includes(i.uuid)) {
           updated.push(i);
@@ -473,7 +473,7 @@ export function reducer(
     case getType(actions.failBulkDisableProfile):
       return { ...state, isEditing: false };
     case getType(actions.receiveBulkEnableProfile):
-      let updatedEnable: AcmeProfileResponse[] = [];
+      let updatedEnable: AcmeProfileListItemDTO[] = [];
       for (let i of state.profiles) {
         if (!action.uuid.includes(i.uuid)) {
           updatedEnable.push(i);
@@ -488,7 +488,7 @@ export function reducer(
         profiles: updatedEnable,
       };
     case getType(actions.receiveBulkDisableProfile):
-      let updatedDisable: AcmeProfileResponse[] = [];
+      let updatedDisable: AcmeProfileListItemDTO[] = [];
       for (let i of state.profiles) {
         if (!action.uuid.includes(i.uuid)) {
           updatedDisable.push(i);

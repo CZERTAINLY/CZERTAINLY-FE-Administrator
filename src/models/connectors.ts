@@ -1,11 +1,11 @@
 // import { ConnectorAttributes } from "api/connectors";
-import { FunctionGroup } from "api/connectors";
-import { AttributeResponse } from "./attributes";
+import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { AttributeDescriptorDTO } from "../api/.common/AttributeDTO";
 
 export interface Connector {
   uuid: string;
   name: string;
-  functionGroups?: FunctionGroup[];
+  functionGroups?: ConnectorFunctionGroupDTO[];
   url: string;
   status?: string | "";
 }
@@ -13,11 +13,11 @@ export interface Connector {
 export interface ConnectorDetails {
   uuid: string;
   name?: string;
-  functionGroups?: FunctionGroup[];
+  functionGroups?: ConnectorFunctionGroupDTO[];
   url: string;
   status?: string | "";
   authType: string;
-  authAttributes: AttributeResponse[];
+  authAttributes: AttributeDescriptorDTO[];
 }
 
 export interface ConnectorFunctionGroup {

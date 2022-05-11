@@ -1,0 +1,64 @@
+DTO objects do not match API spec
+DTO Objects are mixed with Business Objects
+API call definitions does not follow API Spec (there are types used internally for whatever...)
+Mocks does not follow API Spec
+Mocks does not work properly (especially bulk updates can't work, but a lot of other bugs also exist)
+
+----
+
+- Complete refactoring of API
+   - Renaming of DTO objects to contain the DTO postfix
+   - Renaming of DTO objects to better describe what they are used for
+   - Synchronizing DTO interfaces with API Spec
+   - Rework of backend calls according to DTO changes
+   - Rework of MOCKS to follow API Spec and DTO changes
+
+
+- Complete refactoring of MOCKS objects (database)
+   - Reworked database to follow API Spec
+   - Database splitted to multiple files (better readability and maintainability)
+
+- Complete refactorung of MOCK functionality
+   - Reworked all mocks to follow API spec
+   - Fixed many bugs and incompleteness of mock code
+
+- Code beautification (Increased code readibility)
+   - Long files splitted to multiple ones
+   - Changed indentation of all files
+   - Changed spacing between blocks of code (especially RXJS related)
+
+- ??? Migration to React 18 ??? (if in time till end of next week)
+
+
+
+New ACME Profile bugs
+   - Acme profile name (hint text = ra profile name)
+   - DNS port can start from 0
+   - Retry interval can be set to negative value
+   - Order validity can be set to negative value
+
+
+-----
+
+- Doc:
+   - It would be great if methods are sorted and grouped somehow more logically in documentation (i.e. listings, CRUD, other functions i.e. enable/disable, bulks)
+   - Also, naming of the functions should be more "programmer" way
+
+- Attribute must contain a validtion error message
+
+- API
+   - Incomplete implementation on server side?
+      - listCertificateProfiles
+      - listCAsInProfile
+      - listEntityProfiles
+
+   - time to time there are confusing names, i.e. Authority -> List RA Profile Attributes
+      - it evokes me to think that RA profiles are searched for Authorities then list of attributes set in the RA Profile is returned
+
+   - structures for attributes should be reviewed
+      - now there are various structures used throughout the API
+         - Attribute Descriptor (definition of attribute, its possible values and so on)
+         - Set Attribute Value (uuid, name, value)
+         - Get Attribute Value (uuid, name, value, label, type)
+
+

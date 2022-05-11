@@ -1,5 +1,5 @@
-import { FunctionGroup } from "api/connectors";
-import { AttributeResponse } from "./attributes";
+import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { AttributeDescriptorDTO } from "../api/.common/AttributeDTO";
 
 export interface Authority {
   uuid: string;
@@ -14,13 +14,13 @@ export interface AuthorityProviders {
   name: string;
   status?: string;
   url: string;
-  functionGroups: FunctionGroup[];
+  functionGroups: ConnectorFunctionGroupDTO[];
 }
 
 export interface AuthorityDetails {
   uuid: string;
   name?: string;
-  attributes?: AttributeResponse[];
+  attributes?: AttributeDescriptorDTO[];
   connectorUuid: string;
   credential?: any;
   kind: string;

@@ -6,9 +6,9 @@ import { Button, Container, Table } from "reactstrap";
 import Spinner from "components/Spinner";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/connectors";
-import { fieldNameTransform } from "utils/fieldNameTransform";
+import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import MDBColumnName from "components/MDBColumnName";
-import { FunctionGroup } from "api/connectors";
+import { ConnectorFunctionGroupDTO } from "api/connectors";
 import ToolTip from "components/ToolTip";
 
 import {
@@ -167,7 +167,7 @@ function ConnectorList() {
     </div>
   );
 
-  const getFunctionGroupTable = (functionGroups: FunctionGroup[]) => {
+  const getFunctionGroupTable = (functionGroups: ConnectorFunctionGroupDTO[]) => {
     return (
       <table style={{ border: "none" }}>
         <tbody>
@@ -178,10 +178,10 @@ function ConnectorList() {
                   <MDBBadge
                     color="primary"
                     searchvalue={
-                      fieldNameTransform[group.name || ""] || group.name
+                      FieldNameTransform[group.name || ""] || group.name
                     }
                   >
-                    {fieldNameTransform[group.name || ""] || group.name}
+                    {FieldNameTransform[group.name || ""] || group.name}
                   </MDBBadge>
                 </td>
                 <td style={{ border: "none" }}>
@@ -195,10 +195,10 @@ function ConnectorList() {
     );
   };
 
-  const getFunctionGroupTableContent = (functionGroups: FunctionGroup[]) => {
+  const getFunctionGroupTableContent = (functionGroups: ConnectorFunctionGroupDTO[]) => {
     return functionGroups.map(function (group) {
       const groupName =
-        fieldNameTransform[group.name || ""] || group.name || "";
+        FieldNameTransform[group.name || ""] || group.name || "";
       const groupKinds = group.kinds.join(" ");
 
       return groupName + groupKinds;

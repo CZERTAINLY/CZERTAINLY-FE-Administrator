@@ -1,82 +1,98 @@
-import { ErrorDeleteObject, RaProfile } from "models";
-import { AttributeResponse } from "models/attributes";
+import { ErrorDeleteObject } from "models";
+import { AttributeDTO } from "api/.common/AttributeDTO";
 import { Observable } from "rxjs";
+import { RaProfileDTO } from "api/profiles";
 
-export interface AcmeProfileResponse {
-  uuid: string;
-  name: string;
-  enabled: boolean;
-  description?: string;
-  raProfileName?: string;
-  raProfileUuid?: string;
-  directoryUrl?: string;
+
+export interface AcmeProfileListItemDTO {
+   uuid: string;
+   name: string;
+   enabled: boolean;
+   description?: string;
+   raProfileName?: string;
+   raProfileUuid?: string;
+   directoryUrl?: string;
 }
 
-export interface AcmeProfileDetailResponse {
-  uuid: string;
-  name: string;
-  enabled: boolean;
-  description?: string;
-  termsOfServiceUrl?: string;
-  websiteUrl?: string;
-  dnsResolverIp?: string;
-  dnsResolverPort?: string;
-  raProfile?: RaProfile;
-  retryInterval?: number;
-  termsOfServiceChangeDisable?: boolean;
-  validity?: number;
-  directoryUrl: string;
-  issueCertificateAttributes?: AttributeResponse[];
-  revokeCertificateAttributes?: AttributeResponse[];
-  requireContact: boolean;
-  requireTermsOfService: boolean;
-  termsOfServiceChangeUrl: string;
+
+export interface AcmeProfileDTO {
+   uuid: string;
+   name: string;
+   enabled: boolean;
+   description?: string;
+   termsOfServiceUrl?: string;
+   websiteUrl?: string;
+   dnsResolverIp?: string;
+   dnsResolverPort?: string;
+   raProfile?: RaProfileDTO;
+   retryInterval?: number;
+   termsOfServiceChangeDisable?: boolean;
+   validity?: number;
+   directoryUrl?: string;
+   termsOfServiceChangeUrl?: string;
+   requireContact?: boolean;
+   requireTermsOfService?: boolean;
+   issueCertificateAttributes?: AttributeDTO[];
+   revokeCertificateAttributes?: AttributeDTO[];
 }
+
 
 export interface AcmeProfilesManagementApi {
-  createAcmeProfile(
-    name: string,
-    description: string,
-    termsOfServiceUrl: string,
-    dnsResolverIp: string,
-    dnsResolverPort: string,
-    raProfileUuid: string,
-    websiteUrl: string,
-    retryInterval: number,
-    termsOfServiceChangeDisable: boolean,
-    validity: number,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[],
-    requireContact: boolean,
-    requireTermsOfService: boolean,
-    termsOfServiceChangeUrl: string
-  ): Observable<string>;
-  deleteAcmeProfile(uuid: string | number): Observable<ErrorDeleteObject[]>;
-  enableAcmeProfile(uuid: string | number): Observable<void>;
-  disableAcmeProfile(uuid: string | number): Observable<void>;
-  bulkDeleteAcmeProfile(
-    uuid: (string | number)[]
-  ): Observable<ErrorDeleteObject[]>;
-  bulkForceDeleteAcmeProfile(uuid: (string | number)[]): Observable<void>;
-  bulkEnableAcmeProfile(uuid: (string | number)[]): Observable<void>;
-  bulkDisableAcmeProfile(uuid: (string | number)[]): Observable<void>;
-  getAcmeProfilesList(): Observable<AcmeProfileResponse[]>;
-  getAcmeProfileDetail(uuid: string): Observable<AcmeProfileDetailResponse>;
-  updateAcmeProfile(
-    uuid: string,
-    description: string,
-    termsOfServiceUrl: string,
-    dnsResolverIp: string,
-    dnsResolverPort: string,
-    raProfileUuid: string,
-    websiteUrl: string,
-    retryInterval: number,
-    termsOfServiceChangeDisable: boolean,
-    validity: number,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[],
-    requireContact: boolean,
-    requireTermsOfService: boolean,
-    termsOfServiceChangeUrl: string
-  ): Observable<AcmeProfileDetailResponse>;
+
+   enableAcmeProfile(uuid: string): Observable<void>;
+
+   disableAcmeProfile(uuid: string): Observable<void>;
+
+   getAcmeProfileDetail(uuid: string): Observable<AcmeProfileDTO>;
+
+   updateAcmeProfile(
+      uuid: string,
+      issueCertificateAttributes: AttributeDTO[],
+      revokeCertificateAttributes: AttributeDTO[],
+      description?: string,
+      termsOfServiceUrl?: string,
+      websiteUrl?: string,
+      dnsResolverIp?: string,
+      dnsResolverPort?: string,
+      raProfileUuid?: string,
+      retryInterval?: number,
+      termsOfServiceChangeDisable?: boolean,
+      termsOfServiceChangeUrl?: string,
+      validity?: number,
+      requireContact?: boolean,
+      requireTermsOfService?: boolean,
+   ): Observable<AcmeProfileDTO>;
+
+   deleteAcmeProfile(uuid: string): Observable<ErrorDeleteObject[]>;
+
+   bulkEnableAcmeProfile(uuids: string[]): Observable<void>;
+
+   bulkDisableAcmeProfile(uuids: string[]): Observable<void>;
+
+   getAcmeProfilesList(): Observable<AcmeProfileListItemDTO[]>;
+
+   createAcmeProfile(
+      name: string,
+      issueCertificateAttributes: AttributeDTO[],
+      revokeCertificateAttributes: AttributeDTO[],
+      description?: string,
+      termsOfServiceUrl?: string,
+      websiteUrl?: string,
+      dnsResolverIp?: string,
+      dnsResolverPort?: string,
+      raProfileUuid?: string,
+      retryInterval?: number,
+      validity?: number,
+      requireContact?: boolean,
+      requireTermsOfService?: boolean,
+   ): Observable<string>;
+
+
+   bulkDeleteAcmeProfiles(uuids: string[]): Observable<ErrorDeleteObject[]>;
+
+   bulkForceDeleteAcmeProfiles(uuids: string[]): Observable<void>;
+
+   deleteRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void>;
+
+
 }

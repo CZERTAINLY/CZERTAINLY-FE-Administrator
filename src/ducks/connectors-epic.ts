@@ -3,7 +3,7 @@ import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
-import { ConnectorDetailResponse, ConnectorInfoResponse } from "api/connectors";
+import { ConnectorDetailDTO, ConnectorInfoDTO } from "api/connectors";
 import { Connector, ConnectorDetails } from "models";
 import { extractError } from "utils/net";
 import { EpicDependencies, State as AppState } from "./app-state";
@@ -433,7 +433,7 @@ const updateConnector: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-function mapConnector(connectors: ConnectorInfoResponse): Connector {
+function mapConnector(connectors: ConnectorInfoDTO): Connector {
   return {
     ...connectors,
     uuid: connectors.uuid,
@@ -446,7 +446,7 @@ function mapConnector(connectors: ConnectorInfoResponse): Connector {
 
 function mapConnectorDetail(
   uuid: string,
-  data: ConnectorDetailResponse
+  data: ConnectorDetailDTO
 ): ConnectorDetails {
   return {
     uuid,

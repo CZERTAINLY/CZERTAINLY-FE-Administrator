@@ -131,7 +131,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
     );
   }
 
-  getRaProfilesList(): Observable<model.RaProfileResponse[]> {
+  getRaProfilesList(): Observable<model.RaProfileDTO[]> {
     return of(dbData.raProfiles).pipe(
       delay(randomDelay()),
       map((profiles) =>
@@ -157,7 +157,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
   }
 
   getAttributes(authorityUuid: string): Observable<AttributeResponse[]> {
-    return of(dbData.raProfileAttribute).pipe(
+    return of(dbData.raProfilesAttributes).pipe(
       delay(randomDelay()),
       map((authorityProviderAttributes) =>
         authorityProviderAttributes.map(

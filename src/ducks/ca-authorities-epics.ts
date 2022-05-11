@@ -4,11 +4,12 @@ import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
 import {
-  AuthorityDetailResponse,
-  AuthorityInfoResponse,
+  AuthorityDTO,
+  AuthorityListItemDTO,
   AuthorityProviderAttributes,
-  AuthorityProviderResponse,
+  AuthorityProviderDTO,
 } from "api/authorities";
+
 import { Authority, AuthorityDetails, AuthorityProviders } from "models";
 import { extractError } from "utils/net";
 import { EpicDependencies, State as AppState } from "./app-state";
@@ -317,7 +318,7 @@ const updateAuthority: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-function mapAuthority(authorities: AuthorityInfoResponse): Authority {
+function mapAuthority(authorities: AuthorityListItemDTO): Authority {
   return {
     ...authorities,
     uuid: authorities.uuid,
@@ -328,7 +329,7 @@ function mapAuthority(authorities: AuthorityInfoResponse): Authority {
 }
 
 function mapAuthorityProviders(
-  authorityProviders: AuthorityProviderResponse
+  authorityProviders: AuthorityProviderDTO
 ): AuthorityProviders {
   return {
     ...authorityProviders,
@@ -362,7 +363,7 @@ function mapAuthorityProviderAttributes(
 
 function mapAuthorityDetail(
   uuid: string,
-  data: AuthorityDetailResponse
+  data: AuthorityDTO
 ): AuthorityDetails {
   return {
     uuid,

@@ -3,7 +3,7 @@ import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
-import { RaProfileResponse } from "api/profiles";
+import { RaProfileDTO } from "api/profiles";
 import { RaProfile } from "models";
 import { extractError } from "utils/net";
 import { EpicDependencies, State as AppState } from "./app-state";
@@ -513,7 +513,7 @@ function mapAttributes(attributes: AttributeResponse): AttributeResponse {
   };
 }
 
-function mapProfile(profile: RaProfileResponse): RaProfile {
+function mapProfile(profile: RaProfileDTO): RaProfile {
   return {
     uuid: profile.uuid.toString(),
     name: profile.name,

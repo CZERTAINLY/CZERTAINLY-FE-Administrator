@@ -4,10 +4,10 @@ import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
 import {
-  CredentialDetailResponse,
-  CredentialInfoResponse,
+  CredentialDetailDTO,
+  CredentialInfoDTO,
   CredentialProviderAttributes,
-  CredentialProviderResponse,
+  CredentialProviderDTO,
 } from "api/credentials";
 import { Credential, CredentialDetails, CredentialProviders } from "models";
 import { extractError } from "utils/net";
@@ -278,7 +278,7 @@ const updateCredential: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-function mapCredential(credentials: CredentialInfoResponse): Credential {
+function mapCredential(credentials: CredentialInfoDTO): Credential {
   return {
     ...credentials,
     uuid: credentials.uuid,
@@ -290,7 +290,7 @@ function mapCredential(credentials: CredentialInfoResponse): Credential {
 }
 
 function mapCredentialProviders(
-  credentialProviders: CredentialProviderResponse
+  credentialProviders: CredentialProviderDTO
 ): CredentialProviders {
   return {
     ...credentialProviders,
@@ -324,7 +324,7 @@ function mapCredentialProviderAttributes(
 
 function mapCredentialDetail(
   uuid: string,
-  data: CredentialDetailResponse
+  data: CredentialDetailDTO
 ): CredentialDetails {
   return {
     uuid,

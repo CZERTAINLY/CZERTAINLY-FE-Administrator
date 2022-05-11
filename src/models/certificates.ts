@@ -28,3 +28,4 @@ export interface CertificateResponseDto {
   totalPages: number;
   totalItems: number;
 }
+

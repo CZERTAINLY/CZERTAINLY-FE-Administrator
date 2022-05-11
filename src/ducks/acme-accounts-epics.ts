@@ -40,7 +40,7 @@ const getAccountDetail: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.DetailRequest)),
     switchMap(({ uuid }) =>
-      apiClients.acmeAccounts.getAcmeDetails(uuid).pipe(
+      apiClients.acmeAccounts.getAcmeAccountDetails(uuid).pipe(
         map((detail) => {
           try {
             return actions.receiveAccountDetail(detail);
@@ -69,7 +69,7 @@ const deleteAccount: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.ConfirmDelete)),
     switchMap(({ uuid, history }) =>
-      apiClients.acmeAccounts.deleteAcmeAccount(uuid).pipe(
+      apiClients.acmeAccounts.revokeAcmeAccount(uuid).pipe(
         map(() => {
           history.push("..");
           return actions.receiveDeleteAccount(uuid);
@@ -135,7 +135,7 @@ const bulkDeleteAccount: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.BulkConfirmDelete)),
     switchMap(({ uuid }) =>
-      apiClients.acmeAccounts.bulkDeleteAcmeAccount(uuid).pipe(
+      apiClients.acmeAccounts.bulkRevokeAcmeAccount(uuid).pipe(
         map(() => actions.receiveBulkDeleteAccount(uuid)),
         catchError((err) =>
           of(
