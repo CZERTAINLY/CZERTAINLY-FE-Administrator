@@ -1,293 +1,437 @@
-import { Observable, of, throwError } from "rxjs";
+import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 import { HttpErrorResponse } from "ts-rest-client";
 
-import { dbData, createRaProfile } from "mocks/db";
-import { randomDelay } from "utils/mock";
 import * as model from "./model";
-import { AttributeResponse } from "models/attributes";
-import { RaAcmeLink } from "models";
+import { dbData } from "mocks/db";
+import { randomDelay } from "utils/mock";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
 
 export class ProfilesManagementMock implements model.ProfilesManagementApi {
-  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink> {
-    return of();
-  }
-  activateAcme(
-    uuid: string,
-    acmeProfileUuid: string,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[]
-  ): Observable<RaAcmeLink> {
-    return of();
-  }
-  deactivateAcme(uuid: string): Observable<void> {
-    return of();
-  }
-  createRaProfile(
-    authorityInstanceUuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeResponse[]
-  ): Observable<string> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(() => createRaProfile(name, description))
-    );
-  }
 
-  deleteRaProfile(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
 
-        dbData.raProfiles.splice(profileIdx, 1);
-      })
-    );
-  }
+   getRaProfilesList(): Observable<model.RaProfileDTO[]> {
 
-  enableRaProfile(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles[profileIdx].enabled = true;
-      })
-    );
-  }
-
-  disableRaProfile(uuid: string | number): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles[profileIdx].enabled = false;
-      })
-    );
-  }
-
-  bulkDeleteRaProfile(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles.splice(profileIdx, 1);
-      })
-    );
-  }
-
-  bulkEnableRaProfile(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles[profileIdx].enabled = true;
-      })
-    );
-  }
-
-  bulkDisableRaProfile(uuid: (string | number)[]): Observable<void> {
-    return of(null).pipe(
-      delay(randomDelay()),
-      map(function (): void {
-        const profileIdx = dbData.raProfiles.findIndex(
-          (p) => p.uuid.toString() === uuid[0]
-        );
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
-
-        dbData.raProfiles[profileIdx].enabled = false;
-      })
-    );
-  }
-
-  getRaProfilesList(): Observable<model.RaProfileDTO[]> {
-    return of(dbData.raProfiles).pipe(
-      delay(randomDelay()),
-      map((profiles) =>
-        profiles.map(
-          ({
-            uuid,
-            name,
-            description,
-            enabled,
-            authorityInstanceUuid,
-            authorityInstanceName,
-          }) => ({
-            uuid,
-            name,
-            description,
-            enabled,
-            authorityInstanceUuid,
-            authorityInstanceName,
-          })
-        )
+      return of(
+         dbData.raProfiles
+      ).pipe(
+         delay(randomDelay())
       )
-    );
-  }
 
-  getAttributes(authorityUuid: string): Observable<AttributeResponse[]> {
-    return of(dbData.raProfilesAttributes).pipe(
-      delay(randomDelay()),
-      map((authorityProviderAttributes) =>
-        authorityProviderAttributes.map(
-          ({
-            uuid,
-            name,
-            label,
-            type,
-            required,
-            readOnly,
-            editable,
-            visible,
-            multiValue,
-            description,
-            validationRegex,
-            dependsOn,
-            value,
-            attributeCallback,
-          }) => ({
-            uuid,
-            name,
-            label,
-            type,
-            required,
-            readOnly,
-            editable,
-            visible,
-            multiValue,
-            description,
-            validationRegex,
-            dependsOn,
-            value,
-            attributeCallback,
-          })
-        )
+   }
+
+
+   getRaProfileDetail(uuid: string): Observable<model.RaProfileDTO> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404 });
+               return profile;
+
+            }
+
+         )
+      );
+
+   }
+
+   getAuthorizedClients(uuid: string): Observable<model.RaAuthorizedClientDTO[]> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404 });
+
+               const clients = dbData.clients.filter(
+                  client => client.authorizedProfiles.includes(uuid)
+               );
+
+               return clients.map(
+
+                  client => ({
+                     uuid: client.uuid,
+                     name: client.name,
+                     enabled: client.enabled
+                  })
+
+               );
+
+            }
+
+         )
+
       )
-    );
-  }
 
-  getRaProfileDetail(uuid: string): Observable<model.RaProfileDetailResponse> {
-    return of(
-      dbData.raProfiles.find((p) => p.uuid.toString() === uuid.toString())
-    ).pipe(
-      delay(randomDelay()),
-      map((detail) => {
-        if (detail) {
-          return {
-            ...detail,
-          };
-        }
+   }
 
-        throw new HttpErrorResponse({
-          status: 404,
-        });
-      })
-    );
-  }
+   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
-  getAuthorizedClients(
-    uuid: string
-  ): Observable<model.RaProfileAuthorizationsResponse[]> {
-    const profile = dbData.raProfiles.find(
-      (p) => p.uuid.toString() === uuid.toString()
-    );
-    if (!profile) {
-      return throwError(new HttpErrorResponse({ status: 404 }));
-    }
-    const clients = dbData.clients.filter((c) => c.auth.includes(uuid));
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
 
-    return of(clients).pipe(delay(randomDelay()));
-  }
+         delay(randomDelay()),
+         map(
 
-  getEndEntityProfiles(): Observable<model.EntityProfileResponse[]> {
-    return of(dbData.endEntityProfiles).pipe(delay(randomDelay()));
-  }
+            profile => {
 
-  getCertificateProfiles(
-    endEntityProfileId: number
-  ): Observable<model.EntityProfileResponse[]> {
-    return of(dbData.certificateProfiles).pipe(
-      delay(randomDelay()),
-      map((profiles) =>
-        profiles.filter((p) => p.endEntityProfileId === endEntityProfileId)
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Profile not found" });
+
+               const authority = dbData.authorities.find(authority => authority.uuid === profile.authorityInstanceUuid);
+               if (!authority) throw new HttpErrorResponse({ status: 404, statusText: "Authority not found" });
+
+               return authority.issueAttributes;
+
+            }
+
+
+         )
+
       )
-    );
-  }
 
-  getCertificationAuthorities(
-    endEntityProfileId: number
-  ): Observable<model.EntityProfileResponse[]> {
-    return of(dbData.certificationAuthorities).pipe(
-      delay(randomDelay()),
-      map((cas) =>
-        cas.filter((ca) => ca.endEntityProfileId === endEntityProfileId)
+   }
+
+
+   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Profile not found" });
+
+               const authority = dbData.authorities.find(authority => authority.uuid === profile.authorityInstanceUuid);
+               if (!authority) throw new HttpErrorResponse({ status: 404, statusText: "Authority not found" });
+
+               return authority.revokeAttributes;
+
+            }
+
+
+         )
+
       )
-    );
-  }
 
-  updateRaProfile(
-    authorityInstanceUuid: string,
-    uuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeResponse[]
-  ): Observable<model.RaProfileDetailResponse> {
-    return of(
-      dbData.raProfiles.findIndex((p) => p.uuid.toString() === uuid.toString())
-    ).pipe(
-      delay(randomDelay()),
-      map((profileIdx) => {
-        if (profileIdx < 0) {
-          throw new HttpErrorResponse({ status: 404 });
-        }
+   }
 
-        const detail = dbData.raProfiles[profileIdx];
-        return {
-          ...detail,
-        };
-      })
-    );
-  }
-  getIssuanceAttributes(
-    raProfileUuid: string
-  ): Observable<AttributeResponse[]> {
-    return of([] as AttributeResponse[]);
-  }
 
-  getRevocationAttributes(
-    raProfileUuid: string
-  ): Observable<AttributeResponse[]> {
-    return of([] as AttributeResponse[]);
-  }
+   getRaAcmeProfile(uuid: string): Observable<model.RaAcmeLinkDTO> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Profile not found" });
+
+               if (!profile.acmeProfileLink) return { acmeAvailable: false };
+
+               return profile.acmeProfileLink;
+
+            }
+
+         )
+
+      )
+
+   }
+
+
+   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Profile not found" });
+
+               const acmeProfile = dbData.acmeProfiles.find(acmeProfile => acmeProfile.uuid === acmeProfileUuid);
+               if (!acmeProfile) throw new HttpErrorResponse({ status: 404, statusText: "ACME Profile not found" });
+
+               profile.acmeProfileLink = {
+                  uuid: acmeProfile.uuid,
+                  name: acmeProfile.name,
+                  directoryUrl: acmeProfile.directoryUrl || "",
+                  issueCertificateAttributes: issueCertificateAttributes,
+                  revokeCertificateAttributes: revokeCertificateAttributes,
+                  acmeAvailable: true
+               }
+
+               return profile.acmeProfileLink;
+
+            }
+
+         )
+
+      )
+
+   }
+
+
+   deactivateAcme(uuid: string): Observable<void> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Profile not found" });
+               profile.acmeProfileLink = undefined;
+
+            }
+
+         )
+      )
+
+   }
+
+
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+
+      return of(
+         dbData.authorities.find(authority => authority.uuid === authorityInstanceUuid)
+      ).pipe(
+         delay(randomDelay()),
+         map(
+
+            authority => {
+
+               if (!authority) throw new HttpErrorResponse({ status: 404, statusText: "Authority not found" });
+
+               const uuid = crypto.randomUUID();
+
+               dbData.raProfiles.push({
+                  uuid,
+                  name,
+                  attributes,
+                  description,
+                  enabled: enabled || true,
+                  authorityInstanceUuid: authorityInstanceUuid,
+                  authorityInstanceName: name,
+               })
+
+               return uuid;
+
+            }
+         )
+      );
+
+   }
+
+
+   deleteRaProfile(uuid: string): Observable<void> {
+
+      return of(
+         dbData.raProfiles.findIndex(raProfile => raProfile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profileIndex => {
+               if (profileIndex < 0) throw new HttpErrorResponse({ status: 404 });
+               dbData.raProfiles.splice(profileIndex, 1);
+            }
+
+         )
+      );
+
+   }
+
+
+   enableRaProfile(uuid: string): Observable<void> {
+
+      return of(
+         dbData.raProfiles.find(raProfile => raProfile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+               if (!profile) throw new HttpErrorResponse({ status: 404 });
+               profile.enabled = true;
+            }
+         )
+
+      );
+
+   }
+
+
+   disableRaProfile(uuid: string | number): Observable<void> {
+
+      return of(
+         dbData.raProfiles.find(raProfile => raProfile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+               if (!profile) throw new HttpErrorResponse({ status: 404 });
+               profile.enabled = false;
+            }
+         )
+
+      );
+
+   }
+
+
+   bulkDeleteRaProfile(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+
+                  uuid => {
+
+                     const profileIndex = dbData.raProfiles.findIndex(profile => profile.uuid === uuid);
+                     if (profileIndex < 0) throw new HttpErrorResponse({ status: 404 });
+                     dbData.raProfiles.splice(profileIndex, 1);
+
+                  }
+
+               )
+
+            }
+
+         )
+      );
+
+   }
+
+
+   bulkEnableRaProfile(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+
+                  uuid => {
+
+                     const profile = dbData.raProfiles.find(profile => profile.uuid === uuid);
+                     if (!profile) throw new HttpErrorResponse({ status: 404 });
+                     profile.enabled = true;
+
+                  }
+
+               )
+
+            }
+
+         )
+      );
+
+   }
+
+
+   bulkDisableRaProfile(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+
+                  uuid => {
+
+                     const profile = dbData.raProfiles.find(profile => profile.uuid === uuid);
+                     if (!profile) throw new HttpErrorResponse({ status: 404 });
+                     profile.enabled = false;
+
+                  }
+
+               )
+
+            }
+
+         )
+      );
+
+   }
+
+
+   updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<model.RaProfileDTO> {
+
+      return of(
+         dbData.raProfiles.find(profile => profile.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            profile => {
+
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Profile not found" });
+
+               const authority = dbData.authorities.find(authority => authority.uuid === authorityInstanceUuid);
+               if (!authority) throw new HttpErrorResponse({ status: 404, statusText: "Authority not found" });
+
+               profile.authorityInstanceName = authority.name;
+               profile.authorityInstanceUuid = authority.uuid;
+               profile.attributes = attributes;
+               profile.enabled = enabled || profile.enabled;
+               profile.description = description || profile.description;
+
+               return profile;
+
+            }
+         )
+
+      );
+
+   }
+
 }

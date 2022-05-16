@@ -1,4 +1,4 @@
-import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { FunctionGroupDTO } from "api/connectors";
 import { AttributeResponse } from "models/attributes";
 
 export function inIframe() {
@@ -12,7 +12,7 @@ export function inIframe() {
 
 export function functionGroupChecker(
   finder: string,
-  groups: ConnectorFunctionGroupDTO[]
+  groups: FunctionGroupDTO[]
 ): boolean {
   for (let i of groups) {
     if (i.functionGroupCode === finder) {

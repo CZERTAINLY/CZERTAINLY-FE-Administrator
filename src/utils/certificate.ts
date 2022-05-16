@@ -165,7 +165,7 @@ export function certificatePEM2CertificateDTO(certificate: string): CertificateD
 
       status: "unknown",
       certificateContent: encoded,
-      certificateType: "x509",
+      certificateType: "X509",
 
    }
 

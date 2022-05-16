@@ -107,7 +107,7 @@ export class ClientManagementBackend implements model.ClientManagementApi {
    }
 
 
-   getClientAuth(uuid: string): Observable<model.ClientAuthorizationsDTO[]> {
+   getAuthorizedProfiles(uuid: string): Observable<model.AuthorizedProfilesDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/listauth`, "GET")

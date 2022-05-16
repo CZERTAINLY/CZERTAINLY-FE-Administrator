@@ -1,8 +1,14 @@
-import { RaProfileDTO } from "api/profiles";
+import { RaAcmeLinkDTO, RaProfileDTO } from "api/profiles";
+
+export interface DbRaProfile extends RaProfileDTO {
+   acmeProfileLink?: RaAcmeLinkDTO;
+}
+
 
 interface DbRaProfileList {
-   [key: string]: RaProfileDTO;
+   [key: string]: DbRaProfile;
 }
+
 
 export const dbRaProfiles: DbRaProfileList = {
 
@@ -18,11 +24,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "tokenType",
             label: "Token Type",
             type: "LIST",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
             value: "P12",
          },
          {
@@ -30,12 +31,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "initialEndEntityStatus",
             label: "Initial End Entity Status",
             type: "LIST",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
-            description: "Initial state will be used when end entity is created.",
             value: "NEW",
          },
          {
@@ -43,12 +38,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "description",
             label: "Description",
             type: "STRING",
-            required: false,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
-            description: "Description / Comment",
             value: "localhostProfile",
          },
          {
@@ -56,11 +45,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "endEntityProfile",
             label: "End Entity Profile",
             type: "LIST",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
             value: "1058487535",
          },
          {
@@ -68,30 +52,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "certificateProfile",
             label: "Certificate Profile",
             type: "LIST",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
-            attributeCallback: {
-               callbackMethod: "listCertificateProfiles",
-               mappings: [
-
-                  {
-                     from: "authorityUuid",
-                     to: "authorityUuid",
-                     attributeType: "STRING",
-                     targets: ["pathVariable"],
-                     value: 19,
-                  },
-                  {
-                     from: "endEntityProfileId",
-                     to: "endEntityProfileName",
-                     attributeType: "STRING",
-                     targets: ["pathVariable"],
-                  },
-               ],
-            },
             value: "1987428585",
          },
          {
@@ -99,41 +59,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "certificationAuthority",
             label: "Certification Authority",
             type: "LIST",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
-            attributeCallback: {
-               callbackMethod: "listCAsInProfile",
-               mappings: [
-                  {
-                     from: "authorityUuid",
-                     to: "authorityUuid",
-                     attributeType: "STRING",
-                     targets: ["pathVariable"],
-                     value: 19,
-                  },
-                  {
-                     from: "endEntityProfileId",
-                     to: "endEntityProfileName",
-                     attributeType: "STRING",
-                     targets: ["pathVariable"],
-                  },
-               ],
-            },
-            value: "1526670236",
-         },
-         {
-            uuid: "e0ab3b4e-7681-4a9f-aec5-e025eb1a56a4",
-            name: "sendNotifications",
-            label: "Send Notifications",
-            type: "BOOLEAN",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
             value: true,
          },
          {
@@ -141,11 +66,6 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "keyRecoverable",
             label: "Key Recoverable",
             type: "BOOLEAN",
-            required: true,
-            readOnly: false,
-            editable: true,
-            visible: true,
-            multiValue: false,
             value: true,
          },
       ],
@@ -160,6 +80,7 @@ export const dbRaProfiles: DbRaProfileList = {
       description: "DEMO RA Profile",
       authorityInstanceUuid: "18",
       enabled: true,
+      attributes: []
    },
 
 
@@ -170,6 +91,7 @@ export const dbRaProfiles: DbRaProfileList = {
       description: "",
       authorityInstanceUuid: "17",
       enabled: false,
+      attributes: []
    },
 
    "lab02-ADCS-WebServer": {
@@ -213,8 +135,8 @@ export const dbRaProfiles: DbRaProfileList = {
             label: "End Entity Profile",
             type: "LIST",
             value: {
-               "id": 729841090,
-               "name": "Server"
+               id: 729841090,
+               name: "Server"
             }
          },
          {

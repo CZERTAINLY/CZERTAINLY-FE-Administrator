@@ -12,7 +12,7 @@ export interface ClientDTO {
 }
 
 
-export interface ClientAuthorizationsDTO {
+export interface AuthorizedProfilesDTO {
    uuid: string;
    name: string;
    enabled: boolean;
@@ -21,13 +21,13 @@ export interface ClientAuthorizationsDTO {
 
 export interface ClientManagementApi {
 
-   unauthorizeClient(clientId: string, profileId: string): Observable<void>;
+   unauthorizeClient(clientUuid: string, profileUuid: string): Observable<void>;
 
    enableClient(uuid: string): Observable<void>;
 
    disableClient(uuid: string): Observable<void>;
 
-   authorizeClient(clientId: string, profileId: string): Observable<void>;
+   authorizeClient(clientUuid: string, profileUuid: string): Observable<void>;
 
    bulkEnableClient(uuids: string[]): Observable<void>;
 
@@ -45,7 +45,7 @@ export interface ClientManagementApi {
 
    bulkDeleteClient(uuids: string[]): Observable<void>;
 
-   getClientAuth(uuid: string): Observable<ClientAuthorizationsDTO[]>;
+   getAuthorizedProfiles(uuid: string): Observable<AuthorizedProfilesDTO[]>;
 
 
 }

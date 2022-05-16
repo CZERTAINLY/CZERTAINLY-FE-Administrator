@@ -1,15 +1,14 @@
-import { ClientAuthorizationsDTO, ClientDTO } from "api/clients";
-import { RaProfile } from "models";
+import { ClientDTO } from "api/clients";
 import { dbCertificates } from "./db-certificates";
 
 
-export interface DBClient extends ClientDTO {
-   auth: ClientAuthorizationsDTO[];
+export interface DbClient extends ClientDTO {
+   authorizedProfiles: string[];
 }
 
 
 interface DbClientList {
-   [key: string]: DBClient;
+   [key: string]: DbClient;
 }
 
 
@@ -22,7 +21,7 @@ export const dbClients: DbClientList = {
       description: "T!",
       enabled: false,
       certificate: dbCertificates["t1c.com"],
-      auth: []
+      authorizedProfiles: []
    },
 
    "test-client1": {
@@ -32,7 +31,7 @@ export const dbClients: DbClientList = {
       description: "",
       enabled: true,
       certificate: dbCertificates["t1c.com"],
-      auth: []
+      authorizedProfiles: []
    },
 
    "TestClient": {
@@ -42,7 +41,7 @@ export const dbClients: DbClientList = {
       certificate: dbCertificates["t1c.com"],
       description: "TestClient",
       enabled: false,
-      auth: []
+      authorizedProfiles: []
    }
 
 }

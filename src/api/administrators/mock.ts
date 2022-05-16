@@ -2,9 +2,10 @@ import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 import { HttpErrorResponse } from "ts-rest-client";
 import { randomDelay } from "utils/mock";
-import { dbData, getOrCreateCertificate } from "mocks/db";
+import { dbData } from "mocks/db";
 
 import * as model from "./model";
+import { getOrCreateCertificate } from "mocks/helpers";
 
 
 export class AdministatorManagementMock implements model.AdministratorManagementApi {

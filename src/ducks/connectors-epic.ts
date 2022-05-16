@@ -3,7 +3,7 @@ import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
-import { ConnectorDetailDTO, ConnectorInfoDTO } from "api/connectors";
+import { ConnectorDetailDTO, ConnectorDTO } from "api/connectors";
 import { Connector, ConnectorDetails } from "models";
 import { extractError } from "utils/net";
 import { EpicDependencies, State as AppState } from "./app-state";
@@ -355,7 +355,7 @@ const connectConnector: Epic<Action, Action, AppState, EpicDependencies> = (
     filter(isOfType(Actions.ConnectRequest)),
     switchMap(({ name, url, authType, authAttributes, uuid }) =>
       apiClients.connectors
-        .connectNewConnector(name, url, authType, authAttributes, uuid)
+        .connectToConnector(name, url, authType, authAttributes, uuid)
         .pipe(
           map((connectorResponse) => {
             return actions.receiveConnectConnector(connectorResponse);
@@ -433,7 +433,7 @@ const updateConnector: Epic<Action, Action, AppState, EpicDependencies> = (
     )
   );
 
-function mapConnector(connectors: ConnectorInfoDTO): Connector {
+function mapConnector(connectors: ConnectorDTO): Connector {
   return {
     ...connectors,
     uuid: connectors.uuid,

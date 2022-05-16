@@ -10,7 +10,7 @@ import {
 } from "models";
 import { arrayReducer, createFeatureSelector } from "utils/ducks";
 import { createErrorAlertAction } from "./alerts";
-import { CredentialProviderAttributes } from "api/credentials";
+import { CredentialProviderAttributes } from "api/credential";
 import { functionGroupChecker } from "utils/commons";
 
 export const statePath = "credentials";

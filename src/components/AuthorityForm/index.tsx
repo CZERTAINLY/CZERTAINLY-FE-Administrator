@@ -25,7 +25,7 @@ import {
 } from "ducks/connectors";
 
 import { AuthorityProviderAttributes } from "api/authorities";
-import { ConnectorInfoDTO } from "api/connectors";
+import { ConnectorDTO } from "api/connectors";
 import { attributeCombiner } from "utils/commons";
 import { AuthorityDetails } from "models";
 
@@ -88,7 +88,7 @@ function AuthorityForm({
   const [kind, setKind] = useState<string>();
   const [functionGroup, setFunctiongroup] = useState<string>();
   const [connectorDetails, setConnectorDetails] =
-    useState<ConnectorInfoDTO>();
+    useState<ConnectorDTO>();
   const callbackResponse = useSelector(callbackSelectors.callbackResponse);
 
   const [passAttributes, setPassAttributes] = useState(

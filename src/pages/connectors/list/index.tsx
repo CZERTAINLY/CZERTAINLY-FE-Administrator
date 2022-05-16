@@ -8,7 +8,7 @@ import Widget from "components/Widget";
 import { actions, selectors } from "ducks/connectors";
 import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import MDBColumnName from "components/MDBColumnName";
-import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { FunctionGroupDTO } from "api/connectors";
 import ToolTip from "components/ToolTip";
 
 import {
@@ -167,7 +167,7 @@ function ConnectorList() {
     </div>
   );
 
-  const getFunctionGroupTable = (functionGroups: ConnectorFunctionGroupDTO[]) => {
+  const getFunctionGroupTable = (functionGroups: FunctionGroupDTO[]) => {
     return (
       <table style={{ border: "none" }}>
         <tbody>
@@ -195,7 +195,7 @@ function ConnectorList() {
     );
   };
 
-  const getFunctionGroupTableContent = (functionGroups: ConnectorFunctionGroupDTO[]) => {
+  const getFunctionGroupTableContent = (functionGroups: FunctionGroupDTO[]) => {
     return functionGroups.map(function (group) {
       const groupName =
         FieldNameTransform[group.name || ""] || group.name || "";

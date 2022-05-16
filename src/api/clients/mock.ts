@@ -1,9 +1,10 @@
-import { Observable, of, throwError } from "rxjs";
+import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 
-import { dbData, createClient } from "mocks/db";
-import { randomDelay } from "utils/mock";
 import * as model from "./model";
+
+import { dbData } from "mocks/db";
+import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
 import { certificatePEM2CertificateDTO } from "utils/certificate";
 import { CertificateDTO } from "api/certificates";
@@ -12,10 +13,10 @@ import { CertificateDTO } from "api/certificates";
 export class ClientManagementMock implements model.ClientManagementApi {
 
 
-   unauthorizeClient(clientId: string, profileId: string): Observable<void> {
+   unauthorizeClient(clientUuid: string, profileUuid: string): Observable<void> {
 
       return of(
-         dbData.clients.find((c) => c.uuid === clientId)
+         dbData.clients.find(client => client.uuid === clientUuid)
       ).pipe(
 
          delay(randomDelay()),
@@ -23,12 +24,12 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
             client => {
 
-               if (!client) { throw new HttpErrorResponse({ status: 404, }); }
+               if (!client) { throw new HttpErrorResponse({ status: 404, statusText: "Client not found!" }); }
 
-               const profileIdx = client.auth.findIndex(auth => auth.uuid === profileId)
-               if (profileIdx < 0) { throw new HttpErrorResponse({ status: 404, }); }
+               const profileIdx = client.authorizedProfiles.findIndex(puuid => puuid === profileUuid)
+               if (profileIdx < 0) { throw new HttpErrorResponse({ status: 404, statusText: "Profile authorization not found" }); }
 
-               client.auth.splice(profileIdx, 1);
+               client.authorizedProfiles.splice(profileIdx, 1);
 
             }
 
@@ -81,26 +82,24 @@ export class ClientManagementMock implements model.ClientManagementApi {
    }
 
 
-   authorizeClient(clientId: string, profileId: string): Observable<void> {
+   authorizeClient(clientUuid: string, profileUuid: string): Observable<void> {
 
       return of(
-         dbData.clients.find(client => client.uuid === clientId)
+         dbData.clients.find(client => client.uuid === clientUuid)
       ).pipe(
 
          delay(randomDelay()),
          map(
 
             client => {
+               if (!client) throw new HttpErrorResponse({ status: 404, statusText: "Client not found" });
 
-               const profile = dbData.raProfiles.find(profile => profile.uuid === profileId);
+               const profile = dbData.raProfiles.find(profile => profile.uuid === profileUuid);
+               if (!profile) throw new HttpErrorResponse({ status: 404,statusText: "Profile not found" });
 
-               if (!client || !profile) throw new HttpErrorResponse({ status: 404 });
+               if (client.authorizedProfiles.indexOf(profileUuid) >= 0) throw new HttpErrorResponse({ status: 404,statusText: "Client authorized already" });
 
-               client.auth.push({
-                  uuid: crypto.randomUUID(),
-                  name: profile.name,
-                  enabled: true
-               });
+               client.authorizedProfiles.push(profileUuid);
 
             }
          )
@@ -323,7 +322,7 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
 
 
-   getClientAuth(uuid: string): Observable<model.ClientAuthorizationsDTO[]> {
+   getAuthorizedProfiles(uuid: string): Observable<model.AuthorizedProfilesDTO[]> {
 
       return of(
          dbData.clients.find(client => client.uuid === uuid)
@@ -333,11 +332,30 @@ export class ClientManagementMock implements model.ClientManagementApi {
          map(
 
             client => {
+
                if (!client) throw new HttpErrorResponse({ status: 404 });
-               return client.auth;
+
+               return client.authorizedProfiles.map(
+
+                  uuid => {
+
+                     const profile = dbData.raProfiles.find(profile => profile.uuid === uuid);
+                     if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Authorized profile not found."});
+
+                     return {
+                        uuid,
+                        name: profile.name,
+                        enabled: profile.enabled
+                     }
+
+                  }
+
+               );
+
             }
 
          )
+
       )
 
    }

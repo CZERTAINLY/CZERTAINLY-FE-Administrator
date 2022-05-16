@@ -19,9 +19,9 @@ import {
 } from "utils/validators";
 import { useDispatch, useSelector } from "react-redux";
 import { actions, selectors } from "ducks/credentials";
-import { CredentialProviderAttributes } from "api/credentials";
+import { CredentialProviderAttributes } from "api/credential";
 import { attributeCombiner } from "utils/commons";
-import { ConnectorInfoDTO } from "api/connectors";
+import { ConnectorDTO } from "api/connectors";
 
 export interface DefaultValues {
   name?: string;
@@ -73,7 +73,7 @@ function CredentialForm({
   const [availableKinds, setAvailableKinds] = useState<string[]>();
   const [kind, setKind] = useState<string>();
   const [connectorDetails, setConnectorDetails] =
-    useState<ConnectorInfoDTO>();
+    useState<ConnectorDTO>();
   // eslint-disable-next-line
   const [providerDefault, setProviderDefault]: any = useState();
 

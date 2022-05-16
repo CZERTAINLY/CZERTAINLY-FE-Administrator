@@ -1,76 +1,68 @@
-import { AttributeDescriptorDTO } from "api/.common/AttributeDTO";
-import { RaAcmeLink } from "models";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
 import { Observable } from "rxjs";
 
+
 export interface RaProfileDTO {
-  uuid: string;
-  name: string;
-  enabled: boolean;
-  description: string;
-  authorityInstanceUuid: string;
-  authorityInstanceName: string;
-  attributes?: AttributeDescriptorDTO[];
-  enabledProtocols?: string[];
+   uuid: string;
+   name: string;
+   enabled: boolean;
+   description?: string;
+   authorityInstanceUuid: string;
+   authorityInstanceName: string;
+   attributes: AttributeDTO[];
+   enabledProtocols?: string[];
 }
 
-export interface RaProfileAuthorizationsResponse {
-  uuid: string;
+
+export interface RaAuthorizedClientDTO {
+   uuid: string;
+   name: string;
+   enabled: boolean;
 }
 
-export interface EntityProfileResponse {
-  id: number;
-  name: string;
+
+export interface RaAcmeLinkDTO {
+   uuid?: string;
+   name?: string;
+   directoryUrl?: string;
+   issueCertificateAttributes?: AttributeDTO[];
+   revokeCertificateAttributes?: AttributeDTO[];
+   acmeAvailable: boolean;
 }
+
 
 export interface ProfilesManagementApi {
 
-  createRaProfile(
-    authorityInstanceUuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeDescriptorDTO[]
-  ): Observable<string>;
+   getRaProfilesList(enabled?: boolean): Observable<RaProfileDTO[]>;
 
-  deleteRaProfile(uuid: string | number): Observable<void>;
+   getRaProfileDetail(uuid: string): Observable<RaProfileDTO>;
 
-  enableRaProfile(uuid: string | number): Observable<void>;
+   getAuthorizedClients(uuid: string): Observable<RaAuthorizedClientDTO[]>;
 
-  disableRaProfile(uuid: string | number): Observable<void>;
+   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
 
-  bulkDeleteRaProfile(uuid: (string | number)[]): Observable<void>;
+   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
 
-  bulkEnableRaProfile(uuid: (string | number)[]): Observable<void>;
+   getRaAcmeProfile(uuid: string): Observable<RaAcmeLinkDTO>;
 
-  bulkDisableRaProfile(uuid: (string | number)[]): Observable<void>;
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string>;
 
-  getRaProfilesList(): Observable<RaProfileDTO[]>;
+   updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<RaProfileDTO>;
 
-  getAttributes(authorityUuid: string): Observable<AttributeDescriptorDTO[]>;
+   deleteRaProfile(uuid: string): Observable<void>;
 
-  getRaProfileDetail(uuid: string): Observable<RaProfileDTO>;
+   bulkDeleteRaProfile(uuids: string[]): Observable<void>;
 
-  getAuthorizedClients(uuid: string): Observable<RaProfileAuthorizationsResponse[]>;
+   enableRaProfile(uuid: string): Observable<void>;
 
-  updateRaProfile(
-    authorityInstanceUuid: string,
-    uuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeDescriptorDTO[]
-  ): Observable<RaProfileDTO>;
+   bulkEnableRaProfile(uuids: string[]): Observable<void>;
 
-  getIssuanceAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]>;
+   disableRaProfile(uuid: string): Observable<void>;
 
-  getRevocationAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]>;
+   bulkDisableRaProfile(uuids: string[]): Observable<void>;
 
-  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink>;
+   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<RaAcmeLinkDTO>;
 
-  activateAcme(
-    uuid: string,
-    acmeProfileUuid: string,
-    issueCertificateAttributes: AttributeDescriptorDTO[],
-    revokeCertificateAttributes: AttributeDescriptorDTO[]
-  ): Observable<RaAcmeLink>;
+   deactivateAcme(uuid: string): Observable<void>;
 
-  deactivateAcme(uuid: string): Observable<void>;
 }

@@ -5,7 +5,7 @@ import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 export interface AuthorityDTO {
    uuid: string;
-   name?: string;
+   name: string;
    attributes?: AttributeDTO[];
    status: string;
    connectorUuid: string;
@@ -26,12 +26,7 @@ export interface AuthorityManagementApi {
 
    getAuthoritiesList(): Observable<AuthorityDTO[]>;
 
-   createNewAuthority(
-      name: string,
-      attributes: AttributeDTO[],
-      connectorUuid: string,
-      kind: string
-   ): Observable<string>;
+   createNewAuthority(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string>;
 
    bulkDeleteAuthority(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 

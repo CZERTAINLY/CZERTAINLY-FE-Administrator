@@ -373,7 +373,7 @@ const getIssuanceAttributes: Epic<
   action$.pipe(
     filter(isOfType(Actions.IssuanceAttributesRequest)),
     switchMap(({ raProfileUuid }) =>
-      apiClients.profiles.getIssuanceAttributes(raProfileUuid).pipe(
+      apiClients.profiles.getIssueAttributes(raProfileUuid).pipe(
         map((attributes) => actions.receiveIssuanceAttributes(attributes)),
         catchError((err) =>
           of(

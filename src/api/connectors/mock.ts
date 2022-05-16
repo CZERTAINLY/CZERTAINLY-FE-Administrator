@@ -4,75 +4,151 @@ import { HttpErrorResponse } from "ts-rest-client";
 
 import { randomDelay } from "utils/mock";
 
-import { AllAttributeDTO, AttributeDescriptorDTO } from "api/.common/AttributeDTO";
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
 import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
-import { dbData, createConnector, connectConnector } from "mocks/db";
+import { dbData } from "mocks/db";
+
 import * as model from "./model";
 
 
 export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
-   createNewConnector(
-      name: string,
-      url: string,
-      status: string,
-      functionGroups: any
-   ): Observable<string> {
+   createNewConnector(name: string, url: string, authType: model.AuthType, authAttributes: AttributeDTO[]): Observable<string> {
 
-      return of(null).pipe(
+      return of(
+         dbData.connectorsRemote.find(connector => connector.url === url)
+      ).pipe(
+
          delay(randomDelay()),
-         map(() => createConnector(name, url, status, functionGroups))
+         map(
+
+            connectorRemote => {
+
+               if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
+
+               const uuid = crypto.randomUUID();
+
+               dbData.connectors.push({
+                  uuid,
+                  name,
+                  authType,
+                  authAttributes,
+                  url: connectorRemote.url,
+                  functionGroups: connectorRemote.functionGroups,
+                  status: "registered"
+               });
+
+               return uuid;
+
+            }
+
+         )
+
+      )
+
+   }
+
+
+   connectToConnector(url: string, authType: model.AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
+
+      return of(
+         dbData.connectorsRemote.find(connector => connector.url === url)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            connectorRemote => {
+               if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
+               return connectorRemote.functionGroups;
+            }
+
+         )
+
       );
 
    }
 
 
-   connectNewConnector(
-      name: string,
-      url: string
-   ): Observable<model.ConnectorConnectionDTO[]> {
+   getConnectorsList(functionGroupFilter?: model.FunctionGroupFilter, kind?: string): Observable<model.ConnectorDTO[]> {
 
-      return of(null).pipe(
-         delay(randomDelay()),
-         map(() => connectConnector(name, url))
-      );
+      return of(
+
+         dbData.connectors.filter(
+
+            connector => {
+
+               if (!functionGroupFilter) return true;
+
+               const fgc = model.FunctionGroupFilterToGroupCode[functionGroupFilter];
+
+               for (const functionGroup of connector.functionGroups) {
+                  if (functionGroup.functionGroupCode !== fgc) return;
+                  if (!kind) return true;
+                  if (functionGroup.kinds.indexOf(kind) >= 0) return true;
+               }
+
+            }
+
+         )
+
+      )
 
    }
 
 
-   getConnectorsList(): Observable<model.ConnectorInfoDTO[]> {
+   getConnectorAttributes(uuid: string, functionGroup: model.FunctionGroupFilter, kind: string): Observable<AttributeDescriptorDTO[]> {
 
-      return of(dbData.connectors).pipe(
+      return of(
+         dbData.connectors.find(connector => connector.uuid === uuid)
+      ).pipe(
+
          delay(randomDelay()),
-         map((connectors) =>
-            connectors.map(({ uuid, name, functionGroups, url, status }) => ({
-               uuid,
-               name,
-               functionGroups,
-               url,
-               status,
-            }))
+         map(
+
+            connector => {
+
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found." });
+
+               const connectorRemote = dbData.connectorsRemote.find(connectorRemote => connectorRemote.url === connector.url);
+               if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to remote connector" });
+
+               if (!connectorRemote.attributes.hasOwnProperty(functionGroup)) throw new HttpErrorResponse({ status: 404, statusText: "Invalid function group" });
+
+               const fg = model.FunctionGroupFilterToGroupCode[functionGroup];
+               if (!connectorRemote.attributes[fg]!.hasOwnProperty(kind)) throw new HttpErrorResponse({ status: 404, statusText: "Invalid kind" });
+
+               return connectorRemote.attributes[fg]![kind];
+
+            }
+
          )
       );
 
    }
 
 
-   getConnectorAttributes(): Observable<AttributeDescriptorDTO[]> {
+   getConnectorAllAttributes(uuid: string): Observable<AttributeDescriptorCollectionDTO> {
 
-      return of(dbData.connectorAttributes).pipe(
+      return of(
+         dbData.connectors.find(connector => connector.uuid === uuid)
+      ).pipe(
+
          delay(randomDelay()),
-         map((attributes) => attributes)
-      );
+         map(
 
-   }
+            connector => {
 
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found." });
 
-   getConnectorAllAttributes(): Observable<AllAttributeDTO> {
+               const connectorRemote = dbData.connectorsRemote.find(connectorRemote => connectorRemote.url === connector.url);
+               if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to remote connector" });
 
-      return of(dbData.allAttributeResponse).pipe(
-         delay(randomDelay()),
-         map((attributes) => attributes)
+               return connectorRemote.attributes;
+
+            }
+
+         )
       );
 
    }
@@ -80,72 +156,65 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
    getConnectorHealth(uuid: string): Observable<model.ConnectorHealthDTO> {
 
-      return of({ status: "UP" });
+      return of(
+         dbData.connectors.find(connector => connector.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            connector => {
+
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found." });
+
+               const connectorRemote = dbData.connectorsRemote.find(connectorRemote => connectorRemote.url === connector.url);
+               if (!connectorRemote) return { status: "unknown" };
+
+               return connectorRemote.health;
+
+            }
+
+         )
+      );
 
    }
 
 
-   getConnectorDetail(uuid: string): Observable<model.ConnectorDetailDTO> {
+   getConnectorDetail(uuid: string): Observable<model.ConnectorDTO> {
 
       return of(
-         dbData.connectors.find((c) => c.uuid.toString() === uuid.toString())
+         dbData.connectors.find(connector => connector.uuid === uuid)
       ).pipe(
-         delay(randomDelay()),
-         map((detail) => {
-            if (detail) {
-               return {
-                  uuid: detail.uuid,
-                  functionGroups: detail.functionGroups,
-                  name: detail.name,
-                  url: detail.url,
-                  status: detail.status,
-                  authType: detail.authType,
-                  authAttributes: detail.authAttributes,
-               };
-            }
 
-            throw new HttpErrorResponse({
-               status: 404,
-            });
-         })
+         delay(randomDelay()),
+         map(
+            connector => {
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
+               return connector;
+            }
+         )
       );
 
    }
 
 
-   deleteConnector(uuid: string | number): Observable<DeleteObjectErrorDTO[]> {
+   deleteConnector(uuid: string): Observable<DeleteObjectErrorDTO[]> {
 
-      return of([]).pipe(
+      return of(
+         dbData.connectors.findIndex(connector => connector.uuid === uuid)
+      ).pipe(
+
          delay(randomDelay()),
-         map(function (): any {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
+         map(
+
+            connectorIndex => {
+               if (connectorIndex < 0) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
+               dbData.connectors.splice(connectorIndex, 1);
+               return [];
             }
 
-            dbData.connectors.splice(connectorUuidx, 1);
-         })
-      );
+         )
 
-   }
-
-
-   forceDeleteConnector(uuid: string | number): Observable<void> {
-
-      return of(null).pipe(
-         delay(randomDelay()),
-         map(function (): any {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
-            }
-
-            dbData.connectors.splice(connectorUuidx, 1);
-         })
       );
 
    }
@@ -153,18 +222,20 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
    authorizeConnector(uuid: string): Observable<void> {
 
-      return of(null).pipe(
+      return of(
+         dbData.connectors.find(connector => connector.uuid === uuid)
+      ).pipe(
+
          delay(randomDelay()),
-         map(function (): void {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
+         map(
+
+            connector => {
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
+               connector.status = "waitingForApproval";
+
             }
 
-            dbData.connectors[connectorUuidx].status = "In Progress";
-         })
+         )
       );
 
    }
@@ -172,120 +243,172 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
    reconnectConnector(uuid: string): Observable<void> {
 
-      return of(null).pipe(
+      return of(
+         dbData.connectors.find(connector => connector.uuid === uuid)
+      ).pipe(
+
          delay(randomDelay()),
-         map(function (): void {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
+         map(
+
+            connector => {
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
+               connector.status = "connected";
             }
 
-            dbData.connectors[connectorUuidx].status = "In Progress";
-         })
+         )
+
       );
 
    }
 
 
-   bulkDeleteConnector(
-      uuid: (string | number)[]
-   ): Observable<DeleteObjectErrorDTO[]> {
-
-      return of([]).pipe(
-         delay(randomDelay()),
-         map(function (): any {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
-            }
-
-            dbData.connectors.splice(connectorUuidx, 1);
-         })
-      );
-
-   }
-
-
-   bulkForceDeleteConnector(uuid: (string | number)[]): Observable<void> {
-
-      return of(null).pipe(
-         delay(randomDelay()),
-         map(function (): any {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
-            }
-
-            dbData.connectors.splice(connectorUuidx, 1);
-         })
-      );
-
-   }
-
-
-   bulkAuthorizeConnector(uuid: string[]): Observable<void> {
-
-      return of(null).pipe(
-         delay(randomDelay()),
-         map(function (): void {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
-            }
-
-            dbData.connectors[connectorUuidx].status = "In Progress";
-         })
-      );
-
-   }
-
-
-   bulkReconnectConnector(uuid: string[]): Observable<void> {
-
-      return of(null).pipe(
-         delay(randomDelay()),
-         map(function (): void {
-            const connectorUuidx = dbData.connectors.findIndex(
-               (c) => c.uuid.toString() === uuid.toString()
-            );
-            if (connectorUuidx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
-            }
-
-            dbData.connectors[connectorUuidx].status = "In Progress";
-         })
-      );
-
-   }
-
-
-   updateConnector(
-      uuid: string,
-      name: string,
-      url: string,
-      status: string,
-      functionGroups: model.ConnectorFunctionGroupDTO[]
-   ): Observable<string> {
+   bulkDeleteConnector(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
-         dbData.connectors.findIndex((c) => c.uuid.toString() === uuid.toString())
+         uuids
       ).pipe(
+
          delay(randomDelay()),
-         map((idx) => {
-            if (idx < 0) {
-               throw new HttpErrorResponse({ status: 404 });
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+                  uuid => {
+                     const connectorIndex = dbData.connectors.findIndex(connector => connector.uuid === uuid);
+                     if (connectorIndex < 0) throw new HttpErrorResponse({ status: 404 });
+                     dbData.connectors.splice(connectorIndex, 1);
+                  }
+               )
+
+               return [];
+
             }
-            console.log([uuid, url, name, "Updated Mock"]);
-            return uuid.toString();
-         })
+
+         )
+      );
+
+   }
+
+
+   bulkForceDeleteConnector(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+                  uuid => {
+                     const connectorIndex = dbData.connectors.findIndex(connector => connector.uuid === uuid);
+                     if (connectorIndex < 0) throw new HttpErrorResponse({ status: 404 });
+                     dbData.connectors.splice(connectorIndex, 1);
+                  }
+               )
+
+            }
+
+         )
+      );
+
+   }
+
+
+   bulkAuthorizeConnector(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+
+                  uuid => {
+                     const connector = dbData.connectors.find(connector => connector.uuid === uuid);
+                     if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
+                     connector.status = "waitingForApproval";
+                  }
+
+               )
+
+            }
+
+         )
+
+      );
+
+   }
+
+
+   bulkReconnectConnector(uuids: string[]): Observable<void> {
+
+      return of(
+         uuids
+
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            uuids => {
+
+               uuids.forEach(
+
+                  uuid => {
+
+                     const connector = dbData.connectors.find(connector => connector.uuid === uuid);
+                     if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
+                     connector.status = "connected";
+
+                  }
+
+               )
+
+            }
+
+         )
+
+      );
+
+   }
+
+
+   updateConnector(uuid: string, url: string, authType: model.AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
+
+      return of(
+         dbData.connectors.find(connector => connector.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            connector => {
+
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found"});
+
+               const connectorRemote = dbData.connectorsRemote.find(connector => connector.url === url);
+               if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
+
+               connector.authType = authType;
+               connector.authAttributes = authAttributes;
+               connector.url = url;
+               connector.functionGroups = connectorRemote.functionGroups;
+               connector.status = "registered"
+
+               return connector;
+
+            }
+
+
+         )
       );
 
    }

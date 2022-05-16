@@ -21,7 +21,7 @@ const getAuthorizedProfiles: Epic<Action, Action, AppState, EpicDependencies> =
     action$.pipe(
       filter(isOfType(Actions.AuthListRequest)),
       switchMap(({ uuid }) =>
-        apiClients.clients.getClientAuth(uuid).pipe(
+        apiClients.clients.getAuthorizedProfiles(uuid).pipe(
           map((profiles) =>
             actions.receiveAuthorizedProfiles(
               profiles.map((p) => p.uuid.toString())
@@ -207,7 +207,7 @@ const startDeleteClient: Epic<Action, Action, AppState, EpicDependencies> = (
   action$.pipe(
     filter(isOfType(Actions.DeleteRequest)),
     switchMap(({ uuid }) =>
-      apiClients.clients.getClientAuth(uuid).pipe(
+      apiClients.clients.getAuthorizedProfiles(uuid).pipe(
         map((profiles) => {
           if (Array.isArray(profiles) && profiles.length > 0) {
             return actions.confirmDeleteClientRequest(uuid, useHistory());

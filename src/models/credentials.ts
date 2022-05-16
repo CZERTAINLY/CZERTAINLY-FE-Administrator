@@ -1,4 +1,4 @@
-import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { FunctionGroupDTO } from "api/connectors";
 import { AttributeDescriptorDTO } from "../api/.common/AttributeDTO";
 
 export interface Credential {
@@ -14,7 +14,7 @@ export interface CredentialProviders {
   name: string;
   status?: string;
   url: string;
-  functionGroups: ConnectorFunctionGroupDTO[];
+  functionGroups: FunctionGroupDTO[];
 }
 
 export interface CredentialDetails {

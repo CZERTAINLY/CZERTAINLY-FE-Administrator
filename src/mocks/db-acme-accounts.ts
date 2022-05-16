@@ -1,8 +1,14 @@
 import { AcmeAccountDTO } from "api/acme-account"
 
-interface DbAcmeAccounts {
-   [key: string]: AcmeAccountDTO
+
+export interface DbAcmeAccount extends AcmeAccountDTO {
 }
+
+
+interface DbAcmeAccounts {
+   [key: string]: DbAcmeAccount
+}
+
 
 export const dbAcmeAccounts: DbAcmeAccounts = {
 

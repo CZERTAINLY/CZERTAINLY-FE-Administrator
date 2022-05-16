@@ -1,8 +1,14 @@
 import { CertificateDTO } from "api/certificates"
 
-interface DbCertificateList {
-   [key: string]: CertificateDTO;
+
+export interface DbCertificate extends CertificateDTO {
 }
+
+
+interface DbCertificateList {
+   [key: string]: DbCertificate;
+}
+
 
 export const dbCertificates: DbCertificateList = {
 

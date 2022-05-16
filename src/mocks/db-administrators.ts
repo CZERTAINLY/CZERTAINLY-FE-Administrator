@@ -1,9 +1,15 @@
 import { AdministratorDTO } from "api/administrators";
 import { dbCertificates } from "./db-certificates";
 
+
+export interface DbAdministrator extends AdministratorDTO {
+};
+
+
 interface DbAdministrators {
-   [key: string]: AdministratorDTO;
+   [key: string]: DbAdministrator;
 }
+
 
 export const dbAdministrators: DbAdministrators = {
 

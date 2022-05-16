@@ -1,4 +1,4 @@
-import { ConnectorFunctionGroupDTO } from "api/connectors";
+import { FunctionGroupDTO } from "api/connectors";
 import { AttributeDescriptorDTO } from "../api/.common/AttributeDTO";
 
 export interface Authority {
@@ -14,7 +14,7 @@ export interface AuthorityProviders {
   name: string;
   status?: string;
   url: string;
-  functionGroups: ConnectorFunctionGroupDTO[];
+  functionGroups: FunctionGroupDTO[];
 }
 
 export interface AuthorityDetails {

@@ -164,7 +164,9 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
                   connectorUuid: connector.uuid,
                   kind,
                   attributes,
-                  status: ""
+                  status: "",
+                  issueAttributes: [],
+                  revokeAttributes: []
                })
 
                return uuid;

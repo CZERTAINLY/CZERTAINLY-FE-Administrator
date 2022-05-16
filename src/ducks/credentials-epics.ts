@@ -4,11 +4,11 @@ import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { isOfType } from "typesafe-actions";
 
 import {
-  CredentialDetailDTO,
+  CredentialDTO,
   CredentialInfoDTO,
   CredentialProviderAttributes,
   CredentialProviderDTO,
-} from "api/credentials";
+} from "api/credential";
 import { Credential, CredentialDetails, CredentialProviders } from "models";
 import { extractError } from "utils/net";
 import { EpicDependencies, State as AppState } from "./app-state";
@@ -324,7 +324,7 @@ function mapCredentialProviderAttributes(
 
 function mapCredentialDetail(
   uuid: string,
-  data: CredentialDetailDTO
+  data: CredentialDTO
 ): CredentialDetails {
   return {
     uuid,

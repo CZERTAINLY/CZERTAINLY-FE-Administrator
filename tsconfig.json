@@ -24,5 +24,5 @@
   "include": [
     "src",
     "src/api/.common/attributes.ts"
-  ]
+, "src/api/.providers/authorities", "src/api/credential"  ]
 }

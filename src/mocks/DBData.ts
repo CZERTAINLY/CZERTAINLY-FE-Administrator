@@ -1,171 +1,41 @@
-import { AttributeDescriptorDTO } from "api/.common/AttributeDTO";
-import { AcmeAccountDTO } from "api/acme-account";
-import { AcmeProfileDTO } from "api/acme-profile";
-import { AdministratorDTO } from "api/administrators";
-import { AuditLogDTO } from "api/auditLogs";
-import { AuthorityDTO } from "api/authorities";
+import { DbAuthority } from "./db-authorities";
+import { DbAcmeAccount } from "./db-acme-accounts";
+import { DbAcmeProfile } from "./db-acme-profiles";
+import { DbAdministrator } from "./db-administrators";
+import { DbAuditLog } from "./db-audit-logs";
+import { DbCertificate } from "./db-certificates";
+import { DbClient } from "./db-clients";
+import { DbConnector } from "./db-connectors";
+import { DbRemoteConnector } from "./db-connectors-remote";
+import { DbCredential } from "./db-credentials";
+import { DbRaProfile } from "./db-ra-profiles";
 
-import { CertificateDTO } from "api/certificates";
-import { ClientDTO } from "api/clients";
-import { CredentialDetailDTO } from "api/credentials";
-import { RaProfileDTO } from "api/profiles";
-import { DBClient } from "./db-clients";
-
-interface CredentialProviderFunctionGroupEndpoint {
-   id: number;
-   name: string;
-   context: string;
-   method: string;
-   required: boolean;
-}
-
-
-interface CredentialProviderFunctionGroup {
-   id: number;
-   name: string;
-   code: string;
-   kinds: string[];
-   endPoints: CredentialProviderFunctionGroupEndpoint[]
-}
-
-
-interface CredentialProvider {
-   uuid: string;
-   name: string;
-   functionGroups: CredentialProviderFunctionGroup[];
-   url: string;
-   status: string;
-}
-
-
-
-interface EndEntityProfile {
-   id: number;
-   name: string;
-}
-
-
-interface CertificateProfile {
-   id: number
-   endEntityProfileId: number
-   name: string
-}
-
-
-interface CertificationAuthority {
-   id: number
-   endEntityProfileId: number
-   name: string
-}
-
-
-interface ConnectorFunctionGroupEndpoint {
-   id: number
-   name: string
-   context: string
-   method: string
-   required: boolean
-}
-
-
-interface ConnectorFunctionGroup {
-   id: number
-   name: string
-   code: string
-   kinds: Array<string>
-   endPoints: ConnectorFunctionGroupEndpoint[];
-}
-
-
-interface Connector {
-   uuid: string
-   name: string
-   status: string
-   authType: string
-   authAttributes: Array<any>
-   functionGroups: ConnectorFunctionGroup[];
-   url: string
-}
-
-
-
+import {AuditLogOperation, AuditLogOperationStatus } from "api/auditLogs";
 
 export interface DBData {
 
-   acmeAccounts: AcmeAccountDTO[];
+   acmeAccounts: DbAcmeAccount[];
 
-   acmeProfiles: AcmeProfileDTO[];
+   acmeProfiles: DbAcmeProfile[];
 
-   administrators: AdministratorDTO[];
+   administrators: DbAdministrator[];
 
-   auditLogs: AuditLogDTO[];
-   auditLogsOperations: string[],
-   auditLogsStatuses: string[],
+   auditLogs: DbAuditLog[];
+   auditLogsOperations: AuditLogOperation[],
+   auditLogsStatuses: AuditLogOperationStatus[],
    auditLogsOrigins: string[],
 
-   authorities: AuthorityDTO[];
+   authorities: DbAuthority[];
 
-   certificates: CertificateDTO[];
+   certificates: DbCertificate[];
 
-   clients: DBClient[];
+   clients: DbClient[];
 
-   connectors: Connector[];
-   connectorAttributes: AttributeDescriptorDTO[];
+   connectors: DbConnector[];
+   connectorsRemote: DbRemoteConnector[];
 
-   credentials: CredentialDetailDTO[];
-   credentialProviders: CredentialProvider[];
-   credentialProviderAttributes: AttributeDescriptorDTO[];
+   credentials: DbCredential[];
 
-   raProfiles: RaProfileDTO[];
-   raProfilesAttributes: AttributeDescriptorDTO[];
-
-   endEntityProfiles: EndEntityProfile[];
-
-   certificateProfiles: CertificateProfile[];
-   certificationAuthorities: CertificationAuthority[];
-
-
-   allAttributeResponse: {
-      authorityProvider: {
-        ADCS: Array<{
-          uuid: string
-          name: string
-          label: string
-          type: string
-          required: boolean
-          readOnly: boolean
-          editable: boolean
-          visible: boolean
-          multiValue: boolean
-          description: string
-          value: any
-          validationRegex?: string
-          attributeCallback?: {
-            callbackMethod: string
-            mappings: Array<{
-              from: string
-              to: string
-              attributeType: string
-              targets: Array<string>
-              value: string
-            }>
-          }
-        }>
-      }
-      discoveryProvider: {
-        ADCS: Array<{
-          uuid: string
-          name: string
-          label: string
-          type: string
-          required: boolean
-          readOnly: boolean
-          editable: boolean
-          visible: boolean
-          multiValue: boolean
-          value: Array<string>
-        }>
-      }
-    }
+   raProfiles: DbRaProfile[];
 
 }

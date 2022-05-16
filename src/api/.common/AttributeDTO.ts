@@ -1,6 +1,39 @@
-import { AttributeCallback } from "../../models/callback";
+import { FunctionGroupCode } from "api/connectors";
 
 export type AttributeType = "STRING" | "NUMBER" | "BOOLEAN" | "DROPDOWN" | "LIST" | "FILE" | "CREDENTIAL" | "SECRET";
+
+export type AttributeCallbackMappingTarget = "pathVariable" | "requestParameter" | "body";
+
+export interface CallbackMapping {
+   from?: string;
+   attributeType?: AttributeType;
+   to: string;
+   targets: AttributeCallbackMappingTarget[];
+   value?: any;
+}
+
+export interface CallbackPathVariableDict {
+   [key: string]: any;
+}
+
+export interface CallbackRequestBodyDict {
+   [key: string]: any;
+}
+
+export interface CallbackQueryParameterDict {
+   [key: string]: any;
+}
+
+export interface AttributeCallbackDTO {
+   callbackContext: string;
+   callbackMethod: string;
+   mappings: CallbackMapping[];
+}
+
+export interface AttributeListValueDTO {
+   id: number;
+   name: string;
+}
 
 
 /**
@@ -19,7 +52,18 @@ export interface AttributeDescriptorDTO {
    description?: string;
    dependsOn?: any;
    validationRegex?: string | RegExp;
-   attributeCallback?: AttributeCallback;
+   attributeCallback?: AttributeCallbackDTO;
+   value?: string | number | boolean | string[] | number[] | boolean[] | AttributeListValueDTO[];
+}
+
+
+/**
+ * Used to obtain complete list of named
+ */
+export type AttributeDescriptorCollectionDTO = {
+   [functionGroup in FunctionGroupCode]?: {
+      [kind: string]: AttributeDescriptorDTO[];
+   }
 }
 
 
@@ -36,10 +80,7 @@ export interface AttributeDTO {
    /** Type of the attribute - not used during create */
    type?: AttributeType;
    /** Value of the attribute */
-   value: string | number | boolean | string[] | number[] | boolean[];
+   value: string | number | boolean | string[] | number[] | boolean[] | AttributeListValueDTO;
 }
 
 
-export interface AllAttributeDTO {
-   [key: string]: any;
-}

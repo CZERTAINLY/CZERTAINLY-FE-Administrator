@@ -1,6 +1,6 @@
-import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDTO } from "api/.common/AttributeDTO";
 
-export enum FieldNameTransform {
+export enum AttributeFieldNameTransform {
    name = "Name",
    credentialProvider = "Credential Provider",
    authorityProvider = "Authority Provider",
@@ -8,7 +8,7 @@ export enum FieldNameTransform {
    legacyAuthorityProvider = "Legacy Authority Provider",
 };
 
-export enum FieldTypeTransform {
+export enum AttributeFieldTypeTransform {
    STRING = "text",
    NUMBER = "number",
    SECRET = "password",
@@ -21,14 +21,14 @@ export enum FieldTypeTransform {
 };
 
 
-export function attributeSimplifier(attributes: AttributeDescriptorDTO[]): AttributeDTO[] {
+export function attributeSimplifier(attributes: AttributeDTO[]): AttributeDTO[] {
 
    return attributes.map<AttributeDTO>(
 
       attribute => {
          return {
             name: attribute.name,
-            value: (FieldTypeTransform[attribute.type] === "number" ? Number(attribute.value) : attribute.value),
+            value: attribute.value,
          }
       }
 
