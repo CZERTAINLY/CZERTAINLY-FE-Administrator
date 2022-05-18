@@ -1,7 +1,7 @@
-import { ErrorDeleteObject } from "models";
 import { AttributeDTO } from "api/.common/AttributeDTO";
 import { Observable } from "rxjs";
 import { RaProfileDTO } from "api/profiles";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 
 export interface AcmeProfileListItemDTO {
@@ -63,7 +63,7 @@ export interface AcmeProfilesManagementApi {
       requireTermsOfService?: boolean,
    ): Observable<AcmeProfileDTO>;
 
-   deleteAcmeProfile(uuid: string): Observable<ErrorDeleteObject[]>;
+   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]>;
 
    bulkEnableAcmeProfile(uuids: string[]): Observable<void>;
 
@@ -88,7 +88,7 @@ export interface AcmeProfilesManagementApi {
    ): Observable<string>;
 
 
-   bulkDeleteAcmeProfiles(uuids: string[]): Observable<ErrorDeleteObject[]>;
+   bulkDeleteAcmeProfiles(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 
    bulkForceDeleteAcmeProfiles(uuids: string[]): Observable<void>;
 

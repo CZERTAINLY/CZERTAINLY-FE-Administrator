@@ -1,5 +1,6 @@
 import { AttributeDTO } from "api/.common/AttributeDTO";
-import { ErrorDeleteObject } from "models";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
@@ -51,7 +52,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    }
 
 
-   deleteCredential(uuid: string): Observable<ErrorDeleteObject[]> {
+   deleteCredential(uuid: string): Observable<DeleteObjectErrorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
@@ -69,7 +70,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    }
 
 
-   bulkDeleteCredential(uuids: string[]): Observable<ErrorDeleteObject[]> {
+   bulkDeleteCredential(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)

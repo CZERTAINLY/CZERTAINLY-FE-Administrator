@@ -3,7 +3,7 @@ export enum Role {
   SuperAdmin = "superAdministrator",
 }
 
-export interface Profile {
+export interface UserProfileModel {
   name: string;
   surname: string;
   username: string;

@@ -4,11 +4,11 @@ import { HttpErrorResponse } from "ts-rest-client";
 
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
-import { ErrorDeleteObject } from "models";
 
 import * as model from "./model";
-import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDTO } from "api/.common/AttributeDTO";
 import { RaProfileDTO } from "api/profiles";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementApi {
 
@@ -99,7 +99,7 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
    }
 
 
-   deleteAcmeProfile(uuid: string): Observable<ErrorDeleteObject[]> {
+   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
          dbData.acmeProfiles.findIndex(acmeProfile => acmeProfile.uuid === uuid)
@@ -168,7 +168,7 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
    }
 
 
-   bulkDeleteAcmeProfiles(uuids: string[]): Observable<ErrorDeleteObject[]> {
+   bulkDeleteAcmeProfiles(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
          uuids

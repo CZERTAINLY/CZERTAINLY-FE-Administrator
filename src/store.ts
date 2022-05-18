@@ -1,27 +1,36 @@
-import { Action, applyMiddleware, createStore } from "redux";
-import { composeWithDevTools } from "redux-devtools-extension/developmentOnly";
+import { AnyAction, applyMiddleware, compose } from "redux";
 import { createEpicMiddleware } from "redux-observable";
 
 import { backendClient, mockClient } from "api";
-import { epics, reducers } from "ducks";
-import { initialState, State } from "ducks/app-state";
+import { AppState, epics, initialState, reducers } from "ducks";
+import { configureStore } from "@reduxjs/toolkit";
 
-export default function configureStore() {
-  const useMockSwitch = process.env.REACT_APP_USE_MOCK_API;
-  const useMock = useMockSwitch ? +useMockSwitch !== 0 : false;
+export default function configure() {
 
-  const epicMiddleware = createEpicMiddleware<Action, Action, State>({
-    dependencies: {
-      apiClients: useMock ? mockClient : backendClient,
-    },
-  });
-  const middlewares = [epicMiddleware];
-  const enhancer = composeWithDevTools(applyMiddleware(...middlewares));
+   const useMockSwitch = process.env.REACT_APP_USE_MOCK_API;
 
-  const store = createStore(reducers, initialState, enhancer);
+   const useMock = useMockSwitch ? +useMockSwitch !== 0 : false;
 
-  epicMiddleware.run(epics);
-  store.dispatch({ type: "@@app/INIT" });
+   const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, AppState>({
+      dependencies: {
+         apiClients: useMock ? mockClient : backendClient,
+      },
+   });
 
-  return store;
+   const composeEnhancers = compose();
+   const enhancer = composeEnhancers(applyMiddleware(epicMiddleware));
+
+   const store = configureStore({
+      reducer: reducers,
+      enhancers: [enhancer],
+      preloadedState: initialState
+   });
+
+
+   epicMiddleware.run(epics);
+
+   store.dispatch({ type: "@@app/INIT" });
+
+   return store;
+
 }

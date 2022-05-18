@@ -1,367 +1,299 @@
-import { Epic } from "redux-observable";
 import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { isOfType } from "typesafe-actions";
+import { catchError, filter, map, switchMap } from "rxjs/operators";
 
-import { AdministratorDetailDTO, AdminInfoResponse } from "api/administrators";
-import { Administrator, AdministratorDetail, Role } from "models";
-import { readCertificate } from "utils/file";
+import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
-import { EpicDependencies, State as AppState } from "./app-state";
-import { Action, Actions, actions, selectors } from "./administrators";
 
-const createAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.CreateRequest)),
-    switchMap(
-      ({
-        name,
-        surname,
-        username,
-        email,
-        certificate,
-        description,
-        superAdmin,
-        enabled,
-        certificateUuid,
-        history,
-      }) =>
-        readCertificate(certificate).pipe(
-          switchMap((adminCertificate) =>
-            apiClients.admins
-              .createAdmin(
-                name,
-                surname,
-                username,
-                email,
-                adminCertificate,
-                description,
-                superAdmin ? Role.SuperAdmin : Role.Admin,
-                enabled,
-                certificateUuid
-              )
-              .pipe(
-                map((uuid) => {
-                  history.push(`./detail/${uuid}`);
-                  return actions.receiveCreate(uuid);
-                }),
-                catchError((err) =>
-                  of(
-                    actions.failCreate(
-                      extractError(err, "Failed to create administrator")
-                    )
-                  )
-                )
-              )
-          ),
-          catchError((err) =>
-            of(
-              actions.failCreate(
-                extractError(err, "Failed to read certificate")
-              )
-            )
-          )
-        )
-    )
-  );
+import * as slice from "./administrators";
+import { AdministratorDTO } from "api/administrators";
+import { AdministratorModel } from "models";
 
-const deleteAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DeleteRequest)),
-    switchMap(({ uuid, history }) =>
-      apiClients.admins.deleteAdmin(uuid).pipe(
-        map(() => {
-          history.push("..");
-          return actions.receiveDelete(uuid);
-        }),
-        catchError((err) =>
-          of(actions.failDelete(extractError(err, "Failed to delete client")))
-        )
-      )
-    )
-  );
 
-const disableAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DisableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.admins.disableAdmin(uuid).pipe(
-        map(() => actions.receiveDisable(uuid)),
-        catchError((err) =>
-          of(
-            actions.failDisable(
-              extractError(err, "Failed to disable administrator")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const enableAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.EnableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.admins.enableAdmin(uuid).pipe(
-        map(() => actions.receiveEnable(uuid)),
-        catchError((err) =>
-          of(
-            actions.failEnable(
-              extractError(err, "Failed to enable administrator")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const bulkDeleteAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.BulkDeleteRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.admins.bulkDeleteAdmin(uuid).pipe(
-        map(() => actions.receiveBulkDelete(uuid)),
-        catchError((err) =>
-          of(
-            actions.failBulkDelete(
-              extractError(err, "Failed to delete administrators")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const bulkDisableAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.BulkDisableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.admins.bulkDisableAdmin(uuid).pipe(
-        map(() => actions.receiveBulkDisable(uuid)),
-        catchError((err) =>
-          of(
-            actions.failBulkDisable(
-              extractError(err, "Failed to disable administrator")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const bulkEnableAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.BulkEnableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.admins.bulkEnableAdmin(uuid).pipe(
-        map(() => actions.receiveBulkEnable(uuid)),
-        catchError((err) =>
-          of(
-            actions.failBulkEnable(
-              extractError(err, "Failed to enable administrator")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const fetchAdditionalDetailData: Epic<Action, Action, AppState> = (
-  action$,
-  state$
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DetailRequest)),
-    mergeMap(({ uuid }) => {
-      const result = [] as Action[];
-      const admins = selectors.selectAdministrators(state$.value);
-
-      if (!admins.find((a) => a.uuid === uuid)) {
-        result.push(actions.requestAdministratorsList());
-      }
-
-      return result;
-    })
-  );
-
-const getAdminDetail: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DetailRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.admins.getAdminDetail(uuid).pipe(
-        map((detail) => actions.receiveDetail(mapAdminDetail(uuid, detail))),
-        catchError((err) =>
-          of(
-            actions.failDetail(
-              extractError(err, "Failed to retrieve administrator details")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const getAdminsList: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.ListRequest)),
-    switchMap(() =>
-      apiClients.admins.getAdminsList().pipe(
-        map((admins) =>
-          Array.isArray(admins)
-            ? actions.receiveAdministratorsList(admins.map(mapAdministrator))
-            : actions.failAdministratorsList(
-                "Failed to retrieve administrators list"
-              )
-        ),
-        catchError((err) =>
-          of(
-            actions.failAdministratorsList(
-              extractError(err, "Failed to retrieve administrators list")
-            )
-          )
-        )
-      )
-    )
-  );
-
-const updateAdmin: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.UpdateRequest)),
-    switchMap(
-      ({
-        uuid,
-        name,
-        surname,
-        username,
-        email,
-        certificate,
-        description,
-        superAdmin,
-        certificateUuid,
-        history,
-      }) =>
-        (certificate ? readCertificate(certificate) : of("")).pipe(
-          switchMap((adminCertificate) =>
-            apiClients.admins
-              .updateAdmin(
-                uuid,
-                name,
-                surname,
-                username,
-                email,
-                adminCertificate || undefined,
-                description,
-                superAdmin ? Role.SuperAdmin : Role.Admin,
-                certificateUuid
-              )
-              .pipe(
-                map((admin) => {
-                  history.push(`../detail/${uuid}`);
-                  return actions.receiveUpdate(mapAdminDetail(uuid, admin));
-                }),
-                catchError((err) =>
-                  of(
-                    actions.failUpdate(
-                      extractError(err, "Failed to update administrator")
-                    )
-                  )
-                )
-              )
-          ),
-          catchError((err) =>
-            of(
-              actions.failUpdate(
-                extractError(err, "Failed to read certificate")
-              )
-            )
-          )
-        )
-    )
-  );
-
-function mapAdministrator(admin: AdminInfoResponse): Administrator {
-  return {
-    uuid: admin.uuid,
-    name: admin.name,
-    surname: admin.surname,
-    username: admin.username,
-    certificate: admin.certificate,
-    superAdmin: admin.role === Role.SuperAdmin,
-    enabled: admin.enabled,
-    serialNumber: admin.serialNumber,
-  };
+const adminDtoToAdminModel = (adminDto: AdministratorDTO): AdministratorModel => {
+   return {
+      uuid: adminDto.uuid,
+      name: adminDto.name,
+      username: adminDto.username,
+      //certificate: Certificate,
+      role: adminDto.role,
+      email: adminDto.email,
+      serialNumber: adminDto.serialNumber,
+      description: adminDto.description,
+      enabled: adminDto.enabled,
+      surname: adminDto.surname
+   }
 }
 
-function mapAdminDetail(
-  uuid: string,
-  data: AdministratorDetailDTO
-): AdministratorDetail {
-  return {
-    uuid,
-    certificate: data.certificate,
-    name: data.name,
-    surname: data.surname,
-    username: data.username,
-    description: data.description,
-    email: data.email,
-    superAdmin: data.role === Role.SuperAdmin,
-    enabled: data.enabled,
-    serialNumber: data.serialNumber,
-  };
+
+const listAdmins: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listAdmins.match
+      ),
+      switchMap(
+
+         () => deps.apiClients.admins.getAdminsList().pipe(
+
+            map(list => slice.actions.listAdminsSuccess(list.map(adminDto => adminDtoToAdminModel(adminDto)))),
+
+            catchError(err => of(slice.actions.listAdminFailure(extractError(err, "Failed to get administrators list"))))
+
+         )
+      )
+
+   )
+
 }
+
+
+const getAdminDetail: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getAdminDetail.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.getAdminDetail(action.payload).pipe(
+
+            map(detail => slice.actions.getAdminDetailSuccess(adminDtoToAdminModel(detail))),
+
+            catchError(err => of(slice.actions.getAdminDetailFailure(extractError(err, "Failed to administrator detail"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const createAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.createAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.createAdmin(
+            action.payload.name,
+            action.payload.surname,
+            action.payload.username,
+            action.payload.email,
+            action.payload.description,
+            action.payload.superAdmin ? "superAdministrator" : "administrator",
+            action.payload.enabled
+         ).pipe(
+
+            map(uuid => slice.actions.createAdminSuccess(uuid)),
+
+            catchError(err => of(slice.actions.createAdminFailure(extractError(err, "Failed to create administrator"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const updateAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.updateAdmin(
+            action.payload.uuid,
+            action.payload.name,
+            action.payload.surname,
+            action.payload.username,
+            action.payload.email,
+            action.payload.certificate?.arrayBuffer.toString(),
+            action.payload.description,
+            action.payload.role,
+            action.payload.certificateUuid
+         ).pipe(
+
+            map(adminDTO => slice.actions.updateAdminSuccess(adminDtoToAdminModel(adminDTO))),
+
+            catchError(err => of(slice.actions.updateAdminFailure(extractError(err, "Failed to update administrator"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const deleteAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.deleteAdmin(action.payload).pipe(
+
+            map(() => slice.actions.deleteAdminSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.deleteAdminFailure(extractError(err, "Failed to delete administrator"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkDeleteAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.bulkDeleteAdmin(action.payload).pipe(
+
+            map(() => slice.actions.bulkDeleteAdminSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.bulkDeleteAdminFailure(extractError(err, "Failed to delete selected administrators"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const enableAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.enableAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.enableAdmin(action.payload).pipe(
+
+            map(() => slice.actions.enableAdminSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.enableAdminFailure(extractError(err, "Failed to enable administrator"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkEnableAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkEnableAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.bulkEnableAdmin(action.payload).pipe(
+
+            map(() => slice.actions.bulkEnableAdminSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.bulkDisableAdminFailure(extractError(err, "Failed to enable selected administrators"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const disableAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.disableAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.disableAdmin(action.payload).pipe(
+
+            map(() => slice.actions.disableAdminSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.disableAdmin(extractError(err, "Failed to disable administrator"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkDisableAdmin: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDisableAdmin.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.admins.bulkDisableAdmin(action.payload).pipe(
+
+            map(() => slice.actions.bulkDisableAdminSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.bulkDisableAdminFailure(extractError(err, "Failed to disable selected administrators"))))
+
+         )
+
+      )
+
+   )
+
+}
+
 
 const epics = [
-  createAdmin,
-  deleteAdmin,
-  disableAdmin,
-  enableAdmin,
-  bulkDeleteAdmin,
-  bulkEnableAdmin,
-  bulkDisableAdmin,
-  fetchAdditionalDetailData,
-  getAdminDetail,
-  getAdminsList,
-  updateAdmin,
+   listAdmins,
+   getAdminDetail,
+   createAdmin,
+   updateAdmin,
+   deleteAdmin,
+   bulkDeleteAdmin,
+   enableAdmin,
+   bulkEnableAdmin,
+   disableAdmin,
+   bulkDisableAdmin
 ];
+
 
 export default epics;

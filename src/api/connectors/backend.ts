@@ -5,7 +5,6 @@ import { map } from "rxjs/operators";
 
 import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
-import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 
@@ -97,7 +96,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
 
    getConnectorAttributes(uuid: string, functionGroup: model.FunctionGroupFilter, kind: string): Observable<AttributeDescriptorDTO[]> {
 
-      const fg = model.FunctionGroupFilterToGroupCode[functionGroup];
+      // const fg = model.FunctionGroupFilterToGroupCode[functionGroup];
 
       return this._fetchService.request(
          new HttpRequestOptions(

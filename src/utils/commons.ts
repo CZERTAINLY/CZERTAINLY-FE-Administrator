@@ -1,5 +1,5 @@
 import { FunctionGroupDTO } from "api/connectors";
-import { AttributeResponse } from "models/attributes";
+//import { AttributeResponse } from "models/attributes";
 
 export function inIframe() {
   //Check if the window is directly loaded or loaded uisng an IFrame
@@ -21,6 +21,8 @@ export function functionGroupChecker(
   }
   return false;
 }
+
+/*
 
 export function attributeCombiner(
   attribute: AttributeResponse[],
@@ -83,3 +85,5 @@ export function attributeCombiner(
   }
   return editAttributes;
 }
+
+*/

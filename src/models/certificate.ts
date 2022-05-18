@@ -1,3 +1,5 @@
+import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
+
 export interface Certificate {
   subjectDn: string;
   issuerDn: string;
@@ -67,7 +69,7 @@ export interface X509Certificate {
    readonly extensions: Extension[];
    readonly publicKey: PublicKey;
    readonly publicKeyRaw: Buffer;
-   readonly tbsCertificate: ASN1;
+   //readonly tbsCertificate: ASN1;
 
 
    commonName: string,

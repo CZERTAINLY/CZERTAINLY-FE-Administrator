@@ -10,45 +10,45 @@ import logo from "images/czertainly_white_H.svg";
 import { inIframe } from "utils/commons";
 
 function Sidebar() {
-  const isSuperAdmin = useSelector(selectors.isSuperAdmin);
-  const inFrame = inIframe();
-  return (
-    <nav className={style.root}>
-      <header className={style.logo}>
-        <Link to="/app/home">
-          <img src={logo} alt="CZERTAINLY Logo" />
-        </Link>
-      </header>
-      <ul className={style.nav}>
-        {!inFrame ? <LinksGroup header="Home" headerLink="/app/home" /> : null}
+   const isSuperAdmin = useSelector(selectors.isSuperAdmin);
+   const inFrame = inIframe();
+   return (
 
-        <LinksGroup header="RA Profiles" headerLink="/app/raprofiles" />
-        {isSuperAdmin ? (
-          <LinksGroup
-            header="Administrators"
-            headerLink="/app/administrators"
-          />
-        ) : null}
-        <LinksGroup header="Clients" headerLink="/app/clients" />
-        <LinksGroup header="Connectors" headerLink="/app/connectors" />
-        <LinksGroup header="Credentials" headerLink="/app/credentials" />
-        <LinksGroup header="Authorities" headerLink="/app/authorities" />
+      <nav className={style.root}>
 
-        <LinksGroup
-          header="ACME"
-          childrenLinks={[
-            { name: "ACME Accounts", link: "/app/acmeaccounts" },
-            { name: "ACME Profiles", link: "/app/acmeprofiles" },
-          ]}
-        />
+         <header className={style.logo}>
+            <Link to="/app/home">
+               <img src={logo} alt="CZERTAINLY Logo" />
+            </Link>
+         </header>
 
-        <LinksGroup header="Audit Logs" headerLink="/app/audit" />
-        {!inFrame ? (
-          <LinksGroup header="About" headerLink="/app/about" />
-        ) : null}
-      </ul>
-    </nav>
-  );
+         <ul className={style.nav}>
+
+            {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
+            <LinksGroup _key="/app/raprofiles" header="RA Profiles" headerLink="/app/raprofiles" />
+            {isSuperAdmin ? (<LinksGroup _key="/app/administrators" header="Administrators" headerLink="/app/administrators" />) : null}
+            <LinksGroup _key="/app/clients" header="Clients" headerLink="/app/clients" />
+            <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
+            <LinksGroup _key="/app/credentials" header="Credentials" headerLink="/app/credentials" />
+            <LinksGroup _key="/app/authorities" header="Authorities" headerLink="/app/authorities" />
+
+            <LinksGroup
+               _key="acm1"
+               header="ACME"
+               childrenLinks={[
+                  { _key: "/app/acmeaccounts", name: "ACME Accounts", link: "/app/acmeaccounts" },
+                  { _key: "/app/acmeprofiles", name: "ACME Profiles", link: "/app/acmeprofiles" },
+               ]}
+            />
+
+            <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
+
+            {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}
+
+         </ul>
+
+      </nav>
+   );
 }
 
 export default withRouter(Sidebar);

@@ -2,7 +2,7 @@ import { Observable } from "rxjs";
 
 import { AttributeDTO } from "api/.common/AttributeDTO";
 import { FunctionGroupDTO } from "api/connectors";
-import { ErrorDeleteObject } from "models";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 
 export interface CredentialDTO {
@@ -37,7 +37,7 @@ export interface CredentialManagementApi {
 
    updateCredential(uuid: string, attributes: AttributeDTO[]): Observable<CredentialDTO>;
 
-   deleteCredential(uuid: string): Observable<ErrorDeleteObject[]>;
+   deleteCredential(uuid: string): Observable<DeleteObjectErrorDTO[]>;
 
    getCredentialsList(): Observable<CredentialDTO[]>;
 
@@ -47,6 +47,6 @@ export interface CredentialManagementApi {
 
    bulkForceDeleteCredential(uuids: string[]): Observable<void>;
 
-   bulkDeleteCredential(uuids: string[]): Observable<ErrorDeleteObject[]>;
+   bulkDeleteCredential(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 
 }

@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@fidm/x509": "^1.2.1",
+    "@reduxjs/toolkit": "^1.8.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^11.1.1",
     "@testing-library/user-event": "^12.2.0",

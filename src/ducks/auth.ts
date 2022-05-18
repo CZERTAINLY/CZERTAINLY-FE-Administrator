@@ -1,130 +1,123 @@
-import { createSelector } from 'reselect';
-import { ActionType, createCustomAction, getType } from 'typesafe-actions';
-
-import { Profile, Role } from 'models';
+import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
-import { createErrorAlertAction } from './alerts';
+import { UserProfileModel, Role } from 'models';
 
-export const statePath = 'auth';
-
-export enum Actions {
-  LoginRequest = '@@auth/LOGIN_REQUEST',
-  LoginSuccess = '@@auth/LOGIN_SUCCESS',
-  LoginFailure = '@@auth/LOGIN_FAILURE',
-  LogoutRequest = '@@auth/LOGOUT_REQUEST',
-  LogoutSuccess = '@@auth/LOGOUT_SUCCESS',
-  LogoutFailure = '@@auth/LOGOUT_FAILURE',
-  ProfileRequest = '@@auth/PROFILE_REQUEST',
-  ProfileSuccess = '@@auth/PROFILE_SUCCESS',
-  ProfileFailure = '@@auth/PROFILE_FAILURE',
-  UpdateProfileRequest = '@@auth/UPDATE_PROFILE_REQUEST',
-  UpdateProfileSuccess = '@@auth/UPDATE_PROFILE_SUCCESS',
-  UpdateProfileFailure = '@@auth/UPDATE_PROFILE_FAILURE',
-};
-
-export const actions = {
-  requestLogin: createCustomAction(Actions.LoginRequest, (creds: any) => ({ creds })),
-  receiveLogin: createCustomAction(Actions.LoginSuccess, (token: string) => ({ token })),
-  requestLogout: createCustomAction(Actions.LogoutRequest),
-  requestProfile: createCustomAction(Actions.ProfileRequest),
-  receiveProfile: createCustomAction(Actions.ProfileSuccess, (profile: Profile) => ({ profile })),
-  failProfile: createCustomAction(Actions.ProfileFailure, (error?: string) => createErrorAlertAction(error)),
-  requestUpdateProfile: createCustomAction(Actions.UpdateProfileRequest, (name: string, surname: string, username: string, email: string) => ({ name, surname, username, email })),
-  receiveUpdateProfile: createCustomAction(Actions.UpdateProfileSuccess, (name: string, surname: string, username: string, email: string) => ({ name, surname, username, email })),
-  failUpdateProfile: createCustomAction(Actions.UpdateProfileFailure, (error?: string) => createErrorAlertAction(error)),
-};
-
-export type Action = ActionType<typeof actions>;
 
 export type State = {
-  isFetching: boolean;
-  isFetchingProfile: boolean;
-  isAuthenticated: boolean;
-  isUpdatingProfile: boolean;
-  errorMessage: string;
-  profile: Profile | null;
+   token: string;
+   isLoggingIn: boolean;
+   isFetchingProfile: boolean;
+   isAuthenticated: boolean;
+   isUpdatingProfile: boolean;
+   profile?: UserProfileModel;
 };
 
-// const token = localStorage.getItem('token');
 
 export const initialState: State = {
-  isFetching: false,
-  isFetchingProfile: false,
-  isAuthenticated: true, // !!token,
-  isUpdatingProfile: false,
-  errorMessage: '',
-  profile: null,
+   token: "",
+   isLoggingIn: false,
+   isFetchingProfile: false,
+   isAuthenticated: true,
+   isUpdatingProfile: false,
 };
 
-export function reducer(state: State = initialState, action: Action): State {
-  switch (action.type) {
-    case getType(actions.requestLogin):
-      return { ...state, isFetching: true, isAuthenticated: false };
-    case getType(actions.receiveLogin):
-      return { ...state, isFetching: false, isAuthenticated: true };
-    case getType(actions.requestLogout):
-      return { ...state, isAuthenticated: false };
-    case getType(actions.requestProfile):
-      return { ...state, isFetchingProfile: true, profile: null };
-    case getType(actions.receiveProfile):
-      return { ...state, isFetchingProfile: false, profile: action.profile };
-    case getType(actions.failProfile):
-      return { ...state, isFetchingProfile: false, isAuthenticated: false };
-    case getType(actions.requestUpdateProfile):
-      return { ...state, isUpdatingProfile: true };
-    case getType(actions.receiveUpdateProfile):
-      return { ...state, isUpdatingProfile: false, profile: { ...(state.profile as Profile), name: action.name, surname: action.surname, username: action.username, email: action.email }};
-    case getType(actions.failUpdateProfile):
-      return { ...state, isUpdatingProfile: false };
-    default:
-      return state;
-  }
-}
 
-const selectState = createFeatureSelector<State>(statePath);
+export const slice = createSlice({
 
-const isAuthenticated = createSelector(
-  selectState,
-  state => state.isAuthenticated,
-);
+   name: "auth",
 
-const isFetching = createSelector(
-  selectState,
-  state => state.isFetching,
-);
+   initialState,
 
-const isFetchingProfile = createSelector(
-  selectState,
-  state => state.isFetchingProfile,
-);
+   reducers: {
 
-const isUpdatingProfile = createSelector(
-  selectState,
-  state => state.isUpdatingProfile,
-);
+      login: (state, action: PayloadAction<{ credentials: any }>) => {
+         state.token = "";
+         state.isAuthenticated = false;
+         state.isLoggingIn = true;
 
-const selectErrorMessage = createSelector(
-  selectState,
-  state => state.errorMessage,
-);
+      },
 
-const selectProfile = createSelector(
-  selectState,
-  state => state.profile,
-);
 
-const isSuperAdmin = createSelector(
-  selectProfile,
-  profile => profile?.role === Role.SuperAdmin,
-);
+      loginSuccess: (state, action: PayloadAction<string>) => {
+         state.token = action.payload;
+         state.isAuthenticated = true;
+         state.isLoggingIn = false;
+      },
+
+
+      loginFailed: (state, action: PayloadAction<string | undefined>) => {
+         state.token = "";
+         state.isAuthenticated = false;
+         state.isLoggingIn = false;
+      },
+
+
+      logout: (state) => {
+         state.token = "";
+         state.isAuthenticated = false;
+      },
+
+
+      getProfile: (state) => {
+         state.profile = undefined;
+         state.isFetchingProfile = true;
+      },
+
+
+      getProfileSuccess: (state, action: PayloadAction<UserProfileModel>) => {
+         state.profile = action.payload;
+         state.isFetchingProfile = false;
+      },
+
+
+      getProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+         state.profile = undefined;
+         state.isFetchingProfile = true;
+      },
+
+
+      updateProfile: (state, action: PayloadAction<UserProfileModel>) => {
+         state.isUpdatingProfile = true;
+      },
+
+      updateProfileSuccess: (state, action: PayloadAction<UserProfileModel>) => {
+         state.profile = action.payload;
+         state.isUpdatingProfile = false;
+      },
+
+      updateProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+         state.isUpdatingProfile = false;
+      }
+
+
+   }
+
+});
+
+const selectState = createFeatureSelector<State>(slice.name);
+
+const isAuthenticated = createSelector(selectState, state => state.isAuthenticated);
+
+const isLoggingIn = createSelector(selectState, state => state.isLoggingIn);
+
+const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
+
+const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
+
+const profile = createSelector(selectState, state => state.profile);
+
+const isSuperAdmin = createSelector(profile, profile => profile?.role === Role.SuperAdmin );
 
 export const selectors = {
-  selectState,
-  isAuthenticated,
-  isFetching,
-  isFetchingProfile,
-  isSuperAdmin,
-  isUpdatingProfile,
-  selectErrorMessage,
-  selectProfile,
+   selectState,
+   isAuthenticated,
+   isLoggingIn,
+   isFetchingProfile,
+   isUpdatingProfile,
+   profile,
+   isSuperAdmin
 };
+
+export const actions = slice.actions;
+
+export default slice.reducer;

@@ -1,4 +1,4 @@
-import { Certificate, DistinguishedName, Extension } from '@fidm/x509';
+import { Certificate, DistinguishedName } from '@fidm/x509';
 import { CertificateDTO, CertificateSubjectAlternativeNamesDTO } from 'api/certificates';
 
 import { Certificate as InternalCertificate } from 'models';

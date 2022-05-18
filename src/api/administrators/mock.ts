@@ -36,9 +36,18 @@ export class AdministatorManagementMock implements model.AdministratorManagement
                const certificate = getOrCreateCertificate(adminCertificate, certificateUuid);
                if (!certificate) throw new HttpErrorResponse({ status: 422, statusText: "Missing certificate or certificate does not exist." });
 
-               const administrator: model.AdministratorDTO = {
-                  uuid, username, name, surname, email, certificate, description, role, enabled, serialNumber: certificate.serialNumber
-               }
+               dbData.administrators.push({
+                  uuid,
+                  username,
+                  name,
+                  surname,
+                  email,
+                  certificate,
+                  description,
+                  role,
+                  enabled,
+                  serialNumber: certificate.serialNumber
+               });
 
                return uuid;
 

@@ -83,10 +83,12 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
                const fgc = model.FunctionGroupFilterToGroupCode[functionGroupFilter];
 
                for (const functionGroup of connector.functionGroups) {
-                  if (functionGroup.functionGroupCode !== fgc) return;
+                  if (functionGroup.functionGroupCode !== fgc) return false;
                   if (!kind) return true;
                   if (functionGroup.kinds.indexOf(kind) >= 0) return true;
                }
+
+               return false;
 
             }
 

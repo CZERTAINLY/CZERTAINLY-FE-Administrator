@@ -1,49 +1,99 @@
-import { Epic } from 'redux-observable';
 import { of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import { isOfType } from 'typesafe-actions';
 
-import { UserProfileDTO } from 'api/auth';
-import { Profile, Role } from 'models';
+import { AppEpic } from 'ducks';
+
+import { UserProfileModel, Role } from 'models';
 import { extractError } from 'utils/net';
-import { EpicDependencies, State as AppState } from './app-state';
-import { Action, Actions, actions } from './auth';
+import { UserProfileDTO } from 'api/auth';
+import * as slice from './auth';
 
-const loginUserEpic: Epic<Action, Action> = action$ => action$.pipe(
-  filter(isOfType(Actions.LoginRequest)),
-  map(() => actions.receiveLogin('ahoj')),
-);
 
-const getProfile: Epic<Action, Action, AppState, EpicDependencies> = (action$, _, { apiClients }) => action$.pipe(
-  filter(isOfType(Actions.ProfileRequest)),
-  switchMap(() => apiClients.auth.getProfile().pipe(
-    map(profile => actions.receiveProfile(mapProfile(profile))),
-    catchError(err => of(actions.failProfile(extractError(err, 'Failed to get user profile')))),
-  )),
-);
+const dtoToModel = (profile: UserProfileDTO): UserProfileModel => ({
+      username: profile.username,
+      name: profile.name,
+      surname: profile.surname,
+      email: profile.email,
+      role: profile.role === "superAdministrator" ? Role.SuperAdmin : Role.Admin,
+});
 
-const updateProfile: Epic<Action, Action, AppState, EpicDependencies> = (action$, _, { apiClients }) => action$.pipe(
-  filter(isOfType(Actions.UpdateProfileRequest)),
-  switchMap(({ name, surname, username, email }) => apiClients.auth.updateProfile(name, surname, username, email).pipe(
-    map(() => actions.receiveUpdateProfile(name, surname, username, email)),
-    catchError(err => of(actions.failUpdateProfile(extractError(err, 'Failed to update user profile')))),
-  )),
-);
 
-function mapProfile(profile: UserProfileDTO): Profile {
-  return {
-    name: profile.name,
-    surname: profile.surname,
-    username: profile.username,
-    email: profile.email,
-    role: profile.role as Role,
-  };
+const login: AppEpic = action$ => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.login.match
+      ),
+      map(
+         () => slice.actions.loginSuccess("token")
+      )
+
+   );
+
 }
 
-const epics = [
-  getProfile,
-  loginUserEpic,
-  updateProfile,
+
+const getProfile: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getProfile.match
+      ),
+
+      switchMap(
+
+         () => deps.apiClients.auth.getProfile().pipe(
+
+            map(profile => slice.actions.getProfileSuccess(dtoToModel(profile))),
+
+            catchError(err => of(slice.actions.getProfileFailed(extractError(err, "Failed to get user profile"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const updateProfile: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateProfile.match
+      ),
+
+      switchMap(
+
+         action => deps.apiClients.auth.updateProfile(
+            action.payload.name,
+            action.payload.surname,
+            action.payload.username,
+            action.payload.email
+         ).pipe(
+
+            map(() => slice.actions.updateProfileSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.updateProfileFailed(extractError(err, "Failed to update profile"))))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+export const epics = [
+   login,
+   getProfile,
+   updateProfile
 ];
+
 
 export default epics;

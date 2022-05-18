@@ -2,93 +2,88 @@ import { Observable, from } from "rxjs";
 import { HttpErrorResponse, StringMap } from "ts-rest-client";
 
 export function createNewResource(
-  url: string,
-  body: any,
-  headers?: any
+   url: string,
+   body: any,
+   headers?: any
 ): Observable<string | null> {
-  return from(doFetch(url, body, headers));
+   return from(doFetch(url, body, headers));
 }
 
 async function doFetch(
-  url: string,
-  body: any,
-  headers?: any
+   url: string,
+   body: any,
+   headers?: any
 ): Promise<string | null> {
-  let errorResponse = null;
+   let errorResponse = null;
 
-  try {
-    const response = await fetch(url, {
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-        ...(headers || {}),
-      },
-      method: "POST",
-    });
+   try {
+      const response = await fetch(url, {
+         body: JSON.stringify(body),
+         headers: {
+            "Content-Type": "application/json",
+            ...(headers || {}),
+         },
+         method: "POST",
+      });
 
-    if (response.ok) {
-      return response.headers.get("location");
-    }
+      if (response.ok) {
+         return response.headers.get("location");
+      }
 
-    const responseHeaders = {} as StringMap;
-    if (response.headers) {
-      response.headers.forEach((value, key) => (responseHeaders[key] = value));
-    }
-    const error = await getResponseBody(response);
-    errorResponse = new HttpErrorResponse({
-      headers: responseHeaders,
-      status: response.status,
-      statusText: response.statusText,
-      url: response.url,
-      error,
-    });
-  } catch (err) {
-    let error: Event;
+      const responseHeaders = {} as StringMap;
+      if (response.headers) {
+         response.headers.forEach((value, key) => (responseHeaders[key] = value));
+      }
+      const error = await getResponseBody(response);
+      errorResponse = new HttpErrorResponse({
+         headers: responseHeaders,
+         status: response.status,
+         statusText: response.statusText,
+         url: response.url,
+         error,
+      });
+   } catch (err) {
+      let error: Event;
 
-    if (err instanceof Event) {
-      error = err;
-    } else {
-      error = new ErrorEvent("error", { error: err });
-    }
+      if (err instanceof Event) {
+         error = err;
+      } else {
+         error = new ErrorEvent("error", { error: err });
+      }
 
-    throw new HttpErrorResponse({
-      error,
-      url,
-    });
-  }
+      throw new HttpErrorResponse({
+         error,
+         url,
+      });
+   }
 
-  throw errorResponse;
+   throw errorResponse;
 }
 
 function getResponseBody(response: Response): Promise<any> {
-  const contentType = response.headers.get("Content-Type");
+   const contentType = response.headers.get("Content-Type");
 
-  if (response.status === 204) {
-    return Promise.resolve(null);
-  }
+   if (response.status === 204) {
+      return Promise.resolve(null);
+   }
 
-  if (contentType?.includes("application/json")) {
-    return response.json();
-  }
+   if (contentType?.includes("application/json")) {
+      return response.json();
+   }
 
-  return response.text();
+   return response.text();
 }
 
 export function extractError(err: HttpErrorResponse, headline: string): string {
-  const errorBody = err.error;
-  if (err.status === 422) {
-    if (typeof errorBody === "string") {
-      return `${headline} ${errorBody}`;
-    }
-    return `${headline} ${errorBody.join(", ")}`;
-  }
-  if (!errorBody) {
-    return headline;
-  }
 
-  if (errorBody instanceof Event) {
-    return `${headline}: Network connection failure`;
-  }
+   if (!err.error) return headline;
 
-  return errorBody.message ? `${headline}: ${errorBody.message}` : headline;
+   if (err.error instanceof Event) return `${headline}: Network connection failure`;
+
+   if (err.status === 422) {
+      if (typeof err.error === "string") return `${headline} ${err.error}`;
+      return `${headline} ${err.error.join(", ")}`;
+   }
+
+   return err.error.message ? `${headline}: ${err.error.message}` : headline;
 }

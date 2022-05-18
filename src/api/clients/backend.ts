@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
+import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
 import { createNewResource } from "utils/net";

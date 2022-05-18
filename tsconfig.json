@@ -19,10 +19,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true
   },
   "include": [
-    "src",
-    "src/api/.common/attributes.ts"
-, "src/api/.providers/authorities", "src/api/credential"  ]
+    "src/**/*"
+  ]
+
 }

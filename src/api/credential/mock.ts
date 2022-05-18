@@ -5,7 +5,7 @@ import { HttpErrorResponse } from "ts-rest-client";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 
-import { ErrorDeleteObject } from "models";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 import * as model from "./model";
 import { AttributeDTO } from "api/.common/AttributeDTO";
@@ -106,7 +106,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
    }
 
 
-   deleteCredential(uuid: string): Observable<ErrorDeleteObject[]> {
+   deleteCredential(uuid: string): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
          dbData.credentials.findIndex(credential => credential.uuid === uuid)
@@ -198,7 +198,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
    }
 
 
-   bulkDeleteCredential(uuids: string[]): Observable<ErrorDeleteObject[]> {
+   bulkDeleteCredential(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
          uuids

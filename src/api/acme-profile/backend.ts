@@ -5,10 +5,10 @@ import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
 import { AttributeDTO } from "../.common/AttributeDTO";
-import { ErrorDeleteObject } from "models";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
+import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
 
 const baseUrl = "/api/v1/acmeProfiles";
 
@@ -60,7 +60,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    }
 
 
-   deleteAcmeProfile(uuid: string | number): Observable<ErrorDeleteObject[]> {
+   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
@@ -69,7 +69,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    }
 
 
-   enableAcmeProfile(uuid: string | number): Observable<void> {
+   enableAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
@@ -78,7 +78,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    }
 
 
-   disableAcmeProfile(uuid: string | number): Observable<void> {
+   disableAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
@@ -87,38 +87,36 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    }
 
 
-   bulkDeleteAcmeProfiles(
-      uuid: (string | number)[]
-   ): Observable<ErrorDeleteObject[]> {
+   bulkDeleteAcmeProfiles(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/delete`, "DELETE", uuid)
+         new HttpRequestOptions(`${baseUrl}/delete`, "DELETE", uuids)
       );
 
    }
 
 
-   bulkForceDeleteAcmeProfiles(uuid: (string | number)[]): Observable<void> {
+   bulkForceDeleteAcmeProfiles(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/delete/force`, "DELETE", uuid)
+         new HttpRequestOptions(`${baseUrl}/delete/force`, "DELETE", uuids)
       );
 
    }
 
 
-   bulkEnableAcmeProfile(uuid: (string | number)[]): Observable<void> {
+   bulkEnableAcmeProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuid)
+         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
       );
 
    }
 
-   bulkDisableAcmeProfile(uuid: (string | number)[]): Observable<void> {
+   bulkDisableAcmeProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuid)
+         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
       );
 
    }
@@ -131,9 +129,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    }
 
 
-   getAcmeProfileDetail(
-      uuid: string
-   ): Observable<model.AcmeProfileDTO> {
+   getAcmeProfileDetail(uuid: string): Observable<model.AcmeProfileDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")

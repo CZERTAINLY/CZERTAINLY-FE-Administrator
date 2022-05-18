@@ -27,6 +27,29 @@ Mocks does not work properly (especially bulk updates can't work, but a lot of o
    - Changed indentation of all files
    - Changed spacing between blocks of code (especially RXJS related)
 
+- Refactored components (simplified, beautified, fixed all warnings in console and during compilation):
+   Layout, Footer, Header, Private route, Sidebar + Links, Widget
+
+- Widget => added spinner
+
+- Widget buttons => New separate component
+
+
+
+In progress:
+
+- Migrated to Redux-Toolkit, still in progress ()
+   - simplified store definition & configuration, better readability
+
+- Administrators
+   - using redux-toolkit, refactored epics
+   - list is done
+   - working on forms
+
+- Custom table
+
+
+
 - ??? Migration to React 18 ??? (if in time till end of next week)
 
 

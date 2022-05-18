@@ -1,73 +1,78 @@
-import { combineReducers } from "redux";
-import { combineEpics } from "redux-observable";
+import { Observable } from "rxjs";
+import { combineEpics, Epic } from "redux-observable";
+import { AnyAction, combineReducers } from "redux";
 
-import { State } from "./app-state";
+import { ApiClients } from "api";
 
-import {
-  reducer as administratorsReducer,
-  statePath as administratorsStatePath,
-} from "./administrators";
-import {
-  reducer as alertsReducer,
-  statePath as alertsStatePath,
-} from "./alerts";
-import { reducer as authReducer, statePath as authStatePath } from "./auth";
-import {
-  reducer as clientsReducer,
-  statePath as clientsStatePath,
-} from "./clients";
+import statupEpics from "./startup-epics";
 
-import {
-  reducer as credentialsReducer,
-  statePath as credentialsStatePath,
-} from "./credentials";
+import { initialState as initialAlertsState, slice as alertsSlice } from "./alerts";
 
-import {
-  reducer as authoritiesReducer,
-  statePath as authoritiesStatePath,
-} from "./ca-authorities";
-
-import {
-  reducer as connectorsReducer,
-  statePath as connectorsStatePath,
-} from "./connectors";
-
-import {
-  reducer as profilesReducer,
-  statePath as profilesStatePath,
-} from "./ra-profiles";
-import {
-  reducer as certificatesReducer,
-  statePath as certificatesStatePath,
-} from "./certificates";
-
-import {
-  reducer as acmeAccountReducer,
-  statePath as acmeAccountStatePath,
-} from "./acme-accounts";
-
-import {
-  reducer as acmeProfilesReducer,
-  statePath as acmeProfilesStatePath,
-} from "./acme-profiles";
-
-import adminEpics from "./administrators-epics";
+import { initialState as initialAuthState, slice as authSlice } from "./auth";
 import authEpics from "./auth-epics";
+
+import { initialState as initialAdministratorsState, slice as administratorsSlice } from "./administrators";
+import administratorsEpics from "./administrators-epics";
+
+
+/*
+import { initialState as initialClientsState, State as ClientsState, statePath as clientsStatePath } from "./clients";
+import { initialState as initialCredentialsState, State as CredentialsState, statePath as credentialStatePath } from "./credentials";
+import { initialState as initialConnectorsState, State as ConnectorsState, statePath as connectorStatePath } from "./connectors";
+import { initialState as initialAuthoritiesState, State as AuthoritiesState, statePath as authorityStatePath } from "./ca-authorities";
+import { initialState as initialProfilesState, State as ProfilesState, statePath as profileStatePath } from "./ra-profiles";
+import { initialState as initialCertificatesState, State as CertificatesState, statePath as certificatesStatePath } from "./certificates";
+
+import { initialState as initialAcmeAccountState, State as AcmeAccountState, statePath as acmeAccountStatePath } from "./acme-accounts";
+import { initialState as initialAcmeProfilesState, State as AcmeProfilesState, statePath as acmeProfileStatePath } from "./acme-profiles";
+*/
+
+
+
+/*
+import adminEpics from "./administrators-epics";
 import clientsEpics from "./clients-epics";
 import profileEpics from "./ra-profiles-epics";
-import statupEpics from "./startup-epics";
 import credentialsEpic from "./credentials-epics";
 import connectorsEpic from "./connectors-epic";
 import authoritiesEpic from "./ca-authorities-epics";
 import certificateEpics from "./certificates-epic";
 import acmeAccountEpics from "./acme-accounts-epics";
 import acmeProfileEpics from "./acme-profiles-epics";
+*/
 
-export const reducers = combineReducers<State, any>({
+export interface EpicDependencies {
+   apiClients: ApiClients;
+}
+
+export type AppState = Observable<ReturnType<typeof reducers>>;
+
+export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
+
+export const initialState = {
+   [alertsSlice.name]: initialAlertsState,
+   [authSlice.name]: initialAuthState,
+   [administratorsSlice.name]: initialAdministratorsState,
+/*
+   [certificatesStatePath]: initialCertificatesState,
+   [administratorsStatePath]: initialAdministratorsState,
+   [clientsStatePath]: initialClientsState,
+   [profileStatePath]: initialProfilesState,
+   [credentialStatePath]: initialCredentialsState,
+   [connectorStatePath]: initialConnectorsState,
+   [authorityStatePath]: initialAuthoritiesState,
+   [acmeAccountStatePath]: initialAcmeAccountState,
+   [acmeProfileStatePath]: initialAcmeProfilesState,
+*/
+};
+
+export const reducers = combineReducers<typeof initialState, any>({
+  auth: authSlice.reducer,
+  alerts: alertsSlice.reducer,
+  administrators: administratorsSlice.reducer
+  /*
   [certificatesStatePath]: certificatesReducer,
   [administratorsStatePath]: administratorsReducer,
-  [alertsStatePath]: alertsReducer,
-  [authStatePath]: authReducer,
   [clientsStatePath]: clientsReducer,
   [profilesStatePath]: profilesReducer,
   [credentialsStatePath]: credentialsReducer,
@@ -75,18 +80,21 @@ export const reducers = combineReducers<State, any>({
   [authoritiesStatePath]: authoritiesReducer,
   [acmeAccountStatePath]: acmeAccountReducer,
   [acmeProfilesStatePath]: acmeProfilesReducer,
+  */
 });
 
+
 export const epics = combineEpics(
-  ...adminEpics,
-  ...authEpics,
+   ...statupEpics,
+   ...authEpics,
+   ...administratorsEpics,
+   /*...adminEpics,
   ...clientsEpics,
   ...profileEpics,
-  ...statupEpics,
   ...credentialsEpic,
   ...connectorsEpic,
   ...authoritiesEpic,
   ...certificateEpics,
   ...acmeAccountEpics,
-  ...acmeProfileEpics
+  ...acmeProfileEpics*/
 );
