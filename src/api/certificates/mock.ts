@@ -11,18 +11,32 @@ export class CertificateManagementMock implements model.CertificateManagementApi
 
 
    getCertificatesList(
-      itemsPerPage?: number,
-      pageNumber?: number,
-      filters?: model.CertificateListFilterDTO[]
+      itemsPerPage: number = 100,
+      pageNumber: number = 0,
+      filters: model.CertificateListFilterDTO[] = []
    ): Observable<model.CertificateListDTO> {
 
-      return of({
-         certificates: dbData.certificates,
-         totalPages: 2,
-         pageNumber: 10,
-         itemsPerPage: 23,
-         totalItems: 123,
-      });
+      return of(
+         null
+      ).pipe(
+
+         delay(randomDelay()),
+
+         map(
+            () => {
+
+               const startItem = (pageNumber - 1) * itemsPerPage;
+
+               return {
+                  certificates: dbData.certificates.slice(startItem, startItem + itemsPerPage),
+                  itemsPerPage: itemsPerPage,
+                  pageNumber: pageNumber,
+                  totalPages: Math.ceil(dbData.certificates.length / itemsPerPage),
+                  totalItems: dbData.certificates.length
+               }
+            }
+         )
+      );
 
    }
 
@@ -32,9 +46,15 @@ export class CertificateManagementMock implements model.CertificateManagementApi
       return of(
          dbData.certificates.find((c) => c.uuid.toString() === uuid.toString())
       ).pipe(
+
          delay(randomDelay()),
-         map((detail) => {
-            if (detail) {
+
+         map(
+
+            (detail) => {
+
+               if (!detail) throw new HttpErrorResponse({ status: 404, });
+
                return {
                   commonName: detail.commonName,
                   serialNumber: detail.serialNumber,
@@ -63,10 +83,8 @@ export class CertificateManagementMock implements model.CertificateManagementApi
                };
             }
 
-            throw new HttpErrorResponse({
-               status: 404,
-            });
-         })
+         )
+
       );
 
    }

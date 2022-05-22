@@ -1,10 +1,10 @@
-import { CertificateDetailResponse } from "models";
 import React from "react";
+import { CertificateModel } from "models";
 import { Table } from "reactstrap";
 import { dateFormatter } from "utils/dateUtil";
 
 interface Props {
-  certificate?: CertificateDetailResponse;
+  certificate?: CertificateModel;
 }
 
 function CertificateAttributes({ certificate }: Props) {

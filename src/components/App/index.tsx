@@ -1,7 +1,7 @@
 import React from "react";
 import { Switch, Route, Redirect, Router } from "react-router";
 import { ToastContainer } from "react-toastify";
-import history from "./history";
+import history from "browser-history";
 
 import "styles/theme.scss";
 

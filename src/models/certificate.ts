@@ -1,44 +1,87 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
 
-export interface Certificate {
-  subjectDn: string;
-  issuerDn: string;
-  validFrom: Date;
-  validTo: Date;
-  serialNumber: string;
+
+interface CertificateValidationResultRecordModel {
+   status: "success" | "failed" | "warning" | "revoked" | "not_checked" | "invalid" | "expiring" | "expired";
 }
 
-export interface CertificateDetailResponse {
-  uuid: string;
-  commonName: string;
-  serialNumber: string;
-  issuerCommonName?: string;
-  certificateContent?: string;
-  issuerDn?: string;
-  subjectDn?: string;
-  notAfter?: string;
-  notBefore?: string;
-  publicKeyAlgorithm?: string;
-  signatureAlgorithm?: string;
-  keySize?: number;
-  basicConstraints?: string;
-  status?: string;
-  fingerprint?: string;
-  subjectAlternativeNames?: CertificateMeta;
-  keyUsage?: string[];
-  extendedKeyUsage?: string[];
-  meta?: CertificateMeta;
-  entity?: any;
-  group?: any;
-  owner?: string;
-  raProfile?: any;
-  issuerSerialNumber?: string;
-  certificateType?: string;
-  certificateValidationResult?: CertificateMeta;
+
+export interface CertificateSubjectAlternativeNamesModel {
+
+   [key: string]: any[] | undefined;
+
+   registeredID?: any[];
+   ediPartyName?: any[];
+   iPAddress?: string[];
+   x400Address?: any[];
+   rfc822Name?: any[];
+   otherName?: any[];
+   dNSName?: string[];
+   directoryName?: any[];
+   uniformResourceIdentifier?: string[];
+
 }
 
-export interface CertificateMeta {
-  [key: string]: any;
+
+interface CertificateEntityModel {
+   uuid: string;
+   name: string;
+   description?: string;
+   entityType: "server" | "router" | "HSM" | "switch" | "loadBallancer" | "firewall" | "MDM" | "cloud";
+}
+
+
+interface CertificateMetaModel {
+   [key: string]: string;
+   discoverySource: string;
+   cipherSuite: string;
+}
+
+
+interface CertificateGroupModel {
+   uuid: string;
+   name: string;
+   description: string;
+}
+
+
+interface CertificateRAProfileModel {
+   uuid: string;
+   name: string;
+   enabled: string;
+}
+
+
+export interface CertificateModel {
+
+   uuid: string;
+   commonName: string;
+   serialNumber: string;
+   issuerCommonName: string;
+   certificateContent: string;
+   issuerDn: string;
+   subjectDn: string;
+   notBefore: string;
+   notAfter: string;
+   publicKeyAlgorithm: string;
+   signatureAlgorithm: string;
+   keySize: number;
+   keyUsage: string[];
+   extendedKeyUsage?: string[];
+   basicConstraints: string;
+   status: "valid" | "revoked" | "expired" | "unknown" | "expiring" | "new" | "invalid";
+   fingerprint: string;
+   certificateType?: "X509" | "SSH";
+   issuerSerialNumber?: string;
+   subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
+   meta?: CertificateMetaModel;
+
+   certificateValidationResult?: CertificateValidationResultRecordModel;
+   entity?: CertificateEntityModel;
+   group?: CertificateGroupModel;
+   owner?: string;
+   raProfile?: CertificateRAProfileModel;
+
 }
 
 

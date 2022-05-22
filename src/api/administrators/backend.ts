@@ -1,11 +1,12 @@
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { HttpRequestOptions } from "ts-rest-client";
+import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
 import * as model from "./model";
 import { createNewResource } from "utils/net";
 import { AdministratorRole } from "./model";
+import { CertificateDTO } from "api/certificates";
 
 const baseUrl = "/api/v1/admins";
 
@@ -18,15 +19,15 @@ export class AdministratorsManagementBackend implements model.AdministratorManag
    }
 
    createAdmin(
+      username: string,
       name: string,
       surname: string,
-      username: string,
       email: string,
       description: string,
       role: AdministratorRole,
       enabled: boolean,
-      adminCertificate?: string,
-      certificateUuid?: string
+      certificateUuid?: string,
+      adminCertificate?: CertificateDTO
    ): Observable<string> {
 
       return createNewResource(baseUrl, {
@@ -34,14 +35,19 @@ export class AdministratorsManagementBackend implements model.AdministratorManag
          surname,
          username,
          email,
-         adminCertificate,
+         adminCertificate: adminCertificate?.certificateContent,
          description,
          role,
          enabled,
          certificateUuid,
       }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+         map(
+            uuid => {
+               if (uuid) return uuid;
+               throw new HttpErrorResponse({ status: 0, statusText: "Unexpected server response!" });
+            }
+         )
+      )
 
    }
 
@@ -118,14 +124,14 @@ export class AdministratorsManagementBackend implements model.AdministratorManag
 
    updateAdmin(
       uuid: string,
+      username: string,
       name: string,
       surname: string,
-      username: string,
       email: string,
-      adminCertificate: string | undefined,
       description: string,
-      role: string,
-      certificateUuid: string
+      role: AdministratorRole,
+      certificateUuid?: string,
+      adminCertificate?: CertificateDTO
    ): Observable<model.AdministratorDTO> {
 
       return this._fetchService.request(
@@ -135,10 +141,10 @@ export class AdministratorsManagementBackend implements model.AdministratorManag
             surname,
             username,
             email,
-            adminCertificate,
+            adminCertificate: adminCertificate?.certificateContent,
             description,
             role,
-            certificateUuid,
+            certificateUuid
          })
 
       );

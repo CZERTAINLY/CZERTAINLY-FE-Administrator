@@ -13,22 +13,28 @@ async function doFetch(
    url: string,
    body: any,
    headers?: any
-): Promise<string | null> {
+): Promise<string> {
+
    let errorResponse = null;
 
    try {
       const response = await fetch(url, {
+
          body: JSON.stringify(body),
          headers: {
             "Content-Type": "application/json",
             ...(headers || {}),
          },
          method: "POST",
+
       });
 
+
       if (response.ok) {
-         return response.headers.get("location");
+         const data = await getResponseBody(response);
+         return data.uuid;
       }
+
 
       const responseHeaders = {} as StringMap;
       if (response.headers) {
@@ -61,6 +67,7 @@ async function doFetch(
 }
 
 function getResponseBody(response: Response): Promise<any> {
+
    const contentType = response.headers.get("Content-Type");
 
    if (response.status === 204) {
@@ -69,6 +76,7 @@ function getResponseBody(response: Response): Promise<any> {
 
    if (contentType?.includes("application/json")) {
       return response.json();
+
    }
 
    return response.text();

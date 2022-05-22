@@ -1,12 +1,16 @@
 import { AdministratorModel, AdministratorRole } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import history from "components/App/history";
+
 
 export const statePath = "administrators";
 
+
 export type State = {
+
    administrators: AdministratorModel[];
+   administratorDetail?: AdministratorModel;
+
    checkedRows: string[];
    isCreating: boolean;
    isDeleting: boolean;
@@ -18,13 +22,15 @@ export type State = {
    isBulkDeleting: boolean;
    isBulkEnabling: boolean;
    isBulkDisabling: boolean;
-   selectedAdministrator?: AdministratorModel;
+
 };
 
 
 export const initialState: State = {
+
    administrators: [],
    checkedRows: [],
+
    isCreating: false,
    isDeleting: false,
    isUpdating: false,
@@ -79,6 +85,7 @@ export const slice = createSlice({
 
       getAdminDetail: (state, action: PayloadAction<string>) => {
 
+         state.administratorDetail = undefined;
          state.isFetchingDetail = true;
 
       },
@@ -87,6 +94,7 @@ export const slice = createSlice({
       getAdminDetailSuccess: (state, action: PayloadAction<AdministratorModel>) => {
 
          state.isFetchingDetail = false;
+         state.administratorDetail = action.payload;
 
       },
 
@@ -103,11 +111,10 @@ export const slice = createSlice({
          surname: string,
          username: string,
          email: string,
-         certificate: File,
+         certificate: FileList | undefined,
          description: string,
-         superAdmin: boolean,
-         enabled: boolean,
-         certificateUuid: string
+         role: AdministratorRole,
+         certificateUuid: string | undefined
       }>) => {
 
          state.isCreating = true;
@@ -116,8 +123,9 @@ export const slice = createSlice({
 
 
       createAdminSuccess: (state, action: PayloadAction<string>) => {
+
          state.isCreating = false;
-         history.push(`./detail/${action.payload}`);
+
       },
 
 
@@ -134,10 +142,10 @@ export const slice = createSlice({
          surname: string,
          username: string,
          email: string,
-         certificate: File | undefined,
+         certificate: FileList | undefined,
          description: string,
          role: AdministratorRole,
-         certificateUuid: string
+         certificateUuid: string | undefined
       }>) => {
 
          state.isUpdating = true;
@@ -148,7 +156,6 @@ export const slice = createSlice({
       updateAdminSuccess: (state, action: PayloadAction<AdministratorModel>) => {
 
          state.isUpdating = false;
-         history.push(`./detail/${action.payload}`);
 
       },
 
@@ -174,6 +181,7 @@ export const slice = createSlice({
 
          const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload);
          if (adminIndex >= 0) state.administrators.splice(adminIndex, 1);
+         if (state.administratorDetail?.uuid === action.payload) state.administratorDetail = undefined;
 
       },
 
@@ -201,6 +209,7 @@ export const slice = createSlice({
             uuid => {
                const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === uuid)
                if (adminIndex >= 0) state.administrators.splice(adminIndex, 1);
+               if (state.administratorDetail?.uuid === uuid) state.administratorDetail = undefined;
             }
          )
 
@@ -227,6 +236,7 @@ export const slice = createSlice({
 
          const admin = state.administrators.find(administrator => administrator.uuid === action.payload)
          if (admin) admin.enabled = true;
+         if (state.administratorDetail?.uuid === action.payload) state.administratorDetail.enabled = true;
 
       },
 
@@ -253,6 +263,7 @@ export const slice = createSlice({
             uuid => {
                const admin = state.administrators.find(administrator => administrator.uuid === uuid)
                if (admin) admin.enabled = true;
+               if (state.administratorDetail?.uuid === uuid) state.administratorDetail.enabled = true;
             }
          )
 
@@ -279,6 +290,7 @@ export const slice = createSlice({
 
          const admin = state.administrators.find(administrator => administrator.uuid === action.payload)
          if (admin) admin.enabled = false;
+         if (state.administratorDetail?.uuid === action.payload) state.administratorDetail.enabled = false;
 
 
       },
@@ -306,6 +318,7 @@ export const slice = createSlice({
             uuid => {
                const admin = state.administrators.find(administrator => administrator.uuid === uuid)
                if (admin) admin.enabled = false;
+               if (state.administratorDetail?.uuid === uuid) state.administratorDetail.enabled = false;
             }
          )
 
@@ -334,8 +347,9 @@ const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isBulkEnabling = createSelector(state, (state) => state.isBulkEnabling);
 const isBulkDisabling = createSelector(state, (state) => state.isBulkDisabling);
 const checkedRows = createSelector(state, (state) => state.checkedRows);
+
 const administrators = createSelector(state, (state) => state.administrators);
-const selectedAdministrator = createSelector(state, (state) => state.selectedAdministrator);
+const administrator = createSelector(state, (state) => state.administratorDetail);
 
 export const selectors = {
    state,
@@ -351,7 +365,7 @@ export const selectors = {
    isBulkDisabling,
    selectCheckedRows: checkedRows,
    selectAdministrators: administrators,
-   selectSelectedAdministrator: selectedAdministrator
+   admininistrator: administrator
 };
 
 export const actions = slice.actions;

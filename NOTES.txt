@@ -38,6 +38,8 @@ Mocks does not work properly (especially bulk updates can't work, but a lot of o
 
 In progress:
 
+- Refactoring of model objects according to changes in code (DTO)
+
 - Migrated to Redux-Toolkit, still in progress ()
    - simplified store definition & configuration, better readability
 
@@ -47,6 +49,15 @@ In progress:
    - working on forms
 
 - Custom table
+   - Simplified code, removed for-of loops, using filters, maps and so on
+   - Fixed problems with component array keys
+   - Fixed pagination which didn't work for me at all
+
+- Certificates
+   - removed parts of code duplicating structures
+   - exetended work with binary certificate parsing (still not fully done)
+
+- Added widget buttons component
 
 
 
@@ -93,6 +104,11 @@ New ACME Profile bugs
          - Set Attribute Value (uuid, name, value)
          - Get Attribute Value (uuid, name, value, label, type)
 
+   - Admin create / update => if certificate is passed and it exists already in DB the error is returned instead of the existing certificate is used
+
+
+   - Router -> HASH??? Really???? Wtf Pradeep
+
 
 --- For Pradeep
 
@@ -118,7 +134,13 @@ Code styling
    Split method args, generics, simply method definition on separate lines ONLY when its longer than half of the 24" monitor
       - nobody will print, nobody is using small screens for development anymore, if notebook screen is used, its just usually emergency situation
 
+   Method / Lambda naming
+      - if method is called based on user action, name it so (i.e. onclick={onDeleteClick})
+
    Switch/case - avoid whenever possible
+
+   With - ({a, b, c}) - It should not be used as it is not immediately clear what is going on in the code and it is necessary to navigate throught
+      the code
 
    Typescript
       - we are using TypeScript to help us with:
@@ -169,3 +191,12 @@ Architecture
    Don't mix DTOs with BLOs
    - Although it seems to be a lot of work (it is), the best practice is to transform between these types all the time. It separates
      layers each from other, prevents bugs and so on.
+
+React
+
+   Avoid passing components using props whenever possible. It makes code undebugable. It is much better to pass down the data and generate the
+   view there. This is not always possible, but, should be preferred all the time.
+
+HTML
+
+   Make it readable. Use empty lines, don't split so much tags to multiple lines (when there are so many attributes, do that)

@@ -6,20 +6,22 @@ import { dbData } from "mocks/db";
 
 import * as model from "./model";
 import { getOrCreateCertificate } from "mocks/helpers";
+import { AdministratorRole } from "models";
+import { CertificateDTO } from "api/certificates";
 
 
 export class AdministatorManagementMock implements model.AdministratorManagementApi {
 
    createAdmin(
+      username: string,
       name: string,
       surname: string,
-      username: string,
       email: string,
       description: string,
-      role: model.AdministratorRole,
+      role: AdministratorRole,
       enabled: boolean,
-      adminCertificate?: string,
       certificateUuid?: string,
+      adminCertificate?: CertificateDTO
    ): Observable<string> {
 
       return of(
@@ -33,7 +35,7 @@ export class AdministatorManagementMock implements model.AdministratorManagement
 
                const uuid = crypto.randomUUID();
 
-               const certificate = getOrCreateCertificate(adminCertificate, certificateUuid);
+               const certificate = getOrCreateCertificate(adminCertificate?.certificateContent, certificateUuid);
                if (!certificate) throw new HttpErrorResponse({ status: 422, statusText: "Missing certificate or certificate does not exist." });
 
                dbData.administrators.push({
@@ -46,7 +48,7 @@ export class AdministatorManagementMock implements model.AdministratorManagement
                   description,
                   role,
                   enabled,
-                  serialNumber: certificate.serialNumber
+                  serialNumber: (Math.random() * 1000000000).toString()
                });
 
                return uuid;
@@ -260,14 +262,14 @@ export class AdministatorManagementMock implements model.AdministratorManagement
 
    updateAdmin(
       uuid: string,
+      username: string,
       name: string,
       surname: string,
-      username: string,
       email: string,
-      certificate: string | undefined,
       description: string,
-      role: model.AdministratorRole,
-      certificateUuid: string
+      role: AdministratorRole,
+      certificateUuid?: string,
+      adminCertificate?: CertificateDTO
    ): Observable<model.AdministratorDTO> {
 
       return of(
@@ -279,10 +281,10 @@ export class AdministatorManagementMock implements model.AdministratorManagement
 
             administrator => {
 
-               if (!administrator) throw new HttpErrorResponse({ status: 404 });
+               if (!administrator) throw new HttpErrorResponse({ status: 404, statusText: "Administrator not found" });
 
-               const cert = getOrCreateCertificate(certificate, certificateUuid);
-               if (!cert) throw new HttpErrorResponse({ status: 404 });
+               const cert = getOrCreateCertificate(adminCertificate?.certificateContent, certificateUuid);
+               if (!cert) throw new HttpErrorResponse({ status: 404, statusText: "Missing certificate or certificate does not exist." });
 
                administrator.name = name;
                administrator.surname = surname;

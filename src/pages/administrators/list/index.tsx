@@ -11,7 +11,7 @@ import { actions, selectors } from "ducks/administrators";
 import MDBColumnName from "components/MDBColumnName";
 import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
 
-import CustomTable, { CustomTableHeaders } from "components/CustomTable";
+import CustomTable, { CustomTableHeader } from "components/CustomTable";
 
 function AdministratorsList() {
 
@@ -112,7 +112,7 @@ function AdministratorsList() {
             lineBreak: true,
          };
          column["adminDn"] = {
-            content: "!!!DN!!!" /*administrator.certificate.subjectDn*/,
+            content: administrator.certificate.subjectDn,
             lineBreak: true,
          };
          column["superAdmin"] = {
@@ -135,7 +135,8 @@ function AdministratorsList() {
       return rows;
    };
 
-   const adminTableHeader: CustomTableHeaders[] = [
+
+   const adminTableHeader: CustomTableHeader[] = [
       {
          styledContent: <MDBColumnName columnName="Name" />,
          content: "name",
@@ -179,6 +180,7 @@ function AdministratorsList() {
          width: "10%",
       },
    ];
+
 
    return (
 

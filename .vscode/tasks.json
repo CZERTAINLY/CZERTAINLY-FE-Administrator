@@ -1,15 +1,39 @@
 {
-	"version": "2.0.0",
-	"tasks": [
+   "version": "2.0.0",
+   "tasks": [
       {
-         "type": "typescript",
-         "tsconfig": "tsconfig.json",
-         "option": "watch",
+         "label": "run-react",
+         "type": "npm",
+         "script": "start",
+         "isBackground": true,
          "problemMatcher": [
-            "$tsc-watch"
-         ],
-         "group": "build",
-         "label": "tsc: watch - tsconfig.json"
+            {
+               "owner": "cra",
+               "fileLocation": [
+                  "relative",
+                  "${workspaceFolder}"
+               ],
+               "source": "create-react-app",
+               "applyTo": "allDocuments",
+               "pattern": [
+                  {
+                     "regexp": "^(.*(?=\\n))\\n\\n(.*(?=\\n))\\n([^:]*):\\s(.*(?=\\:\\s)):\\s(.*(?=\\s\\())\\s\\((\\d*):(\\d*)\\)",
+                     "file": 2,
+                     "severity": 3,
+                     "message": 5,
+                     "line": 6,
+                     "column": 7,
+                     "loop": true
+                  }
+
+               ],
+               "background": {
+                  "activeOnStart": true,
+                  "beginsPattern": "Starting the development server\\.\\.\\.",
+                  "endsPattern": "^Keyboard interrupt received, exiting(.*)$"
+               }
+            }
+         ]
       }
    ]
 }

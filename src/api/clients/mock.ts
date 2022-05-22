@@ -6,7 +6,7 @@ import * as model from "./model";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
-import { certificatePEM2CertificateDTO } from "utils/certificate";
+import { certificatePEM2CertificateModel } from "utils/certificate";
 import { CertificateDTO } from "api/certificates";
 
 
@@ -214,7 +214,23 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
                if (certificate) {
 
-                  client.certificate = certificatePEM2CertificateDTO(certificate);
+                  const mcrt = certificatePEM2CertificateModel(certificate);
+
+                  client.certificate =  {
+                     ...mcrt,
+                     subjectAlternativeNames: {
+                        dNSName:  mcrt.subjectAlternativeNames?.dNSName || [],
+                        directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
+                        ediPartyName: mcrt.subjectAlternativeNames?.ediPartyName || [],
+                        iPAddress: mcrt.subjectAlternativeNames?.iPAddress || [],
+                        otherName: mcrt.subjectAlternativeNames?.otherName || [],
+                        registeredID: mcrt.subjectAlternativeNames?.registeredID || [],
+                        rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
+                        uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
+                        x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
+                     }
+                  }
+
                   dbData.certificates.push({
                      ...client.certificate,
                      uuid: crypto.randomUUID()
@@ -287,7 +303,23 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
                if (certificate) {
 
-                  cert = certificatePEM2CertificateDTO(certificate);
+                  const mcrt = certificatePEM2CertificateModel(certificate);
+
+                  cert =  {
+                     ...mcrt,
+                     subjectAlternativeNames: {
+                        dNSName:  mcrt.subjectAlternativeNames?.dNSName || [],
+                        directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
+                        ediPartyName: mcrt.subjectAlternativeNames?.ediPartyName || [],
+                        iPAddress: mcrt.subjectAlternativeNames?.iPAddress || [],
+                        otherName: mcrt.subjectAlternativeNames?.otherName || [],
+                        registeredID: mcrt.subjectAlternativeNames?.registeredID || [],
+                        rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
+                        uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
+                        x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
+                     }
+                  }
+
                   dbData.certificates.push({
                      ...cert,
                      uuid: crypto.randomUUID()

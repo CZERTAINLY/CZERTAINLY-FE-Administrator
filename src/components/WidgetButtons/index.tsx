@@ -4,7 +4,7 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "cross-circle";
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle";
    tooltip?: string;
    disabled: boolean;
    onClick: (event: React.MouseEvent) => void
@@ -22,6 +22,7 @@ const colors = {
    "times": "red",
    "check": "auto",
    "plug": "auto",
+   "pencil": "auto",
    "cross-circle": "black",
 };
 
@@ -32,6 +33,7 @@ const classNames = {
    "times": "fa fa-times",
    "check": "fa fa-check",
    "plug": "fa fa-trash",
+   "pencil": "fa fa-pencil-square-o",
    "cross-circle": "fa fa-times-circle"
 }
 

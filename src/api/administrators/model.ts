@@ -33,14 +33,14 @@ export interface AdministratorManagementApi {
 
    updateAdmin(
       uuid: string,
+      username: string,
       name: string,
       surname: string,
-      username: string,
       email: string,
-      certificate: string | undefined,
       description: string,
       role: AdministratorRole,
-      certificateUuid: string
+      certificateUuid?: string,
+      adminCertificate?: CertificateDTO
    ): Observable<AdministratorDTO>;
 
    deleteAdmin(uuid: string): Observable<void>;
@@ -48,15 +48,15 @@ export interface AdministratorManagementApi {
    getAdminsList(): Observable<AdministratorDTO[]>;
 
    createAdmin(
+      username: string,
       name: string,
       surname: string,
-      username: string,
       email: string,
       description: string,
       role: AdministratorRole,
       enabled: boolean,
-      adminCertificate?: string,
-      certificateUuid?: string
+      certificateUuid?: string,
+      adminCertificate?: CertificateDTO
    ): Observable<string>;
 
    bulkDeleteAdmin(uuids: string[]): Observable<void>;

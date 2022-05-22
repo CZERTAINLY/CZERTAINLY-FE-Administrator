@@ -1,3 +1,3 @@
 export function randomDelay() {
-  return Math.random() * 1000;
+   return Math.random() * 1000;
 }

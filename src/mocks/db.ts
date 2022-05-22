@@ -34,7 +34,25 @@ export const dbData: DBData = {
 
    administrators: [
       dbAdministrators["Lukáš"],
-      dbAdministrators["Super_Administrator"]
+      dbAdministrators["Super_Administrator"],
+      dbAdministrators["Super_Administrator1"],
+      dbAdministrators["Super_Administrator2"],
+      dbAdministrators["Super_Administrator3"],
+      dbAdministrators["Super_Administrator4"],
+      dbAdministrators["Super_Administrator5"],
+      dbAdministrators["Super_Administrator6"],
+      dbAdministrators["Super_Administrator7"],
+      dbAdministrators["Super_Administrator8"],
+      dbAdministrators["Super_Administrator9"],
+      dbAdministrators["Super_Administrator10"],
+      dbAdministrators["Super_Administrator11"],
+      dbAdministrators["Super_Administrator12"],
+      dbAdministrators["Super_Administrator13"],
+      dbAdministrators["Super_Administrator14"],
+      dbAdministrators["Super_Administrator15"],
+      dbAdministrators["Super_Administrator16"],
+      dbAdministrators["Super_Administrator17"],
+      dbAdministrators["Super_Administrator18"]
    ],
 
    auditLogs: [

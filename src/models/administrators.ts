@@ -1,3 +1,5 @@
+import { CertificateModel } from "models";
+
 export type AdministratorRole = "administrator" | "superAdministrator";
 
 export interface AdministratorModel {
@@ -10,7 +12,7 @@ export interface AdministratorModel {
    email: string;
    role: AdministratorRole;
    description: string;
-   //certificate: Certificate;
+   certificate: CertificateModel;
    enabled: boolean;
 
 }

@@ -1,5 +1,5 @@
 import { CertificateDTO } from "api/certificates";
-import { certificatePEM2CertificateDTO } from "utils/certificate";
+import { certificatePEM2CertificateModel } from "utils/certificate";
 import { dbData } from "./db";
 
 export function getOrCreateCertificate(certificateContent: string | undefined, certificateUuid: string | undefined): CertificateDTO | undefined {
@@ -13,14 +13,30 @@ export function getOrCreateCertificate(certificateContent: string | undefined, c
 
    if (!certificateContent) return certificate;
 
-   const acrt = certificatePEM2CertificateDTO(certificateContent);
-   const crt = dbData.certificates.find(certificate => certificate.fingerprint === acrt.fingerprint && certificate.serialNumber === acrt.serialNumber);
+   const mcrt = certificatePEM2CertificateModel(certificateContent);
+   const crt = dbData.certificates.find(certificate => certificate.fingerprint === mcrt.fingerprint && certificate.serialNumber === mcrt.serialNumber);
 
    if (crt) return crt;
 
-   acrt.uuid = crypto.randomUUID();
-   dbData.certificates.push(acrt);
+   mcrt.uuid = crypto.randomUUID();
 
-   return acrt;
+   const dtoctr: CertificateDTO = {
+      ...mcrt,
+      subjectAlternativeNames: {
+         dNSName:  mcrt.subjectAlternativeNames?.dNSName || [],
+         directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
+         ediPartyName: mcrt.subjectAlternativeNames?.ediPartyName || [],
+         iPAddress: mcrt.subjectAlternativeNames?.iPAddress || [],
+         otherName: mcrt.subjectAlternativeNames?.otherName || [],
+         registeredID: mcrt.subjectAlternativeNames?.registeredID || [],
+         rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
+         uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
+         x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
+      }
+   }
+
+   dbData.certificates.push(dtoctr);
+
+   return dtoctr;
 
 }

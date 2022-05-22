@@ -1,58 +1,77 @@
 import { Certificate, DistinguishedName } from '@fidm/x509';
-import { CertificateDTO, CertificateSubjectAlternativeNamesDTO } from 'api/certificates';
 
-import { Certificate as InternalCertificate } from 'models';
+import { CertificateModel, CertificateSubjectAlternativeNamesModel } from 'models';
 
 function getDistinguishedName(dn: DistinguishedName): string {
-  const segments = [] as string[];
+   const segments = [] as string[];
 
-  if (dn) {
-    if (dn.commonName) {
-      segments.push(`CN=${dn.commonName}`);
-    }
-    if (dn.organizationName) {
-      segments.push(`O=${dn.organizationName}`);
-    }
-    if (dn.organizationalUnitName) {
-      segments.push(`OU=${dn.organizationalUnitName}`);
-    }
-    if (dn.localityName) {
-      segments.push(`L=${dn.localityName}`);
-    }
-    if (dn.countryName) {
-      segments.push(`C=${dn.countryName}`);
-    }
-  }
+   if (dn) {
+      if (dn.commonName) {
+         segments.push(`CN=${dn.commonName}`);
+      }
+      if (dn.organizationName) {
+         segments.push(`O=${dn.organizationName}`);
+      }
+      if (dn.organizationalUnitName) {
+         segments.push(`OU=${dn.organizationalUnitName}`);
+      }
+      if (dn.localityName) {
+         segments.push(`L=${dn.localityName}`);
+      }
+      if (dn.countryName) {
+         segments.push(`C=${dn.countryName}`);
+      }
+   }
 
-  return segments.join(',');
+   return segments.join(',');
 }
 
-export function getCertificateInformation(encoded: string): InternalCertificate {
-  let toDecode = encoded;
+export function getCertificateInformation(encoded: string): CertificateModel {
 
-  if (!encoded.startsWith('-----BEGIN CERTIFICATE-----')) {
-    toDecode = `-----BEGIN CERTIFICATE-----
+   let toDecode = encoded;
+
+   if (!encoded.startsWith('-----BEGIN CERTIFICATE-----')) {
+      toDecode = `-----BEGIN CERTIFICATE-----
       ${encoded}
       -----END CERTIFICATE-----
     `;
-  }
+   }
 
-  const cert = Certificate.fromPEM(Buffer.from(toDecode, 'utf-8'));
-  const subjectDn = getDistinguishedName(cert.subject);
-  const issuerDn = getDistinguishedName(cert.issuer);
+   try {
 
-  return {
-    subjectDn,
-    issuerDn,
-    validFrom: cert.validFrom,
-    validTo: cert.validTo,
-    serialNumber: cert.serialNumber,
-  };
+      const cert = Certificate.fromPEM(Buffer.from(toDecode, 'utf-8'));
+      const subjectDn = getDistinguishedName(cert.subject);
+      const issuerDn = getDistinguishedName(cert.issuer);
+
+      return {
+         uuid: "",
+         commonName: cert.subject.commonName,
+         issuerCommonName: cert.issuer.commonName,
+         certificateContent: encoded.replace(/\r\n/g, "\n").replace("-----BEGIN CERTIFICATE-----\n", "").replace("\n-----END CERTIFICATE-----", "").replace(/\n/g, ""),
+         publicKeyAlgorithm: cert.publicKey.algo,
+         signatureAlgorithm: cert.signatureAlgorithm,
+         basicConstraints: "",
+         status: "unknown",
+         fingerprint: cert.publicKey.getFingerprint("sha256").toString("base64"),
+         subjectAlternativeNames: {},
+         keySize: cert.publicKey.keyRaw.byteLength / 8,
+         keyUsage: [ cert.keyUsage.toString() ],
+         subjectDn,
+         issuerDn,
+         notBefore: cert.validFrom.toString(),
+         notAfter: cert.validTo.toString(),
+         serialNumber: cert.serialNumber,
+      };
+
+   } catch(e) {
+      console.log(e);
+      throw(e);
+   }
 
 }
 
 
-export function certificatePEM2CertificateDTO(certificate: string): CertificateDTO {
+export function certificatePEM2CertificateModel(certificate: string): CertificateModel {
 
    const crt = Certificate.fromPEM(Buffer.from(certificate));
 
@@ -112,14 +131,14 @@ export function certificatePEM2CertificateDTO(certificate: string): CertificateD
 
       tmp.push(`critical: ${bc.critical ? "yes" : "no"}`);
       tmp.push(`CA: ${bc.isCA ? "true" : "false"}`);
-      tmp.push(`Path length: ${bc.maxPathLen === -1 ? "unlimited" : bc.maxPathLen.toString() }`);
+      tmp.push(`Path length: ${bc.maxPathLen === -1 ? "unlimited" : bc.maxPathLen.toString()}`);
 
       return tmp.join(", ");
 
    }
 
 
-   function getSubjectAlternativeNames(): CertificateSubjectAlternativeNamesDTO {
+   function getSubjectAlternativeNames(): CertificateSubjectAlternativeNamesModel {
 
       return {
          dNSName: crt.dnsNames,
@@ -170,3 +189,28 @@ export function certificatePEM2CertificateDTO(certificate: string): CertificateD
    }
 
 }
+
+
+export const emptyCertificate: CertificateModel = {
+   uuid: "",
+   commonName: "",
+   serialNumber: "",
+   issuerCommonName: "",
+   certificateContent: "",
+   issuerDn: "",
+   subjectDn: "",
+   notBefore: "",
+   notAfter: "",
+   publicKeyAlgorithm: "",
+   signatureAlgorithm: "",
+   keySize: -1,
+   keyUsage: [],
+   extendedKeyUsage: [],
+   basicConstraints: "",
+   status: "unknown",
+   fingerprint: "",
+   certificateType: "X509",
+   issuerSerialNumber: "",
+   subjectAlternativeNames: {}
+}
+
