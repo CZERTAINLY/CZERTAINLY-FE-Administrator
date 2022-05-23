@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 
 import * as slice from "./certificates";
 import { actions as alertActions } from "./alerts";
-import { transformCertDtoToCertModel } from "./transform/certificates";
+import { transformCertDTOToCertModel } from "./transform/certificates";
 
 
 const listCertificates: AppEpic = (action$, state, deps) => {
@@ -26,7 +26,7 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                action.payload.filters
             ).pipe(
 
-            map(list => slice.actions.listCertificatesSuccess(list.certificates.map(cert => transformCertDtoToCertModel(cert)))),
+            map(list => slice.actions.listCertificatesSuccess(list.certificates.map(cert => transformCertDTOToCertModel(cert)))),
 
             catchError(err => of(slice.actions.listCertificatesFailure(extractError(err, "Failed to get certificates list"))))
 
@@ -67,7 +67,7 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.certificates.getCertificateDetail(action.payload).pipe(
 
-            map(certificate => slice.actions.getCertificateDetailSuccess(transformCertDtoToCertModel(certificate))),
+            map(certificate => slice.actions.getCertificateDetailSuccess(transformCertDTOToCertModel(certificate))),
 
             catchError(err => of(slice.actions.getCertificateDetailFailure(extractError(err, "Failed to get certificate detail"))))
 

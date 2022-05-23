@@ -1,9 +1,10 @@
 export * from "./auth";
 export * from "./certificate";
 export * from "./administrators";
+export * from "./clients";
+
 
 /*export * from "./audit-log";
-export * from "./clients";
 */
 
 export * from "./alerts";
