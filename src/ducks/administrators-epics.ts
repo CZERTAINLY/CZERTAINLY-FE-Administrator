@@ -11,8 +11,8 @@ import { actions as alertActions } from "./alerts";
 import { readFileString$ } from "utils/readFile";
 import { getCertificateInformation } from "utils/certificate";
 
-import { transformCertModelToCertDTO } from "./transform/certificates";
-import { transformAdminDtoToAdminModel } from "./transform/administrators";
+import { transformCertModelToDTO } from "./transform/certificates";
+import { transformAdminDtoToModel } from "./transform/administrators";
 
 
 const listAdmins: AppEpic = (action$, state, deps) => {
@@ -26,7 +26,7 @@ const listAdmins: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.admins.getAdminsList().pipe(
 
-            map(list => slice.actions.listAdminsSuccess(list.map(adminDto => transformAdminDtoToAdminModel(adminDto)))),
+            map(list => slice.actions.listAdminsSuccess(list.map(adminDto => transformAdminDtoToModel(adminDto)))),
 
             catchError(err => of(slice.actions.listAdminFailure(extractError(err, "Failed to get administrators list"))))
 
@@ -66,7 +66,7 @@ const getAdminDetail: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.admins.getAdminDetail(action.payload).pipe(
 
-            map(detail => slice.actions.getAdminDetailSuccess(transformAdminDtoToAdminModel(detail))),
+            map(detail => slice.actions.getAdminDetailSuccess(transformAdminDtoToModel(detail))),
 
             catchError(err => of(slice.actions.getAdminDetailFailure(extractError(err, "Failed to load administrator detail"))))
 
@@ -118,7 +118,7 @@ const createAdmin: AppEpic = (action$, state, deps) => {
                   action.payload.role,
                   false,
                   action.payload.certificateUuid,
-                  certificateContent ? transformCertModelToCertDTO(getCertificateInformation(certificateContent as string)) : undefined
+                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
                ).pipe(
 
                   map(uuid => slice.actions.createAdminSuccess(uuid)),
@@ -199,10 +199,10 @@ const updateAdmin: AppEpic = (action$, state, deps) => {
                   action.payload.description,
                   action.payload.role,
                   action.payload.certificateUuid,
-                  certificateContent ? transformCertModelToCertDTO(getCertificateInformation(certificateContent as string)) : undefined
+                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
                ).pipe(
 
-                  map(adminDTO => slice.actions.updateAdminSuccess(transformAdminDtoToAdminModel(adminDTO))),
+                  map(adminDTO => slice.actions.updateAdminSuccess(transformAdminDtoToModel(adminDTO))),
 
                   catchError(err => of(slice.actions.updateAdminFailure(extractError(err, "Failed to update administrator"))))
 

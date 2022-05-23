@@ -1,10 +1,8 @@
 import { FunctionGroupCode } from "api/connectors";
+import { AttributeCallbackMappingTarget, AttributeType, AttributeValue } from "types/attributes";
 
-export type AttributeType = "STRING" | "NUMBER" | "BOOLEAN" | "DROPDOWN" | "LIST" | "FILE" | "CREDENTIAL" | "SECRET";
 
-export type AttributeCallbackMappingTarget = "pathVariable" | "requestParameter" | "body";
-
-export interface CallbackMapping {
+export interface AttibuteCallbackMappingDTO {
    from?: string;
    attributeType?: AttributeType;
    to: string;
@@ -27,13 +25,9 @@ export interface CallbackQueryParameterDict {
 export interface AttributeCallbackDTO {
    callbackContext: string;
    callbackMethod: string;
-   mappings: CallbackMapping[];
+   mappings: AttibuteCallbackMappingDTO[];
 }
 
-export interface AttributeListValueDTO {
-   id: number;
-   name: string;
-}
 
 
 /**
@@ -53,7 +47,7 @@ export interface AttributeDescriptorDTO {
    dependsOn?: any;
    validationRegex?: string | RegExp;
    attributeCallback?: AttributeCallbackDTO;
-   value?: string | number | boolean | string[] | number[] | boolean[] | AttributeListValueDTO[];
+   value?: AttributeValue;
 }
 
 
@@ -80,7 +74,7 @@ export interface AttributeDTO {
    /** Type of the attribute - not used during create */
    type?: AttributeType;
    /** Value of the attribute */
-   value: string | number | boolean | string[] | number[] | boolean[] | AttributeListValueDTO;
+   value: AttributeValue;
 }
 
 

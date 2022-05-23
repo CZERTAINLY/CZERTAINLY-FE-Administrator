@@ -1,14 +1,14 @@
 import { AdministratorDTO } from "api/administrators";
 import { AdministratorModel } from "models";
-import { transformCertDTOToCertModel } from "./certificates";
+import { transformCertDTOToModel } from "./certificates";
 
-export function transformAdminDtoToAdminModel(adminDto: AdministratorDTO): AdministratorModel {
+export function transformAdminDtoToModel(adminDto: AdministratorDTO): AdministratorModel {
 
    return {
       uuid: adminDto.uuid,
       name: adminDto.name,
       username: adminDto.username,
-      certificate: transformCertDTOToCertModel(adminDto.certificate),
+      certificate: transformCertDTOToModel(adminDto.certificate),
       role: adminDto.role,
       email: adminDto.email,
       serialNumber: adminDto.serialNumber,
