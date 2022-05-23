@@ -3,13 +3,10 @@ import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
-export const statePath = "administrators";
-
-
 export type State = {
 
+   administrator?: AdministratorModel;
    administrators: AdministratorModel[];
-   administratorDetail?: AdministratorModel;
 
    checkedRows: string[];
    isCreating: boolean;
@@ -61,6 +58,7 @@ export const slice = createSlice({
 
       listAdmins: (state, action: PayloadAction<void>) => {
 
+         state.checkedRows = [];
          state.isFetchingList = true;
 
       },
@@ -69,7 +67,6 @@ export const slice = createSlice({
       listAdminsSuccess: (state, action: PayloadAction<AdministratorModel[]>) => {
 
          state.isFetchingList = false;
-         state.checkedRows = [];
          state.administrators = action.payload;
 
       },
@@ -78,14 +75,13 @@ export const slice = createSlice({
       listAdminFailure: (state, action: PayloadAction<string | undefined>) => {
 
          state.isFetchingList = false;
-         state.checkedRows = [];
 
       },
 
 
       getAdminDetail: (state, action: PayloadAction<string>) => {
 
-         state.administratorDetail = undefined;
+         state.administrator = undefined;
          state.isFetchingDetail = true;
 
       },
@@ -94,7 +90,7 @@ export const slice = createSlice({
       getAdminDetailSuccess: (state, action: PayloadAction<AdministratorModel>) => {
 
          state.isFetchingDetail = false;
-         state.administratorDetail = action.payload;
+         state.administrator = action.payload;
 
       },
 
@@ -111,9 +107,9 @@ export const slice = createSlice({
          surname: string,
          username: string,
          email: string,
-         certificate: FileList | undefined,
          description: string,
          role: AdministratorRole,
+         certificate: FileList | undefined,
          certificateUuid: string | undefined
       }>) => {
 
@@ -157,6 +153,11 @@ export const slice = createSlice({
 
          state.isUpdating = false;
 
+         const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload.uuid)
+         if (adminIndex >= 0) state.administrators[adminIndex] = action.payload;
+
+         if (state.administrator?.uuid === action.payload.uuid) state.administrator = action.payload;
+
       },
 
 
@@ -181,7 +182,8 @@ export const slice = createSlice({
 
          const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload);
          if (adminIndex >= 0) state.administrators.splice(adminIndex, 1);
-         if (state.administratorDetail?.uuid === action.payload) state.administratorDetail = undefined;
+
+         if (state.administrator?.uuid === action.payload) state.administrator = undefined;
 
       },
 
@@ -207,9 +209,12 @@ export const slice = createSlice({
 
          action.payload.forEach(
             uuid => {
+
                const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === uuid)
                if (adminIndex >= 0) state.administrators.splice(adminIndex, 1);
-               if (state.administratorDetail?.uuid === uuid) state.administratorDetail = undefined;
+
+               if (state.administrator?.uuid === uuid) state.administrator = undefined;
+
             }
          )
 
@@ -236,7 +241,8 @@ export const slice = createSlice({
 
          const admin = state.administrators.find(administrator => administrator.uuid === action.payload)
          if (admin) admin.enabled = true;
-         if (state.administratorDetail?.uuid === action.payload) state.administratorDetail.enabled = true;
+
+         if (state.administrator?.uuid === action.payload) state.administrator.enabled = true;
 
       },
 
@@ -263,7 +269,7 @@ export const slice = createSlice({
             uuid => {
                const admin = state.administrators.find(administrator => administrator.uuid === uuid)
                if (admin) admin.enabled = true;
-               if (state.administratorDetail?.uuid === uuid) state.administratorDetail.enabled = true;
+               if (state.administrator?.uuid === uuid) state.administrator.enabled = true;
             }
          )
 
@@ -290,7 +296,7 @@ export const slice = createSlice({
 
          const admin = state.administrators.find(administrator => administrator.uuid === action.payload)
          if (admin) admin.enabled = false;
-         if (state.administratorDetail?.uuid === action.payload) state.administratorDetail.enabled = false;
+         if (state.administrator?.uuid === action.payload) state.administrator.enabled = false;
 
 
       },
@@ -318,7 +324,7 @@ export const slice = createSlice({
             uuid => {
                const admin = state.administrators.find(administrator => administrator.uuid === uuid)
                if (admin) admin.enabled = false;
-               if (state.administratorDetail?.uuid === uuid) state.administratorDetail.enabled = false;
+               if (state.administrator?.uuid === uuid) state.administrator.enabled = false;
             }
          )
 
@@ -334,22 +340,25 @@ export const slice = createSlice({
 
 })
 
-const state = createFeatureSelector<State>(statePath);
 
-const isFetchingList = createSelector(state, (state) => state.isFetchingList);
-const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
-const isCreating = createSelector(state, (state) => state.isCreating);
-const isDeleting = createSelector(state, (state) => state.isDeleting);
-const isUpdating = createSelector(state, (state) => state.isUpdating);
-const isEnabling = createSelector(state, (state) => state.isEnabling);
-const isDisabing = createSelector(state, (state) => state.isDisabing);
-const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
-const isBulkEnabling = createSelector(state, (state) => state.isBulkEnabling);
-const isBulkDisabling = createSelector(state, (state) => state.isBulkDisabling);
-const checkedRows = createSelector(state, (state) => state.checkedRows);
+const state = createFeatureSelector<State>(slice.name);
 
-const administrators = createSelector(state, (state) => state.administrators);
-const administrator = createSelector(state, (state) => state.administratorDetail);
+const administrators = createSelector(state, state => state.administrators);
+const administrator = createSelector(state, state => state.administrator);
+
+const checkedRows = createSelector(state, state => state.checkedRows);
+
+const isFetchingList = createSelector(state, state => state.isFetchingList);
+const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
+const isCreating = createSelector(state, state => state.isCreating);
+const isUpdating = createSelector(state, state => state.isUpdating);
+const isDeleting = createSelector(state, state => state.isDeleting);
+const isEnabling = createSelector(state, state => state.isEnabling);
+const isDisabing = createSelector(state, state => state.isDisabing);
+const isBulkDeleting = createSelector(state, state => state.isBulkDeleting);
+const isBulkEnabling = createSelector(state, state => state.isBulkEnabling);
+const isBulkDisabling = createSelector(state, state => state.isBulkDisabling);
+
 
 export const selectors = {
    state,
