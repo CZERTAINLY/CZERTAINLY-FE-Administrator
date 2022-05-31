@@ -1,32 +1,8 @@
 import { Observable } from "rxjs";
 
-import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
-
-
-export type FunctionGroupCode = "credentialProvider" | "authorityProvider" | "legacyAuthorityProvider" | "discoveryProvider";
-
-export type FunctionGroupFilter = "CREDENTIAL_PROVIDER" | "AUTHORITY_PROVIDER" | "LEGACY_AUTHORITY_PROVIDER" | "DISCOVERY_PROVIDER";
-
-export type AuthType = "none" | "basic" | "certificate" | "apiKey" | "jwt";
-
-export type Status = "waitingForApproval" | "registered" | "connected" | "unavailable" | "misconfigured" | "failed" | "offline";
-
-
-export const FunctionGroupToGroupFilter: { [code in FunctionGroupCode]: FunctionGroupFilter } = {
-   "credentialProvider": "CREDENTIAL_PROVIDER",
-   "legacyAuthorityProvider": "AUTHORITY_PROVIDER",
-   "authorityProvider": "LEGACY_AUTHORITY_PROVIDER",
-   "discoveryProvider": "DISCOVERY_PROVIDER"
-}
-
-
-export const FunctionGroupFilterToGroupCode: { [filter in FunctionGroupFilter]: FunctionGroupCode } = {
-   "CREDENTIAL_PROVIDER": "credentialProvider",
-   "AUTHORITY_PROVIDER": "legacyAuthorityProvider",
-   "LEGACY_AUTHORITY_PROVIDER": "authorityProvider",
-   "DISCOVERY_PROVIDER": "discoveryProvider"
-}
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { AuthType, FunctionGroupCode, Status } from "types/connectors";
 
 
 export interface EndpointDTO {
@@ -58,6 +34,11 @@ export interface ConnectorDTO {
 }
 
 
+export interface ConnectorHealthPartDTO {
+   [key: string]: ConnectorHealthDTO;
+}
+
+
 export interface ConnectorHealthDTO {
    status: "ok" | "nok" | "unknown";
    description?: string;
@@ -65,21 +46,15 @@ export interface ConnectorHealthDTO {
 }
 
 
-export interface ConnectorHealthPartDTO {
-   [key: string]: ConnectorHealthDTO;
-}
-
-
-
 export interface ConnectorManagementApi {
 
-   getConnectorsList(functionGroupFilter?: FunctionGroupFilter, kind?: string): Observable<ConnectorDTO[]>;
+   getConnectorsList(functionGroupCode?: FunctionGroupCode, kind?: string): Observable<ConnectorDTO[]>;
 
    getConnectorDetail(uuid: string): Observable<ConnectorDTO>;
 
    getConnectorHealth(uuid: string): Observable<ConnectorHealthDTO>;
 
-   getConnectorAttributes(uuid: string, functionGroup: FunctionGroupFilter, kind: string): Observable<AttributeDescriptorDTO[]>;
+   getConnectorAttributes(uuid: string, functionGroup: FunctionGroupCode, kind: string): Observable<AttributeDescriptorDTO[]>;
 
    getConnectorAllAttributes(uuid: string): Observable<AttributeDescriptorCollectionDTO>;
 
@@ -87,7 +62,7 @@ export interface ConnectorManagementApi {
 
    updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<ConnectorDTO>;
 
-   deleteConnector(uuid: string): Observable<DeleteObjectErrorDTO[]>;
+   deleteConnector(uuid: string): Observable<void>;
 
    bulkDeleteConnector(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 
@@ -103,12 +78,17 @@ export interface ConnectorManagementApi {
 
    bulkAuthorizeConnector(uuids: string[]): Observable<void>;
 
-   getCallback(
+   /*callback(
       connectorUuid: string,
-      request: any,
       functionGroup: string,
       kind: string,
-      authorityUuid: string
-   ): Observable<any>;
+      request: {
+         uuid: string,
+         name: string,
+         pathVariables: any,
+         queryParameters: any,
+         requestBody: any
+      },
+   ): Observable<any>;*/
 
 }

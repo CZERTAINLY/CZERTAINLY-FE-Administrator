@@ -1,25 +1,4 @@
-import { AttributeDTO } from "api/.common/AttributeDTO";
-
-export enum AttributeFieldNameTransform {
-   name = "Name",
-   credentialProvider = "Credential Provider",
-   authorityProvider = "Authority Provider",
-   discoveryProvider = "Discovery Provider",
-   legacyAuthorityProvider = "Legacy Authority Provider",
-};
-
-export enum AttributeFieldTypeTransform {
-   STRING = "text",
-   NUMBER = "number",
-   SECRET = "password",
-   DROPDOWN = "select",
-   SELECT = "select",
-   LIST = "select",
-   FILE = "file",
-   BOOLEAN = "checkbox",
-   CREDENTIAL = "select"
-};
-
+import { AttributeDTO } from "api/_common/attributeDTO";
 
 export function attributeSimplifier(attributes: AttributeDTO[]): AttributeDTO[] {
 

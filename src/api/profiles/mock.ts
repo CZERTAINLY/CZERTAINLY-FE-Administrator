@@ -5,7 +5,7 @@ import { HttpErrorResponse } from "ts-rest-client";
 import * as model from "./model";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
-import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 export class ProfilesManagementMock implements model.ProfilesManagementApi {
 

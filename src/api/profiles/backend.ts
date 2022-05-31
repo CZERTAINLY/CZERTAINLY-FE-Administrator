@@ -4,7 +4,7 @@ import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
-import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { attributeSimplifier } from "utils/attributes";
 import { createNewResource } from "utils/net";
 

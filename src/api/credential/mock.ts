@@ -5,10 +5,10 @@ import { HttpErrorResponse } from "ts-rest-client";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 import * as model from "./model";
-import { AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
 
 
 export class CredentialManagementMock implements model.CredentialManagementApi {

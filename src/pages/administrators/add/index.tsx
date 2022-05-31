@@ -1,9 +1,9 @@
 import React from "react";
 import { Container } from "reactstrap";
 
-import AdminForm from "components/AdminForm";
+import AdminForm from "components/Forms/AdminForm";
 
-function AdminAdd() {
+export default function AdminAdd() {
 
    const title = (
       <h5>
@@ -17,5 +17,3 @@ function AdminAdd() {
       </Container>
    );
 }
-
-export default AdminAdd;

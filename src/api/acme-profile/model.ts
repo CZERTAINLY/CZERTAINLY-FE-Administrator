@@ -1,7 +1,7 @@
-import { AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
 import { Observable } from "rxjs";
 import { RaProfileDTO } from "api/profiles";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 
 export interface AcmeProfileListItemDTO {

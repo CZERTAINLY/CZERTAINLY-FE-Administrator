@@ -1,4 +1,4 @@
-import { AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { Observable } from "rxjs";
 
 

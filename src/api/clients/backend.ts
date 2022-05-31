@@ -1,3 +1,4 @@
+import { CertificateDTO } from "api/certificates";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
@@ -31,7 +32,7 @@ export class ClientManagementBackend implements model.ClientManagementApi {
    }
 
 
-   createNewClient(name: string, description?: string, enabled?: boolean, certificate?: string, certificateUuid?: string): Observable<string> {
+   createNewClient(name: string, description?: string, enabled?: boolean, certificateUuid?: string, certificate?: CertificateDTO): Observable<string> {
 
       return createNewResource(baseUrl, {
          name,
@@ -39,6 +40,7 @@ export class ClientManagementBackend implements model.ClientManagementApi {
          description,
          enabled,
          certificateUuid,
+         clientCertificate: certificate
       }).pipe(
          map(
 
@@ -107,7 +109,7 @@ export class ClientManagementBackend implements model.ClientManagementApi {
    }
 
 
-   getAuthorizedProfiles(uuid: string): Observable<model.AuthorizedProfilesDTO[]> {
+   getAuthorizedProfiles(uuid: string): Observable<model.AuthorizedRAProfileDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/listauth`, "GET")
@@ -143,7 +145,7 @@ export class ClientManagementBackend implements model.ClientManagementApi {
    }
 
 
-   updateClient(uuid: string, certificate?: string, description?: string, certificateUuid?: string): Observable<model.ClientDTO> {
+   updateClient(uuid: string, description?: string, certificateUuid?: string, certificate?: CertificateDTO): Observable<model.ClientDTO> {
 
       return this._fetchService.request(
 
@@ -152,9 +154,9 @@ export class ClientManagementBackend implements model.ClientManagementApi {
             "POST",
             {
                uuid,
-               certificate,
                description,
                certificateUuid,
+               clientCertificate: certificate?.certificateContent,
             }
          )
 

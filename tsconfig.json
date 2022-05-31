@@ -1,4 +1,5 @@
 {
+
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -22,8 +23,9 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true
   },
+
   "include": [
     "src/**/*"
-  ]
+   ]
 
 }

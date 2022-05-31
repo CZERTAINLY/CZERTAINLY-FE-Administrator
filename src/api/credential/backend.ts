@@ -1,5 +1,5 @@
-import { AttributeDTO } from "api/.common/AttributeDTO";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";

@@ -6,8 +6,8 @@ import * as model from "./model";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
-import { certificatePEM2CertificateModel } from "utils/certificate";
 import { CertificateDTO } from "api/certificates";
+import { getOrCreateCertificate } from "mocks/helpers";
 
 
 export class ClientManagementMock implements model.ClientManagementApi {
@@ -197,7 +197,7 @@ export class ClientManagementMock implements model.ClientManagementApi {
    }
 
 
-   updateClient(uuid: string, certificate?: string, description?: string, certificateUuid?: string): Observable<model.ClientDTO> {
+   updateClient(uuid: string, description?: string, certificateUuid?: string, certificate?: CertificateDTO): Observable<model.ClientDTO> {
 
       return of(
          dbData.clients.find(client => client.uuid === uuid)
@@ -210,41 +210,11 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
                if (!client) throw new HttpErrorResponse({ status: 404 });
 
+               const cert = getOrCreateCertificate(certificate?.certificateContent, certificateUuid);
+               if (!cert) throw new HttpErrorResponse({ status: 422, statusText: "Missing certificate or certificate does not exist." });
+
+               client.certificate = cert;
                if (description) client.description = description;
-
-               if (certificate) {
-
-                  const mcrt = certificatePEM2CertificateModel(certificate);
-
-                  client.certificate =  {
-                     ...mcrt,
-                     subjectAlternativeNames: {
-                        dNSName:  mcrt.subjectAlternativeNames?.dNSName || [],
-                        directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
-                        ediPartyName: mcrt.subjectAlternativeNames?.ediPartyName || [],
-                        iPAddress: mcrt.subjectAlternativeNames?.iPAddress || [],
-                        otherName: mcrt.subjectAlternativeNames?.otherName || [],
-                        registeredID: mcrt.subjectAlternativeNames?.registeredID || [],
-                        rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
-                        uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
-                        x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
-                     }
-                  }
-
-                  dbData.certificates.push({
-                     ...client.certificate,
-                     uuid: crypto.randomUUID()
-                  })
-
-               }
-
-               if (certificateUuid) {
-
-                  const certificate = dbData.certificates.find(certificate => certificate.uuid === certificateUuid);
-                  if (!certificate) throw new HttpErrorResponse({ status: 404, statusText: "Certificate not found!" });
-                  client.certificate = certificate;
-
-               }
 
                return client;
 
@@ -286,7 +256,7 @@ export class ClientManagementMock implements model.ClientManagementApi {
    }
 
 
-   createNewClient(name: string, description?: string, enabled?: boolean, certificate?: string, certificateUuid?: string): Observable<string> {
+   createNewClient(name: string, description?: string, enabled?: boolean, certificateUuid?: string, certificate?: CertificateDTO): Observable<string> {
 
       return of(
          null
@@ -299,39 +269,8 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
                const uuid = crypto.randomUUID();
 
-               let cert: CertificateDTO | undefined;
-
-               if (certificate) {
-
-                  const mcrt = certificatePEM2CertificateModel(certificate);
-
-                  cert =  {
-                     ...mcrt,
-                     subjectAlternativeNames: {
-                        dNSName:  mcrt.subjectAlternativeNames?.dNSName || [],
-                        directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
-                        ediPartyName: mcrt.subjectAlternativeNames?.ediPartyName || [],
-                        iPAddress: mcrt.subjectAlternativeNames?.iPAddress || [],
-                        otherName: mcrt.subjectAlternativeNames?.otherName || [],
-                        registeredID: mcrt.subjectAlternativeNames?.registeredID || [],
-                        rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
-                        uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
-                        x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
-                     }
-                  }
-
-                  dbData.certificates.push({
-                     ...cert,
-                     uuid: crypto.randomUUID()
-                  })
-
-               }
-
-               if (certificateUuid) {
-                  cert = dbData.certificates.find(certificate => certificate.uuid === certificateUuid);
-               }
-
-               if (!cert) throw new HttpErrorResponse({ status: 404, statusText: "Certificate is missing or not found" });
+               const cert = getOrCreateCertificate(certificate?.certificateContent, certificateUuid);
+               if (!cert) throw new HttpErrorResponse({ status: 422, statusText: "Missing certificate or certificate does not exist." });
 
                const client: model.ClientDTO = {
                   uuid,
@@ -354,7 +293,7 @@ export class ClientManagementMock implements model.ClientManagementApi {
 
 
 
-   getAuthorizedProfiles(uuid: string): Observable<model.AuthorizedProfilesDTO[]> {
+   getAuthorizedProfiles(uuid: string): Observable<model.AuthorizedRAProfileDTO[]> {
 
       return of(
          dbData.clients.find(client => client.uuid === uuid)

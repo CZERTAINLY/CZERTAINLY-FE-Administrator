@@ -1,4 +1,5 @@
-import { AuditLogDTO, AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from "api/auditLogs";
+import { AuditLogDTO } from "api/auditLogs";
+import { AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from "types/auditlog";
 
 
 export interface DbAuditLog extends AuditLogDTO {

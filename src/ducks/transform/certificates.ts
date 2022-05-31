@@ -1,7 +1,7 @@
 import { CertificateDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
 import { CertificateModel } from "models";
 
-export function transformCertDTOToCertModel(certificate: CertificateDTO): CertificateModel {
+export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
    const sanClone: CertificateSubjectAlternativeNamesDTO = JSON.parse(JSON.stringify(certificate.subjectAlternativeNames));
 
@@ -72,7 +72,7 @@ export function transformCertDTOToCertModel(certificate: CertificateDTO): Certif
 }
 
 
-export function transformCertModelToCertDTO(certificate: CertificateModel): CertificateDTO {
+export function transformCertModelToDTO(certificate: CertificateModel): CertificateDTO {
 
    const sanClone: CertificateSubjectAlternativeNamesDTO = JSON.parse(JSON.stringify(certificate.subjectAlternativeNames));
 

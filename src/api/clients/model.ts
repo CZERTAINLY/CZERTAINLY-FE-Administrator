@@ -12,7 +12,7 @@ export interface ClientDTO {
 }
 
 
-export interface AuthorizedProfilesDTO {
+export interface AuthorizedRAProfileDTO {
    uuid: string;
    name: string;
    enabled: boolean;
@@ -35,17 +35,17 @@ export interface ClientManagementApi {
 
    getClientDetail(uuid: string): Observable<ClientDTO>;
 
-   updateClient(uuid: string, certificate?: string, description?: string, certificateUuid?: string): Observable<ClientDTO>;
+   updateClient(uuid: string, description?: string, certificateUuid?: string, certificate?: CertificateDTO): Observable<ClientDTO>;
 
    deleteClient(uuid: string): Observable<void>;
 
    getClientsList(): Observable<ClientDTO[]>;
 
-   createNewClient(name: string, description?: string, enabled?: boolean, certificate?: string, certificateUuid?: string): Observable<string>;
+   createNewClient(name: string, description?: string, enabled?: boolean, certificateUuid?: string, certificate?: CertificateDTO): Observable<string>;
 
    bulkDeleteClient(uuids: string[]): Observable<void>;
 
-   getAuthorizedProfiles(uuid: string): Observable<AuthorizedProfilesDTO[]>;
+   getAuthorizedProfiles(uuid: string): Observable<AuthorizedRAProfileDTO[]>;
 
 
 }

@@ -10,7 +10,8 @@ import { DbRemoteConnector } from "./db-connectors-remote";
 import { DbCredential } from "./db-credentials";
 import { DbRaProfile } from "./db-ra-profiles";
 
-import {AuditLogOperation, AuditLogOperationStatus } from "api/auditLogs";
+import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
+
 
 export interface DBData {
 

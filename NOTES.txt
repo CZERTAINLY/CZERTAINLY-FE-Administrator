@@ -34,30 +34,32 @@ Mocks does not work properly (especially bulk updates can't work, but a lot of o
 
 - Widget buttons => New separate component
 
-
-
-In progress:
-
-- Refactoring of model objects according to changes in code (DTO)
-
-- Migrated to Redux-Toolkit, still in progress ()
-   - simplified store definition & configuration, better readability
-
-- Administrators
-   - using redux-toolkit, refactored epics
-   - list is done
-   - working on forms
-
 - Custom table
    - Simplified code, removed for-of loops, using filters, maps and so on
    - Fixed problems with component array keys
    - Fixed pagination which didn't work for me at all
 
+
+- Administrators (all parts of the code according to above changes)
+- Audit logs (all parts of the code according to above changes, reworked to use Ducks)
+
 - Certificates
    - removed parts of code duplicating structures
    - exetended work with binary certificate parsing (still not fully done)
 
-- Added widget buttons component
+
+In progress:
+
+- Migrated to Redux-Toolkit, still in progress ()
+   - simplified store definition & configuration, better readability
+
+- Refactoring of model objects according to changes in code (DTO)
+
+- Currently connectors
+   - clients / connectors ducks refactored
+   - clients / connectors pages in progress
+
+
 
 
 
@@ -70,6 +72,13 @@ New ACME Profile bugs
    - DNS port can start from 0
    - Retry interval can be set to negative value
    - Order validity can be set to negative value
+
+
+To Be Refactored in future:
+---------------------------
+
+   - Custom Table should be a single component used throughout the application
+   - React-select not styled in the bootrtrap way and does not support validation messages
 
 
 -----
@@ -104,8 +113,14 @@ New ACME Profile bugs
          - Set Attribute Value (uuid, name, value)
          - Get Attribute Value (uuid, name, value, label, type)
 
+   - When object is created through the API it should be returned in order to be possible to avoid list reloading
+
+   - Some endpoinds can be merged togeter and work based on arguments passed (i.e. connectors -> getAttributes, getAllAttributes)
+
    - Admin create / update => if certificate is passed and it exists already in DB the error is returned instead of the existing certificate is used
 
+   - Connectors
+      - Should not delete return same thing as bulkDelete
 
    - Router -> HASH??? Really???? Wtf Pradeep
 

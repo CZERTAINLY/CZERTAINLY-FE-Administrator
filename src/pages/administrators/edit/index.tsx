@@ -1,9 +1,9 @@
 import React from "react";
 import { Container } from "reactstrap";
 
-import AdminForm from "components/AdminForm";
+import AdminForm from "components/Forms/AdminForm";
 
-function AdminEdit() {
+export default function AdminEdit() {
 
    const title = (
       <h5>
@@ -19,4 +19,3 @@ function AdminEdit() {
 
 }
 
-export default AdminEdit;

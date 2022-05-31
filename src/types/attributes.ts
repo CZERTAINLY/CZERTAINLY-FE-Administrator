@@ -10,4 +10,4 @@ export type AttributeListValue = {
 }
 
 
-export type AttributeValue = string | number | boolean | string[] | number[] | boolean[] | AttributeListValue[];
+export type AttributeValue = string | number | boolean | AttributeListValue | string[] | number[] | boolean[] | AttributeListValue[];

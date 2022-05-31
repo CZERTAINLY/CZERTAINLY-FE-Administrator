@@ -1,8 +1,8 @@
 import { Observable } from "rxjs";
 
-import { AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
 import { FunctionGroupDTO } from "api/connectors";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 
 export interface CredentialDTO {

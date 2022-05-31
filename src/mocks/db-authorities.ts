@@ -1,4 +1,4 @@
-import { AttributeDescriptorDTO } from "api/.common/AttributeDTO";
+import { AttributeDescriptorDTO } from "api/_common/attributeDTO";
 import { AuthorityDTO } from "api/authority";
 
 

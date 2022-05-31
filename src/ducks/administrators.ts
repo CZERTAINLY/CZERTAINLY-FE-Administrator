@@ -5,17 +5,18 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type State = {
 
+   checkedRows: string[];
+
    administrator?: AdministratorModel;
    administrators: AdministratorModel[];
 
-   checkedRows: string[];
    isCreating: boolean;
    isDeleting: boolean;
    isUpdating: boolean;
    isFetchingDetail: boolean;
    isFetchingList: boolean;
    isEnabling: boolean;
-   isDisabing: boolean;
+   isDisabling: boolean;
    isBulkDeleting: boolean;
    isBulkEnabling: boolean;
    isBulkDisabling: boolean;
@@ -25,8 +26,9 @@ export type State = {
 
 export const initialState: State = {
 
-   administrators: [],
    checkedRows: [],
+
+   administrators: [],
 
    isCreating: false,
    isDeleting: false,
@@ -34,7 +36,7 @@ export const initialState: State = {
    isFetchingDetail: false,
    isFetchingList: false,
    isEnabling: false,
-   isDisabing: false,
+   isDisabling: false,
    isBulkDeleting: false,
    isBulkEnabling: false,
    isBulkDisabling: false
@@ -75,7 +77,6 @@ export const slice = createSlice({
       listAdminFailure: (state, action: PayloadAction<string | undefined>) => {
 
          state.isFetchingList = false;
-
       },
 
 
@@ -91,6 +92,14 @@ export const slice = createSlice({
 
          state.isFetchingDetail = false;
          state.administrator = action.payload;
+
+         const index = state.administrators.findIndex(administrator => administrator.uuid === action.payload.uuid);
+
+         if (index >= 0) {
+            state.administrators[index] = action.payload;
+         } else {
+            state.administrators.push(action.payload);
+         }
 
       },
 
@@ -121,6 +130,7 @@ export const slice = createSlice({
       createAdminSuccess: (state, action: PayloadAction<string>) => {
 
          state.isCreating = false;
+         // !!! as no full admin object is not retuned from the server is is not possible to add/replace it in the list !!!
 
       },
 
@@ -154,7 +164,12 @@ export const slice = createSlice({
          state.isUpdating = false;
 
          const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload.uuid)
-         if (adminIndex >= 0) state.administrators[adminIndex] = action.payload;
+
+         if (adminIndex >= 0) {
+            state.administrators[adminIndex] = action.payload;
+         } else {
+            state.administrators.push(action.payload);
+         }
 
          if (state.administrator?.uuid === action.payload.uuid) state.administrator = action.payload;
 
@@ -195,14 +210,14 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAdmin: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteAdmins: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDeleting = true;
 
       },
 
 
-      bulkDeleteAdminSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteAdminsSuccess: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDeleting = false;
          state.checkedRows = [];
@@ -221,7 +236,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAdminFailure: (state, action: PayloadAction<string>) => {
+      bulkDeleteAdminsFailure: (state, action: PayloadAction<string>) => {
 
          state.isBulkDeleting = false;
 
@@ -254,14 +269,14 @@ export const slice = createSlice({
       },
 
 
-      bulkEnableAdmin: (state, action: PayloadAction<string[]>) => {
+      bulkEnableAdmins: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkEnabling = true;
 
       },
 
 
-      bulkEnableAdminSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkEnableAdminsSuccess: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkEnabling = false;
 
@@ -276,7 +291,7 @@ export const slice = createSlice({
       },
 
 
-      bulkEnableAdminFailure: (state, action: PayloadAction<string>) => {
+      bulkEnableAdminsFailure: (state, action: PayloadAction<string>) => {
 
          state.isBulkEnabling = false;
 
@@ -285,14 +300,14 @@ export const slice = createSlice({
 
       disableAdmin: (state, action: PayloadAction<string>) => {
 
-         state.isDisabing = true;
+         state.isDisabling = true;
 
       },
 
 
       disableAdminSuccess: (state, action: PayloadAction<string>) => {
 
-         state.isDisabing = false;
+         state.isDisabling = false;
 
          const admin = state.administrators.find(administrator => administrator.uuid === action.payload)
          if (admin) admin.enabled = false;
@@ -304,19 +319,19 @@ export const slice = createSlice({
 
       disableAdminFailure: (state, action: PayloadAction<string>) => {
 
-         state.isDisabing = false;
+         state.isDisabling = false;
 
       },
 
 
-      bulkDisableAdmin: (state, action: PayloadAction<string[]>) => {
+      bulkDisableAdmins: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDisabling = true;
 
       },
 
 
-      bulkDisableAdminSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDisableAdminsSuccess: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDisabling = false;
 
@@ -331,7 +346,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDisableAdminFailure: (state, action: PayloadAction<string>) => {
+      bulkDisableAdminsFailure: (state, action: PayloadAction<string>) => {
 
          state.isBulkDisabling = false;
 
@@ -354,7 +369,7 @@ const isCreating = createSelector(state, state => state.isCreating);
 const isUpdating = createSelector(state, state => state.isUpdating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isEnabling = createSelector(state, state => state.isEnabling);
-const isDisabing = createSelector(state, state => state.isDisabing);
+const isDisabling = createSelector(state, state => state.isDisabling);
 const isBulkDeleting = createSelector(state, state => state.isBulkDeleting);
 const isBulkEnabling = createSelector(state, state => state.isBulkEnabling);
 const isBulkDisabling = createSelector(state, state => state.isBulkDisabling);
@@ -368,12 +383,12 @@ export const selectors = {
    isDeleting,
    isUpdating,
    isEnabling,
-   isDisabing,
+   isDisabling,
    isBulkDeleting,
    isBulkEnabling,
    isBulkDisabling,
-   selectCheckedRows: checkedRows,
-   selectAdministrators: administrators,
+   checkedRows: checkedRows,
+   administrators: administrators,
    admininistrator: administrator
 };
 

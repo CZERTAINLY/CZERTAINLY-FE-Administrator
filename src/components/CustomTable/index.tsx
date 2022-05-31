@@ -9,7 +9,7 @@ import styles from "./CustomTable.module.scss";
 import { checkAllHandler, checkHandler } from "utils/checkbox";
 
 
-export interface CustomTableHeader {
+export interface CustomTableHeaderColumn {
    content: any;
    sort?: boolean;
    id?: string;
@@ -31,7 +31,7 @@ interface Row {
 }
 
 interface Props {
-   headers: CustomTableHeader[];
+   headers: CustomTableHeaderColumn[];
    rows: Row[];
    checkbox?: boolean;
    checkedRows: any;

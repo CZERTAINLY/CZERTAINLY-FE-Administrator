@@ -4,16 +4,17 @@ import { HttpErrorResponse } from "ts-rest-client";
 
 import { randomDelay } from "utils/mock";
 
-import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 import { dbData } from "mocks/db";
 
 import * as model from "./model";
+import { AuthType, FunctionGroupCode } from "types/connectors";
 
 
 export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
-   createNewConnector(name: string, url: string, authType: model.AuthType, authAttributes: AttributeDTO[]): Observable<string> {
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes: AttributeDTO[]): Observable<string> {
 
       return of(
          dbData.connectorsRemote.find(connector => connector.url === url)
@@ -49,7 +50,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   connectToConnector(url: string, authType: model.AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
 
       return of(
          dbData.connectorsRemote.find(connector => connector.url === url)
@@ -70,7 +71,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   getConnectorsList(functionGroupFilter?: model.FunctionGroupFilter, kind?: string): Observable<model.ConnectorDTO[]> {
+   getConnectorsList(functionGroupCode?: FunctionGroupCode, kind?: string): Observable<model.ConnectorDTO[]> {
 
       return of(
 
@@ -78,9 +79,9 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
             connector => {
 
-               if (!functionGroupFilter) return true;
+               if (!functionGroupCode) return true;
 
-               const fgc = model.FunctionGroupFilterToGroupCode[functionGroupFilter];
+               const fgc = functionGroupCode;
 
                for (const functionGroup of connector.functionGroups) {
                   if (functionGroup.functionGroupCode !== fgc) return false;
@@ -99,7 +100,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   getConnectorAttributes(uuid: string, functionGroup: model.FunctionGroupFilter, kind: string): Observable<AttributeDescriptorDTO[]> {
+   getConnectorAttributes(uuid: string, functionGroupCode: FunctionGroupCode, kind: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.connectors.find(connector => connector.uuid === uuid)
@@ -115,9 +116,9 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
                const connectorRemote = dbData.connectorsRemote.find(connectorRemote => connectorRemote.url === connector.url);
                if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to remote connector" });
 
-               if (!connectorRemote.attributes.hasOwnProperty(functionGroup)) throw new HttpErrorResponse({ status: 404, statusText: "Invalid function group" });
+               if (!connectorRemote.attributes.hasOwnProperty(functionGroupCode)) throw new HttpErrorResponse({ status: 404, statusText: "Invalid function group" });
 
-               const fg = model.FunctionGroupFilterToGroupCode[functionGroup];
+               const fg = functionGroupCode;
                if (!connectorRemote.attributes[fg]!.hasOwnProperty(kind)) throw new HttpErrorResponse({ status: 404, statusText: "Invalid kind" });
 
                return connectorRemote.attributes[fg]![kind];
@@ -200,7 +201,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   deleteConnector(uuid: string): Observable<DeleteObjectErrorDTO[]> {
+   deleteConnector(uuid: string): Observable<void> {
 
       return of(
          dbData.connectors.findIndex(connector => connector.uuid === uuid)
@@ -212,7 +213,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
             connectorIndex => {
                if (connectorIndex < 0) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
                dbData.connectors.splice(connectorIndex, 1);
-               return [];
+               return;
             }
 
          )
@@ -383,7 +384,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   updateConnector(uuid: string, url: string, authType: model.AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
+   updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
 
       return of(
          dbData.connectors.find(connector => connector.uuid === uuid)
@@ -416,7 +417,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   getCallback(connectorUuid: string, request: any): Observable<any> {
+   callback(connectorUuid: string, request: any): Observable<any> {
 
       return of([
          {

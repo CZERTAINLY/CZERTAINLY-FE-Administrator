@@ -2,31 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
+
 import { Container, Table, Row, Col, Button } from "reactstrap";
+import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
+
+import { actions, selectors } from "ducks/administrators";
 
 import StatusCircle from "components/StatusCircle";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import { actions, selectors } from "ducks/administrators";
 import CertificateAttributes from "components/CertificateAttributes";
-import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
-function AdministratorDetail() {
+export default function AdministratorDetail() {
 
    const dispatch = useDispatch();
-
-   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-
-   const administrator = useSelector(selectors.admininistrator);
-   const isFetching = useSelector(selectors.isFetchingDetail);
-   const isDisabling = useSelector(selectors.isEnabling);
-   const isEnabling = useSelector(selectors.isDisabing);
 
    const { params } = useRouteMatch<{ id: string }>();
 
    const history = useHistory();
 
+   const administrator = useSelector(selectors.admininistrator);
+   const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+   const isDisabling = useSelector(selectors.isDisabling);
+   const isEnabling = useSelector(selectors.isEnabling);
+
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
    useEffect(() => {
       dispatch(actions.getAdminDetail(params.id));
@@ -66,14 +67,19 @@ function AdministratorDetail() {
 
 
    const attributesTitle = (
+
       <div>
+
          <div className="pull-right mt-n-xs">
             <WidgetButtons buttons={buttons} />
          </div>
+
          <h5>
             Administrator <span className="fw-semi-bold">Attributes</span>
          </h5>
+
       </div>
+
    );
 
 
@@ -88,7 +94,7 @@ function AdministratorDetail() {
       <Container className="themed-container" fluid>
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
             <Col>
-               <Widget title={attributesTitle} busy={isFetching || isEnabling || isDisabling}>
+               <Widget title={attributesTitle} busy={isFetchingDetail || isEnabling || isDisabling}>
                   <Table className="table-hover" size="sm">
                      <thead>
                         <tr>
@@ -139,7 +145,7 @@ function AdministratorDetail() {
             </Col>
 
             <Col>
-               <Widget title={certificateTitle} busy={isFetching}>
+               <Widget title={certificateTitle} busy={isFetchingDetail}>
                   <CertificateAttributes certificate={administrator?.certificate} />
                </Widget>
             </Col>
@@ -170,4 +176,3 @@ function AdministratorDetail() {
    );
 }
 
-export default AdministratorDetail;

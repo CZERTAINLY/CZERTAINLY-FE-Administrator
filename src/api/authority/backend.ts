@@ -5,10 +5,10 @@ import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
 import { createNewResource } from "utils/net";
-import { AttributeDTO } from "api/.common/AttributeDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
 
 import * as model from "./model";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 const baseUrl = "/api/v1/authorities";
 const baseUrlAuthorityProvider = "/api/v1/connectors";

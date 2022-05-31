@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
-import { AttributeDTO } from "api/.common/AttributeDTO";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 
 export interface AuthorityDTO {

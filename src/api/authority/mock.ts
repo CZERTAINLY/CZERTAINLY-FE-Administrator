@@ -7,8 +7,8 @@ import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
 
-import { AttributeDTO } from "api/.common/AttributeDTO";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 export class AuthorityManagementMock implements model.AuthorityManagementApi {
 

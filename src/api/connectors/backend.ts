@@ -1,18 +1,18 @@
-import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/.common/AttributeDTO";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { functionGroupCodeToGroupFilter } from "ducks/transform/connectors";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { AuthType, FunctionGroupCode } from "types/connectors";
 
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
 
 const baseUrl = "/api/v1/connectors";
-const baseUrlCallback = "/api/v1";
-
 
 export class ConnectorManagementBackend implements model.ConnectorManagementApi {
 
@@ -23,7 +23,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    private _fetchService: FetchHttpService;
 
 
-   createNewConnector(name: string, url: string, authType: model.AuthType, authAttributes?: AttributeDTO[]): Observable<string> {
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<string> {
 
       return createNewResource(
          baseUrl,
@@ -47,7 +47,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   connectToConnector(url: string, authType: model.AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
 
       return this._fetchService.request(
 
@@ -63,9 +63,9 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   getConnectorsList(functionGroupFilter?: model.FunctionGroupFilter, kind?: string): Observable<model.ConnectorDTO[]> {
+   getConnectorsList(functionGroupCode?: FunctionGroupCode, kind?: string): Observable<model.ConnectorDTO[]> {
 
-      const fgf = functionGroupFilter ? `functionGroupFilter=${functionGroupFilter}` : "";
+      const fgf = functionGroupCode ? `functionGroupFilter=${functionGroupCodeToGroupFilter[functionGroupCode]}` : "";
       const k = kind ? `kind=${kind}` : "";
 
       const search = fgf ? `?${fgf}` + k ? `&kind=${k}` : "" : "";
@@ -94,13 +94,13 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
 
    }
 
-   getConnectorAttributes(uuid: string, functionGroup: model.FunctionGroupFilter, kind: string): Observable<AttributeDescriptorDTO[]> {
+   getConnectorAttributes(uuid: string, functionGroupCode: FunctionGroupCode, kind: string): Observable<AttributeDescriptorDTO[]> {
 
-      // const fg = model.FunctionGroupFilterToGroupCode[functionGroup];
+      const fg = functionGroupCodeToGroupFilter[functionGroupCode];
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/${functionGroup}/${kind}/attributes`,
+            `${baseUrl}/${uuid}/${fg}/${kind}/attributes`,
             "GET"
          )
       );
@@ -117,7 +117,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   deleteConnector(uuid: string): Observable<DeleteObjectErrorDTO[]> {
+   deleteConnector(uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
@@ -181,7 +181,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   updateConnector(uuid: string, url: string, authType: model.AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
+   updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
@@ -195,12 +195,17 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   getCallback(
+   /*allback(
       connectorUuid: string,
-      request: any,
       functionGroup: string,
       kind: string,
-      authorityUuid: string
+      request: {
+         uuid: string,
+         name: string,
+         pathVariables: any,
+         queryParameters: any,
+         requestBody: any
+      },
    ): Observable<any> {
 
       // Authority calback API
@@ -210,7 +215,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
             new HttpRequestOptions(
                `${baseUrlCallback}/${authorityUuid}/callback`,
                "POST",
-               request
+               requestBody
             )
          );
 
@@ -221,10 +226,10 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
          new HttpRequestOptions(
             `${baseUrl}/${connectorUuid}/${functionGroup}/${kind}/callback`,
             "POST",
-            request
+            requestBody
          )
       );
 
-   }
+   }*/
 
 }

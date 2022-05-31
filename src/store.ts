@@ -23,6 +23,9 @@ export default function configure() {
    const store = configureStore({
       reducer: reducers,
       enhancers: [enhancer],
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+         serializableCheck: false // disable immutability checks because of date => should be refactored and date should not be stored in state
+      }),
       preloadedState: initialState
    });
 

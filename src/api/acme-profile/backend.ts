@@ -4,11 +4,11 @@ import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
-import { AttributeDTO } from "../.common/AttributeDTO";
+import { AttributeDTO } from "../_common/attributeDTO";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
-import { DeleteObjectErrorDTO } from "api/.common/DeleteObjectErrorDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 const baseUrl = "/api/v1/acmeProfiles";
 

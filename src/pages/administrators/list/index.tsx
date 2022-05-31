@@ -1,39 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { Button, Container } from "reactstrap";
 
-import StatusBadge from "components/StatusBadge";
-import StatusCircle from "components/StatusCircle";
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/administrators";
-import MDBColumnName from "components/MDBColumnName";
+
 import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
 
-import CustomTable, { CustomTableHeader } from "components/CustomTable";
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import MDBColumnName from "components/MDBColumnName";
+import StatusBadge from "components/StatusBadge";
+import StatusCircle from "components/StatusCircle";
+import CustomTable, { CustomTableHeaderColumn } from "components/CustomTable";
 
-function AdministratorsList() {
+export default function AdministratorsList() {
 
+   const dispatch = useDispatch();
    const history = useHistory();
 
-   const checkedRows = useSelector(selectors.selectCheckedRows);
-   const administrators = useSelector(selectors.selectAdministrators);
+   const { path } = useRouteMatch();
+
+   const checkedRows = useSelector(selectors.checkedRows);
+   const administrators = useSelector(selectors.administrators);
+
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
    const isUpdating = useSelector(selectors.isUpdating);
    const isEnabling = useSelector(selectors.isEnabling);
    const isBulkEnabling = useSelector(selectors.isBulkEnabling);
-   const isDisabling = useSelector(selectors.isDisabing);
+   const isDisabling = useSelector(selectors.isDisabling);
    const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isDisabling || isBulkDisabling;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-
-   const dispatch = useDispatch();
-   const { path } = useRouteMatch();
 
    useEffect(
       () => {
@@ -44,26 +46,26 @@ function AdministratorsList() {
       []
    );
 
-   const onAddClick = () => {
+   const onAddClick = useCallback(() => {
       history.push("/app/administrators/add");
-   }
+   }, [history]);
 
-   const onEnableClick = () => {
-      dispatch(actions.bulkEnableAdmin(checkedRows));
-   };
+   const onEnableClick = useCallback(() => {
+      dispatch(actions.bulkEnableAdmins(checkedRows));
+   }, [checkedRows, dispatch]);
 
-   const onDisableClick = () => {
-      dispatch(actions.bulkDisableAdmin(checkedRows));
-   };
+   const onDisableClick = useCallback(() => {
+      dispatch(actions.bulkDisableAdmins(checkedRows));
+   }, [checkedRows, dispatch]);
 
-   const onDeleteConfirmed = () => {
-      dispatch(actions.bulkDeleteAdmin(checkedRows));
+   const onDeleteConfirmed = useCallback(() => {
+      dispatch(actions.bulkDeleteAdmins(checkedRows));
       setConfirmDelete(false);
-   };
+   }, [checkedRows, dispatch]);
 
-   const setCheckedRows = (rows: string[]) => {
+   const setCheckedRows = useCallback((rows: string[]) => {
       dispatch(actions.setCheckedRows(rows));
-   }
+   }, [dispatch]);
 
    const buttons: WidgetButtonProps[] = [
       { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
@@ -88,55 +90,59 @@ function AdministratorsList() {
 
    const adminTableData = () => {
 
-      let rows: any = [];
+      return administrators.map(
 
-      for (let administrator of administrators) {
+         administrator => {
 
-         let column: any = {};
+            let column: any = {};
 
-         column["name"] = {
-            content: administrator.name,
-            styledContent: (
-               <Link to={`${path}/detail/${administrator.uuid}`}>
-                  {administrator.name}
-               </Link>
-            ),
-            lineBreak: true,
-         };
-         column["username"] = {
-            content: administrator.username,
-            lineBreak: true,
-         };
-         column["serialNumber"] = {
-            content: administrator.serialNumber,
-            lineBreak: true,
-         };
-         column["adminDn"] = {
-            content: administrator.certificate.subjectDn,
-            lineBreak: true,
-         };
-         column["superAdmin"] = {
-            content: administrator.role === "superAdministrator" ? "Yes" : "No",
-            styledContent: <StatusCircle status={administrator.role === "superAdministrator"} />,
-            lineBreak: true,
-         };
-         column["status"] = {
-            content: administrator.enabled ? "enabled" : "disabled",
-            styledContent: <StatusBadge enabled={administrator.enabled} />,
-            lineBreak: true,
-         };
-         rows.push({
-            id: administrator.uuid,
-            column: column,
-            data: administrator,
-         });
-      }
+            column["name"] = {
+               content: administrator.name,
+               styledContent: <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.name}</Link>,
+               lineBreak: true,
+            };
 
-      return rows;
-   };
+            column["username"] = {
+               content: administrator.username,
+               lineBreak: true,
+            };
+
+            column["serialNumber"] = {
+               content: administrator.serialNumber,
+               lineBreak: true,
+            };
+
+            column["adminDn"] = {
+               content: administrator.certificate.subjectDn,
+               lineBreak: true,
+            };
+
+            column["superAdmin"] = {
+               content: administrator.role === "superAdministrator" ? "Yes" : "No",
+               styledContent: <StatusCircle status={administrator.role === "superAdministrator"} />,
+               lineBreak: true,
+            };
+
+            column["status"] = {
+               content: administrator.enabled ? "enabled" : "disabled",
+               styledContent: <StatusBadge enabled={administrator.enabled} />,
+               lineBreak: true,
+            };
+
+            return {
+               id: administrator.uuid,
+               column: column,
+               data: administrator,
+            };
+
+         }
+
+      );
+
+   }
 
 
-   const adminTableHeader: CustomTableHeader[] = [
+   const adminTableHeader: CustomTableHeaderColumn[] = [
       {
          styledContent: <MDBColumnName columnName="Name" />,
          content: "name",
@@ -227,5 +233,3 @@ function AdministratorsList() {
    );
 
 }
-
-export default AdministratorsList;

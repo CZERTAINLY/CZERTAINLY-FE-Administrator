@@ -1,5 +1,6 @@
-import { AttributeDescriptorCollectionDTO, AttributeDTO } from "api/.common/AttributeDTO";
-import { AuthType, ConnectorHealthDTO, FunctionGroupDTO } from "api/connectors";
+import { AttributeDescriptorCollectionDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { ConnectorHealthDTO, FunctionGroupDTO } from "api/connectors";
+import { AuthType } from "types/connectors";
 
 
 export interface DbRemoteConnector {

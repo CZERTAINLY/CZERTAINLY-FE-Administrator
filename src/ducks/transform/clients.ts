@@ -1,8 +1,8 @@
-import { ClientDTO } from "api/clients/model";
-import { ClientModel } from "models";
-import { transformCertDTOToCertModel } from "./certificates";
+import { AuthorizedRAProfileDTO, ClientDTO } from "api/clients/model";
+import { ClientAuthorizedRaProfileModel, ClientModel } from "models";
+import { transformCertDTOToModel } from "./certificates";
 
-export function transformClientDTOToClientModel(client: ClientDTO): ClientModel {
+export function transformClientDTOToModel(client: ClientDTO): ClientModel {
 
    return {
       uuid: client.uuid,
@@ -10,7 +10,17 @@ export function transformClientDTOToClientModel(client: ClientDTO): ClientModel 
       description: client.description,
       serialNumber: client.serialNumber,
       enabled: client.enabled,
-      certificate: transformCertDTOToCertModel(client.certificate)
+      certificate: transformCertDTOToModel(client.certificate)
+   }
+
+}
+
+export function transformClientAuthorizedProfileDTOToModel(profile: AuthorizedRAProfileDTO): ClientAuthorizedRaProfileModel {
+
+   return {
+      uuid: profile.uuid,
+      name: profile.name,
+      enabled: profile.enabled
    }
 
 }

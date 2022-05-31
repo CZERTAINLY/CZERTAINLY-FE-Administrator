@@ -1,17 +1,18 @@
-import { ClientModel } from "models/clients";
+import { ClientAuthorizedRaProfileModel, ClientModel } from "models/clients";
 
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RaProfileModel } from "models/raProfile";
 
 
 export type State = {
 
+   checkedRows: string[],
+
    clients: ClientModel[],
 
    client?: ClientModel,
-   authorizedProfiles: string[];
-
-   checkedRows: string[],
+   authorizedProfiles: ClientAuthorizedRaProfileModel[];
 
    isFetchingList: boolean,
    isFetchingDetail: boolean,
@@ -31,11 +32,11 @@ export type State = {
 
 export const initialState: State = {
 
+   checkedRows: [],
+
    clients: [],
 
    authorizedProfiles: [],
-
-   checkedRows: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -123,7 +124,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorizedProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      getAuthorizedProfilesSuccess: (state, action: PayloadAction<ClientAuthorizedRaProfileModel[]>) => {
 
          state.authorizedProfiles = action.payload;
          state.isFetchingAuthorizedProfiles = false;
@@ -263,26 +264,29 @@ export const slice = createSlice({
       },
 
 
-
-      authorizeClient: (state, action: PayloadAction<{ clientUuid: string, profileUuid: string }>) => {
+      authorizeClient: (state, action: PayloadAction<{ clientUuid: string, raProfile: RaProfileModel | ClientAuthorizedRaProfileModel }>) => {
 
          state.isAuthorizing = true;
 
       },
 
 
-      authorizeClientSuccess: (state, action: PayloadAction<{ clientUuid: string, profileUuid: string }>) => {
+      authorizeClientSuccess: (state, action: PayloadAction<{ clientUuid: string, raProfile: RaProfileModel | ClientAuthorizedRaProfileModel }>) => {
 
          state.isAuthorizing = false;
 
-         if (state.client?.uuid === action.payload.clientUuid && !state.authorizedProfiles.includes(action.payload.profileUuid)) {
-            state.authorizedProfiles.push(action.payload.profileUuid);
+         if (state.client?.uuid === action.payload.clientUuid && !state.authorizedProfiles.find(p => p.uuid !== action.payload.raProfile.uuid)) {
+            state.authorizedProfiles.push({
+               uuid: action.payload.raProfile.uuid,
+               name: action.payload.raProfile.name,
+               enabled: action.payload.raProfile.enabled
+            });
          }
 
       },
 
 
-      authorizeClientFailed: (state, action: PayloadAction<{ clientUuid: string, profileUuid: string }>) => {
+      authorizeClientFailure: (state, action: PayloadAction<string>) => {
 
          state.isAuthorizing = false;
 
@@ -308,7 +312,7 @@ export const slice = createSlice({
       },
 
 
-      enableClientFailed: (state, action: PayloadAction<string>) => {
+      enableClientFailure: (state, action: PayloadAction<string>) => {
 
          state.isEnabling = false;
 
@@ -417,6 +421,7 @@ const state = createFeatureSelector<State>(slice.name);
 
 const clients = createSelector(state, state => state.clients);
 const client = createSelector(state, state => state.client);
+
 const authorizedProfiles = createSelector(state, state => state.authorizedProfiles);
 const checkedRows = createSelector(state, state => state.checkedRows);
 const isFetchingList = createSelector(state, state => state.isFetchingList);
