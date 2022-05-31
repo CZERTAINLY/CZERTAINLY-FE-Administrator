@@ -192,12 +192,7 @@ function AcmeProfileForm({
         changedRevokeAttributes = revokeAttributes;
       } else {
         for (let i of revokeAttributes) {
-          if (
-            JSON.stringify(revokeEditableAttributes).indexOf(
-              JSON.stringify(i)
-            ) < 0 ||
-            !!i.value
-          )
+          if (JSON.stringify(revokeEditableAttributes).indexOf(JSON.stringify(i) ) < 0 || !!i.value)
             if (
               typeof i.value === "object" &&
               typeof i.value.id == "undefined"
