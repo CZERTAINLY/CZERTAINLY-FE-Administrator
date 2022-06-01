@@ -32,7 +32,7 @@ const classNames = {
    "trash": "fa fa-trash",
    "times": "fa fa-times",
    "check": "fa fa-check",
-   "plug": "fa fa-trash",
+   "plug": "fa fa-plug",
    "pencil": "fa fa-pencil-square-o",
    "cross-circle": "fa fa-times-circle"
 }

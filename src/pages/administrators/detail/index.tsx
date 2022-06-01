@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
-import { Container, Table, Row, Col, Button } from "reactstrap";
-import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
+import { Container, Table, Row, Col } from "reactstrap";
 
 import { actions, selectors } from "ducks/administrators";
 
@@ -13,6 +12,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import CertificateAttributes from "components/CertificateAttributes";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { Dialog } from "components/Dialog";
 
 export default function AdministratorDetail() {
 
@@ -39,7 +39,7 @@ export default function AdministratorDetail() {
    }
 
 
-   const onDeleteClick = () => {
+   const onDeleteConfirmed = () => {
       if (!administrator) return;
       dispatch(actions.deleteAdmin(administrator.uuid));
       setConfirmDelete(false);
@@ -151,26 +151,16 @@ export default function AdministratorDetail() {
             </Col>
          </Row>
 
-         <MDBModal overflowScroll={false} isOpen={confirmDelete} toggle={() => setConfirmDelete(false)}>
-
-            <MDBModalHeader toggle={() => setConfirmDelete(false)}>
-               Delete Credential
-            </MDBModalHeader>
-
-            <MDBModalBody>
-               You are about to delete an Administrator. Is this what you want to do?
-            </MDBModalBody>
-
-            <MDBModalFooter>
-               <Button color="danger" onClick={onDeleteClick}>
-                  Yes, delete
-               </Button>
-               <Button color="secondary" onClick={() => setConfirmDelete(false)}>
-                  Cancel
-               </Button>
-            </MDBModalFooter>
-
-         </MDBModal>
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Administrator"
+            body="You are about to delete an Administrator. Is this what you want to do?"
+            toggle={ () => setConfirmDelete(false) }
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
 
       </Container>
    );

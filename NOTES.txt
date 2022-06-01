@@ -212,6 +212,8 @@ React
    Avoid passing components using props whenever possible. It makes code undebugable. It is much better to pass down the data and generate the
    view there. This is not always possible, but, should be preferred all the time.
 
+   Use keys for all mapped data - this is necessarty to React works properly, effectively and it prevents displaying of warnings and errors in the console
+
 HTML
 
    Make it readable. Use empty lines, don't split so much tags to multiple lines (when there are so many attributes, do that)

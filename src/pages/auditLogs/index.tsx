@@ -11,7 +11,6 @@ import { selectors } from "ducks/audit";
 import { AuditLogModel } from "models";
 
 import AuditLogsFilters, { FormValues as FilterValues, } from "components/AuditLogsFilters";
-
 import ObjectValues from "components/ObjectValues";
 import Widget from "components/Widget";
 import SortColumnHeader from "components/SortColumnHeader";

@@ -71,7 +71,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
       const search = fgf ? `?${fgf}` + k ? `&kind=${k}` : "" : "";
 
       return this._fetchService.request(
-         new HttpRequestOptions(`baseUrl${search}`, "GET")
+         new HttpRequestOptions(`${baseUrl}${search}`, "GET")
       );
 
    }

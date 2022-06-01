@@ -39,7 +39,7 @@ export interface AttributeDependencyDTO {
  * Used to describe properties of particular object attributes (generate the form)
  */
 export interface AttributeDescriptorDTO {
-   uuid: string | number;
+   uuid: string;
    name: string;
    type: AttributeType;
    label: string;

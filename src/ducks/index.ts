@@ -11,6 +11,9 @@ import { initialState as initialAlertsState, slice as alertsSlice } from "./aler
 import { initialState as initialAuthState, slice as authSlice } from "./auth";
 import authEpics from "./auth-epics";
 
+import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./audit";
+import auditLogsEpics from "./audit-epics";
+
 import { initialState as initialAdministratorsState, slice as administratorsSlice } from "./administrators";
 import administratorsEpics from "./administrators-epics";
 
@@ -20,14 +23,14 @@ import certificatesEpics from "./certificates-epic";
 import { initialState as initialClientsState, slice as clientsSlice } from "./clients";
 import clientsEpics from "./clients-epics";
 
-import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./audit";
-import auditLogsEpics from "./audit-epics";
+import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
+import connectorsEpics from "./connectors-epic";
+
 
 
 
 /*
 import { initialState as initialCredentialsState, State as CredentialsState, statePath as credentialStatePath } from "./credentials";
-import { initialState as initialConnectorsState, State as ConnectorsState, statePath as connectorStatePath } from "./connectors";
 import { initialState as initialAuthoritiesState, State as AuthoritiesState, statePath as authorityStatePath } from "./ca-authorities";
 import { initialState as initialProfilesState, State as ProfilesState, statePath as profileStatePath } from "./ra-profiles";
 import { initialState as initialCertificatesState, State as CertificatesState, statePath as certificatesStatePath } from "./certificates";
@@ -60,13 +63,13 @@ export const initialState = {
    [alertsSlice.name]: initialAlertsState,
    [auditLogsSlice.name]: initialAuditLogsState,
    [authSlice.name]: initialAuthState,
-   [certificatesSlice.name]: initialCertificatesState,
    [administratorsSlice.name]: initialAdministratorsState,
+   [certificatesSlice.name]: initialCertificatesState,
    [clientsSlice.name]: initialClientsState,
+   [connectorsSlice.name]: initialConnectorsState,
    /*
       [profileStatePath]: initialProfilesState,
       [credentialStatePath]: initialCredentialsState,
-      [connectorStatePath]: initialConnectorsState,
       [authorityStatePath]: initialAuthoritiesState,
       [acmeAccountStatePath]: initialAcmeAccountState,
       [acmeProfileStatePath]: initialAcmeProfilesState,
@@ -80,12 +83,10 @@ export const reducers = combineReducers<typeof initialState, any>({
    [certificatesSlice.name]: certificatesSlice.reducer,
    [administratorsSlice.name]: administratorsSlice.reducer,
    [clientsSlice.name]: clientsSlice.reducer,
+   [connectorsSlice.name]: connectorsSlice.reducer,
    /*
-   [administratorsStatePath]: administratorsReducer,
-   [clientsStatePath]: clientsReducer,
    [profilesStatePath]: profilesReducer,
    [credentialsStatePath]: credentialsReducer,
-   [connectorsStatePath]: connectorsReducer,
    [authoritiesStatePath]: authoritiesReducer,
    [acmeAccountStatePath]: acmeAccountReducer,
    [acmeProfilesStatePath]: acmeProfilesReducer,
@@ -99,13 +100,12 @@ export const epics = combineEpics(
    ...auditLogsEpics,
    ...certificatesEpics,
    ...administratorsEpics,
-   ...clientsEpics
+   ...clientsEpics,
+   ...connectorsEpics,
    /*...adminEpics,
   ...profileEpics,
   ...credentialsEpic,
-  ...connectorsEpic,
   ...authoritiesEpic,
-  ...certificateEpics,
   ...acmeAccountEpics,
   ...acmeProfileEpics*/
 );

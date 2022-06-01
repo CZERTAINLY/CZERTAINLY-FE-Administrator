@@ -75,7 +75,7 @@ export interface AttributeDependencyModel {
  * Used to describe properties of particular object attributes (generate the form)
  */
  export interface AttributeDescriptorModel {
-   uuid: string | number;
+   uuid: string;
    name: string;
    type: AttributeType;
    label: string;

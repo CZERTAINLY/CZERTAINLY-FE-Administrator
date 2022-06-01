@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
+import { Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/clients";
-
-import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
 
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { CustomTableHeaderColumn } from "components/CustomTable";
+import { Dialog } from "components/Dialog";
 
 export default function ClientList() {
 
@@ -179,31 +178,20 @@ export default function ClientList() {
             />
          </Widget>
 
-         <MDBModal overflowScroll={false} isOpen={confirmDelete} toggle={() => setConfirmDelete(false)}>
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Client"
 
-            <MDBModalHeader toggle={() => setConfirmDelete(false)}>
-               Delete Client
-            </MDBModalHeader>
+            body="You are about deleting a client with existing authorizations to RA
+            Profiles. If you continue, these authorizations will be deleted as
+            well. Is this what you want to do?"
 
-            <MDBModalBody>
-               You are about deleting a client with existing authorizations to RA
-               Profiles. If you continue, these authorizations will be deleted as
-               well. Is this what you want to do?
-            </MDBModalBody>
-
-            <MDBModalFooter>
-
-               <Button color="danger" onClick={onDeleteConfirmed}>
-                  Yes, delete
-               </Button>
-
-               <Button color="secondary" onClick={() => setConfirmDelete(false)}>
-                  Cancel
-               </Button>
-
-            </MDBModalFooter>
-
-         </MDBModal>
+            toggle={ () => setConfirmDelete(false) }
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
 
       </Container>
    );

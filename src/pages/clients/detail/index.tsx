@@ -307,6 +307,27 @@ export default function ClientDetail() {
         </Form>
       </Widget>
 
+
+         <Dialog
+
+            isOpen={confirmDelete}
+
+            caption="Delete Client"
+
+            body="You are about deleting a client with existing authorizations to RA
+            Profiles. If you continue, these authorizations will be deleted as
+            well. Is this what you want to do?"
+
+            toggle={ () => setConfirmDelete(false) }
+
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+
+         />
+
+
       <MDBModal
         overflowScroll={false}
         isOpen={confirmDeleteId !== ""}

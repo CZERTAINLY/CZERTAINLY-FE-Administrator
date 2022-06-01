@@ -8,6 +8,7 @@ import ConnectorEdit from "./edit";
 import ConnectorsList from "./list";
 
 function Connectors() {
+
   const { path } = useRouteMatch();
 
   return (
@@ -19,6 +20,7 @@ function Connectors() {
       <Route path={`${path}/add`} component={ConnectorAdd} exact />
     </Switch>
   );
+
 }
 
 export default Connectors;

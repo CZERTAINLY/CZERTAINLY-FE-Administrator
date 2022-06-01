@@ -26,7 +26,7 @@ interface FormValues {
 }
 
 interface Props {
-   title: string;
+   title: JSX.Element;
 }
 
 const optionsForAuth = [

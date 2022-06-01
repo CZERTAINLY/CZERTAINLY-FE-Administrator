@@ -27,6 +27,6 @@ yarn-error.log*
 .idea/
 
 #Proxy Files
-src/gateway_client_key.pem
-src/gateway_client_cert.pem
-src/setupProxy.js
+#src/gateway_client_key.pem
+#src/gateway_client_cert.pem
+#src/setupProxy.js

@@ -162,7 +162,7 @@ function CustomTable({
 
                         header => (
 
-                           <td key={header.content}>
+                           <td key={header.id || header.content}>
                               {
                                  header.content !== "checkbox" ? (
                                     row.column[header?.content]?.styledContent || row.column[header?.content]?.content || null

@@ -1,20 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { Button, Container, Table } from "reactstrap";
 
-import Spinner from "components/Spinner";
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/connectors";
 import MDBColumnName from "components/MDBColumnName";
 import { FunctionGroupDTO } from "api/connectors";
-import ToolTip from "components/ToolTip";
 
-import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader, } from "mdbreact";
 import { inventoryStatus } from "utils/connector";
 import CustomTable from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { attributeFieldNameTransform } from "models/attributes";
+import { Dialog } from "components/Dialog";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -41,8 +39,7 @@ function ConnectorList() {
 
    useEffect(() => {
       dispatch(actions.listConnectors());
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, []);
+   }, [dispatch]);
 
    /*useEffect(() => {
       if (deleteErrorMessages?.length > 0) {
@@ -78,21 +75,9 @@ function ConnectorList() {
       [dispatch]
    );*/
 
-   const getKindsForDisplay = (kinds: string[]) => {
-      return kinds.map(function (kind) {
-         return (
-            <>
-               <MDBBadge color="secondary" searchvalue={kind}>
-                  {kind}
-               </MDBBadge>
-               &nbsp;
-            </>
-         );
-      });
-   };
 
-   const onDeleteConnector = (event: any) => {
-      //dispatch(actions.confirmBulkDeleteConnectorRequest(checkedRows));
+   const onDeleteConfirmed = () => {
+      dispatch(actions.bulkDeleteConnectors(checkedRows));
    };
 
    const onAuthorizeConnector = (event: any) => {
@@ -110,18 +95,23 @@ function ConnectorList() {
       //setDeleteErrorModalOpen(false);
    };
 
+
    const onAddClick = useCallback(() => {
    }, [history]);
+
 
    const onReconnectClick = useCallback(() => {
    }, [checkedRows, dispatch]);
 
+
    const onAuthorizeClick = useCallback(() => {
    }, [checkedRows, dispatch]);
+
 
    const setCheckedRows = useCallback((rows: string[]) => {
       dispatch(actions.setCheckedRows(rows));
    }, [dispatch]);
+
 
    const buttons: WidgetButtonProps[] = [
       { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
@@ -132,6 +122,7 @@ function ConnectorList() {
 
 
    const title = (
+
       <div>
 
          <div className="pull-right mt-n-xs">
@@ -143,69 +134,89 @@ function ConnectorList() {
          </h5>
 
       </div>
+
    );
 
-   const getFunctionGroupTable = (functionGroups: FunctionGroupDTO[]) => {
-      return (
-         <table style={{ border: "none" }}>
-            <tbody>
-               {functionGroups.map(function (group) {
-                  return (
-                     <tr style={{ border: "none" }}>
-                        <td style={{ border: "none" }}>
-                           <MDBBadge
-                              color="primary"
-                              searchvalue={
-                                 attributeFieldNameTransform[group.name || ""] || group.name
-                              }
-                           >
-                              {attributeFieldNameTransform[group.name || ""] || group.name}
-                           </MDBBadge>
-                        </td>
-                        <td style={{ border: "none" }}>
-                           {getKindsForDisplay(group.kinds)}
-                        </td>
-                     </tr>
-                  );
-               })}
-            </tbody>
-         </table>
-      );
+
+   const getKinds = (functionGroups: FunctionGroupDTO[]) => {
+
+      return functionGroups.map(
+
+         group => (
+
+            <div key={group.uuid}>
+
+               {group.kinds.map(
+
+                  kind => (
+                     <span key={kind}>
+                        <MDBBadge color="secondary" searchvalue={kind}>
+                           {kind}
+                        </MDBBadge>
+                        &nbsp;
+                     </span>
+                  )
+
+               )}
+
+            </div>
+
+         )
+
+      )
+
    };
 
-   const getFunctionGroupTableContent = (functionGroups: FunctionGroupDTO[]) => {
-      return functionGroups.map(function (group) {
-         const groupName =
-            attributeFieldNameTransform[group.name || ""] || group.name || "";
-         const groupKinds = group.kinds.join(" ");
 
-         return groupName + groupKinds;
-      });
-   };
+   const getFunctionGroups = (functionGroups: FunctionGroupDTO[]) => {
+
+      return functionGroups.map(
+
+         group => (
+
+            <div key={group.uuid}>
+               <MDBBadge color="primary" searchvalue={attributeFieldNameTransform[group.name || ""] || group.name}>
+                  {attributeFieldNameTransform[group.name || ""] || group.name}
+               </MDBBadge>
+            </div>
+
+         )
+
+      )
+   }
+
 
    const connectorList = () => {
       let rows: any = [];
       for (let connector of connectors) {
+
          let connectorStatus = inventoryStatus(connector.status || "");
          let column: any = {};
+
          column["name"] = {
             content: connector.name,
             styledContent: (
                <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>
             ),
             lineBreak: true,
+
          };
+
          column["functions"] = {
-            content: getFunctionGroupTableContent(
-               connector.functionGroups || []
-            ).join(""),
-            styledContent: getFunctionGroupTable(connector.functionGroups || []),
+            styledContent: getFunctionGroups(connector.functionGroups || []),
             lineBreak: true,
          };
+
+         column["kinds"] = {
+            styledContent: getKinds(connector.functionGroups || []),
+            lineBreak: true,
+         };
+
          column["url"] = {
             content: connector.url,
             lineBreak: true,
          };
+
          column["status"] = {
             content: connector.status,
             styledContent: (
@@ -213,12 +224,15 @@ function ConnectorList() {
             ),
             lineBreak: true,
          };
+
          rows.push({
             id: connector.uuid,
             column: column,
             data: connector,
          });
+
       }
+
       return rows;
    };
 
@@ -231,10 +245,17 @@ function ConnectorList() {
          width: "15%",
       },
       {
-         styledContent: <MDBColumnName columnName="Function Groups & Kinds" />,
+         styledContent: <MDBColumnName columnName="Function Groups" />,
          content: "functions",
          sort: false,
          id: "connectorFunctions",
+         width: "35%",
+      },
+      {
+         styledContent: <MDBColumnName columnName="Kinds" />,
+         content: "kinds",
+         sort: false,
+         id: "kinds",
          width: "35%",
       },
       {
@@ -254,10 +275,14 @@ function ConnectorList() {
    ];
 
    return (
+
       <div>
          <Container className="themed-container" fluid>
-            <Widget title={title}>
+
+            <Widget title={title} busy={isBusy}>
+
                <br />
+
                <CustomTable
                   checkedRows={checkedRows}
                   checkedRowsFunction={setCheckedRows}
@@ -265,7 +290,21 @@ function ConnectorList() {
                   headers={connectorRowHeaders}
                   rows={connectorList()}
                />
+
             </Widget>
+
+            <Dialog
+               isOpen={confirmDelete}
+               caption="Delete Connector"
+               body="You are about to delete connectors. Is this what you want to do?"
+               toggle={() => setConfirmDelete(false)}
+               buttons={[
+                  { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                  { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+               ]}
+            />
+
+
 
             {/*<MDBModal
                overflowScroll={false}
