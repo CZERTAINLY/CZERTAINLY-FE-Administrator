@@ -217,3 +217,23 @@ React
 HTML
 
    Make it readable. Use empty lines, don't split so much tags to multiple lines (when there are so many attributes, do that)
+
+
+
+
+
+---------------------------------------------------------------------
+Pradeep - Changes
+---------------------------------------------------------------------
+
+Converted the following ducks to toolkit
+1. RA Profile
+2. Credential
+3. ACME Profile
+4. ACME Account
+5. Authorities
+
+
+To be updated in the ducks.
+
+Authority and Credentials - Implement methods in the API to get the attributes for the respective provider
