@@ -16,6 +16,8 @@ export type State = {
    connectorAttributes?: AttributeDescriptorCollectionModel;
    connectorConnectionDetails?: FunctionGroupModel[];
 
+   deleteErrorMessages: DeleteObjectErrorModel[];
+
    connectors: ConnectorModel[];
 
    isFetchingList: boolean;
@@ -42,6 +44,8 @@ export const initialState: State = {
    checkedRows: [],
 
    connectors: [],
+
+   deleteErrorMessages: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -73,6 +77,13 @@ export const slice = createSlice({
       setCheckedRows: (state, action: PayloadAction<string[]>) => {
 
          state.checkedRows = action.payload;
+
+      },
+
+
+      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+
+         state.deleteErrorMessages = [];
 
       },
 
@@ -301,7 +312,10 @@ export const slice = createSlice({
       bulkDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
          state.isBulkDeleting = false;
-         if (Array.isArray(action.payload.errors) && action.payload.errors.length > 0) return;
+         if (Array.isArray(action.payload.errors) && action.payload.errors.length > 0) {
+            state.deleteErrorMessages = action.payload.errors;
+            return;
+         }
 
          action.payload.uuids.forEach(
             uuid => {
@@ -316,6 +330,35 @@ export const slice = createSlice({
       bulkDeleteConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
 
          state.isBulkDeleting = false;
+
+      },
+
+
+      bulkForceDeleteConnectors: (state, action: PayloadAction<string[]>) => {
+
+         state.isBulkForceDeleting = true;
+
+      },
+
+
+      bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+
+         state.isBulkForceDeleting = false;
+         if (Array.isArray(action.payload.errors) && action.payload.errors.length > 0) return;
+
+         action.payload.uuids.forEach(
+            uuid => {
+               const index = state.connectors.findIndex(connector => connector.uuid === uuid);
+               if (index >= 0) state.connectors.splice(index, 1);
+            }
+         )
+
+      },
+
+
+      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
+
+         state.isBulkForceDeleting = false;
 
       },
 
@@ -432,6 +475,7 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const checkedRows = createSelector(state, state => state.checkedRows);
+const deleteErrorMessages = createSelector(state, state => state.deleteErrorMessages);
 
 const connector = createSelector(state, state => state.connector);
 const connectorHealth = createSelector(state, state => state.connectorHealth);
@@ -453,12 +497,14 @@ const isUpdating = createSelector(state, state => state.isUpdating);
 const isConnecting = createSelector(state, state => state.isConnecting);
 const isBulkConnecting = createSelector(state, state => state.isBulkReconnecting);
 const isReconnecting = createSelector(state, state => state.isReconnecting);
+const isBulkReconnecting = createSelector(state, state => state.isBulkReconnecting);
 const isAuthorizing = createSelector(state, state => state.isAuthorizing);
 const isBulkAuthorizing = createSelector(state, state => state.isBulkAuthorizing);
 
 export const selectors = {
    state,
    checkedRows,
+   deleteErrorMessages,
    connector,
    connectorHealth,
    connectorAttributes,
@@ -477,6 +523,7 @@ export const selectors = {
    isConnecting,
    isBulkConnecting,
    isReconnecting,
+   isBulkReconnecting,
    isAuthorizing,
    isBulkAuthorizing
 };

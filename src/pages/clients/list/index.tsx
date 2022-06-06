@@ -171,7 +171,7 @@ export default function ClientList() {
             <br />
             <CustomTable
                checkedRows={checkedRows}
-               checkedRowsFunction={setCheckedRows}
+               onCheckedRowsChanged={setCheckedRows}
                data={clients}
                headers={clientTableHeader}
                rows={clientTableData()}

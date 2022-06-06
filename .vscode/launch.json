@@ -10,7 +10,7 @@
          "name": "Launch Chrome against localhost",
          "url": "http://localhost:3000",
          "webRoot": "${workspaceFolder}",
-         "preLaunchTask": "run-react"
+         //"preLaunchTask": "run-react"
       }
    ]
 }

@@ -1,27 +1,27 @@
 import React from "react";
 import { MDBBadge } from "mdbreact";
+import { Status } from "types/connectors";
 
 interface Props {
-  status: string | undefined;
+  status: Status | undefined;
 }
 
-function InventoryStatusBadge({ status }: Props) {
-  switch (status) {
-    case "Success":
-      return <MDBBadge color="success">{status}</MDBBadge>;
-    case "registered":
-      return <MDBBadge color="success">Registered</MDBBadge>;
-    case "connected":
-      return <MDBBadge color="success">Connected</MDBBadge>;
-    case "failed":
-      return <MDBBadge color="danger">Failed</MDBBadge>;
-    case "offline":
-      return <MDBBadge color="danger">Offline</MDBBadge>;
-    case "waitingForApproval":
-      return <MDBBadge color="warning">Awaiting Authorization</MDBBadge>;
-    default:
-      return <MDBBadge color="dark">{status || "Unknown"}</MDBBadge>;
+export default function InventoryStatusBadge({ status }: Props) {
+
+  const statusMap: { [key in Status]: { color: string, text: string } } = {
+    "connected": { color: "success", text: "Connected" },
+    "registered": { color: "warning", text: "Registered" },
+    "failed": { color: "danger", text: "Failed" },
+    "offline": { color: "secondary", text: "Offline" },
+    "waitingForApproval": { color: "info", text: "Waiting for approval" },
+    "misconfigured": { color: "danger", text: "Misconfigured" },
+    "unavailable": { color: "secondary", text: "Unavailable" },
   }
-}
 
-export default InventoryStatusBadge;
+  const _default = { color: "secondary", text: "Unknown" };
+
+  const { color, text } = status ? statusMap[status] || _default : _default;
+
+  return <MDBBadge color={color}>{text}</MDBBadge>;
+
+}

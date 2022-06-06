@@ -1,24 +1,21 @@
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { useRouteMatch, Link } from "react-router-dom";
-import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader, } from "mdbreact";
+import { useRouteMatch } from "react-router-dom";
 
 import { actions, selectors } from "ducks/connectors";
-import { ConnectorHealthModel } from "models/connectors";
+
+import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
 
 import Select from "react-select";
-import ToolTip from "components/ToolTip";
 
 import cx from "classnames";
 
 import { Button, Col, Container, Row, Table } from "reactstrap";
 
-import Spinner from "components/Spinner";
+
 import Widget from "components/Widget";
-
-
 import InventoryStatusBadge from "components/ConnectorStatus";
 
 
@@ -42,14 +39,15 @@ export default function ConnectorDetail() {
    const health = useSelector(selectors.connectorHealth);
 
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-   const isFetchingAllAttributes = useSelector(selectors.isFetchingAllAttributes);
+   const isFetchingHealth = useSelector(selectors.isFetchingHealth);
+   const isFetchingAttributes = useSelector(selectors.isFetchingAttributes)
 
    //const deleteErrorMessages = useSelector(selectors.selectDeleteConnectorError);
 
    const ignoreValueTypes = ["FILE", "SECRET", "PASSWORD"];
 
-   const [currentFunctionGroupDisplay, setCurrentFunctionGroupDisplay] = useState<any>();
-   const [defaultFunctionGroupValue, setDefaultFunctionGroupValue] = useState<any>();
+   const [functionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
+
    const [currentFunctionGroupKind, setCurrentFunctionGroupKind] = useState<any>();
    const [currentFunctionGroupKindAttributes, setCurrentFunctionGroupKindAttributes] = useState<any>();
    const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
@@ -58,7 +56,15 @@ export default function ConnectorDetail() {
       dispatch(actions.getConnectorDetail(params.id));
       dispatch(actions.getConnectorHealth(params.id));
       dispatch(actions.getAllConnectorAttributes(params.id));
-   }, [[params.id], dispatch]);
+   }, [params.id, dispatch]);
+
+   useEffect(() => {
+
+      if (!connector) return;
+
+      if (connector.functionGroups.length > 0) setFunctionGroup(connector.functionGroups[0]);
+
+   }, [connector]);
 
    /*useEffect(() => {
       if (deleteErrorMessages?.length > 0) {
@@ -205,15 +211,23 @@ export default function ConnectorDetail() {
 
    )
 
-   const valuesForFunctionGroup = connector?.functionGroups?.map(group => ({ label: group.name, value: group.functionGroupCode }));
+   const valuesForFunctionGroup = connector?.functionGroups?.map(
 
-   const selectedFunctionGroupDetails = (groupCode: string) => {
-      for (let i of connector?.functionGroups || []) {
-         if (i.functionGroupCode === groupCode) {
-            setCurrentFunctionGroupDisplay(i);
-         }
-      }
+      group => ({
+         label: group.name,
+         value: group.functionGroupCode
+      })
+
+   ) || [];
+
+
+   const onFunctionGroupChange = (groupCode: string) => {
+
+      const group = (connector?.functionGroups || []).find(group => group.functionGroupCode === groupCode);
+      if (group) setFunctionGroup(group);
+
    };
+
 
    const healthBody = (parts?: ConnectorHealthModel[]) => {
 
@@ -221,7 +235,7 @@ export default function ConnectorDetail() {
 
       return Object.entries(parts).map(
 
-         ([key, value]) => ["ok", "failed", "down", "nok", "unknown" ].includes(value.status)
+         ([key, value]) => ["ok", "failed", "down", "nok", "unknown"].includes(value.status)
             ? (
                <tr>
                   <td>{<MDBBadge color="warning">{key}</MDBBadge>}</td>
@@ -242,15 +256,15 @@ export default function ConnectorDetail() {
       let endPoints: any = [];
 
 
-      for (let key of currentFunctionGroupDisplay?.endPoints || []) {
+      for (let key of functionGroup?.endPoints || []) {
          let searchKey = "";
          if (
-            currentFunctionGroupDisplay?.functionGroupCode ===
+            functionGroup?.functionGroupCode ===
             "legacyAuthorityProvider"
          ) {
             if (
                key.context.includes("authorityProvider") ||
-               key.context.includes(currentFunctionGroupDisplay?.functionGroupCode)
+               key.context.includes(functionGroup?.functionGroupCode)
             ) {
                endPoints.push(
                   <tr>
@@ -266,7 +280,7 @@ export default function ConnectorDetail() {
             }
          } else {
             searchKey =
-               currentFunctionGroupDisplay?.functionGroupCode || "undefined";
+               functionGroup?.functionGroupCode || "undefined";
             if (key.context.includes(searchKey)) {
                endPoints.push(
                   <tr>
@@ -285,7 +299,7 @@ export default function ConnectorDetail() {
       return endPoints;
    };
 
-   const functionGroupKinds = currentFunctionGroupDisplay?.kinds?.map(function (
+   const functionGroupKinds = functionGroup?.kinds?.map(function (
       kind: string
    ) {
       return { label: kind, value: kind };
@@ -380,23 +394,24 @@ export default function ConnectorDetail() {
 
             </Col>
          </Row>
+
          <Widget title="Function Group Details">
             <hr />
             <Row xs="1" sm="2" md="3" lg="3" xl="4">
                <Col style={{ display: "inline-block" }}>
                   <Select
+                     key="connectorFunctionGroupDropdown"
                      maxMenuHeight={140}
                      options={valuesForFunctionGroup}
-                     placeholder={defaultFunctionGroupValue}
+                     value={ { label: functionGroup?.name, value: functionGroup?.functionGroupCode } }
                      menuPlacement="auto"
-                     key="connectorFunctionGroupDropdown"
-                     onChange={(event) =>
-                        selectedFunctionGroupDetails(event?.value || "")
-                     }
+                     onChange={(event) => onFunctionGroupChange(event?.value || "")}
                   />
                </Col>
             </Row>
+
             &nbsp;
+
             <Widget title="End Points">
                <Table className="table-hover" size="sm">
                   <thead>
@@ -422,7 +437,7 @@ export default function ConnectorDetail() {
                      <Select
                         maxMenuHeight={140}
                         options={functionGroupKinds}
-                        placeholder={currentFunctionGroupDisplay?.kinds[0]}
+                        placeholder={functionGroup?.kinds[0]}
                         menuPlacement="auto"
                         key="connectorFunctionGroupKindDropdown"
                         onChange={(event: any) =>

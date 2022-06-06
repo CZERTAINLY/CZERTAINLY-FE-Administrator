@@ -46,8 +46,8 @@ export default function AdministratorsList() {
    );
 
    const onAddClick = useCallback(() => {
-      history.push("/app/administrators/add");
-   }, [history]);
+      history.push(`${path}/add`);
+   }, [history, path]);
 
    const onEnableClick = useCallback(() => {
       dispatch(actions.bulkEnableAdmins(checkedRows));
@@ -196,7 +196,7 @@ export default function AdministratorsList() {
             <br />
             <CustomTable
                checkedRows={checkedRows}
-               checkedRowsFunction={setCheckedRows}
+               onCheckedRowsChanged={setCheckedRows}
                data={administrators}
                headers={adminTableHeader}
                rows={adminTableData()}

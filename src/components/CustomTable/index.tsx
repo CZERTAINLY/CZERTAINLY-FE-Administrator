@@ -24,6 +24,10 @@ interface ColumnContent {
    lineBreak?: boolean;
 }
 
+interface Column {
+   [key: string]: ColumnContent;
+}
+
 interface Row {
    id?: string;
    column: Column;
@@ -35,13 +39,9 @@ interface Props {
    rows: Row[];
    checkbox?: boolean;
    checkedRows: any;
-   checkedRowsFunction: Function;
+   onCheckedRowsChanged: Function;
    data: any;
    sourceCheckHandler?: Function;
-}
-
-export interface Column {
-   [key: string]: ColumnContent;
 }
 
 
@@ -50,10 +50,11 @@ function CustomTable({
    rows,
    checkbox = true,
    checkedRows,
-   checkedRowsFunction,
+   onCheckedRowsChanged: checkedRowsFunction,
    data,
    sourceCheckHandler,
 }: Props) {
+
 
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(10);
@@ -62,6 +63,7 @@ function CustomTable({
    const [updatedHeaders, setUpdatedHeaders] = useState(headers);
    const [tableRows, setTableRows] = useState<JSX.Element[]>([]);
    const [pageLength, setPageLength] = useState(0);
+
 
    const firstPage = useCallback(() => setPage(1), [setPage]);
    const prevPage = useCallback(() => setPage(page - 1), [page, setPage]);
@@ -81,6 +83,7 @@ function CustomTable({
       },
       [setPageSize]
    );
+
 
    useEffect(
 
@@ -171,9 +174,7 @@ function CustomTable({
                                        type="checkbox"
                                        name={row.data?.uuid?.toString()}
                                        onChange={sourceCheckHandler ? () => sourceCheckHandler(row.data) : () => handleCheck(row.data)}
-                                       checked={checkedRows.includes(
-                                          row.data?.uuid?.toString()
-                                       )}
+                                       checked={checkedRows.includes(row.data?.uuid?.toString())}
                                     />
 
                                  )}

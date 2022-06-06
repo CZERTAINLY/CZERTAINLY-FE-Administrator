@@ -331,11 +331,7 @@ function ConnectorForm({ title }: Props) {
 
                                     <td>Connector Status</td>
                                     <td>
-                                       <InventoryStatusBadge
-                                          status={
-                                             connectionDetails.length > 0 ? "Success" : "Failed"
-                                          }
-                                       />
+                                       <InventoryStatusBadge status={ connectionDetails.length > 0 ? "connected" : "failed" } />
                                     </td>
 
                                  </tr>
