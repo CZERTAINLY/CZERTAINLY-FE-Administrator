@@ -1,69 +1,49 @@
 import cx from "classnames";
-import React, { useCallback, useState, Fragment, useEffect, ReactElement, } from "react";
+import React, { useCallback, useState, useEffect, useMemo, } from "react";
 import { Input, Pagination, PaginationItem, PaginationLink, Table, } from "reactstrap";
 
-import SortColumnHeader from "components/SortColumnHeader";
-import SortTableHeader from "components/SortTableHeader";
-
 import styles from "./CustomTable.module.scss";
-import { checkAllHandler, checkHandler } from "utils/checkbox";
+import { jsxInnerText } from "utils/jsxInnerText";
 
 
-export interface CustomTableHeaderColumn {
-   content: any;
-   sort?: boolean;
-   id?: string;
-   styledContent?: ReactElement<any, any>;
+export interface TableHeader {
+   id: string;
+   content: string | JSX.Element
+   sortable?: boolean;
+   sort?: "asc" | "desc";
    width?: string;
 }
 
-interface ColumnContent {
-   id?: string;
-   content?: any;
-   styledContent: any;
-   lineBreak?: boolean;
-}
-
-interface Column {
-   [key: string]: ColumnContent;
-}
-
-interface Row {
-   id?: string;
-   column: Column;
-   data?: any;
+export interface TableDataRow {
+   id: number | string;
+   columns: (string | JSX.Element)[];
 }
 
 interface Props {
-   headers: CustomTableHeaderColumn[];
-   rows: Row[];
-   checkbox?: boolean;
-   checkedRows: any;
-   onCheckedRowsChanged: Function;
-   data: any;
-   sourceCheckHandler?: Function;
+   headers: TableHeader[];
+   data: TableDataRow[];
+   hasCheckboxes?: boolean;
+   hasPagination?: boolean;
+   onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
 }
 
 
 function CustomTable({
    headers,
-   rows,
-   checkbox = true,
-   checkedRows,
-   onCheckedRowsChanged: checkedRowsFunction,
    data,
-   sourceCheckHandler,
+   hasCheckboxes,
+   hasPagination,
+   onCheckedRowsChanged
 }: Props) {
 
+   const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
+   const [tblData, setTblData] = useState<TableDataRow[]>(data);
+   const [tblCheckedRows, setTblCheckedRows] = useState<(string | number)[]>([]);
 
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(10);
    const [totalPages, setTotalPages] = useState(1);
    const [searchKey, setSearchKey] = useState<string>("");
-   const [updatedHeaders, setUpdatedHeaders] = useState(headers);
-   const [tableRows, setTableRows] = useState<JSX.Element[]>([]);
-   const [pageLength, setPageLength] = useState(0);
-
 
    const firstPage = useCallback(() => setPage(1), [setPage]);
    const prevPage = useCallback(() => setPage(page - 1), [page, setPage]);
@@ -71,167 +51,225 @@ function CustomTable({
    const lastPage = useCallback(() => setPage(totalPages), [setPage, totalPages]);
 
 
-   const handleCheck = (checkedRow: any) => {
-      checkHandler(checkedRow, checkedRows, checkedRowsFunction);
-   };
+   useEffect(
+      () => { setTblHeaders(headers); },
+      [headers]
+   );
+
+
+   useEffect(
+
+      () => {
+         setTblData(data);
+         setTblCheckedRows(tblCheckedRows.filter(row => data.find(data => data.id === row)));
+      },
+
+      [data]
+
+   );
+
+
+   useEffect(
+
+      () => {
+         setTotalPages(Math.ceil(tblData.length / pageSize))
+      },
+      [tblData, pageSize]
+
+   );
+
+
+   const onRowCheckboxClick = useCallback(
+
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+
+         const checkedRow = e.target.getAttribute("data-id");
+         const checkedRows = tblData.filter(row => tblCheckedRows.includes(row.id)).map(row => row.id);
+
+         if (e.target.checked) {
+            if (checkedRow) checkedRows.push(checkedRow)
+         } else {
+            if (checkedRow) checkedRows.splice(checkedRows.indexOf(checkedRow), 1);
+         }
+
+         setTblCheckedRows(checkedRows);
+         if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
+
+      }, [tblData, tblCheckedRows, onCheckedRowsChanged]
+
+   );
+
+
+   const onCheckAllCheckboxClick = useCallback(
+
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+
+         if (!e.target.checked) {
+            setTblCheckedRows([]);
+            if (onCheckedRowsChanged) onCheckedRowsChanged([]);
+            return;
+         }
+
+         const checkedRows = tblData.map(row => row.id);
+         setTblCheckedRows(checkedRows);
+         if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
+
+      }, [tblData, onCheckedRowsChanged]
+
+   );
+
+
+   const onColumnSortClick = useCallback(
+
+      (e: React.MouseEvent<HTMLTableCellElement>) => {
+
+         if (!tblHeaders) return;
+
+         const sortColumn = e.currentTarget.getAttribute("data-id");
+         const hdr = tblHeaders?.find(header => header.id === sortColumn);
+         if (!hdr) return;
+
+         const sort = hdr.sort === "asc" ? "desc" : "asc";
+         const column = tblHeaders?.findIndex(header => header.id === sortColumn);
+         if (column === undefined || column === -1) return;
+
+         const headers: TableHeader[] = tblHeaders.map(
+            header => ({
+               id: header.id,
+               content: header.content,
+               sortable: header.sortable,
+               sort: header.id === sortColumn ? sort : undefined,
+            })
+         )
+
+         const sortedData = [...tblData].sort(
+            (a, b) => {
+               const aVal = typeof a.columns[column] === "string" ? a.columns[column] : jsxInnerText(a.columns[column] as JSX.Element);
+               const bVal = typeof b.columns[column] === "string" ? b.columns[column] : jsxInnerText(b.columns[column] as JSX.Element);
+               if (aVal === bVal) return 0;
+               if (aVal < bVal) return sort === "asc" ? -1 : 1;
+               return sort === "asc" ? 1 : -1;
+            }
+         )
+
+         setTblHeaders(headers);
+         setTblData(sortedData);
+
+      }, [tblHeaders, tblData]
+
+   );
 
 
    const onPageSizeChange = useCallback(
+
       (event: React.ChangeEvent<HTMLInputElement>) => {
          setPageSize(+event.target.value);
          setPage(1);
       },
       [setPageSize]
-   );
-
-
-   useEffect(
-
-      () => {
-         setTotalPages(Math.ceil(rows.length / pageSize))
-      }
-
-      , [rows, pageSize]
 
    );
 
 
-   useEffect(
+   const header = useMemo(
 
-      () => {
+      () => (hasCheckboxes ? [{ id: "__checkbox__", content: "" }, ...tblHeaders || []] : tblHeaders || []).map(
 
-         let updatedHeaders = [...headers];
+         header => (
 
-         if (!checkbox) return;
+            <th key={header.id} {...(header.sortable ? { onClick: onColumnSortClick } : {})} data-id={header.id}>
 
-         updatedHeaders.unshift({
-            content: "checkbox",
-            sort: false,
-            width: "2%",
-            styledContent: (
+               {
+                  header.id === "__checkbox__" ? (
 
-               <input
-                  id="checkAllCheckBox"
-                  type="checkbox"
-                  checked={checkedRows.length === tableRows.length && tableRows.length > 0}
-                  onChange={(event) =>
-                     checkAllHandler(
-                        event.target.checked,
-                        rows,
-                        searchKey,
-                        pageSize,
-                        page,
-                        checkedRowsFunction,
-                        updatedHeaders
-                     )
-                  }
-               />
+                     <input type="checkbox" checked={tblCheckedRows.length === tblData.length} onChange={onCheckAllCheckboxClick} />
 
-            ),
-         });
+                  ) : header.sortable ? (
 
-         setUpdatedHeaders(updatedHeaders);
+                     <>
+                        {header.content}
+                        &nbsp;
+                        {header.sort === "asc"
+                           ?
+                           <>
+                              <i className="fa fa-arrow-up" />
+                              <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
+                           </>
+                           :
+                           header.sort === "desc"
+                              ?
+                              <>
+                                 <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
+                                 <i className="fa fa-arrow-down" />
+                              </>
+                              :
+                              <>
+                                 <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
+                                 <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
+                              </>
+                        }
+                     </>
 
-      },
+                  ) : (
 
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [tableRows.length, checkedRows, data, searchKey, page, pageSize, checkedRowsFunction]
+                     header.content
 
+                  )
+
+               }
+
+            </th>
+
+         )
+
+      ),
+      [hasCheckboxes, tblHeaders, tblCheckedRows, tblData, onColumnSortClick, onCheckAllCheckboxClick]
    );
 
 
-   useEffect(
 
-      () => {
+   const body = useMemo(
 
-         let spliceRows: Row[] = rows;
+      () => (
+         searchKey
 
-         if (searchKey) spliceRows = rows.filter(row => getMergedRowContent(row).includes(searchKey.toLowerCase()));
+            ? tblData.filter(
+               row => {
+                  let rowStr = "";
+                  row.columns.forEach(col => rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element));
+                  return rowStr.toLowerCase().includes(searchKey.toLowerCase());
+               }
+            )
+            : tblData).map(
 
-         setPageLength(spliceRows.length);
-         setTotalPages(Math.ceil(spliceRows.length / pageSize));
+               row => (
 
-         spliceRows = spliceRows.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize);
+                  <tr key={row.id}>
 
-         let updTableRows = spliceRows.map(
+                     {!hasCheckboxes ? (<></>) : (
+                        <td>
+                           <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
+                        </td>
+                     )}
 
-            row => (
 
-               <Fragment key={row.id}>
-
-                  <tr>
-
-                     {updatedHeaders.map(
-
-                        header => (
-
-                           <td key={header.id || header.content}>
-                              {
-                                 header.content !== "checkbox" ? (
-                                    row.column[header?.content]?.styledContent || row.column[header?.content]?.content || null
-                                 ) : (
-                                    <input
-                                       type="checkbox"
-                                       name={row.data?.uuid?.toString()}
-                                       onChange={sourceCheckHandler ? () => sourceCheckHandler(row.data) : () => handleCheck(row.data)}
-                                       checked={checkedRows.includes(row.data?.uuid?.toString())}
-                                    />
-
-                                 )}
-                           </td>
-
+                     {row.columns.map(
+                        (column, index) => (
+                           <td key={index}>{column}</td>
                         )
                      )}
 
                   </tr>
 
-               </Fragment>
+               )
 
-            )
+            ),
+      [tblCheckedRows, tblData, onRowCheckboxClick, hasCheckboxes, searchKey]
 
-         );
-
-
-         setTableRows(updTableRows);
-
-      },
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [rows, searchKey, checkedRows, page, pageSize, sourceCheckHandler, totalPages, updatedHeaders]
    );
 
 
-   const headerRow = () => {
-
-      return updatedHeaders.map(
-
-         (header) => {
-
-            return header.sort ? (
-               <SortColumnHeader id={header.id || header.content} text={header.content} />
-            ) : (
-               <th key={header.id || header.content}>{header.styledContent ? header.styledContent : header.content}</th>
-            );
-
-         }
-
-      );
-
-   };
-
-
-   const getMergedRowContent = (row: Row) => {
-
-      return updatedHeaders
-         .map(
-            (header) => row.column[header?.content]?.content?.toLowerCase() || ""
-         )
-         .join();
-
-   };
-
-
-   const pagination = rows.length > pageSize ? (
+   const pagination = tblData.length > pageSize ? (
 
       <Pagination size="sm" aria-label="Navigation">
 
@@ -272,33 +310,34 @@ function CustomTable({
 
          <div className="table-responsive">
             <Table className={cx("table", styles.logsTable)} size="sm">
-               <SortTableHeader>{headerRow()}</SortTableHeader>
-               <tbody>{tableRows}</tbody>
+               <thead><tr>{header}</tr></thead>
+               <tbody>{body}</tbody>
             </Table>
          </div>
 
 
-         <div className={styles.paginationContainer}>
+         {!hasPagination ? <></> : (
 
-            <div>
-               <Input type="select" value={pageSize} onChange={onPageSizeChange}>
-                  <option>10</option>
-                  <option>20</option>
-                  <option>50</option>
-                  <option>100</option>
-               </Input>
+            <div className={styles.paginationContainer}>
+
+               <div>
+                  <Input type="select" value={pageSize} onChange={onPageSizeChange}>
+                     <option>10</option>
+                     <option>20</option>
+                     <option>50</option>
+                     <option>100</option>
+                  </Input>
+               </div>
+
+               {pagination}
+
+               <span>
+                  {`Showing ${(page - 1) * pageSize + 1} to ${page !== totalPages ? page * pageSize : tblData.length % pageSize || pageSize} of ${tblData.length} entries`}
+               </span>
+
             </div>
 
-            {pagination}
-
-            <span>
-               {`Showing ${(page - 1) * pageSize + 1} to ${page !== totalPages ? page * pageSize : tableRows.length % pageSize || pageSize} of ${pageLength} entries`}
-            </span>
-
-
-         </div>
-
-
+         )}
 
       </div>
 
