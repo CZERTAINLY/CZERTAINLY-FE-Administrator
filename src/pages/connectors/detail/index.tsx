@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
@@ -16,13 +16,14 @@ import { Button, Col, Container, Row, Table } from "reactstrap";
 
 
 import Widget from "components/Widget";
-import CustomTable from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import InventoryStatusBadge from "components/ConnectorStatus";
 
 
 import styles from "./connectorDetails.module.scss";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import { attributeFieldNameTransform } from "models/attributes";
+import { AttributeDescriptorModel, attributeFieldNameTransform } from "models/attributes";
+import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -36,35 +37,70 @@ export default function ConnectorDetail() {
    const history = useHistory();
 
    const connector = useSelector(selectors.connector);
-   const attributes = useSelector(selectors.connectorAttributes);
    const health = useSelector(selectors.connectorHealth);
+   const attributes = useSelector(selectors.connectorAttributes);
 
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isFetchingHealth = useSelector(selectors.isFetchingHealth);
    const isFetchingAttributes = useSelector(selectors.isFetchingAttributes)
 
+
+   const [currentFunctionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
+   const [currentFunctionGroupKind, setCurrentFunctionGroupKind] = useState<string>();
+   const [currentFunctionGroupKindAttributes, setCurrentFunctionGroupKindAttributes] = useState<AttributeDescriptorModel[] | undefined>();
+
+   const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
    //const deleteErrorMessages = useSelector(selectors.selectDeleteConnectorError);
 
-   const ignoreValueTypes = ["FILE", "SECRET", "PASSWORD"];
 
-   const [functionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
-
-   const [currentFunctionGroupKind, setCurrentFunctionGroupKind] = useState<any>();
-   const [currentFunctionGroupKindAttributes, setCurrentFunctionGroupKindAttributes] = useState<any>();
-   const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
-
-
-   useEffect(() => {
-      dispatch(actions.getConnectorDetail(params.id));
-      dispatch(actions.getConnectorHealth(params.id));
-      dispatch(actions.getAllConnectorAttributes(params.id));
-   }, [params.id, dispatch]);
+   useEffect(
+      () => {
+         setFunctionGroup(undefined);
+         dispatch(actions.getConnectorDetail(params.id));
+         dispatch(actions.getConnectorHealth(params.id));
+         dispatch(actions.getAllConnectorAttributes(params.id));
+      },
+      [params.id, dispatch]
+   );
 
 
-   useEffect(() => {
-      if (!connector) return;
-      if (connector.functionGroups.length > 0) setFunctionGroup(connector.functionGroups[0]);
-   }, [connector]);
+   useEffect(
+      () => {
+
+         if (!connector || connector.functionGroups.length == 0) {
+            setFunctionGroup(undefined);
+            setCurrentFunctionGroupKind(undefined);
+            return;
+         }
+
+         setFunctionGroup(connector.functionGroups[0]);
+
+         if (connector.functionGroups[0].kinds.length > 0) {
+            setCurrentFunctionGroupKind(connector.functionGroups[0].kinds[0]);
+         } else {
+            setCurrentFunctionGroupKind(undefined);
+         }
+
+      },
+      [connector]
+   );
+
+
+   useEffect(
+      () => {
+
+         let attrs: AttributeDescriptorModel[] | undefined = undefined;
+
+         if (attributes && connector && currentFunctionGroup && currentFunctionGroupKind) {
+            const fgAttrs = attributes[currentFunctionGroup.functionGroupCode]
+            if (fgAttrs) attrs = fgAttrs[currentFunctionGroupKind];
+         }
+
+         setCurrentFunctionGroupKindAttributes(attrs);
+
+      },
+      [attributes, connector, currentFunctionGroup, currentFunctionGroupKind]
+   );
 
 
    /*useEffect(() => {
@@ -157,46 +193,166 @@ export default function ConnectorDetail() {
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-   const onAddClick = () => {
-   }
 
-   const onReconnectClick = () => {
-   }
-
-   const onAuthorizeClick = () => {
-   }
-
-   const onFunctionGroupChange = (groupCode: string) => {
-
-      const group = (connector?.functionGroups || []).find(group => group.functionGroupCode === groupCode);
-      if (group) setFunctionGroup(group);
-
-   };
+   const onAddClick = useCallback(
+      () => {
+      },
+      []
+   );
 
 
-
-   const buttons: WidgetButtonProps[] = [
-      { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onAddClick(); } },
-      { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-      { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
-      { icon: "check", disabled: false, tooltip: "Authorize", onClick: () => { onAuthorizeClick() } }
-   ];
+   const onReconnectClick = useCallback(
+      () => {
+      },
+      []
+   );
 
 
-   const attributesTitle = (
+   const onAuthorizeClick = useCallback(
+      () => {
+      },
+      []
+   );
 
-      <div>
 
-         <div className="pull-right mt-n-xs">
-            <WidgetButtons buttons={buttons} />
+   const onFunctionGroupChange = useCallback(
+      (groupCode: string) => {
+
+         const group = (connector?.functionGroups || []).find(group => group.functionGroupCode === groupCode);
+         if (group) setFunctionGroup(group);
+
+      },
+      [connector]
+   );
+
+   const onFunctionGroupKindChange = useCallback(
+
+      (kind: string) => setCurrentFunctionGroupKind(kind),
+      []
+
+   );
+
+
+   const widgetButtons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
+         { icon: "check", disabled: false, tooltip: "Authorize", onClick: () => { onAuthorizeClick() } }
+      ], [onAddClick, onReconnectClick, onAuthorizeClick]
+   );
+
+
+   const attributesTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={widgetButtons} />
+            </div>
+
+            <h5>
+               Connector <span className="fw-semi-bold">Details</span>
+            </h5>
+
          </div>
 
-         <h5>
-            Connector <span className="fw-semi-bold">Details</span>
-         </h5>
+      ),
+      [widgetButtons]
 
-      </div>
+   );
 
+
+   const attributesHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "adminName",
+            content: "Attribute"
+         },
+         {
+            id: "adminUsername",
+            content: "Value"
+         },
+      ],
+      []
+   )
+
+
+   const attributesData: TableDataRow[] = useMemo(
+      () => {
+
+         if (!connector) return [];
+
+         return [
+            {
+               id: "uuid",
+               columns: ["UUID", connector.uuid]
+            },
+            {
+               id: "name",
+               columns: ["Name", connector.name],
+            },
+            {
+               id: "url",
+               columns: ["URL", connector.url]
+            },
+            {
+               id: "status",
+               columns: ["Status", <InventoryStatusBadge status={connector?.status} />]
+            },
+            {
+               id: "authType",
+               columns: ["Auth Type", connector.authType]
+            }
+
+         ]
+
+      },
+      [connector]
+   )
+
+
+   const functionalityHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "functionGroup",
+            content: "Function Group"
+         },
+         {
+            id: "kind",
+            content: "Kind"
+         },
+      ],
+      []
+   )
+
+
+   const functionalityData: TableDataRow[] = useMemo(
+
+      () => (connector?.functionGroups || []).map(
+
+         functionGroup => (
+            {
+               id: functionGroup.name,
+               columns: [
+                  functionGroup.name,
+                  <>
+                     {functionGroup.kinds?.map(
+                        kind => (
+                           <div key={kind} className={styles.kind}>
+                              <MDBBadge color="secondary">{kind}</MDBBadge>
+                           </div>
+                        )
+                     )}
+                  </>
+               ]
+            }
+         )
+
+      ),
+      [connector]
    );
 
 
@@ -231,12 +387,12 @@ export default function ConnectorDetail() {
       return Object.entries(parts).map(
 
          ([key, value]) => ["ok", "failed", "down", "nok", "unknown"].includes(value.status)
-            ? (
-               <tr>
-                  <td>{<MDBBadge color="warning">{key}</MDBBadge>}</td>
-                  <td>{value.description}</td>
-               </tr>
-            )
+            ?
+            <tr>
+               <td>{<MDBBadge color="warning">{key}</MDBBadge>}</td>
+               <td>{value.description}</td>
+            </tr>
+
             :
             <tr>
                <td>{<MDBBadge color="success">{key}</MDBBadge>}</td>
@@ -245,6 +401,50 @@ export default function ConnectorDetail() {
       )
 
    };
+
+
+   const endPointsHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "name",
+            sortable: true,
+            sort: "asc",
+            content: "Name"
+         },
+         {
+            id: "context",
+            sortable: true,
+            content: "Context"
+         },
+         {
+            id: "method",
+            sortable: true,
+            content: "Method"
+         }
+      ],
+      []
+   )
+
+
+   const endPointsData: TableDataRow[] = useMemo(
+
+      () => (currentFunctionGroup?.endPoints || []).map(
+
+         endPoint => ({
+
+            id: endPoint.name,
+            columns: [
+               endPoint.name,
+               endPoint.context,
+               endPoint.method
+            ]
+
+         })
+      ),
+
+      [currentFunctionGroup]
+
+   );
 
 
    const functionGroupSelectData = connector?.functionGroups?.map(
@@ -257,24 +457,7 @@ export default function ConnectorDetail() {
    ) || [];
 
 
-   const getEndPoints = () => functionGroup?.endPoints.map(
-
-      endPoint => (
-         <tr>
-            <td>
-               <div style={{ wordBreak: "break-all" }}>{endPoint.name}</div>
-            </td>
-            <td>
-               <div style={{ wordBreak: "break-all" }}>{endPoint.context}</div>
-            </td>
-            <td>{endPoint.method}</td>
-         </tr>
-      )
-
-   );
-
-
-   const functionGroupKinds = functionGroup?.kinds?.map(
+   const functionGroupKinds = currentFunctionGroup?.kinds?.map(
       kind => ({ label: kind, value: kind })
    ) || [];
 
@@ -287,51 +470,12 @@ export default function ConnectorDetail() {
 
             <Col>
 
-               <Widget title={attributesTitle}>
+               <Widget title={attributesTitle} busy={isFetchingDetail}>
 
-                  <Table className="table-hover" size="sm">
-
-                     <thead>
-
-                        <tr>
-                           <th>Attribute</th>
-                           <th>Value</th>
-                        </tr>
-
-                     </thead>
-
-                     <tbody>
-
-                        <tr>
-                           <td>Id</td>
-                           <td>{connector?.uuid}</td>
-                        </tr>
-
-                        <tr>
-                           <td>Name</td>
-                           <td>{connector?.name}</td>
-                        </tr>
-
-                        <tr>
-                           <td>Url</td>
-                           <td>{connector?.url}</td>
-                        </tr>
-
-                        <tr>
-                           <td>Status</td>
-                           <td>
-                              <InventoryStatusBadge status={connector?.status} />
-                           </td>
-                        </tr>
-
-                        <tr>
-                           <td>Auth Type</td>
-                           <td>{connector?.authType}</td>
-                        </tr>
-
-                     </tbody>
-
-                  </Table>
+                  <CustomTable
+                     headers={attributesHeaders}
+                     data={attributesData}
+                  />
 
                </Widget>
 
@@ -339,61 +483,17 @@ export default function ConnectorDetail() {
 
             <Col>
 
-               <Widget title="Connector Functionality">
+               <Widget title="Connector Functionality" busy={isFetchingDetail}>
 
-                  <Table className="table-hover" size="sm">
-
-                     <thead>
-
-                        <tr>
-                           <th>Function Group</th>
-                           <th>Kind</th>
-                        </tr>
-
-                     </thead>
-
-                     <tbody>
-
-                        {connector?.functionGroups?.map(functionGroup => {
-
-                           return (
-
-                              <tr>
-
-                                 <td>
-                                    <MDBBadge color="primary">
-                                       {attributeFieldNameTransform[functionGroup.name || ""] || functionGroup.name}
-                                    </MDBBadge>
-                                 </td>
-
-
-                                 <td>
-                                    <div>
-                                       {functionGroup.kinds?.map(
-                                          types => (
-                                             <div className={styles.kind}>
-                                                <MDBBadge color="secondary">{types}</MDBBadge>
-                                             </div>
-                                          )
-                                       )}
-                                    </div>
-
-                                 </td>
-
-                              </tr>
-
-                           );
-
-                        })}
-
-                     </tbody>
-
-                  </Table>
+                  <CustomTable
+                     headers={functionalityHeaders}
+                     data={functionalityData}
+                  />
 
                </Widget>
 
 
-               <Widget title={healthTitle}>
+               <Widget title={healthTitle} busy={isFetchingHealth}>
 
                   <Table className="table-hover" size="sm">
 
@@ -417,7 +517,7 @@ export default function ConnectorDetail() {
          </Row>
 
 
-         <Widget title="Function Group Details">
+         <Widget title="Function Group Details" busy={isFetchingDetail}>
 
             <hr />
 
@@ -429,7 +529,7 @@ export default function ConnectorDetail() {
                      key="connectorFunctionGroupDropdown"
                      maxMenuHeight={140}
                      options={functionGroupSelectData}
-                     value={{ label: functionGroup?.name, value: functionGroup?.functionGroupCode }}
+                     value={{ label: currentFunctionGroup?.name, value: currentFunctionGroup?.functionGroupCode }}
                      menuPlacement="auto"
                      onChange={(event) => onFunctionGroupChange(event?.value || "")}
                   />
@@ -442,36 +542,16 @@ export default function ConnectorDetail() {
 
             <Widget title="End Points">
 
-               <Table className="table-hover" size="sm">
-
-                  <thead>
-
-                     <tr>
-                        <th>
-                           <b>Name</b>
-                        </th>
-
-                        <th>
-                           <b>Context</b>
-                        </th>
-
-                        <th>
-                           <b>Method</b>
-                        </th>
-
-                     </tr>
-
-                  </thead>
-
-                  <tbody>{getEndPoints()}</tbody>
-
-               </Table>
+               <CustomTable
+                  headers={endPointsHeaders}
+                  data={endPointsData}
+               />
 
             </Widget>
 
             <hr />
 
-            <Widget title="Attributes">
+            <Widget title="Attributes" busy={isFetchingAttributes}>
 
                <Row xs="1" sm="2" md="3" lg="3" xl="4">
 
@@ -480,15 +560,26 @@ export default function ConnectorDetail() {
                      <Select
                         maxMenuHeight={140}
                         options={functionGroupKinds}
-                        placeholder={functionGroup?.kinds[0]}
+                        placeholder={currentFunctionGroup?.kinds[0]}
                         menuPlacement="auto"
                         key="connectorFunctionGroupKindDropdown"
-                        onChange={(event: any) => setCurrentFunctionGroupKind(event?.value || "")}
+                        onChange={(event) => onFunctionGroupKindChange(event?.value || "")}
                      />
 
                   </Col>
 
                </Row>
+
+               &nbsp;
+
+               <Widget title="End Points">
+
+                  <AttributeDescriptorViewer
+                     attributeDescriptors={currentFunctionGroupKindAttributes || []}
+                     ignoreValueTypes={[]}
+                  />
+
+               </Widget>
 
                &nbsp;
 
