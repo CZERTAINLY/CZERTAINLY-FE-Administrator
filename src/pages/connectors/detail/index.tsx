@@ -16,6 +16,7 @@ import { Button, Col, Container, Row, Table } from "reactstrap";
 
 
 import Widget from "components/Widget";
+import CustomTable from "components/CustomTable";
 import InventoryStatusBadge from "components/ConnectorStatus";
 
 
@@ -52,19 +53,19 @@ export default function ConnectorDetail() {
    const [currentFunctionGroupKindAttributes, setCurrentFunctionGroupKindAttributes] = useState<any>();
    const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
 
+
    useEffect(() => {
       dispatch(actions.getConnectorDetail(params.id));
       dispatch(actions.getConnectorHealth(params.id));
       dispatch(actions.getAllConnectorAttributes(params.id));
    }, [params.id, dispatch]);
 
+
    useEffect(() => {
-
       if (!connector) return;
-
       if (connector.functionGroups.length > 0) setFunctionGroup(connector.functionGroups[0]);
-
    }, [connector]);
+
 
    /*useEffect(() => {
       if (deleteErrorMessages?.length > 0) {
@@ -165,12 +166,22 @@ export default function ConnectorDetail() {
    const onAuthorizeClick = () => {
    }
 
+   const onFunctionGroupChange = (groupCode: string) => {
+
+      const group = (connector?.functionGroups || []).find(group => group.functionGroupCode === groupCode);
+      if (group) setFunctionGroup(group);
+
+   };
+
+
+
    const buttons: WidgetButtonProps[] = [
       { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onAddClick(); } },
       { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
       { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
       { icon: "check", disabled: false, tooltip: "Authorize", onClick: () => { onAuthorizeClick() } }
    ];
+
 
    const attributesTitle = (
 
@@ -187,6 +198,7 @@ export default function ConnectorDetail() {
       </div>
 
    );
+
 
    const healthTitle = (
 
@@ -211,23 +223,6 @@ export default function ConnectorDetail() {
 
    )
 
-   const valuesForFunctionGroup = connector?.functionGroups?.map(
-
-      group => ({
-         label: group.name,
-         value: group.functionGroupCode
-      })
-
-   ) || [];
-
-
-   const onFunctionGroupChange = (groupCode: string) => {
-
-      const group = (connector?.functionGroups || []).find(group => group.functionGroupCode === groupCode);
-      if (group) setFunctionGroup(group);
-
-   };
-
 
    const healthBody = (parts?: ConnectorHealthModel[]) => {
 
@@ -251,204 +246,254 @@ export default function ConnectorDetail() {
 
    };
 
-   const getEndPoints = () => {
 
-      let endPoints: any = [];
+   const functionGroupSelectData = connector?.functionGroups?.map(
+
+      group => ({
+         label: group.name,
+         value: group.functionGroupCode
+      })
+
+   ) || [];
 
 
-      for (let key of functionGroup?.endPoints || []) {
-         let searchKey = "";
-         if (
-            functionGroup?.functionGroupCode ===
-            "legacyAuthorityProvider"
-         ) {
-            if (
-               key.context.includes("authorityProvider") ||
-               key.context.includes(functionGroup?.functionGroupCode)
-            ) {
-               endPoints.push(
-                  <tr>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.name}</div>
-                     </td>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.context}</div>
-                     </td>
-                     <td>{key.method}</td>
-                  </tr>
-               );
-            }
-         } else {
-            searchKey =
-               functionGroup?.functionGroupCode || "undefined";
-            if (key.context.includes(searchKey)) {
-               endPoints.push(
-                  <tr>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.name}</div>
-                     </td>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.context}</div>
-                     </td>
-                     <td>{key.method}</td>
-                  </tr>
-               );
-            }
-         }
-      }
-      return endPoints;
-   };
+   const getEndPoints = () => functionGroup?.endPoints.map(
 
-   const functionGroupKinds = functionGroup?.kinds?.map(function (
-      kind: string
-   ) {
-      return { label: kind, value: kind };
-   });
+      endPoint => (
+         <tr>
+            <td>
+               <div style={{ wordBreak: "break-all" }}>{endPoint.name}</div>
+            </td>
+            <td>
+               <div style={{ wordBreak: "break-all" }}>{endPoint.context}</div>
+            </td>
+            <td>{endPoint.method}</td>
+         </tr>
+      )
+
+   );
+
+
+   const functionGroupKinds = functionGroup?.kinds?.map(
+      kind => ({ label: kind, value: kind })
+   ) || [];
+
 
    return (
+
       <Container className="themed-container" fluid>
+
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
+
             <Col>
+
                <Widget title={attributesTitle}>
+
                   <Table className="table-hover" size="sm">
+
                      <thead>
+
                         <tr>
                            <th>Attribute</th>
                            <th>Value</th>
                         </tr>
+
                      </thead>
+
                      <tbody>
+
                         <tr>
                            <td>Id</td>
                            <td>{connector?.uuid}</td>
                         </tr>
+
                         <tr>
                            <td>Name</td>
                            <td>{connector?.name}</td>
                         </tr>
+
                         <tr>
                            <td>Url</td>
                            <td>{connector?.url}</td>
                         </tr>
+
                         <tr>
                            <td>Status</td>
                            <td>
                               <InventoryStatusBadge status={connector?.status} />
                            </td>
                         </tr>
+
                         <tr>
                            <td>Auth Type</td>
                            <td>{connector?.authType}</td>
                         </tr>
+
                      </tbody>
+
                   </Table>
+
                </Widget>
+
             </Col>
+
             <Col>
+
                <Widget title="Connector Functionality">
+
                   <Table className="table-hover" size="sm">
+
                      <thead>
+
                         <tr>
                            <th>Function Group</th>
                            <th>Kind</th>
                         </tr>
+
                      </thead>
+
                      <tbody>
+
                         {connector?.functionGroups?.map(functionGroup => {
+
                            return (
+
                               <tr>
+
                                  <td>
                                     <MDBBadge color="primary">
                                        {attributeFieldNameTransform[functionGroup.name || ""] || functionGroup.name}
                                     </MDBBadge>
                                  </td>
+
+
                                  <td>
                                     <div>
-                                       {functionGroup.kinds?.map(function (types) {
-                                          return (
+                                       {functionGroup.kinds?.map(
+                                          types => (
                                              <div className={styles.kind}>
                                                 <MDBBadge color="secondary">{types}</MDBBadge>
                                              </div>
-                                          );
-                                       })}
+                                          )
+                                       )}
                                     </div>
+
                                  </td>
+
                               </tr>
+
                            );
+
                         })}
+
                      </tbody>
+
                   </Table>
+
                </Widget>
 
+
                <Widget title={healthTitle}>
+
                   <Table className="table-hover" size="sm">
+
                      <tbody>
+
                         <tr key="healthCheckStatus">
                            <td>Status</td>
                            <td>{health?.status || "unknown"}</td>
                         </tr>
+
                         {healthBody()}
+
                      </tbody>
+
                   </Table>
+
                </Widget>
 
             </Col>
+
          </Row>
 
+
          <Widget title="Function Group Details">
+
             <hr />
+
             <Row xs="1" sm="2" md="3" lg="3" xl="4">
+
                <Col style={{ display: "inline-block" }}>
+
                   <Select
                      key="connectorFunctionGroupDropdown"
                      maxMenuHeight={140}
-                     options={valuesForFunctionGroup}
-                     value={ { label: functionGroup?.name, value: functionGroup?.functionGroupCode } }
+                     options={functionGroupSelectData}
+                     value={{ label: functionGroup?.name, value: functionGroup?.functionGroupCode }}
                      menuPlacement="auto"
                      onChange={(event) => onFunctionGroupChange(event?.value || "")}
                   />
+
                </Col>
+
             </Row>
 
             &nbsp;
 
             <Widget title="End Points">
+
                <Table className="table-hover" size="sm">
+
                   <thead>
+
                      <tr>
                         <th>
                            <b>Name</b>
                         </th>
+
                         <th>
                            <b>Context</b>
                         </th>
+
                         <th>
                            <b>Method</b>
                         </th>
+
                      </tr>
+
                   </thead>
+
                   <tbody>{getEndPoints()}</tbody>
+
                </Table>
+
             </Widget>
+
             <hr />
+
             <Widget title="Attributes">
+
                <Row xs="1" sm="2" md="3" lg="3" xl="4">
+
                   <Col>
+
                      <Select
                         maxMenuHeight={140}
                         options={functionGroupKinds}
                         placeholder={functionGroup?.kinds[0]}
                         menuPlacement="auto"
                         key="connectorFunctionGroupKindDropdown"
-                        onChange={(event: any) =>
-                           setCurrentFunctionGroupKind(event?.value || "")
-                        }
+                        onChange={(event: any) => setCurrentFunctionGroupKind(event?.value || "")}
                      />
+
                   </Col>
+
                </Row>
+
                &nbsp;
 
             </Widget>
+
          </Widget>
 
          {/*<MDBModal

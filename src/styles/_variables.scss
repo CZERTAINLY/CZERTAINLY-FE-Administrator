@@ -16,20 +16,25 @@ $font-size-sm: 0.875rem !default;
 $font-size-large: 1.1rem;
 $font-size-small: 0.9rem;
 $font-size-index: 0.7rem;
-//$font-family-base: "Nunito", "HelveticaNeue-Light", sans-serif;
+$font-family-base: "Nunito", "HelveticaNeue-Light", sans-serif;
 //$font-family-base: "Roboto", sans-serif;
 //$font-family-sans-serif:  "Roboto", Helvetica, Arial, sans-serif !default;
 //$font-family-serif:       "Roboto", Georgia, "Times New Roman", Times, serif !default;
 //$font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
 //$font-family-base:        $font-family-sans-serif !default;
-$font-family-base:        "Roboto", sans-serif !default;
+//$font-family-base:        "Roboto", sans-serif !default;
 
 $line-height-computed: 1.5rem;
 
-$font-weight-thin: 200;
+/*$font-weight-thin: 200;
 $font-weight-normal: 300;
 $font-weight-semi-bold: 500;
-$font-weight-bold: 600;
+$font-weight-bold: 600;*/
+
+$font-weight-thin: 500;
+$font-weight-normal: 600;
+$font-weight-semi-bold: 700;
+$font-weight-bold: 800;
 
 $glyphicons-halflings-include-bonus: false !default;
 $glyphicons-halflings-class-prefix: glyphicon !default;

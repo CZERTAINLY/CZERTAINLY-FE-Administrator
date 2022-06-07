@@ -1,5 +1,5 @@
 import { AttributeDTO } from "api/_common/attributeDTO";
-import { RaProfileModel } from "./raProfile";
+import { RaProfileModel } from "./ra-profiles";
 
 export interface AcmeProfileListModel {
    uuid: string;

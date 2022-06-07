@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { Container, Table } from "reactstrap";
@@ -8,8 +8,7 @@ import { actions, selectors } from "ducks/connectors";
 import Widget from "components/Widget";
 import MDBColumnName from "components/MDBColumnName";
 
-import { inventoryStatus } from "utils/connector";
-import CustomTable from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { attributeFieldNameTransform } from "models/attributes";
 import { Dialog } from "components/Dialog";
@@ -43,32 +42,35 @@ function ConnectorList() {
    const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
 
-   useEffect(() => {
-      dispatch(actions.clearDeleteErrorMessages());
-      dispatch(actions.listConnectors());
-   }, [dispatch]);
+   useEffect(
+      () => {
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.listConnectors());
+      },
+      [dispatch]
+   );
 
 
-   useEffect(() => {
-      setConfirmForceDelete(deleteErrorMessages.length > 0);
-   }, [deleteErrorMessages]);
+   useEffect(
+      () => { setConfirmForceDelete(deleteErrorMessages.length > 0); },
+      [deleteErrorMessages]
+   );
 
 
-   const onAddClick = useCallback(() => {
-      history.push(`${""}/add`);
-   }, [history]);
+   const onAddClick = useCallback(
+      () => { history.push(`${""}/add`); },
+      [history]
+   );
 
 
    const onReconnectClick = useCallback(
-      () => {
-         dispatch(actions.bulkReconnectConnectors(checkedRows));
-      },
+      () => { dispatch(actions.bulkReconnectConnectors(checkedRows)); },
       [checkedRows, dispatch]
    );
 
 
    const setCheckedRows = useCallback(
-      (rows: string[]) => { dispatch(actions.setCheckedRows(rows)); },
+      (rows: (string | number)[]) => { dispatch(actions.setCheckedRows(rows as string[])); },
       [dispatch]
    );
 
@@ -78,7 +80,7 @@ function ConnectorList() {
          setConfirmDelete(false);
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkDeleteConnectors(checkedRows));
-       },
+      },
       [dispatch, checkedRows]
    );
 
@@ -109,19 +111,24 @@ function ConnectorList() {
    ]
 
 
-   const title = (
+   const title = useMemo(
 
-      <div>
+      () => (
 
-         <div className="pull-right mt-n-xs">
-            <WidgetButtons buttons={buttons} />
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               <span className="fw-semi-bold">Connector Store</span>
+            </h5>
+
          </div>
 
-         <h5 className="mt-0">
-            <span className="fw-semi-bold">Connector Store</span>
-         </h5>
-
-      </div>
+      ),
+      [buttons]
 
    );
 
@@ -156,47 +163,6 @@ function ConnectorList() {
    };
 
 
-   const forceDeleteBody = (
-
-      <div>
-
-         <div>Failed to delete some of the connectors. Please find the details below:</div>
-
-         <Table className="table-hover" size="sm">
-
-            <thead>
-
-               <tr>
-                  <th>
-                     <b>Name</b>
-                  </th>
-                  <th>
-                     <b>Dependencies</b>
-                  </th>
-               </tr>
-
-            </thead>
-
-            <tbody>
-
-               {deleteErrorMessages?.map(
-                  message => (
-                     <tr>
-                        <td>{message.name}</td>
-                        <td>{message.message}</td>
-                     </tr>
-                  )
-               )}
-
-            </tbody>
-
-         </Table >
-
-      </div>
-
-   )
-
-
    const getFunctionGroups = (functionGroups: FunctionGroupModel[]) => {
 
       return functionGroups.map(
@@ -215,93 +181,111 @@ function ConnectorList() {
    }
 
 
-   const connectorList = () => {
-      let rows: any = [];
-      for (let connector of connectors) {
+   const forceDeleteBody = useMemo(
 
-         let connectorStatus = inventoryStatus(connector.status || "");
-         let column: any = {};
+      () => (
 
-         column["name"] = {
-            content: connector.name,
-            styledContent: (
-               <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>
-            ),
-            lineBreak: true,
+         <div>
 
-         };
+            <div>Failed to delete some of the connectors. Please find the details below:</div>
 
-         column["functions"] = {
-            styledContent: getFunctionGroups(connector.functionGroups || []),
-            lineBreak: true,
-         };
+            <Table className="table-hover" size="sm">
 
-         column["kinds"] = {
-            styledContent: getKinds(connector.functionGroups || []),
-            lineBreak: true,
-         };
+               <thead>
 
-         column["url"] = {
-            content: connector.url,
-            lineBreak: true,
-         };
+                  <tr>
+                     <th>
+                        <b>Name</b>
+                     </th>
+                     <th>
+                        <b>Dependencies</b>
+                     </th>
+                  </tr>
 
-         column["status"] = {
-            content: connector.status,
-            styledContent: (
-               <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
-            ),
-            lineBreak: true,
-         };
+               </thead>
 
-         rows.push({
+               <tbody>
+
+                  {deleteErrorMessages?.map(
+                     message => (
+                        <tr>
+                           <td>{message.name}</td>
+                           <td>{message.message}</td>
+                        </tr>
+                     )
+                  )}
+
+               </tbody>
+
+            </Table >
+
+         </div>
+
+      ),
+      [deleteErrorMessages]
+
+   );
+
+
+   const connectorRowHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            id: "connectorName",
+            width: "15%",
+         },
+         {
+            content: <MDBColumnName columnName="Function Groups" />,
+            sortable: true,
+            id: "connectorFunctions",
+            width: "35%",
+         },
+         {
+            content: <MDBColumnName columnName="Kinds" />,
+            sortable: true,
+            id: "kinds",
+            width: "35%",
+         },
+         {
+            content: <MDBColumnName columnName="URL" />,
+            sortable: true,
+            id: "connectorUrl",
+            width: "30%",
+         },
+         {
+            content: <MDBColumnName columnName="Status" />,
+            sortable: true,
+            id: "connectorStatus",
+            width: "10%",
+         },
+      ],
+      []
+
+   );
+
+
+   const connectorList: TableDataRow[] = useMemo(
+
+      () => connectors.map(
+
+         connector => ({
             id: connector.uuid,
-            column: column,
-            data: connector,
-         });
+            columns: [
+               <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>,
+               <>{getFunctionGroups(connector.functionGroups)}</>,
+               <>{getKinds(connector.functionGroups)}</>,
+               <>{connector.url}</>,
+               <>{connector.status}</>,
+            ],
+         })
 
-      }
+      ),
+      [connectors, path]
 
-      return rows;
-   };
+   );
 
-   const connectorRowHeaders = [
-      {
-         styledContent: <MDBColumnName columnName="Name" />,
-         content: "name",
-         sort: false,
-         id: "connectorName",
-         width: "15%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Function Groups" />,
-         content: "functions",
-         sort: false,
-         id: "connectorFunctions",
-         width: "35%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Kinds" />,
-         content: "kinds",
-         sort: false,
-         id: "kinds",
-         width: "35%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="URL" />,
-         content: "url",
-         sort: false,
-         id: "connectorUrl",
-         width: "30%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Status" />,
-         content: "status",
-         sort: false,
-         id: "connectorStatus",
-         width: "10%",
-      },
-   ];
 
    return (
 
@@ -313,11 +297,11 @@ function ConnectorList() {
                <br />
 
                <CustomTable
-                  checkedRows={checkedRows}
-                  onCheckedRowsChanged={setCheckedRows}
-                  data={connectors}
                   headers={connectorRowHeaders}
-                  rows={connectorList()}
+                  data={connectorList}
+                  onCheckedRowsChanged={setCheckedRows}
+                  hasCheckboxes={true}
+                  hasPagination={true}
                />
 
             </Widget>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { Container } from "reactstrap";
@@ -11,7 +11,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import StatusBadge from "components/StatusBadge";
 import StatusCircle from "components/StatusCircle";
-import CustomTable, { CustomTableHeaderColumn } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { Dialog } from "components/Dialog";
 
 export default function AdministratorsList() {
@@ -49,22 +49,28 @@ export default function AdministratorsList() {
       history.push(`${path}/add`);
    }, [history, path]);
 
-   const onEnableClick = useCallback(() => {
-      dispatch(actions.bulkEnableAdmins(checkedRows));
-   }, [checkedRows, dispatch]);
+   const onEnableClick = useCallback(
+      () => { dispatch(actions.bulkEnableAdmins(checkedRows)); },
+      [checkedRows, dispatch]
+   );
 
-   const onDisableClick = useCallback(() => {
-      dispatch(actions.bulkDisableAdmins(checkedRows));
-   }, [checkedRows, dispatch]);
+   const onDisableClick = useCallback(
+      () => { dispatch(actions.bulkDisableAdmins(checkedRows)); },
+      [checkedRows, dispatch]
+   );
 
-   const onDeleteConfirmed = useCallback(() => {
-      dispatch(actions.bulkDeleteAdmins(checkedRows));
-      setConfirmDelete(false);
-   }, [checkedRows, dispatch]);
+   const onDeleteConfirmed = useCallback(
+      () => {
+         dispatch(actions.bulkDeleteAdmins(checkedRows));
+         setConfirmDelete(false);
+      },
+      [checkedRows, dispatch]
+   );
 
-   const setCheckedRows = useCallback((rows: string[]) => {
-      dispatch(actions.setCheckedRows(rows));
-   }, [dispatch]);
+   const setCheckedRows = useCallback(
+      (rows: (string | number)[]) => { dispatch(actions.setCheckedRows(rows as string[])); },
+      [dispatch]
+   );
 
    const buttons: WidgetButtonProps[] = [
       { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
@@ -87,104 +93,77 @@ export default function AdministratorsList() {
       </div>
    );
 
-   const adminTableData = () => {
 
-      return administrators.map(
-
-         administrator => {
-
-            let column: any = {};
-
-            column["name"] = {
-               content: administrator.name,
-               styledContent: <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.name}</Link>,
-               lineBreak: true,
-            };
-
-            column["username"] = {
-               content: administrator.username,
-               lineBreak: true,
-            };
-
-            column["serialNumber"] = {
-               content: administrator.serialNumber,
-               lineBreak: true,
-            };
-
-            column["adminDn"] = {
-               content: administrator.certificate.subjectDn,
-               lineBreak: true,
-            };
-
-            column["superAdmin"] = {
-               content: administrator.role === "superAdministrator" ? "Yes" : "No",
-               styledContent: <StatusCircle status={administrator.role === "superAdministrator"} />,
-               lineBreak: true,
-            };
-
-            column["status"] = {
-               content: administrator.enabled ? "enabled" : "disabled",
-               styledContent: <StatusBadge enabled={administrator.enabled} />,
-               lineBreak: true,
-            };
-
-            return {
-               id: administrator.uuid,
-               column: column,
-               data: administrator,
-            };
-
-         }
-
-      );
-
-   }
+   const adminTableHeader: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "adminName",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            width: "5%",
+         },
+         {
+            id: "adminUsername",
+            content: <MDBColumnName columnName="Username" />,
+            sortable: true,
+            width: "10%",
+         },
+         {
+            id: "adminSerialNumber",
+            content: <MDBColumnName columnName="Serial Number" />,
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "adminAdminDn",
+            content: <MDBColumnName columnName="Admin DN" />,
+            sortable: true,
+            width: "35%",
+         },
+         {
+            id: "adminSuperAdmin",
+            content: <MDBColumnName columnName="Super Admin" />,
+            sortable: true,
+            width: "5%",
+         },
+         {
+            id: "adminStatus",
+            content: <MDBColumnName columnName="Status" />,
+            sortable: true,
+            width: "10%",
+         },
+      ],
+      []
+   );
 
 
-   const adminTableHeader: CustomTableHeaderColumn[] = [
-      {
-         styledContent: <MDBColumnName columnName="Name" />,
-         content: "name",
-         sort: false,
-         id: "adminName",
-         width: "5%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Username" />,
-         content: "username",
-         sort: false,
-         id: "adminUsername",
-         width: "10%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Serial Number" />,
-         content: "serialNumber",
-         sort: false,
-         id: "adminSerialNumber",
-         width: "15%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Admin DN" />,
-         content: "adminDn",
-         sort: false,
-         id: "adminAdminDn",
-         width: "35%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Super Admin" />,
-         content: "superAdmin",
-         sort: false,
-         id: "adminSuperAdmin",
-         width: "5%",
-      },
-      {
-         styledContent: <MDBColumnName columnName="Status" />,
-         content: "status",
-         sort: false,
-         id: "adminStatus",
-         width: "10%",
-      },
-   ];
+   const adminTableData: TableDataRow[] = useMemo(
+
+      () => administrators.map(
+
+         administrator => ({
+
+            id: administrator.uuid,
+
+            columns: [
+
+               <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.name}</Link>,
+
+               administrator.username,
+
+               administrator.serialNumber,
+
+               administrator.certificate.subjectDn,
+
+               <StatusCircle status={administrator.role === "superAdministrator"} />,
+
+               <StatusBadge enabled={administrator.enabled} />,
+
+            ]
+         })
+      ),
+      [administrators, path]
+   );
 
 
    return (
@@ -195,11 +174,11 @@ export default function AdministratorsList() {
 
             <br />
             <CustomTable
-               checkedRows={checkedRows}
-               onCheckedRowsChanged={setCheckedRows}
-               data={administrators}
                headers={adminTableHeader}
-               rows={adminTableData()}
+               data={adminTableData}
+               onCheckedRowsChanged={setCheckedRows}
+               hasCheckboxes={true}
+               hasPagination={true}
             />
 
          </Widget>
@@ -208,7 +187,7 @@ export default function AdministratorsList() {
             isOpen={confirmDelete}
             caption="Delete Administrator"
             body="You are about to delete an Administrator. Is this what you want to do?"
-            toggle={ () => setConfirmDelete(false) }
+            toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },

@@ -9,7 +9,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
-import CustomTable, { CustomTableHeaderColumn } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { Dialog } from "components/Dialog";
 
 export default function ClientList() {
@@ -44,26 +44,33 @@ export default function ClientList() {
       []
    );
 
-   const onAddClick = useCallback(() => {
-      history.push("/app/clients/add");
-   }, [history]);
+   const onAddClick = useCallback(
+      () => { history.push("/app/clients/add"); },
+      [history]
+   );
 
-   const onEnableClick = useCallback(() => {
-      dispatch(actions.bulkEnableClients(checkedRows));
-   }, [checkedRows, dispatch]);
+   const onEnableClick = useCallback(
+      () => { dispatch(actions.bulkEnableClients(checkedRows)); },
+      [checkedRows, dispatch]
+   );
 
-   const onDisableClick = useCallback(() => {
-      dispatch(actions.bulkDisableClients(checkedRows));
-   }, [checkedRows, dispatch]);
+   const onDisableClick = useCallback(
+      () => { dispatch(actions.bulkDisableClients(checkedRows)); },
+      [checkedRows, dispatch]
+   );
 
-   const onDeleteConfirmed = useCallback(() => {
-      dispatch(actions.bulkDeleteClients(checkedRows));
-      setConfirmDelete(false);
-   }, [checkedRows, dispatch]);
+   const onDeleteConfirmed = useCallback(
+      () => {
+         dispatch(actions.bulkDeleteClients(checkedRows));
+         setConfirmDelete(false);
+      },
+      [checkedRows, dispatch]
+   );
 
-   const setCheckedRows = useCallback((rows: string[]) => {
-      dispatch(actions.setCheckedRows(rows));
-   }, [dispatch]);
+   const setCheckedRows = useCallback(
+      (rows: (string | number)[]) => { dispatch(actions.setCheckedRows(rows as string[])); },
+      [dispatch]
+   );
 
 
    const buttons: WidgetButtonProps[] = [
@@ -88,79 +95,57 @@ export default function ClientList() {
       </div>
    );
 
-   const clientTableData = () => {
 
-      return clients.map(
-
-         client => {
-
-            let column: any = {};
-
-            column["name"] = {
-               content: client.name,
-               styledContent: <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>,
-               lineBreak: true,
-            };
-
-            column["serialNumber"] = {
-               content: client.serialNumber,
-               lineBreak: true,
-            };
-
-            column["clientDn"] = {
-               content: client?.certificate?.subjectDn,
-               lineBreak: true,
-            };
-
-            column["status"] = {
-               content: client.enabled ? "enabled" : "disabled",
-               styledContent: <StatusBadge enabled={client.enabled} />,
-               lineBreak: true,
-            };
-
-            return {
-               id: client.uuid,
-               column: column,
-               data: client,
-            };
-
-         }
-
-      );
-
-
-   };
-
-   const clientTableHeader: CustomTableHeaderColumn[] = [
+   const clientTableHeader: TableHeader[] = [
       {
-         styledContent: <MDBColumnName columnName="Name" />,
-         content: "name",
-         sort: false,
+         content: <MDBColumnName columnName="Name" />,
+         sortable: false,
          id: "clientName",
          width: "10%",
       },
       {
-         styledContent: <MDBColumnName columnName="Serial Number" />,
-         content: "serialNumber",
-         sort: false,
+         content: <MDBColumnName columnName="Serial Number" />,
+         sortable: false,
          id: "clientSerialNumber",
          width: "25%",
       },
       {
-         styledContent: <MDBColumnName columnName="Client DN" />,
-         content: "clientDn",
-         sort: false,
+         content: <MDBColumnName columnName="Client DN" />,
+         sortable: false,
          id: "clientAdminDn",
          width: "35%",
       },
       {
-         styledContent: <MDBColumnName columnName="Status" />,
-         content: "status",
-         sort: false,
+         content: <MDBColumnName columnName="Status" />,
+         sortable: false,
          id: "clientStatus",
          width: "10%",
       },
    ];
+
+
+   const clientTableData: TableDataRow[] = clients.map(
+
+      client => ({
+
+         id: client.uuid,
+
+         columns: [
+
+            <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>,
+
+            client.serialNumber,
+
+            client?.certificate?.subjectDn,
+
+            client.enabled ? "enabled" : "disabled"
+
+         ]
+
+      })
+
+   );
+
 
    return (
 
@@ -170,11 +155,9 @@ export default function ClientList() {
 
             <br />
             <CustomTable
-               checkedRows={checkedRows}
-               onCheckedRowsChanged={setCheckedRows}
-               data={clients}
                headers={clientTableHeader}
-               rows={clientTableData()}
+               data={clientTableData}
+               onCheckedRowsChanged={setCheckedRows}
             />
          </Widget>
 
@@ -186,7 +169,7 @@ export default function ClientList() {
             Profiles. If you continue, these authorizations will be deleted as
             well. Is this what you want to do?"
 
-            toggle={ () => setConfirmDelete(false) }
+            toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
