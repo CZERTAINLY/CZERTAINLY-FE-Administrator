@@ -62,7 +62,27 @@ function CustomTable({
    useEffect(
 
       () => {
-         setTblData(data);
+         const sorted = [ ...data ];
+
+         const sortColumn = headers.findIndex(h => h.sort);
+
+         if (sortColumn >= 0) {
+
+            const sortDirection = headers[sortColumn].sort;
+
+            sorted.sort(
+
+               (a, b) => {
+                  const aVal = typeof a.columns[sortColumn] === "string" ? a.columns[sortColumn] : jsxInnerText(a.columns[sortColumn] as JSX.Element);
+                  const bVal = typeof b.columns[sortColumn] === "string" ? b.columns[sortColumn] : jsxInnerText(b.columns[sortColumn] as JSX.Element);
+                  if (aVal === bVal) return 0;
+                  return aVal > bVal ? (sortDirection === "asc" ? 1 : -1) : (sortDirection === "asc" ? -1 : 1);
+               }
+
+            );
+         }
+
+         setTblData(sorted);
          setTblCheckedRows(tblCheckedRows.filter(row => data.find(data => data.id === row)));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,8 +199,7 @@ function CustomTable({
                const aVal = typeof a.columns[column] === "string" ? a.columns[column] : jsxInnerText(a.columns[column] as JSX.Element);
                const bVal = typeof b.columns[column] === "string" ? b.columns[column] : jsxInnerText(b.columns[column] as JSX.Element);
                if (aVal === bVal) return 0;
-               if (aVal < bVal) return sort === "asc" ? -1 : 1;
-               return sort === "asc" ? 1 : -1;
+               return aVal > bVal ? (sort === "asc" ? 1 : -1) : (sort === "asc" ? -1 : 1);
             }
          )
 
