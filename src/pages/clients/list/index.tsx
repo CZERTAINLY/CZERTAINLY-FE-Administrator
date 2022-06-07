@@ -99,7 +99,8 @@ export default function ClientList() {
    const clientTableHeader: TableHeader[] = [
       {
          content: <MDBColumnName columnName="Name" />,
-         sortable: false,
+         sortable: true,
+         sort: "asc",
          id: "clientName",
          width: "10%",
       },
@@ -117,7 +118,7 @@ export default function ClientList() {
       },
       {
          content: <MDBColumnName columnName="Status" />,
-         sortable: false,
+         sortable: true,
          id: "clientStatus",
          width: "10%",
       },
@@ -138,7 +139,7 @@ export default function ClientList() {
 
             client?.certificate?.subjectDn,
 
-            client.enabled ? "enabled" : "disabled"
+            <StatusBadge enabled={client.enabled} />,
 
          ]
 
