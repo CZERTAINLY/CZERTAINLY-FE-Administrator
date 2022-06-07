@@ -100,6 +100,7 @@ export default function AdministratorsList() {
             id: "adminName",
             content: <MDBColumnName columnName="Name" />,
             sortable: true,
+            sort: "asc",
             width: "5%",
          },
          {
