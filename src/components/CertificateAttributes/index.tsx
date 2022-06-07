@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { CertificateModel } from "models";
-import { Table } from "reactstrap";
 import { dateFormatter } from "utils/dateUtil";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
