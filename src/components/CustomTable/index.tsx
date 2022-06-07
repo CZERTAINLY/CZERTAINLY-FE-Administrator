@@ -410,7 +410,7 @@ function CustomTable({
 
    return (
 
-      <div>
+      <div className={styles.customTable}>
 
          {
             canSearch
