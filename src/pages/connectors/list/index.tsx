@@ -237,6 +237,7 @@ function ConnectorList() {
          {
             content: <MDBColumnName columnName="Name" />,
             sortable: true,
+            sort: "asc",
             id: "connectorName",
             width: "15%",
          },
