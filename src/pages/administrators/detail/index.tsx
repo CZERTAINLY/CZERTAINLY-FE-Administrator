@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
-import { Container, Table, Row, Col } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 
 import { actions, selectors } from "ducks/administrators";
 

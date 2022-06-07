@@ -62,7 +62,7 @@ function CustomTable({
    useEffect(
 
       () => {
-         const sorted = [ ...data ];
+         const sorted = [...data];
 
          const sortColumn = headers.findIndex(h => h.sort);
 
@@ -114,7 +114,7 @@ function CustomTable({
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, []
+      }, [tblData, onCheckedRowsChanged]
 
    );
 
@@ -165,7 +165,7 @@ function CustomTable({
          setTblCheckedRows(checked);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
 
-      }, [tblData, tblCheckedRows, onCheckedRowsChanged]
+      }, [tblCheckedRows, onCheckedRowsChanged]
 
    );
 
@@ -315,7 +315,8 @@ function CustomTable({
                )
 
             ),
-      [tblCheckedRows, tblData, onRowCheckboxClick, hasCheckboxes, searchKey]
+
+      [tblData, tblCheckedRows, onRowToggleSelection, onRowCheckboxClick, hasCheckboxes, searchKey]
 
    );
 
@@ -356,16 +357,16 @@ function CustomTable({
          {
             canSearch
                ?
-                  <>
-                     <div className="pull-right mt-n-xs">
-                        <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
-                     </div>
-                     <br />
-                     <br />
-                  </>
+               <>
+                  <div className="pull-right mt-n-xs">
+                     <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
+                  </div>
+                  <br />
+                  <br />
+               </>
 
                :
-                  <></>
+               <></>
          }
 
 
