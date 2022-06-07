@@ -2,6 +2,7 @@ import { AuthType, FunctionGroupCode, Status } from "types/connectors";
 import { AttributeModel } from "./attributes";
 
 export interface EndpointModel {
+   uuid?: string;
    name: string;
    context: string;
    method: string;

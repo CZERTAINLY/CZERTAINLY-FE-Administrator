@@ -6,6 +6,7 @@ import { AuthType, FunctionGroupCode, Status } from "types/connectors";
 
 
 export interface EndpointDTO {
+   uuid?: string;
    name: string;
    context: string;
    method: string;
