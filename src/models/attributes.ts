@@ -1,4 +1,4 @@
-import { AttributeCallbackMappingTarget, AttributeListValue, AttributeType, AttributeValue } from "types/attributes";
+import { AttributeCallbackMappingTarget, AttributeType, AttributeValue } from "types/attributes";
 import { FunctionGroupCode } from "types/connectors";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
