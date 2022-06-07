@@ -14,7 +14,7 @@ interface Props {
    ignoreValueTypes: AttributeType[];
 }
 
-export default function ({
+export default function AttributeDescriptorViewer({
    attributeDescriptors,
    ignoreValueTypes
 }: Props) {
@@ -85,10 +85,6 @@ export default function ({
          {
             id: "defaultValue",
             content: "Default Value"
-         },
-         {
-            id: "details",
-            content: "Details"
          }
       ],
       []
@@ -105,153 +101,79 @@ export default function ({
             columns: [
                attributeDescriptor.label || attributeFieldNameTransform[attributeDescriptor.name] || attributeDescriptor.name,
                attributeDescriptor.required ? "Yes" : "No",
-               getAttributeValues(attributeDescriptor)//,
+               getAttributeValues(attributeDescriptor),
                //getAttributeDetail(attributeDescriptor)
+            ],
+            detailColumns: [
+               (
+                  <>
+
+                     <p>
+                        <b>Name</b>: {attributeDescriptor.name}
+                     </p>
+
+                     <p>
+                        <b>Type</b>: {attributeDescriptor.type}
+                     </p>
+
+
+                  </>
+               ),
+               (
+                  <>
+                     <p>
+                        <b>Read Only</b>:{" "}
+                        {attributeDescriptor.readOnly ? "Yes" : "No"}
+                     </p>
+
+                     <p>
+                        <b>Editable</b>: {attributeDescriptor.editable ? "Yes" : "No"}
+                     </p>
+                  </>
+               ),
+               (
+                  <>
+                     <p>
+                        <b>Visible</b>: {attributeDescriptor.visible ? "No" : "Yes"}
+                     </p>
+
+                     <p>
+                        <b>Multiple Value</b>:{" "}
+                        {attributeDescriptor.multiValue ? "Yes" : "No"}
+                     </p>
+
+                  </>
+               ),
+               (
+                  <>
+                     <p>
+                        <b>Description</b>: {attributeDescriptor.description}
+                     </p>
+
+                     <p>
+                        <b>Validation Regex</b>: {attributeDescriptor.validationRegex}
+                     </p>
+
+                  </>
+               )
+
             ]
 
          })
 
       ),
-
-      []
+      [attributeDescriptors, getAttributeValues]
    );
 
 
 
    return (
 
-      <>
-         <CustomTable
-            headers={headers}
-            data={data}
-         />
-
-         <Table className="table-hover" size="sm">
-            <thead>
-               <tr>
-                  <th>
-                     <b>Name</b>
-                  </th>
-
-                  <th>
-                     <b>Required</b>
-                  </th>
-                  <th>
-                     <b>Default Value</b>
-                  </th>
-                  <th>
-                     <b>Details</b>
-                  </th>
-               </tr>
-            </thead>
-
-            <tbody>
-
-               {attributeDescriptors.map(
-
-                  attributeDescriptor => (
-                     <>
-
-                        <tr>
-
-                           <td>
-                              {attributeDescriptor.label ||
-                                 attributeFieldNameTransform[attributeDescriptor.name] ||
-                                 attributeDescriptor.name}
-                           </td>
-
-                           <td>{attributeDescriptor.required ? "Yes" : "No"}</td>
-
-                           <td>
-                              {ignoreValueTypes.includes(attributeDescriptor.type)
-                                 ? "************"
-                                 : getAttributeValues(attributeDescriptor)}
-                           </td>
-
-                           <td onClick={() => toggleRow(attributeDescriptor.uuid)}>
-                              <span className={styles.showMore}>Show more...</span>
-                           </td>
-                        </tr>
-
-                        <tr className={cx(styles.detailRow, { [styles.hidden]: !expandedRows.includes(attributeDescriptor.uuid) })}>
-
-                           <td>
-
-                              <div className={cx({ [styles.hidden]: !expandedRows.includes(attributeDescriptor.uuid) })}>
-
-                                 <p>
-                                    <b>Name</b>: {attributeDescriptor.name}
-                                 </p>
-
-                                 <p>
-                                    <b>Type</b>: {attributeDescriptor.type}
-                                 </p>
-
-                              </div>
-
-                           </td>
-
-                           <td>
-
-                              <div className={cx({ [styles.hidden]: !expandedRows.includes(attributeDescriptor.uuid) })}>
-
-                                 <p>
-                                    <b>Read Only</b>:{" "}
-                                    {attributeDescriptor.readOnly ? "Yes" : "No"}
-                                 </p>
-
-                                 <p>
-                                    <b>Editable</b>: {attributeDescriptor.editable ? "Yes" : "No"}
-                                 </p>
-
-                              </div>
-
-                           </td>
-
-                           <td>
-                              <div className={cx({ [styles.hidden]: !expandedRows.includes(attributeDescriptor.uuid) })}>
-
-                                 <p>
-                                    <b>Visible</b>: {attributeDescriptor.visible ? "No" : "Yes"}
-                                 </p>
-
-                                 <p>
-                                    <b>Multiple Value</b>:{" "}
-                                    {attributeDescriptor.multiValue ? "Yes" : "No"}
-                                 </p>
-
-                              </div>
-
-                           </td>
-
-                           <td className={"w-25"}>
-
-                              <div className={cx({ [styles.hidden]: !expandedRows.includes(attributeDescriptor.uuid) })}>
-
-                                 <p>
-                                    <b>Description</b>: {attributeDescriptor.description}
-                                 </p>
-
-                                 <p>
-                                    <b>Validation Regex</b>: {attributeDescriptor.validationRegex}
-                                 </p>
-
-                              </div>
-
-                           </td>
-
-                        </tr>
-
-                     </>
-
-                  )
-
-               )}
-
-            </tbody>
-
-         </Table>
-      </>
+      <CustomTable
+         headers={headers}
+         data={data}
+         hasDetails={true}
+      />
 
    )
 

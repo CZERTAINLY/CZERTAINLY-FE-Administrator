@@ -1,5 +1,5 @@
 import cx from "classnames";
-import React, { useCallback, useState, useEffect, useMemo, } from "react";
+import React, { useCallback, useState, useEffect, useMemo, Fragment, } from "react";
 import { Input, Pagination, PaginationItem, PaginationLink, Table, } from "reactstrap";
 
 import styles from "./CustomTable.module.scss";
@@ -17,6 +17,7 @@ export interface TableHeader {
 export interface TableDataRow {
    id: number | string;
    columns: (string | JSX.Element)[];
+   detailColumns?: (string | JSX.Element)[];
 }
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
    canSearch?: boolean;
    hasCheckboxes?: boolean;
    hasPagination?: boolean;
+   hasDetails?: boolean;
    onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
 }
 
@@ -35,6 +37,7 @@ function CustomTable({
    canSearch,
    hasCheckboxes,
    hasPagination,
+   hasDetails,
    onCheckedRowsChanged
 }: Props) {
 
@@ -46,6 +49,8 @@ function CustomTable({
    const [pageSize, setPageSize] = useState(10);
    const [totalPages, setTotalPages] = useState(1);
    const [searchKey, setSearchKey] = useState<string>("");
+
+   const [expandedRow, setExpandedRow] = useState<string | number>();
 
    const firstPage = useCallback(() => setPage(1), [setPage]);
    const prevPage = useCallback(() => setPage(page - 1), [page, setPage]);
@@ -224,57 +229,71 @@ function CustomTable({
 
    const header = useMemo(
 
-      () => (hasCheckboxes ? [{ id: "__checkbox__", content: "" }, ...tblHeaders || []] : tblHeaders || []).map(
+      () => {
 
-         header => (
+         const columns = tblHeaders ? [...tblHeaders] : [];
 
-            <th key={header.id} {...(header.sortable ? { onClick: onColumnSortClick } : {})} data-id={header.id}>
+         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false });
+         if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false });
 
-               {
-                  header.id === "__checkbox__" ? (
+         return columns.map(
 
-                     <input type="checkbox" checked={tblCheckedRows.length === tblData.length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+            header => (
 
-                  ) : header.sortable ? (
+               <Fragment key={header.id}>
 
-                     <>
-                        {header.content}
-                        &nbsp;
-                        {header.sort === "asc"
-                           ?
+                  <th {...(header.sortable ? { onClick: onColumnSortClick } : {})} data-id={header.id}>
+
+                     {
+                        header.id === "__checkbox__" ? (
+
+                           <input type="checkbox" checked={tblCheckedRows.length === tblData.length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+
+                        ) : header.sortable ? (
+
                            <>
-                              <i className="fa fa-arrow-up" />
-                              <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
+                              {header.content}
+                              &nbsp;
+                              {header.sort === "asc"
+                                 ?
+                                 <>
+                                    <i className="fa fa-arrow-up" />
+                                    <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
+                                 </>
+                                 :
+                                 header.sort === "desc"
+                                    ?
+                                    <>
+                                       <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
+                                       <i className="fa fa-arrow-down" />
+                                    </>
+                                    :
+                                    <>
+                                       <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
+                                       <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
+                                    </>
+                              }
                            </>
-                           :
-                           header.sort === "desc"
-                              ?
-                              <>
-                                 <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
-                                 <i className="fa fa-arrow-down" />
-                              </>
-                              :
-                              <>
-                                 <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
-                                 <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
-                              </>
-                        }
-                     </>
 
-                  ) : (
+                        ) : (
 
-                     header.content
+                           header.content
 
-                  )
+                        )
 
-               }
+                     }
 
-            </th>
+                  </th>
+
+
+               </Fragment>
+
+
+            )
 
          )
-
-      ),
-      [hasCheckboxes, tblHeaders, tblCheckedRows, tblData, onColumnSortClick, onCheckAllCheckboxClick]
+      },
+      [hasCheckboxes, hasDetails, tblHeaders, tblCheckedRows, tblData, onColumnSortClick, onCheckAllCheckboxClick]
    );
 
 
@@ -293,30 +312,69 @@ function CustomTable({
             )
             : tblData).map(
 
-               row => (
+               (row, index) => (
 
-                  <tr key={row.id} {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
+                  <Fragment key={row.id}>
 
-                     {!hasCheckboxes ? (<></>) : (
-                        <td>
-                           <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
-                        </td>
-                     )}
+                     <tr {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
 
+                        {!hasCheckboxes ? (<></>) : (
+                           <td>
+                              <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
+                           </td>
+                        )}
 
-                     {row.columns.map(
-                        (column, index) => (
-                           <td key={index}>{column}</td>
-                        )
-                     )}
+                        {row.columns.map(
 
-                  </tr>
+                           (column, index) => (
+
+                              <td key={index}>
+
+                                 <div>{column ? column : <>&nbsp;</>}</div>
+
+                                 {
+                                    row.detailColumns && row.detailColumns[index] && expandedRow === row.id ? (
+                                       <div className={styles.detail}>{row.detailColumns[index]}</div>
+                                    ) : (
+                                       <></>
+                                    )
+                                 }
+
+                              </td>
+
+                           )
+
+                        )}
+
+                        {!hasDetails ? (<></>) : (
+
+                           <td className="w-25">
+
+                              <div className={styles.showMore} onClick={() => expandedRow === row.id ? setExpandedRow(undefined) : setExpandedRow(row.id)}>
+                                 { expandedRow === row.id ? "Show less..." : "Show more..." }
+                              </div>
+
+                              {
+                                 row.detailColumns && row.detailColumns[headers.length] && expandedRow === row.id ? (
+                                    <div className={styles.detail}>{row.detailColumns[headers.length]}</div>
+                                 ) : (
+                                    <></>
+                                 )
+                              }
+
+                           </td>
+                        )}
+
+                     </tr>
+
+                  </Fragment>
+
 
                )
 
             ),
 
-      [tblData, tblCheckedRows, onRowToggleSelection, onRowCheckboxClick, hasCheckboxes, searchKey]
+      [hasCheckboxes, hasDetails, tblCheckedRows, headers, tblData, searchKey, expandedRow, onRowToggleSelection, onRowCheckboxClick, ]
 
    );
 
