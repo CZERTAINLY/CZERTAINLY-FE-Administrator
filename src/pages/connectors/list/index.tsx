@@ -282,7 +282,6 @@ function ConnectorList() {
                   <>{getFunctionGroups(connector.functionGroups)}</>,
                   <>{getKinds(connector.functionGroups)}</>,
                   <>{connector.url}</>,
-                  <>{connector.status}</>,
                   <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
                ],
             }
