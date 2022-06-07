@@ -22,6 +22,7 @@ export interface TableDataRow {
 interface Props {
    headers: TableHeader[];
    data: TableDataRow[];
+   canSearch?: boolean;
    hasCheckboxes?: boolean;
    hasPagination?: boolean;
    onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
@@ -31,6 +32,7 @@ interface Props {
 function CustomTable({
    headers,
    data,
+   canSearch,
    hasCheckboxes,
    hasPagination,
    onCheckedRowsChanged
@@ -78,28 +80,6 @@ function CustomTable({
 
    );
 
-
-   const onRowCheckboxClick = useCallback(
-
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-
-         const checkedRow = e.target.getAttribute("data-id");
-         const checkedRows = tblData.filter(row => tblCheckedRows.includes(row.id)).map(row => row.id);
-
-         if (e.target.checked) {
-            if (checkedRow) checkedRows.push(checkedRow)
-         } else {
-            if (checkedRow) checkedRows.splice(checkedRows.indexOf(checkedRow), 1);
-         }
-
-         setTblCheckedRows(checkedRows);
-         if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
-
-      }, [tblData, tblCheckedRows, onCheckedRowsChanged]
-
-   );
-
-
    const onCheckAllCheckboxClick = useCallback(
 
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,9 +94,60 @@ function CustomTable({
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, [tblData, onCheckedRowsChanged]
+      }, []
 
    );
+
+
+   const onRowToggleSelection = useCallback(
+
+      (e: React.MouseEvent<HTMLTableRowElement>) => {
+
+         if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") return;
+
+         const id = e.currentTarget.getAttribute("data-id");
+         if (!id) return;
+
+         const checkedRows = [...tblCheckedRows];
+
+         if (checkedRows.includes(id)) {
+            checkedRows.splice(checkedRows.indexOf(id), 1);
+         } else {
+            checkedRows.push(id);
+         }
+
+         setTblCheckedRows(checkedRows);
+
+         e.stopPropagation();
+         e.preventDefault();
+      },
+      [tblCheckedRows, setTblCheckedRows, onCheckedRowsChanged]
+
+   );
+
+
+   const onRowCheckboxClick = useCallback(
+
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+
+         const id = e.target.getAttribute("data-id");
+         if (!id) return;
+
+         const checked = [...tblCheckedRows];
+
+         if (e.target.checked) {
+            if (id && !checked.includes(id)) checked.push(id)
+         } else {
+            if (id && checked.includes(id)) checked.splice(checked.indexOf(id), 1);
+         }
+
+         setTblCheckedRows(checked);
+         if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
+
+      }, [tblData, tblCheckedRows, onCheckedRowsChanged]
+
+   );
+
 
 
    const onColumnSortClick = useCallback(
@@ -182,7 +213,7 @@ function CustomTable({
                {
                   header.id === "__checkbox__" ? (
 
-                     <input type="checkbox" checked={tblCheckedRows.length === tblData.length} onChange={onCheckAllCheckboxClick} />
+                     <input type="checkbox" checked={tblCheckedRows.length === tblData.length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
 
                   ) : header.sortable ? (
 
@@ -244,7 +275,7 @@ function CustomTable({
 
                row => (
 
-                  <tr key={row.id}>
+                  <tr key={row.id} {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
 
                      {!hasCheckboxes ? (<></>) : (
                         <td>
@@ -301,15 +332,25 @@ function CustomTable({
    return (
 
       <div>
-         <div className="pull-right mt-n-xs">
-            <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
-         </div>
 
-         <br />
-         <br />
+         {
+            canSearch
+               ?
+                  <>
+                     <div className="pull-right mt-n-xs">
+                        <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
+                     </div>
+                     <br />
+                     <br />
+                  </>
+
+               :
+                  <></>
+         }
+
 
          <div className="table-responsive">
-            <Table className={cx("table", styles.logsTable)} size="sm">
+            <Table className={cx("table-hover", styles.logsTable)} size="sm">
                <thead><tr>{header}</tr></thead>
                <tbody>{body}</tbody>
             </Table>

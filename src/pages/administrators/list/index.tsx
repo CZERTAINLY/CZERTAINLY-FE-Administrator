@@ -177,6 +177,7 @@ export default function AdministratorsList() {
                headers={adminTableHeader}
                data={adminTableData}
                onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
                hasCheckboxes={true}
                hasPagination={true}
             />
