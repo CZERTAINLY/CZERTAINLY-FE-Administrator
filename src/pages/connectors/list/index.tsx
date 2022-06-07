@@ -13,6 +13,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { attributeFieldNameTransform } from "models/attributes";
 import { Dialog } from "components/Dialog";
 import { FunctionGroupModel } from "models/connectors";
+import { inventoryStatus } from "utils/connector";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -270,16 +271,22 @@ function ConnectorList() {
 
       () => connectors.map(
 
-         connector => ({
-            id: connector.uuid,
-            columns: [
-               <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>,
-               <>{getFunctionGroups(connector.functionGroups)}</>,
-               <>{getKinds(connector.functionGroups)}</>,
-               <>{connector.url}</>,
-               <>{connector.status}</>,
-            ],
-         })
+         connector => {
+
+            const connectorStatus = inventoryStatus(connector.status);
+
+            return {
+               id: connector.uuid,
+               columns: [
+                  <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>,
+                  <>{getFunctionGroups(connector.functionGroups)}</>,
+                  <>{getKinds(connector.functionGroups)}</>,
+                  <>{connector.url}</>,
+                  <>{connector.status}</>,
+                  <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
+               ],
+            }
+         }
 
       ),
       [connectors, path]

@@ -63,7 +63,7 @@ function CustomTable({
          setTblData(data);
          setTblCheckedRows(tblCheckedRows.filter(row => data.find(data => data.id === row)));
       },
-
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [data]
 
    );
