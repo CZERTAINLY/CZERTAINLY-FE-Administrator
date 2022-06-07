@@ -104,12 +104,15 @@ function ConnectorList() {
    );
 
 
-   const buttons: WidgetButtonProps[] = [
-      { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
-      { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-      { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
-      { icon: "check", disabled: checkedRows.length === 0, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true); } }
-   ]
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true); } }
+      ],
+      [checkedRows, onAddClick, onReconnectClick]
+   );
 
 
    const title = useMemo(

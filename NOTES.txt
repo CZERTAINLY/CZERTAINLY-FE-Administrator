@@ -27,8 +27,8 @@ Mocks does not work properly (especially bulk updates can't work, but a lot of o
    - Changed indentation of all files
    - Changed spacing between blocks of code (especially RXJS related)
 
-- Refactored components (simplified, beautified, fixed all warnings in console and during compilation):
-   Layout, Footer, Header, Private route, Sidebar + Links, Widget
+- Refactored components (enhanced, simplified, beautified, fixed all warnings in console and during compilation):
+   Layout, Footer, Header, Private route, Sidebar + Links, Widget, CustomTable
 
 - Widget => added spinner
 
@@ -41,11 +41,15 @@ Mocks does not work properly (especially bulk updates can't work, but a lot of o
 
 
 - Administrators (all parts of the code according to above changes)
+
 - Audit logs (all parts of the code according to above changes, reworked to use Ducks)
 
 - Certificates
    - removed parts of code duplicating structures
    - exetended work with binary certificate parsing (still not fully done)
+
+
+- Removed external dependencies
 
 
 In progress:

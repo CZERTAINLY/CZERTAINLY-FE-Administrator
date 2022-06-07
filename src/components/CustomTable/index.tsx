@@ -117,6 +117,7 @@ function CustomTable({
          }
 
          setTblCheckedRows(checkedRows);
+         if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
          e.stopPropagation();
          e.preventDefault();
