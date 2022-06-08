@@ -40,22 +40,11 @@ export default function AdministratorDetail() {
    );
 
 
-   const onAddClick = useCallback(
+   const onEditClick = useCallback(
       () => {
          history.push(`../../administrators/edit/${administrator?.uuid}`);
       },
       [administrator, history]
-   );
-
-
-
-   const onDeleteConfirmed = useCallback(
-      () => {
-         if (!administrator) return;
-         dispatch(actions.deleteAdmin(administrator.uuid));
-         setConfirmDelete(false);
-      },
-      [administrator, dispatch]
    );
 
 
@@ -77,14 +66,24 @@ export default function AdministratorDetail() {
    );
 
 
+   const onDeleteConfirmed = useCallback(
+      () => {
+         if (!administrator) return;
+         dispatch(actions.deleteAdmin(administrator.uuid));
+         setConfirmDelete(false);
+      },
+      [administrator, dispatch]
+   );
+
+
    const buttons: WidgetButtonProps[] = useMemo(
       () => [
-         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onAddClick(); } },
+         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: administrator?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: !(administrator?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
-      [administrator, onAddClick, onDisableClick, onEnableClick]
+      [administrator, onEditClick, onDisableClick, onEnableClick]
    );
 
 
