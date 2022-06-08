@@ -65,7 +65,7 @@ export default function ConnectorDetail() {
    useEffect(
       () => {
 
-         if (!connector || connector.functionGroups.length == 0) {
+         if (!connector || connector.functionGroups.length === 0) {
             setFunctionGroup(undefined);
             setCurrentFunctionGroupKind(undefined);
             return;
@@ -120,7 +120,7 @@ export default function ConnectorDetail() {
          if (!connector) return;
          dispatch(actions.bulkReconnectConnectors([connector.uuid]));
       },
-      []
+      [connector, dispatch]
    );
 
 
@@ -179,7 +179,7 @@ export default function ConnectorDetail() {
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
          { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true) } }
-      ], [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize]
+      ], [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize, connector]
    );
 
 
@@ -466,7 +466,6 @@ export default function ConnectorDetail() {
                <Col style={{ display: "inline-block" }}>
 
                   <Select
-                     key="connectorFunctionGroupDropdown"
                      maxMenuHeight={140}
                      options={functionGroupSelectData}
                      value={{ label: currentFunctionGroup?.name, value: currentFunctionGroup?.functionGroupCode }}
@@ -500,6 +499,7 @@ export default function ConnectorDetail() {
                      <Select
                         maxMenuHeight={140}
                         options={functionGroupKinds}
+                        value={{ label: currentFunctionGroupKind, value: currentFunctionGroupKind }}
                         placeholder={currentFunctionGroup?.kinds[0]}
                         menuPlacement="auto"
                         key="connectorFunctionGroupKindDropdown"
@@ -514,10 +514,7 @@ export default function ConnectorDetail() {
 
                <Widget title="End Points">
 
-                  <AttributeDescriptorViewer
-                     attributeDescriptors={currentFunctionGroupKindAttributes || []}
-                     ignoreValueTypes={[]}
-                  />
+                  <AttributeDescriptorViewer attributeDescriptors={currentFunctionGroupKindAttributes || []} />
 
                </Widget>
 

@@ -1,42 +1,16 @@
-import styles from "./attributeDescriptorViewer.module.scss";
-
-import cx from "classnames";
-import { Table } from "reactstrap";
-
 import { AttributeDescriptorModel } from "models/attributes"
-import { AttributeType } from "types/attributes"
 import { attributeFieldNameTransform } from "models/attributes";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 interface Props {
    attributeDescriptors: AttributeDescriptorModel[];
-   ignoreValueTypes: AttributeType[];
 }
 
 export default function AttributeDescriptorViewer({
    attributeDescriptors,
-   ignoreValueTypes
 }: Props) {
-
-
-   const [expandedRows, setExpandedRows] = useState<string[]>([]);
-
-
-   const toggleRow = useCallback(
-
-      (uuid: string): void => {
-
-         if (expandedRows.includes(uuid)) {
-            setExpandedRows(expandedRows.filter(expuuid => expuuid !== uuid));
-         } else {
-            setExpandedRows([...expandedRows, uuid]);
-         }
-
-      },
-      []
-
-   );
 
 
    const getAttributeValues = useCallback(
@@ -60,15 +34,6 @@ export default function AttributeDescriptorViewer({
       []
 
    );
-
-
-   const getAttributeDetail = useCallback(
-
-      (attributeDescriptor: AttributeDescriptorModel) => {
-      },
-      []
-
-   )
 
 
    const headers: TableHeader[] = useMemo(
