@@ -1,29 +1,24 @@
+import styles from "./connectorDetails.module.scss";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
+import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
+import { AttributeDescriptorModel } from "models/attributes";
+
 import { actions, selectors } from "ducks/connectors";
 
-import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
-
 import Select from "react-select";
-
-import cx from "classnames";
-
-import { Button, Col, Container, Row, Table } from "reactstrap";
-
+import { Col, Container, Row, Table } from "reactstrap";
 
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import InventoryStatusBadge from "components/ConnectorStatus";
-
-
-import styles from "./connectorDetails.module.scss";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import { AttributeDescriptorModel, attributeFieldNameTransform } from "models/attributes";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
+import { Dialog } from "components/Dialog";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -42,15 +37,18 @@ export default function ConnectorDetail() {
 
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isFetchingHealth = useSelector(selectors.isFetchingHealth);
-   const isFetchingAttributes = useSelector(selectors.isFetchingAttributes)
+   const isFetchingAttributes = useSelector(selectors.isFetchingAttributes);
+   const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
+   const isAuthorizing = useSelector(selectors.isAuthorizing);
 
+   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
    const [currentFunctionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
    const [currentFunctionGroupKind, setCurrentFunctionGroupKind] = useState<string>();
    const [currentFunctionGroupKindAttributes, setCurrentFunctionGroupKindAttributes] = useState<AttributeDescriptorModel[] | undefined>();
 
-   const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
-   //const deleteErrorMessages = useSelector(selectors.selectDeleteConnectorError);
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+   const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
 
 
    useEffect(
@@ -103,116 +101,58 @@ export default function ConnectorDetail() {
    );
 
 
-   /*useEffect(() => {
-      if (deleteErrorMessages?.length > 0) {
-         setDeleteErrorModalOpen(true);
-      } else {
-         setDeleteErrorModalOpen(false);
-      }
-   }, [deleteErrorMessages]);
-
-   useEffect(() => {
-      if (connector?.functionGroups?.length) {
-         dispatch(actions.requestAllAttributeList(uuid));
-         setDefaultFunctionGroupValue(connector.functionGroups[0].name);
-         selectedFunctionGroupDetails(
-            connector.functionGroups[0].functionGroupCode || ""
-         );
-         setCurrentFunctionGroupKind(connector.functionGroups[0].kinds[0]);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [uuid, connector, dispatch]);
-
-   useEffect(() => {
-      for (let [key, value] of Object.entries(attributes || {})) {
-         if (key === currentFunctionGroupDisplay?.functionGroupCode) {
-            for (let [inrKey, inrValue] of Object.entries(value)) {
-               if (inrKey === currentFunctionGroupKind) {
-                  setCurrentFunctionGroupKindAttributes(inrValue);
-               }
-            }
-         }
-      }
-   }, [attributes, currentFunctionGroupDisplay, currentFunctionGroupKind]);
-
-   const onConfirmDelete = useCallback(() => {
-      dispatch(
-         actions.confirmDeleteConnector(connector?.uuid || "", history)
-      );
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [dispatch, connector]);
-
-   const onConfirmAuthorize = useCallback(() => {
-      dispatch(actions.confirmAuthorizeConnector(connector?.uuid || ""));
-   }, [dispatch, connector]);
-
-   const onCancelAuthorize = useCallback(
-      () => dispatch(actions.cancelAuthorizeConnector()),
-      [dispatch]
-   );
-
-   const onForceDeleteCancel = useCallback(() => {
-      dispatch(actions.cancelForceDeleteConnector());
-      setDeleteErrorModalOpen(false);
-   }, [dispatch]);
-
-   const onCancelDelete = useCallback(
-      () => dispatch(actions.cancelDeleteConnector()),
-      [dispatch]
-   );
-
-   const onDeleteConnector = (event: any) => {
-      dispatch(
-         actions.confirmDeleteConnectorRequest(
-            connector?.uuid || "",
-            history
-         )
-      );
-   };
-
-   const onAuthorizeConnector = (event: any) => {
-      dispatch(actions.confirmAuthorizeConnector(connector?.uuid || ""));
-   };
-
-   const onReconnectConnector = () => {
-      dispatch(actions.requestReconnectConnector(connector?.uuid || ""));
-   };
-
-   const onForceDeleteConnector = (event: any) => {
-      dispatch(
-         actions.requestForceDeleteConnector(connector?.uuid || "", history)
-      );
-      setDeleteErrorModalOpen(false);
-   };
 
 
-   const [expandedRowId, setExpandedRowId] = useState<number | string | null>(
-      null
-   );
-*/
-
-   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
 
-   const onAddClick = useCallback(
+
+
+   const onEditClick = useCallback(
       () => {
+         history.push(`../../connectors/edit/${connector?.uuid}`);
       },
-      []
+      [connector, history]
    );
 
 
    const onReconnectClick = useCallback(
       () => {
+         if (!connector) return;
+         dispatch(actions.bulkReconnectConnectors([connector.uuid]));
       },
       []
    );
 
 
-   const onAuthorizeClick = useCallback(
+   const onDeleteConfirmed = useCallback(
       () => {
+         if (!connector) return;
+         dispatch(actions.deleteConnector(connector.uuid));
+         setConfirmDelete(false);
       },
-      []
+      [connector, dispatch]
    );
+
+
+   const onAuthorizeConfirmed = useCallback(
+      () => {
+         if (!connector) return;
+         setConfirmAuthorize(false);
+         dispatch(actions.authorizeConnector(connector.uuid));
+      },
+      [dispatch, connector]
+   );
+
+
+
+   const onForceDeleteConnector = useCallback(
+      () => {
+         if (!connector) return;
+         dispatch(actions.clearDeleteErrorMessages);
+         dispatch(actions.bulkForceDeleteConnectors([connector.uuid]));
+      },
+      [connector, dispatch]
+   )
 
 
    const onFunctionGroupChange = useCallback(
@@ -235,11 +175,11 @@ export default function ConnectorDetail() {
 
    const widgetButtons: WidgetButtonProps[] = useMemo(
       () => [
-         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onAddClick(); } },
+         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
-         { icon: "check", disabled: false, tooltip: "Authorize", onClick: () => { onAuthorizeClick() } }
-      ], [onAddClick, onReconnectClick, onAuthorizeClick]
+         { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true) } }
+      ], [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize]
    );
 
 
@@ -470,7 +410,7 @@ export default function ConnectorDetail() {
 
             <Col>
 
-               <Widget title={attributesTitle} busy={isFetchingDetail}>
+               <Widget title={attributesTitle} busy={isFetchingDetail || isBulkReconnecting || isAuthorizing}>
 
                   <CustomTable
                      headers={attributesHeaders}
@@ -587,74 +527,46 @@ export default function ConnectorDetail() {
 
          </Widget>
 
-         {/*<MDBModal
-            overflowScroll={false}
-            isOpen={confirmDeleteId !== ""}
-            toggle={onCancelDelete}
-         >
-            <MDBModalHeader toggle={onCancelDelete}>
-               Delete Connector
-            </MDBModalHeader>
-            <MDBModalBody>
-               You are about to delete connectors. Is this what you want to do?
-            </MDBModalBody>
-            <MDBModalFooter>
-               <Button color="danger" onClick={onConfirmDelete}>
-                  Yes, delete
-               </Button>
-               <Button color="secondary" onClick={onCancelDelete}>
-                  Cancel
-               </Button>
-            </MDBModalFooter>
-         </MDBModal>
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Connector"
+            body="You are about to delete an Connector. Is this what you want to do?"
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
 
-         <MDBModal
-            overflowScroll={false}
-            isOpen={confirmAuthorizeId !== ""}
-            toggle={onCancelAuthorize}
-         >
-            <MDBModalHeader toggle={onCancelAuthorize}>
-               Authorize Connector
-            </MDBModalHeader>
-            <MDBModalBody>
-               You are about authorize a connector. Is this what you want to do?
-            </MDBModalBody>
-            <MDBModalFooter>
-               <Button color="success" onClick={onConfirmAuthorize}>
-                  Yes, Authorize
-               </Button>
-               <Button color="secondary" onClick={onCancelAuthorize}>
-                  Cancel
-               </Button>
-            </MDBModalFooter>
-         </MDBModal>
+         <Dialog
+            isOpen={confirmAuthorize}
+            caption="Authorize Connector"
+            body="You are about to authorize an Connector. Is this what you want to do?"
+            toggle={() => setConfirmAuthorize(false)}
+            buttons={[
+               { color: "success", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
+               { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
+            ]}
+         />
 
-         <MDBModal
-            overflowScroll={false}
-            isOpen={deleteErrorModalOpen}
-            toggle={onForceDeleteCancel}
-         >
-            <MDBModalHeader toggle={onForceDeleteCancel}>
-               Delete Connector
-            </MDBModalHeader>
-            <MDBModalBody>
-               Failed to delete the connector as the connector has dependent objects.
-               Please find the details below:
-               <br />
-               <br />
-               {deleteErrorMessages?.map(function (message) {
-                  return message.message;
-               })}
-            </MDBModalBody>
-            <MDBModalFooter>
-               <Button color="danger" onClick={onForceDeleteConnector}>
-                  Force
-               </Button>
-               <Button color="secondary" onClick={onForceDeleteCancel}>
-                  Cancel
-               </Button>
-            </MDBModalFooter>
-            </MDBModal>*/}
+         <Dialog
+            isOpen={deleteErrorMessage !== ""}
+            caption="Delete Connector"
+            body={
+               <>
+                  Failed to delete the connector as the connector has dependent objects.
+                  Please find the details below:
+                  <br />
+                  <br />
+                  {deleteErrorMessage}
+               </>
+            }
+            toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteConnector, body: "Force" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+            ]}
+         />
 
       </Container>
 

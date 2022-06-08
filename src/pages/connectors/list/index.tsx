@@ -26,7 +26,7 @@ function ConnectorList() {
 
    const checkedRows = useSelector(selectors.checkedRows);
    const connectors = useSelector(selectors.connectors);
-   const deleteErrorMessages = useSelector(selectors.deleteErrorMessages);
+   const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
@@ -53,8 +53,8 @@ function ConnectorList() {
 
 
    useEffect(
-      () => { setConfirmForceDelete(deleteErrorMessages.length > 0); },
-      [deleteErrorMessages]
+      () => { setConfirmForceDelete(bulkDeleteErrorMessages.length > 0); },
+      [bulkDeleteErrorMessages]
    );
 
 
@@ -210,7 +210,7 @@ function ConnectorList() {
 
                <tbody>
 
-                  {deleteErrorMessages?.map(
+                  {bulkDeleteErrorMessages?.map(
                      message => (
                         <tr>
                            <td>{message.name}</td>
@@ -226,7 +226,7 @@ function ConnectorList() {
          </div>
 
       ),
-      [deleteErrorMessages]
+      [bulkDeleteErrorMessages]
 
    );
 
@@ -312,6 +312,7 @@ function ConnectorList() {
                   onCheckedRowsChanged={setCheckedRows}
                   hasCheckboxes={true}
                   hasPagination={true}
+                  canSearch={true}
                />
 
             </Widget>

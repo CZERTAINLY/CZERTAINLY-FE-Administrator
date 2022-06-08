@@ -1,4 +1,4 @@
-import { of } from "rxjs";
+import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 import history from "browser-history";
 
@@ -369,10 +369,28 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
 
             map(() => slice.actions.deleteConnectorSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.deleteConnector(extractError(err, "Failed to delete connector"))))
+            catchError(err => of(slice.actions.deleteConnectorFailure(extractError(err, "Failed to delete connector"))))
 
          )
 
+      )
+   )
+
+}
+
+
+const deleteConnectorSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteConnectorSuccess.match
+      ),
+      switchMap(
+         () => {
+            history.push("../");
+            return EMPTY
+         }
       )
    )
 
@@ -386,8 +404,8 @@ const deleteConnectorFailure: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.deleteConnectorFailure.match
       ),
-      map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+      switchMap(
+         () => EMPTY // alertActions.error(action.payload || "Unexpected error occured")
       )
 
    )
@@ -656,6 +674,7 @@ const epics = [
    updateConnector,
    updateConnectorFailure,
    deleteConnector,
+   deleteConnectorSuccess,
    deleteConnectorFailure,
    bulkDeleteConnectors,
    bulkDeleteConnectorsFailed,

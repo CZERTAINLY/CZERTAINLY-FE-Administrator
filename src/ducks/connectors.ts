@@ -16,7 +16,8 @@ export type State = {
    connectorAttributes?: AttributeDescriptorCollectionModel;
    connectorConnectionDetails?: FunctionGroupModel[];
 
-   deleteErrorMessages: DeleteObjectErrorModel[];
+   deleteErrorMessage: string;
+   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
 
    connectors: ConnectorModel[];
 
@@ -45,7 +46,8 @@ export const initialState: State = {
 
    connectors: [],
 
-   deleteErrorMessages: [],
+   deleteErrorMessage: "",
+   bulkDeleteErrorMessages: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -83,13 +85,15 @@ export const slice = createSlice({
 
       clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
 
-         state.deleteErrorMessages = [];
+         state.deleteErrorMessage = "";
+         state.bulkDeleteErrorMessages = [];
 
       },
 
 
       listConnectors: (state, action: PayloadAction<void>) => {
 
+         state.checkedRows = [];
          state.connectors = [];
          state.isFetchingList = true;
 
@@ -281,7 +285,9 @@ export const slice = createSlice({
 
       deleteConnector: (state, action: PayloadAction<string>) => {
 
+         state.deleteErrorMessage = "";
          state.isDeleting = true;
+
       },
 
 
@@ -297,6 +303,7 @@ export const slice = createSlice({
 
       deleteConnectorFailure: (state, action: PayloadAction<string>) => {
 
+         state.deleteErrorMessage = action.payload;
          state.isDeleting = false;
 
       },
@@ -304,6 +311,7 @@ export const slice = createSlice({
 
       bulkDeleteConnectors: (state, action: PayloadAction<string[]>) => {
 
+         state.bulkDeleteErrorMessages = [];
          state.isBulkDeleting = true;
 
       },
@@ -313,7 +321,7 @@ export const slice = createSlice({
 
          state.isBulkDeleting = false;
          if (Array.isArray(action.payload.errors) && action.payload.errors.length > 0) {
-            state.deleteErrorMessages = action.payload.errors;
+            state.bulkDeleteErrorMessages = action.payload.errors;
             return;
          }
 
@@ -329,6 +337,13 @@ export const slice = createSlice({
 
       bulkDeleteConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
 
+         state.bulkDeleteErrorMessages = [
+            {
+               uuid: "",
+               name: "Failed to delete connectors",
+               message: action.payload || "Unknown error"
+            }
+         ]
          state.isBulkDeleting = false;
 
       },
@@ -475,7 +490,9 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const checkedRows = createSelector(state, state => state.checkedRows);
-const deleteErrorMessages = createSelector(state, state => state.deleteErrorMessages);
+
+const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
+const bulkDeleteErrorMessages = createSelector(state, state => state.bulkDeleteErrorMessages);
 
 const connector = createSelector(state, state => state.connector);
 const connectorHealth = createSelector(state, state => state.connectorHealth);
@@ -504,7 +521,8 @@ const isBulkAuthorizing = createSelector(state, state => state.isBulkAuthorizing
 export const selectors = {
    state,
    checkedRows,
-   deleteErrorMessages,
+   deleteErrorMessage,
+   bulkDeleteErrorMessages,
    connector,
    connectorHealth,
    connectorAttributes,
