@@ -159,6 +159,7 @@ export default function ClientList() {
                headers={clientTableHeader}
                data={clientTableData}
                onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
             />
          </Widget>
 
