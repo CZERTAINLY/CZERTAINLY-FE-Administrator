@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -101,7 +101,7 @@ function AdminForm({ title }: Props) {
 
             if (administrator && administrator.certificate && administrator.certificate.uuid && !loadedCerts.find(cert => cert.uuid === administrator.certificate.uuid)) {
 
-               const certs = [ administrator.certificate, ...loadedCerts  ];
+               const certs = [administrator.certificate, ...loadedCerts];
 
                setLoadedCerts(certs);
 
@@ -151,7 +151,7 @@ function AdminForm({ title }: Props) {
          pagedCert => loadedCerts.find(loadedCert => loadedCert.uuid === pagedCert.uuid) === undefined
       )
 
-      const certs = [ ...loadedCerts, ...fpc];
+      const certs = [...loadedCerts, ...fpc];
 
       setLoadedCerts(certs);
 
@@ -243,16 +243,19 @@ function AdminForm({ title }: Props) {
 
    const inProgressTitle = editMode ? "Saving..." : "Creating...";
 
-   const defaultValues = {
-      name: editMode ? administrator?.name || "" : "",
-      surname: editMode ? administrator?.surname : "",
-      username: editMode ? administrator?.username : "",
-      email: editMode ? administrator?.email : "",
-      superAdmin: editMode ? administrator?.role === "superAdministrator" || false : false,
-      inputType: inputTypeValue,
-      certificate: selectedCertificate,
-      description: editMode ? administrator?.description || "" : "",
-   }
+   const defaultValues = useMemo(
+      () => ({
+         name: editMode ? administrator?.name || "" : "",
+         surname: editMode ? administrator?.surname : "",
+         username: editMode ? administrator?.username : "",
+         email: editMode ? administrator?.email : "",
+         superAdmin: editMode ? administrator?.role === "superAdministrator" || false : false,
+         inputType: inputTypeValue,
+         certificate: selectedCertificate,
+         description: editMode ? administrator?.description || "" : "",
+      }),
+      [administrator, editMode, inputTypeValue, selectedCertificate]
+   );
 
    return (
 
