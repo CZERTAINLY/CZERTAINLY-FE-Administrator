@@ -118,7 +118,7 @@ export default function ConnectorDetail() {
    const onReconnectClick = useCallback(
       () => {
          if (!connector) return;
-         dispatch(actions.bulkReconnectConnectors([connector.uuid]));
+         dispatch(actions.reconnectConnector(connector.uuid));
       },
       [connector, dispatch]
    );
@@ -148,7 +148,7 @@ export default function ConnectorDetail() {
    const onForceDeleteConnector = useCallback(
       () => {
          if (!connector) return;
-         dispatch(actions.clearDeleteErrorMessages);
+         dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkForceDeleteConnectors([connector.uuid]));
       },
       [connector, dispatch]
