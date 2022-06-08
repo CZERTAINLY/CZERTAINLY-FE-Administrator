@@ -30,12 +30,12 @@ export const slice = createSlice({
 
          reducer: (state, action: PayloadAction<string>) => {
 
-            state.msgId++;
             state.messages.push({
                id: state.msgId,
                message: action.payload,
                color: "danger"
             })
+            state.msgId++;
 
          }
 
@@ -48,12 +48,13 @@ export const slice = createSlice({
 
          reducer: (state, action: PayloadAction<string>) => {
 
-            state.msgId++;
             state.messages.push({
                id: state.msgId,
                message: action.payload,
                color: "success"
             })
+            state.msgId++;
+
          }
 
       },
@@ -71,7 +72,7 @@ export const slice = createSlice({
          reducer: (state, action: PayloadAction<number>) => {
 
             const messageIndex = state.messages.findIndex(message => message.id === action.payload);
-            if (!messageIndex) return;
+            if (messageIndex === -1) return;
 
             state.messages.splice(messageIndex, 1);
 
