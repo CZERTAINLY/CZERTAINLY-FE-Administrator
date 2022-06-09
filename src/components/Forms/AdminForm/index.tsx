@@ -34,16 +34,6 @@ interface FormValues {
    certificate: any;
 }
 
-const optionsForInput = [
-   {
-      label: "Upload a new Certificate",
-      value: "upload",
-   },
-   {
-      label: "Choose Existing Certificate",
-      value: "select",
-   },
-]
 
 function AdminForm({ title }: Props) {
 
@@ -53,6 +43,21 @@ function AdminForm({ title }: Props) {
    const { params } = useRouteMatch<{ id: string }>();
 
    const editMode = params.id !== undefined;
+
+   const optionsForInput = useMemo(
+      () => [
+         {
+            label: "Upload a new Certificate",
+            value: "upload",
+         },
+         {
+            label: "Choose Existing Certificate",
+            value: "select",
+         },
+      ],
+      []
+   );
+
 
    const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
    const certificates = useSelector(certSelectors.certificates);
@@ -217,11 +222,14 @@ function AdminForm({ title }: Props) {
    )
 
 
-   const onCancel = () => {
+   const onCancel = useCallback(
+      () => {
 
-      history.goBack();
+         history.goBack();
 
-   }
+      },
+      [history]
+   );
 
 
    const loadNextCertificates = () => {
@@ -239,9 +247,17 @@ function AdminForm({ title }: Props) {
    };
 
 
-   const submitTitle = editMode ? "Save" : "Create";
+   const submitTitle = useMemo(
+      () => editMode ? "Save" : "Create",
+      [editMode]
+   );
 
-   const inProgressTitle = editMode ? "Saving..." : "Creating...";
+
+   const inProgressTitle = useMemo(
+      () => editMode ? "Saving..." : "Creating...",
+      [editMode]
+   )
+
 
    const defaultValues = useMemo(
       () => ({
