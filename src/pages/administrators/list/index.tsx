@@ -97,17 +97,17 @@ export default function AdministratorsList() {
    const adminTableHeader: TableHeader[] = useMemo(
       () => [
          {
-            id: "adminName",
-            content: <MDBColumnName columnName="Name" />,
-            sortable: true,
-            sort: "asc",
-            width: "5%",
-         },
-         {
             id: "adminUsername",
             content: <MDBColumnName columnName="Username" />,
             sortable: true,
+            sort: "asc",
             width: "10%",
+         },
+         {
+            id: "adminName",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            width: "5%",
          },
          {
             id: "adminSerialNumber",
@@ -148,9 +148,9 @@ export default function AdministratorsList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.name}</Link>,
+               <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.username}</Link>,
 
-               administrator.username,
+               administrator.name,
 
                administrator.serialNumber,
 

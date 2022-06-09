@@ -266,11 +266,11 @@ function AdminForm({ title }: Props) {
          username: editMode ? administrator?.username : "",
          email: editMode ? administrator?.email : "",
          superAdmin: editMode ? administrator?.role === "superAdministrator" || false : false,
-         inputType: inputTypeValue,
+         inputType: optionsForInput[1],
          certificate: selectedCertificate,
          description: editMode ? administrator?.description || "" : "",
       }),
-      [administrator, editMode, inputTypeValue, selectedCertificate]
+      [administrator, editMode, selectedCertificate]
    );
 
    return (
