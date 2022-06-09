@@ -47,7 +47,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.ConnectionDTO[]> {
 
       return this._fetchService.request(
 
@@ -136,7 +136,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   reconnectConnector(uuid: string): Observable<void> {
+   reconnectConnector(uuid: string): Observable<model.ConnectionDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/reconnect`, "PUT")
@@ -145,7 +145,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   bulkDeleteConnector(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+   bulkDeleteConnectors(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)
@@ -154,7 +154,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   bulkForceDeleteConnector(uuids: string[]): Observable<void> {
+   bulkForceDeleteConnectors(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/force`, "DELETE", uuids)
@@ -163,7 +163,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   bulkAuthorizeConnector(uuids: string[]): Observable<void> {
+   bulkAuthorizeConnectors(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/approve`, "PUT", uuids)
@@ -172,7 +172,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   bulkReconnectConnector(uuids: string[]): Observable<void> {
+   bulkReconnectConnectors(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/reconnect`, "PUT", uuids)

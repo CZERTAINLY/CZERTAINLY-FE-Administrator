@@ -91,6 +91,13 @@ export const slice = createSlice({
       },
 
 
+      clearConnectionDetails: (state, action: PayloadAction<void>) => {
+
+         state.connectorConnectionDetails = undefined;
+
+      },
+
+
       listConnectors: (state, action: PayloadAction<void>) => {
 
          state.checkedRows = [];
@@ -349,17 +356,16 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteConnectors: (state, action: PayloadAction<string[]>) => {
+      bulkForceDeleteConnectors: (state, action: PayloadAction<{ uuids: string[], successRedirect?: string}>) => {
 
          state.isBulkForceDeleting = true;
 
       },
 
 
-      bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], successRedirect?: string}>) => {
 
          state.isBulkForceDeleting = false;
-         if (Array.isArray(action.payload.errors) && action.payload.errors.length > 0) return;
 
          action.payload.uuids.forEach(
             uuid => {
@@ -403,13 +409,15 @@ export const slice = createSlice({
 
       reconnectConnector: (state, action: PayloadAction<string>) => {
 
+         state.connectorConnectionDetails = undefined;
          state.isReconnecting = true;
 
       },
 
 
-      reconnectConnectorSuccess: (state, action: PayloadAction<void>) => {
+      reconnectConnectorSuccess: (state, action: PayloadAction<FunctionGroupModel[]>) => {
 
+         state.connectorConnectionDetails = action.payload;
          state.isReconnecting = false;
 
       },

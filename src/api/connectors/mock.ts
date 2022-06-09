@@ -50,7 +50,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.FunctionGroupDTO[]> {
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.ConnectionDTO[]> {
 
       return of(
          dbData.connectorsRemote.find(connector => connector.url === url)
@@ -61,7 +61,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
             connectorRemote => {
                if (!connectorRemote) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
-               return connectorRemote.functionGroups;
+               return connectorRemote.functionGroups.map(functionGroup => ({ functionGroup }));
             }
 
          )
@@ -244,7 +244,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   reconnectConnector(uuid: string): Observable<void> {
+   reconnectConnector(uuid: string): Observable<model.ConnectionDTO[]> {
 
       return of(
          dbData.connectors.find(connector => connector.uuid === uuid)
@@ -254,8 +254,12 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
          map(
 
             connector => {
-               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to the connector" });
-               connector.status = "connected";
+               if (!connector) throw new HttpErrorResponse({ status: 404, statusText: "Connector not found" });
+
+               const remoteConnector = dbData.connectorsRemote.find(connectorRemote => connectorRemote.url === connector.url);
+               if (!remoteConnector) throw new HttpErrorResponse({ status: 404, statusText: "Failed to connect to remote connector" });
+
+               return remoteConnector.functionGroups.map(functionGroup => ({ functionGroup }));
             }
 
          )
@@ -265,7 +269,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   bulkDeleteConnector(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+   bulkDeleteConnectors(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
          uuids
@@ -294,7 +298,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   bulkForceDeleteConnector(uuids: string[]): Observable<void> {
+   bulkForceDeleteConnectors(uuids: string[]): Observable<void> {
 
       return of(
          uuids
@@ -321,7 +325,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   bulkAuthorizeConnector(uuids: string[]): Observable<void> {
+   bulkAuthorizeConnectors(uuids: string[]): Observable<void> {
 
       return of(
          uuids
@@ -351,7 +355,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   bulkReconnectConnector(uuids: string[]): Observable<void> {
+   bulkReconnectConnectors(uuids: string[]): Observable<void> {
 
       return of(
          uuids

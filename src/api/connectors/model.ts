@@ -23,6 +23,11 @@ export interface FunctionGroupDTO {
 }
 
 
+export interface ConnectionDTO {
+   functionGroup: FunctionGroupDTO
+}
+
+
 export interface ConnectorDTO {
    uuid: string;
    name: string;
@@ -64,19 +69,19 @@ export interface ConnectorManagementApi {
 
    deleteConnector(uuid: string): Observable<void>;
 
-   bulkDeleteConnector(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
+   bulkDeleteConnectors(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 
-   bulkForceDeleteConnector(uuids: string[]): Observable<void>;
+   bulkForceDeleteConnectors(uuids: string[]): Observable<void>;
 
-   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<FunctionGroupDTO[]>;
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<ConnectionDTO[]>;
 
-   bulkReconnectConnector(uuids: string[]): Observable<void>;
+   reconnectConnector(uuid: string): Observable<ConnectionDTO[]>;
 
-   reconnectConnector(uuid: string): Observable<void>;
+   bulkReconnectConnectors(uuids: string[]): Observable<void>;
 
    authorizeConnector(uuid: string): Observable<void>;
 
-   bulkAuthorizeConnector(uuids: string[]): Observable<void>;
+   bulkAuthorizeConnectors(uuids: string[]): Observable<void>;
 
    /*callback(
       connectorUuid: string,

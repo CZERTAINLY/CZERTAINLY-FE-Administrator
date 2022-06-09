@@ -59,8 +59,8 @@ function ConnectorList() {
 
 
    const onAddClick = useCallback(
-      () => { history.push(`${""}/add`); },
-      [history]
+      () => { history.push(`${path}/add`); },
+      [history, path]
    );
 
 
@@ -89,7 +89,7 @@ function ConnectorList() {
    const onForceDeleteConfirmed = useCallback(
       () => {
          dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkForceDeleteConnectors(checkedRows));
+         dispatch(actions.bulkForceDeleteConnectors({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
    );

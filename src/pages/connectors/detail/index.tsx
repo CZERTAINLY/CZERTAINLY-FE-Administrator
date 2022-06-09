@@ -101,12 +101,6 @@ export default function ConnectorDetail() {
    );
 
 
-
-
-
-
-
-
    const onEditClick = useCallback(
       () => {
          history.push(`../../connectors/edit/${connector?.uuid}`);
@@ -144,12 +138,11 @@ export default function ConnectorDetail() {
    );
 
 
-
    const onForceDeleteConnector = useCallback(
       () => {
          if (!connector) return;
          dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkForceDeleteConnectors([connector.uuid]));
+         dispatch(actions.bulkForceDeleteConnectors({ uuids: [connector.uuid], successRedirect: `../` }));
       },
       [connector, dispatch]
    )
@@ -164,6 +157,7 @@ export default function ConnectorDetail() {
       },
       [connector]
    );
+
 
    const onFunctionGroupKindChange = useCallback(
 

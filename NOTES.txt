@@ -241,3 +241,41 @@ Converted the following ducks to toolkit
 To be updated in the ducks.
 
 Authority and Credentials - Implement methods in the API to get the attributes for the respective provider
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------
+
+MS-ADCS-Connector
+http://ms-adcs-connector-service:8080
+
+
+	lab02-ADCS
+		MS-ADCS-Connector
+		ADCS
+		lab02.3key.company
+		5985
+		lab02-ADCS
+
+	xx
+		MS-ADCS-Connector
+		ADCS
+		lab02.3key.company
+		5985
+		lab02-ADCS
+
+	test
+		MS-ADCS-Connector
+		ADCS
+		38.242.225.187
+		5985
+		lab02-ADCS

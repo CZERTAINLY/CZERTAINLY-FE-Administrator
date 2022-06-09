@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Form, Field } from "react-final-form";
 import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
@@ -11,38 +11,25 @@ import InventoryStatusBadge from "components/ConnectorStatus";
 import Widget from "components/Widget";
 import Select from "react-select";
 
-import { FunctionGroupModel } from "models/connectors";
+import { ConnectorModel, EndpointModel, FunctionGroupModel } from "models/connectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
 
 import { actions as conenctorActions, selectors as connectorSelectors } from "ducks/connectors";
+import { AuthType } from "types/connectors";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 
 interface FormValues {
    uuid: string;
    name: string;
    url: string;
-   authenticationType: string;
+   authenticationType: { value: AuthType };
 }
 
 interface Props {
    title: JSX.Element;
 }
-
-const optionsForAuth = [
-   {
-      label: "No Auth",
-      value: "noAuth",
-   },
-   {
-      label: "Basic Auth",
-      value: "basic",
-   },
-   {
-      label: "Client Cert",
-      value: "clientCert",
-   },
-];
 
 function ConnectorForm({ title }: Props) {
 
@@ -53,92 +40,180 @@ function ConnectorForm({ title }: Props) {
 
    const editMode = params.id !== undefined;
 
-   const isFetchingClient = useSelector(connectorSelectors.isFetchingDetail);
-   const isCreatingClient = useSelector(connectorSelectors.isCreating);
-   const isUpdatingClient = useSelector(connectorSelectors.isUpdating);
+
+   const optionsForAuth: { label: string, value: AuthType }[] = useMemo(
+      () => [
+         {
+            label: "No Auth",
+            value: "none",
+         },
+         {
+            label: "Basic Auth",
+            value: "basic",
+         },
+         {
+            label: "Client Cert",
+            value: "certificate",
+         },
+      ],
+      []
+   );
+
+
+   const isFetching = useSelector(connectorSelectors.isFetchingDetail);
+   const isCreating = useSelector(connectorSelectors.isCreating);
+   const isUpdating = useSelector(connectorSelectors.isUpdating);
    const isConnecting = useSelector(connectorSelectors.isConnecting);
+
+   const connectorSelector = useSelector(connectorSelectors.connector);
    const connectionDetails = useSelector(connectorSelectors.connectorConnectionDetails);
+
+   const [connector, setConnector] = useState<ConnectorModel>();
+
+   const [selectedAuthType, setSelectedAuthType] = useState<{ label: string, value: AuthType }>(
+      editMode ? optionsForAuth.find(opt => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0]
+   );
 
    const submitTitle = editMode ? "Save" : "Create";
    const connectTitle = editMode ? "Reconnect" : "Connect";
    const inProgressTitle = editMode ? "Saving..." : "Creating...";
    const connectProgressTitle = editMode ? "Reconnecting..." : "Connecting...";
 
-   const defaultValues = {
-   }
+
+   useEffect(
+
+      () => {
+
+         if (params.id && (!connectorSelector || connectorSelector.uuid !== params.id) && !isFetching) {
+            dispatch(conenctorActions.getConnectorDetail(params.id));
+         }
+
+         if (params.id && (connectorSelector && connectorSelector.uuid === params.id && !isFetching)) {
+            dispatch(conenctorActions.reconnectConnector(params.id));
+         }
+
+         if (params.id && connectorSelector?.uuid === params.id) {
+
+            setConnector(connectorSelector);
+
+         } else {
+
+            dispatch(conenctorActions.clearConnectionDetails());
+
+            setConnector({
+               uuid: "",
+               name: "",
+               url: "",
+               authType: "none",
+               status: "unavailable",
+               functionGroups: [],
+            });
+
+         }
+
+      },
+
+      [editMode, params.id, connectorSelector, isFetching, dispatch]
+   )
+
 
 
    const onSubmit = useCallback(
+
       (values: FormValues) => {
-         //onSubmit(values.uuid, values.name, values.url, "none", []);
+
+         if (editMode) {
+
+            if (!connector) return;
+
+            dispatch(conenctorActions.updateConnector({
+               uuid: connector?.uuid,
+               url: values.url,
+               authType: selectedAuthType.value,
+               // authAttributes: []
+            }))
+
+         } else {
+
+            dispatch(conenctorActions.createConnector({
+               name: values.name,
+               url: values.url,
+               authType: selectedAuthType.value,
+               // authAttributes: []
+            }))
+
+         }
+
       },
-      [/*onSubmit*/]
+      []
    );
 
+
    const onCancel = useCallback(
-      () => {},
+
+      () => {
+         history.goBack();
+      },
+      []
+
+   )
+
+
+   const onConnectClick = (values: FormValues) => {
+      dispatch(conenctorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
+   };
+
+
+   const endPointsHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "name",
+            sortable: true,
+            sort: "asc",
+            content: "Name"
+         },
+         {
+            id: "context",
+            sortable: true,
+            content: "Context"
+         },
+         {
+            id: "method",
+            sortable: true,
+            content: "Method"
+         }
+      ],
       []
    )
 
 
-   const connectCallback = (values: FormValues) => {
-      //onConnect(values.uuid, values.name, values.url, "none", []);
-   };
+   const getEndPointInfo = useCallback(
+
+      (endpoints: EndpointModel[]): TableDataRow[] => {
+         return endpoints.map(
+            (endpoint: EndpointModel) => ({
+               id: endpoint.name,
+               columns: [
+                  endpoint.name,
+                  endpoint.context,
+                  endpoint.method
+               ]
+            })
+
+         )
+      },
+      []
+   );
 
 
-   const getEndPointInfo = (endpoints: any, functionGroup: any) => {
-
-      let returnData: any = [];
-
-      for (let key of endpoints) {
-
-         let searchKey = "";
-
-         if (functionGroup?.functionGroupCode === "legacyAuthorityProvider") {
-            if (
-               key.context.includes("authorityProvider") ||
-               key.context.includes(functionGroup.functionGroupCode)
-            ) {
-               returnData.push(
-                  <tr>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.name}</div>
-                     </td>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.context}</div>
-                     </td>
-                     <td>{key.method}</td>
-                  </tr>
-               );
-            }
-
-         } else {
-
-            searchKey = functionGroup?.functionGroupCode || "undefined";
-
-            if (key.context.includes(searchKey)) {
-
-               returnData.push(
-                  <tr>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.name}</div>
-                     </td>
-                     <td>
-                        <div style={{ wordBreak: "break-all" }}>{key.context}</div>
-                     </td>
-                     <td>{key.method}</td>
-                  </tr>
-               );
-
-            }
-
-         }
-
-      }
-
-      return returnData;
-
-   };
+   const defaultValues = useMemo(
+      () => ({
+         name: editMode ? connector?.name : "",
+         url: editMode ? connector?.url || "" : "",
+         authenticationType: editMode ? optionsForAuth.find(opt => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
+      }),
+      [editMode, optionsForAuth, connector]
+   );
 
 
    return (
@@ -179,21 +254,19 @@ function ConnectorForm({ title }: Props) {
 
                      <Field name="authenticationType">
 
-                        {({ input, meta }) => (
+                        {({ input, meta, }) => (
 
                            <FormGroup>
 
                               <Label for="authenticationType">Authentication Type</Label>
 
                               <Select
+                                 {...input}
                                  maxMenuHeight={140}
+                                 menuPlacement="auto"
                                  options={optionsForAuth}
                                  placeholder="Select Auth Type"
-                                 menuPlacement="auto"
-                                 defaultValue={{
-                                    label: "No Auth",
-                                    value: "noAuth",
-                                 }}
+                                 onChange={(e) => { input.onChange(e); setSelectedAuthType(e); }}
                               />
 
                               <FormFeedback>{meta.error}</FormFeedback>
@@ -205,7 +278,7 @@ function ConnectorForm({ title }: Props) {
                      </Field>
 
                      {
-                        values.authenticationType === "basic" ? (
+                        values.authenticationType.value === "basic" ? (
 
                            <div>
 
@@ -263,7 +336,7 @@ function ConnectorForm({ title }: Props) {
                      }
 
                      {
-                        values.authenticationType === "clientCert" ? (
+                        values.authenticationType.value === "certificate" ? (
 
                            <Field name="clientCert">
 
@@ -300,10 +373,9 @@ function ConnectorForm({ title }: Props) {
                            <Button
 
                               color="success"
-                              onClick={() => connectCallback(values)}
+                              onClick={() => onConnectClick(values)}
                               disabled={submitting || isConnecting || pristine}
                            >
-
                               {isConnecting ? connectProgressTitle : connectTitle}
                            </Button>
 
@@ -313,10 +385,10 @@ function ConnectorForm({ title }: Props) {
 
                   </Widget>
 
-                  <Widget title="Connection Details">
+                  {
+                     connectionDetails ? (
 
-                     {
-                        connectionDetails ? (
+                        <Widget title="Connection Details" busy={isConnecting}>
 
                            <Table className="table-hover" size="sm">
 
@@ -331,7 +403,7 @@ function ConnectorForm({ title }: Props) {
 
                                     <td>Connector Status</td>
                                     <td>
-                                       <InventoryStatusBadge status={ connectionDetails.length > 0 ? "connected" : "failed" } />
+                                       <InventoryStatusBadge status={connectionDetails.length > 0 ? "connected" : "failed"} />
                                     </td>
 
                                  </tr>
@@ -358,134 +430,124 @@ function ConnectorForm({ title }: Props) {
 
                            </Table>
 
-                        ) : ("Click Connect to initiate the connection")
 
-                     }
+                           {
 
-                     {
+                              connectionDetails && connectionDetails.length > 0 ? (
 
-                        connectionDetails && connectionDetails.length > 0 ? (
+                                 <div>
 
-                           <div>
+                                    <b>Connector Functionality Description</b>
 
-                              <b>Connector Functionality Description</b>
+                                    <hr />{" "}
 
-                              <hr />{" "}
+                                    {connectionDetails.map(
 
-                              {connectionDetails.map(
+                                       functionGroup => (
 
-                                 functionGroup => (
+                                          <Widget key={functionGroup.name} title={
 
-                                    <Widget title={functionGroup.name}>
+                                             <>
 
-                                       <Table className="table-hover" size="sm">
-                                          <thead>
-                                             <tr>
-                                                <th>
-                                                   <b>Name</b>
-                                                </th>
-                                                <th>
-                                                   <b>Context</b>
-                                                </th>
-                                                <th>
-                                                   <b>Method</b>
-                                                </th>
-                                             </tr>
-                                          </thead>
-                                          <tbody>
-                                             {getEndPointInfo(functionGroup?.endPoints, functionGroup)}
-                                          </tbody>
+                                                {functionGroup.name}
 
-                                       </Table>
+                                                <div className="pull-right mt-n-xs">
+                                                   {
+                                                      functionGroup.kinds.map(kinds =>
+                                                         <>
+                                                            &nbsp;
+                                                            <Badge style={{ backgroundColor: "Bronze" }} pill>
+                                                               {kinds}
+                                                            </Badge>
+                                                         </>
+                                                      )
+                                                   }
+                                                </div>
 
-                                       <p>
-                                          <b>Implemented Kinds</b>
-                                       </p>
+                                             </>
 
-                                       {functionGroup.kinds.map(function (kinds) {
+                                          }>
 
-                                          return (
-                                             <div>
-                                                <Badge style={{ backgroundColor: "Bronze" }} pill>
-                                                   {kinds}
-                                                </Badge>
-                                                &nbsp;
-                                             </div>
-                                          );
+                                             <CustomTable
+                                                headers={endPointsHeaders}
+                                                data={getEndPointInfo(functionGroup?.endPoints)}
+                                             />
 
-                                       })}
+                                          </Widget>
 
-                                    </Widget>
+                                       )
 
-                                 )
+                                    )}
 
-                              )}
+                                 </div>
 
-                           </div>
+                              ) : null}
 
-                        ) : null}
+                           {
 
-                     {
+                              connectionDetails && connectionDetails.length > 0 ? (
 
-                        connectionDetails && connectionDetails.length > 0 ? (
+                                 <div>
 
-                           <div>
+                                    <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())} >
 
-                              <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())} >
+                                       {({ input, meta }) => (
 
-                                 {({ input, meta }) => (
+                                          <FormGroup>
 
-                                    <FormGroup>
+                                             <Label for="name">Connector Name</Label>
 
-                                       <Label for="name">Connector Name</Label>
+                                             <Input
+                                                {...input}
+                                                valid={!meta.error && meta.touched}
+                                                invalid={!!meta.error && meta.touched}
+                                                type="text"
+                                                placeholder="Connector Name"
+                                                disabled={editMode}
+                                             />
 
-                                       <Input
-                                          {...input}
-                                          valid={!meta.error && meta.touched}
-                                          invalid={!!meta.error && meta.touched}
-                                          type="text"
-                                          placeholder="Connector Name"
-                                          disabled={editMode}
-                                       />
+                                             <FormFeedback>{meta.error}</FormFeedback>
 
-                                       <FormFeedback>{meta.error}</FormFeedback>
+                                          </FormGroup>
 
-                                    </FormGroup>
+                                       )}
 
-                                 )}
+                                    </Field>
 
-                              </Field>
+                                    <div className="d-flex justify-content-end">
 
-                              <div className="d-flex justify-content-end">
+                                       <ButtonGroup>
 
-                                 <ButtonGroup>
+                                          <Button
+                                             color="default"
+                                             onClick={onCancel}
+                                             disabled={submitting}
+                                          >
+                                             Cancel
+                                          </Button>
 
-                                    <Button
-                                       color="default"
-                                       onClick={onCancel}
-                                       disabled={submitting}
-                                    >
-                                       Cancel
-                                    </Button>
+                                          <ProgressButton
+                                             title={submitTitle}
+                                             inProgressTitle={inProgressTitle}
+                                             inProgress={submitting}
+                                             disabled={pristine}
+                                          />
 
-                                    <ProgressButton
-                                       title={submitTitle}
-                                       inProgressTitle={inProgressTitle}
-                                       inProgress={submitting}
-                                       disabled={pristine}
-                                    />
+                                       </ButtonGroup>
 
-                                 </ButtonGroup>
+                                    </div>
 
-                              </div>
+                                 </div>
 
-                           </div>
+                              ) : null
 
-                        ) : null
+                           }
 
-                     }
+                        </Widget>
 
-                  </Widget>
+                     ) : null
+
+                  }
 
                </BootstrapForm>
 
