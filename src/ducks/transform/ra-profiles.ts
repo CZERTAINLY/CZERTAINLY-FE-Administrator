@@ -10,7 +10,7 @@ export function transformRaProfileDtoToModel(raProfileDto: RaProfileDTO): RaProf
         description: raProfileDto.description,
         authorityInstanceUuid: raProfileDto.authorityInstanceUuid,
         authorityInstanceName: raProfileDto.authorityInstanceName,
-        attributes: raProfileDto.attributes.map(attribute => transformAttributeDTOToModel(attribute)),
+        attributes: raProfileDto.attributes ? raProfileDto.attributes.map(attribute => transformAttributeDTOToModel(attribute)) : [],
         enabledProtocols: raProfileDto.enabledProtocols
     };
 }
