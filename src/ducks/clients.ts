@@ -1,7 +1,7 @@
 import { ClientAuthorizedRaProfileModel, ClientModel } from "models/clients";
 
 import { createFeatureSelector } from "utils/ducks";
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { RaProfileModel } from "models/ra-profiles";
 
 
@@ -21,6 +21,7 @@ export type State = {
    isUpdating: boolean,
    isDeleting: boolean,
    isAuthorizing: boolean,
+   isUnauthorizing: boolean,
    isEnabling: boolean,
    isDisabling: boolean,
    isBulkEnabling: boolean,
@@ -45,6 +46,7 @@ export const initialState: State = {
    isUpdating: false,
    isDeleting: false,
    isAuthorizing: false,
+   isUnauthorizing: false,
    isEnabling: false,
    isDisabling: false,
    isBulkEnabling: false,
@@ -275,10 +277,13 @@ export const slice = createSlice({
 
          state.isAuthorizing = false;
 
-         if (state.client?.uuid === action.payload.clientUuid && !state.authorizedProfiles.find(p => p.uuid !== action.payload.raProfile.uuid)) {
+         console.log(current(state));
+
+         if (state.client?.uuid === action.payload.clientUuid && !state.authorizedProfiles.find(p => p.uuid === action.payload.raProfile.uuid)) {
             state.authorizedProfiles.push({
                uuid: action.payload.raProfile.uuid,
                name: action.payload.raProfile.name,
+               description: action.payload.raProfile.description || "",
                enabled: action.payload.raProfile.enabled
             });
          }
@@ -292,6 +297,35 @@ export const slice = createSlice({
 
       },
 
+
+      unauthorizeClient: (state, action: PayloadAction<{ clientUuid: string, raProfile: RaProfileModel | ClientAuthorizedRaProfileModel }>) => {
+
+         state.isUnauthorizing = true;
+
+      },
+
+
+      unauthorizeClientSuccess: (state, action: PayloadAction<{ clientUuid: string, raProfile: RaProfileModel | ClientAuthorizedRaProfileModel }>) => {
+
+         state.isUnauthorizing = false;
+
+         if (state.client?.uuid !== action.payload.clientUuid) return;
+
+         console.log(current(state));
+
+         const authProfileIndex = state.authorizedProfiles.findIndex(authorizedProfile => authorizedProfile.uuid === action.payload.raProfile.uuid);
+         if (authProfileIndex === -1) return;
+
+         state.authorizedProfiles.splice(authProfileIndex, 1);
+
+      },
+
+
+      unauthorizeClientFailure: (state, action: PayloadAction<string>) => {
+
+         state.isUnauthorizing = false;
+
+      },
 
       enableClient: (state, action: PayloadAction<string>) => {
 
@@ -419,11 +453,12 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
+const checkedRows = createSelector(state, state => state.checkedRows);
+
 const clients = createSelector(state, state => state.clients);
 const client = createSelector(state, state => state.client);
-
 const authorizedProfiles = createSelector(state, state => state.authorizedProfiles);
-const checkedRows = createSelector(state, state => state.checkedRows);
+
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
 const isFetchingAuthorizedProfiles = createSelector(state, state => state.isFetchingAuthorizedProfiles);
@@ -431,6 +466,7 @@ const isCreating = createSelector(state, state => state.isCreating);
 const isUpdating = createSelector(state, state => state.isUpdating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isAuthorizing = createSelector(state, state => state.isAuthorizing);
+const isUnuthorizing = createSelector(state, state => state.isUnauthorizing);
 const isEnabling = createSelector(state, state => state.isEnabling);
 const isDisabling = createSelector(state, state => state.isDisabling);
 const isBulkEnabling = createSelector(state, state => state.isBulkEnabling);
@@ -450,6 +486,7 @@ export const selectors = {
    isUpdating,
    isDeleting,
    isAuthorizing,
+   isUnuthorizing,
    isEnabling,
    isDisabling,
    isBulkEnabling,

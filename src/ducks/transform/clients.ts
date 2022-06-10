@@ -20,6 +20,7 @@ export function transformClientAuthorizedProfileDTOToModel(profile: AuthorizedRA
    return {
       uuid: profile.uuid,
       name: profile.name,
+      description: profile.description || "",
       enabled: profile.enabled
    }
 

@@ -422,7 +422,7 @@ const authorizeClient: AppEpic = (action$, state, deps) => {
 };
 
 
-const authorizeClientFailed: AppEpic = (action$, state, deps) => {
+const authorizeClientFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
@@ -436,6 +436,46 @@ const authorizeClientFailed: AppEpic = (action$, state, deps) => {
    )
 
 };
+
+
+const unauthorizeClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.unauthorizeClient.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.unauthorizeClient(action.payload.clientUuid, action.payload.raProfile.uuid).pipe(
+
+            map(() => slice.actions.unauthorizeClientSuccess(action.payload)),
+
+            catchError(err => of(slice.actions.unauthorizeClientFailure(extractError(err, "Failed to unauthorize client"))))
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const unauthorizeClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.unauthorizeClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload || "Unexpected error occured")
+      )
+
+   )
+
+}
 
 
 const enableClient: AppEpic = (action$, state, deps) => {
@@ -617,7 +657,9 @@ const epics = [
    bulkDeleteClients,
    bulkDeleteClientsFailure,
    authorizeClient,
-   authorizeClientFailed,
+   authorizeClientFailure,
+   unauthorizeClient,
+   unauthorizeClientFailure,
    enableClient,
    enableClientFailed,
    bulkEnableClients,

@@ -12,5 +12,6 @@ export interface ClientModel {
 export interface ClientAuthorizedRaProfileModel {
    uuid: string;
    name: string;
+   description: string;
    enabled: boolean;
 }

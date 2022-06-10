@@ -15,6 +15,7 @@ export interface ClientDTO {
 export interface AuthorizedRAProfileDTO {
    uuid: string;
    name: string;
+   description?: string;
    enabled: boolean;
 }
 

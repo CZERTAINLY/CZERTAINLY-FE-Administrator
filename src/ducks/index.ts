@@ -26,13 +26,13 @@ import clientsEpics from "./clients-epics";
 import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
 import connectorsEpics from "./connectors-epic";
 
-
+import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
+import raProfilesEpics from "./ra-profiles-epics";
 
 
 /*
 import { initialState as initialCredentialsState, State as CredentialsState, statePath as credentialStatePath } from "./credentials";
 import { initialState as initialAuthoritiesState, State as AuthoritiesState, statePath as authorityStatePath } from "./ca-authorities";
-import { initialState as initialProfilesState, State as ProfilesState, statePath as profileStatePath } from "./ra-profiles";
 import { initialState as initialCertificatesState, State as CertificatesState, statePath as certificatesStatePath } from "./certificates";
 
 import { initialState as initialAcmeAccountState, State as AcmeAccountState, statePath as acmeAccountStatePath } from "./acme-accounts";
@@ -67,8 +67,9 @@ export const initialState = {
    [certificatesSlice.name]: initialCertificatesState,
    [clientsSlice.name]: initialClientsState,
    [connectorsSlice.name]: initialConnectorsState,
+   [raProfilesSlice.name]: initialRaProfilesState,
+
    /*
-      [profileStatePath]: initialProfilesState,
       [credentialStatePath]: initialCredentialsState,
       [authorityStatePath]: initialAuthoritiesState,
       [acmeAccountStatePath]: initialAcmeAccountState,
@@ -84,6 +85,8 @@ export const reducers = combineReducers<typeof initialState, any>({
    [administratorsSlice.name]: administratorsSlice.reducer,
    [clientsSlice.name]: clientsSlice.reducer,
    [connectorsSlice.name]: connectorsSlice.reducer,
+   [raProfilesSlice.name]: raProfilesSlice.reducer,
+
    /*
    [profilesStatePath]: profilesReducer,
    [credentialsStatePath]: credentialsReducer,
@@ -102,6 +105,8 @@ export const epics = combineEpics(
    ...administratorsEpics,
    ...clientsEpics,
    ...connectorsEpics,
+   ...raProfilesEpics,
+
    /*...adminEpics,
   ...profileEpics,
   ...credentialsEpic,

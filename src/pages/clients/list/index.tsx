@@ -10,7 +10,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { Dialog } from "components/Dialog";
+import Dialog from "components/Dialog";
 
 export default function ClientList() {
 
@@ -59,6 +59,11 @@ export default function ClientList() {
       [checkedRows, dispatch]
    );
 
+   const onDeleteClick = useCallback(
+      () => { setConfirmDelete(true); },
+      []
+   );
+
    const onDeleteConfirmed = useCallback(
       () => {
          dispatch(actions.bulkDeleteClients(checkedRows));
@@ -75,7 +80,7 @@ export default function ClientList() {
 
    const buttons: WidgetButtonProps[] = [
       { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
-      { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+      { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { onDeleteClick() } },
       { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
       { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
    ]
@@ -160,6 +165,7 @@ export default function ClientList() {
                data={clientTableData}
                onCheckedRowsChanged={setCheckedRows}
                canSearch={true}
+               hasCheckboxes={true}
             />
          </Widget>
 
@@ -167,9 +173,7 @@ export default function ClientList() {
             isOpen={confirmDelete}
             caption="Delete Client"
 
-            body="You are about deleting a client with existing authorizations to RA
-            Profiles. If you continue, these authorizations will be deleted as
-            well. Is this what you want to do?"
+            body="You are about deleting clients. Is this what you want to do?"
 
             toggle={() => setConfirmDelete(false)}
             buttons={[

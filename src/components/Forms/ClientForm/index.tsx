@@ -59,8 +59,8 @@ function ClientForm({ title }: Props) {
    const isFetchingClientDetail = useSelector(clientSelectors.isFetchingDetail);
    const clientSelector = useSelector(clientSelectors.client);
 
-   const isCreatingClient = useSelector(clientSelectors.isCreating);
-   const isUpdatingClient = useSelector(clientSelectors.isUpdating);
+   const isCreating = useSelector(clientSelectors.isCreating);
+   const isUpdating = useSelector(clientSelectors.isUpdating);
 
    const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
@@ -219,7 +219,7 @@ function ClientForm({ title }: Props) {
    const inProgressTitle = editMode ? "Saving..." : "Creating...";
 
    const defaultValues = {
-      name: "",
+      name: editMode ? client?.name : "",
       inputType: editMode ? optionsForInput[1] : optionsForInput[0]
    }
 
@@ -365,11 +365,11 @@ function ClientForm({ title }: Props) {
                         <ProgressButton
                            title={submitTitle}
                            inProgressTitle={inProgressTitle}
-                           inProgress={submitting || isCreatingClient || isUpdatingClient}
+                           inProgress={submitting || isCreating || isUpdating}
                            disabled={pristine}
                         />
 
-                        <Button color="default" onClick={onCancel} disabled={submitting || isCreatingClient || isUpdatingClient}>
+                        <Button color="default" onClick={onCancel} disabled={submitting || isCreating || isUpdating}>
                            Cancel
                         </Button>
 
