@@ -7,6 +7,7 @@ interface Props {
   title: string;
   inProgressTitle?: string;
   color?: string;
+  onClick?: () => void;
 }
 
 function ProgressButton({
@@ -15,9 +16,10 @@ function ProgressButton({
   inProgressTitle = title,
   disabled = false,
   color = "primary",
+  onClick
 }: Props) {
   return (
-    <Button color={color} type="submit" disabled={disabled || inProgress}>
+    <Button color={color} type="submit" disabled={disabled || inProgress} onClick={onClick}>
       {inProgress ? (
         <div>
           <Spinner color="light" size="sm" />
