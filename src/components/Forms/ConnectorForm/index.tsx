@@ -11,7 +11,7 @@ import InventoryStatusBadge from "components/ConnectorStatus";
 import Widget from "components/Widget";
 import Select from "react-select";
 
-import { ConnectorModel, EndpointModel, FunctionGroupModel } from "models/connectors";
+import { ConnectorModel, EndpointModel } from "models/connectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
 
