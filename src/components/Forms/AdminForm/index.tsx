@@ -74,7 +74,7 @@ function AdminForm({ title }: Props) {
 
    const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
 
-   const [inputTypeValue, setInputTypeValue] = useState<{ label: string, value: string }>(editMode ? optionsForInput[1] : optionsForInput[0]);
+   const [, setInputTypeValue] = useState<{ label: string, value: string }>(editMode ? optionsForInput[1] : optionsForInput[0]);
 
    const [selectedCertificate, setSelectedCertificate] = useState<{ label: string, value: string }>();
 
@@ -270,7 +270,7 @@ function AdminForm({ title }: Props) {
          certificate: selectedCertificate,
          description: editMode ? administrator?.description || "" : "",
       }),
-      [administrator, editMode, selectedCertificate]
+      [administrator, editMode, selectedCertificate, optionsForInput]
    );
 
    return (

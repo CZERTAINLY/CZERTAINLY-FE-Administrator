@@ -18,7 +18,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import InventoryStatusBadge from "components/ConnectorStatus";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
-import { Dialog } from "components/Dialog";
+import Dialog from "components/Dialog";
 
 const { MDBBadge } = require("mdbreact");
 

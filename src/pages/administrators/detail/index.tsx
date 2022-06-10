@@ -2,18 +2,18 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
-
 import { Container, Row, Col } from "reactstrap";
 
 import { actions, selectors } from "ducks/administrators";
 
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 import StatusCircle from "components/StatusCircle";
 import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
+
 import CertificateAttributes from "components/CertificateAttributes";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import { Dialog } from "components/Dialog";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 
 export default function AdministratorDetail() {
@@ -119,11 +119,11 @@ export default function AdministratorDetail() {
    const detailHeaders: TableHeader[] = useMemo(
       () => [
          {
-            id: "adminName",
+            id: "attribute",
             content: "Attribute",
          },
          {
-            id: "adminUsername",
+            id: "value",
             content: "Value",
          },
       ],
@@ -131,50 +131,48 @@ export default function AdministratorDetail() {
    );
 
 
-   const adminAttributes: TableDataRow[] = useMemo(
-      () => {
+   const detailData: TableDataRow[] = useMemo(
 
-         if (!administrator) return [];
+      () => !administrator ? [] : [
 
-         return [
-            {
-               id: "uuid",
-               columns: ["UUID", administrator.uuid]
-            },
-            {
-               id: "name",
-               columns: ["Name", administrator.name]
-            },
-            {
-               id: "surname",
-               columns: ["Surname", administrator.surname]
-            },
-            {
-               id: "username",
-               columns: ["Username", administrator.username]
-            },
-            {
-               id: "email",
-               columns: ["Email", administrator.email]
-            },
-            {
-               id: "description",
-               columns: ["Description", administrator.description]
-            },
-            {
-               id: "superadmin",
-               columns: ["Superadmin", <StatusCircle status={administrator?.role === "superAdministrator"} /> ]
-            },
-            {
-               id: "enabled",
-               columns: ["Administrator Enabled", <StatusBadge enabled={administrator.enabled} />]
-            },
+         {
+            id: "uuid",
+            columns: ["UUID", administrator.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", administrator.name]
+         },
+         {
+            id: "surname",
+            columns: ["Surname", administrator.surname]
+         },
+         {
+            id: "username",
+            columns: ["Username", administrator.username]
+         },
+         {
+            id: "email",
+            columns: ["Email", administrator.email]
+         },
+         {
+            id: "description",
+            columns: ["Description", administrator.description]
+         },
+         {
+            id: "superadmin",
+            columns: ["Superadmin", <StatusCircle status={administrator?.role === "superAdministrator"} />]
+         },
+         {
+            id: "enabled",
+            columns: ["Administrator Enabled", <StatusBadge enabled={administrator.enabled} />]
+         },
 
-         ]
-
-      },
+      ],
       [administrator]
+
    );
+
 
    return (
       <Container className="themed-container" fluid>
@@ -185,10 +183,10 @@ export default function AdministratorDetail() {
 
                   <CustomTable
                      headers={detailHeaders}
-                     data={adminAttributes}
+                     data={detailData}
                   />
 
-              </Widget>
+               </Widget>
 
             </Col>
 
@@ -212,5 +210,7 @@ export default function AdministratorDetail() {
 
       </Container>
    );
+
+
 }
 

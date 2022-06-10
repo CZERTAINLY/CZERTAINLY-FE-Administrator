@@ -19,7 +19,7 @@ interface Props {
 }
 
 
-export function Dialog(props: Props) {
+export default function Dialog(props: Props) {
 
    return (
 

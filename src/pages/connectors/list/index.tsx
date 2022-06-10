@@ -10,8 +10,9 @@ import MDBColumnName from "components/MDBColumnName";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from "components/Dialog";
+
 import { attributeFieldNameTransform } from "models/attributes";
-import { Dialog } from "components/Dialog";
 import { FunctionGroupModel } from "models/connectors";
 import { inventoryStatus } from "utils/connector";
 
