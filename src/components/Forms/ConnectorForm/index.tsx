@@ -18,6 +18,7 @@ import { useHistory, useRouteMatch } from "react-router";
 import { actions as conenctorActions, selectors as connectorSelectors } from "ducks/connectors";
 import { AuthType } from "types/connectors";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { MDBBadge } from "mdbreact";
 
 
 interface FormValues {
@@ -456,9 +457,9 @@ function ConnectorForm({ title }: Props) {
                                                       functionGroup.kinds.map(kinds =>
                                                          <>
                                                             &nbsp;
-                                                            <Badge style={{ backgroundColor: "Bronze" }} pill>
+                                                            <MDBBadge color="secondary" searchvalue={kinds}>
                                                                {kinds}
-                                                            </Badge>
+                                                            </MDBBadge>
                                                          </>
                                                       )
                                                    }
