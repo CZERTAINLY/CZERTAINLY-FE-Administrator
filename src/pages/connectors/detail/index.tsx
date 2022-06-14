@@ -418,7 +418,7 @@ export default function ConnectorDetail() {
 
             <Col>
 
-               <Widget title="Connector Functionality" busy={isFetchingDetail}>
+               <Widget title="Connector Functionality" busy={isFetchingDetail || isReconnecting}>
 
                   <CustomTable
                      headers={functionalityHeaders}
@@ -452,7 +452,7 @@ export default function ConnectorDetail() {
          </Row>
 
 
-         <Widget title="Function Group Details" busy={isFetchingDetail}>
+         <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting}>
 
             <hr />
 
