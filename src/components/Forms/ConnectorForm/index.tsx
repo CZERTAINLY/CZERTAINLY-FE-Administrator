@@ -65,6 +65,7 @@ function ConnectorForm({ title }: Props) {
    const isCreating = useSelector(connectorSelectors.isCreating);
    const isUpdating = useSelector(connectorSelectors.isUpdating);
    const isConnecting = useSelector(connectorSelectors.isConnecting);
+   const isReconnecting = useSelector(connectorSelectors.isReconnecting);
 
    const connectorSelector = useSelector(connectorSelectors.connector);
    const connectionDetails = useSelector(connectorSelectors.connectorConnectionDetails);
@@ -161,7 +162,11 @@ function ConnectorForm({ title }: Props) {
 
 
    const onConnectClick = (values: FormValues) => {
-      dispatch(conenctorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
+      if (editMode) {
+         dispatch(conenctorActions.reconnectConnector(connector!.uuid));
+      } else {
+         dispatch(conenctorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
+      }
    };
 
 
@@ -297,7 +302,7 @@ function ConnectorForm({ title }: Props) {
                                           invalid={!!meta.error && meta.touched}
                                           type="text"
                                           placeholder="Username"
-                                          disabled={editMode}
+                                          //disabled={editMode}
                                        />
                                        <FormFeedback>{meta.error}</FormFeedback>
 
@@ -320,7 +325,7 @@ function ConnectorForm({ title }: Props) {
                                           invalid={!!meta.error && meta.touched}
                                           type="password"
                                           placeholder="Password"
-                                          disabled={editMode}
+                                          // disabled={editMode}
                                        />
 
                                        <FormFeedback>{meta.error}</FormFeedback>
@@ -353,7 +358,7 @@ function ConnectorForm({ title }: Props) {
                                        invalid={!!meta.error && meta.touched}
                                        type="file"
                                        placeholder="clientCert"
-                                       disabled={editMode}
+                                       // disabled={editMode}
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -375,9 +380,9 @@ function ConnectorForm({ title }: Props) {
 
                               color="success"
                               onClick={() => onConnectClick(values)}
-                              disabled={submitting || isConnecting || pristine}
+                              disabled={submitting || isConnecting || isReconnecting}
                            >
-                              {isConnecting ? connectProgressTitle : connectTitle}
+                              {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}
                            </Button>
 
                         </ButtonGroup>
