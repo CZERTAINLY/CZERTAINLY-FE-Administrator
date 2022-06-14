@@ -530,17 +530,34 @@ const reconnectConnector: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.connectors.reconnectConnector(action.payload).pipe(
 
-            map(connection => {
-               return slice.actions.reconnectConnectorSuccess(
-                  connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
-               )
-            }),
+            map(
+               connection => slice.actions.reconnectConnectorSuccess({
+                  uuid: action.payload,
+                  functionGroups: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
+               })
+            ),
 
             catchError(err => of(slice.actions.reconnectConnectorFailure(extractError(err, "Failed to reconnect connector"))))
 
          )
 
       )
+   )
+
+}
+
+
+const reconnectConnectorSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.reconnectConnectorSuccess.match
+      ),
+      map(
+         action => slice.actions.getConnectorHealth(action.payload.uuid)
+      )
+
    )
 
 }
@@ -764,6 +781,7 @@ const epics = [
    connectConnector,
    connectConnectorFailure,
    reconnectConnector,
+   reconnectConnectorSuccess,
    reconnectConnectorFailure,
    bulkReconnectConnectors,
    bulkReconnectConnectorsFailure,

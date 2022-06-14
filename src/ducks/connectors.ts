@@ -415,9 +415,9 @@ export const slice = createSlice({
       },
 
 
-      reconnectConnectorSuccess: (state, action: PayloadAction<FunctionGroupModel[]>) => {
+      reconnectConnectorSuccess: (state, action: PayloadAction<{ uuid: string, functionGroups: FunctionGroupModel[] }>) => {
 
-         state.connectorConnectionDetails = action.payload;
+         state.connectorConnectionDetails = action.payload.functionGroups;
          state.isReconnecting = false;
 
       },
