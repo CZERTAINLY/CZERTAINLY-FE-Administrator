@@ -38,6 +38,7 @@ export default function ConnectorDetail() {
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isFetchingHealth = useSelector(selectors.isFetchingHealth);
    const isFetchingAttributes = useSelector(selectors.isFetchingAttributes);
+   const isReconnecting = useSelector(selectors.isReconnecting);
    const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
    const isAuthorizing = useSelector(selectors.isAuthorizing);
 
@@ -404,7 +405,7 @@ export default function ConnectorDetail() {
 
             <Col>
 
-               <Widget title={attributesTitle} busy={isFetchingDetail || isBulkReconnecting || isAuthorizing}>
+               <Widget title={attributesTitle} busy={isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing}>
 
                   <CustomTable
                      headers={attributesHeaders}
