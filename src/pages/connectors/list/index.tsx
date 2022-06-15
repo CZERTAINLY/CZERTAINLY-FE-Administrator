@@ -6,10 +6,9 @@ import { Container, Table } from "reactstrap";
 import { actions, selectors } from "ducks/connectors";
 
 import Widget from "components/Widget";
-import MDBColumnName from "components/MDBColumnName";
-
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import MDBColumnName from "components/MDBColumnName";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import { attributeFieldNameTransform } from "models/attributes";
@@ -27,6 +26,7 @@ function ConnectorList() {
 
    const checkedRows = useSelector(selectors.checkedRows);
    const connectors = useSelector(selectors.connectors);
+
    const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
    const isFetching = useSelector(selectors.isFetchingList);
@@ -54,25 +54,33 @@ function ConnectorList() {
 
 
    useEffect(
-      () => { setConfirmForceDelete(bulkDeleteErrorMessages.length > 0); },
+      () => {
+         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
+      },
       [bulkDeleteErrorMessages]
    );
 
 
    const onAddClick = useCallback(
-      () => { history.push(`${path}/add`); },
+      () => {
+         history.push(`${path}/add`);
+      },
       [history, path]
    );
 
 
    const onReconnectClick = useCallback(
-      () => { dispatch(actions.bulkReconnectConnectors(checkedRows)); },
+      () => {
+         dispatch(actions.bulkReconnectConnectors(checkedRows));
+      },
       [checkedRows, dispatch]
    );
 
 
    const setCheckedRows = useCallback(
-      (rows: (string | number)[]) => { dispatch(actions.setCheckedRows(rows as string[])); },
+      (rows: (string | number)[]) => {
+         dispatch(actions.setCheckedRows(rows as string[]));
+      },
       [dispatch]
    );
 
@@ -138,52 +146,62 @@ function ConnectorList() {
    );
 
 
-   const getKinds = (functionGroups: FunctionGroupModel[]) => {
+   const getKinds = useCallback(
 
-      return functionGroups.map(
+      (functionGroups: FunctionGroupModel[]) => {
 
-         group => (
+         return functionGroups.map(
 
-            <div key={group.uuid}>
+            group => (
 
-               {group.kinds.map(
+               <div key={group.uuid}>
 
-                  kind => (
-                     <span key={kind}>
-                        <MDBBadge color="secondary" searchvalue={kind}>
-                           {kind}
-                        </MDBBadge>
-                        &nbsp;
-                     </span>
-                  )
+                  {group.kinds.map(
 
-               )}
+                     kind => (
+                        <span key={kind}>
+                           <MDBBadge color="secondary" searchvalue={kind}>
+                              {kind}
+                           </MDBBadge>
+                           &nbsp;
+                        </span>
+                     )
 
-            </div>
+                  )}
 
-         )
+               </div>
 
-      )
-
-   };
-
-
-   const getFunctionGroups = (functionGroups: FunctionGroupModel[]) => {
-
-      return functionGroups.map(
-
-         group => (
-
-            <div key={group.uuid}>
-               <MDBBadge color="primary" searchvalue={attributeFieldNameTransform[group.name || ""] || group.name}>
-                  {attributeFieldNameTransform[group.name || ""] || group.name}
-               </MDBBadge>
-            </div>
+            )
 
          )
 
-      )
-   }
+      },
+      []
+
+   );
+
+
+   const getFunctionGroups = useCallback(
+
+      (functionGroups: FunctionGroupModel[]) => {
+
+         return functionGroups.map(
+
+            group => (
+
+               <div key={group.uuid}>
+                  <MDBBadge color="primary" searchvalue={attributeFieldNameTransform[group.name || ""] || group.name}>
+                     {attributeFieldNameTransform[group.name || ""] || group.name}
+                  </MDBBadge>
+               </div>
+
+            )
+
+         )
+      },
+      []
+
+   );
 
 
    const forceDeleteBody = useMemo(

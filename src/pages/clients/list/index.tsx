@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { Container } from "reactstrap";
@@ -14,7 +14,10 @@ import Dialog from "components/Dialog";
 
 export default function ClientList() {
 
+   const dispatch = useDispatch();
    const history = useHistory();
+
+   const { path } = useRouteMatch();
 
    const checkedRows = useSelector(selectors.checkedRows);
    const clients = useSelector(selectors.clients);
@@ -22,47 +25,55 @@ export default function ClientList() {
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
-   const isUpdating = useSelector(selectors.isUpdating);
-   const isEnabling = useSelector(selectors.isEnabling);
    const isBulkEnabling = useSelector(selectors.isBulkEnabling);
    const isDisabling = useSelector(selectors.isDisabling);
    const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isDisabling || isBulkDisabling;
+   const isBusy = isFetching || isDeleting || isBulkDeleting || isBulkEnabling || isDisabling || isBulkDisabling;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-   const dispatch = useDispatch();
-   const { path } = useRouteMatch();
 
    useEffect(
       () => {
          dispatch(actions.setCheckedRows([]));
          dispatch(actions.listClients());
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
+      [dispatch]
    );
 
+
    const onAddClick = useCallback(
-      () => { history.push("/app/clients/add"); },
+      () => {
+         history.push("/app/clients/add");
+      },
       [history]
    );
 
+
    const onEnableClick = useCallback(
-      () => { dispatch(actions.bulkEnableClients(checkedRows)); },
+      () => {
+         dispatch(actions.bulkEnableClients(checkedRows));
+      },
       [checkedRows, dispatch]
    );
+
 
    const onDisableClick = useCallback(
-      () => { dispatch(actions.bulkDisableClients(checkedRows)); },
+      () => {
+         dispatch(actions.bulkDisableClients(checkedRows));
+      },
       [checkedRows, dispatch]
    );
 
+
    const onDeleteClick = useCallback(
-      () => { setConfirmDelete(true); },
+      () => {
+         setConfirmDelete(true);
+      },
       []
    );
+
 
    const onDeleteConfirmed = useCallback(
       () => {
@@ -72,8 +83,11 @@ export default function ClientList() {
       [checkedRows, dispatch]
    );
 
+
    const setCheckedRows = useCallback(
-      (rows: (string | number)[]) => { dispatch(actions.setCheckedRows(rows as string[])); },
+      (rows: (string | number)[]) => {
+         dispatch(actions.setCheckedRows(rows as string[]));
+      },
       [dispatch]
    );
 
@@ -85,70 +99,81 @@ export default function ClientList() {
       { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
    ]
 
-   const title = (
-      <div>
+   const title = useMemo(
+      () => (
+         <div>
 
-         <div className="pull-right mt-n-xs">
-            <WidgetButtons buttons={buttons} />
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">Clients</span>
+            </h5>
+
          </div>
-
-
-         <h5 className="mt-0">
-            List of <span className="fw-semi-bold">Clients</span>
-         </h5>
-
-      </div>
+      ),
+      [buttons]
    );
 
 
-   const clientTableHeader: TableHeader[] = [
-      {
-         content: <MDBColumnName columnName="Name" />,
-         sortable: true,
-         sort: "asc",
-         id: "clientName",
-         width: "10%",
-      },
-      {
-         content: <MDBColumnName columnName="Serial Number" />,
-         sortable: false,
-         id: "clientSerialNumber",
-         width: "25%",
-      },
-      {
-         content: <MDBColumnName columnName="Client DN" />,
-         sortable: false,
-         id: "clientAdminDn",
-         width: "35%",
-      },
-      {
-         content: <MDBColumnName columnName="Status" />,
-         sortable: true,
-         id: "clientStatus",
-         width: "10%",
-      },
-   ];
+   const clientTableHeader: TableHeader[] = useMemo(
+      () => [
+         {
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            id: "clientName",
+            width: "10%",
+         },
+         {
+            content: <MDBColumnName columnName="Serial Number" />,
+            sortable: false,
+            id: "clientSerialNumber",
+            width: "25%",
+         },
+         {
+            content: <MDBColumnName columnName="Client DN" />,
+            sortable: false,
+            id: "clientAdminDn",
+            width: "35%",
+         },
+         {
+            content: <MDBColumnName columnName="Status" />,
+            sortable: true,
+            id: "clientStatus",
+            width: "10%",
+         },
+      ],
+      []
+   );
 
 
-   const clientTableData: TableDataRow[] = clients.map(
+   const clientTableData: TableDataRow[] = useMemo(
 
-      client => ({
+      () => clients.map(
 
-         id: client.uuid,
+         client => ({
 
-         columns: [
+            id: client.uuid,
 
-            <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>,
+            columns: [
 
-            client.serialNumber,
+               <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>,
 
-            client?.certificate?.subjectDn,
+               client.serialNumber,
 
-            <StatusBadge enabled={client.enabled} />,
+               client?.certificate?.subjectDn,
 
-         ]
+               <StatusBadge enabled={client.enabled} />,
 
-      })
+            ]
+
+         })
+
+      ),
+      [clients, path]
 
    );
 

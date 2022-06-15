@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, Fragment } from "react";
+import React, { useCallback, useState, useEffect, Fragment, useMemo } from "react";
 
 import { Container, Input, Pagination, PaginationItem, PaginationLink, Table } from "reactstrap";
 import cx from "classnames";
@@ -65,14 +65,15 @@ function AuditLogs() {
    useEffect(() => {
       dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [ pageSize, sort, filters, dispatch ]);
+   }, [pageSize, sort, filters, dispatch]);
+
 
    // load when page changes but not loaded
    useEffect(() => {
       if (logData && logData[page - 1]) return;
       dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [ logData, page ])
+   }, [logData, page])
 
 
    useEffect(() => {
@@ -136,25 +137,32 @@ function AuditLogs() {
    };
 
 
-   const queryString = filters
-      ? Object.entries(filters)
-         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-         .join("&")
-      : "";
+   const queryString = useMemo(
+      () => (
+         filters
+            ?
+            Object.entries(filters).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join("&")
+            : ""
+      ),
+      [filters]
+   )
 
 
-   const auditLogsTitle = (
-      <div className="d-flex justify-content-between align-items-center">
-         <h5>
-            <span className="fw-semi-bold">Audit Logs</span>
-         </h5>
-         <a
-            href={`/api/v1/logs/export?${queryString}`}
-            className={styles.exportButton}
-         >
-            Export
-         </a>
-      </div>
+   const auditLogsTitle = useMemo(
+      () => (
+         <div className="d-flex justify-content-between align-items-center">
+            <h5>
+               <span className="fw-semi-bold">Audit Logs</span>
+            </h5>
+            <a
+               href={`/api/v1/logs/export?${queryString}`}
+               className={styles.exportButton}
+            >
+               Export
+            </a>
+         </div>
+      ),
+      [queryString]
    );
 
 

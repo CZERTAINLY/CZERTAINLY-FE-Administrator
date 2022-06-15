@@ -5,7 +5,6 @@ import { Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/administrators";
 
-
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
@@ -28,12 +27,10 @@ export default function AdministratorsList() {
    const isDeleting = useSelector(selectors.isDeleting);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
    const isUpdating = useSelector(selectors.isUpdating);
-   const isEnabling = useSelector(selectors.isEnabling);
    const isBulkEnabling = useSelector(selectors.isBulkEnabling);
-   const isDisabling = useSelector(selectors.isDisabling);
    const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isDisabling || isBulkDisabling;
+   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -45,19 +42,30 @@ export default function AdministratorsList() {
       [dispatch]
    );
 
-   const onAddClick = useCallback(() => {
-      history.push(`${path}/add`);
-   }, [history, path]);
+
+   const onAddClick = useCallback(
+      () => {
+         history.push(`${path}/add`);
+      },
+      [history, path]
+   );
+
 
    const onEnableClick = useCallback(
-      () => { dispatch(actions.bulkEnableAdmins(checkedRows)); },
+      () => {
+         dispatch(actions.bulkEnableAdmins(checkedRows));
+      },
       [checkedRows, dispatch]
    );
 
+
    const onDisableClick = useCallback(
-      () => { dispatch(actions.bulkDisableAdmins(checkedRows)); },
+      () => {
+         dispatch(actions.bulkDisableAdmins(checkedRows));
+      },
       [checkedRows, dispatch]
    );
+
 
    const onDeleteConfirmed = useCallback(
       () => {
@@ -67,30 +75,41 @@ export default function AdministratorsList() {
       [checkedRows, dispatch]
    );
 
+
    const setCheckedRows = useCallback(
-      (rows: (string | number)[]) => { dispatch(actions.setCheckedRows(rows as string[])); },
+      (rows: (string | number)[]) => {
+         dispatch(actions.setCheckedRows(rows as string[]));
+      },
       [dispatch]
    );
 
-   const buttons: WidgetButtonProps[] = [
-      { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
-      { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-      { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
-      { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
-   ]
 
-   const title = (
-      <div>
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onAddClick, onEnableClick, onDisableClick]
+   );
 
-         <div className="pull-right mt-n-xs">
-            <WidgetButtons buttons={buttons} />
+
+   const title = useMemo(
+      () => (
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">Administrators</span>
+            </h5>
+
          </div>
-
-         <h5 className="mt-0">
-            List of <span className="fw-semi-bold">Administrators</span>
-         </h5>
-
-      </div>
+      ),
+      [buttons]
    );
 
 

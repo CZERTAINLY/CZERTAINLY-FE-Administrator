@@ -49,7 +49,7 @@ export default function ClientDetail() {
          if (!params.id) return;
          dispatch(clientActions.getClientDetail(params.id));
          dispatch(clientActions.getAuthorizedProfiles(params.id));
-         dispatch(raProfileActions.listProfiles());
+         dispatch(raProfileActions.listRaProfiles());
       },
       [params.id, dispatch]
    );
