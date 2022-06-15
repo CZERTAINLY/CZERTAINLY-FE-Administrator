@@ -196,10 +196,8 @@ export default function ClientList() {
 
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete Client"
-
-            body="You are about deleting clients. Is this what you want to do?"
-
+            caption={`Delete ${checkedRows.length > 1 ? "Clients" : "a Client"}`}
+            body={`You are about deleting ${checkedRows.length > 1 ? "Clients" : "a Client"}. Is this what you want to do?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },

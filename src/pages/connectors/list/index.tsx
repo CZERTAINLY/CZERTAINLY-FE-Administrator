@@ -210,7 +210,7 @@ function ConnectorList() {
 
          <div>
 
-            <div>Failed to delete some of the connectors. Please find the details below:</div>
+            <div>Failed to delete {checkedRows.length > 1 ? "Connectors" : "a Connector"}. Please find the details below:</div>
 
             <Table className="table-hover" size="sm">
 
@@ -338,8 +338,8 @@ function ConnectorList() {
 
             <Dialog
                isOpen={confirmDelete}
-               caption="Delete Connector"
-               body="You are about to delete connector/s. Is this what you want to do?"
+               caption={`Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+               body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?}`}
                toggle={() => setConfirmDelete(false)}
                buttons={[
                   { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
@@ -349,8 +349,8 @@ function ConnectorList() {
 
             <Dialog
                isOpen={confirmAuthorize}
-               caption="Authorize Connector"
-               body="You are about to authorize a connector/s. Is this what you want to do?"
+               caption={`Authorize ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+               body={`You are about to authorize a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
                toggle={() => setConfirmAuthorize(false)}
                buttons={[
                   { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
@@ -360,7 +360,7 @@ function ConnectorList() {
 
             <Dialog
                isOpen={confirmForceDelete}
-               caption="Force Delete Connector"
+               caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
                body={forceDeleteBody}
                toggle={() => setConfirmForceDelete(false)}
                buttons={[

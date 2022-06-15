@@ -206,8 +206,8 @@ export default function AdministratorsList() {
 
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete Administrator"
-            body="You are about to delete an Administrator. Is this what you want to do?"
+            caption={`Delete ${checkedRows.length > 1 ? "Administrators" : "an Administrator"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Administrators" : "an Administrator"}. Is this what you want to do?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
