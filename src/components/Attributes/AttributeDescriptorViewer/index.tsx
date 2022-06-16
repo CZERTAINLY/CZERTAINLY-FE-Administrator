@@ -17,17 +17,17 @@ export default function AttributeDescriptorViewer({
 
       (attributeDescriptor: AttributeDescriptorModel) => {
 
-         if (!attributeDescriptor.value) return "";
+         if (!attributeDescriptor.content) return "";
 
          if (
-            typeof attributeDescriptor.value !== "string" &&
+            typeof attributeDescriptor.content !== "string" &&
             ["LIST", "list", "array", "ARRAY", "BOOLEAN", "CREDENTIAL"].includes(
                attributeDescriptor.type
             )
          ) {
-            return (attributeDescriptor.value as Array<any>)[0]
+            return (attributeDescriptor.content.value as Array<any>)[0]
          } else {
-            return attributeDescriptor.value;
+            return attributeDescriptor.content.value;
          }
 
       },
@@ -62,7 +62,7 @@ export default function AttributeDescriptorViewer({
 
          attributeDescriptor => ({
 
-            id: attributeDescriptor.uuid,
+            id: attributeDescriptor.name,
             columns: [
                attributeDescriptor.label || attributeFieldNameTransform[attributeDescriptor.name] || attributeDescriptor.name,
                attributeDescriptor.required ? "Yes" : "No",
@@ -91,9 +91,9 @@ export default function AttributeDescriptorViewer({
                         {attributeDescriptor.readOnly ? "Yes" : "No"}
                      </p>
 
-                     <p>
+                     {/*<p>
                         <b>Editable</b>: {attributeDescriptor.editable ? "Yes" : "No"}
-                     </p>
+                     </p>*/}
                   </>
                ),
                (
@@ -104,7 +104,7 @@ export default function AttributeDescriptorViewer({
 
                      <p>
                         <b>Multiple Value</b>:{" "}
-                        {attributeDescriptor.multiValue ? "Yes" : "No"}
+                        {attributeDescriptor.multiSelect ? "Yes" : "No"}
                      </p>
 
                   </>

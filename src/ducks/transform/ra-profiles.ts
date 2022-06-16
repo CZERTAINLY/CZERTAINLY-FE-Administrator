@@ -1,6 +1,6 @@
 import { RaAuthorizedClientDTO, RaProfileDTO } from "api/profiles";
 import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models/ra-profiles";
-import { transformAttributeDTOToModel } from "./attributes";
+import { transformAttributeDTOToModel, transformAttributeModelToDTO } from "./attributes";
 
 export function transformRaProfileDtoToModel(raProfileDto: RaProfileDTO): RaProfileModel {
     return {
@@ -30,8 +30,8 @@ export function transformRaAcmeLinkDtoToModel(raAcmeLinkDto: RaAcmeLinkModel): R
         uuid: raAcmeLinkDto.uuid,
         name: raAcmeLinkDto.name,
         directoryUrl: raAcmeLinkDto.directoryUrl,
-        issueCertificateAttributes: raAcmeLinkDto.issueCertificateAttributes?.map(attribute => transformAttributeDTOToModel(attribute)),
-        revokeCertificateAttributes: raAcmeLinkDto.revokeCertificateAttributes?.map(attribute => transformAttributeDTOToModel(attribute)),
+        issueCertificateAttributes: raAcmeLinkDto.issueCertificateAttributes?.map(attribute => transformAttributeModelToDTO(attribute)),
+        revokeCertificateAttributes: raAcmeLinkDto.revokeCertificateAttributes?.map(attribute => transformAttributeModelToDTO(attribute)),
         acmeAvailable: raAcmeLinkDto.acmeAvailable
     };
 }

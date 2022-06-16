@@ -24,7 +24,7 @@ export default function AdministratorDetail() {
 
    const history = useHistory();
 
-   const administrator = useSelector(selectors.admininistrator);
+   const administrator = useSelector(selectors.administrator);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isDisabling = useSelector(selectors.isDisabling);
    const isEnabling = useSelector(selectors.isEnabling);

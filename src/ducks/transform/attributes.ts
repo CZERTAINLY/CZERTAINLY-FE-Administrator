@@ -12,7 +12,7 @@ export function transformAttributeDTOToModel(attribute: AttributeDTO): Attribute
       name: attribute.name,
       label: attribute.label,
       type: attribute.type,
-      value: attribute.value
+      content: JSON.parse(JSON.stringify(attribute.content))
    }
 
 }
@@ -25,39 +25,41 @@ export function transformAttributeModelToDTO(attribute: AttributeModel): Attribu
       name: attribute.name,
       label: attribute.label,
       type: attribute.type,
-      value: attribute.value
+      content: JSON.parse(JSON.stringify(attribute.content))
    }
 
 }
 
 
-export function transformAttributeDescriptorDTOToModel(attributeDesctiptor: AttributeDescriptorDTO): AttributeDescriptorModel {
+export function transformAttributeDescriptorDTOToModel(attributeDescriptor: AttributeDescriptorDTO): AttributeDescriptorModel {
 
    return {
-      uuid: attributeDesctiptor.uuid,
-      name: attributeDesctiptor.name,
-      type: attributeDesctiptor.type,
-      label: attributeDesctiptor.label,
-      required: attributeDesctiptor.required,
-      readOnly: attributeDesctiptor.readOnly,
-      editable: attributeDesctiptor.editable,
-      visible: attributeDesctiptor.visible,
-      multiValue: attributeDesctiptor.multiValue,
-      description: attributeDesctiptor.description,
-      dependsOn: attributeDesctiptor.dependsOn ? attributeDesctiptor.dependsOn.map(dep => ({ name: dep.name, value: dep.value })) : undefined,
-      validationRegex: attributeDesctiptor.validationRegex,
-      attributeCallback: attributeDesctiptor.attributeCallback ? {
-         callbackContext: attributeDesctiptor.attributeCallback.callbackContext,
-         callbackMethod: attributeDesctiptor.attributeCallback.callbackMethod,
-         mappings: attributeDesctiptor.attributeCallback.mappings.map(mapping => ({
-            from: mapping.from,
-            to: mapping.to,
-            attributeType: mapping.attributeType,
-            targets: [...mapping.targets],
-            value: typeof mapping.value === "object" ? JSON.parse(JSON.stringify(mapping.value)) : mapping.value ? mapping.value : undefined
-         }))
-      } : undefined,
-      value: typeof attributeDesctiptor.value === "object" ? JSON.parse(JSON.stringify(attributeDesctiptor.value)) : attributeDesctiptor.value
+      uuid: attributeDescriptor.uuid,
+      name: attributeDescriptor.name,
+      group: attributeDescriptor.group,
+      type: attributeDescriptor.type,
+      label: attributeDescriptor.label,
+      required: attributeDescriptor.required,
+      readOnly: attributeDescriptor.readOnly,
+      visible: attributeDescriptor.visible,
+      list: attributeDescriptor.list,
+      multiSelect: attributeDescriptor.multiSelect,
+      description: attributeDescriptor.description,
+      validationRegex: attributeDescriptor.validationRegex ? new RegExp(attributeDescriptor.validationRegex) : undefined,
+      callback: !attributeDescriptor.callback ? undefined : {
+         callbackContext: attributeDescriptor.callback.callbackContext,
+         callbackMethod: attributeDescriptor.callback.callbackMethod,
+         mappings: attributeDescriptor.callback.mappings.map(
+            mapping => ({
+               from: mapping.from ? mapping.from : undefined,
+               attributeType: mapping.attributeType ? mapping.attributeType : undefined,
+               to: mapping.to,
+               targets: mapping.targets,
+               value: mapping.value
+            })
+         )
+      },
+      content: JSON.parse(JSON.stringify(attributeDescriptor.content))
    }
 
 }

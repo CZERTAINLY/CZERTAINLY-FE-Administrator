@@ -5,7 +5,6 @@ import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-import { attributeSimplifier } from "utils/attributes";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
@@ -37,8 +36,8 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
          new HttpRequestOptions(`${baseUrl}/${uuid}/activateAcme`, "POST", {
             acmeProfileUuid,
-            issueCertificateAttributes: attributeSimplifier(issueCertificateAttributes),
-            revokeCertificateAttributes: attributeSimplifier(revokeCertificateAttributes),
+            issueCertificateAttributes: issueCertificateAttributes,
+            revokeCertificateAttributes: revokeCertificateAttributes,
          })
 
       );
@@ -63,7 +62,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
             authorityInstanceUuid,
             name: name,
             description,
-            attributes: attributeSimplifier(attributes),
+            attributes: attributes,
          }
       ).pipe(
          map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
@@ -158,7 +157,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
             authorityInstanceUuid,
             description,
             uuid,
-            attributes: attributeSimplifier(attributes),
+            attributes: attributes,
          })
       );
 

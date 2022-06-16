@@ -92,12 +92,15 @@ export default function ClientList() {
    );
 
 
-   const buttons: WidgetButtonProps[] = [
-      { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
-      { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { onDeleteClick() } },
-      { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
-      { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
-   ]
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { onDeleteClick() } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onAddClick, onDeleteClick, onEnableClick, onDisableClick]
+   );
 
    const title = useMemo(
       () => (

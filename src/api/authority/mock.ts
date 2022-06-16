@@ -71,7 +71,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
                      const authorityAttribute = authority.attributes?.find(authorityAttribute => authorityAttribute.uuid === attribute.uuid);
 
                      if (authorityAttribute) {
-                        authorityAttribute.value = attribute.value;
+                        authorityAttribute.content = attribute.content;
                      } else {
 
                         authority.attributes = authority.attributes || [];
@@ -79,7 +79,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
                         authority.attributes.push({
                            uuid: attribute.uuid,
                            name: attribute.name,
-                           value: attribute.value
+                           content: attribute.content
                         });
 
                      }

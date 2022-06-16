@@ -43,13 +43,13 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   uuid: "e334e055-900e-43f1-aedc-54e837028de0",
                   name: "keyStoreType",
                   label: "Key Store Type",
-                  type: "LIST",
+                  type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
-                  value: ["PKCS12", "JKS"],
+                  list: true,
+                  multiSelect: false,
+                  content: { value: ["PKCS12", "JKS"] },
                },
                {
                   uuid: "6df7ace9-c501-4d58-953c-f8d53d4fb378",
@@ -58,9 +58,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "FILE",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "d975fe42-9d09-4740-a362-fc26f98e55ea",
@@ -69,21 +69,21 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "SECRET",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "c4454807-805a-44e2-81d1-94b56e993786",
                   name: "trustStoreType",
                   label: "Trust Store Type",
-                  type: "LIST",
+                  type: "STRING",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
-                  value: ["PKCS12", "JKS"],
+                  list: true,
+                  multiSelect: false,
+                  content: { value: ["PKCS12", "JKS"] },
                },
                {
                   uuid: "6a245220-eaf4-44cb-9079-2228ad9264f5",
@@ -92,9 +92,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "FILE",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "85a874da-1413-4770-9830-4188a37c95ee",
@@ -103,9 +103,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "SECRET",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                }
 
             ]
@@ -135,9 +135,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "04506d45-c865-4ddc-b6fc-117ee5d5c8e7",
@@ -146,9 +146,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "SECRET",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                }
             ],
             ApiKey: [
@@ -159,9 +159,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "SECRET",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                }
             ],
             SoftKeyStore: [
@@ -169,16 +169,13 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   uuid: "e334e055-900e-43f1-aedc-54e837028de0",
                   name: "keyStoreType",
                   label: "Key Store Type",
-                  type: "LIST",
+                  type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
-                  value: [
-                     "PKCS12",
-                     "JKS"
-                  ]
+                  list: true,
+                  multiSelect: false,
+                  content: { value: ["PKCS12", "JKS"] }
                },
                {
                   uuid: "6df7ace9-c501-4d58-953c-f8d53d4fb378",
@@ -187,9 +184,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "FILE",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "d975fe42-9d09-4740-a362-fc26f98e55ea",
@@ -198,24 +195,21 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "SECRET",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "c4454807-805a-44e2-81d1-94b56e993786",
                   name: "trustStoreType",
                   label: "Trust Store Type",
-                  type: "LIST",
+                  type: "STRING",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
-                  value: [
-                     "PKCS12",
-                     "JKS"
-                  ]
+                  list: true,
+                  multiSelect: false,
+                  content: { value: ["PKCS12", "JKS"] }
                },
                {
                   uuid: "6a245220-eaf4-44cb-9079-2228ad9264f5",
@@ -224,9 +218,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "FILE",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "85a874da-1413-4770-9830-4188a37c95ee",
@@ -235,9 +229,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "SECRET",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false
+                  list: false,
+                  multiSelect: false,
                }
             ]
          }
@@ -289,10 +283,10 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
-                  description: "Multiple values can be given seperated by comma ','."
+                  description: "Multiple values can be given seperated by comma ','.",
+                  list: false,
+                  multiSelect: false,
                },
                {
                   uuid: "a9091e0d-f9b9-4514-b275-1dd52aa870ec",
@@ -301,27 +295,25 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Multiple values can be given seperated by comma ','.",
-                  value: "443"
+                  content: { value: "443" }
+
                },
                {
                   uuid: "3c70d728-e8c3-40f9-b9b2-5d7256f89ef0",
                   name: "allPorts",
                   label: "All Ports?",
-                  type: "LIST",
+                  type: "STRING",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: true,
+                  multiSelect: false,
                   description: "Select to discover certificates from all ports.",
-                  value: [
-                     "No",
-                     "Yes"
-                  ]
+                  content: { value: ["No", "Yes"] }
                }
             ]
          }
@@ -391,12 +383,12 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Cryptosense Analyzer URL to access the API",
                   validationRegex: "^(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$",
-                  value: "https://analyzer.cryptosense.com/api/v2"
+                  content: { value: "https://analyzer.cryptosense.com/api/v2" }
                },
                {
                   uuid: "9379ca2c-aa51-42c8-8afd-2e2d16c99c56",
@@ -405,11 +397,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: false,
                   readOnly: true,
-                  editable: true,
                   visible: false,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "API Key to authorize communication with the Analyzer",
-                  value: "ApiKey"
+                  content: { value: "ApiKey" }
                },
                {
                   uuid: "9379ca2c-aa51-42c8-8afd-2a2d16c99c57",
@@ -418,11 +410,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "CREDENTIAL",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Credential for the communication",
-                  attributeCallback: {
+                  callback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [
@@ -438,14 +430,14 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   uuid: "131f64b8-52e4-4cb8-b7de-63ca61c35209",
                   name: "project",
                   label: "Project",
-                  type: "LIST",
+                  type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: true,
+                  multiSelect: false,
                   description: "List of available projects",
-                  attributeCallback: {
+                  callback: {
                      callbackContext: "/v1/discoveryProvider/listAvailableProjects",
                      callbackMethod: "POST",
                      mappings: [
@@ -462,20 +454,20 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  value: true
+                  content: { value: [] }
                },
                {
                   uuid: "131f64b8-52e4-4db8-b7de-63ca61c35209",
                   name: "report",
                   label: "Report",
-                  type: "LIST",
+                  type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: true,
+                  multiSelect: false,
                   description: "List of available reports",
-                  attributeCallback: {
+                  callback: {
                      callbackContext: "/v1/discoveryProvider/listAvailableReports/{projectId}",
                      callbackMethod: "POST",
                      mappings: [
@@ -497,7 +489,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  value: true
+                  content: { value: [] }
                }
             ]
          }
@@ -626,9 +618,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Address of ADCS server.",
                   validationRegex: "^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))$"
                },
@@ -639,24 +631,24 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "BOOLEAN",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Use https for connection with ADCS server.",
-                  value: false
+                  content: { value: false }
                },
                {
                   uuid: "9587a320-a487-4084-9645-0b6c24636fa6",
                   name: "port",
                   label: "Port",
-                  type: "NUMBER",
+                  type: "INTEGER",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Define WinRM port, default port for http is 5985 and for https 5986.",
-                  value: 5985
+                  content: { value: 5985 }
                },
                {
                   uuid: "d9f79ba6-47e5-437b-a7bc-82dbafa9cf03",
@@ -665,11 +657,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "CREDENTIAL",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Credential for the communication",
-                  attributeCallback: {
+                  callback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [
@@ -689,32 +681,34 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   uuid: "87a94421-c5d8-4a23-bb2c-bbee76cb4eaa",
                   name: "caInstance",
                   label: "CA Instance",
-                  type: "LIST",
+                  type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
-                  value: [
-                     "lab02-ADCS",
-                     "xx",
-                     "test",
-                     "11",
-                     "12",
-                     "111"
-                  ]
+                  list: true,
+                  multiSelect: false,
+                  content: {
+                     value: [
+                        "lab02-ADCS",
+                        "xx",
+                        "test",
+                        "11",
+                        "12",
+                        "111"
+                     ]
+                  }
                },
                {
                   uuid: "25b35cf2-45cb-4e4c-b5b3-a99ecb8aa8e6",
                   name: "caAdcs",
                   label: "Certificate Authority",
-                  type: "LIST",
+                  type: "STRING",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: true,
-                  attributeCallback: {
+                  list: true,
+                  multiSelect: false,
+                  callback: {
                      callbackContext: "/v1/discoveryProvider/listCertificateAuthority/{caInstance}",
                      callbackMethod: "GET",
                      mappings: [
@@ -725,19 +719,19 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  value: []
+                  content: { value: [] }
                },
                {
                   uuid: "83c0f20b-4789-44f2-abd2-a84c131d5e97",
                   name: "template",
                   label: "Template",
-                  type: "LIST",
+                  type: "STRING",
                   required: false,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: true,
-                  attributeCallback: {
+                  list: true,
+                  multiSelect: false,
+                  callback: {
                      callbackContext: "/v1/discoveryProvider/listTemplate/{caInstance}",
                      callbackMethod: "GET",
                      mappings: [
@@ -748,7 +742,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  value: []
+                  content: { value: [] }
                }
             ]
          }
@@ -934,9 +928,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "URL of EJBCA web service"
                },
                {
@@ -946,11 +940,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "CREDENTIAL",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "Credential for the communication",
-                  attributeCallback: {
+                  callback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [
@@ -1136,9 +1130,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "STRING",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "URL of EJBCA web services"
                },
                {
@@ -1148,11 +1142,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   type: "CREDENTIAL",
                   required: true,
                   readOnly: false,
-                  editable: true,
                   visible: true,
-                  multiValue: false,
+                  list: false,
+                  multiSelect: false,
                   description: "SoftKeyStore Credential representing EJBCA administrator for the communication",
-                  attributeCallback: {
+                  callback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [

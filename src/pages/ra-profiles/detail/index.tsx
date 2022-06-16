@@ -2,43 +2,25 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
-import {
-  ButtonGroup,
-  Container,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Table,
-  Row,
-  Col,
-  Button,
-} from "reactstrap";
-
+import { ButtonGroup, Container, Form, FormGroup, Input, Label, Table, Row, Col, Button } from "reactstrap";
+/*
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import Select from "react-select";
-import {
-  actions as clientActions,
-  selectors as clientSelectors,
-} from "ducks/clients";
+
+import { actions as clientActions, selectors as clientSelectors } from "ducks/clients";
 import { actions, selectors } from "ducks/ra-profiles";
-import {
-  actions as acmeActions,
-  selectors as acmeSelectors,
-} from "ducks/acme-profiles";
+
+import { actions as acmeActions, selectors as acmeSelectors } from "ducks/acme-profiles";
 import { Client } from "models";
+
 import { FieldNameTransform } from "utils/attributes/fieldNameTransform";
 import ToolTip from "components/ToolTip";
 import { AttributeResponse } from "models/attributes";
-import {
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
+
+import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
 import DynamicForm from "components/DynamicForm";
 
 function RaProfileDetail() {
@@ -58,7 +40,7 @@ function RaProfileDetail() {
   const allClients = useSelector(clientSelectors.selectClients);
   const isFetchingClients = useSelector(clientSelectors.isFetching);
   const isAuthorizing = useSelector(clientSelectors.isAuthorizingProfile);
-  const isEditing = useSelector(selectors.isEditing);
+  const isEditing = useSelector(selectors.isUpdating);
   const isFetchingProfiles = useSelector(selectors.isFetching);
   const profileDetails = useSelector(selectors.selectSelectedProfile);
   const authorizedClientIds = useSelector(selectors.selectAuthorizedClientIds);
@@ -720,3 +702,4 @@ function RaProfileDetail() {
 }
 
 export default RaProfileDetail;
+*/

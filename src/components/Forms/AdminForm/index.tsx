@@ -63,7 +63,7 @@ function AdminForm({ title }: Props) {
    const certificates = useSelector(certSelectors.certificates);
 
    const isFetchingAdminDetail = useSelector(adminSelectors.isFetchingDetail);
-   const administratorSelector = useSelector(adminSelectors.admininistrator);
+   const administratorSelector = useSelector(adminSelectors.administrator);
 
    const isCreatingAdmin = useSelector(adminSelectors.isCreating);
    const isUpdatingAdmin = useSelector(adminSelectors.isUpdating);

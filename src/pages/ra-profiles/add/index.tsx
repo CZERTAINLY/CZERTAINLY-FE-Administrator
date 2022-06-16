@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Container } from "reactstrap";
-
+/*
 import RaProfileForm from "components/RaProfileForm";
 import Spinner from "components/Spinner";
 import Widget from "components/Widget";
@@ -62,3 +62,4 @@ function RaProfileAdd() {
 }
 
 export default RaProfileAdd;
+*/

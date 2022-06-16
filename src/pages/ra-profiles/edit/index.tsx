@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Action } from "redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Container } from "reactstrap";
-
+/*
 import RaProfileForm from "components/RaProfileForm";
 import ConfirmEditDialog from "components/ConfirmActionDialog";
 import Spinner from "components/Spinner";
@@ -16,7 +16,7 @@ function RaProfileEdit() {
   const dispatch = useDispatch();
   const history = useHistory();
   const isFetching = useSelector(selectors.isFetching);
-  const isEditing = useSelector(selectors.isEditing);
+  const isEditing = useSelector(selectors.isUpdating);
   const raProfile = useSelector(selectors.selectProfileDetail);
   const isFetchingCallback = useSelector(callbackSelectors.isFetchingCallback);
   const { params } = useRouteMatch();
@@ -85,3 +85,4 @@ function RaProfileEdit() {
 }
 
 export default RaProfileEdit;
+*/

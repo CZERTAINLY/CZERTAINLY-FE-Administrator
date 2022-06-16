@@ -2,6 +2,12 @@ import { FunctionGroupCode } from "types/connectors";
 import { AttributeCallbackMappingTarget, AttributeType, AttributeValue } from "types/attributes";
 
 
+export interface AttributeContentDTO {
+   [key: string]: AttributeValue;
+   value: AttributeValue;
+}
+
+
 export interface AttibuteCallbackMappingDTO {
    from?: string;
    attributeType?: AttributeType;
@@ -10,19 +16,8 @@ export interface AttibuteCallbackMappingDTO {
    value?: any;
 }
 
-export interface CallbackPathVariableDict {
-   [key: string]: any;
-}
 
-export interface CallbackRequestBodyDict {
-   [key: string]: any;
-}
-
-export interface CallbackQueryParameterDict {
-   [key: string]: any;
-}
-
-export interface AttributeCallbackDTO {
+export interface AttributeCallbackDescriptorDTO {
    callbackContext: string;
    callbackMethod: string;
    mappings: AttibuteCallbackMappingDTO[];
@@ -40,19 +35,19 @@ export interface AttributeDependencyDTO {
  */
 export interface AttributeDescriptorDTO {
    uuid: string;
-   name: string;
    type: AttributeType;
+   name: string;
    label: string;
-   required?: boolean;
-   readOnly?: boolean;
-   editable?: boolean;
-   visible?: boolean;
-   multiValue?: boolean;
    description?: string;
-   dependsOn?: AttributeDependencyDTO[];
+   group?: string;
+   required: boolean;
+   readOnly: boolean;
+   visible: boolean;
+   list: boolean;
+   multiSelect: boolean;
    validationRegex?: string;
-   attributeCallback?: AttributeCallbackDTO;
-   value?: AttributeValue;
+   callback?: AttributeCallbackDescriptorDTO;
+   content?: AttributeContentDTO;
 }
 
 
@@ -70,16 +65,11 @@ export type AttributeDescriptorCollectionDTO = {
  * Used to get or set attributes of a particular object
  */
 export interface AttributeDTO {
-   /** Unique attribute value identifier - not used during create */
-   uuid?: string;
-   /** Name of the attribute taken from the attribute descriptor when created */
+   uuid: string;
    name: string;
-   /** Description of the attribute - not used during create */
    label?: string;
-   /** Type of the attribute - not used during create */
-   type?: AttributeType;
-   /** Value of the attribute */
-   value: AttributeValue;
+   type?: AttributeType
+   content: AttributeContentDTO;
 }
 
 

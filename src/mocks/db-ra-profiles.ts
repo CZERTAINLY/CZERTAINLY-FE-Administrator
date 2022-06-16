@@ -23,50 +23,50 @@ export const dbRaProfiles: DbRaProfileList = {
             uuid: "72498bd8-37f9-4fcb-86cb-d23570cf916f",
             name: "tokenType",
             label: "Token Type",
-            type: "LIST",
-            value: "P12",
+            type: "STRING",
+            content: { value: "P12" }
          },
          {
             uuid: "223f2d64-3c70-40a2-9f51-255d32c897b8",
             name: "initialEndEntityStatus",
             label: "Initial End Entity Status",
-            type: "LIST",
-            value: "NEW",
+            type: "STRING",
+            content: { value: "NEW" },
          },
          {
             uuid: "d5f1c8aa-c4b4-4cb5-bf66-b8563c6647f1",
             name: "description",
             label: "Description",
             type: "STRING",
-            value: "localhostProfile",
+            content: { value: "localhostProfile" },
          },
          {
             uuid: "baf2d142-f35a-437f-81c7-35c128881fc0",
             name: "endEntityProfile",
             label: "End Entity Profile",
-            type: "LIST",
-            value: "1058487535",
+            type: "STRING",
+            content: { value: "1058487535" },
          },
          {
             uuid: "eb57a756-5a11-4d31-866b-e3f066f7a2b9",
             name: "certificateProfile",
             label: "Certificate Profile",
-            type: "LIST",
-            value: "1987428585",
+            type: "STRING",
+            content: { value: "1987428585" },
          },
          {
             uuid: "eb57a756-5a11-4d31-866b-e3f066f7a2c8",
             name: "certificationAuthority",
             label: "Certification Authority",
-            type: "LIST",
-            value: true,
+            type: "BOOLEAN",
+            content: { value: true }
          },
          {
             uuid: "417077da-bb2b-4f35-a0f7-abf824e345ec",
             name: "keyRecoverable",
             label: "Key Recoverable",
             type: "BOOLEAN",
-            value: true,
+            content: { value: true }
          },
       ],
       enabled: false,
@@ -106,15 +106,15 @@ export const dbRaProfiles: DbRaProfileList = {
             uuid: "87a94421-c5d8-4a23-bb2c-bbee76cb4ea9",
             name: "template",
             label: "Template",
-            type: "LIST",
-            value: "WebServer",
+            type: "STRING",
+            content: { value: "WebServer" }
          },
          {
             uuid: "1467ffaa- 445c - 11ec - 81d3 - 0242ac130003",
             name: "caAdcs",
             label: "Certification Authority",
-            type: "LIST",
-            value: "vmi307469.3key.local\\Demo MS Sub CA"
+            type: "STRING",
+            content: { value: "vmi307469.3key.local\\Demo MS Sub CA" }
          }
       ],
       enabled: true
@@ -133,8 +133,9 @@ export const dbRaProfiles: DbRaProfileList = {
             uuid: "baf2d142-f35a-437f-81c7-35c128881fc0",
             name: "endEntityProfile",
             label: "End Entity Profile",
-            type: "LIST",
-            value: {
+            type: "JSON",
+            content: {
+               value: "Server",
                id: 729841090,
                name: "Server"
             }
@@ -143,8 +144,9 @@ export const dbRaProfiles: DbRaProfileList = {
             uuid: "eb57a756-5a11-4d31-866b-e3f066f7a2b9",
             name: "certificateProfile",
             label: "Certificate Profile",
-            type: "LIST",
-            value: {
+            type: "JSON",
+            content: {
+               value: "Server",
                id: 9,
                name: "SERVER"
             }
@@ -153,8 +155,9 @@ export const dbRaProfiles: DbRaProfileList = {
             uuid: "edfd318a-8428-4fd1-b546-fd5238674f78",
             name: "certificationAuthority",
             label: "Certification Authority",
-            type: "LIST",
-            value: {
+            type: "JSON",
+            content: {
+               value: "ManagementCA",
                id: 577762076,
                name: "ManagementCA"
             }
@@ -164,35 +167,35 @@ export const dbRaProfiles: DbRaProfileList = {
             name: "sendNotifications",
             label: "Send Notifications",
             type: "BOOLEAN",
-            value: false
+            content:  { value: false }
          },
          {
             uuid: "417077da-bb2b-4f35-a0f7-abf824e345ec",
             name: "keyRecoverable",
             label: "Key Recoverable",
             type: "BOOLEAN",
-            value: false
+            content: { value: true }
          },
          {
             uuid: "3655e4f5-61d8-49c9-b116-f466a9f8c6b4",
             name: "usernameGenMethod",
             label: "Username Generation Method",
-            type: "LIST",
-            value: "RANDOM"
+            type: "STRING",
+            content: { value: "RANDOM" }
          },
          {
             uuid: "c0c14dee-9319-4b03-af01-6a21bf30c1e3",
             name: "usernamePrefix",
             label: "Username Prefix",
             type: "STRING",
-            value: "czertainly-"
+            content: { value: "czertainly-" }
          },
          {
             uuid: "5c94731f-621e-4851-b40d-b4f4897f0240",
             name: "usernamePostfix",
             label: "Username Postfix",
             type: "STRING",
-            value: "-generated"
+            content: { value: "-generated" }
          }
       ],
    }

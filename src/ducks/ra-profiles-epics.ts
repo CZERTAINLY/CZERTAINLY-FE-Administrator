@@ -7,23 +7,23 @@ import { AppEpic } from "ducks";
 import { slice } from "./ra-profiles";
 import history from "browser-history";
 import { transformRaAuthorizedClientDtoToModel, transformRaProfileDtoToModel } from "./transform/ra-profiles";
-import { transformAttributeDescriptorDTOToModel } from "./transform/attributes";
+import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 
 
-const listProfiles: AppEpic = (action$, state$, deps) => {
+const listRaProfiles: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.listProfiles.match
+         slice.actions.listRaProfiles.match
       ),
       switchMap(
 
          () => deps.apiClients.profiles.getRaProfilesList().pipe(
 
-            map(list => slice.actions.listProfilesSuccess(list.map(profile => transformRaProfileDtoToModel(profile)))),
+            map(list => slice.actions.listRaProfilesSuccess(list.map(profile => transformRaProfileDtoToModel(profile)))),
 
-            catchError((err) => of(slice.actions.listProfilesFailure(extractError(err, "Failed to get RA profiles list"))))
+            catchError((err) => of(slice.actions.listRaProfilesFailure(extractError(err, "Failed to get RA profiles list"))))
          )
       )
    );
@@ -31,12 +31,12 @@ const listProfiles: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listProfilesFailure: AppEpic = (action$, state$, deps) => {
+const listRaProfilesFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.listProfilesFailure.match
+         slice.actions.listRaProfilesFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -46,20 +46,20 @@ const listProfilesFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const getProfileDetail: AppEpic = (action$, state$, deps) => {
+const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.getProfileDetail.match
+         slice.actions.getRaProfileDetail.match
       ),
       switchMap(
 
          action => deps.apiClients.profiles.getRaProfileDetail(action.payload).pipe(
 
-            map(profileDto => slice.actions.getProfileDetailSuccess(transformRaProfileDtoToModel(profileDto))),
+            map(profileDto => slice.actions.getRaProfileDetailSuccess(transformRaProfileDtoToModel(profileDto))),
 
-            catchError(err => of(slice.actions.getProfileDetailFailure(extractError(err, "Failed to get RA Profile detail"))))
+            catchError(err => of(slice.actions.getRaProfileDetailFailure(extractError(err, "Failed to get RA Profile detail"))))
 
          )
       )
@@ -69,12 +69,12 @@ const getProfileDetail: AppEpic = (action$, state$, deps) => {
 }
 
 
-const getProfileDetailFailure: AppEpic = (action$, state$, deps) => {
+const getRaProfileDetailFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.getProfileDetailFailure.match
+         slice.actions.getRaProfileDetailFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -124,12 +124,12 @@ const listAuthorizedClientsFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const createProfile: AppEpic = (action$, state$, deps) => {
+const createRaProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.createProfile.match
+         slice.actions.createRaProfile.match
       ),
 
       switchMap(
@@ -137,13 +137,13 @@ const createProfile: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.createRaProfile(
             action.payload.authorityInstanceUuid,
             action.payload.name,
-            action.payload.attributes,
+            action.payload.attributes.map(attr => transformAttributeModelToDTO(attr)),
             action.payload.description
          ).pipe(
 
-            map(uuid => slice.actions.createProfileSuccess(uuid)),
+            map(uuid => slice.actions.createRaProfileSuccess(uuid)),
 
-            catchError(err => of(slice.actions.createProfileFailure(extractError(err, "Failed to create profile"))))
+            catchError(err => of(slice.actions.createRaProfileFailure(extractError(err, "Failed to create profile"))))
          )
       )
 
@@ -152,12 +152,12 @@ const createProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const createProfileSuccess: AppEpic = (action$, state, deps) => {
+const createRaProfileSuccess: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.createProfileSuccess.match
+         slice.actions.createRaProfileSuccess.match
       ),
 
       switchMap(
@@ -174,11 +174,11 @@ const createProfileSuccess: AppEpic = (action$, state, deps) => {
 }
 
 
-const createProfileFailure: AppEpic = (action$, state$, deps) => {
+const createRaProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
       filter(
-         slice.actions.createProfileFailure.match
+         slice.actions.createRaProfileFailure.match
       ),
 
       map(
@@ -191,26 +191,26 @@ const createProfileFailure: AppEpic = (action$, state$, deps) => {
 
 
 
-const updateProfile: AppEpic = (action$, state$, deps) => {
+const updateRaProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.editProfile.match
+         slice.actions.updateRaProfile.match
       ),
       switchMap(
 
          action => deps.apiClients.profiles.updateRaProfile(
             action.payload.profileUuid,
             action.payload.authorityInstanceUuid,
-            action.payload.attributes,
+            action.payload.attributes.map(attr => transformAttributeModelToDTO(attr)),
             action.payload.enabled,
             action.payload.description
          ).pipe(
 
-            map(raProfileDTO => slice.actions.editProfileSuccess(transformRaProfileDtoToModel(raProfileDTO))),
+            map(raProfileDTO => slice.actions.updateRaProfileSuccess(transformRaProfileDtoToModel(raProfileDTO))),
 
-            catchError(err => of(slice.actions.editProfileFailure(extractError(err, "Failed to update profile"))))
+            catchError(err => of(slice.actions.updateRaProfileFailure(extractError(err, "Failed to update profile"))))
 
          )
 
@@ -221,12 +221,12 @@ const updateProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const updateProfileFailure: AppEpic = (action$, state$, deps) => {
+const updateRaProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.editProfileFailure.match
+         slice.actions.updateRaProfileFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -237,21 +237,21 @@ const updateProfileFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const enableProfile: AppEpic = (action$, state$, deps) => {
+const enableRaProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.enableProfile.match
+         slice.actions.enableRaProfile.match
       ),
 
       switchMap(
 
          action => deps.apiClients.profiles.enableRaProfile(action.payload).pipe(
 
-            map(() => slice.actions.enableProfileSuccess(action.payload)),
+            map(() => slice.actions.enableRaProfileSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.enableProfileFailure(extractError(err, "Failed to enable profile"))))
+            catchError(err => of(slice.actions.enableRaProfileFailure(extractError(err, "Failed to enable profile"))))
 
          )
       )
@@ -261,12 +261,12 @@ const enableProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const enableProfileFailure: AppEpic = (action$, state$, deps) => {
+const enableRaProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.enableProfileFailure.match
+         slice.actions.enableRaProfileFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -276,21 +276,21 @@ const enableProfileFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const disableProfile: AppEpic = (action$, state$, deps) => {
+const disableRaProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.disableProfile.match
+         slice.actions.disableRaProfile.match
       ),
 
       switchMap(
 
          action => deps.apiClients.profiles.disableRaProfile(action.payload).pipe(
 
-            map(() => slice.actions.disableProfileSuccess(action.payload)),
+            map(() => slice.actions.disableRaProfileSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.enableProfileFailure(extractError(err, "Failed to disable profile"))))
+            catchError(err => of(slice.actions.enableRaProfileFailure(extractError(err, "Failed to disable profile"))))
 
          )
       )
@@ -300,12 +300,12 @@ const disableProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const disableProfileFailure: AppEpic = (action$, state$, deps) => {
+const disableRaProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.disableProfileFailure.match
+         slice.actions.disableRaProfileFailure.match
       ),
 
       map(
@@ -317,20 +317,20 @@ const disableProfileFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const deleteProfile: AppEpic = (action$, state$, deps) => {
+const deleteRaProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.deleteProfile.match
+         slice.actions.deleteRaProfile.match
       ),
       switchMap(
 
          action => deps.apiClients.profiles.deleteRaProfile(action.payload).pipe(
 
-            map(() => slice.actions.deleteProfileSuccess(action.payload)),
+            map(() => slice.actions.deleteRaProfileSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.deleteProfileFailure(extractError(err, "Failed to delete profile"))))
+            catchError(err => of(slice.actions.deleteRaProfileFailure(extractError(err, "Failed to delete profile"))))
 
          )
 
@@ -341,12 +341,12 @@ const deleteProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const deleteProfileFailure: AppEpic = (action$, state$, deps) => {
+const deleteRaProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.deleteProfileFailure.match
+         slice.actions.deleteRaProfileFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -369,8 +369,8 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.activateAcme(
             action.payload.uuid,
             action.payload.acmeProfileUuid,
-            action.payload.issueCertificateAttributes,
-            action.payload.revokeCertificateAttributes
+            action.payload.issueCertificateAttributes.map(attr => transformAttributeModelToDTO(attr)),
+            action.payload.revokeCertificateAttributes.map(attr => transformAttributeModelToDTO(attr)),
          ).pipe(
 
             map(raAcmeLink => slice.actions.activateAcmeSuccess(raAcmeLink)),
@@ -529,15 +529,15 @@ const bulkEnableProfiles: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.bulkEnableProfiles.match
+         slice.actions.bulkEnableRaProfiles.match
       ),
       switchMap(
 
          action => deps.apiClients.profiles.bulkEnableRaProfile(action.payload).pipe(
 
-            map(() => slice.actions.bulkEnableProfilesSuccess(action.payload)),
+            map(() => slice.actions.bulkEnableRaProfilesSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.bulkEnableProfilesFailure(extractError(err, "Failed to enable profiles"))))
+            catchError(err => of(slice.actions.bulkEnableRaProfilesFailure(extractError(err, "Failed to enable profiles"))))
 
          )
 
@@ -553,7 +553,7 @@ const bulkEnableProfilesFailure: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.bulkEnableProfilesFailure.match
+         slice.actions.bulkEnableRaProfilesFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -569,16 +569,16 @@ const bulkDisableProfiles: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.bulkDisableProfiles.match
+         slice.actions.bulkDisableRaProfiles.match
       ),
 
       switchMap(
 
          action => deps.apiClients.profiles.bulkDisableRaProfile(action.payload).pipe(
 
-            map(() => slice.actions.bulkDisableProfilesSuccess(action.payload)),
+            map(() => slice.actions.bulkDisableRaProfilesSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.bulkDisableProfilesFailure(extractError(err, "Failed to disable profiles"))))
+            catchError(err => of(slice.actions.bulkDisableRaProfilesFailure(extractError(err, "Failed to disable profiles"))))
 
          )
 
@@ -594,7 +594,7 @@ const bulkDisableProfilesFailure: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.bulkDisableProfilesFailure.match
+         slice.actions.bulkDisableRaProfilesFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -610,15 +610,15 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.bulkDeleteProfiles.match
+         slice.actions.bulkDeleteRaProfiles.match
       ),
       switchMap(
 
          action => deps.apiClients.profiles.bulkDeleteRaProfile(action.payload).pipe(
 
-            map(() => slice.actions.bulkDeleteProfilesSuccess(action.payload)),
+            map(() => slice.actions.bulkDeleteRaProfilesSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.bulkDeleteProfilesFailure(extractError(err, "Failed to delete profiles"))))
+            catchError(err => of(slice.actions.bulkDeleteRaProfilesFailure(extractError(err, "Failed to delete profiles"))))
 
          )
       )
@@ -633,7 +633,7 @@ const bulkDeleteProfilesFailure: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.bulkDeleteProfilesFailure.match
+         slice.actions.bulkDeleteRaProfilesFailure.match
       ),
       map(
          action => alertActions.error(action.payload || "Unexpected error occurred")
@@ -645,23 +645,23 @@ const bulkDeleteProfilesFailure: AppEpic = (action$, state$, deps) => {
 
 
 const epics = [
-   listProfiles,
-   listProfilesFailure,
+   listRaProfiles,
+   listRaProfilesFailure,
    listAuthorizedClients,
    listAuthorizedClientsFailure,
-   getProfileDetail,
-   getProfileDetailFailure,
-   createProfile,
-   createProfileFailure,
-   createProfileSuccess,
-   updateProfile,
-   updateProfileFailure,
-   enableProfile,
-   enableProfileFailure,
-   disableProfile,
-   disableProfileFailure,
-   deleteProfile,
-   deleteProfileFailure,
+   getRaProfileDetail,
+   getRaProfileDetailFailure,
+   createRaProfile,
+   createRaProfileFailure,
+   createRaProfileSuccess,
+   updateRaProfile,
+   updateRaProfileFailure,
+   enableRaProfile,
+   enableRaProfileFailure,
+   disableRaProfile,
+   disableRaProfileFailure,
+   deleteRaProfile,
+   deleteRaProfileFailure,
    activateAcme,
    activateAcmeFailure,
    deactivateAcme,

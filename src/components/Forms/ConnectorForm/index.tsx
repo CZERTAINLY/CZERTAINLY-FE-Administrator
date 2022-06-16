@@ -147,7 +147,7 @@ function ConnectorForm({ title }: Props) {
          }
 
       },
-      []
+      [editMode, connector, selectedAuthType.value, dispatch]
    );
 
 
@@ -156,7 +156,7 @@ function ConnectorForm({ title }: Props) {
       () => {
          history.goBack();
       },
-      []
+      [history]
 
    )
 

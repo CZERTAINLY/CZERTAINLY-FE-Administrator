@@ -5,7 +5,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
-import { attributeSimplifier } from "utils/attributes";
+// import { attributeSimplifier } from "utils/attributes";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
@@ -28,7 +28,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
          name,
          kind,
          connectorUuid,
-         attributes: attributeSimplifier(attributes),
+         attributes: attributes,
       }).pipe(
          map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
       );
@@ -93,7 +93,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
             uuid,
-            attributes: attributeSimplifier(attributes),
+            attributes: attributes,
          })
       );
 

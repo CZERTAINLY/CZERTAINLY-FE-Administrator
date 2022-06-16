@@ -27,7 +27,7 @@ export const dbAuthorities: DbAuthoritiesList = {
          {
             uuid: "hashgdh",
             name: "url",
-            value: "https://lab01.3key.company/ejbca/ejbcaws/ejbcaws?wsdl",
+            content: { value: "https://lab01.3key.company/ejbca/ejbcaws/ejbcaws?wsdl" }
          },
       ],
 
@@ -39,9 +39,9 @@ export const dbAuthorities: DbAuthoritiesList = {
             "type": "STRING",
             "required": false,
             "readOnly": false,
-            "editable": true,
             "visible": true,
-            "multiValue": false,
+            "list": false,
+            "multiSelect": false,
             "description": "End Entity email address"
          },
          {
@@ -51,9 +51,9 @@ export const dbAuthorities: DbAuthoritiesList = {
             "type": "STRING",
             "required": false,
             "readOnly": false,
-            "editable": true,
             "visible": true,
-            "multiValue": false,
+            "list": false,
+            "multiSelect": false,
             "description": "Comma separated Subject Alternative Names"
          },
          {
@@ -63,9 +63,9 @@ export const dbAuthorities: DbAuthoritiesList = {
             "type": "STRING",
             "required": false,
             "readOnly": false,
-            "editable": true,
             "visible": true,
-            "multiValue": false,
+            "list": false,
+            "multiSelect": false,
             "description": "Comma separated Extension Data"
          }
       ],

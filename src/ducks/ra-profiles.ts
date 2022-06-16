@@ -5,6 +5,8 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type State = {
 
+   checkedRows: string[];
+
    raProfile?: RaProfileModel;
    raProfiles: RaProfileModel[];
 
@@ -38,6 +40,8 @@ export type State = {
 
 export const initialState: State = {
 
+   checkedRows: [],
+
    raProfiles: [],
 
    isFetchingList: false,
@@ -69,7 +73,14 @@ export const slice = createSlice({
 
    reducers: {
 
-      listProfiles: (state, action: PayloadAction<void>) => {
+      setCheckedRows(state, action: PayloadAction<string[]>) {
+
+         state.checkedRows = action.payload;
+
+      },
+
+
+      listRaProfiles: (state, action: PayloadAction<void>) => {
 
          state.raProfiles = [];
          state.isFetchingList = true;
@@ -77,7 +88,7 @@ export const slice = createSlice({
       },
 
 
-      listProfilesSuccess: (state, action: PayloadAction<RaProfileModel[]>) => {
+      listRaProfilesSuccess: (state, action: PayloadAction<RaProfileModel[]>) => {
 
          state.raProfiles = action.payload;
          state.isFetchingList = false;
@@ -85,7 +96,7 @@ export const slice = createSlice({
       },
 
 
-      listProfilesFailure: (state, action: PayloadAction<string>) => {
+      listRaProfilesFailure: (state, action: PayloadAction<string>) => {
 
          state.isFetchingList = false;
 
@@ -115,7 +126,7 @@ export const slice = createSlice({
       },
 
 
-      getProfileDetail: (state, action: PayloadAction<string>) => {
+      getRaProfileDetail: (state, action: PayloadAction<string>) => {
 
          state.raProfile = undefined;
          state.isFetchingDetail = true;
@@ -123,7 +134,7 @@ export const slice = createSlice({
       },
 
 
-      getProfileDetailSuccess: (state, action: PayloadAction<RaProfileModel>) => {
+      getRaProfileDetailSuccess: (state, action: PayloadAction<RaProfileModel>) => {
 
          state.isFetchingDetail = false;
          state.raProfile = action.payload;
@@ -131,7 +142,7 @@ export const slice = createSlice({
       },
 
 
-      getProfileDetailFailure: (state, action: PayloadAction<string>) => {
+      getRaProfileDetailFailure: (state, action: PayloadAction<string>) => {
 
          state.isFetchingDetail = false;
 
@@ -161,7 +172,7 @@ export const slice = createSlice({
       },
 
 
-      createProfile: (state, action: PayloadAction<{
+      createRaProfile: (state, action: PayloadAction<{
          authorityInstanceUuid: string,
          name: string,
          description: string,
@@ -173,21 +184,21 @@ export const slice = createSlice({
       },
 
 
-      createProfileSuccess: (state, action: PayloadAction<string>) => {
+      createRaProfileSuccess: (state, action: PayloadAction<string>) => {
 
          state.isCreating = false;
 
       },
 
 
-      createProfileFailure: (state, action: PayloadAction<string>) => {
+      createRaProfileFailure: (state, action: PayloadAction<string>) => {
 
          state.isCreating = false;
 
       },
 
 
-      editProfile: (state, action: PayloadAction<{
+      updateRaProfile: (state, action: PayloadAction<{
          profileUuid: string,
          authorityInstanceUuid: string,
          description: string,
@@ -200,7 +211,7 @@ export const slice = createSlice({
       },
 
 
-      editProfileSuccess: (state, action: PayloadAction<RaProfileModel>) => {
+      updateRaProfileSuccess: (state, action: PayloadAction<RaProfileModel>) => {
 
          state.isEditing = false;
          state.raProfile = action.payload;
@@ -208,21 +219,21 @@ export const slice = createSlice({
       },
 
 
-      editProfileFailure: (state, action: PayloadAction<string>) => {
+      updateRaProfileFailure: (state, action: PayloadAction<string>) => {
 
          state.isEditing = false;
 
       },
 
 
-      enableProfile: (state, action: PayloadAction<string>) => {
+      enableRaProfile: (state, action: PayloadAction<string>) => {
 
          state.isEnabling = true;
 
       },
 
 
-      enableProfileSuccess: (state, action: PayloadAction<string>) => {
+      enableRaProfileSuccess: (state, action: PayloadAction<string>) => {
 
          state.isEnabling = false;
 
@@ -232,21 +243,21 @@ export const slice = createSlice({
       },
 
 
-      enableProfileFailure: (state, action: PayloadAction<string>) => {
+      enableRaProfileFailure: (state, action: PayloadAction<string>) => {
 
          state.isEnabling = false;
 
       },
 
 
-      disableProfile: (state, action: PayloadAction<string>) => {
+      disableRaProfile: (state, action: PayloadAction<string>) => {
 
          state.isDisabling = true;
 
       },
 
 
-      disableProfileSuccess: (state, action: PayloadAction<string>) => {
+      disableRaProfileSuccess: (state, action: PayloadAction<string>) => {
 
          state.isDisabling = false;
 
@@ -256,21 +267,21 @@ export const slice = createSlice({
       },
 
 
-      disableProfileFailure: (state, action: PayloadAction<string>) => {
+      disableRaProfileFailure: (state, action: PayloadAction<string>) => {
 
          state.isDisabling = false;
 
       },
 
 
-      deleteProfile: (state, action: PayloadAction<string>) => {
+      deleteRaProfile: (state, action: PayloadAction<string>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteProfileSuccess: (state, action: PayloadAction<string>) => {
+      deleteRaProfileSuccess: (state, action: PayloadAction<string>) => {
 
          state.isDeleting = false;
 
@@ -280,7 +291,7 @@ export const slice = createSlice({
       },
 
 
-      deleteProfileFailure: (state, action: PayloadAction<string>) => {
+      deleteRaProfileFailure: (state, action: PayloadAction<string>) => {
 
          state.isDeleting = false;
 
@@ -336,14 +347,14 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteRaProfiles: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDeleting = true;
 
       },
 
 
-      bulkDeleteProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteRaProfilesSuccess: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDeleting = false;
 
@@ -352,21 +363,21 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteProfilesFailure: (state, action: PayloadAction<string>) => {
+      bulkDeleteRaProfilesFailure: (state, action: PayloadAction<string>) => {
 
          state.isBulkDeleting = false;
 
       },
 
 
-      bulkEnableProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkEnableRaProfiles: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkEnabling = true;
 
       },
 
 
-      bulkEnableProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkEnableRaProfilesSuccess: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkEnabling = false;
 
@@ -375,21 +386,21 @@ export const slice = createSlice({
       },
 
 
-      bulkEnableProfilesFailure: (state, action: PayloadAction<string>) => {
+      bulkEnableRaProfilesFailure: (state, action: PayloadAction<string>) => {
 
          state.isBulkEnabling = false;
 
       },
 
 
-      bulkDisableProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkDisableRaProfiles: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDisabling = true;
 
       },
 
 
-      bulkDisableProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDisableRaProfilesSuccess: (state, action: PayloadAction<string[]>) => {
 
          state.isBulkDisabling = false;
 
@@ -398,7 +409,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDisableProfilesFailure: (state, action: PayloadAction<string>) => {
+      bulkDisableRaProfilesFailure: (state, action: PayloadAction<string>) => {
 
          state.isBulkDisabling = false;
 
@@ -453,8 +464,11 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
+const checkedRows = createSelector(state, (state: State) => state.checkedRows);
+
 const raProfile = createSelector(state, (state: State) => state.raProfile);
 const raProfiles = createSelector(state, (state: State) => state.raProfiles);
+
 const authorizedClients = createSelector(state, (state: State) => state.authorizedClients);
 const attributes = createSelector(state, (state: State) => state.attributes);
 const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
@@ -481,9 +495,14 @@ const isDeactivatingAcme = createSelector(state, (state: State) => state.isDeact
 
 
 export const selectors = {
+
    state,
+
+   checkedRows,
+
    raProfile,
    raProfiles,
+
    authorizedClients,
    attributes,
    acmeDetails,
@@ -499,7 +518,7 @@ export const selectors = {
    isCreating,
    isDeleting,
    isBulkDeleting,
-   isEditing,
+   isUpdating: isEditing,
    isEnabling,
    isBulkEnabling,
    isDisabling,

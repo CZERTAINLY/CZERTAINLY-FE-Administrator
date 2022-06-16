@@ -98,7 +98,7 @@ export default function ClientDetail() {
          if (!client) return;
          dispatch(clientActions.deleteClient(client.uuid));
       },
-      [dispatch]
+      [dispatch, client]
    )
 
 
@@ -236,7 +236,7 @@ export default function ClientDetail() {
             ]
          })
       ),
-      [authorizedProfiles, dispatch]
+      [authorizedProfiles, dispatch, client]
    )
 
 

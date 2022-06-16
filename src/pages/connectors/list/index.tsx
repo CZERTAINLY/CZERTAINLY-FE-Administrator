@@ -245,7 +245,7 @@ function ConnectorList() {
          </div>
 
       ),
-      [bulkDeleteErrorMessages]
+      [bulkDeleteErrorMessages, checkedRows.length]
 
    );
 
@@ -311,7 +311,7 @@ function ConnectorList() {
          }
 
       ),
-      [connectors, path]
+      [connectors, path, getFunctionGroups, getKinds]
 
    );
 

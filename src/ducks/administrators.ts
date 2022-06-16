@@ -10,11 +10,12 @@ export type State = {
    administrator?: AdministratorModel;
    administrators: AdministratorModel[];
 
+   isFetchingList: boolean;
+   isFetchingDetail: boolean;
+
    isCreating: boolean;
    isDeleting: boolean;
    isUpdating: boolean;
-   isFetchingDetail: boolean;
-   isFetchingList: boolean;
    isEnabling: boolean;
    isDisabling: boolean;
    isBulkDeleting: boolean;
@@ -30,11 +31,12 @@ export const initialState: State = {
 
    administrators: [],
 
+   isFetchingDetail: false,
+   isFetchingList: false,
+
    isCreating: false,
    isDeleting: false,
    isUpdating: false,
-   isFetchingDetail: false,
-   isFetchingList: false,
    isEnabling: false,
    isDisabling: false,
    isBulkDeleting: false,
@@ -377,6 +379,9 @@ const isBulkDisabling = createSelector(state, state => state.isBulkDisabling);
 
 export const selectors = {
    state,
+   checkedRows,
+   administrators,
+   administrator,
    isFetchingList,
    isFetchingDetail,
    isCreating,
@@ -386,12 +391,11 @@ export const selectors = {
    isDisabling,
    isBulkDeleting,
    isBulkEnabling,
-   isBulkDisabling,
-   checkedRows: checkedRows,
-   administrators: administrators,
-   admininistrator: administrator
+   isBulkDisabling
 };
 
+
 export const actions = slice.actions;
+
 
 export default slice.reducer;
