@@ -59,7 +59,7 @@ export function transformAttributeDescriptorDTOToModel(attributeDescriptor: Attr
             })
          )
       },
-      content: JSON.parse(JSON.stringify(attributeDescriptor.content))
+      content: !attributeDescriptor.content ? undefined : JSON.parse(JSON.stringify(attributeDescriptor.content))
    }
 
 }

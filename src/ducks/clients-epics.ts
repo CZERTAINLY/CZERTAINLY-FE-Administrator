@@ -70,7 +70,7 @@ const getClientDetail: AppEpic = (action$, state, deps) => {
 
             map(detail => slice.actions.getClientDetailSuccess(transformClientDTOToModel(detail))),
 
-            catchError(err => of(slice.actions.getClientDetailFailure(extractError(err, "Failed to load administrator detail"))))
+            catchError(err => of(slice.actions.getClientDetailFailure(extractError(err, "Failed to load client detail"))))
 
          )
 
@@ -166,7 +166,7 @@ const createClient: AppEpic = (action$, state, deps) => {
 
             ),
 
-            catchError(err => of(slice.actions.createClientFailure(extractError(err, "Failed to update administrator")))),
+            catchError(err => of(slice.actions.createClientFailure(extractError(err, "Failed to create client")))),
 
          )
 
@@ -306,7 +306,7 @@ const deleteClient: AppEpic = (action$, state, deps) => {
 
             map(() => slice.actions.deleteClientSuccess(action.payload)),
 
-            catchError(err => of(slice.actions.deleteClientFailure(extractError(err, "Failed to delete administrator"))))
+            catchError(err => of(slice.actions.deleteClientFailure(extractError(err, "Failed to delete client"))))
 
          )
 

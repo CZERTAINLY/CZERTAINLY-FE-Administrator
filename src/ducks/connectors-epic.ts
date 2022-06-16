@@ -156,7 +156,7 @@ const getAllConnectorAttributes: AppEpic = (action$, state, deps) => {
 
             map(descColl => slice.actions.getAllConnectorAttributesSuccess(transfromAttributeDescriptorCollectionDTOToModel(descColl))),
 
-            catchError(err => of(slice.actions.getAllConnectorAttributesFailure(extractError(err, "Failed to "))))
+            catchError(err => of(slice.actions.getAllConnectorAttributesFailure(extractError(err, "Failed to get all connector attributes"))))
          )
 
       )
@@ -194,7 +194,7 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
 
             map(health => slice.actions.getConnectorHealthSuccess(transformConnectorHealthDTOToModel(health))),
 
-            catchError(err => of(slice.actions.getConnectorHealthFailure(extractError(err, "Failed to "))))
+            catchError(err => of(slice.actions.getConnectorHealthFailure(extractError(err, "Failed to get connector health"))))
 
          )
 
@@ -493,7 +493,7 @@ const connectConnector: AppEpic = (action$, state, deps) => {
                connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
             )),
 
-            catchError(err => of(slice.actions.connectConnectorFailure(extractError(err, "Failed to "))))
+            catchError(err => of(slice.actions.connectConnectorFailure(extractError(err, "Failed to connect to connector"))))
 
          )
 
@@ -537,7 +537,7 @@ const reconnectConnector: AppEpic = (action$, state, deps) => {
                })
             ),
 
-            catchError(err => of(slice.actions.reconnectConnectorFailure(extractError(err, "Failed to reconnect connector"))))
+            catchError(err => of(slice.actions.reconnectConnectorFailure(extractError(err, "Failed to reconnect to connector"))))
 
          )
 
@@ -592,7 +592,7 @@ const bulkReconnectConnectors: AppEpic = (action$, state, deps) => {
 
             map(() => slice.actions.bulkReconnectConnectorsSuccess()),
 
-            catchError(err => of(slice.actions.bulkReconnectConnectorsFailure(extractError(err, "Failed to bulk reconnect connectors"))))
+            catchError(err => of(slice.actions.bulkReconnectConnectorsFailure(extractError(err, "Failed to bulk reconnect to connectors"))))
 
          )
 
@@ -670,7 +670,7 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
 
             map(() => slice.actions.bulkAuthorizeConnectorsSuccess()),
 
-            catchError(err => of(slice.actions.bulkAuthorizeConnectorsFailure(extractError(err, "Failed to "))))
+            catchError(err => of(slice.actions.bulkAuthorizeConnectorsFailure(extractError(err, "Failed to bulk authorize connectors"))))
 
          )
 

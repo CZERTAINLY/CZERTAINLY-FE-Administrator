@@ -62,8 +62,8 @@ function ConnectorForm({ title }: Props) {
 
 
    const isFetching = useSelector(connectorSelectors.isFetchingDetail);
-   const isCreating = useSelector(connectorSelectors.isCreating);
-   const isUpdating = useSelector(connectorSelectors.isUpdating);
+   // const isCreating = useSelector(connectorSelectors.isCreating);
+   // const isUpdating = useSelector(connectorSelectors.isUpdating);
    const isConnecting = useSelector(connectorSelectors.isConnecting);
    const isReconnecting = useSelector(connectorSelectors.isReconnecting);
 
