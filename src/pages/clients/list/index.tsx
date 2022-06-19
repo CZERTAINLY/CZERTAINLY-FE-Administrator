@@ -140,13 +140,13 @@ export default function ClientList() {
             content: <MDBColumnName columnName="Client DN" />,
             sortable: false,
             id: "clientAdminDn",
-            width: "35%",
          },
          {
             content: <MDBColumnName columnName="Status" />,
+            align: "center",
             sortable: true,
             id: "clientStatus",
-            width: "10%",
+            width: "7%",
          },
       ],
       []

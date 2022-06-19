@@ -8,7 +8,8 @@ import { jsxInnerText } from "utils/jsxInnerText";
 
 export interface TableHeader {
    id: string;
-   content: string | JSX.Element
+   content: string | JSX.Element;
+   align?: "left" | "center" | "right";
    sortable?: boolean;
    sort?: "asc" | "desc";
    width?: string;
@@ -192,9 +193,7 @@ function CustomTable({
 
          const headers: TableHeader[] = tblHeaders.map(
             header => ({
-               id: header.id,
-               content: header.content,
-               sortable: header.sortable,
+               ...header,
                sort: header.id === sortColumn ? sort : undefined,
             })
          )
@@ -233,7 +232,7 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false });
+         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
          if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false });
 
          return columns.map(
@@ -242,7 +241,11 @@ function CustomTable({
 
                <Fragment key={header.id}>
 
-                  <th {...(header.sortable ? { onClick: onColumnSortClick } : {})} data-id={header.id}>
+                  <th className={styles.header}
+                     data-id={header.id}
+                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
+                     style={{ ...(header.width ? { width: header.width } : {}), ...header.align ? { textAlign: header.align } : {} }}
+                  >
 
                      {
                         header.id === "__checkbox__" ? (
@@ -328,7 +331,7 @@ function CustomTable({
 
                            (column, index) => (
 
-                              <td key={index}>
+                              <td key={index} className={styles.dataCell} style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}>
 
                                  <div>{column ? column : <>&nbsp;</>}</div>
 
@@ -351,7 +354,7 @@ function CustomTable({
                            <td className="w-25">
 
                               <div className={styles.showMore} onClick={() => expandedRow === row.id ? setExpandedRow(undefined) : setExpandedRow(row.id)}>
-                                 { expandedRow === row.id ? "Show less..." : "Show more..." }
+                                 {expandedRow === row.id ? "Show less..." : "Show more..."}
                               </div>
 
                               {
@@ -374,7 +377,7 @@ function CustomTable({
 
             ),
 
-      [hasCheckboxes, hasDetails, tblCheckedRows, headers, tblData, searchKey, expandedRow, onRowToggleSelection, onRowCheckboxClick, ]
+      [hasCheckboxes, hasDetails, tblCheckedRows, headers, tblData, searchKey, expandedRow, onRowToggleSelection, onRowCheckboxClick,]
 
    );
 

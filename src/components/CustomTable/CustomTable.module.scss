@@ -54,6 +54,14 @@
   min-width: 100%;
 }
 
-.dateCell {
-  overflow-wrap: anywhere;
+.dataCell {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.header {
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   overflow: hidden;
 }

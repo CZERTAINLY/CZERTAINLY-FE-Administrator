@@ -138,19 +138,20 @@ export default function AdministratorsList() {
             id: "adminAdminDn",
             content: <MDBColumnName columnName="Admin DN" />,
             sortable: true,
-            width: "35%",
          },
          {
             id: "adminSuperAdmin",
             content: <MDBColumnName columnName="Super Admin" />,
+            align: "center",
             sortable: true,
-            width: "5%",
+            width: "11%",
          },
          {
             id: "adminStatus",
             content: <MDBColumnName columnName="Status" />,
+            align: "center",
             sortable: true,
-            width: "10%",
+            width: "7%",
          },
       ],
       []

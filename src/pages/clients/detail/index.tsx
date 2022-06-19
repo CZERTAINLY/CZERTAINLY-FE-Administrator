@@ -123,7 +123,7 @@ export default function ClientDetail() {
             </div>
 
             <h5>
-               Administrator <span className="fw-semi-bold">Attributes</span>
+               Client <span className="fw-semi-bold">Details</span>
             </h5>
 
          </div>
@@ -135,7 +135,7 @@ export default function ClientDetail() {
    const certificateTitle = useMemo(
       () => (
          <h5>
-            Administrator Certificate <span className="fw-semi-bold">Attributes</span>
+            Client Certificate <span className="fw-semi-bold">Details</span>
          </h5>
       ),
       []

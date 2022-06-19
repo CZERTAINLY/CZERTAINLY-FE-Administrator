@@ -36,7 +36,6 @@ function ConnectorList() {
    const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
    const isBulkAuthorizing = useSelector(selectors.isBulkAuthorizing);
 
-
    const isBusy = isFetching || isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -258,31 +257,31 @@ function ConnectorList() {
             sortable: true,
             sort: "asc",
             id: "connectorName",
-            width: "15%",
+            width: "25%",
          },
          {
             content: <MDBColumnName columnName="Function Groups" />,
+            align: "center",
             sortable: true,
             id: "connectorFunctions",
-            width: "35%",
+            width: "15%",
          },
          {
             content: <MDBColumnName columnName="Kinds" />,
             sortable: true,
             id: "kinds",
-            width: "35%",
+            width: "15%",
          },
          {
             content: <MDBColumnName columnName="URL" />,
             sortable: true,
             id: "connectorUrl",
-            width: "30%",
          },
          {
             content: <MDBColumnName columnName="Status" />,
             sortable: true,
             id: "connectorStatus",
-            width: "10%",
+            width: "5%",
          },
       ],
       []
@@ -301,11 +300,17 @@ function ConnectorList() {
             return {
                id: connector.uuid,
                columns: [
+
                   <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>,
+
                   <>{getFunctionGroups(connector.functionGroups)}</>,
+
                   <>{getKinds(connector.functionGroups)}</>,
+
                   <>{connector.url}</>,
+
                   <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
+
                ],
             }
          }

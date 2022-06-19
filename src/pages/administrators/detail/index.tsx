@@ -97,7 +97,7 @@ export default function AdministratorDetail() {
             </div>
 
             <h5>
-               Administrator <span className="fw-semi-bold">Attributes</span>
+               Administrator <span className="fw-semi-bold">Details</span>
             </h5>
 
          </div>
@@ -109,7 +109,7 @@ export default function AdministratorDetail() {
    const certificateTitle = useMemo(
       () => (
          <h5>
-            Administrator Certificate <span className="fw-semi-bold">Attributes</span>
+            Administrator Certificate <span className="fw-semi-bold">Details</span>
          </h5>
       ),
       []
