@@ -42,7 +42,10 @@ function AdminForm({ title }: Props) {
 
    const { params } = useRouteMatch<{ id: string }>();
 
-   const editMode = params.id !== undefined;
+   const editMode = useMemo(
+      () => params.id !== undefined,
+      [params.id]
+   );
 
    const optionsForInput = useMemo(
       () => [

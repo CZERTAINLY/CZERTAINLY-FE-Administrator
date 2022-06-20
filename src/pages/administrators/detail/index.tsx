@@ -119,8 +119,8 @@ export default function AdministratorDetail() {
    const detailHeaders: TableHeader[] = useMemo(
       () => [
          {
-            id: "attribute",
-            content: "Attribute",
+            id: "property",
+            content: "Property",
          },
          {
             id: "value",

@@ -29,23 +29,17 @@ import connectorsEpics from "./connectors-epic";
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
 import raProfilesEpics from "./ra-profiles-epics";
 
+import { initialState as initialCredentialsState, slice as credentialsSlice} from "./credentials";
+import credentialsEpics from "./credentials-epics";
+
 
 /*
-import { initialState as initialCredentialsState, State as CredentialsState, statePath as credentialStatePath } from "./credentials";
 import { initialState as initialAuthoritiesState, State as AuthoritiesState, statePath as authorityStatePath } from "./ca-authorities";
-import { initialState as initialCertificatesState, State as CertificatesState, statePath as certificatesStatePath } from "./certificates";
-
 import { initialState as initialAcmeAccountState, State as AcmeAccountState, statePath as acmeAccountStatePath } from "./acme-accounts";
 import { initialState as initialAcmeProfilesState, State as AcmeProfilesState, statePath as acmeProfileStatePath } from "./acme-profiles";
 */
 
-
-
 /*
-import adminEpics from "./administrators-epics";
-import profileEpics from "./ra-profiles-epics";
-import credentialsEpic from "./credentials-epics";
-import connectorsEpic from "./connectors-epic";
 import authoritiesEpic from "./ca-authorities-epics";
 import acmeAccountEpics from "./acme-accounts-epics";
 import acmeProfileEpics from "./acme-profiles-epics";
@@ -68,9 +62,9 @@ export const initialState = {
    [clientsSlice.name]: initialClientsState,
    [connectorsSlice.name]: initialConnectorsState,
    [raProfilesSlice.name]: initialRaProfilesState,
+   [credentialsSlice.name]: initialCredentialsState
 
    /*
-      [credentialStatePath]: initialCredentialsState,
       [authorityStatePath]: initialAuthoritiesState,
       [acmeAccountStatePath]: initialAcmeAccountState,
       [acmeProfileStatePath]: initialAcmeProfilesState,
@@ -86,10 +80,9 @@ export const reducers = combineReducers<typeof initialState, any>({
    [clientsSlice.name]: clientsSlice.reducer,
    [connectorsSlice.name]: connectorsSlice.reducer,
    [raProfilesSlice.name]: raProfilesSlice.reducer,
+   [credentialsSlice.name]: credentialsSlice.reducer
 
    /*
-   [profilesStatePath]: profilesReducer,
-   [credentialsStatePath]: credentialsReducer,
    [authoritiesStatePath]: authoritiesReducer,
    [acmeAccountStatePath]: acmeAccountReducer,
    [acmeProfilesStatePath]: acmeProfilesReducer,
@@ -106,10 +99,9 @@ export const epics = combineEpics(
    ...clientsEpics,
    ...connectorsEpics,
    ...raProfilesEpics,
+   ...credentialsEpics
 
-   /*...adminEpics,
-  ...profileEpics,
-  ...credentialsEpic,
+   /*
   ...authoritiesEpic,
   ...acmeAccountEpics,
   ...acmeProfileEpics*/

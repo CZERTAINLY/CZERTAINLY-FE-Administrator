@@ -203,11 +203,11 @@ export default function ConnectorDetail() {
    const attributesHeaders: TableHeader[] = useMemo(
       () => [
          {
-            id: "adminName",
-            content: "Attribute"
+            id: "property",
+            content: "Property"
          },
          {
-            id: "adminUsername",
+            id: "value",
             content: "Value"
          },
       ],

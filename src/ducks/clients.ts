@@ -277,8 +277,6 @@ export const slice = createSlice({
 
          state.isAuthorizing = false;
 
-         console.log(current(state));
-
          if (state.client?.uuid === action.payload.clientUuid && !state.authorizedProfiles.find(p => p.uuid === action.payload.raProfile.uuid)) {
             state.authorizedProfiles.push({
                uuid: action.payload.raProfile.uuid,
@@ -310,8 +308,6 @@ export const slice = createSlice({
          state.isUnauthorizing = false;
 
          if (state.client?.uuid !== action.payload.clientUuid) return;
-
-         console.log(current(state));
 
          const authProfileIndex = state.authorizedProfiles.findIndex(authorizedProfile => authorizedProfile.uuid === action.payload.raProfile.uuid);
          if (authProfileIndex === -1) return;

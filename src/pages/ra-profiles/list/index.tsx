@@ -23,7 +23,7 @@ function RaProfileList() {
    const checkedRows = useSelector(selectors.checkedRows);
    const raProfiles = useSelector(selectors.raProfiles);
 
-   const isFetching = useSelector(selectors.isFetchingDetail);
+   const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
    const isUpdating = useSelector(selectors.isUpdating);
@@ -123,11 +123,11 @@ function RaProfileList() {
             id: "description",
             content: <MDBColumnName columnName="Description" />,
             sortable: true,
-            width: "20%",
          },
          {
             id: "authority",
             styledContent: <MDBColumnName columnName="Authority" />,
+            align: "center",
             content: "authority",
             sortable: true,
             width: "15%",
@@ -135,15 +135,17 @@ function RaProfileList() {
          {
             id: "enabledProtocols",
             content: <MDBColumnName columnName="Enabled Protocols" />,
+            align: "center",
             sortable: true,
             width: "20%",
          },
          {
             id: "status",
             styledContent: <MDBColumnName columnName="Status" />,
+            align: "center",
             content: "status",
             sortable: true,
-            width: "10%",
+            width: "7%",
          },
       ],
       []

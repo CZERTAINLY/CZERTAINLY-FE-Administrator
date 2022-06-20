@@ -273,6 +273,10 @@ export const slice = createSlice({
 
          state.isUpdating = false;
 
+         if (state.connector?.uuid === action.payload.uuid) {
+            state.connector = action.payload;
+         }
+
          const index = state.connectors.findIndex(connector => connector.uuid === action.payload.uuid);
          if (index >= 0) {
             state.connectors[index] = action.payload

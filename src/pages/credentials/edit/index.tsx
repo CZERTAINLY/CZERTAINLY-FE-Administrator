@@ -1,5 +1,30 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useMemo } from "react";
+import { Container } from "reactstrap";
+
+import CredentialForm from "components/Forms/CredentialForm";
+
+export default function CredentialEdit() {
+
+   const title = useMemo(
+      () => (
+         <h5>
+            Edit <span className="fw-semi-bold">Credential</span>
+         </h5>
+      ),
+      []
+   );
+
+   return (
+      <Container className="themed-container" fluid>
+         <CredentialForm title={title} />
+      </Container>
+   );
+
+}
+
+
+
+/*import { useDispatch, useSelector } from "react-redux";
 import { Action } from "redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Container } from "reactstrap";
@@ -97,3 +122,4 @@ function CredentialEdit() {
 }
 
 export default CredentialEdit;
+*/

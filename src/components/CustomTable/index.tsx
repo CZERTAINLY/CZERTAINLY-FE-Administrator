@@ -377,7 +377,7 @@ function CustomTable({
 
             ),
 
-      [hasCheckboxes, hasDetails, tblCheckedRows, headers, tblData, searchKey, expandedRow, onRowToggleSelection, onRowCheckboxClick,]
+      [hasCheckboxes, hasDetails, tblCheckedRows, headers, tblHeaders, tblData, searchKey, expandedRow, onRowToggleSelection, onRowCheckboxClick,]
 
    );
 

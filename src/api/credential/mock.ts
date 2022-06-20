@@ -198,7 +198,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
    }
 
 
-   bulkDeleteCredential(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+   bulkDeleteCredentials(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return of(
          uuids
@@ -231,7 +231,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
 
    }
 
-   bulkForceDeleteCredential(uuids: string[]): Observable<void> {
+   bulkForceDeleteCredentials(uuids: string[]): Observable<void> {
 
       return of(
          uuids

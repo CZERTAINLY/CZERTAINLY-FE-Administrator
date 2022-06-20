@@ -2,8 +2,8 @@ import React from "react";
 import { Switch, Route } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
-import CredentialAdd from "./add";
 import CredentialDetail from "./detail";
+import CredentialAdd from "./add";
 import CredentialEdit from "./edit";
 import CredentialsList from "./list";
 

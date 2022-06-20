@@ -65,10 +65,10 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
 
    getConnectorsList(functionGroupCode?: FunctionGroupCode, kind?: string): Observable<model.ConnectorDTO[]> {
 
-      const fgf = functionGroupCode ? `functionGroupFilter=${functionGroupCodeToGroupFilter[functionGroupCode]}` : "";
+      const fgf = functionGroupCode ? `functionGroup=${functionGroupCodeToGroupFilter[functionGroupCode]}` : "";
       const k = kind ? `kind=${kind}` : "";
 
-      const search = fgf ? `?${fgf}` + k ? `&kind=${k}` : "" : "";
+      const search = fgf ? `?${fgf}` + (k ? `&kind=${k}` : "") : "";
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}${search}`, "GET")
@@ -96,11 +96,11 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
 
    getConnectorAttributes(uuid: string, functionGroupCode: FunctionGroupCode, kind: string): Observable<AttributeDescriptorDTO[]> {
 
-      const fg = functionGroupCodeToGroupFilter[functionGroupCode];
+      //const fg = functionGroupCodeToGroupFilter[functionGroupCode];
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/${fg}/${kind}/attributes`,
+            `${baseUrl}/${uuid}/${functionGroupCode}/${kind}/attributes`,
             "GET"
          )
       );

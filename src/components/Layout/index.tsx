@@ -17,13 +17,12 @@ import AuditLogs from "pages/auditLogs";
 import Administrators from "pages/administrators";
 import Connectors from "pages/connectors";
 import Clients from "pages/clients";
+import RaProfiles from "pages/ra-profiles";
+import Credentials from "pages/credentials";
 
 
 /*
-import Administrators from "pages/administrators";
-import RaProfiles from "pages/ra-profiles";
 import Profile from "pages/profile";
-import Credentials from "pages/credentials";
 import Authorities from "pages/authorities";
 import AcmeAccounts from "pages/acme-accounts";
 import AcmeProfiles from "pages/acme-profiles";
@@ -59,10 +58,10 @@ function Layout() {
                   <Route path="/app/about" component={About} />
                   <Route path="/app/clients" component={Clients} />
                   <Route path="/app/connectors" component={Connectors} />
-
-                  {/*
                   <Route path="/app/raprofiles" component={RaProfiles} />
                   <Route path="/app/credentials" component={Credentials} />
+
+                  {/*
                   <Route path="/app/authorities" component={Authorities} />
                   <Route path="/app/profile" component={Profile} />
                   <Route path="/app/acmeaccounts" component={AcmeAccounts} />

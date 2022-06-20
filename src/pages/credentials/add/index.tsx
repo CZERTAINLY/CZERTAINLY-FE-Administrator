@@ -1,14 +1,14 @@
 import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import ConnectorForm from "components/Forms/ConnectorForm";
+import CredentialForm from "components/Forms/CredentialForm";
 
-export default function ConnedctorEdit() {
+export default function CredentialEdit() {
 
    const title = useMemo(
       () => (
          <h5>
-            Edit <span className="fw-semi-bold">Connector</span>
+            Add <span className="fw-semi-bold">Credential</span>
          </h5>
       ),
       []
@@ -16,7 +16,7 @@ export default function ConnedctorEdit() {
 
    return (
       <Container className="themed-container" fluid>
-         <ConnectorForm title={title} />
+         <CredentialForm title={title} />
       </Container>
    );
 

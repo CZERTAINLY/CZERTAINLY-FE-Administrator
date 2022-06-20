@@ -45,8 +45,8 @@ export interface CredentialManagementApi {
 
    forceDeleteCredential(uuid: string | number): Observable<void>;
 
-   bulkForceDeleteCredential(uuids: string[]): Observable<void>;
+   bulkForceDeleteCredentials(uuids: string[]): Observable<void>;
 
-   bulkDeleteCredential(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
+   bulkDeleteCredentials(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 
 }

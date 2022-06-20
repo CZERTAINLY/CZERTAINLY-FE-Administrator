@@ -39,8 +39,10 @@ function ConnectorForm({ title }: Props) {
 
    const { params } = useRouteMatch<{ id: string }>();
 
-   const editMode = params.id !== undefined;
-
+   const editMode = useMemo(
+      () => params.id !== undefined,
+      [params.id]
+   );
 
    const optionsForAuth: { label: string, value: AuthType }[] = useMemo(
       () => [
@@ -225,6 +227,7 @@ function ConnectorForm({ title }: Props) {
    return (
 
       <div>
+
          <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
             {({ handleSubmit, pristine, submitting, values }) => (

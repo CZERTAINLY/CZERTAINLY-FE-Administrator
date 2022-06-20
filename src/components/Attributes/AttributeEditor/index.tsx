@@ -1,67 +1,92 @@
-type AttributeType = "BOOLEAN" | "INTEGER" | "FLOAT" | "STRING" | "TEXT" | "DATE" | "TIME" | "DATETIME" | "FILE" | "SECRET" | "CREDENTIAL" | "JSON";
-
-type AttributeMappingTarget = "pathVariable" | "requestParameter" | "body";
-
-type AttributeValue = string | number | boolean | Date | AttributeContent | string[] | number[] | boolean[] | Date[]| AttributeContent[];
-
-
-interface AttributeContent {
-   value: string;
-}
-
-
-interface Attribute {
-   name: string;
-   value: AttributeValue;
-}
-
-
-interface AttributeCallbackMapping {
-   from: string;
-   attributeType: AttributeType;
-   to: string;
-   targets: AttributeMappingTarget;
-   value: AttributeValue;
-}
-
-
-interface AttributeCallbackDescriptor {
-   callbackContext: string;
-   method: string;
-   mappings: AttributeCallbackMapping;
-}
-
-
-interface AttributeDescriptor {
-   uuid: string;
-   type: AttributeType;
-   name: string;
-   label: string;
-   description: string;
-   group: string;
-   required: boolean;
-   readonly: boolean;
-   visible: boolean;
-   list: boolean;
-   multiSelect: boolean;
-   validationRegex?: RegExp;
-   callback?: AttributeCallbackDescriptor;
-   content: AttributeValue;
-}
-
+import Widget from "components/Widget";
+import { AttributeDescriptorModel, AttributeModel } from "models/attributes";
+import { Fragment, useMemo } from "react";
+import { Field, useForm } from "react-final-form";
+import { FormGroup, Input, Label } from "reactstrap";
+import { AttributeType } from "types/attributes";
+import BooleanAttribute from "./BooleanAttribute";
+import CredentialAttribute from "./CredentialAttribute";
+import DateAttribute from "./DateAttribute";
+import DateTimeAttribute from "./DateTimeAttribute";
+import FileAttribute from "./FileAttribute";
+import FloatAttribute from "./FloatAttribute";
+import IntegerAttribute from "./IntegerAttribute";
+import JSONAttribute from "./JSONAttribute";
+import SecretAttribute from "./SecretAttribute";
+import StringAttribute from "./StringAttribute";
+import TextAttribute from "./TextAttribute";
+import TimeAttribute from "./TimeAttribute";
 
 interface Props {
-   attributes: Attribute[];
-   attributeDescriptors: AttributeDescriptor[];
-   onChange: (attributes: Attribute[]) => void;
+   attributeDescriptors: AttributeDescriptorModel[];
+   attributes?: AttributeModel[];
 }
 
 
 export default function AttributeEditor({
-   attributes,
    attributeDescriptors,
-   onChange,
+   attributes = []
 }: Props) {
 
+   const attrs = useMemo(
+
+      () => {
+
+         const fields: { [key in AttributeType ]: Function } = {
+            "BOOLEAN": BooleanAttribute,
+            "INTEGER": IntegerAttribute,
+            "FLOAT": FloatAttribute,
+            "STRING": StringAttribute,
+            "TEXT": TextAttribute,
+            "DATE": DateAttribute,
+            "TIME": TimeAttribute,
+            "DATETIME": DateTimeAttribute,
+            "CREDENTIAL": CredentialAttribute,
+            "FILE": FileAttribute,
+            "JSON": JSONAttribute,
+            "SECRET": SecretAttribute,
+         }
+
+         const grouped: { [key: string]: AttributeDescriptorModel[] } = {};
+
+         attributeDescriptors.forEach(
+            descriptor => {
+               const groupName = descriptor.group || "__";
+               grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
+            }
+         );
+
+         const attrs: JSX.Element[] = [];
+
+         for (const group in grouped) attrs.push(
+
+            <Widget key={group} title={<h6>{group === "__" ? "Ungrouped" : group}</h6>}>
+
+               {
+                  grouped[group].map(
+                     descriptor => (
+                        <Fragment key={descriptor.name}>
+                           {fields[descriptor.type]({
+                              descriptor,
+                              attribute: attributes.find(attribute => attribute.name === descriptor.name)
+                           }) || null}<br />
+                        </Fragment>
+                     )
+                  )
+               }
+
+            </Widget>
+
+         )
+
+         return attrs;
+
+      },
+      [attributeDescriptors, attributes]
+
+   )
+
+
+   return <>{attrs}</>;
 
 }

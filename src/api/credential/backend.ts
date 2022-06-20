@@ -70,7 +70,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    }
 
 
-   bulkDeleteCredential(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+   bulkDeleteCredentials(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)
@@ -79,7 +79,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    }
 
 
-   bulkForceDeleteCredential(uuids: string[]): Observable<void> {
+   bulkForceDeleteCredentials(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/force`, "DELETE", uuids)

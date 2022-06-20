@@ -1,14 +1,17 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
 import AdminForm from "components/Forms/AdminForm";
 
 export default function AdminAdd() {
 
-   const title = (
+   const title = useMemo(
+      () => (
       <h5>
          Add new <span className="fw-semi-bold">Administrator</span>
       </h5>
+      ),
+      []
    );
 
    return (
