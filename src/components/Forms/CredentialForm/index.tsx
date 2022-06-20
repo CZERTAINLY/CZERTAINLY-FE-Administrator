@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
-import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
+import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
 import { actions, selectors } from "ducks/credentials";
 import { CredentialModel } from "models/credentials";
@@ -13,13 +13,14 @@ import Select from "react-select/";
 import { ConnectorModel } from "models/connectors";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
+import { mutators } from "utils/attributeEditorMutators";
+import ProgressButton from "components/ProgressButton";
 
 
 interface FormValues {
-   name: string;
-   url: string;
-   connectorUuid: string;
-   kind: string;
+   name: string | undefined;
+   credentialProvider: { value: string; label: string } | undefined;
+   storeKind: { value: string; label: string } | undefined;
 }
 
 export interface Props {
@@ -53,7 +54,6 @@ export default function CredentialForm({
 
    const [credential, setCredential] = useState<CredentialModel>();
    const [credentialProvider, setCredentialProvider] = useState<ConnectorModel>();
-   const [kind, setKind] = useState<string>();
 
    const isBusy = useMemo(
       () => isFetchingCredentialDetail || isFetchingCredentialProviders || isCreatingCredential || isUpdatingCredential || isFetchingAttributeDescriptors,
@@ -74,7 +74,6 @@ export default function CredentialForm({
 
          if (editMode && credentialSelector?.uuid === params.id) {
             setCredential(credentialSelector);
-            setKind(credentialSelector.kind);
          }
 
          if (editMode && credentialSelector?.uuid === params.id && credentialProviders && credentialProviders.length > 0) {
@@ -114,7 +113,6 @@ export default function CredentialForm({
       (event) => {
 
          if (!event.value || !credentialProvider) return;
-         setKind(event.value);
          dispatch(actions.listCredentialProviderAttributeDescriptors({ uuid: credentialProvider.uuid, kind: event.value }));
 
       },
@@ -128,7 +126,9 @@ export default function CredentialForm({
 
       (values: FormValues) => {
 
-         if (editMode) {
+         console.log(values);
+
+         /*if (editMode) {
 
             dispatch(actions.updateCredential({
                uuid: params.id,
@@ -144,10 +144,30 @@ export default function CredentialForm({
                attributes: []
             }));
 
-         }
+         }*/
       },
       [editMode, dispatch, credential]
    );
+
+
+   const onCancel = useCallback(
+      () => {
+
+      },
+      []
+   )
+
+
+   const submitTitle = useMemo(
+      () => editMode ? "Save" : "Create",
+      [editMode]
+   )
+
+
+   const inProgressTitle = useMemo(
+      () => editMode ? "Saving..." : "Creating...",
+      [editMode]
+   )
 
 
    const optionsForCredentialProviders = useMemo(
@@ -178,11 +198,11 @@ export default function CredentialForm({
    );
 
 
-   const defaultValues = useMemo(
+   const defaultValues: FormValues = useMemo(
       () => ({
-         name: editMode ? credential?.name : "",
-         connectorName: editMode ? credential?.connectorName : "",
-         test: "qwert"
+         name: editMode ? credential?.name || undefined : undefined,
+         credentialProvider: editMode ? credential ? { value: credential.connectorUuid, label: credential.connectorName } : undefined : undefined,
+         storeKind: editMode ? credential ? { value: credential?.kind, label: credential?.kind } : undefined : undefined,
       }),
       [editMode, credential]
    );
@@ -192,9 +212,9 @@ export default function CredentialForm({
 
       <Widget title={title} busy={isBusy}>
 
-         <Form initialValues={defaultValues} onSubmit={onSubmit}>
+         <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
 
-            {({ handleSubmit, pristine, submitting }) => (
+            {({ handleSubmit, pristine, submitting, values, valid }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
 
@@ -211,7 +231,7 @@ export default function CredentialForm({
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
                               type="text"
-                              placeholder="Credential Name"
+                              placeholder="Enter the Credential Name"
                               disabled={editMode}
                            />
 
@@ -224,13 +244,13 @@ export default function CredentialForm({
 
                   {!editMode ? (
 
-                     <Field name="connectorUuid">
+                     <Field name="credentialProvider">
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="connectorUuid">Credential Provider</Label>
+                              <Label for="credentialProvider">Credential Provider</Label>
 
                               <Select
                                  {...input}
@@ -249,13 +269,13 @@ export default function CredentialForm({
 
                   ) : (
 
-                     <Field name="connectorName">
+                     <Field name="credentialProvider" format={(value) => value ? value.label : ""}>
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="connectorName">Credential Provider</Label>
+                              <Label for="credentialProvider">Credential Provider</Label>
 
                               <Input
                                  {...input}
@@ -276,22 +296,23 @@ export default function CredentialForm({
 
                   {!editMode && optionsForKinds?.length ? (
 
-                     <Field name="connectorKind">
+                     <Field name="storeKind">
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="connectorKind">Kind</Label>
+                              <Label for="storeKind">Kind</Label>
 
                               <Select
                                  {...input}
                                  maxMenuHeight={140}
                                  menuPlacement="auto"
                                  options={optionsForKinds}
-                                 placeholder="Select Kind"
+                                 placeholder="Select Key Store Kind"
                                  onChange={(event) => { onKindChange(event); input.onChange(event); }}
                               />
+
                            </FormGroup>
                         )}
                      </Field>
@@ -300,16 +321,16 @@ export default function CredentialForm({
 
                   {editMode && credential?.kind ? (
 
-                     <Field name="connectorKind">
+                     <Field name="storeKind" format={(value) => value ? value.label : ""}>
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="connectorKind">Kind</Label>
+                              <Label for="storeKind">Kind</Label>
 
                               <Input
-                                 value={credential?.kind}
+                                 {...input}
                                  valid={!meta.error && meta.touched}
                                  invalid={!!meta.error && meta.touched}
                                  type="text"
@@ -325,7 +346,7 @@ export default function CredentialForm({
 
                   ) : null}
 
-                  {credentialProvider && kind && credentialProviderAttributeDescriptors && credentialProviderAttributeDescriptors.length > 0 ? (
+                  {credentialProvider && values.storeKind && credentialProviderAttributeDescriptors && credentialProviderAttributeDescriptors.length > 0 ? (
 
                      <>
                         <hr />
@@ -361,25 +382,31 @@ export default function CredentialForm({
                         kind=""
                         functionGroup=""
                      />
-                  ) : null}
-                  <div className="d-flex justify-content-end">
-                     <ButtonGroup>
-                        <Button
-                           color="default"
-                           onClick={onCancel}
-                           disabled={submitting || isSubmitting}
-                        >
-                           Cancel
-                        </Button>
-                        <ProgressButton
-                           title={submitTitle}
-                           inProgressTitle={inProgressTitle}
-                           inProgress={submitting || isSubmitting}
-                           disabled={!editMode ? pristine : false}
-                        />
-                     </ButtonGroup>
-                  </div>
-                  */}
+                  ) : null}*/
+
+                     <div className="d-flex justify-content-end">
+
+                        <ButtonGroup>
+
+                           <ProgressButton
+                              title={submitTitle}
+                              inProgressTitle={inProgressTitle}
+                              inProgress={submitting}
+                              disabled={!editMode ? pristine : false || !valid}
+                           />
+
+                           <Button
+                              color="default"
+                              onClick={onCancel}
+                              disabled={submitting}
+                           >
+                              Cancel
+                           </Button>
+
+                        </ButtonGroup>
+
+                     </div>
+                  }
 
                </BootstrapForm>
             )}

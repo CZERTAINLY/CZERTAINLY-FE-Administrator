@@ -1,13 +1,19 @@
 // import { FieldState, FieldValidator } from "final-form";
 
-export const validateRequired = () => (value: any) =>
-   value ? undefined : "Required Field";
+export const composeValidators = (...validators: any[]) => (value: string) =>
+   validators.reduce((error, validator) => error || validator(value), undefined);
 
-export const validatePattern =
-   (pattern: RegExp, message?: string) => (value: any) =>
+export const validateRequired = () => (value: any) => value ? undefined : "Required Field";
+
+export const validatePattern = (pattern: RegExp, message?: string) =>
+   (value: any) =>
       !value || pattern.test(value)
          ? undefined
          : message || `Value must conform to ${pattern}`;
+
+export const validateInteger = () => validatePattern(/^\d+$/, "Value must be an integer");
+
+export const validateFloat = () => validatePattern(/^\d+\.\d+$/, "Value must be a float");
 
 export const validateAlphaNumeric = () =>
    validatePattern(
@@ -20,17 +26,6 @@ export const validateEmail = () =>
       /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+$/,
       "Value must be a valid email address"
    );
-
-/*export const composeValidators =
-   (...validators: FieldValidator<any>[]) =>
-      (value: any, allValues: object, meta?: FieldState<any>) =>
-         validators.reduce(
-            (error, validator) => error || validator(value, allValues, meta),
-            undefined
-         );*/
-
-export const composeValidators = (...validators: any[]) => (value: string) =>
-   validators.reduce((error, validator) => error || validator(value), undefined);
 
 export const validateUrl = () =>
    validatePattern(

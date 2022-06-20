@@ -1,7 +1,7 @@
 import { ClientAuthorizedRaProfileModel, ClientModel } from "models/clients";
 
 import { createFeatureSelector } from "utils/ducks";
-import { createSelector, createSlice, current, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RaProfileModel } from "models/ra-profiles";
 
 

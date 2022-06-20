@@ -1,70 +1,168 @@
-import { AttributeDescriptorModel, AttributeModel } from "models/attributes"
-import { useEffect, useState } from "react";
-import Select, { Options } from "react-select";
+import { AttributeContentModel, AttributeDescriptorModel, AttributeModel } from "models/attributes"
+import { useEffect, useMemo } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
+import Select, { SingleValue } from "react-select";
+import { Field, useForm } from "react-final-form";
+import { composeValidators, validatePattern, validateRequired } from "utils/validators";
 
 interface Props {
-   descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   descriptor: AttributeDescriptorModel;
+   attribute?: AttributeModel;
 }
 
-export default function StringAttribute({
+export function StringAttribute({
    descriptor,
-   attribute
+   attribute,
 }: Props): JSX.Element {
 
-   const [value, setValue] = useState<{ value: string, label: string } | string>();
+   const form = useForm();
 
    useEffect(
 
       () => {
+
+         if (!attribute || !attribute.content) {
+
+            form.mutators.setAttribute(
+
+               `__attribute__${descriptor.name}`,
+               descriptor.content
+                  ?
+                  descriptor.content instanceof Array
+                     ?
+                     descriptor.content.map(
+                        content => ({
+                           value: content.value,
+                           label: content.value,
+                        })
+                     )
+                     :
+                     (descriptor.content as AttributeContentModel).value
+                  :
+                  undefined
+            );
+
+            return;
+
+         }
+
+         form.mutators.setAttribute(`__attribute__${descriptor.name}`,
+
+            descriptor.list
+
+               ?
+
+               descriptor.multiSelect && attribute.content instanceof Array
+
+                  ?
+
+                  attribute.content.map(
+                     content => ({
+                        value: content.value,
+                        label: content.value
+                     })
+                  )
+
+                  :
+
+                  ({
+                     value: (attribute.content as AttributeContentModel).value,
+                     label: (attribute.content as AttributeContentModel).value
+                  })
+
+               :
+
+               (attribute.content as AttributeContentModel).value
+
+         );
+
       },
 
-      [descriptor, attribute]
+      [descriptor, attribute, form.mutators]
    )
 
-   console.log(descriptor, attribute);
-   console.log(value)
+   const options = useMemo(
 
-   const options = (descriptor.content instanceof Array ? descriptor.content : []).map(
-      content => ({
-         value: content.value as string,
-         label: content.value as string
-      })
+      () => (descriptor.content instanceof Array ? descriptor.content : []).map(
+
+         content => ({
+            value: content.value as string,
+            label: content.value as string
+         }) as SingleValue<{ value: string; label: string }>,
+
+      ),
+      [descriptor.content]
    )
 
+   const validators: any = useMemo(
 
-   return !descriptor || !descriptor.content ? <></> : (
+      () => {
 
-      <div>
+         const vals = [];
 
-         <FormGroup>
+         if (descriptor.required) vals.push(validateRequired());
+         if (descriptor.validationRegex) vals.push(validatePattern(descriptor.validationRegex));
 
-            <Label for={descriptor.name}>{descriptor.label}</Label>
+         return composeValidators.apply(undefined, vals);
 
-            {
-               descriptor.list ? (
+      },
 
-                  <Select
-                     name={descriptor.name}
-                     options={options}
-                     value={value}
-                  />
+      [descriptor.required, descriptor.validationRegex]
 
-               ) : (
-                  <Input
-                     type="text"
-                     name={descriptor.name}
-                     value={value as string}
-                  />
-               )
-            }
-
-         </FormGroup>
+   );
 
 
-      </div>
+   return !descriptor ? <></> : (
+
+      <FormGroup row={false}>
+
+         <Field name={`__attribute__${descriptor.name}`} validate={validators}>
+
+            {({ input, meta }) => (
+
+               <>
+
+                  {descriptor.visible ? (
+
+                     <Label for={`__attribute__${descriptor.name}`}>{descriptor.label}</Label>
+
+                  ) : null}
+
+                  {descriptor.list && descriptor.visible ? (
+
+                     <>
+                        <Select
+                           {...input}
+                           maxMenuHeight={140}
+                           menuPlacement="auto"
+                           options={options}
+                           placeholder={`Select ${descriptor.label}`}
+                           styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                           isDisabled={descriptor.readOnly}
+                           isMulti={descriptor.multiSelect}
+                        />
+
+                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+                     </>
+
+                  ) : (
+                     <Input
+                        {...input}
+                        type={descriptor.visible ? "text" : "hidden"}
+                        placeholder={`Enter ${descriptor.label}`}
+                        disabled={descriptor.readOnly}
+                     />
+                  )}
+
+               </>
+
+            )}
+
+         </Field >
+
+      </FormGroup>
 
    )
 
 }
+

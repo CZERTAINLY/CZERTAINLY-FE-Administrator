@@ -5,7 +5,7 @@ interface Props {
    attribute: AttributeModel
 }
 
-export default function CredentialAttribute({
+export function CredentialAttribute({
    descriptor,
    attribute
 }: Props): JSX.Element {

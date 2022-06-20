@@ -5,7 +5,7 @@ interface Props {
    attribute: AttributeModel
 }
 
-export default function JSONAttribute({
+export function JSONAttribute({
    descriptor,
    attribute
 }: Props): JSX.Element {

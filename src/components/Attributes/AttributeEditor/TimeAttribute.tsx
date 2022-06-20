@@ -5,7 +5,7 @@ interface Props {
    attribute: AttributeModel
 }
 
-export default function TimeAttribute({
+export function TimeAttribute({
    descriptor,
    attribute
 }: Props): JSX.Element {

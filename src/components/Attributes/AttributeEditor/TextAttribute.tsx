@@ -5,7 +5,7 @@ interface Props {
    attribute: AttributeModel
 }
 
-export default function TextAttribute({
+export function TextAttribute({
    descriptor,
    attribute
 }: Props): JSX.Element {
