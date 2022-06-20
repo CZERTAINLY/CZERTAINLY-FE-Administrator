@@ -47,7 +47,7 @@ export interface AttributeDescriptorDTO {
    multiSelect: boolean;
    validationRegex?: string;
    callback?: AttributeCallbackDescriptorDTO;
-   content?: AttributeContentDTO;
+   content?: AttributeContentDTO | AttributeContentDTO[];
 }
 
 

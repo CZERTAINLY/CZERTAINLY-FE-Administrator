@@ -16,80 +16,88 @@ export default function AttributeViewer({
 
       (attribute: AttributeModel) => {
 
-         if (!attribute.type || !attribute.content || !attribute.content.value) return "Not set";
+         if (!attribute.type || !attribute.content) return "Not set";
 
          const typeMap = {
 
             "BOOLEAN":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value ? "true" : "false").join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value !== undefined ? content.value ? "true" : "false" : "Not set").join(", ")
                   :
                   attribute.content.value ? "True" : "False",
 
             "INTEGER":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  parseInt(attribute.content.value as string, 10).toString(),
+                  attribute.content.value ? parseInt(attribute.content.value as string, 10).toString() : "Not set",
 
             "FLOAT":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  parseFloat(attribute.content.value as string).toString(),
+                  attribute.content.value ? parseFloat(attribute.content.value as string).toString() : "Not set",
 
             "STRING":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
             "TEXT":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
             "DATE":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
             "TIME":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
 
             "DATETIME":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
 
             "FILE":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value =>
-                     value.toString().length > 40 ? value.toString().substring(0, 40) + "..." : value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(
+                     content =>
+                        content.value ?
+                           content.value.toString().length > 40 ? content.value.toString().substring(0, 40) + "..." : content.value.toString()
+                           :
+                           "Not set"
+                  ).join(", ")
                   :
-                  attribute.content.value.toString().length > 40 ? attribute.content.value.toString().substring(0, 40) + "..." : attribute.content.value.toString(),
+                  attribute.content.value ?
+                     attribute.content.value.toString().length > 40 ? attribute.content.value.toString().substring(0, 40) + "..." : attribute.content.value.toString()
+                     :
+                     "Not set",
 
             "SECRET": "*****",
 
             "CREDENTIAL":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
             "JSON":
-               attribute.content.value instanceof Array ?
-                  attribute.content.value.map(value => value.toString()).join(", ")
+               attribute.content instanceof Array ?
+                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
-                  attribute.content.value as string,
+                  attribute.content.value ? attribute.content.value as string : "Not set",
 
          }
 

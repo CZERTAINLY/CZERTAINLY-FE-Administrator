@@ -2,7 +2,7 @@ import { AttributeCallbackMappingTarget, AttributeType, AttributeValue } from "t
 import { FunctionGroupCode } from "types/connectors";
 
 
-interface AttributeContentModel {
+export interface AttributeContentModel {
    value: AttributeValue;
 }
 
@@ -15,7 +15,7 @@ interface AttributeContentModel {
    name: string;
    label?: string;
    type?: AttributeType
-   content: AttributeContentModel;
+   content: AttributeContentModel | AttributeContentModel[];
 }
 
 
@@ -49,7 +49,7 @@ export interface AttributeDescriptorModel {
    multiSelect: boolean;
    validationRegex?: RegExp;
    callback?: AttributeCallbackDescriptorModel;
-   content?: AttributeContentModel;
+   content?: AttributeContentModel | AttributeContentModel[];
 }
 
 

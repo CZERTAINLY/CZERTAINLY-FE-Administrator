@@ -1,4 +1,4 @@
-import { AttributeDescriptorModel } from "models/attributes"
+import { AttributeContentModel, AttributeDescriptorModel } from "models/attributes"
 import { attributeFieldNameTransform } from "models/attributes";
 import { useCallback, useMemo } from "react";
 
@@ -19,16 +19,16 @@ export default function AttributeDescriptorViewer({
 
          if (!attributeDescriptor.content) return "";
 
-         if (
-            typeof attributeDescriptor.content !== "string" &&
-            ["LIST", "list", "array", "ARRAY", "BOOLEAN", "CREDENTIAL"].includes(
-               attributeDescriptor.type
-            )
-         ) {
-            return (attributeDescriptor.content.value as Array<any>)[0]
+         if (attributeDescriptor.content instanceof Array) {
+
+            return attributeDescriptor.content.map(
+               content => content.value
+            ).join(", ");
+
          } else {
-            return attributeDescriptor.content.value;
+            return (attributeDescriptor.content as AttributeContentModel).value;
          }
+
 
       },
       []
@@ -66,7 +66,7 @@ export default function AttributeDescriptorViewer({
             columns: [
                attributeDescriptor.label || attributeFieldNameTransform[attributeDescriptor.name] || attributeDescriptor.name,
                attributeDescriptor.required ? "Yes" : "No",
-               getAttributeValues(attributeDescriptor),
+               getAttributeValues(attributeDescriptor).toString(),
                //getAttributeDetail(attributeDescriptor)
             ],
             detailColumns: [

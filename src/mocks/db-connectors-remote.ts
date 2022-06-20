@@ -48,8 +48,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
-                  content: { value: ["PKCS12", "JKS"] },
+                  multiSelect: true,
+                  content: [
+                     { value: "PKCS12" },
+                     { value: "JKS" },
+                  ]
                },
                {
                   uuid: "6df7ace9-c501-4d58-953c-f8d53d4fb378",
@@ -83,7 +86,10 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   visible: true,
                   list: true,
                   multiSelect: false,
-                  content: { value: ["PKCS12", "JKS"] },
+                  content: [
+                     { value: "PKCS12" },
+                     { value: "JKS" }
+                  ],
                },
                {
                   uuid: "6a245220-eaf4-44cb-9079-2228ad9264f5",
@@ -174,8 +180,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
-                  content: { value: ["PKCS12", "JKS"] }
+                  multiSelect: true,
+                  content: [
+                     { value: "PKCS12" },
+                     { value: "JKS" }
+                  ]
                },
                {
                   uuid: "6df7ace9-c501-4d58-953c-f8d53d4fb378",
@@ -208,8 +217,11 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
-                  content: { value: ["PKCS12", "JKS"] }
+                  multiSelect: true,
+                  content: [
+                     { value: "PKCS12" },
+                     { value: "JKS" }
+                  ]
                },
                {
                   uuid: "6a245220-eaf4-44cb-9079-2228ad9264f5",
@@ -299,7 +311,9 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: false,
                   multiSelect: false,
                   description: "Multiple values can be given seperated by comma ','.",
-                  content: { value: "443" }
+                  content: {
+                     value: "443"
+                  }
 
                },
                {
@@ -311,9 +325,12 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
+                  multiSelect: true,
                   description: "Select to discover certificates from all ports.",
-                  content: { value: ["No", "Yes"] }
+                  content: [
+                     { value: "No" },
+                     { value: "Yes" }
+                  ]
                }
             ]
          }
@@ -435,7 +452,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
+                  multiSelect: true,
                   description: "List of available projects",
                   callback: {
                      callbackContext: "/v1/discoveryProvider/listAvailableProjects",
@@ -454,7 +471,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  content: { value: [] }
+                  content: []
                },
                {
                   uuid: "131f64b8-52e4-4db8-b7de-63ca61c35209",
@@ -465,7 +482,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
+                  multiSelect: true,
                   description: "List of available reports",
                   callback: {
                      callbackContext: "/v1/discoveryProvider/listAvailableReports/{projectId}",
@@ -489,7 +506,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  content: { value: [] }
+                  content: []
                }
             ]
          }
@@ -687,16 +704,14 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   visible: true,
                   list: true,
                   multiSelect: false,
-                  content: {
-                     value: [
-                        "lab02-ADCS",
-                        "xx",
-                        "test",
-                        "11",
-                        "12",
-                        "111"
-                     ]
-                  }
+                  content: [
+                     { value: "lab02-ADCS" },
+                     { value: "xx" },
+                     { value: "test" },
+                     { value: "11" },
+                     { value: "12" },
+                     { value: "111" }
+                  ]
                },
                {
                   uuid: "25b35cf2-45cb-4e4c-b5b3-a99ecb8aa8e6",
@@ -707,7 +722,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
+                  multiSelect: true,
                   callback: {
                      callbackContext: "/v1/discoveryProvider/listCertificateAuthority/{caInstance}",
                      callbackMethod: "GET",
@@ -719,7 +734,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  content: { value: [] }
+                  content: []
                },
                {
                   uuid: "83c0f20b-4789-44f2-abd2-a84c131d5e97",
@@ -730,7 +745,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   readOnly: false,
                   visible: true,
                   list: true,
-                  multiSelect: false,
+                  multiSelect: true,
                   callback: {
                      callbackContext: "/v1/discoveryProvider/listTemplate/{caInstance}",
                      callbackMethod: "GET",
@@ -742,7 +757,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         }
                      ]
                   },
-                  content: { value: [] }
+                  content: []
                }
             ]
          }
