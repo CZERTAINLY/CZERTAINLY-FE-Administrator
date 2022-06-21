@@ -6,7 +6,7 @@ import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
 import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
-import { AttributeDescriptorModel } from "models/attributes";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 
 import { actions, selectors } from "ducks/connectors";
 

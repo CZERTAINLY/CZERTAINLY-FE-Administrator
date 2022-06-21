@@ -1,4 +1,7 @@
-import { AttributeContentModel, AttributeDescriptorModel, AttributeModel } from "models/attributes"
+import { AttributeContentModel } from "models/attributes/AttributeContentModel";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
+
 import { useEffect, useMemo } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
 import { Field, useForm } from "react-final-form";

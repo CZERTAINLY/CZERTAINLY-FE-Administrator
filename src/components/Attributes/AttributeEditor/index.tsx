@@ -1,6 +1,6 @@
 import Widget from "components/Widget";
-import { AttributeDescriptorModel, AttributeModel } from "models/attributes";
-import { Fragment } from "react";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
 import { AttributeType } from "types/attributes";
 import { BooleanAttribute } from "./BooleanAttribute";
 import { CredentialAttribute } from "./CredentialAttribute";

@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorCollectionModel, AttributeDescriptorModel, AttributeModel } from "models/attributes";
+import { AttributeDescriptorCollectionModel } from "models/attributes/AttributeDescriptorCollectionModel";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
 import { ConnectorHealthModel, ConnectorModel, FunctionGroupModel } from "models/connectors";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 import { createSelector } from "reselect";

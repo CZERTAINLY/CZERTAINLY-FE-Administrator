@@ -2,7 +2,8 @@ import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CredentialModel } from "models/credentials";
 import { ConnectorModel } from "models/connectors";
-import { AttributeDescriptorModel, AttributeModel } from "models/attributes";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 
 

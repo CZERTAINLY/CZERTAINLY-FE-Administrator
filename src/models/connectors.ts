@@ -1,5 +1,5 @@
 import { AuthType, FunctionGroupCode, Status } from "types/connectors";
-import { AttributeModel } from "./attributes";
+import { AttributeModel } from "./attributes/AttributeModel";
 
 export interface EndpointModel {
    uuid?: string;

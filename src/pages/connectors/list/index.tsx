@@ -11,7 +11,7 @@ import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
-import { attributeFieldNameTransform } from "models/attributes";
+import { attributeFieldNameTransform } from "utils/attributes";
 import { FunctionGroupModel } from "models/connectors";
 import { inventoryStatus } from "utils/connector";
 

@@ -1,9 +1,13 @@
-import { AttributeContentModel, AttributeDescriptorModel, AttributeModel } from "models/attributes"
-import { useEffect, useMemo } from "react";
+import { AttributeContentModel } from "models/attributes/AttributeContentModel";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
+
+import { useCallback, useEffect, useMemo } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
 import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
 import { composeValidators, validatePattern, validateRequired } from "utils/validators";
+import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
 
 interface Props {
    descriptor: AttributeDescriptorModel;
@@ -46,7 +50,7 @@ export function FileAttribute({
 
          }
 
-         form.mutators.setAttribute(`__attribute__${descriptor.name}`,
+         form.mutators.setAttribute(`__attribute__${descriptor.name}.file`,
 
             descriptor.list
 
@@ -94,6 +98,26 @@ export function FileAttribute({
       [descriptor.content]
    )
 
+
+   const onFileChanged = useCallback(
+
+      (e: React.ChangeEvent<HTMLInputElement>, attributeIdentifier: string) => {
+
+         if (!e.target.files || e.target.files.length === 0) return;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.target.files[0]);
+
+         reader.onload = (e) => {
+            console.log(e.target!.result);
+         }
+
+      },
+      []
+
+   )
+
+
    const validators: any = useMemo(
 
       () => {
@@ -112,75 +136,118 @@ export function FileAttribute({
    );
 
 
-   return !descriptor ? <></> : (
+   const createFields = useCallback(
 
-      <FormGroup>
+      (
+         index: number | undefined,
+         attributeName: string,
+         attributeUUID: string | undefined,
+         attributeData: FileAttributeContentModel | undefined,
+         attributeLabel: string,
+         isVisible: boolean,
+         isReadOnly: boolean,
+         validators
+      ) => {
 
-         <Field name={`__attribute__${descriptor.name}`} validate={validators}>
+         const _uuid = attributeUUID ? `:${attributeUUID}` : "";
+         const _index = index ? `[${index}]` : "";
 
-            {({ input, meta }) => (
+         const attributeIdentifier = `__attribute__.${attributeName}${_uuid}${_index}`;
 
-               <>
+         return (
 
-                  {descriptor.visible ? (
+            <FormGroup>
 
-                     <Label for={`__attribute__${descriptor.name}`}>{descriptor.label}</Label>
+               {isVisible ? (<Label for={`${attributeIdentifier}.file`}>{attributeLabel}</Label>) : null}
 
-                  ) : null}
+               <div style={{ display: "flex" }}>
 
-                  {descriptor.list && descriptor.visible ? (
+                  <Field name={`${attributeIdentifier}.file`} validate={validators}>
 
-                     <>
-                        <Select
-                           {...input}
-                           maxMenuHeight={140}
-                           menuPlacement="auto"
-                           options={options}
-                           placeholder={`Select ${descriptor.label}`}
-                           styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                           isDisabled={descriptor.readOnly}
-                           isMulti={descriptor.multiSelect}
-                        />
-
-                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
-                     </>
-
-                  ) : (
-                     <FormGroup style={{display: "flex"}}>
+                     {({ input, meta }) => (
 
                         <Input
                            {...input}
                            type={descriptor.visible ? "text" : "hidden"}
                            placeholder={`Select ${descriptor.label} File`}
                            disabled={true}
-                           style={{flexGrow: 1}}
+                           style={{ flexGrow: 1 }}
                         />
-                        &nbsp;
 
-                        <Label className="btn btn-default" for="input-file" style={{width: "auto", whiteSpace: "nowrap"}}>Select file...</Label>
+                     )}
+
+                  </Field >
+
+                  &nbsp;
+
+                  <Field name={`${attributeIdentifier}.contentType`} validate={validators}>
+
+                     {({ input }) => (
 
                         <Input
-                           id="input-file"
-                           type="file"
-                           style={{display: "none"}}
-                           onChange={(e) => {
-                              if (!e.target.files || e.target.files.length === 0) return;
-                              const reader = new FileReader();
-                              reader.onload = (e) => { console.log(e.target!.result); }
-                              reader.readAsDataURL(e.target.files[0]);
-                           }}
+                           {...input}
+                           type={descriptor.visible ? "text" : "hidden"}
+                           placeholder="Content Type"
+                           style={{ width: "8rem", textAlign: "center" }}
+                           disabled={true}
                         />
 
-                     </FormGroup>
-                  )}
+                     )}
 
-               </>
+                  </Field>
 
-            )}
+                  &nbsp;
 
-         </Field >
+                  <Field name={`${attributeIdentifier}.fileName`} validate={validators}>
 
-      </FormGroup>
+                     {({ input }) => (
+
+                        <Input
+                           {...input}
+                           type={descriptor.visible ? "text" : "hidden"}
+                           placeholder="File Name"
+                           style={{ width: "8rem", textAlign: "center" }}
+                           disabled={true}
+                        />
+
+                     )}
+
+                  </Field>
+
+                  &nbsp;
+
+                  <Label className="btn btn-default" for="input-file" style={{ width: "auto", whiteSpace: "nowrap", display: "block" }}>Select file...</Label>
+
+                  <Input id="input-file" type="file" style={{ display: "none" }} onChange={(e) => onFileChanged(e, attributeIdentifier)} />
+
+               </div>
+
+            </FormGroup>
+
+         )
+
+      },
+      []
+
+   )
+
+
+   return !descriptor ? <></> : (
+
+      <>
+         {
+            createFields(
+               undefined,
+               descriptor.name,
+               attribute ? attribute.uuid : undefined,
+               attribute ? attribute.content as FileAttributeContentModel : undefined,
+               descriptor.label,
+               descriptor.visible,
+               descriptor.readOnly,
+               validators
+            )
+         }
+      </>
 
    )
 

@@ -1,5 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { AttributeModel } from "models/attributes";
+import { AttributeModel } from "models/attributes/AttributeModel";
 import { useCallback, useMemo } from "react";
 
 

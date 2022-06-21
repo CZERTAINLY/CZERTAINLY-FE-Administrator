@@ -1,4 +1,4 @@
-import { AttributeModel } from "./attributes";
+import { AttributeModel } from "./attributes/AttributeModel";
 
 export interface RaProfileModel {
    uuid: string;

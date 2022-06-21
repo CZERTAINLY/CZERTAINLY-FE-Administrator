@@ -1,6 +1,8 @@
 import { AttributeDescriptorDTO, AttributeDTO, AttributeDescriptorCollectionDTO } from "api/_common/attributeDTO";
 import { ConnectorHealthDTO } from "api/connectors";
-import { AttributeDescriptorCollectionModel, AttributeDescriptorModel, AttributeModel } from "models/attributes";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeDescriptorCollectionModel } from "models/attributes/AttributeDescriptorCollectionModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
 import { ConnectorHealthModel, ConnectorHealthPartModel } from "models/connectors";
 import { FunctionGroupCode } from "types/connectors";
 
