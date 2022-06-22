@@ -139,8 +139,8 @@ export function collectFormAttributes(descriptors: AttributeDescriptorModel[] | 
 
       const attr: AttributeModel = {
          name: attributeName,
-         type: descriptor.type,
-         label: descriptor.label,
+         /*type: descriptor.type,
+         label: descriptor.label,*/
          content: content,
       }
 
