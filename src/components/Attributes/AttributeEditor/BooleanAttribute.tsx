@@ -146,7 +146,7 @@ export function BooleanAttribute({
                            isMulti={true}
                         />
 
-                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
                      </>
 
                   ) : (

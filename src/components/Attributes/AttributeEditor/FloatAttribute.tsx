@@ -146,7 +146,7 @@ export function FloatAttribute({
                            isMulti={descriptor.multiSelect}
                         />
 
-                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
                      </>
 
                   ) : (

@@ -279,3 +279,8 @@ http://ms-adcs-connector-service:8080
 		38.242.225.187
 		5985
 		lab02-ADCS
+
+
+
+-----------
+

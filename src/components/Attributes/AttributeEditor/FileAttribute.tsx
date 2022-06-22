@@ -1,10 +1,8 @@
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
 
 import { useCallback, useEffect, useMemo } from "react";
-import { FormGroup, Input, Label } from "reactstrap";
-import Select, { SingleValue } from "react-select";
+import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { Field, useForm } from "react-final-form";
 import { composeValidators, validatePattern, validateRequired } from "utils/validators";
 import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
@@ -21,97 +19,69 @@ export function FileAttribute({
 
    const form = useForm();
 
-   useEffect(
 
-      () => {
+   const onFileLoaded = useCallback(
 
-         if (!attribute || !attribute.content) {
+      (data, fileName) => {
 
-            form.mutators.setAttribute(
+         const fileInfo = data.target!.result as string;
 
-               `__attribute__${descriptor.name}`,
-               descriptor.content
-                  ?
-                  descriptor.content instanceof Array
-                     ?
-                     descriptor.content.map(
-                        content => ({
-                           value: content.value,
-                           label: content.value,
-                        })
-                     )
-                     :
-                     (descriptor.content as AttributeContentModel).value
-                  :
-                  undefined
-            );
+         const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
+         const fileContent = fileInfo.split(",")[1];
 
-            return;
-
-         }
-
-         form.mutators.setAttribute(`__attribute__${descriptor.name}.file`,
-
-            descriptor.list
-
-               ?
-
-               descriptor.multiSelect && attribute.content instanceof Array
-
-                  ?
-
-                  attribute.content.map(
-                     content => ({
-                        value: content.value,
-                        label: content.value
-                     })
-                  )
-
-                  :
-
-                  ({
-                     value: (attribute.content as AttributeContentModel).value,
-                     label: (attribute.content as AttributeContentModel).value
-                  })
-
-               :
-
-               (attribute.content as AttributeContentModel).value
-
-         );
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}.value`, fileContent);
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}.fileName`, fileName);
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}.contentType`, contentType);
 
       },
+      []
 
-      [descriptor, attribute, form.mutators]
-   )
+   );
 
-   const options = useMemo(
-
-      () => (descriptor.content instanceof Array ? descriptor.content : []).map(
-
-         content => ({
-            value: content.value as string,
-            label: content.value as string
-         }) as SingleValue<{ value: string; label: string }>,
-
-      ),
-      [descriptor.content]
-   )
 
 
    const onFileChanged = useCallback(
 
-      (e: React.ChangeEvent<HTMLInputElement>, attributeIdentifier: string) => {
+      (e: React.ChangeEvent<HTMLInputElement>) => {
 
          if (!e.target.files || e.target.files.length === 0) return;
 
+         const fileName = e.target.files[0].name;
+
          const reader = new FileReader();
          reader.readAsDataURL(e.target.files[0]);
+         reader.onload = (data) => onFileLoaded(data, fileName);
 
-         reader.onload = (e) => {
-            console.log(e.target!.result);
-         }
+      },
+      []
 
+   )
+
+
+   const onFileDrop = useCallback(
+
+      (e: React.DragEvent<HTMLInputElement>) => {
+
+         e.preventDefault();
+
+         if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+
+         const fileName = e.dataTransfer.files[0].name;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.dataTransfer.files[0]);
+         reader.onload = (data) => { onFileLoaded(data, fileName); }
+      },
+      []
+
+   )
+
+
+   const onFileDragOver = useCallback(
+
+      (e: React.DragEvent<HTMLInputElement>) => {
+
+         e.preventDefault();
       },
       []
 
@@ -136,117 +106,202 @@ export function FileAttribute({
    );
 
 
-   const createFields = useCallback(
+   const baseFieldId = useMemo(
 
-      (
-         index: number | undefined,
-         attributeName: string,
-         attributeUUID: string | undefined,
-         attributeData: FileAttributeContentModel | undefined,
-         attributeLabel: string,
-         isVisible: boolean,
-         isReadOnly: boolean,
-         validators
-      ) => {
-
-         const _uuid = attributeUUID ? `:${attributeUUID}` : "";
-         const _index = index ? `[${index}]` : "";
-
-         const attributeIdentifier = `__attribute__.${attributeName}${_uuid}${_index}`;
-
-         return (
-
-            <FormGroup>
-
-               {isVisible ? (<Label for={`${attributeIdentifier}.file`}>{attributeLabel}</Label>) : null}
-
-               <div style={{ display: "flex" }}>
-
-                  <Field name={`${attributeIdentifier}.file`} validate={validators}>
-
-                     {({ input, meta }) => (
-
-                        <Input
-                           {...input}
-                           type={descriptor.visible ? "text" : "hidden"}
-                           placeholder={`Select ${descriptor.label} File`}
-                           disabled={true}
-                           style={{ flexGrow: 1 }}
-                        />
-
-                     )}
-
-                  </Field >
-
-                  &nbsp;
-
-                  <Field name={`${attributeIdentifier}.contentType`} validate={validators}>
-
-                     {({ input }) => (
-
-                        <Input
-                           {...input}
-                           type={descriptor.visible ? "text" : "hidden"}
-                           placeholder="Content Type"
-                           style={{ width: "8rem", textAlign: "center" }}
-                           disabled={true}
-                        />
-
-                     )}
-
-                  </Field>
-
-                  &nbsp;
-
-                  <Field name={`${attributeIdentifier}.fileName`} validate={validators}>
-
-                     {({ input }) => (
-
-                        <Input
-                           {...input}
-                           type={descriptor.visible ? "text" : "hidden"}
-                           placeholder="File Name"
-                           style={{ width: "8rem", textAlign: "center" }}
-                           disabled={true}
-                        />
-
-                     )}
-
-                  </Field>
-
-                  &nbsp;
-
-                  <Label className="btn btn-default" for="input-file" style={{ width: "auto", whiteSpace: "nowrap", display: "block" }}>Select file...</Label>
-
-                  <Input id="input-file" type="file" style={{ display: "none" }} onChange={(e) => onFileChanged(e, attributeIdentifier)} />
-
-               </div>
-
-            </FormGroup>
-
-         )
-
+      () => {
+         const uuid = attribute ? `:${attribute.uuid}` : "";
+         return `${descriptor.name}${uuid}`;
       },
-      []
+      [attribute, descriptor.name]
 
    )
 
 
-   return !descriptor ? <></> : (
+   const setupAttributeDefaultValues = useCallback(
+
+      () => {
+
+
+         const fileContent = attribute && (attribute.content as FileAttributeContentModel).value
+            ?
+            (attribute.content as FileAttributeContentModel).value
+            :
+            descriptor.content && (descriptor.content as FileAttributeContentModel).value
+               ?
+               (descriptor.content as FileAttributeContentModel).value
+               :
+               "";
+
+         const fileName = attribute && (attribute.content as FileAttributeContentModel).fileName
+            ?
+            (attribute.content as FileAttributeContentModel).fileName
+            :
+            descriptor.content && (descriptor.content as FileAttributeContentModel).fileName
+               ?
+               (descriptor.content as FileAttributeContentModel).fileName
+               :
+               fileContent
+                  ?
+                  "Unknown"
+                  :
+                  "";
+
+         const contentType = attribute && (attribute.content as FileAttributeContentModel).contentType
+            ?
+            (attribute.content as FileAttributeContentModel).contentType
+            :
+            descriptor.content && (descriptor.content as FileAttributeContentModel).contentType
+               ?
+               (descriptor.content as FileAttributeContentModel).contentType
+               :
+               fileContent
+                  ?
+                  "Unknown"
+                  :
+                  "";
+
+         const initialValues = { ...form.getState().values };
+
+         initialValues["__attribute__"] = initialValues["__attribute__"] || {};
+         initialValues["__attribute__"][baseFieldId] = initialValues["__attribute__"][baseFieldId] || {};
+         initialValues["__attribute__"][baseFieldId].value = fileContent;
+         initialValues["__attribute__"][baseFieldId].fileName = fileName;
+         initialValues["__attribute__"][baseFieldId].contentType = contentType;
+
+         form.setConfig("initialValues", initialValues);
+
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}.value`, fileContent);
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}.fileName`, fileName);
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}.contentType`, contentType);
+
+      },
+      [baseFieldId, descriptor.content, attribute]
+
+   )
+
+
+   useEffect(
+
+      () => {
+         setupAttributeDefaultValues();
+      },
+
+      [descriptor, attribute, form.mutators, setupAttributeDefaultValues]
+   )
+
+
+   return !descriptor || !descriptor.visible ? <></> : (
 
       <>
-         {
-            createFields(
-               undefined,
-               descriptor.name,
-               attribute ? attribute.uuid : undefined,
-               attribute ? attribute.content as FileAttributeContentModel : undefined,
-               descriptor.label,
-               descriptor.visible,
-               descriptor.readOnly,
-               validators
-            )
-         }
+
+         <FormGroup>
+
+            <Label>{descriptor.label}</Label>
+
+            {!descriptor.visible ? <></> : (
+               <div className="border border-light rounded mb-0" style={{ display: "flex", flexWrap: "wrap", padding: "1em", borderStyle: "dashed !important" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
+
+                  <div style={{ flexGrow: 1 }}>
+
+                     {descriptor.visible ? (<Label for={`__attribute__.${baseFieldId}.value`}>File content</Label>) : null}
+
+                     <Field name={`__attribute__.${baseFieldId}.value`} validate={validators}>
+
+                        {({ input, meta }) => (
+
+                           <>
+
+                              <Input
+                                 {...input}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type={descriptor.visible ? "text" : "hidden"}
+                                 placeholder={`Select or drag & drop ${descriptor.label} File`}
+                                 readOnly={true}
+                              />
+
+                              <FormFeedback>{meta.error}</FormFeedback>
+
+                           </>
+
+                        )}
+
+                     </Field >
+
+                  </div>
+
+
+                  &nbsp;
+
+                  <div style={{ width: "13rem" }}>
+
+                     {descriptor.visible ? (<Label for={`__attribute__.${baseFieldId}.contentType`}>Content type</Label>) : null}
+
+                     <Field name={`__attribute__.${baseFieldId}.contentType`} validate={validators}>
+
+                        {({ input, meta }) => (
+
+                              <Input
+                                 {...input}
+                                 type={descriptor.visible ? "text" : "hidden"}
+                                 placeholder="File not selected"
+                                 disabled={true}
+                                 style={{ textAlign: "center" }}
+                              />
+
+                        )}
+
+                     </Field>
+
+                  </div>
+
+                  &nbsp;
+
+                  <div style={{ width: "10rem" }}>
+
+                     {descriptor.visible ? (<Label for={`__attribute__.${baseFieldId}.contentType`}>File name</Label>) : null}
+
+                     <Field name={`__attribute__.${baseFieldId}.fileName`} validate={validators}>
+
+                        {({ input }) => (
+
+                           <Input
+                              {...input}
+                              type={descriptor.visible ? "text" : "hidden"}
+                              placeholder="File not selected"
+                              disabled={true}
+                              style={{ textAlign: "center" }}
+                           />
+
+                        )}
+
+                     </Field>
+
+                  </div>
+
+                  &nbsp;
+
+                  <div>
+
+                     <Label for="input-file">&nbsp;</Label><br />
+
+                     <Label className="btn btn-default" for="input-file" style={{ margin: 0 }}>Select file...</Label>
+
+                     <Input id="input-file" type="file" style={{ display: "none" }} onChange={onFileChanged} />
+
+                  </div>
+
+                  <div style={{ flexBasis: "100%", height: 0 }}></div>
+
+                  <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
+                     Select or Drag &amp; Drop file to Drop Zone.
+                  </div>
+
+               </div>
+            )}
+
+         </FormGroup>
+
       </>
 
    )

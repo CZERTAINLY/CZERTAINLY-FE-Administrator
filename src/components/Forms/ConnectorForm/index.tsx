@@ -278,7 +278,7 @@ function ConnectorForm({ title }: Props) {
                                  onChange={(e) => { input.onChange(e); setSelectedAuthType(e); }}
                               />
 
-                              <FormFeedback>{meta.error}</FormFeedback>
+                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
                            </FormGroup>
 
@@ -305,7 +305,7 @@ function ConnectorForm({ title }: Props) {
                                           invalid={!!meta.error && meta.touched}
                                           type="text"
                                           placeholder="Username"
-                                          //disabled={editMode}
+                                       //disabled={editMode}
                                        />
                                        <FormFeedback>{meta.error}</FormFeedback>
 
@@ -328,7 +328,7 @@ function ConnectorForm({ title }: Props) {
                                           invalid={!!meta.error && meta.touched}
                                           type="password"
                                           placeholder="Password"
-                                          // disabled={editMode}
+                                       // disabled={editMode}
                                        />
 
                                        <FormFeedback>{meta.error}</FormFeedback>
@@ -361,7 +361,7 @@ function ConnectorForm({ title }: Props) {
                                        invalid={!!meta.error && meta.touched}
                                        type="file"
                                        placeholder="clientCert"
-                                       // disabled={editMode}
+                                    // disabled={editMode}
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>

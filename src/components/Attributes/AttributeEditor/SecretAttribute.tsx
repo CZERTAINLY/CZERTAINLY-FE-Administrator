@@ -3,7 +3,7 @@ import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorM
 import { AttributeModel } from "models/attributes/AttributeModel";
 
 import { useEffect, useMemo } from "react";
-import { FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { Field, useForm } from "react-final-form";
 import { composeValidators, validatePattern, validateRequired } from "utils/validators";
 import { useDispatch } from "react-redux";
@@ -33,11 +33,16 @@ export function SecretAttribute({
          }
 
          if (!attribute || !attribute.content || !(attribute.content as AttributeContentModel).value) {
-            form.mutators.setAttribute(`__attribute__${descriptor.name}`, undefined);
+            form.mutators.setAttribute(`__attribute__.${descriptor.name}`, undefined);
             return;
          }
 
-         form.mutators.setAttribute(`__attribute__${descriptor.name}`, (attribute.content as AttributeContentModel).value);
+         const initialValues = { ...form.getState().values };
+         initialValues[`__attribute__`] = initialValues[`__attribute__`] || {};
+         initialValues[`__attribute__`][descriptor.name] = (attribute.content as AttributeContentModel).value;
+         form.setConfig("initialValues", initialValues);
+
+         form.mutators.setAttribute(`__attribute__.${descriptor.name}`, (attribute.content as AttributeContentModel).value);
 
       },
 
@@ -67,7 +72,7 @@ export function SecretAttribute({
 
       <FormGroup>
 
-         <Field name={`__attribute__${descriptor.name}`} validate={validators}>
+         <Field name={`__attribute__.${descriptor.name}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -75,16 +80,20 @@ export function SecretAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__${descriptor.name}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__.${descriptor.name}`}>{descriptor.label}</Label>
 
                   ) : null}
 
                   <Input
                      {...input}
+                     valid={!meta.error && meta.touched}
+                     invalid={!!meta.error && meta.touched}
                      type={descriptor.visible ? "password" : "hidden"}
                      placeholder={`Enter ${descriptor.label}`}
                      disabled={descriptor.readOnly}
                   />
+
+                  <FormFeedback>{meta.error}</FormFeedback>
 
                </>
 
