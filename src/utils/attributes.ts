@@ -42,7 +42,7 @@ export function collectFormAttributes(descriptors: AttributeDescriptorModel[] | 
 
       const attributeName = info[0];
       const attributeType = info[1];
-      const attributeUuid = info.length === 3 ? info[3] : undefined;
+      const attributeUuid = info.length === 3 ? info[2] : undefined;
 
       const descriptor = descriptors?.find(d => d.name === attributeName);
 
@@ -134,6 +134,8 @@ export function collectFormAttributes(descriptors: AttributeDescriptorModel[] | 
             continue;
 
       }
+
+      if (!content || !content.value) continue;
 
       const attr: AttributeModel = {
          name: attributeName,
