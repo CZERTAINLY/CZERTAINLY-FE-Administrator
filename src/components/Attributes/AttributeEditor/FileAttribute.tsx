@@ -20,6 +20,17 @@ export function FileAttribute({
    const form = useForm();
 
 
+   const baseFieldId = useMemo(
+
+      () => {
+         const uuid = attribute ? `:${attribute.uuid}` : "";
+         return `${descriptor.name}:File${uuid}`;
+      },
+      [attribute, descriptor.name]
+
+   )
+
+
    const onFileLoaded = useCallback(
 
       (data, fileName) => {
@@ -34,7 +45,7 @@ export function FileAttribute({
          form.mutators.setAttribute(`__attribute__.${baseFieldId}.contentType`, contentType);
 
       },
-      []
+      [baseFieldId, form.mutators]
 
    );
 
@@ -53,7 +64,7 @@ export function FileAttribute({
          reader.onload = (data) => onFileLoaded(data, fileName);
 
       },
-      []
+      [onFileLoaded]
 
    )
 
@@ -72,7 +83,7 @@ export function FileAttribute({
          reader.readAsDataURL(e.dataTransfer.files[0]);
          reader.onload = (data) => { onFileLoaded(data, fileName); }
       },
-      []
+      [onFileLoaded]
 
    )
 
@@ -104,17 +115,6 @@ export function FileAttribute({
       [descriptor.required, descriptor.validationRegex]
 
    );
-
-
-   const baseFieldId = useMemo(
-
-      () => {
-         const uuid = attribute ? `:${attribute.uuid}` : "";
-         return `${descriptor.name}${uuid}`;
-      },
-      [attribute, descriptor.name]
-
-   )
 
 
    const setupAttributeDefaultValues = useCallback(
@@ -175,7 +175,7 @@ export function FileAttribute({
          form.mutators.setAttribute(`__attribute__.${baseFieldId}.contentType`, contentType);
 
       },
-      [baseFieldId, descriptor.content, attribute]
+      [baseFieldId, descriptor.content, attribute, form]
 
    )
 

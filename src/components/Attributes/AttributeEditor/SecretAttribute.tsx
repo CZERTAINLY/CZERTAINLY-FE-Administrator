@@ -22,6 +22,15 @@ export function SecretAttribute({
    const form = useForm();
    const dispatch = useDispatch();
 
+   const baseFieldId = useMemo(
+
+      () => {
+         const uuid = attribute ? `:${attribute.uuid}` : "";
+         return `${descriptor.name}:Secret${uuid}`;
+      },
+      [attribute, descriptor.name]
+
+   )
 
    useEffect(
 
@@ -33,20 +42,20 @@ export function SecretAttribute({
          }
 
          if (!attribute || !attribute.content || !(attribute.content as AttributeContentModel).value) {
-            form.mutators.setAttribute(`__attribute__.${descriptor.name}`, undefined);
+            form.mutators.setAttribute(`__attribute__.${baseFieldId}`, undefined);
             return;
          }
 
          const initialValues = { ...form.getState().values };
          initialValues[`__attribute__`] = initialValues[`__attribute__`] || {};
-         initialValues[`__attribute__`][descriptor.name] = (attribute.content as AttributeContentModel).value;
+         initialValues[`__attribute__`][baseFieldId] = (attribute.content as AttributeContentModel).value;
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__.${descriptor.name}`, (attribute.content as AttributeContentModel).value);
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}`, (attribute.content as AttributeContentModel).value);
 
       },
 
-      [descriptor, attribute, form.mutators, dispatch]
+      [baseFieldId, descriptor, attribute, form, dispatch]
    )
 
 
@@ -72,7 +81,7 @@ export function SecretAttribute({
 
       <FormGroup>
 
-         <Field name={`__attribute__.${descriptor.name}`} validate={validators}>
+         <Field name={`__attribute__.${baseFieldId}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -80,7 +89,7 @@ export function SecretAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__.${descriptor.name}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 

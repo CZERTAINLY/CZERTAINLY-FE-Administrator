@@ -3,10 +3,10 @@ import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorM
 import { AttributeModel } from "models/attributes/AttributeModel";
 
 import { useEffect, useMemo } from "react";
-import { FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
-import { composeValidators, validateInteger, validateRequired } from "utils/validators";
+import { composeValidators, validateInteger, validatePattern, validateRequired } from "utils/validators";
 
 interface Props {
    descriptor: AttributeDescriptorModel;
@@ -20,70 +20,60 @@ export function IntegerAttribute({
 
    const form = useForm();
 
+   const baseFieldId = useMemo(
+
+      () => {
+         const uuid = attribute ? `:${attribute.uuid}` : "";
+         return `${descriptor.name}:Integer${uuid}`;
+      },
+      [attribute, descriptor.name]
+
+   )
+
    useEffect(
 
       () => {
 
-         if (!attribute || !attribute.content) {
+         if (!attribute || !attribute.content) return;
 
-            form.mutators.setAttribute(
+         const attributeValue = descriptor.list
 
-               `__attribute__${descriptor.name}`,
-               descriptor.content
-                  ?
-                  descriptor.content instanceof Array
-                     ?
-                     descriptor.content.map(
-                        content => ({
-                           value: content.value,
-                           label: content.value,
-                        })
-                     )
-                     :
-                     (descriptor.content as AttributeContentModel).value
-                  :
-                  undefined
-            );
+            ?
 
-            return;
-
-         }
-
-
-         form.mutators.setAttribute(`__attribute__${descriptor.name}`,
-
-            descriptor.list
+            descriptor.multiSelect && attribute.content instanceof Array
 
                ?
 
-               descriptor.multiSelect && attribute.content instanceof Array
-
-                  ?
-
-                  attribute.content.map(
-                     content => ({
-                        value: content.value,
-                        label: content.value
-                     })
-                  )
-
-                  :
-
-                  ({
-                     value: (attribute.content as AttributeContentModel).value,
-                     label: (attribute.content as AttributeContentModel).value
+               attribute.content.map(
+                  content => ({
+                     value: content.value,
+                     label: content.value
                   })
+               )
 
                :
 
-               (attribute.content as AttributeContentModel).value
+               ({
+                  value: (attribute.content as AttributeContentModel).value,
+                  label: (attribute.content as AttributeContentModel).value
+               })
 
-         );
+            :
+
+            (attribute.content as AttributeContentModel).value
+
+         const initialValues = { ...form.getState().values };
+         initialValues[`__attribute__`] = initialValues[`__attribute__`] || {};
+         initialValues[`__attribute__`][baseFieldId] = attributeValue;
+         form.setConfig("initialValues", initialValues);
+
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}`, attributeValue);
 
       },
 
-      [descriptor, attribute, form.mutators]
+      [baseFieldId, descriptor, attribute, form]
    )
+
 
    const options = useMemo(
 
@@ -98,29 +88,31 @@ export function IntegerAttribute({
       [descriptor.content]
    )
 
+
    const validators: any = useMemo(
 
       () => {
 
          const vals = [];
 
-         if (descriptor.required) vals.push(validateRequired());
          vals.push(validateInteger());
+         if (descriptor.required) vals.push(validateRequired());
+         if (descriptor.validationRegex) vals.push(validatePattern(descriptor.validationRegex));
 
          return composeValidators.apply(undefined, vals);
 
       },
 
-      [descriptor.required]
+      [descriptor.required, descriptor.validationRegex]
 
    );
 
 
    return !descriptor ? <></> : (
 
-      <FormGroup>
+      <FormGroup row={false}>
 
-         <Field name={`__attribute__${descriptor.name}`} validate={validators}>
+         <Field name={`__attribute__.${baseFieldId}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -128,7 +120,7 @@ export function IntegerAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__${descriptor.name}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 
@@ -147,15 +139,24 @@ export function IntegerAttribute({
                         />
 
                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
                      </>
 
                   ) : (
-                     <Input
-                        {...input}
-                        type={descriptor.visible ? "text" : "hidden"}
-                        placeholder={`Enter ${descriptor.label}`}
-                        disabled={descriptor.readOnly}
-                     />
+                     <>
+
+                        <Input
+                           {...input}
+                           valid={!meta.error && meta.touched}
+                           invalid={!!meta.error && meta.touched}
+                           type={descriptor.visible ? "text" : "hidden"}
+                           placeholder={`Enter ${descriptor.label}`}
+                           disabled={descriptor.readOnly}
+                        />
+
+                        <FormFeedback>{meta.error}</FormFeedback>
+
+                     </>
                   )}
 
                </>

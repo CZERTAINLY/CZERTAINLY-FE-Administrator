@@ -15,7 +15,7 @@ import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import { mutators } from "utils/attributeEditorMutators";
 import ProgressButton from "components/ProgressButton";
-import { FormApi } from "final-form";
+import { collectFormAttributes } from "utils/attributes";
 
 
 interface FormValues {
@@ -127,28 +127,26 @@ export default function CredentialForm({
 
       (values: FormValues, form: any) => {
 
-         console.log(values);
-         console.log(form.getState());
-
-         /*if (editMode) {
+         if (editMode) {
 
             dispatch(actions.updateCredential({
                uuid: params.id,
-               attributes: []
+               attributes: collectFormAttributes(credentialProviderAttributeDescriptors, values)
             }));
 
          } else {
 
             dispatch(actions.createCredential({
-               name: values.name,
-               connectorUuid: values.connectorUuid,
-               kind: values.kind,
-               attributes: []
+               name: values.name!,
+               connectorUuid: values.credentialProvider!.value,
+               kind: values.storeKind?.value!,
+               attributes: collectFormAttributes(credentialProviderAttributeDescriptors, values)
             }));
 
-         }*/
+         }
+
       },
-      [editMode, dispatch, credential]
+      [editMode, dispatch, credential, credentialProviderAttributeDescriptors]
    );
 
 

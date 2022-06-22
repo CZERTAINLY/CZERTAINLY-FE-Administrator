@@ -2,7 +2,7 @@ import { AttributeType } from "types/attributes";
 import { AttributeContentModel } from "./AttributeContentModel";
 
 export interface AttributeModel {
-   uuid: string;
+   uuid?: string;
    name: string;
    label?: string;
    type?: AttributeType

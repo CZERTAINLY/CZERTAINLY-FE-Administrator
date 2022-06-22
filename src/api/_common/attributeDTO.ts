@@ -65,7 +65,7 @@ export type AttributeDescriptorCollectionDTO = {
  * Used to get or set attributes of a particular object
  */
 export interface AttributeDTO {
-   uuid: string;
+   uuid?: string;
    name: string;
    label?: string;
    type?: AttributeType

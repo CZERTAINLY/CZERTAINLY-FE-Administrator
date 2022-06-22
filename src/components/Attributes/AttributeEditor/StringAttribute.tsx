@@ -20,6 +20,16 @@ export function StringAttribute({
 
    const form = useForm();
 
+   const baseFieldId = useMemo(
+
+      () => {
+         const uuid = attribute ? `:${attribute.uuid}` : "";
+         return `${descriptor.name}:String${uuid}`;
+      },
+      [attribute, descriptor.name]
+
+   )
+
    useEffect(
 
       () => {
@@ -54,14 +64,14 @@ export function StringAttribute({
 
          const initialValues = { ...form.getState().values };
          initialValues[`__attribute__`] = initialValues[`__attribute__`] || {};
-         initialValues[`__attribute__`][descriptor.name] = attributeValue;
+         initialValues[`__attribute__`][baseFieldId] = attributeValue;
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__.${descriptor.name}`, attributeValue);
+         form.mutators.setAttribute(`__attribute__.${baseFieldId}`, attributeValue);
 
       },
 
-      [descriptor, attribute, form.mutators]
+      [baseFieldId, descriptor, attribute, form]
    )
 
 
@@ -101,7 +111,7 @@ export function StringAttribute({
 
       <FormGroup row={false}>
 
-         <Field name={`__attribute__.${descriptor.name}`} validate={validators}>
+         <Field name={`__attribute__.${baseFieldId}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -109,7 +119,7 @@ export function StringAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__.${descriptor.name}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 

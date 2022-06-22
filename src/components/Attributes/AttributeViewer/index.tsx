@@ -141,7 +141,7 @@ export default function AttributeViewer({
 
          attribute => {
             return ({
-               id: attribute.uuid,
+               id: attribute.uuid || "",
                columns: [
                   attribute.label || "",
                   attribute.type || "",
