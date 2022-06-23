@@ -37,7 +37,7 @@ export default function ClientDetail() {
    const isEnabling = useSelector(clientSelectors.isEnabling);
    const isFetchingAuthorizedProfiles = useSelector(clientSelectors.isFetchingAuthorizedProfiles);
    const isAuthorizing = useSelector(clientSelectors.isAuthorizing);
-   const isUnauthorizing = useSelector(clientSelectors.isUnuthorizing);
+   const isUnauthorizing = useSelector(clientSelectors.isUnauthorizing);
 
    const [selectedProfile, setSelectedProfile] = useState<{ value: string; label: string; } | null>(null);
 

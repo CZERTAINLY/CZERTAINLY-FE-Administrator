@@ -2,7 +2,302 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
+
 import { ButtonGroup, Container, Form, FormGroup, Input, Label, Table, Row, Col, Button } from "reactstrap";
+
+import { actions as clientActions, selectors as clientSelectors } from "ducks/clients";
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
+
+import Widget from "components/Widget";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import AttributeViewer from "components/Attributes/AttributeViewer";
+import Dialog from "components/Dialog";
+import StatusBadge from "components/StatusBadge";
+import Select from "react-select";
+import ProgressButton from "components/ProgressButton";
+import { group } from "console";
+import ToolTip from "components/ToolTip";
+
+
+export default function RaProfileDetail() {
+
+   const dispatch = useDispatch();
+
+   const { params } = useRouteMatch<{ id: string }>();
+   const history = useHistory();
+
+   const clients = useSelector(clientSelectors.clients);
+
+   const isFetchingClients = useSelector(clientSelectors.isFetchingList);
+
+   const raProfile = useSelector(raProfilesSelectors.raProfile);
+   const raProfileAuthorizedClients = useSelector(raProfilesSelectors.authorizedClients);
+
+   const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
+   const isFetchingAuthorizedClients = useSelector(raProfilesSelectors.isFetchingAuthorizedClients);
+   const isFetchingAttributes = useSelector(raProfilesSelectors.isFetchingAttributes);
+   const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
+   const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
+   const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
+
+   const isDeleting = useSelector(raProfilesSelectors.isDeleting);
+   const isEnabling = useSelector(raProfilesSelectors.isEnabling);
+   const isDisabling = useSelector(raProfilesSelectors.isDisabling);
+   const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
+   const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
+
+   const isAuthorizing = useSelector(clientSelectors.isAuthorizing);
+   const isUnauthorizing = useSelector(clientSelectors.isUnauthorizing);
+
+   const [clientToAuthorize, setClientToAuthorize] = useState<{ value: string; label: string; } | null>(null);
+
+   const isBusy = useMemo(
+      () => isFetchingProfile || isDeleting || isEnabling || isDisabling,
+      [isFetchingProfile, isDeleting, isEnabling, isDisabling]
+   )
+
+   useEffect(
+      () => {
+         dispatch(raProfilesActions.getRaProfileDetail(params.id));
+         dispatch(raProfilesActions.getAttributes(params.id));
+         dispatch(raProfilesActions.listIssuanceAttributes(params.id));
+         dispatch(raProfilesActions.listRevocationAttributes(params.id));
+      },
+      [params.id, dispatch]
+
+   )
+
+   useEffect(
+      () => {
+         if (isAuthorizing || isUnauthorizing) return;
+         dispatch(raProfilesActions.listAuthorizedClients(params.id));
+         dispatch(clientActions.listClients());
+         setClientToAuthorize(null);
+      },
+      [isAuthorizing, isUnauthorizing]
+   )
+
+
+   const onAuthorizeClick = useCallback(
+      () => {
+         if (!raProfile || !clientToAuthorize) return;
+         dispatch(clientActions.authorizeClient({ clientUuid: clientToAuthorize.value, raProfile }))
+      }
+      , [dispatch, raProfile, clientToAuthorize]
+   )
+
+
+   const detailHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "property",
+            content: "Property",
+         },
+         {
+            id: "value",
+            content: "Value",
+         },
+      ],
+      []
+   );
+
+
+   const detailData: TableDataRow[] = useMemo(
+
+      () => !raProfile ? [] : [
+
+         {
+            id: "uuid",
+            columns: ["UUID", raProfile.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", raProfile.name]
+         },
+         {
+            id: "description",
+            columns: ["Description", raProfile.description || ""]
+         },
+         {
+            id: "enabled",
+            columns: ["Enabled", <StatusBadge enabled={raProfile!.enabled} />,
+            ]
+         },
+         {
+            id: "authorityUuid",
+            columns: ["Authority Instance UUID", raProfile.authorityInstanceUuid]
+         },
+         {
+            id: "authorityName",
+            columns: ["Authority Instance Name", raProfile.authorityInstanceName]
+         }
+
+      ],
+      [raProfile]
+
+   )
+
+
+   const authorizedClientsHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "name",
+            content: "Client Name",
+         },
+         {
+            id: "dn",
+            content: "Client DN",
+         },
+         {
+            id: "status",
+            content: "Status",
+         },
+         {
+            id: "actions",
+            content: "Actions",
+         },
+      ],
+      []
+   );
+
+
+   const authorizedClientsData: TableDataRow[] = useMemo(
+
+      () => !raProfileAuthorizedClients || !clients || raProfileAuthorizedClients.length === 0 || clients.length === 0 || !raProfile
+         ?
+         []
+         :
+         raProfileAuthorizedClients.map(
+
+            uuid => {
+
+               const client = clients.find(c => c.uuid === uuid);
+
+               return ({
+                  id: client!.uuid,
+                  columns: [
+                     <Link to={`../../clients/detail/${client!.uuid}`}>{client!.name}</Link>,
+                     client!.certificate.subjectDn,
+                     <StatusBadge enabled={client!.enabled} />,
+                     <Button
+                        className="btn btn-link"
+                        color="white"
+                        data-placement="right"
+                        data-for={client?.name}
+                        data-tip
+                        onClick={() => {
+                           dispatch(clientActions.unauthorizeClient({ clientUuid: client!.uuid, raProfile }))
+                        }}
+                     >
+                        <i className="fa fa-trash" style={{ color: "red" }} />
+                        <ToolTip message={`Unauthorize ${client?.name}`} id={client!.name} place="right" />
+                     </Button>
+
+                  ]
+               })
+
+            }
+
+         ),
+      [clients, raProfileAuthorizedClients, raProfile]
+
+   );
+
+
+   const optionsForClients = useMemo(
+
+      () => !raProfileAuthorizedClients || !clients || clients.length === 0
+         ?
+         []
+         :
+         clients.filter(client => !raProfileAuthorizedClients.includes(client.uuid)).map(
+            client => ({
+               value: client.uuid,
+               label: client.name
+            })
+         ),
+      [clients, raProfileAuthorizedClients]
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title="RA Profile Detail" busy={isBusy}>
+
+            <br />
+
+            <CustomTable
+               headers={detailHeaders}
+               data={detailData}
+            />
+
+         </Widget>
+
+         {
+
+            raProfile && raProfile.attributes && raProfile.attributes.length > 0 && (
+
+               <Widget title="RA Profile Attributes" busy={isBusy}>
+
+                  <br />
+
+                  <AttributeViewer attributes={raProfile?.attributes} />
+
+               </Widget>
+            )
+
+         }
+
+         <Widget title="Authorized Clients" busy={isFetchingAuthorizedClients || isFetchingClients || isAuthorizing || isUnauthorizing}>
+
+            <br />
+
+            <CustomTable
+               headers={authorizedClientsHeaders}
+               data={authorizedClientsData}
+            />
+
+            <Label>Authorize a client</Label>
+
+            <div style={{ display: "flex" }}>
+
+               <div style={{ flexGrow: 1 }}>
+                  <Select
+                     value={clientToAuthorize}
+                     options={optionsForClients}
+                     isClearable={true}
+                     placeholder="Select a client to authorize..."
+                     onChange={(e: any) => { setClientToAuthorize(e) }}
+                  />
+               </div>
+
+               &nbsp;
+
+               <ProgressButton
+                  title="Authorize"
+                  inProgressTitle="Authorizing..."
+                  inProgress={isAuthorizing}
+                  disabled={clientToAuthorize === null}
+                  onClick={onAuthorizeClick}
+               />
+
+            </div>
+
+
+
+
+         </Widget>
+
+
+      </Container>
+
+   )
+
+}
+
 /*
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";

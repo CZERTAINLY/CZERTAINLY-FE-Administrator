@@ -482,7 +482,7 @@ export const selectors = {
    isUpdating,
    isDeleting,
    isAuthorizing,
-   isUnuthorizing,
+   isUnauthorizing: isUnuthorizing,
    isEnabling,
    isDisabling,
    isBulkEnabling,

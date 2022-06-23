@@ -3,10 +3,11 @@ import { Switch, Route } from 'react-router';
 import { useRouteMatch } from 'react-router-dom';
 
 import ProfilesList from './list';
+import ProfileDetail from './detail';
+
 /*
 import ProfileAdd from './add';
 import ProfileEdit from './edit';
-import ProfileDetail from './detail';
 */
 
 function RaProfiles() {
@@ -15,7 +16,8 @@ function RaProfiles() {
    return (
       <Switch>
          <Route path={path} component={ProfilesList} exact />
-         {/*<Route path={`${path}/detail/:id`} component={ProfileDetail} exact />
+         <Route path={`${path}/detail/:id`} component={ProfileDetail} exact />
+         {/*
          <Route path={`${path}/edit/:id`} component={ProfileEdit} exact />
          <Route path={`${path}/add`} component={ProfileAdd} exact />*/}
       </Switch>

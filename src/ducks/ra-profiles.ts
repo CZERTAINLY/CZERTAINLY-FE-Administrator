@@ -514,7 +514,7 @@ export const selectors = {
    isFetchingAuthorizedClients,
    isFetchingAttributes,
    isFetchingIssuanceAttributes,
-   isFetchinRevocationAttributes,
+   isFetchingRevocationAttributes: isFetchinRevocationAttributes,
    isFetchingAcmeDetails,
    isCreating,
    isDeleting,
