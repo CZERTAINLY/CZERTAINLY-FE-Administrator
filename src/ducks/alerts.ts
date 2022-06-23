@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MessageModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector } from 'reselect';
+import { store } from "../index"
 
 
 export type State = {
@@ -32,6 +33,7 @@ export const slice = createSlice({
 
             state.messages.push({
                id: state.msgId,
+               time: Date.now(),
                message: action.payload,
                color: "danger"
             })
@@ -50,12 +52,27 @@ export const slice = createSlice({
 
             state.messages.push({
                id: state.msgId,
+               time: Date.now(),
                message: action.payload,
                color: "success"
             })
             state.msgId++;
 
          }
+
+      },
+
+
+      hide: {
+
+         prepare: (id: number) => ({ payload: id }),
+
+         reducer: (state, action: PayloadAction<number>) => {
+            const msgIndex = state.messages.findIndex(message => message.id === action.payload);
+            if (msgIndex < 0) return;
+            state.messages[msgIndex].isHiding = true;
+         }
+
 
       },
 
@@ -94,6 +111,28 @@ export const selectors = {
 
 
 export const actions = slice.actions;
+
+
+setInterval(
+
+   () => {
+      const alerts = store.getState().alerts;
+      alerts.messages.forEach(
+         message => {
+
+            if (Date.now() - message.time > 7000) {
+               store.dispatch(actions.hide(message.id));
+            }
+
+            if (Date.now() - message.time > 10000) {
+               store.dispatch(actions.dismiss(message.id));
+            }
+
+         }
+      )
+   },1000
+
+);
 
 
 export default slice.reducer;

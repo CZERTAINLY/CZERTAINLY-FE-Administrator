@@ -5,3 +5,11 @@
   bottom: 60px;
   padding: 0 30px;
 }
+
+.alert {
+}
+
+.alert[data-hiding="true"] {
+   transition: 3s;
+   opacity: 0;
+}
