@@ -31,15 +31,6 @@ function CredentialDetail() {
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
 
-   const allowedAttributeTypeForDetail = [
-      "STRING",
-      "NUMBER",
-      "DROPDOWN",
-      "LIST",
-      "CREDENTIAL",
-   ];
-
-
    useEffect(
 
       () => {

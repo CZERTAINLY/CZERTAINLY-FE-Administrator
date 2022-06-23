@@ -47,6 +47,7 @@ export function collectFormAttributes(descriptors: AttributeDescriptorModel[] | 
       const descriptor = descriptors?.find(d => d.name === attributeName);
 
       if (!descriptor) continue;
+      if (!attributes[attribute]) continue;
 
       let content: any;
 

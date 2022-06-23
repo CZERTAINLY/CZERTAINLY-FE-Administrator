@@ -136,6 +136,7 @@ export function FloatAttribute({
                            styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                            isDisabled={descriptor.readOnly}
                            isMulti={descriptor.multiSelect}
+                           isClearable={!descriptor.required}
                         />
 
                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
