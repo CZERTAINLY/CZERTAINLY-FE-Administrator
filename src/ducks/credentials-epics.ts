@@ -221,20 +221,6 @@ const createCredential: AppEpic = (action$, state, deps) => {
 }
 
 
-const createCredentialFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createCredentialFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload || "Unexpected error occurred")
-      )
-   );
-}
-
-
 const createCredentialSuccess: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -250,6 +236,22 @@ const createCredentialSuccess: AppEpic = (action$, state, deps) => {
    )
 
 }
+
+
+const createCredentialFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.createCredentialFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload || "Unexpected error occurred")
+      )
+   );
+}
+
+
 
 
 const deleteCredential: AppEpic = (action$, state, deps) => {
@@ -276,6 +278,24 @@ const deleteCredential: AppEpic = (action$, state, deps) => {
       )
 
    );
+
+}
+
+
+const deleteCredentialSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteCredentialSuccess.match
+      ),
+      switchMap(
+         () => {
+            history.push("../");
+            return EMPTY
+         }
+      )
+   )
 
 }
 
@@ -321,6 +341,23 @@ const updateCredential: AppEpic = (action$, state, deps) => {
       )
 
    );
+
+}
+
+
+const updateCredentialSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+      filter(
+         slice.actions.updateCredentialSuccess.match
+      ),
+      switchMap(
+         action => {
+            history.push(`../detail/${action.payload.uuid}`);
+            return EMPTY;
+         }
+      )
+   )
 
 }
 
@@ -442,8 +479,10 @@ const epics = [
    createCredentialFailure,
    createCredentialSuccess,
    deleteCredential,
+   deleteCredentialSuccess,
    deleteCredentialFailure,
    updateCredential,
+   updateCredentialSuccess,
    updateCredentialFailure,
    bulkDeleteCredential,
    bulkDeleteCredentialFailure,

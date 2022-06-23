@@ -11,6 +11,7 @@ import { actions, selectors } from "ducks/credentials";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeViewer from "components/Attributes/AttributeViewer";
+import Dialog from "components/Dialog";
 
 function CredentialDetail() {
 
@@ -24,6 +25,8 @@ function CredentialDetail() {
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
    const isForceBulkDeleting = useSelector(selectors.isForceBulkDeleting);
+
+   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
@@ -188,107 +191,37 @@ function CredentialDetail() {
 
          }
 
-         {/*
 
-         <Widget title={attributeTitle}>
-            <Table className="table-hover" size="sm">
-               <thead>
-                  <tr>
-                     <th>Attribute</th>
-                     <th>Value</th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {credential?.attributes.map(function (attribute) {
-                     return (
-                        <tr>
-                           <td>
-                              {attribute.label ||
-                                 FieldNameTransform[attribute.name] ||
-                                 attribute.name}
-                           </td>
-                           { }
-                           <td>
-                              {allowedAttributeTypeForDetail.includes(attribute.type)
-                                 ? attribute.value
-                                 : "<" + attribute.type + ">"}
-                           </td>
-                        </tr>
-                     );
-                  })}
-               </tbody>
-            </Table>
-         </Widget>
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Credential"
+            body="You are about to delete an Credential. Is this what you want to do?"
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
 
-         <MDBModal
-            overflowScroll={false}
-            isOpen={confirmDeleteId !== ""}
-            toggle={onCancelDelete}
-         >
-            <MDBModalHeader toggle={onCancelDelete}>
-               Delete Credential
-            </MDBModalHeader>
-            <MDBModalBody>
-               You are about deleting a credential. If you continue, these connectors
-               with the credentials will fail. Is this what you want to do?
-            </MDBModalBody>
-            <MDBModalFooter>
-               <Button color="danger" onClick={onDeleteConfirmed}>
-                  Yes, delete
-               </Button>
-               <Button color="secondary" onClick={onCancelDelete}>
-                  Cancel
-               </Button>
-            </MDBModalFooter>
-         </MDBModal>
 
-         <MDBModal
-            overflowScroll={false}
-            isOpen={deleteErrorModalOpen}
-            toggle={onForceDeleteCancel}
-         >
-            <MDBModalHeader toggle={onForceDeleteCancel}>
-               Delete Credential
-            </MDBModalHeader>
-            <MDBModalBody>
-               Failed to delete some of the credentials. Please find the details
-               below &nbsp;
-               <Table className="table-hover" size="sm">
-                  <thead>
-                     <tr>
-                        <th>
-                           <b>Name</b>
-                        </th>
-                        <th>
-                           <b>Dependencies</b>
-                        </th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     {deleteErrorMessages?.map(function (message) {
-                        return (
-                           <tr>
-                              <td>{message.name}</td>
-                              <td>{message.message}</td>
-                           </tr>
-                        );
-                     })}
-                  </tbody>
-               </Table>
-            </MDBModalBody>
-            <MDBModalFooter>
-               <Button color="danger" onClick={onForceDeleteCredential}>
-                  Force
-               </Button>
-               <Button color="secondary" onClick={onForceDeleteCancel}>
-                  Cancel
-               </Button>
-            </MDBModalFooter>
-         </MDBModal>
-
-         <Spinner active={isFetchingCredential} />
-
-                  */}
+         <Dialog
+            isOpen={deleteErrorMessage !== ""}
+            caption="Delete Connector"
+            body={
+               <>
+                  Failed to delete the Credential as the Credential has dependent objects.
+                  Please find the details below:
+                  <br />
+                  <br />
+                  {deleteErrorMessage}
+               </>
+            }
+            toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteConfirmed, body: "Force" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+            ]}
+         />
 
       </Container>
    );

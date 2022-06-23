@@ -85,8 +85,6 @@ export default function CredentialForm({
             }
          }
 
-
-
       },
       [dispatch, editMode, params.id, credentialSelector, credentialProviders]
 
@@ -122,7 +120,6 @@ export default function CredentialForm({
    );
 
 
-
    const onSubmit = useCallback(
 
       (values: FormValues, form: any) => {
@@ -146,15 +143,15 @@ export default function CredentialForm({
          }
 
       },
-      [editMode, dispatch, credential, credentialProviderAttributeDescriptors]
+      [editMode, dispatch, params.id, credentialProviderAttributeDescriptors]
    );
 
 
    const onCancel = useCallback(
       () => {
-
+         history.goBack();
       },
-      []
+      [history]
    )
 
 
