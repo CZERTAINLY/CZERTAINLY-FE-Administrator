@@ -29,7 +29,6 @@ function CredentialDetail() {
    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-   const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
 
    const allowedAttributeTypeForDetail = [
@@ -77,7 +76,6 @@ function CredentialDetail() {
       () => {
          if (!credential) return;
          dispatch(actions.deleteCredential(credential.uuid));
-         setConfirmForceDelete(false);
       },
       [dispatch, credential]
 
