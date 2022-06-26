@@ -25,7 +25,9 @@ export type State = {
    isFetchingAttributes: boolean;
    isFetchingIssuanceAttributes: boolean;
    isFetchinRevocationAttributes: boolean;
+
    isFetchingAcmeDetails: boolean;
+
    isCreating: boolean;
    isDeleting: boolean;
    isBulkDeleting: boolean;
@@ -146,29 +148,6 @@ export const slice = createSlice({
       getRaProfileDetailFailure: (state, action: PayloadAction<string>) => {
 
          state.isFetchingDetail = false;
-
-      },
-
-
-      getAttributes: (state, action: PayloadAction<string>) => {
-
-         state.attributes = undefined;
-         state.isFetchingAttributes = true;
-
-      },
-
-
-      getAttributesSuccess: (state, action: PayloadAction<AttributeModel[]>) => {
-
-         state.isFetchingAttributes = false;
-         state.attributes = action.payload;
-
-      },
-
-
-      getAttributesFailure: (state, action: PayloadAction<string>) => {
-
-         state.isFetchingAttributes = false;
 
       },
 
@@ -344,6 +323,28 @@ export const slice = createSlice({
       deactivateAcmeFailure: (state, action: PayloadAction<string>) => {
 
          state.isDeactivatingAcme = false;
+
+      },
+
+
+      getAcmeDetails: (state, action: PayloadAction<string>) => {
+
+         state.isFetchingAcmeDetails = true;
+
+      },
+
+
+      getAcmeDetailsSuccess: (state, action: PayloadAction<RaAcmeLinkModel>) => {
+
+         state.isFetchingAcmeDetails = false;
+         state.acmeDetails = action.payload;
+
+      },
+
+
+      getAcmeDetailsFailure: (state, action: PayloadAction<string>) => {
+
+         state.isFetchingAcmeDetails = false;
 
       },
 

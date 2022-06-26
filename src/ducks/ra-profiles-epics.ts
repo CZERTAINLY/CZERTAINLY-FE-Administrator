@@ -8,6 +8,7 @@ import { slice } from "./ra-profiles";
 import history from "browser-history";
 import { transformRaAuthorizedClientDtoToModel, transformRaProfileDtoToModel } from "./transform/ra-profiles";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
+import { transfromRaAcmeLinkDtoToModel } from "./transform/acme-profiles";
 
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
@@ -443,6 +444,46 @@ const deactivateAcmeFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
+const getAcmeDetails: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getAcmeDetails.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.profiles.getRaAcmeProfile(action.payload).pipe(
+
+            map(acmeDetails => slice.actions.getAcmeDetailsSuccess(transfromRaAcmeLinkDtoToModel(acmeDetails))),
+
+            catchError(err => of(slice.actions.getAcmeDetailsFailure(extractError(err, "Failed to get ACME details"))))
+
+         )
+
+      )
+
+   );
+
+}
+
+
+const getAcmeDetailsFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getAcmeDetailsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload || "Unexpected error occurred")
+      )
+
+   );
+
+}
+
+
 const listIssuanceAttributes: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -666,6 +707,8 @@ const epics = [
    activateAcmeFailure,
    deactivateAcme,
    deactivateAcmeFailure,
+   getAcmeDetails,
+   getAcmeDetailsFailure,
    listIssuanceAttributes,
    listIssuanceAttributesFailure,
    listRevocationAttributes,

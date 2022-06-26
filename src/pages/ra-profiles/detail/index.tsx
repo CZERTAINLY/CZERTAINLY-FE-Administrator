@@ -18,6 +18,7 @@ import Select from "react-select";
 import ProgressButton from "components/ProgressButton";
 import { group } from "console";
 import ToolTip from "components/ToolTip";
+import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 
 
 export default function RaProfileDetail() {
@@ -32,13 +33,19 @@ export default function RaProfileDetail() {
    const isFetchingClients = useSelector(clientSelectors.isFetchingList);
 
    const raProfile = useSelector(raProfilesSelectors.raProfile);
-   const raProfileAuthorizedClients = useSelector(raProfilesSelectors.authorizedClients);
+
+   const raProfileAuthorizedClientUuids = useSelector(raProfilesSelectors.authorizedClients);
+   const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
+   const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
 
    const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
    const isFetchingAuthorizedClients = useSelector(raProfilesSelectors.isFetchingAuthorizedClients);
    const isFetchingAttributes = useSelector(raProfilesSelectors.isFetchingAttributes);
    const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
    const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
+
+   const acmeDetails = useSelector(raProfilesSelectors.acmeDetails);
+
    const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
 
    const isDeleting = useSelector(raProfilesSelectors.isDeleting);
@@ -47,45 +54,93 @@ export default function RaProfileDetail() {
    const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
    const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
 
-   const isAuthorizing = useSelector(clientSelectors.isAuthorizing);
+   const isAuthorizingClient = useSelector(clientSelectors.isAuthorizing);
    const isUnauthorizing = useSelector(clientSelectors.isUnauthorizing);
 
    const [clientToAuthorize, setClientToAuthorize] = useState<{ value: string; label: string; } | null>(null);
+   const [authorizedClientsDataState, setAuthorizedClientsDataState] = useState<TableDataRow[]>([]);
+
+   const [activatingAcme, setActivatingAcme] = useState(false);
+
 
    const isBusy = useMemo(
       () => isFetchingProfile || isDeleting || isEnabling || isDisabling,
       [isFetchingProfile, isDeleting, isEnabling, isDisabling]
    )
 
+
+   const isWorkingWithProtocol = useMemo(
+      () => isActivatingAcme || isDeactivatingAcme || isFetchingAcmeDetails,
+      [isActivatingAcme, isDeactivatingAcme, isFetchingAcmeDetails]
+   )
+
+
    useEffect(
       () => {
          dispatch(raProfilesActions.getRaProfileDetail(params.id));
-         dispatch(raProfilesActions.getAttributes(params.id));
          dispatch(raProfilesActions.listIssuanceAttributes(params.id));
          dispatch(raProfilesActions.listRevocationAttributes(params.id));
+         dispatch(raProfilesActions.getAcmeDetails(params.id));
       },
       [params.id, dispatch]
 
    )
 
+
    useEffect(
       () => {
-         if (isAuthorizing || isUnauthorizing) return;
+         if (isAuthorizingClient || isUnauthorizing) return;
          dispatch(raProfilesActions.listAuthorizedClients(params.id));
          dispatch(clientActions.listClients());
          setClientToAuthorize(null);
       },
-      [isAuthorizing, isUnauthorizing]
+      [dispatch, isAuthorizingClient, isUnauthorizing, params.id]
    )
 
 
-   const onAuthorizeClick = useCallback(
+   const onAuthorizeClientClick = useCallback(
       () => {
          if (!raProfile || !clientToAuthorize) return;
          dispatch(clientActions.authorizeClient({ clientUuid: clientToAuthorize.value, raProfile }))
       }
       , [dispatch, raProfile, clientToAuthorize]
    )
+
+
+   const availableClients: { value: string; label: string; }[] = useMemo(
+
+      () =>
+
+         !raProfileAuthorizedClientUuids
+
+            ?
+            [] :
+            clients.filter(
+               client => !raProfileAuthorizedClientUuids.some(authorizedClientUuid => client.uuid === authorizedClientUuid)
+            ).sort(
+               (a, b) => a.name.localeCompare(b.name)
+            ).map(
+               client => (
+                  { value: client.uuid, label: client.name }
+               )
+            ),
+
+      [clients, raProfileAuthorizedClientUuids]
+
+   );
+
+
+   useEffect(
+      () => {
+         if (!availableClients || availableClients.length === 0) {
+            setClientToAuthorize(null);
+            return;
+         }
+         setClientToAuthorize(availableClients[0]);
+      },
+      [availableClients, setClientToAuthorize]
+   )
+
 
 
    const detailHeaders: TableHeader[] = useMemo(
@@ -152,10 +207,14 @@ export default function RaProfileDetail() {
          {
             id: "status",
             content: "Status",
+            align: "center",
+            width: "0"
          },
          {
             id: "actions",
             content: "Actions",
+            align: "center",
+            width: "0"
          },
       ],
       []
@@ -164,11 +223,11 @@ export default function RaProfileDetail() {
 
    const authorizedClientsData: TableDataRow[] = useMemo(
 
-      () => !raProfileAuthorizedClients || !clients || raProfileAuthorizedClients.length === 0 || clients.length === 0 || !raProfile
+      () => !raProfileAuthorizedClientUuids || !clients || raProfileAuthorizedClientUuids.length === 0 || clients.length === 0 || !raProfile
          ?
          []
          :
-         raProfileAuthorizedClients.map(
+         raProfileAuthorizedClientUuids.map(
 
             uuid => {
 
@@ -181,7 +240,7 @@ export default function RaProfileDetail() {
                      client!.certificate.subjectDn,
                      <StatusBadge enabled={client!.enabled} />,
                      <Button
-                        className="btn btn-link"
+                        className="btn btn-link p-0"
                         color="white"
                         data-placement="right"
                         data-for={client?.name}
@@ -200,24 +259,136 @@ export default function RaProfileDetail() {
             }
 
          ),
-      [clients, raProfileAuthorizedClients, raProfile]
+      [dispatch, clients, raProfileAuthorizedClientUuids, raProfile]
 
    );
 
 
-   const optionsForClients = useMemo(
+   // this is helper to prevent "blinking" of the table when the data is being fetched
+   useEffect(
+      () => {
+         if (!isFetchingAuthorizedClients) setAuthorizedClientsDataState(authorizedClientsData);
+      },
+      [isFetchingAuthorizedClients, authorizedClientsData]
+   )
 
-      () => !raProfileAuthorizedClients || !clients || clients.length === 0
-         ?
-         []
-         :
-         clients.filter(client => !raProfileAuthorizedClients.includes(client.uuid)).map(
-            client => ({
-               value: client.uuid,
-               label: client.name
-            })
-         ),
-      [clients, raProfileAuthorizedClients]
+
+   const acmeProfileHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "property",
+            content: "",
+         },
+         {
+            id: "value",
+            content: "",
+         },
+      ],
+      []
+   )
+
+
+   const acmeProfileData: TableDataRow[] = useMemo(
+
+      () => !acmeDetails ? [] : [
+         {
+            id: "uuid",
+            columns: [
+               "UUID",
+               acmeDetails.uuid || "",
+            ]
+         },
+         {
+            id: "name",
+            columns: [
+               "Name",
+               acmeDetails.name || "",
+            ]
+         },
+         {
+            id: "Directory URL",
+            columns: [
+               "Directory URL",
+               acmeDetails.directoryUrl || "",
+            ]
+         }
+      ],
+
+      [acmeDetails]
+
+   )
+
+
+   const availableProtocolsHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "name",
+            content: "Protocol name",
+            width: "10%"
+         },
+         {
+            id: "status",
+            content: "Status",
+            align: "center",
+            width: "10%"
+         },
+         {
+            id: "actions",
+            content: "Actions",
+            align: "center",
+            width: "10%"
+         },
+      ],
+      []
+   );
+
+
+   const availableProtocolsData: TableDataRow[] = useMemo(
+      () => [
+         {
+            id: "acme",
+            columns: [
+               "ACME",
+               <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable : undefined} />,
+               <ProgressButton
+                  title={raProfile?.enabledProtocols?.includes("ACME") ? "Enable" : "Disable"}
+                  inProgressTitle={raProfile?.enabledProtocols?.includes("ACME") ? "Enabling..." : "Disabling..."}
+                  inProgress={isActivatingAcme || isDeactivatingAcme}
+                  onClick={() => raProfile?.enabledProtocols?.includes("ACME") ? dispatch(raProfilesActions.deactivateAcme(raProfile.uuid)) : setActivatingAcme(true)}
+               />
+
+            ],
+            detailColumns: [
+               <></>,
+               <></>,
+               <></>,
+               <>
+                  <b>Protocol settings</b><br /><br />
+                  <CustomTable
+                     hasHeader={false}
+                     headers={acmeProfileHeaders}
+                     data={acmeProfileData}
+                  />
+
+                  {acmeDetails && acmeDetails.issueCertificateAttributes && acmeDetails.issueCertificateAttributes.length > 0 ? (
+                     <>
+                        <b>Settings for certificate issuing</b><br /><br />
+                        <AttributeViewer hasHeader={false} attributes={acmeDetails?.issueCertificateAttributes} />
+                     </>
+                  ) : <></>}
+
+                  {acmeDetails && acmeDetails.revokeCertificateAttributes && acmeDetails.revokeCertificateAttributes.length > 0 ? (
+                     <>
+                        <b>Settings for certificate revocation</b><br /><br />
+                        <AttributeViewer hasHeader={false} attributes={acmeDetails?.revokeCertificateAttributes} />
+                     </>
+                  ) : <></>}
+
+               </>,
+            ],
+         }
+      ],
+      [dispatch, isActivatingAcme, isDeactivatingAcme, raProfile, acmeDetails, acmeProfileData, acmeProfileHeaders]
    );
 
 
@@ -225,39 +396,52 @@ export default function RaProfileDetail() {
 
       <Container className="themed-container" fluid>
 
-         <Widget title="RA Profile Detail" busy={isBusy}>
+         <Row xs="1" sm="1" md="2" lg="2" xl="2">
 
-            <br />
+            <Col>
 
-            <CustomTable
-               headers={detailHeaders}
-               data={detailData}
-            />
-
-         </Widget>
-
-         {
-
-            raProfile && raProfile.attributes && raProfile.attributes.length > 0 && (
-
-               <Widget title="RA Profile Attributes" busy={isBusy}>
+               <Widget title="RA Profile Detail" busy={isBusy}>
 
                   <br />
 
-                  <AttributeViewer attributes={raProfile?.attributes} />
+                  <CustomTable
+                     headers={detailHeaders}
+                     data={detailData}
+                  />
 
                </Widget>
-            )
 
-         }
+            </Col>
 
-         <Widget title="Authorized Clients" busy={isFetchingAuthorizedClients || isFetchingClients || isAuthorizing || isUnauthorizing}>
+            <Col>
+
+               <Widget title="Attributes" busy={isBusy || isFetchingAttributes || isFetchingIssuanceAttributes || isFetchingRevocationAttributes}>
+
+                  {
+
+                     !raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? <></> : (
+                        <>
+                           <br />
+                           <Label>RA profile attributes</Label>
+                           <AttributeViewer attributes={raProfile?.attributes} />
+                        </>
+                     )
+                  }
+
+               </Widget>
+
+            </Col>
+
+         </Row>
+
+
+         <Widget title="Authorized Clients" busy={isFetchingAuthorizedClients || isFetchingClients || isAuthorizingClient || isUnauthorizing}>
 
             <br />
 
             <CustomTable
                headers={authorizedClientsHeaders}
-               data={authorizedClientsData}
+               data={authorizedClientsDataState}
             />
 
             <Label>Authorize a client</Label>
@@ -267,8 +451,7 @@ export default function RaProfileDetail() {
                <div style={{ flexGrow: 1 }}>
                   <Select
                      value={clientToAuthorize}
-                     options={optionsForClients}
-                     isClearable={true}
+                     options={availableClients}
                      placeholder="Select a client to authorize..."
                      onChange={(e: any) => { setClientToAuthorize(e) }}
                   />
@@ -279,15 +462,24 @@ export default function RaProfileDetail() {
                <ProgressButton
                   title="Authorize"
                   inProgressTitle="Authorizing..."
-                  inProgress={isAuthorizing}
+                  inProgress={isAuthorizingClient}
                   disabled={clientToAuthorize === null}
-                  onClick={onAuthorizeClick}
+                  onClick={onAuthorizeClientClick}
                />
 
             </div>
 
+         </Widget>
 
+         <Widget title="Available protocols" busy={isBusy || isWorkingWithProtocol}>
 
+            <br />
+
+            <CustomTable
+               hasDetails={true}
+               headers={availableProtocolsHeaders}
+               data={availableProtocolsData}
+            />
 
          </Widget>
 
