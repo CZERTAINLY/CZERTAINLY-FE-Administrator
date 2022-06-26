@@ -9,7 +9,7 @@ import { slice } from "./connectors";
 import { actions as alertActions } from "./alerts";
 import { transformConnectorDTOToModel, transformFunctionGroupDTOtoModel } from "./transform/connectors";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO, transformConnectorHealthDTOToModel, transfromAttributeDescriptorCollectionDTOToModel } from "./transform/attributes";
-import { transformDeleteObjectErrorDTOToModel } from "./transform/_common";
+import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
 
 
 const listConnectors: AppEpic = (action$, state, deps) => {
@@ -445,7 +445,7 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
 
             map(errors => slice.actions.bulkDeleteConnectorsSuccess({
                uuids: action.payload,
-               errors: errors.map(error => transformDeleteObjectErrorDTOToModel(error))
+               errors: errors.map(error => transformDeleteObjectErrorDtoToModel(error))
             })),
 
             catchError(err => of(slice.actions.bulkDeleteConnectorsFailure(extractError(err, "Failed to bulk delete connectors"))))
