@@ -57,6 +57,7 @@ export default function ClientDetail() {
 
    const onEditClick = useCallback(
       () => {
+         if (!client) return;
          history.push(`../../clients/edit/${client?.uuid}`);
       },
       [client, history]
