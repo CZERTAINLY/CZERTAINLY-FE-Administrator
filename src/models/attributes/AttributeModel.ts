@@ -6,5 +6,5 @@ export interface AttributeModel {
    name: string;
    label?: string;
    type?: AttributeType
-   content: AttributeContentModel | AttributeContentModel[];
+   content?: AttributeContentModel | AttributeContentModel[];
 }

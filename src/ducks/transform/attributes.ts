@@ -14,7 +14,7 @@ export function transformAttributeDTOToModel(attribute: AttributeDTO): Attribute
       name: attribute.name,
       label: attribute.label,
       type: attribute.type,
-      content: JSON.parse(JSON.stringify(attribute.content))
+      content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined
    }
 
 }
@@ -27,7 +27,7 @@ export function transformAttributeModelToDTO(attribute: AttributeModel): Attribu
       name: attribute.name,
       label: attribute.label,
       type: attribute.type,
-      content: JSON.parse(JSON.stringify(attribute.content))
+      content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined
    }
 
 }
