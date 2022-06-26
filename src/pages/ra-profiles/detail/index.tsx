@@ -3,22 +3,26 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 
-import { ButtonGroup, Container, Form, FormGroup, Input, Label, Table, Row, Col, Button } from "reactstrap";
+import { Form as BootstrapForm, ButtonGroup, Container, FormGroup, Input, Label, Row, Col, Button } from "reactstrap";
+import { Field, Form } from "react-final-form";
+import Select from "react-select";
 
 import { actions as clientActions, selectors as clientSelectors } from "ducks/clients";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
+import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from "ducks/acme-profiles";
 
+import Spinner from "components/Spinner";
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeViewer from "components/Attributes/AttributeViewer";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
-import Select from "react-select";
 import ProgressButton from "components/ProgressButton";
-import { group } from "console";
 import ToolTip from "components/ToolTip";
-import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
+import { validateRequired } from "utils/validators";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+
 
 
 export default function RaProfileDetail() {
@@ -37,6 +41,10 @@ export default function RaProfileDetail() {
    const raProfileAuthorizedClientUuids = useSelector(raProfilesSelectors.authorizedClients);
    const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
    const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
+
+   const acmeProfiles = useSelector(acmeProfilesSelectors.profiles);
+
+   const isFetchingAcmeProfiles = useSelector(acmeProfilesSelectors.isFetchingList);
 
    const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
    const isFetchingAuthorizedClients = useSelector(raProfilesSelectors.isFetchingAuthorizedClients);
@@ -60,8 +68,9 @@ export default function RaProfileDetail() {
    const [clientToAuthorize, setClientToAuthorize] = useState<{ value: string; label: string; } | null>(null);
    const [authorizedClientsDataState, setAuthorizedClientsDataState] = useState<TableDataRow[]>([]);
 
-   const [activatingAcme, setActivatingAcme] = useState(false);
-
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+   const [activateAcmeDialog, setActivateAcmeDialog] = useState(false);
+   const [confirmDeactivateAcme, setConfirmDeactivateAcme] = useState<boolean>(false);
 
    const isBusy = useMemo(
       () => isFetchingProfile || isDeleting || isEnabling || isDisabling,
@@ -76,6 +85,7 @@ export default function RaProfileDetail() {
 
 
    useEffect(
+
       () => {
          dispatch(raProfilesActions.getRaProfileDetail(params.id));
          dispatch(raProfilesActions.listIssuanceAttributes(params.id));
@@ -88,6 +98,7 @@ export default function RaProfileDetail() {
 
 
    useEffect(
+
       () => {
          if (isAuthorizingClient || isUnauthorizing) return;
          dispatch(raProfilesActions.listAuthorizedClients(params.id));
@@ -95,16 +106,122 @@ export default function RaProfileDetail() {
          setClientToAuthorize(null);
       },
       [dispatch, isAuthorizingClient, isUnauthorizing, params.id]
+
    )
+
+
+   const onEditClick = useCallback(
+
+      () => {
+         if (!raProfile) return;
+         history.push(`../../raprofiles/edit/${raProfile?.uuid}`);
+      },
+      [history, raProfile]
+
+   );
+
+
+   const onEnableClick = useCallback(
+      () => {
+
+         if (!raProfile) return;
+         dispatch(raProfilesActions.enableRaProfile(raProfile.uuid));
+      },
+      [dispatch, raProfile]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+         if (!raProfile) return;
+         dispatch(raProfilesActions.disableRaProfile(raProfile.uuid));
+      },
+      [dispatch, raProfile]
+
+   );
 
 
    const onAuthorizeClientClick = useCallback(
+
       () => {
          if (!raProfile || !clientToAuthorize) return;
          dispatch(clientActions.authorizeClient({ clientUuid: clientToAuthorize.value, raProfile }))
-      }
-      , [dispatch, raProfile, clientToAuthorize]
+      },
+      [dispatch, raProfile, clientToAuthorize]
+
    )
+
+
+   const onDeleteConfirmed = useCallback(
+
+      () => {
+         if (!raProfile) return;
+         dispatch(raProfilesActions.deleteRaProfile(raProfile.uuid));
+      },
+      [dispatch, raProfile]
+
+   )
+
+
+   const onDeactivateAcmeConfirmed = useCallback(
+
+      () => {
+         if (!raProfile) return;
+         dispatch(raProfilesActions.deactivateAcme(raProfile.uuid));
+      },
+      [dispatch, raProfile]
+
+   )
+
+
+   const openAcmeActivationDialog = useCallback(
+
+      () => {
+         dispatch(acmeProfilesActions.listAcmeProfiles());
+         setActivateAcmeDialog(true);
+      },
+      [dispatch]
+
+   )
+
+
+   const onActivateAcmeSubmit = useCallback(
+      (values: any) => {
+      },
+      []
+   )
+
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
+         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: raProfile?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: !(raProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [raProfile, onEditClick, onDisableClick, onEnableClick]
+   );
+
+
+   const attributesTitle = useMemo(
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5>
+               RA Profile <span className="fw-semi-bold">Details</span>
+            </h5>
+
+         </div>
+
+      ), [buttons]
+   );
+
 
 
    const availableClients: { value: string; label: string; }[] = useMemo(
@@ -131,6 +248,7 @@ export default function RaProfileDetail() {
 
 
    useEffect(
+
       () => {
          if (!availableClients || availableClients.length === 0) {
             setClientToAuthorize(null);
@@ -139,11 +257,12 @@ export default function RaProfileDetail() {
          setClientToAuthorize(availableClients[0]);
       },
       [availableClients, setClientToAuthorize]
+
    )
 
 
-
    const detailHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "property",
@@ -155,6 +274,7 @@ export default function RaProfileDetail() {
          },
       ],
       []
+
    );
 
 
@@ -195,18 +315,23 @@ export default function RaProfileDetail() {
 
 
    const authorizedClientsHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "name",
             content: "Client Name",
+            sortable: true,
+            sort: "asc"
          },
          {
             id: "dn",
             content: "Client DN",
+            sortable: true,
          },
          {
             id: "status",
             content: "Status",
+            sortable: true,
             align: "center",
             width: "0"
          },
@@ -218,6 +343,7 @@ export default function RaProfileDetail() {
          },
       ],
       []
+
    );
 
 
@@ -236,9 +362,13 @@ export default function RaProfileDetail() {
                return ({
                   id: client!.uuid,
                   columns: [
+
                      <Link to={`../../clients/detail/${client!.uuid}`}>{client!.name}</Link>,
+
                      client!.certificate.subjectDn,
+
                      <StatusBadge enabled={client!.enabled} />,
+
                      <Button
                         className="btn btn-link p-0"
                         color="white"
@@ -266,14 +396,17 @@ export default function RaProfileDetail() {
 
    // this is helper to prevent "blinking" of the table when the data is being fetched
    useEffect(
+
       () => {
          if (!isFetchingAuthorizedClients) setAuthorizedClientsDataState(authorizedClientsData);
       },
       [isFetchingAuthorizedClients, authorizedClientsData]
+
    )
 
 
    const acmeProfileHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "property",
@@ -285,6 +418,7 @@ export default function RaProfileDetail() {
          },
       ],
       []
+
    )
 
 
@@ -320,15 +454,19 @@ export default function RaProfileDetail() {
 
 
    const availableProtocolsHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "name",
             content: "Protocol name",
-            width: "10%"
+            sortable: true,
+            width: "10%",
+            sort: "asc"
          },
          {
             id: "status",
             content: "Status",
+            sortable: true,
             align: "center",
             width: "10%"
          },
@@ -340,21 +478,29 @@ export default function RaProfileDetail() {
          },
       ],
       []
+
    );
 
 
    const availableProtocolsData: TableDataRow[] = useMemo(
+
       () => [
          {
             id: "acme",
             columns: [
                "ACME",
-               <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable : undefined} />,
+               <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable ? true : false : undefined} />,
                <ProgressButton
-                  title={raProfile?.enabledProtocols?.includes("ACME") ? "Enable" : "Disable"}
-                  inProgressTitle={raProfile?.enabledProtocols?.includes("ACME") ? "Enabling..." : "Disabling..."}
+                  title={acmeDetails?.acmeAvailable ? "Deactivate" : "Activate"}
+                  inProgressTitle={acmeDetails?.acmeAvailable ? "Deactivating..." : "Activating..."}
                   inProgress={isActivatingAcme || isDeactivatingAcme}
-                  onClick={() => raProfile?.enabledProtocols?.includes("ACME") ? dispatch(raProfilesActions.deactivateAcme(raProfile.uuid)) : setActivatingAcme(true)}
+                  onClick={
+                     () => acmeDetails?.acmeAvailable
+                        ?
+                        setConfirmDeactivateAcme(true)
+                        :
+                        openAcmeActivationDialog()
+                  }
                />
 
             ],
@@ -362,33 +508,49 @@ export default function RaProfileDetail() {
                <></>,
                <></>,
                <></>,
-               <>
-                  <b>Protocol settings</b><br /><br />
-                  <CustomTable
-                     hasHeader={false}
-                     headers={acmeProfileHeaders}
-                     data={acmeProfileData}
-                  />
 
-                  {acmeDetails && acmeDetails.issueCertificateAttributes && acmeDetails.issueCertificateAttributes.length > 0 ? (
-                     <>
-                        <b>Settings for certificate issuing</b><br /><br />
-                        <AttributeViewer hasHeader={false} attributes={acmeDetails?.issueCertificateAttributes} />
-                     </>
-                  ) : <></>}
+               !acmeDetails || !acmeDetails.acmeAvailable ? <>ACME is not active</> :
 
-                  {acmeDetails && acmeDetails.revokeCertificateAttributes && acmeDetails.revokeCertificateAttributes.length > 0 ? (
-                     <>
-                        <b>Settings for certificate revocation</b><br /><br />
-                        <AttributeViewer hasHeader={false} attributes={acmeDetails?.revokeCertificateAttributes} />
-                     </>
-                  ) : <></>}
+                  <>
+                     <b>Protocol settings</b><br /><br />
+                     <CustomTable
+                        hasHeader={false}
+                        headers={acmeProfileHeaders}
+                        data={acmeProfileData}
+                     />
 
-               </>,
+                     {acmeDetails && acmeDetails.issueCertificateAttributes && acmeDetails.issueCertificateAttributes.length > 0 ? (
+                        <>
+                           <b>Settings for certificate issuing</b><br /><br />
+                           <AttributeViewer hasHeader={false} attributes={acmeDetails?.issueCertificateAttributes} />
+                        </>
+                     ) : <></>}
+
+                     {acmeDetails && acmeDetails.revokeCertificateAttributes && acmeDetails.revokeCertificateAttributes.length > 0 ? (
+                        <>
+                           <b>Settings for certificate revocation</b><br /><br />
+                           <AttributeViewer hasHeader={false} attributes={acmeDetails?.revokeCertificateAttributes} />
+                        </>
+                     ) : <></>}
+
+                  </>,
+
             ],
          }
       ],
-      [dispatch, isActivatingAcme, isDeactivatingAcme, raProfile, acmeDetails, acmeProfileData, acmeProfileHeaders]
+      [acmeDetails, isActivatingAcme, isDeactivatingAcme, acmeProfileHeaders, acmeProfileData, openAcmeActivationDialog]
+
+   );
+
+
+   const optionsForAcmeProfiles = useMemo(
+      () => acmeProfiles.map(
+         acmeProfile => ({
+            value: acmeProfile.uuid,
+            label: acmeProfile.name
+         })
+      ),
+      [acmeProfiles]
    );
 
 
@@ -400,7 +562,7 @@ export default function RaProfileDetail() {
 
             <Col>
 
-               <Widget title="RA Profile Detail" busy={isBusy}>
+               <Widget title={attributesTitle} busy={isBusy}>
 
                   <br />
 
@@ -450,6 +612,8 @@ export default function RaProfileDetail() {
 
                <div style={{ flexGrow: 1 }}>
                   <Select
+                     maxMenuHeight={140}
+                     menuPlacement="auto"
                      value={clientToAuthorize}
                      options={availableClients}
                      placeholder="Select a client to authorize..."
@@ -471,6 +635,7 @@ export default function RaProfileDetail() {
 
          </Widget>
 
+
          <Widget title="Available protocols" busy={isBusy || isWorkingWithProtocol}>
 
             <br />
@@ -484,7 +649,136 @@ export default function RaProfileDetail() {
          </Widget>
 
 
-      </Container>
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Client"
+            body="You are about to delete RA Profiles which may have existing
+                  authorizations from clients. If you continue, these authorizations
+                  will be deleted as well. Is this what you want to do?"
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={confirmDeactivateAcme}
+            caption="Deactivate ACME"
+            body="You are about to deactivate ACME protocol for the RA profile. Is this what you want to do?"
+            toggle={() => setConfirmDeactivateAcme(false)}
+            buttons={[
+               { color: "danger", onClick: onDeactivateAcmeConfirmed, body: "Yes, deactivate" },
+               { color: "secondary", onClick: () => setConfirmDeactivateAcme(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={activateAcmeDialog}
+            caption="Activate ACME protocol"
+            body={
+
+               <>
+                  <Spinner active={isFetchingAcmeProfiles} />
+
+                  <Form onSubmit={onActivateAcmeSubmit}>
+
+                     {({ handleSubmit, pristine, submitting, values }) => (
+
+                        <BootstrapForm onSubmit={handleSubmit}>
+
+                           <Field name="AcmeProfiles" validate={validateRequired()}>
+
+                              {({ input, meta }) =>
+
+                                 <FormGroup>
+
+                                    <Label for="acmeProfiles">Select ACME profile</Label>
+
+                                    <Select
+                                       {...input}
+                                       maxMenuHeight={140}
+                                       menuPlacement="auto"
+                                       options={optionsForAcmeProfiles}
+                                       placeholder="Select ACME profile to be activated"
+                                       styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+
+                                 </FormGroup>
+
+
+                              }
+
+                           </Field>
+
+                           {!issuanceAttributes || issuanceAttributes.length === 0 ? <></> : (
+
+                              <Field name="IssuanceAttributes">
+
+                                 {({ input, meta }) => (
+
+                                    <FormGroup>
+
+                                       <Label for="issuanceAttributes">Issuance attributes</Label>
+
+                                       <AttributeEditor
+                                          id="issuanceAttributes"
+                                          attributeDescriptors={issuanceAttributes}
+                                       />
+
+                                    </FormGroup>
+
+                                 )}
+
+                              </Field>
+
+                           )}
+
+
+                           {!revocationAttributes || revocationAttributes.length === 0 ? <></> : (
+
+                              <Field name="RevocationAttributes">
+
+                                 {({ input, meta }) => (
+
+                                    <FormGroup>
+
+                                       <Label for="revocationAttributes">Revocation attributes</Label>
+
+                                       <AttributeEditor
+                                          id="revocationAttributes"
+                                          attributeDescriptors={revocationAttributes}
+                                       />
+
+                                    </FormGroup>
+
+                                 )}
+
+                              </Field>
+
+                           )}
+
+
+                        </BootstrapForm>
+
+                     )}
+
+                  </Form>
+
+               </>
+
+            }
+
+            toggle={() => setActivateAcmeDialog(false)}
+            buttons={[]}
+         />
+
+
+      </Container >
 
    )
 

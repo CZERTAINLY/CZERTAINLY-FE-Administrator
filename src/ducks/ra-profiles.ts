@@ -220,6 +220,8 @@ export const slice = createSlice({
          const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload);
          if (raProfile) raProfile.enabled = true;
 
+         if (state.raProfile?.uuid === action.payload) state.raProfile.enabled = true;
+
       },
 
 
@@ -244,6 +246,8 @@ export const slice = createSlice({
          const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload);
          if (raProfile) raProfile.enabled = false;
 
+         if (state.raProfile?.uuid === action.payload) state.raProfile.enabled = false;
+
       },
 
 
@@ -267,6 +271,8 @@ export const slice = createSlice({
 
          const index = state.raProfiles.findIndex(raProfile => raProfile.uuid === action.payload);
          if (index !== -1) state.raProfiles.splice(index, 1);
+
+         if (state.raProfile?.uuid === action.payload) state.raProfile = undefined;
 
       },
 
@@ -362,6 +368,8 @@ export const slice = createSlice({
 
          state.raProfiles = state.raProfiles.filter(p => !action.payload.includes(p.uuid));
 
+         if (state.raProfile && action.payload.includes(state.raProfile.uuid)) state.raProfile = undefined;
+
       },
 
 
@@ -383,7 +391,11 @@ export const slice = createSlice({
 
          state.isBulkEnabling = false;
 
-         state.raProfiles = state.raProfiles.map(raProfile => ({ ...raProfile, enabled: true }));
+         state.raProfiles = state.raProfiles.map(
+            raProfile => ({ ...raProfile, enabled: action.payload.includes(raProfile.uuid) ? true : raProfile.enabled })
+         );
+
+         if (state.raProfile && action.payload.includes(state.raProfile.uuid)) state.raProfile.enabled = true;
 
       },
 
@@ -406,7 +418,11 @@ export const slice = createSlice({
 
          state.isBulkDisabling = false;
 
-         state.raProfiles = state.raProfiles.map(raProfile => ({ ...raProfile, enabled: false }));
+         state.raProfiles = state.raProfiles.map(
+            raProfile => ({ ...raProfile, enabled: action.payload.includes(raProfile.uuid) ? false : raProfile.enabled })
+         );
+
+         if (state.raProfile && action.payload.includes(state.raProfile.uuid)) state.raProfile.enabled = false;
 
       },
 
