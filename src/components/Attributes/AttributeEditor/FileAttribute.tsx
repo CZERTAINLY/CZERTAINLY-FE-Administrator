@@ -8,11 +8,13 @@ import { composeValidators, validatePattern, validateRequired } from "utils/vali
 import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
 
 interface Props {
-   descriptor: AttributeDescriptorModel;
-   attribute?: AttributeModel;
+   id: string;
+   descriptor: AttributeDescriptorModel,
+   attribute: AttributeModel
 }
 
 export function FileAttribute({
+   id,
    descriptor,
    attribute,
 }: Props): JSX.Element {
@@ -40,12 +42,12 @@ export function FileAttribute({
          const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
          const fileContent = fileInfo.split(",")[1];
 
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}.value`, fileContent);
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}.fileName`, fileName);
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}.contentType`, contentType);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}.value`, fileContent);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}.fileName`, fileName);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}.contentType`, contentType);
 
       },
-      [baseFieldId, form.mutators]
+      [baseFieldId, form.mutators, id]
 
    );
 
@@ -162,20 +164,20 @@ export function FileAttribute({
 
          const initialValues = { ...form.getState().values };
 
-         initialValues["__attribute__"] = initialValues["__attribute__"] || {};
-         initialValues["__attribute__"][baseFieldId] = initialValues["__attribute__"][baseFieldId] || {};
-         initialValues["__attribute__"][baseFieldId].value = fileContent;
-         initialValues["__attribute__"][baseFieldId].fileName = fileName;
-         initialValues["__attribute__"][baseFieldId].contentType = contentType;
+         initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
+         initialValues[`__attribute__${id}__`][baseFieldId] = initialValues[`__attribute__${id}__`][baseFieldId] || {};
+         initialValues[`__attribute__${id}__`][baseFieldId].value = fileContent;
+         initialValues[`__attribute__${id}__`][baseFieldId].fileName = fileName;
+         initialValues[`__attribute__${id}__`][baseFieldId].contentType = contentType;
 
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}.value`, fileContent);
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}.fileName`, fileName);
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}.contentType`, contentType);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}.value`, fileContent);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}.fileName`, fileName);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}.contentType`, contentType);
 
       },
-      [baseFieldId, descriptor.content, attribute, form]
+      [attribute, descriptor.content, form, id, baseFieldId]
 
    )
 
@@ -203,9 +205,9 @@ export function FileAttribute({
 
                   <div style={{ flexGrow: 1 }}>
 
-                     {descriptor.visible ? (<Label for={`__attribute__.${baseFieldId}.value`}>File content</Label>) : null}
+                     {descriptor.visible ? (<Label for={`__attribute__${id}__.${baseFieldId}.value`}>File content</Label>) : null}
 
-                     <Field name={`__attribute__.${baseFieldId}.value`} validate={validators}>
+                     <Field name={`__attribute__${id}__.${baseFieldId}.value`} validate={validators}>
 
                         {({ input, meta }) => (
 
@@ -235,9 +237,9 @@ export function FileAttribute({
 
                   <div style={{ width: "13rem" }}>
 
-                     {descriptor.visible ? (<Label for={`__attribute__.${baseFieldId}.contentType`}>Content type</Label>) : null}
+                     {descriptor.visible ? (<Label for={`__attribute__${id}__.${baseFieldId}.contentType`}>Content type</Label>) : null}
 
-                     <Field name={`__attribute__.${baseFieldId}.contentType`} validate={validators}>
+                     <Field name={`__attribute__${id}__.${baseFieldId}.contentType`} validate={validators}>
 
                         {({ input, meta }) => (
 
@@ -259,9 +261,9 @@ export function FileAttribute({
 
                   <div style={{ width: "10rem" }}>
 
-                     {descriptor.visible ? (<Label for={`__attribute__.${baseFieldId}.contentType`}>File name</Label>) : null}
+                     {descriptor.visible ? (<Label for={`__attribute__${id}__.${baseFieldId}.contentType`}>File name</Label>) : null}
 
-                     <Field name={`__attribute__.${baseFieldId}.fileName`} validate={validators}>
+                     <Field name={`__attribute__${id}__.${baseFieldId}.fileName`} validate={validators}>
 
                         {({ input }) => (
 

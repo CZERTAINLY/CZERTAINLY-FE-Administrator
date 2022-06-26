@@ -9,11 +9,13 @@ import { Field, useForm } from "react-final-form";
 import { composeValidators, validateFloat, validatePattern, validateRequired } from "utils/validators";
 
 interface Props {
-   descriptor: AttributeDescriptorModel;
-   attribute?: AttributeModel;
+   id: string;
+   descriptor: AttributeDescriptorModel,
+   attribute: AttributeModel
 }
 
 export function FloatAttribute({
+   id,
    descriptor,
    attribute,
 }: Props): JSX.Element {
@@ -63,15 +65,15 @@ export function FloatAttribute({
             (attribute.content as AttributeContentModel).value
 
          const initialValues = { ...form.getState().values };
-         initialValues[`__attribute__`] = initialValues[`__attribute__`] || {};
-         initialValues[`__attribute__`][baseFieldId] = attributeValue;
+         initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
+         initialValues[`__attribute__${id}__`][baseFieldId] = attributeValue;
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}`, attributeValue);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, attributeValue);
 
       },
 
-      [baseFieldId, descriptor, attribute, form]
+      [baseFieldId, descriptor, attribute, form, id]
    )
 
 
@@ -112,7 +114,7 @@ export function FloatAttribute({
 
       <FormGroup row={false}>
 
-         <Field name={`__attribute__.${baseFieldId}`} validate={validators}>
+         <Field name={`__attribute__${id}__.${baseFieldId}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -120,7 +122,7 @@ export function FloatAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__.${baseFieldId}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__${id}__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 

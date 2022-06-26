@@ -16,12 +16,14 @@ import { TextAttribute } from "./TextAttribute";
 import { TimeAttribute } from "./TimeAttribute";
 
 interface Props {
+   id: string;
    attributeDescriptors: AttributeDescriptorModel[];
    attributes?: AttributeModel[];
 }
 
 
 export default function AttributeEditor({
+   id,
    attributeDescriptors,
    attributes = []
 }: Props) {
@@ -54,13 +56,14 @@ export default function AttributeEditor({
 
    for (const group in grouped) attrs.push(
 
-      <Widget key={group} title={<h6>{group === "__" ? "Ungrouped" : group}</h6>}>
+      <Widget key={group} title={<h6>{group === "__" ? "" : group}</h6>}>
 
          {
             grouped[group].map(
                descriptor => (
                   <div key={descriptor.name}>
                      {fields[descriptor.type]({
+                        id,
                         descriptor,
                         attribute: attributes.find(attribute => attribute.name === descriptor.name)
                      }) || null}
@@ -72,8 +75,6 @@ export default function AttributeEditor({
       </Widget>
 
    )
-
-
 
    return <>{attrs}</>;
 

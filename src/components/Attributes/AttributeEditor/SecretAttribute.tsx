@@ -10,11 +10,13 @@ import { useDispatch } from "react-redux";
 import { actions } from "ducks/alerts";
 
 interface Props {
-   descriptor: AttributeDescriptorModel;
-   attribute?: AttributeModel;
+   id: string;
+   descriptor: AttributeDescriptorModel,
+   attribute: AttributeModel
 }
 
 export function SecretAttribute({
+   id,
    descriptor,
    attribute,
 }: Props): JSX.Element {
@@ -42,20 +44,20 @@ export function SecretAttribute({
          }
 
          if (!attribute || !attribute.content || !(attribute.content as AttributeContentModel).value) {
-            form.mutators.setAttribute(`__attribute__.${baseFieldId}`, undefined);
+            form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, undefined);
             return;
          }
 
          const initialValues = { ...form.getState().values };
-         initialValues[`__attribute__`] = initialValues[`__attribute__`] || {};
-         initialValues[`__attribute__`][baseFieldId] = (attribute.content as AttributeContentModel).value;
+         initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
+         initialValues[`__attribute__${id}__`][baseFieldId] = (attribute.content as AttributeContentModel).value;
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__.${baseFieldId}`, (attribute.content as AttributeContentModel).value);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, (attribute.content as AttributeContentModel).value);
 
       },
 
-      [baseFieldId, descriptor, attribute, form, dispatch]
+      [baseFieldId, descriptor, attribute, form, dispatch, id]
    )
 
 
@@ -81,7 +83,7 @@ export function SecretAttribute({
 
       <FormGroup>
 
-         <Field name={`__attribute__.${baseFieldId}`} validate={validators}>
+         <Field name={`__attribute__${id}__.${baseFieldId}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -89,7 +91,7 @@ export function SecretAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__.${baseFieldId}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__${id}__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 

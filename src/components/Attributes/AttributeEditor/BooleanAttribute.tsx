@@ -9,11 +9,13 @@ import { Field, useForm } from "react-final-form";
 import { composeValidators, validateFloat, validateRequired } from "utils/validators";
 
 interface Props {
+   id: string;
    descriptor: AttributeDescriptorModel;
    attribute?: AttributeModel;
 }
 
 export function BooleanAttribute({
+   id,
    descriptor,
    attribute,
 }: Props): JSX.Element {
@@ -28,7 +30,7 @@ export function BooleanAttribute({
 
             form.mutators.setAttribute(
 
-               `__attribute__${descriptor.name}`,
+               `__attribute__${id}__${descriptor.name}`,
                descriptor.content
                   ?
                   descriptor.content instanceof Array
@@ -50,7 +52,7 @@ export function BooleanAttribute({
          }
 
 
-         form.mutators.setAttribute(`__attribute__${descriptor.name}`,
+         form.mutators.setAttribute(`__attribute__${id}__${descriptor.name}`,
 
             descriptor.list
 
@@ -82,7 +84,7 @@ export function BooleanAttribute({
 
       },
 
-      [descriptor, attribute, form.mutators]
+      [descriptor, attribute, form.mutators, id]
    )
 
    const options = useMemo(
@@ -120,7 +122,7 @@ export function BooleanAttribute({
 
       <FormGroup>
 
-         <Field name={`__attribute__${descriptor.name}`} validate={validators}>
+         <Field name={`__attribute__${id}__${descriptor.name}`} validate={validators}>
 
             {({ input, meta }) => (
 
@@ -128,7 +130,7 @@ export function BooleanAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__${descriptor.name}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__${id}__${descriptor.name}`}>{descriptor.label}</Label>
 
                   ) : null}
 

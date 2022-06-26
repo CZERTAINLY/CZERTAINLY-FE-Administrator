@@ -128,7 +128,7 @@ export default function CredentialForm({
 
             dispatch(actions.updateCredential({
                uuid: params.id,
-               attributes: collectFormAttributes(credentialProviderAttributeDescriptors, values)
+               attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values)
             }));
 
          } else {
@@ -137,7 +137,7 @@ export default function CredentialForm({
                name: values.name!,
                connectorUuid: values.credentialProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes(credentialProviderAttributeDescriptors, values)
+               attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values)
             }));
 
          }
@@ -358,6 +358,7 @@ export default function CredentialForm({
 
 
                         <AttributeEditor
+                           id="credential"
                            attributeDescriptors={credentialProviderAttributeDescriptors}
                            attributes={credential?.attributes}
                         />

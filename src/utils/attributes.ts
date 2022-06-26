@@ -26,11 +26,11 @@ export const attributeFieldTypeTransform: { [name: string]: string } = {
 };
 
 
-export function collectFormAttributes(descriptors: AttributeDescriptorModel[] | undefined, values: Record<string, any>): AttributeModel[] {
+export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModel[] | undefined, values: Record<string, any>): AttributeModel[] {
 
-   if (!descriptors || !values["__attribute__"]) return [];
+   if (!descriptors || !values[`__attribute__${id}__`]) return [];
 
-   const attributes = values["__attribute__"];
+   const attributes = values[`__attribute__${id}__`];
 
    const attrs: AttributeModel[] = [];
 
