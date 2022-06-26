@@ -32,17 +32,17 @@ import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialCredentialsState, slice as credentialsSlice} from "./credentials";
 import credentialsEpics from "./credentials-epics";
 
+import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
+import acmeProfilesEpics from "./acme-profiles-epics";
 
 /*
 import { initialState as initialAuthoritiesState, State as AuthoritiesState, statePath as authorityStatePath } from "./ca-authorities";
 import { initialState as initialAcmeAccountState, State as AcmeAccountState, statePath as acmeAccountStatePath } from "./acme-accounts";
-import { initialState as initialAcmeProfilesState, State as AcmeProfilesState, statePath as acmeProfileStatePath } from "./acme-profiles";
 */
 
 /*
 import authoritiesEpic from "./ca-authorities-epics";
 import acmeAccountEpics from "./acme-accounts-epics";
-import acmeProfileEpics from "./acme-profiles-epics";
 */
 
 export interface EpicDependencies {
@@ -62,12 +62,12 @@ export const initialState = {
    [clientsSlice.name]: initialClientsState,
    [connectorsSlice.name]: initialConnectorsState,
    [raProfilesSlice.name]: initialRaProfilesState,
-   [credentialsSlice.name]: initialCredentialsState
+   [credentialsSlice.name]: initialCredentialsState,
+   [acmeProfilesSlice.name]: initialAcmeProfilesState,
 
    /*
       [authorityStatePath]: initialAuthoritiesState,
       [acmeAccountStatePath]: initialAcmeAccountState,
-      [acmeProfileStatePath]: initialAcmeProfilesState,
    */
 };
 
@@ -80,7 +80,8 @@ export const reducers = combineReducers<typeof initialState, any>({
    [clientsSlice.name]: clientsSlice.reducer,
    [connectorsSlice.name]: connectorsSlice.reducer,
    [raProfilesSlice.name]: raProfilesSlice.reducer,
-   [credentialsSlice.name]: credentialsSlice.reducer
+   [credentialsSlice.name]: credentialsSlice.reducer,
+   [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
 
    /*
    [authoritiesStatePath]: authoritiesReducer,
@@ -99,7 +100,8 @@ export const epics = combineEpics(
    ...clientsEpics,
    ...connectorsEpics,
    ...raProfilesEpics,
-   ...credentialsEpics
+   ...credentialsEpics,
+   ...acmeProfilesEpics
 
    /*
   ...authoritiesEpic,
