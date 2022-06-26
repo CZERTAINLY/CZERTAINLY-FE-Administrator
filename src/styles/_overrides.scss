@@ -164,7 +164,8 @@
   > tfoot > tr > th,
   > tfoot > tr > td {
     padding: 4px;
-  }
+    vertical-align: middle;
+   }
 
   &.table-no-border {
     margin-left: -4px;

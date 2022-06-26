@@ -25,6 +25,7 @@ interface Props {
    headers: TableHeader[];
    data: TableDataRow[];
    canSearch?: boolean;
+   hasHeader?: boolean;
    hasCheckboxes?: boolean;
    hasPagination?: boolean;
    hasDetails?: boolean;
@@ -36,6 +37,7 @@ function CustomTable({
    headers,
    data,
    canSearch,
+   hasHeader = true,
    hasCheckboxes,
    hasPagination,
    hasDetails,
@@ -233,7 +235,7 @@ function CustomTable({
          const columns = tblHeaders ? [...tblHeaders] : [];
 
          if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
-         if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false });
+         if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false, width: "100%" });
 
          return columns.map(
 
@@ -433,7 +435,7 @@ function CustomTable({
 
          <div className="table-responsive">
             <Table className={cx("table-hover", styles.logsTable)} size="sm">
-               <thead><tr>{header}</tr></thead>
+               {!hasHeader ? <></> :<thead><tr>{header}</tr></thead> }
                <tbody>{body}</tbody>
             </Table>
          </div>

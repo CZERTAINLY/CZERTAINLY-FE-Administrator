@@ -5,11 +5,13 @@ import { useCallback, useMemo } from "react";
 
 export interface Props {
    attributes: AttributeModel[] | undefined;
+   hasHeader?: boolean
 }
 
 
 export default function AttributeViewer({
-   attributes = []
+   attributes = [],
+   hasHeader = true
 }: Props) {
 
    const getAttributeContent = useCallback(
@@ -159,6 +161,7 @@ export default function AttributeViewer({
       <CustomTable
          headers={tableHeaders}
          data={tableData}
+         hasHeader={hasHeader}
       />
    )
 

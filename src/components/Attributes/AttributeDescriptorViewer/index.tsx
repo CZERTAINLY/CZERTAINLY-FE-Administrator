@@ -42,15 +42,18 @@ export default function AttributeDescriptorViewer({
       () => [
          {
             id: "name",
-            content: "Name"
+            content: "Name",
+            width: "20%"
          },
          {
             id: "required",
-            content: "Required"
+            content: "Required",
+            width: "10%"
          },
          {
             id: "defaultValue",
-            content: "Default Value"
+            content: "Default Value",
+            width: "10%"
          }
       ],
       []
@@ -71,58 +74,36 @@ export default function AttributeDescriptorViewer({
                //getAttributeDetail(attributeDescriptor)
             ],
             detailColumns: [
-               (
-                  <>
-
-                     <p>
-                        <b>Name</b>: {attributeDescriptor.name}
-                     </p>
-
-                     <p>
-                        <b>Type</b>: {attributeDescriptor.type}
-                     </p>
-
-
-                  </>
-               ),
-               (
-                  <>
-                     <p>
-                        <b>Read Only</b>:{" "}
-                        {attributeDescriptor.readOnly ? "Yes" : "No"}
-                     </p>
-
-                     {/*<p>
-                        <b>Editable</b>: {attributeDescriptor.editable ? "Yes" : "No"}
-                     </p>*/}
-                  </>
-               ),
-               (
-                  <>
-                     <p>
-                        <b>Visible</b>: {attributeDescriptor.visible ? "No" : "Yes"}
-                     </p>
-
-                     <p>
-                        <b>Multiple Value</b>:{" "}
-                        {attributeDescriptor.multiSelect ? "Yes" : "No"}
-                     </p>
-
-                  </>
-               ),
-               (
-                  <>
-                     <p>
-                        <b>Description</b>: {attributeDescriptor.description}
-                     </p>
-
-                     <p>
-                        <b>Validation Regex</b>: {attributeDescriptor.validationRegex}
-                     </p>
-
-                  </>
-               )
-
+               <></>,
+               <></>,
+               <></>,
+               <CustomTable
+                  headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
+                  data={[
+                     { id: "name", columns: [<b>Name</b>, attributeDescriptor.name] },
+                     { id: "desc", columns: [<b>Description</b>, attributeDescriptor.description || "Not set"] },
+                     { id: "label", columns: [<b>Label</b>, attributeDescriptor.label] },
+                     { id: "group", columns: [<b>Group</b>, attributeDescriptor.group || "Not set"] },
+                     { id: "type", columns: [<b>Type</b>, attributeDescriptor.type] },
+                     { id: "required", columns: [<b>Required</b>, attributeDescriptor.required ? "Yes" : "No"] },
+                     { id: "readOnly", columns: [<b>Read Only</b>, attributeDescriptor.readOnly ? "Yes" : "No"] },
+                     { id: "list", columns: [<b>List</b>, attributeDescriptor.list ? "Yes" : "No"] },
+                     { id: "muliValue", columns: [<b>Multiple Values</b>, attributeDescriptor.multiSelect ? "Yes" : "No"] },
+                     { id: "validationRegex", columns: [<b>Validation Regex</b>, attributeDescriptor.validationRegex ? attributeDescriptor.validationRegex.toString() : "Not set"] },
+                     {
+                        id: "defaults", columns: [<b>Defaults</b>, attributeDescriptor.content
+                           ?
+                           attributeDescriptor.content instanceof Array
+                              ?
+                              attributeDescriptor.content.map(content => content.value.toString()).join(", ")
+                              :
+                              attributeDescriptor.content.value.toString()
+                           : "Not set"
+                        ]
+                     },
+                  ]}
+                  hasHeader={false}
+               />
             ]
 
          })
