@@ -1,14 +1,15 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
-import Spinner from "components/Spinner";
+
+import { MDBBadge } from "mdbreact";
+
+import { actions, selectors } from "ducks/ra-profiles";
+
+import { Container } from "reactstrap";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import { actions, selectors } from "ducks/ra-profiles";
 import MDBColumnName from "components/MDBColumnName";
-import { MDBBadge, MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
-import ToolTip from "components/ToolTip";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import Dialog from "components/Dialog";
@@ -200,7 +201,7 @@ function RaProfileList() {
 
          })
       ),
-      [raProfiles]
+      [getProtocolsForDisplay, path, raProfiles]
 
    )
 
