@@ -70,7 +70,7 @@ function ConnectorList() {
 
    const onReconnectClick = useCallback(
       () => {
-         dispatch(actions.bulkReconnectConnectors(checkedRows));
+         dispatch(actions.bulkReconnectConnectors({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -78,7 +78,7 @@ function ConnectorList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
-         dispatch(actions.setCheckedRows(rows as string[]));
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
       [dispatch]
    );
@@ -88,7 +88,7 @@ function ConnectorList() {
       () => {
          setConfirmDelete(false);
          dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkDeleteConnectors(checkedRows));
+         dispatch(actions.bulkDeleteConnectors({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
    );
@@ -106,7 +106,7 @@ function ConnectorList() {
    const onAuthorizeConfirmed = useCallback(
       () => {
          setConfirmAuthorize(false);
-         dispatch(actions.bulkAuthorizeConnectors(checkedRows));
+         dispatch(actions.bulkAuthorizeConnectors({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
    );

@@ -87,9 +87,11 @@ function AdminForm({ title }: Props) {
 
       dispatch(
          certActions.listCertificates({
-            itemsPerPage: 100,
-            pageNumber: 1,
-            filters: [],
+            query: {
+               itemsPerPage: 100,
+               pageNumber: 1,
+               filters: [],
+            }
          })
       );
 
@@ -99,7 +101,7 @@ function AdminForm({ title }: Props) {
 
    useEffect(() => {
 
-      if (params.id && (!administratorSelector || administratorSelector.uuid !== params.id)) dispatch(adminActions.getAdminDetail(params.id));
+      if (params.id && (!administratorSelector || administratorSelector.uuid !== params.id)) dispatch(adminActions.getAdminDetail({ uuid: params.id }));
 
       if (params.id && administratorSelector?.uuid === params.id) {
 
@@ -241,9 +243,11 @@ function AdminForm({ title }: Props) {
 
       dispatch(
          certActions.listCertificates({
-            itemsPerPage: 100,
-            pageNumber: currentPage,
-            filters: [],
+            query: {
+               itemsPerPage: 100,
+               pageNumber: currentPage,
+               filters: [],
+            }
          })
       );
 

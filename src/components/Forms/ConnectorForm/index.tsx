@@ -89,11 +89,11 @@ function ConnectorForm({ title }: Props) {
       () => {
 
          if (params.id && (!connectorSelector || connectorSelector.uuid !== params.id) && !isFetching) {
-            dispatch(conenctorActions.getConnectorDetail(params.id));
+            dispatch(conenctorActions.getConnectorDetail({ uuid: params.id }));
          }
 
          if (params.id && (connectorSelector && connectorSelector.uuid === params.id && !isFetching)) {
-            dispatch(conenctorActions.reconnectConnector(params.id));
+            dispatch(conenctorActions.reconnectConnector({ uuid: params.id }));
          }
 
          if (params.id && connectorSelector?.uuid === params.id) {
@@ -165,7 +165,7 @@ function ConnectorForm({ title }: Props) {
 
    const onConnectClick = (values: FormValues) => {
       if (editMode) {
-         dispatch(conenctorActions.reconnectConnector(connector!.uuid));
+         dispatch(conenctorActions.reconnectConnector({ uuid: connector!.uuid }));
       } else {
          dispatch(conenctorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
       }

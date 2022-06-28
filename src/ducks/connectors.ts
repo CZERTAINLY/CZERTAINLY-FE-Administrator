@@ -1,13 +1,15 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createFeatureSelector } from "utils/ducks";
+
 import { AttributeDescriptorCollectionModel } from "models/attributes/AttributeDescriptorCollectionModel";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
-import { ConnectorHealthModel, ConnectorModel, FunctionGroupModel } from "models/connectors";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { createSelector } from "reselect";
-import { AuthType, FunctionGroupCode } from "types/connectors";
 
-import { createFeatureSelector } from "utils/ducks";
+import { AuthType, FunctionGroupCode } from "types/connectors";
+import { ConnectorHealthModel, ConnectorModel, FunctionGroupModel } from "models/connectors";
+
+import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+
 
 export type State = {
 
@@ -78,9 +80,16 @@ export const slice = createSlice({
 
    reducers: {
 
-      setCheckedRows: (state, action: PayloadAction<string[]>) => {
+      resetState: (state, action: PayloadAction<void>) => {
 
-         state.checkedRows = action.payload;
+         state = initialState;
+
+      },
+
+
+      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+
+         state.checkedRows = action.payload.checkedRows;
 
       },
 
@@ -109,22 +118,22 @@ export const slice = createSlice({
       },
 
 
-      listConnectorsSuccess: (state, action: PayloadAction<ConnectorModel[]>) => {
+      listConnectorsSuccess: (state, action: PayloadAction<{ connectorList: ConnectorModel[] }>) => {
 
          state.isFetchingList = false;
-         state.connectors = action.payload;
+         state.connectors = action.payload.connectorList;
 
       },
 
 
-      listConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
+      listConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false;
 
       },
 
 
-      getConnectorDetail: (state, action: PayloadAction<string>) => {
+      getConnectorDetail: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.connector = undefined;
          state.connectorAttributes = undefined;
@@ -135,24 +144,31 @@ export const slice = createSlice({
       },
 
 
-      getConnectorDetailSuccess: (state, action: PayloadAction<ConnectorModel>) => {
+      getConnectorDetailSuccess: (state, action: PayloadAction<{ connector: ConnectorModel }>) => {
 
          state.isFetchingDetail = false;
-         state.connector = action.payload;
-         const index = state.connectors.findIndex(connector => connector.uuid === action.payload.uuid);
-         if (index >= 0) state.connectors[index] = action.payload;
+
+         state.connector = action.payload.connector;
+
+         const index = state.connectors.findIndex(connector => connector.uuid === action.payload.connector.uuid);
+
+         if (index >= 0) {
+            state.connectors[index] = action.payload.connector;
+         } else {
+            state.connectors.push(action.payload.connector);
+         }
 
       },
 
 
-      getConnectorDetailFailure: (state, action: PayloadAction<string | undefined>) => {
+      getConnectorDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false;
 
       },
 
 
-      getConnectorAttributes: (state, action: PayloadAction<{ uuid: string, functionGroup: FunctionGroupCode, kind: string }>) => {
+      getConnectorAttributesDescriptors: (state, action: PayloadAction<{ uuid: string, functionGroup: FunctionGroupCode, kind: string }>) => {
 
          if (
             state.connectorAttributes &&
@@ -167,7 +183,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAttributesSuccess: (state, action: PayloadAction<{ functionGroup: FunctionGroupCode, kind: string, attributes: AttributeDescriptorModel[] }>) => {
+      getConnectorAttributeDescriptorsSuccess: (state, action: PayloadAction<{ functionGroup: FunctionGroupCode, kind: string, attributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingAllAttributes = false;
          state.connectorAttributes = state.connectorAttributes || {};
@@ -177,14 +193,14 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAttributesFailure: (state, action: PayloadAction<string | undefined>) => {
+      getConnectorAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingAllAttributes = false;
 
       },
 
 
-      getAllConnectorAttributes: (state, action: PayloadAction<string>) => {
+      getConnectorAllAttributesDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isFetchingAllAttributes = true;
          state.connectorAttributes = undefined;
@@ -192,22 +208,22 @@ export const slice = createSlice({
       },
 
 
-      getAllConnectorAttributesSuccess: (state, action: PayloadAction<AttributeDescriptorCollectionModel>) => {
+      getConnectorAllAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptorCollection: AttributeDescriptorCollectionModel }>) => {
 
          state.isFetchingAllAttributes = false;
-         state.connectorAttributes = action.payload;
+         state.connectorAttributes = action.payload.attributeDescriptorCollection;
 
       },
 
 
-      getAllConnectorAttributesFailure: (state, action: PayloadAction<string | undefined>) => {
+      getAllConnectorAllAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingAllAttributes = false;
 
       },
 
 
-      getConnectorHealth: (state, action: PayloadAction<string>) => {
+      getConnectorHealth: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.connectorHealth = undefined;
          state.isFetchingHealth = true;
@@ -215,88 +231,97 @@ export const slice = createSlice({
       },
 
 
-      getConnectorHealthSuccess: (state, action: PayloadAction<ConnectorHealthModel>) => {
+      getConnectorHealthSuccess: (state, action: PayloadAction<{ health: ConnectorHealthModel }>) => {
 
          state.isFetchingHealth = false;
-         state.connectorHealth = action.payload;
+         state.connectorHealth = action.payload.health;
 
       },
 
 
-      getConnectorHealthFailure: (state, action: PayloadAction<string | undefined>) => {
+      getConnectorHealthFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingHealth = false;
 
       },
 
 
-      connectorCallback: (state, action: PayloadAction<{ authorityUuid: string, connectorUuid: string, name: string, functionGroup: string }>) => {
-      },
-
-
-      connectorCallbackSuccess: (state, action: PayloadAction<any>) => {
-      },
-
-
-      connectorCallbackFailure: (state, action: PayloadAction<string | undefined>) => {
-      },
-
-
-      createConnector: (state, action: PayloadAction<{name: string, url: string, authType: AuthType, authAttributes?: AttributeModel[]}>) => {
+      createConnector: (state, action: PayloadAction<{
+         name: string,
+         url: string,
+         authType: AuthType,
+         authAttributes?: AttributeModel[]
+      }>) => {
 
          state.isCreating = true;
 
       },
 
 
-      createConnectorSuccess: (state, action: PayloadAction<ConnectorModel>) => {
+      createConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorModel }>) => {
 
          state.isCreating = false;
-         // !!! When connector is created the complete object should be returned in order to be possible to local cache
+
+         const index = state.connectors.findIndex(connector => connector.uuid === action.payload.connector.uuid);
+
+         if (index >= 0) {
+            state.connectors[index] = action.payload.connector;
+         } else {
+            state.connectors.push(action.payload.connector);
+         }
+
+         state.connector = action.payload.connector;
+         state.connectorHealth = undefined;
+         state.connectorAttributes = undefined;
+         state.connectorConnectionDetails = undefined;
 
       },
 
 
-      createConnectorFailure: (state, action: PayloadAction<string | undefined>) => {
+      createConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isCreating = false;
 
       },
 
 
-      updateConnector: (state, action: PayloadAction<{ uuid: string, url: string, authType: AuthType, authAttributes?: AttributeModel[] }>) => {
+      updateConnector: (state, action: PayloadAction<{
+         uuid: string,
+         url: string,
+         authType: AuthType,
+         authAttributes?: AttributeModel[]
+      }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      updateConnectorSuccess: (state, action: PayloadAction<ConnectorModel>) => {
+      updateConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorModel }>) => {
 
          state.isUpdating = false;
 
-         if (state.connector?.uuid === action.payload.uuid) {
-            state.connector = action.payload;
-         }
+         const index = state.connectors.findIndex(connector => connector.uuid === action.payload.connector.uuid);
 
-         const index = state.connectors.findIndex(connector => connector.uuid === action.payload.uuid);
          if (index >= 0) {
-            state.connectors[index] = action.payload
+            state.connectors[index] = action.payload.connector
          } else {
-            state.connectors.push(action.payload)
+            state.connectors.push(action.payload.connector)
          }
+
+         if (state.connector?.uuid === action.payload.connector.uuid) state.connector = action.payload.connector;
 
       },
 
 
-      updateConnectorFailure: (state, action: PayloadAction<string | undefined>) => {
+      updateConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false;
 
       },
 
 
-      deleteConnector: (state, action: PayloadAction<string>) => {
+      deleteConnector: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.deleteErrorMessage = "";
          state.isDeleting = true;
@@ -304,25 +329,33 @@ export const slice = createSlice({
       },
 
 
-      deleteConnectorSuccess: (state, action: PayloadAction<string>) => {
+      deleteConnectorSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = false;
 
-         const index = state.connectors.findIndex(connector => connector.uuid === action.payload);
+         const index = state.connectors.findIndex(connector => connector.uuid === action.payload.uuid);
+
          if (index >= 0) state.connectors.splice(index, 1);
 
+         if (state.connector?.uuid === action.payload.uuid) {
+            state.connector = undefined;
+            state.connectorHealth = undefined;
+            state.connectorAttributes = undefined;
+            state.connectorConnectionDetails = undefined;
+         }
+
       },
 
 
-      deleteConnectorFailure: (state, action: PayloadAction<string>) => {
+      deleteConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.deleteErrorMessage = action.payload;
+         state.deleteErrorMessage = action.payload.error || "Unknown error";
          state.isDeleting = false;
 
       },
 
 
-      bulkDeleteConnectors: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteConnectors: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.bulkDeleteErrorMessages = [];
          state.isBulkDeleting = true;
@@ -333,57 +366,71 @@ export const slice = createSlice({
       bulkDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
          state.isBulkDeleting = false;
-         if (Array.isArray(action.payload.errors) && action.payload.errors.length > 0) {
+
+         if (action.payload.errors.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return;
          }
 
          action.payload.uuids.forEach(
+
             uuid => {
                const index = state.connectors.findIndex(connector => connector.uuid === uuid);
                if (index >= 0) state.connectors.splice(index, 1);
             }
+
          )
+
+         if (state.connector && action.payload.uuids.includes(state.connector.uuid)) {
+            state.connector = undefined;
+            state.connectorHealth = undefined;
+            state.connectorAttributes = undefined;
+            state.connectorConnectionDetails = undefined;
+         }
 
       },
 
 
-      bulkDeleteConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
+      bulkDeleteConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.bulkDeleteErrorMessages = [
-            {
-               uuid: "",
-               name: "Failed to delete connectors",
-               message: action.payload || "Unknown error"
-            }
-         ]
          state.isBulkDeleting = false;
 
       },
 
 
-      bulkForceDeleteConnectors: (state, action: PayloadAction<{ uuids: string[], successRedirect?: string}>) => {
+      bulkForceDeleteConnectors: (state, action: PayloadAction<{ uuids: string[], successRedirect?: string }>) => {
 
          state.isBulkForceDeleting = true;
 
       },
 
 
-      bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], successRedirect?: string}>) => {
+      bulkForceDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], successRedirect?: string }>) => {
 
          state.isBulkForceDeleting = false;
 
          action.payload.uuids.forEach(
+
             uuid => {
+
                const index = state.connectors.findIndex(connector => connector.uuid === uuid);
                if (index >= 0) state.connectors.splice(index, 1);
+
             }
+
          )
+
+         if (state.connector && action.payload.uuids.includes(state.connector.uuid)) {
+            state.connector = undefined;
+            state.connectorHealth = undefined;
+            state.connectorAttributes = undefined;
+            state.connectorConnectionDetails = undefined;
+         }
 
       },
 
 
-      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
+      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkForceDeleting = false;
 
@@ -398,22 +445,22 @@ export const slice = createSlice({
       },
 
 
-      connectConnectorSuccess: (state, action: PayloadAction<FunctionGroupModel[]>) => {
+      connectConnectorSuccess: (state, action: PayloadAction<{ connectionDetails: FunctionGroupModel[] }>) => {
 
          state.isConnecting = false;
-         state.connectorConnectionDetails = action.payload;
+         state.connectorConnectionDetails = action.payload.connectionDetails;
 
       },
 
 
-      connectConnectorFailure: (state, action: PayloadAction<string | undefined>) => {
+      connectConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isConnecting = false;
 
       },
 
 
-      reconnectConnector: (state, action: PayloadAction<string>) => {
+      reconnectConnector: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.connectorConnectionDetails = undefined;
          state.isReconnecting = true;
@@ -429,77 +476,78 @@ export const slice = createSlice({
       },
 
 
-      reconnectConnectorFailure: (state, action: PayloadAction<string | undefined>) => {
+      reconnectConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isReconnecting = false;
 
       },
 
 
-      bulkReconnectConnectors: (state, action: PayloadAction<string[]>) => {
+      bulkReconnectConnectors: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkReconnecting = true;
       },
 
 
-      bulkReconnectConnectorsSuccess: (state, action: PayloadAction<void>) => {
+      bulkReconnectConnectorsSuccess: (state, action: PayloadAction<{ uuids: string [] }>) => {
 
          state.isBulkReconnecting = false;
 
       },
 
 
-      bulkReconnectConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
+      bulkReconnectConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkReconnecting = false;
 
       },
 
 
-      authorizeConnector: (state, action: PayloadAction<string>) => {
+      authorizeConnector: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isAuthorizing = true;
 
       },
 
 
-      authorizeConnectorAuccess: (state, action: PayloadAction<void>) => {
+      authorizeConnectorAuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isAuthorizing = false;
 
       },
 
 
-      authorizeConnectorFailure: (state, action: PayloadAction<string | undefined>) => {
+      authorizeConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isAuthorizing = false;
 
       },
 
 
-      bulkAuthorizeConnectors: (state, action: PayloadAction<string[]>) => {
+      bulkAuthorizeConnectors: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isBulkReconnecting = true;
-
-      },
-
-
-      bulkAuthorizeConnectorsSuccess: (state, action: PayloadAction<void>) => {
-
-         state.isBulkReconnecting = false;
+         state.isBulkAuthorizing = true;
 
       },
 
 
-      bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<string | undefined>) => {
+      bulkAuthorizeConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isBulkReconnecting = false;
+         state.isBulkAuthorizing = false;
+
+      },
+
+
+      bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkAuthorizing = false;
 
       }
 
    }
 
 });
+
 
 const state = createFeatureSelector<State>(slice.name);
 
@@ -532,16 +580,22 @@ const isBulkReconnecting = createSelector(state, state => state.isBulkReconnecti
 const isAuthorizing = createSelector(state, state => state.isAuthorizing);
 const isBulkAuthorizing = createSelector(state, state => state.isBulkAuthorizing);
 
+
 export const selectors = {
+
    state,
+
    checkedRows,
+
    deleteErrorMessage,
    bulkDeleteErrorMessages,
+
    connector,
    connectorHealth,
    connectorAttributes,
    connectorConnectionDetails,
    connectors,
+
    isFetchingList,
    isFetchingDetail,
    isFetchingHealth,
@@ -558,9 +612,12 @@ export const selectors = {
    isBulkReconnecting,
    isAuthorizing,
    isBulkAuthorizing
+
 };
 
+
 export const actions = slice.actions;
+
 
 export default slice.reducer;
 

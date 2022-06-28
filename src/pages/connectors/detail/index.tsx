@@ -55,9 +55,9 @@ export default function ConnectorDetail() {
    useEffect(
       () => {
          setFunctionGroup(undefined);
-         dispatch(actions.getConnectorDetail(params.id));
-         dispatch(actions.getConnectorHealth(params.id));
-         dispatch(actions.getAllConnectorAttributes(params.id));
+         dispatch(actions.getConnectorDetail({ uuid: params.id }));
+         dispatch(actions.getConnectorHealth({ uuid: params.id }));
+         dispatch(actions.getConnectorAllAttributesDescriptors({ uuid: params.id }));
       },
       [params.id, dispatch]
    );
@@ -113,7 +113,7 @@ export default function ConnectorDetail() {
    const onReconnectClick = useCallback(
       () => {
          if (!connector) return;
-         dispatch(actions.reconnectConnector(connector.uuid));
+         dispatch(actions.reconnectConnector({ uuid: connector.uuid }));
       },
       [connector, dispatch]
    );
@@ -122,7 +122,7 @@ export default function ConnectorDetail() {
    const onDeleteConfirmed = useCallback(
       () => {
          if (!connector) return;
-         dispatch(actions.deleteConnector(connector.uuid));
+         dispatch(actions.deleteConnector({ uuid: connector.uuid }));
          setConfirmDelete(false);
       },
       [connector, dispatch]
@@ -133,7 +133,7 @@ export default function ConnectorDetail() {
       () => {
          if (!connector) return;
          setConfirmAuthorize(false);
-         dispatch(actions.authorizeConnector(connector.uuid));
+         dispatch(actions.authorizeConnector({ uuid: connector.uuid }));
       },
       [dispatch, connector]
    );

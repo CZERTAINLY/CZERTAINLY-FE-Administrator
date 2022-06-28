@@ -47,8 +47,8 @@ export default function ClientDetail() {
    useEffect(
       () => {
          if (!params.id) return;
-         dispatch(clientActions.getClientDetail(params.id));
-         dispatch(clientActions.getAuthorizedProfiles(params.id));
+         dispatch(clientActions.getClientDetail({ uuid: params.id }));
+         dispatch(clientActions.getAuthorizedProfiles({ clientUuid: params.id }));
          dispatch(raProfileActions.listRaProfiles());
       },
       [params.id, dispatch]
@@ -67,7 +67,7 @@ export default function ClientDetail() {
    const onEnableClick = useCallback(
       () => {
          if (!client) return;
-         dispatch(clientActions.enableClient(client.uuid));
+         dispatch(clientActions.enableClient({ uuid: client.uuid }));
       },
       [client, dispatch]
    )
@@ -76,7 +76,7 @@ export default function ClientDetail() {
    const onDisableClick = useCallback(
       () => {
          if (!client) return;
-         dispatch(clientActions.disableClient(client.uuid));
+         dispatch(clientActions.disableClient({ uuid: client.uuid }));
       }
       , [client, dispatch]
    )
@@ -97,7 +97,7 @@ export default function ClientDetail() {
       () => {
          setConfirmDelete(false);
          if (!client) return;
-         dispatch(clientActions.deleteClient(client.uuid));
+         dispatch(clientActions.deleteClient({ uuid: client.uuid }));
       },
       [dispatch, client]
    )

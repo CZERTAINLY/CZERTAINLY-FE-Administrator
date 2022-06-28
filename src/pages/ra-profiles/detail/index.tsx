@@ -78,10 +78,10 @@ export default function RaProfileDetail() {
    useEffect(
 
       () => {
-         dispatch(raProfilesActions.getRaProfileDetail(params.id));
-         dispatch(raProfilesActions.listIssuanceAttributes(params.id));
-         dispatch(raProfilesActions.listRevocationAttributes(params.id));
-         dispatch(raProfilesActions.getAcmeDetails(params.id));
+         dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
+         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: params.id }));
+         dispatch(raProfilesActions.listRevocationAttributes({ uuid: params.id }));
+         dispatch(raProfilesActions.getAcmeDetails({ uuid: params.id }));
       },
       [params.id, dispatch]
 
@@ -92,7 +92,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (isAuthorizingClient || isUnauthorizing) return;
-         dispatch(raProfilesActions.listAuthorizedClients(params.id));
+         dispatch(raProfilesActions.listAuthorizedClients({ uuid: params.id }));
          dispatch(clientActions.listClients());
          setClientToAuthorize(null);
       },
@@ -116,7 +116,7 @@ export default function RaProfileDetail() {
       () => {
 
          if (!raProfile) return;
-         dispatch(raProfilesActions.enableRaProfile(raProfile.uuid));
+         dispatch(raProfilesActions.enableRaProfile({ uuid: raProfile.uuid }));
       },
       [dispatch, raProfile]
 
@@ -127,7 +127,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.disableRaProfile(raProfile.uuid));
+         dispatch(raProfilesActions.disableRaProfile({ uuid: raProfile.uuid }));
       },
       [dispatch, raProfile]
 
@@ -149,7 +149,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.deleteRaProfile(raProfile.uuid));
+         dispatch(raProfilesActions.deleteRaProfile({ uuid: raProfile.uuid }));
       },
       [dispatch, raProfile]
 
@@ -160,7 +160,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.deactivateAcme(raProfile.uuid));
+         dispatch(raProfilesActions.deactivateAcme({ uuid: raProfile.uuid }));
          setConfirmDeactivateAcme(false);
       },
       [dispatch, raProfile]

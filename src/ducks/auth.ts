@@ -9,7 +9,7 @@ export type State = {
    isFetchingProfile: boolean;
    isAuthenticated: boolean;
    isUpdatingProfile: boolean;
-   profile?: UserProfileModel;
+   userProfile?: UserProfileModel;
 };
 
 
@@ -31,6 +31,7 @@ export const slice = createSlice({
    reducers: {
 
       login: (state, action: PayloadAction<{ credentials: any }>) => {
+
          state.token = "";
          state.isAuthenticated = false;
          state.isLoggingIn = true;
@@ -38,55 +39,73 @@ export const slice = createSlice({
       },
 
 
-      loginSuccess: (state, action: PayloadAction<string>) => {
-         state.token = action.payload;
+      loginSuccess: (state, action: PayloadAction<{ token: string }>) => {
+
+         state.token = action.payload.token;
          state.isAuthenticated = true;
          state.isLoggingIn = false;
+
       },
 
 
-      loginFailed: (state, action: PayloadAction<string | undefined>) => {
+      loginFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
          state.token = "";
          state.isAuthenticated = false;
          state.isLoggingIn = false;
+
       },
 
 
-      logout: (state) => {
+      logout: (state, action: PayloadAction<void>) => {
+
          state.token = "";
          state.isAuthenticated = false;
+
       },
 
 
-      getProfile: (state) => {
-         state.profile = undefined;
+      getProfile: (state, action: PayloadAction<void>) => {
+
+         state.userProfile = undefined;
          state.isFetchingProfile = true;
+
       },
 
 
       getProfileSuccess: (state, action: PayloadAction<UserProfileModel>) => {
-         state.profile = action.payload;
+
+         state.userProfile = action.payload;
          state.isFetchingProfile = false;
+
       },
 
 
-      getProfileFailed: (state, action: PayloadAction<string | undefined>) => {
-         state.profile = undefined;
+      getProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.userProfile = undefined;
          state.isFetchingProfile = true;
+
       },
 
 
-      updateProfile: (state, action: PayloadAction<UserProfileModel>) => {
+      updateProfile: (state, action: PayloadAction<{ userProfile: UserProfileModel }>) => {
+
          state.isUpdatingProfile = true;
+
       },
 
-      updateProfileSuccess: (state, action: PayloadAction<UserProfileModel>) => {
-         state.profile = action.payload;
+      updateProfileSuccess: (state, action: PayloadAction<{ userProfile: UserProfileModel }>) => {
+
+         state.userProfile = action.payload.userProfile;
          state.isUpdatingProfile = false;
+
       },
 
-      updateProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      updateProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
          state.isUpdatingProfile = false;
+
       }
 
 
@@ -94,7 +113,10 @@ export const slice = createSlice({
 
 });
 
+
 const selectState = createFeatureSelector<State>(slice.name);
+
+const userProfile = createSelector(selectState, state => state.userProfile);
 
 const isAuthenticated = createSelector(selectState, state => state.isAuthenticated);
 
@@ -104,20 +126,21 @@ const isFetchingProfile = createSelector(selectState, state => state.isFetchingP
 
 const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
 
-const profile = createSelector(selectState, state => state.profile);
+const isSuperAdmin = createSelector(userProfile, profile => profile?.role === Role.SuperAdmin );
 
-const isSuperAdmin = createSelector(profile, profile => profile?.role === Role.SuperAdmin );
 
 export const selectors = {
    selectState,
+   profile: userProfile,
    isAuthenticated,
    isLoggingIn,
    isFetchingProfile,
    isUpdatingProfile,
-   profile,
    isSuperAdmin
 };
 
+
 export const actions = slice.actions;
+
 
 export default slice.reducer;

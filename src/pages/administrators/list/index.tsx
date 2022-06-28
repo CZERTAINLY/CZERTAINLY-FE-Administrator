@@ -36,7 +36,7 @@ export default function AdministratorsList() {
 
    useEffect(
       () => {
-         dispatch(actions.setCheckedRows([]));
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listAdmins());
       },
       [dispatch]
@@ -53,7 +53,7 @@ export default function AdministratorsList() {
 
    const onEnableClick = useCallback(
       () => {
-         dispatch(actions.bulkEnableAdmins(checkedRows));
+         dispatch(actions.bulkEnableAdmins({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -61,7 +61,7 @@ export default function AdministratorsList() {
 
    const onDisableClick = useCallback(
       () => {
-         dispatch(actions.bulkDisableAdmins(checkedRows));
+         dispatch(actions.bulkDisableAdmins({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -69,7 +69,7 @@ export default function AdministratorsList() {
 
    const onDeleteConfirmed = useCallback(
       () => {
-         dispatch(actions.bulkDeleteAdmins(checkedRows));
+         dispatch(actions.bulkDeleteAdmins({ uuids: checkedRows }));
          setConfirmDelete(false);
       },
       [checkedRows, dispatch]
@@ -78,7 +78,7 @@ export default function AdministratorsList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
-         dispatch(actions.setCheckedRows(rows as string[]));
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
       [dispatch]
    );

@@ -32,7 +32,9 @@ const listLogs: AppEpic = (action$, state, deps) => {
                })
             ),
 
-            catchError(err => of(slice.actions.listLogsFailure(extractError(err, "Failed to get audit logs list"))))
+            catchError(
+               err => of(slice.actions.listLogsFailure({ error: extractError(err, "Failed to get audit logs list") }))
+            )
 
          )
 
@@ -50,7 +52,7 @@ const listLogsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listLogsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -69,9 +71,11 @@ const listObjects: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.auditLogs.getObjects().pipe(
 
-            map(objects => slice.actions.listObjectsSuccess(objects)),
+            map(
+               objectList => slice.actions.listObjectsSuccess({ objectList })
+            ),
 
-            catchError(err => of(slice.actions.listObjectsFailure(extractError(err, "Failed to get objects list"))))
+            catchError(err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") })))
 
          )
 
@@ -90,7 +94,7 @@ const listObjectsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listObjectsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -109,9 +113,13 @@ const listOperations: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.auditLogs.getOperations().pipe(
 
-            map(operations => slice.actions.listOperationsSuccess(operations)),
+            map(
+               operationList => slice.actions.listOperationsSuccess({ operationList })
+            ),
 
-            catchError(err => of(slice.actions.listObjectsFailure(extractError(err, "Failed to get operations list"))))
+            catchError(
+               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get operations list") }))
+            )
 
          )
 
@@ -130,7 +138,7 @@ const listOperationsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listOperationsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.errors || "Unexpected error occured")
       )
 
    )
@@ -149,9 +157,13 @@ const listStatuses: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.auditLogs.getStatuses().pipe(
 
-            map(statuses => slice.actions.listStatusesSuccess(statuses)),
+            map(
+               statusList => slice.actions.listStatusesSuccess({ statusList})
+            ),
 
-            catchError(err => of(slice.actions.listStatusesFailure(extractError(err, "Failed to get statuses list"))))
+            catchError(
+               err => of(slice.actions.listStatusesFailure({ error: extractError(err, "Failed to get statuses list") }))
+            )
 
          )
 
@@ -170,7 +182,7 @@ const listStatusesFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listStatusesFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )

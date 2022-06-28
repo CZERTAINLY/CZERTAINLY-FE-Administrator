@@ -34,7 +34,7 @@ function CredentialDetail() {
    useEffect(
 
       () => {
-         dispatch(actions.getCredentialDetail(params.id));
+         dispatch(actions.getCredentialDetail({ uuid: params.id }));
       },
       [params.id, dispatch]
 
@@ -54,7 +54,7 @@ function CredentialDetail() {
 
       () => {
          if (!credential) return;
-         dispatch(actions.deleteCredential(credential.uuid));
+         dispatch(actions.deleteCredential({ uuid: credential.uuid }));
          setConfirmDelete(false);
       },
       [dispatch, credential]
@@ -66,7 +66,7 @@ function CredentialDetail() {
 
       () => {
          if (!credential) return;
-         dispatch(actions.deleteCredential(credential.uuid));
+         dispatch(actions.deleteCredential({ uuid: credential.uuid }));
       },
       [dispatch, credential]
 

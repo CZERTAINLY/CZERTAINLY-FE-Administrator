@@ -23,9 +23,14 @@ const listConnectors: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.connectors.getConnectorsList().pipe(
 
-            map(list => slice.actions.listConnectorsSuccess(list.map(connectorDto => transformConnectorDTOToModel(connectorDto))),
+            map(
+               list => slice.actions.listConnectorsSuccess({
+                  connectorList: list.map(connectorDto => transformConnectorDTOToModel(connectorDto))
+               }),
 
-               catchError(err => of(slice.actions.listConnectorsFailure(extractError(err, "Failed to get connector list"))))
+               catchError(
+                  err => of(slice.actions.listConnectorsFailure({ error: extractError(err, "Failed to get connector list") }))
+               )
             )
 
          )
@@ -45,7 +50,7 @@ const listConnectorsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listConnectorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -62,15 +67,17 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorDetail(action.payload).pipe(
+         action => deps.apiClients.connectors.getConnectorDetail(action.payload.uuid).pipe(
 
-            map(detail => slice.actions.getConnectorDetailSuccess(transformConnectorDTOToModel(detail)),
-
-               catchError(err => of(slice.actions.getConnectorDetailFailure(extractError(err, "Failed to get connector detail"))))
-
+            map(
+               detail => slice.actions.getConnectorDetailSuccess({ connector: transformConnectorDTOToModel(detail) })
+            ),
+            catchError(
+               err => of(slice.actions.getConnectorDetailFailure({ error: extractError(err, "Failed to get connector detail") }))
             )
 
          )
+
       )
 
    )
@@ -86,7 +93,7 @@ const getConnectorDetailFailure: AppEpic = (action$, state, deps) => {
          slice.actions.getConnectorDetailFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -94,12 +101,12 @@ const getConnectorDetailFailure: AppEpic = (action$, state, deps) => {
 }
 
 
-const getConnectorAttributes: AppEpic = (action$, state, deps) => {
+const getConnectorAttributesDescriptors: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.getConnectorAttributes.match
+         slice.actions.getConnectorAttributesDescriptors.match
       ),
       switchMap(
 
@@ -110,14 +117,16 @@ const getConnectorAttributes: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               attrs => slice.actions.getConnectorAttributesSuccess({
+               attrs => slice.actions.getConnectorAttributeDescriptorsSuccess({
                   functionGroup: action.payload.functionGroup,
                   kind: action.payload.kind,
                   attributes: attrs.map(attr => transformAttributeDescriptorDTOToModel(attr))
                })
             ),
 
-            catchError(err => of(slice.actions.getConnectorAttributesFailure(extractError(err, "Failed to get connector attributes"))))
+            catchError(
+               err => of(slice.actions.getConnectorAttributesDescriptorsFailure({ error: extractError(err, "Failed to get connector attributes") }))
+            )
 
          )
 
@@ -127,15 +136,15 @@ const getConnectorAttributes: AppEpic = (action$, state, deps) => {
 }
 
 
-const getConnectorAttributesFailure: AppEpic = (action$, state, deps) => {
+const getConnectorAttributesDescriptorsFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.getConnectorAttributesFailure.match
+         slice.actions.getConnectorAttributesDescriptorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -143,20 +152,26 @@ const getConnectorAttributesFailure: AppEpic = (action$, state, deps) => {
 }
 
 
-const getAllConnectorAttributes: AppEpic = (action$, state, deps) => {
+const getConnectorAllAttributesDescriptors: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.getAllConnectorAttributes.match
+         slice.actions.getConnectorAllAttributesDescriptors.match
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAllAttributes(action.payload).pipe(
+         action => deps.apiClients.connectors.getConnectorAllAttributes(action.payload.uuid).pipe(
 
-            map(descColl => slice.actions.getAllConnectorAttributesSuccess(transfromAttributeDescriptorCollectionDTOToModel(descColl))),
+            map(
+               descColl => slice.actions.getConnectorAllAttributesDescriptorsSuccess({
+                  attributeDescriptorCollection: transfromAttributeDescriptorCollectionDTOToModel(descColl)
+               })
+            ),
 
-            catchError(err => of(slice.actions.getAllConnectorAttributesFailure(extractError(err, "Failed to get all connector attributes"))))
+            catchError(
+               err => of(slice.actions.getAllConnectorAllAttributesDescriptorsFailure({ error: extractError(err, "Failed to get all connector attributes") }))
+            )
          )
 
       )
@@ -165,15 +180,15 @@ const getAllConnectorAttributes: AppEpic = (action$, state, deps) => {
 }
 
 
-const getAllConnectorAttributesFailure: AppEpic = (action$, state, deps) => {
+const getAllConnectorAllAttributesDescriptorsFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.getAllConnectorAttributesFailure.match
+         slice.actions.getAllConnectorAllAttributesDescriptorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -190,11 +205,15 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorHealth(action.payload).pipe(
+         action => deps.apiClients.connectors.getConnectorHealth(action.payload.uuid).pipe(
 
-            map(health => slice.actions.getConnectorHealthSuccess(transformConnectorHealthDTOToModel(health))),
+            map(
+               health => slice.actions.getConnectorHealthSuccess({ health: transformConnectorHealthDTOToModel(health) })
+            ),
 
-            catchError(err => of(slice.actions.getConnectorHealthFailure(extractError(err, "Failed to get connector health"))))
+            catchError(
+               err => of(slice.actions.getConnectorHealthFailure({ error: extractError(err, "Failed to get connector health") }))
+            )
 
          )
 
@@ -278,15 +297,21 @@ const createConnector: AppEpic = (action$, state, deps) => {
 
                uuid => deps.apiClients.connectors.getConnectorDetail(uuid).pipe(
 
-                  map(connector => slice.actions.createConnectorSuccess(transformConnectorDTOToModel(connector))),
+                  map(
+                     connector => slice.actions.createConnectorSuccess({
+                        connector: transformConnectorDTOToModel(connector)
+                     })
+                  ),
 
-                  catchError(err => of(slice.actions.createConnectorFailure(extractError(err, "Failed to get created connector"))))
+                  catchError(
+                     err => of(slice.actions.createConnectorFailure({ error: extractError(err, "Failed to get created connector") }))
+                  )
 
                )
 
             ),
 
-            catchError(err => of(slice.actions.createConnectorFailure(extractError(err, "Failed to create connector"))))
+            catchError(err => of(slice.actions.createConnectorFailure({ error: extractError(err, "Failed to create connector") })))
 
          )
 
@@ -305,7 +330,7 @@ const createConnectorSuccess: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
          action => {
-            history.push(`./detail/${action.payload.uuid}`);
+            history.push(`./detail/${action.payload.connector.uuid}`);
             return EMPTY;
          }
       )
@@ -323,7 +348,7 @@ const createConnectorFailure: AppEpic = (action$, state, deps) => {
          slice.actions.createConnectorFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -347,9 +372,13 @@ const updateConnector: AppEpic = (action$, state, deps) => {
             action.payload.authAttributes?.map(attribute => transformAttributeModelToDTO(attribute))
          ).pipe(
 
-            map(connector => slice.actions.updateConnectorSuccess(transformConnectorDTOToModel(connector))),
+            map(
+               connector => slice.actions.updateConnectorSuccess({ connector: transformConnectorDTOToModel(connector) })
+            ),
 
-            catchError(err => of(slice.actions.updateConnectorFailure(extractError(err, "Failed to update connector"))))
+            catchError(
+               err => of(slice.actions.updateConnectorFailure({ error: extractError(err, "Failed to update connector") }))
+            )
 
          )
 
@@ -367,7 +396,7 @@ const updateConnectorFailure: AppEpic = (action$, state, deps) => {
          slice.actions.updateConnectorFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -384,11 +413,15 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.deleteConnector(action.payload).pipe(
+         action => deps.apiClients.connectors.deleteConnector(action.payload.uuid).pipe(
 
-            map(() => slice.actions.deleteConnectorSuccess(action.payload)),
+            map(
+               () => slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid })
+            ),
 
-            catchError(err => of(slice.actions.deleteConnectorFailure(extractError(err, "Failed to delete connector"))))
+            catchError(
+               err => of(slice.actions.deleteConnectorFailure({ error: extractError(err, "Failed to delete connector") }))
+            )
 
          )
 
@@ -441,14 +474,18 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkDeleteConnectors(action.payload).pipe(
+         action => deps.apiClients.connectors.bulkDeleteConnectors(action.payload.uuids).pipe(
 
-            map(errors => slice.actions.bulkDeleteConnectorsSuccess({
-               uuids: action.payload,
-               errors: errors.map(error => transformDeleteObjectErrorDtoToModel(error))
-            })),
+            map(
+               errors => slice.actions.bulkDeleteConnectorsSuccess({
+                  uuids: action.payload.uuids,
+                  errors: errors.map(error => transformDeleteObjectErrorDtoToModel(error))
+               })
+            ),
 
-            catchError(err => of(slice.actions.bulkDeleteConnectorsFailure(extractError(err, "Failed to bulk delete connectors"))))
+            catchError(
+               err => of(slice.actions.bulkDeleteConnectorsFailure({ error: extractError(err, "Failed to bulk delete connectors") }))
+            )
 
          )
 
@@ -466,7 +503,7 @@ const bulkDeleteConnectorsFailed: AppEpic = (action$, state, deps) => {
          slice.actions.bulkDeleteConnectorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -489,11 +526,15 @@ const connectConnector: AppEpic = (action$, state, deps) => {
             action.payload.authAttributes?.map(attribute => transformAttributeModelToDTO(attribute))
          ).pipe(
 
-            map(connection => slice.actions.connectConnectorSuccess(
-               connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
-            )),
+            map(
+               connection => slice.actions.connectConnectorSuccess({
+                  connectionDetails: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
+               })
+            ),
 
-            catchError(err => of(slice.actions.connectConnectorFailure(extractError(err, "Failed to connect to connector"))))
+            catchError(
+               err => of(slice.actions.connectConnectorFailure({ error: extractError(err, "Failed to connect to connector") }))
+            )
 
          )
 
@@ -511,7 +552,7 @@ const connectConnectorFailure: AppEpic = (action$, state, deps) => {
          slice.actions.connectConnectorFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -528,16 +569,18 @@ const reconnectConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.reconnectConnector(action.payload).pipe(
+         action => deps.apiClients.connectors.reconnectConnector(action.payload.uuid).pipe(
 
             map(
                connection => slice.actions.reconnectConnectorSuccess({
-                  uuid: action.payload,
+                  uuid: action.payload.uuid,
                   functionGroups: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
                })
             ),
 
-            catchError(err => of(slice.actions.reconnectConnectorFailure(extractError(err, "Failed to reconnect to connector"))))
+            catchError(
+               err => of(slice.actions.reconnectConnectorFailure({ error: extractError(err, "Failed to reconnect to connector") }))
+            )
 
          )
 
@@ -555,7 +598,7 @@ const reconnectConnectorSuccess: AppEpic = (action$, state, deps) => {
          slice.actions.reconnectConnectorSuccess.match
       ),
       map(
-         action => slice.actions.getConnectorHealth(action.payload.uuid)
+         action => slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
       )
 
    )
@@ -571,7 +614,7 @@ const reconnectConnectorFailure: AppEpic = (action$, state, deps) => {
          slice.actions.reconnectConnectorFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -588,11 +631,15 @@ const bulkReconnectConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkReconnectConnectors(action.payload).pipe(
+         action => deps.apiClients.connectors.bulkReconnectConnectors(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkReconnectConnectorsSuccess()),
+            map(
+               () => slice.actions.bulkReconnectConnectorsSuccess({ uuids: action.payload.uuids })
+            ),
 
-            catchError(err => of(slice.actions.bulkReconnectConnectorsFailure(extractError(err, "Failed to bulk reconnect to connectors"))))
+            catchError(
+               err => of(slice.actions.bulkReconnectConnectorsFailure({ error: extractError(err, "Failed to bulk reconnect to connectors") }))
+            )
 
          )
 
@@ -610,7 +657,7 @@ const bulkReconnectConnectorsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkReconnectConnectorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -627,11 +674,15 @@ const authorizeConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.authorizeConnector(action.payload).pipe(
+         action => deps.apiClients.connectors.authorizeConnector(action.payload.uuid).pipe(
 
-            map(() => slice.actions.authorizeConnectorAuccess()),
+            map(
+               () => slice.actions.authorizeConnectorAuccess({ uuid: action.payload.uuid })
+            ),
 
-            catchError(err => of(slice.actions.authorizeConnectorFailure(extractError(err, "Failed to authorize connector"))))
+            catchError(
+               err => of(slice.actions.authorizeConnectorFailure({ error: extractError(err, "Failed to authorize connector") }))
+            )
 
          )
 
@@ -649,7 +700,7 @@ const authorizeConnectorFailure: AppEpic = (action$, state, deps) => {
          slice.actions.authorizeConnectorFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -666,11 +717,15 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkAuthorizeConnectors(action.payload).pipe(
+         action => deps.apiClients.connectors.bulkAuthorizeConnectors(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkAuthorizeConnectorsSuccess()),
+            map(
+               () => slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids })
+            ),
 
-            catchError(err => of(slice.actions.bulkAuthorizeConnectorsFailure(extractError(err, "Failed to bulk authorize connectors"))))
+            catchError(
+               err => of(slice.actions.bulkAuthorizeConnectorsFailure({ error: extractError(err, "Failed to bulk authorize connectors") }))
+            )
 
          )
 
@@ -688,7 +743,7 @@ const bulkAuthorizeConnectorsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkAuthorizeConnectorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -707,9 +762,13 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.connectors.bulkForceDeleteConnectors(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkForceDeleteConnectorsSuccess(action.payload)),
+            map(
+               () => slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids })
+            ),
 
-            catchError(err => of(slice.actions.bulkForceDeleteConnectorsFailure(extractError(err, "Failed to force delete connectors"))))
+            catchError(
+               err => of(slice.actions.bulkForceDeleteConnectorsFailure({ error: extractError(err, "Failed to force delete connectors") }))
+            )
 
          )
 
@@ -747,7 +806,7 @@ const bulkForceDeleteConnectorsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkForceDeleteConnectorsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -760,10 +819,10 @@ const epics = [
    listConnectorsFailure,
    getConnectorDetail,
    getConnectorDetailFailure,
-   getConnectorAttributes,
-   getConnectorAttributesFailure,
-   getAllConnectorAttributes,
-   getAllConnectorAttributesFailure,
+   getConnectorAttributesDescriptors,
+   getConnectorAttributesDescriptorsFailure,
+   getConnectorAllAttributesDescriptors,
+   getAllConnectorAllAttributesDescriptorsFailure,
    getConnectorHealth,
    getConnectorHealthFailure,
    //connectorCallback,

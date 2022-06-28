@@ -1,23 +1,22 @@
-import { AcmeProfileDTO, AcmeProfileListItemDTO } from "api/acme-profile";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { AcmeProfileListModel, AcmeProfileModel } from "models/acme-profiles";
-import { AttributeDTO } from "api/_common/attributeDTO";
+import { AcmeProfileListItemModel, AcmeProfileModel } from "models/acme-profiles";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
 
 
 export type State = {
 
    checkedRows: string[];
 
-   profile?: AcmeProfileModel;
-   profiles: AcmeProfileListModel[];
+   deleteErrorMessage: string;
+   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
 
-   deleteProfileErrors: DeleteObjectErrorModel[];
+   acmeProfile?: AcmeProfileModel;
+   acmeProfiles: AcmeProfileListItemModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
-
    isCreating: boolean;
    isDeleting: boolean;
    isUpdating: boolean;
@@ -35,13 +34,13 @@ export const initialState: State = {
 
    checkedRows: [],
 
-   profiles: [],
+   acmeProfiles: [],
 
-   deleteProfileErrors: [],
+   deleteErrorMessage: "",
+   bulkDeleteErrorMessages: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
-
    isCreating: false,
    isDeleting: false,
    isUpdating: false,
@@ -63,6 +62,28 @@ export const slice = createSlice({
 
    reducers: {
 
+      resetState: (state, action: PayloadAction<void>) => {
+
+         state = initialState;
+
+      },
+
+
+      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+
+         state.checkedRows = action.payload.checkedRows
+
+      },
+
+
+      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+
+         state.deleteErrorMessage = "";
+         state.bulkDeleteErrorMessages = [];
+
+      },
+
+
       listAcmeProfiles: (state, action: PayloadAction<void>) => {
 
          state.isFetchingList = true;
@@ -70,37 +91,47 @@ export const slice = createSlice({
       },
 
 
-      listAcmeProfilesSuccess: (state, action: PayloadAction<AcmeProfileListItemDTO[]>) => {
+      listAcmeProfilesSuccess: (state, action: PayloadAction<{ acmeProfileList: AcmeProfileListItemModel[] }>) => {
 
-         state.profiles = action.payload;
+         state.acmeProfiles = action.payload.acmeProfileList;
          state.isFetchingList = false;
 
       },
 
 
-      listAcmeProfilesFailed: (state, action: PayloadAction<string | undefined>) => {
+      listAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false
 
       },
 
 
-      getAcmeProfile: (state, action: PayloadAction<string>) => {
+      getAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isFetchingDetail = true;
 
       },
 
 
-      getAcmeProfileSuccess: (state, action: PayloadAction<AcmeProfileModel>) => {
+      getAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileModel }>) => {
 
-         state.profile = action.payload;
          state.isFetchingDetail = false;
+
+         state.acmeProfile = action.payload.acmeProfile;
+
+         const acmeProfileIndex = state.acmeProfiles.findIndex(acmeProfile => acmeProfile.uuid === action.payload.acmeProfile.uuid);
+
+         if (acmeProfileIndex >= 0) {
+            state.acmeProfiles[acmeProfileIndex] = action.payload.acmeProfile;
+         } else {
+            state.acmeProfiles.push(action.payload.acmeProfile);
+         }
+
 
       },
 
 
-      getAcmeProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      getAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false
 
@@ -118,8 +149,8 @@ export const slice = createSlice({
          retryInterval: number,
          termsOfServiceChangeDisable: boolean,
          validity: number,
-         issueCertificateAttributes: AttributeDTO[],
-         revokeCertificateAttributes: AttributeDTO[],
+         issueCertificateAttributes: AttributeModel[],
+         revokeCertificateAttributes: AttributeModel[],
          requireContact: boolean,
          requireTermsOfService: boolean,
          termsOfServiceChangeUrl: string
@@ -130,21 +161,21 @@ export const slice = createSlice({
       },
 
 
-      createAcmeProfileSuccess: (state, action: PayloadAction<string>) => {
+      createAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isCreating = false;
 
       },
 
 
-      createAcmeProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      createAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isCreating = false
 
       },
 
 
-      editAcmeProfile: (state, action: PayloadAction<{
+      updateAcmeProfile: (state, action: PayloadAction<{
          uuid: string,
          name: string,
          description: string,
@@ -156,8 +187,8 @@ export const slice = createSlice({
          retryInterval: number,
          termsOfServiceChangeDisable: boolean,
          validity: number,
-         issueCertificateAttributes: AttributeDTO[],
-         revokeCertificateAttributes: AttributeDTO[],
+         issueCertificateAttributes: AttributeModel[],
+         revokeCertificateAttributes: AttributeModel[],
          requireContact: boolean,
          requireTermsOfService: boolean,
          termsOfServiceChangeUrl: string
@@ -168,186 +199,238 @@ export const slice = createSlice({
       },
 
 
-      editAcmeProfileSuccess: (state, action: PayloadAction<string>) => {
+      updateAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileModel }>) => {
 
          state.isUpdating = false;
+
+         const acmeProfileIndex = state.acmeProfiles.findIndex(acmeProfile => acmeProfile.uuid === action.payload.acmeProfile.uuid);
+
+         if (acmeProfileIndex >= 0) {
+            state.acmeProfiles[acmeProfileIndex] = action.payload.acmeProfile;
+         } else {
+            state.acmeProfiles.push(action.payload.acmeProfile);
+         }
+
+         if (state.acmeProfile?.uuid === action.payload.acmeProfile.uuid) state.acmeProfile = action.payload.acmeProfile;
 
       },
 
 
-      editAcmeProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      updateAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false
 
       },
 
 
-      deleteAcmeProfile: (state, action: PayloadAction<string>) => {
+      deleteAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteAcmeProfileSuccess: (state, action: PayloadAction<string>) => {
+      deleteAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string, errors: DeleteObjectErrorModel[] }>) => {
 
          state.isDeleting = false;
-         const profileIndex = state.profiles.findIndex(profile => profile.uuid === action.payload);
-         if (profileIndex >= 0) state.profiles.splice(profileIndex, 1);
 
-         if (state.profile?.uuid === action.payload) state.profile = undefined;
+         const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === action.payload.uuid);
+
+         if (profileIndex >= 0) state.acmeProfiles.splice(profileIndex, 1);
+
+         if (state.acmeProfile?.uuid === action.payload.uuid) state.acmeProfile = undefined;
 
       },
 
 
-      deleteAcmeProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      deleteAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false
 
       },
 
 
-      enableAcmeProfile: (state, action: PayloadAction<string>) => {
+      enableAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      enableAcmeProfileSuccess: (state, action: PayloadAction<string>) => {
+      enableAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isUpdating = false;
-         const profileIndex = state.profiles.findIndex(profile => profile.uuid === action.payload);
-         if (profileIndex >= 0) state.profiles[profileIndex].enabled = true;
+
+         const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === action.payload.uuid);
+
+         if (profileIndex >= 0) state.acmeProfiles[profileIndex].enabled = true;
+
+         if (state.acmeProfile?.uuid === action.payload.uuid) state.acmeProfile.enabled = true;
 
       },
 
 
-      enableAcmeProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      enableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false;
 
       },
 
 
-      disableAcmeProfile: (state, action: PayloadAction<string>) => {
+      disableAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      disableAcmeProfileSuccess: (state, action: PayloadAction<string>) => {
+      disableAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isUpdating = false;
-         const profileIndex = state.profiles.findIndex(profile => profile.uuid === action.payload);
-         if (profileIndex >= 0) state.profiles[profileIndex].enabled = false;
+
+         const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === action.payload.uuid);
+
+         if (profileIndex >= 0) state.acmeProfiles[profileIndex].enabled = false;
+
+         if (state.acmeProfile?.uuid === action.payload.uuid) state.acmeProfile.enabled = false;
 
       },
 
 
-      disableAcmeProfileFailed: (state, action: PayloadAction<string | undefined>) => {
+      disableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false;
 
       },
 
 
-      bulkDeleteAcmeProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
          state.isDeleting = false;
 
-         action.payload.forEach(uuid => {
-            const profileIndex = state.profiles.findIndex(profile => profile.uuid === uuid);
-            if (profileIndex >= 0) state.profiles.splice(profileIndex, 1);
-         });
+         if (action.payload.errors.length > 0) {
+            state.bulkDeleteErrorMessages = action.payload.errors;
+            return
+         }
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === uuid);
+               if (profileIndex >= 0) state.acmeProfiles.splice(profileIndex, 1);
+            }
+
+         );
+
+         if (state.acmeProfile && action.payload.uuids.includes(state.acmeProfile.uuid)) state.acmeProfile = undefined;
 
       },
 
 
-      bulkDeleteAcmeProfilesFailed: (state, action: PayloadAction<string>) => {
+      bulkDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false;
 
       },
 
 
-      bulkForceDeleteAcmeProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkForceDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      bulkForceDeleteAcmeProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkForceDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isDeleting = false;
-         action.payload.forEach(uuid => {
-            const profileIndex = state.profiles.findIndex(profile => profile.uuid === uuid);
-            if (profileIndex >= 0) state.profiles.splice(profileIndex, 1);
-         });
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === uuid);
+               if (profileIndex >= 0) state.acmeProfiles.splice(profileIndex, 1);
+            }
+
+         );
+
+         if (state.acmeProfile && action.payload.uuids.includes(state.acmeProfile.uuid)) state.acmeProfile = undefined;
 
       },
 
 
-      bulkForceDeleteAcmeProfilesFailed: (state, action: PayloadAction<string>) => {
+      bulkForceDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false;
 
       },
 
 
-      bulkEnableAcmeProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkEnableAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      bulkEnableAcmeProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkEnableAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isUpdating = false;
-         action.payload.forEach(uuid => {
-            const profileIndex = state.profiles.findIndex(profile => profile.uuid === uuid);
-            if (profileIndex >= 0) state.profiles[profileIndex].enabled = true;
-         });
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === uuid);
+               if (profileIndex >= 0) state.acmeProfiles[profileIndex].enabled = true;
+            }
+
+         );
+
+         if (state.acmeProfile && action.payload.uuids.includes(state.acmeProfile.uuid)) state.acmeProfile.enabled = true;
 
       },
 
 
-      bulkEnableAcmeProfilesFailed: (state, action: PayloadAction<string>) => {
+      bulkEnableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false
 
       },
 
 
-      bulkDisableAcmeProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkDisableAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      bulkDisableAcmeProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDisableAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isUpdating = false;
-         action.payload.forEach(uuid => {
-            const profileIndex = state.profiles.findIndex(profile => profile.uuid === uuid);
-            if (profileIndex >= 0) state.profiles[profileIndex].enabled = false;
-         });
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === uuid);
+               if (profileIndex >= 0) state.acmeProfiles[profileIndex].enabled = false;
+            }
+
+         );
+
+         if (state.acmeProfile && action.payload.uuids.includes(state.acmeProfile.uuid)) state.acmeProfile.enabled = false;
 
       },
 
 
-      bulkDisableAcmeProfilesFailed: (state, action: PayloadAction<string>) => {
+      bulkDisableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false
 
@@ -359,14 +442,16 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const profiles = createSelector(state, state => state.profiles);
-const profile = createSelector(state, state => state.profile);
+const acmeProfile = createSelector(state, state => state.acmeProfile);
+const acmeProfiles = createSelector(state, state => state.acmeProfiles);
+
+const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
+const bulkDeleteErrorMessages = createSelector(state, state => state.bulkDeleteErrorMessages);
 
 const checkedRows = createSelector(state, state => state.checkedRows);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
-
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
@@ -379,10 +464,17 @@ const isBulkForceDeleting = createSelector(state, (state) => state.isBulkForceDe
 
 
 export const selectors = {
+
    state,
+
    checkedRows,
-   profiles,
-   profile,
+
+   deleteErrorMessage,
+   bulkDeleteErrorMessages,
+
+   acmeProfile,
+   acmeProfiles,
+
    isFetchingList,
    isFetchingDetail,
    isCreating,
@@ -393,7 +485,8 @@ export const selectors = {
    isBulkDeleting,
    isBulkEnabling,
    isBulkDisabling,
-   isBulkForceDeleting,
+   isBulkForceDeleting
+
 };
 
 

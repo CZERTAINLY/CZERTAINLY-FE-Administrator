@@ -10,11 +10,11 @@ import * as slice from './auth';
 
 
 const dtoToModel = (profile: UserProfileDTO): UserProfileModel => ({
-      username: profile.username,
-      name: profile.name,
-      surname: profile.surname,
-      email: profile.email,
-      role: profile.role === "superAdministrator" ? Role.SuperAdmin : Role.Admin,
+   username: profile.username,
+   name: profile.name,
+   surname: profile.surname,
+   email: profile.email,
+   role: profile.role === "superAdministrator" ? Role.SuperAdmin : Role.Admin,
 });
 
 
@@ -26,7 +26,7 @@ const login: AppEpic = action$ => {
          slice.actions.login.match
       ),
       map(
-         () => slice.actions.loginSuccess("token")
+         () => slice.actions.loginSuccess({ token: "token" })
       )
 
    );
@@ -46,9 +46,13 @@ const getProfile: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.auth.getProfile().pipe(
 
-            map(profile => slice.actions.getProfileSuccess(dtoToModel(profile))),
+            map(
+               profile => slice.actions.getProfileSuccess(dtoToModel(profile))
+            ),
 
-            catchError(err => of(slice.actions.getProfileFailed(extractError(err, "Failed to get user profile"))))
+            catchError(
+               err => of(slice.actions.getProfileFailed({ error: extractError(err, "Failed to get user profile") }))
+            )
 
          )
 
@@ -70,15 +74,19 @@ const updateProfile: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => deps.apiClients.auth.updateProfile(
-            action.payload.name,
-            action.payload.surname,
-            action.payload.username,
-            action.payload.email
+            action.payload.userProfile.name,
+            action.payload.userProfile.surname,
+            action.payload.userProfile.username,
+            action.payload.userProfile.email
          ).pipe(
 
-            map(() => slice.actions.updateProfileSuccess(action.payload)),
+            map(
+               () => slice.actions.updateProfileSuccess(action.payload)
+            ),
 
-            catchError(err => of(slice.actions.updateProfileFailed(extractError(err, "Failed to update profile"))))
+            catchError(
+               err => of(slice.actions.updateProfileFailed({ error: extractError(err, "Failed to update profile") }))
+            )
 
          )
 

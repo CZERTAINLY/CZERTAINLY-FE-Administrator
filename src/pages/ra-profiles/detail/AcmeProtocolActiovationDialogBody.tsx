@@ -31,7 +31,7 @@ export default function AcmeProtocolActiovationDialogBody({
 
    const dispatch = useDispatch();
 
-   const acmeProfiles = useSelector(acmeProfilesSelectors.profiles);
+   const acmeProfiles = useSelector(acmeProfilesSelectors.acmeProfiles);
 
    const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
    const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
@@ -53,8 +53,8 @@ export default function AcmeProtocolActiovationDialogBody({
 
          dispatch(acmeProfilesActions.listAcmeProfiles());
          if (!raProfileUuid) return;
-         dispatch(raProfilesActions.listIssuanceAttributes(raProfileUuid));
-         dispatch(raProfilesActions.listRevocationAttributes(raProfileUuid));
+         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: raProfileUuid }));
+         dispatch(raProfilesActions.listRevocationAttributes({ uuid: raProfileUuid }));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [visible]

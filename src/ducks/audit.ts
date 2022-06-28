@@ -49,7 +49,12 @@ export const slice = createSlice({
 
    reducers: {
 
-      listLogs: (state, action: PayloadAction<{ page: number, size: number, sort?: string, filters?: { [key: string]: string } }>) => {
+      listLogs: (state, action: PayloadAction<{
+         page: number,
+         size: number,
+         sort?: string,
+         filters?: { [key: string]: string }
+      }>) => {
 
          state.pageData = [];
          state.loadedPageNumber = undefined;
@@ -60,7 +65,12 @@ export const slice = createSlice({
       },
 
 
-      listLogsSuccess: (state, action: PayloadAction<{ page: number, size: number, total: number, data: AuditLogModel[] }>) => {
+      listLogsSuccess: (state, action: PayloadAction<{
+         page: number,
+         size: number,
+         total: number,
+         data: AuditLogModel[]
+      }>) => {
 
          state.isFetchingPageData = false;
          state.loadedPageNumber = action.payload.page;
@@ -70,7 +80,7 @@ export const slice = createSlice({
       },
 
 
-      listLogsFailure: (state, action: PayloadAction<string | undefined>) => {
+      listLogsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingPageData = false;
 
@@ -85,15 +95,15 @@ export const slice = createSlice({
       },
 
 
-      listObjectsSuccess: (state, action: PayloadAction<string[]>) => {
+      listObjectsSuccess: (state, action: PayloadAction<{ objectList: string[] }>) => {
 
-         state.objects = action.payload;
+         state.objects = action.payload.objectList;
          state.isFetchingObjects = false;
 
       },
 
 
-      listObjectsFailure: (state, action: PayloadAction<string | undefined>) => {
+      listObjectsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingObjects = false;
 
@@ -108,15 +118,15 @@ export const slice = createSlice({
       },
 
 
-      listOperationsSuccess: (state, action: PayloadAction<string[]>) => {
+      listOperationsSuccess: (state, action: PayloadAction<{ operationList: string[] }>) => {
 
-         state.operations = action.payload;
+         state.operations = action.payload.operationList;
          state.isFetchingOperations = false;
 
       },
 
 
-      listOperationsFailure: (state, action: PayloadAction<string | undefined>) => {
+      listOperationsFailure: (state, action: PayloadAction<{ errors: string | undefined }>) => {
 
          state.isFetchingOperations = false;
 
@@ -131,15 +141,15 @@ export const slice = createSlice({
       },
 
 
-      listStatusesSuccess: (state, action: PayloadAction<string[]>) => {
+      listStatusesSuccess: (state, action: PayloadAction<{ statusList: string[] }>) => {
 
-         state.statuses = action.payload;
+         state.statuses = action.payload.statusList;
          state.isFetchingStatuses = false;
 
       },
 
 
-      listStatusesFailure: (state, action: PayloadAction<string | undefined>) => {
+      listStatusesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingStatuses = false;
 
@@ -166,21 +176,29 @@ const isFetchingObjects = createSelector(state, state => state.isFetchingObjects
 const isFetchingOperations = createSelector(state, state => state.isFetchingOperations);
 const isFetchingStatuses = createSelector(state, state => state.isFetchingStatuses);
 
+
 export const selectors = {
+
    state,
+
    loadedPageNumber,
    loadedPageSize,
    totalPagesAvailable,
+
    pageData,
    objects,
    operations,
    statuses,
+
    isFetchingPageData,
    isFetchingObjects,
    isFetchingOperations,
    isFetchingStatuses
+
 }
 
+
 export const actions = slice.actions;
+
 
 export default slice.reducer;

@@ -48,7 +48,7 @@ export const slice = createSlice({
 
    reducers: {
 
-      listCertificates: (state, action: PayloadAction<CertificateListQuery>) => {
+      listCertificates: (state, action: PayloadAction<{ query: CertificateListQuery }>) => {
 
          state.certificates = [];
          state.isFetchingList = true;
@@ -56,22 +56,22 @@ export const slice = createSlice({
       },
 
 
-      listCertificatesSuccess: (state, action: PayloadAction<CertificateModel[]>) => {
+      listCertificatesSuccess: (state, action: PayloadAction<{ certificateList: CertificateModel[] }>) => {
 
          state.isFetchingList = false;
-         state.certificates = action.payload;
+         state.certificates = action.payload.certificateList;
 
       },
 
 
-      listCertificatesFailure: (state, action: PayloadAction<string | undefined>) => {
+      listCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false;
 
       },
 
 
-      getCertificateDetail: (state, action: PayloadAction<string>) => {
+      getCertificateDetail: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.certificateDetail = undefined;
          state.isFetchingDetail = true;
@@ -79,15 +79,15 @@ export const slice = createSlice({
       },
 
 
-      getCertificateDetailSuccess: (state, action: PayloadAction<CertificateModel>) => {
+      getCertificateDetailSuccess: (state, action: PayloadAction<{ certificate: CertificateModel }>) => {
 
          state.isFetchingDetail = false;
-         state.certificateDetail = action.payload;
+         state.certificateDetail = action.payload.certificate;
 
       },
 
 
-      getCertificateDetailFailure: (state, action: PayloadAction<string | undefined>) => {
+      getCertificateDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false;
 

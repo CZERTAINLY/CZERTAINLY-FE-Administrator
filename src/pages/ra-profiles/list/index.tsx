@@ -38,7 +38,7 @@ function RaProfileList() {
 
 
    useEffect(() => {
-      dispatch(actions.setCheckedRows([]));
+      dispatch(actions.setCheckedRows({ checkedRows: [] }));
       dispatch(actions.listRaProfiles());
    }, [dispatch]);
 
@@ -50,7 +50,7 @@ function RaProfileList() {
 
    const onEnableClick = useCallback(
       () => {
-         dispatch(actions.bulkEnableRaProfiles(checkedRows));
+         dispatch(actions.bulkEnableRaProfiles({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -58,7 +58,7 @@ function RaProfileList() {
 
    const onDisableClick = useCallback(
       () => {
-         dispatch(actions.bulkDisableRaProfiles(checkedRows));
+         dispatch(actions.bulkDisableRaProfiles({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -66,7 +66,7 @@ function RaProfileList() {
 
    const onDeleteConfirmed = useCallback(
       () => {
-         dispatch(actions.bulkDeleteRaProfiles(checkedRows));
+         dispatch(actions.bulkDeleteRaProfiles({ uuids: checkedRows }));
          setConfirmDelete(false);
       },
       [checkedRows, dispatch]
@@ -75,7 +75,7 @@ function RaProfileList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
-         dispatch(actions.setCheckedRows(rows as string[]));
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
       [dispatch]
    );

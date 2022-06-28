@@ -1,7 +1,7 @@
-import { AttributeDTO } from "api/_common/attributeDTO";
+import { AttributeModel } from "./attributes/AttributeModel";
 import { RaProfileModel } from "./ra-profiles";
 
-export interface AcmeProfileListModel {
+export interface AcmeProfileListItemModel {
    uuid: string;
    name: string;
    enabled: boolean;
@@ -29,6 +29,6 @@ export interface AcmeProfileModel {
    termsOfServiceChangeUrl?: string;
    requireContact?: boolean;
    requireTermsOfService?: boolean;
-   issueCertificateAttributes?: AttributeDTO[];
-   revokeCertificateAttributes?: AttributeDTO[];
+   issueCertificateAttributes?: AttributeModel[];
+   revokeCertificateAttributes?: AttributeModel[];
 }

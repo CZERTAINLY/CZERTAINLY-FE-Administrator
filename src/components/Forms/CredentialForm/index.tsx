@@ -66,7 +66,7 @@ export default function CredentialForm({
       () => {
 
          if (editMode && (!credentialSelector || credentialSelector.uuid !== params.id)) {
-            dispatch(actions.getCredentialDetail(params.id));
+            dispatch(actions.getCredentialDetail({ uuid: params.id }));
          }
 
          if (!credentialProviders) {
@@ -81,7 +81,7 @@ export default function CredentialForm({
             const provider = credentialProviders.find(p => p.uuid === credentialSelector.connectorUuid);
             if (provider) {
                setCredentialProvider(provider);
-               dispatch(actions.listCredentialProviderAttributeDescriptors({ uuid: credentialSelector.connectorUuid, kind: credentialSelector.kind }));
+               dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialSelector.connectorUuid, kind: credentialSelector.kind }));
             }
          }
 
@@ -112,7 +112,7 @@ export default function CredentialForm({
       (event) => {
 
          if (!event.value || !credentialProvider) return;
-         dispatch(actions.listCredentialProviderAttributeDescriptors({ uuid: credentialProvider.uuid, kind: event.value }));
+         dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialProvider.uuid, kind: event.value }));
 
       },
       [dispatch, credentialProvider]

@@ -34,7 +34,7 @@ export default function AdministratorDetail() {
 
    useEffect(
       () => {
-         dispatch(actions.getAdminDetail(params.id));
+         dispatch(actions.getAdminDetail({ uuid: params.id }));
       },
       [params.id, dispatch]
    );
@@ -51,7 +51,7 @@ export default function AdministratorDetail() {
    const onEnableClick = useCallback(
       () => {
          if (!administrator) return;
-         dispatch(actions.enableAdmin(administrator.uuid));
+         dispatch(actions.enableAdmin({ uuid: administrator.uuid }));
       },
       [administrator, dispatch]
    );
@@ -60,7 +60,7 @@ export default function AdministratorDetail() {
    const onDisableClick = useCallback(
       () => {
          if (!administrator) return;
-         dispatch(actions.disableAdmin(administrator.uuid));
+         dispatch(actions.disableAdmin({ uuid: administrator.uuid }));
       },
       [administrator, dispatch]
    );
@@ -69,7 +69,7 @@ export default function AdministratorDetail() {
    const onDeleteConfirmed = useCallback(
       () => {
          if (!administrator) return;
-         dispatch(actions.deleteAdmin(administrator.uuid));
+         dispatch(actions.deleteAdmin({ uuid: administrator.uuid }));
          setConfirmDelete(false);
       },
       [administrator, dispatch]

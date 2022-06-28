@@ -66,7 +66,7 @@ function CredentialList() {
       () => {
          setConfirmDelete(false);
          dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkDeleteCredentials(checkedRows));
+         dispatch(actions.bulkDeleteCredentials({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
    );
@@ -75,7 +75,7 @@ function CredentialList() {
    const onForceDeleteConfirmed = useCallback(
       () => {
          dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkForceDeleteCredentials(checkedRows));
+         dispatch(actions.bulkForceDeleteCredentials({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
    );
@@ -83,7 +83,7 @@ function CredentialList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
-         dispatch(actions.setCheckedRows(rows as string[]));
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
       [dispatch]
    );

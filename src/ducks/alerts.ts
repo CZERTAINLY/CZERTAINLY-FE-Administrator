@@ -79,11 +79,6 @@ export const slice = createSlice({
 
       dismiss: {
 
-         /**
-          * Returns an dispatchable action to remove message from the alert queue
-          * @param messageId Id of the message to be removed from the queue
-          * @returns
-          */
          prepare: (messageId: number) => ({ payload: messageId }),
 
          reducer: (state, action: PayloadAction<number>) => {

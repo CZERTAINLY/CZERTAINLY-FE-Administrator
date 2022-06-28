@@ -1,10 +1,10 @@
 import { AcmeProfileDTO, AcmeProfileListItemDTO } from "api/acme-profile";
 import { RaAcmeLinkDTO } from "api/profiles";
-import { AcmeProfileListModel, AcmeProfileModel } from "models/acme-profiles";
+import { AcmeProfileListItemModel, AcmeProfileModel } from "models/acme-profiles";
 import { RaAcmeLinkModel } from "models/ra-profiles";
 import { transformAttributeDTOToModel } from "./attributes";
 
-export function transformAcmeProfileListDtoToModel(acmeProfileDto: AcmeProfileListItemDTO): AcmeProfileListModel {
+export function transformAcmeProfileListDtoToModel(acmeProfileDto: AcmeProfileListItemDTO): AcmeProfileListItemModel {
 
    return {
       uuid: acmeProfileDto.uuid,

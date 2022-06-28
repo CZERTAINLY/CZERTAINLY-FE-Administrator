@@ -1,11 +1,11 @@
 import { AuthorityDTO } from "api/authority";
-import { AuthorityModel } from "models/ca-authorities";
+import { AuthorityModel } from "models/authorities";
 
 export function transformAuthorityDtoToModel(authorityDto: AuthorityDTO): AuthorityModel {
     return {
         uuid: authorityDto.uuid,
         name: authorityDto.name,
-        attributes: authorityDto.attributes,
+        attributes: authorityDto.attributes || [],
         status: authorityDto.status,
         connectorUuid: authorityDto.connectorUuid,
         connectorName: authorityDto.connectorName,

@@ -21,16 +21,18 @@ const listCertificates: AppEpic = (action$, state, deps) => {
          action => {
 
             return deps.apiClients.certificates.getCertificatesList(
-               action.payload.itemsPerPage,
-               action.payload.pageNumber,
-               action.payload.filters
+               action.payload.query.itemsPerPage,
+               action.payload.query.pageNumber,
+               action.payload.query.filters
             ).pipe(
 
-            map(list => slice.actions.listCertificatesSuccess(list.certificates.map(cert => transformCertDTOToModel(cert)))),
+               map(
+                  list => slice.actions.listCertificatesSuccess({ certificateList: list.certificates.map(cert => transformCertDTOToModel(cert)) })
+               ),
 
-            catchError(err => of(slice.actions.listCertificatesFailure(extractError(err, "Failed to get certificates list"))))
+               catchError(err => of(slice.actions.listCertificatesFailure({ error: extractError(err, "Failed to get certificates list") })))
 
-         )
+            )
          }
 
       )
@@ -48,7 +50,7 @@ const listCertificatesFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listCertificatesFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -65,11 +67,14 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.getCertificateDetail(action.payload).pipe(
+         action => deps.apiClients.certificates.getCertificateDetail(action.payload.uuid).pipe(
 
-            map(certificate => slice.actions.getCertificateDetailSuccess(transformCertDTOToModel(certificate))),
-
-            catchError(err => of(slice.actions.getCertificateDetailFailure(extractError(err, "Failed to get certificate detail"))))
+            map(
+               certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertDTOToModel(certificate) })
+            ),
+            catchError(
+               err => of(slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }))
+            )
 
          )
 
@@ -88,7 +93,7 @@ const getCertificateDetailFailure: AppEpic = (action$, state, deps) => {
          slice.actions.getCertificateDetailFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )

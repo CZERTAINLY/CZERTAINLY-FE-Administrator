@@ -36,7 +36,7 @@ export default function ClientList() {
 
    useEffect(
       () => {
-         dispatch(actions.setCheckedRows([]));
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listClients());
       },
       [dispatch]
@@ -53,7 +53,7 @@ export default function ClientList() {
 
    const onEnableClick = useCallback(
       () => {
-         dispatch(actions.bulkEnableClients(checkedRows));
+         dispatch(actions.bulkEnableClients({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -61,7 +61,7 @@ export default function ClientList() {
 
    const onDisableClick = useCallback(
       () => {
-         dispatch(actions.bulkDisableClients(checkedRows));
+         dispatch(actions.bulkDisableClients({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
    );
@@ -77,7 +77,7 @@ export default function ClientList() {
 
    const onDeleteConfirmed = useCallback(
       () => {
-         dispatch(actions.bulkDeleteClients(checkedRows));
+         dispatch(actions.bulkDeleteClients({ uuids: checkedRows }));
          setConfirmDelete(false);
       },
       [checkedRows, dispatch]
@@ -86,7 +86,7 @@ export default function ClientList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
-         dispatch(actions.setCheckedRows(rows as string[]));
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
       [dispatch]
    );

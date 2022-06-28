@@ -26,9 +26,9 @@ const listAdmins: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.admins.getAdminsList().pipe(
 
-            map(list => slice.actions.listAdminsSuccess(list.map(adminDto => transformAdminDtoToModel(adminDto)))),
+            map(list => slice.actions.listAdminsSuccess({ adminList: list.map(adminDto => transformAdminDtoToModel(adminDto)) })),
 
-            catchError(err => of(slice.actions.listAdminFailure(extractError(err, "Failed to get administrators list"))))
+            catchError(err => of(slice.actions.listAdminFailure({ error: extractError(err, "Failed to get administrators list") })))
 
          )
       )
@@ -46,7 +46,7 @@ const listAdminsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.listAdminFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -64,11 +64,15 @@ const getAdminDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.getAdminDetail(action.payload).pipe(
+         action => deps.apiClients.admins.getAdminDetail(action.payload.uuid).pipe(
 
-            map(detail => slice.actions.getAdminDetailSuccess(transformAdminDtoToModel(detail))),
+            map(
+               detail => slice.actions.getAdminDetailSuccess({ administrator: transformAdminDtoToModel(detail) })
+            ),
 
-            catchError(err => of(slice.actions.getAdminDetailFailure(extractError(err, "Failed to load administrator detail"))))
+            catchError(
+               err => of(slice.actions.getAdminDetailFailure({ error: extractError(err, "Failed to load administrator detail") }))
+            )
 
          )
 
@@ -87,7 +91,7 @@ const getAdminDetailFailure: AppEpic = (action$, state, deps) => {
          slice.actions.getAdminDetailFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -121,15 +125,15 @@ const createAdmin: AppEpic = (action$, state, deps) => {
                   certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
                ).pipe(
 
-                  map(uuid => slice.actions.createAdminSuccess(uuid)),
+                  map(uuid => slice.actions.createAdminSuccess({ uuid })),
 
-                  catchError(err => of(slice.actions.createAdminFailure(extractError(err, "Failed to create administrator"))))
+                  catchError(err => of(slice.actions.createAdminFailure({ error: extractError(err, "Failed to create administrator") })))
 
                )
 
             ),
 
-            catchError(err => of(slice.actions.createAdminFailure(extractError(err, "Failed to create administrator")))),
+            catchError(err => of(slice.actions.createAdminFailure({ error: extractError(err, "Failed to create administrator") }))),
 
          )
 
@@ -170,7 +174,7 @@ const createAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.createAdminFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -203,15 +207,21 @@ const updateAdmin: AppEpic = (action$, state, deps) => {
                   certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
                ).pipe(
 
-                  map(adminDTO => slice.actions.updateAdminSuccess(transformAdminDtoToModel(adminDTO))),
+                  map(
+                     adminDTO => slice.actions.updateAdminSuccess({ administrator: transformAdminDtoToModel(adminDTO) })
+                  ),
 
-                  catchError(err => of(slice.actions.updateAdminFailure(extractError(err, "Failed to update administrator"))))
+                  catchError(
+                     err => of(slice.actions.updateAdminFailure({ error: extractError(err, "Failed to update administrator") }))
+                  )
 
                )
 
             ),
 
-            catchError(err => of(slice.actions.updateAdminFailure(extractError(err, "Failed to update administrator")))),
+            catchError(
+               err => of(slice.actions.updateAdminFailure({ error: extractError(err, "Failed to update administrator") }))
+            ),
 
          )
 
@@ -232,7 +242,7 @@ const updateAdminSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`../detail/${action.payload.uuid}`);
+            history.push(`../detail/${action.payload.administrator.uuid}`);
             return EMPTY;
          }
 
@@ -251,7 +261,7 @@ const updateAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.updateAdminFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -268,11 +278,14 @@ const deleteAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.deleteAdmin(action.payload).pipe(
+         action => deps.apiClients.admins.deleteAdmin(action.payload.uuid).pipe(
 
-            map(() => slice.actions.deleteAdminSuccess(action.payload)),
-
-            catchError(err => of(slice.actions.deleteAdminFailure(extractError(err, "Failed to delete administrator"))))
+            map(
+               () => slice.actions.deleteAdminSuccess(action.payload)
+            ),
+            catchError(
+               err => of(slice.actions.deleteAdminFailure({ error: extractError(err, "Failed to delete administrator") }))
+            )
 
          )
 
@@ -310,7 +323,7 @@ const deleteAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.deleteAdminFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -327,11 +340,14 @@ const bulkDeleteAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.bulkDeleteAdmin(action.payload).pipe(
+         action => deps.apiClients.admins.bulkDeleteAdmin(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkDeleteAdminsSuccess(action.payload)),
-
-            catchError(err => of(slice.actions.bulkDeleteAdminsFailure(extractError(err, "Failed to delete selected administrators"))))
+            map(
+               () => slice.actions.bulkDeleteAdminsSuccess({ uuids: action.payload.uuids })
+            ),
+            catchError(
+               err => of(slice.actions.bulkDeleteAdminsFailure({ error: extractError(err, "Failed to delete selected administrators") }))
+            )
 
          )
 
@@ -350,7 +366,7 @@ const bulkDeleteAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkDeleteAdminsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -367,11 +383,15 @@ const enableAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.enableAdmin(action.payload).pipe(
+         action => deps.apiClients.admins.enableAdmin(action.payload.uuid).pipe(
 
-            map(() => slice.actions.enableAdminSuccess(action.payload)),
+            map(
+               () => slice.actions.enableAdminSuccess({ uuid: action.payload.uuid })
+            ),
 
-            catchError(err => of(slice.actions.enableAdminFailure(extractError(err, "Failed to enable administrator"))))
+            catchError(
+               err => of(slice.actions.enableAdminFailure({ error: extractError(err, "Failed to enable administrator") }))
+            )
 
          )
 
@@ -390,7 +410,7 @@ const enableAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.enableAdminFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -407,11 +427,15 @@ const bulkEnableAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.bulkEnableAdmin(action.payload).pipe(
+         action => deps.apiClients.admins.bulkEnableAdmin(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkEnableAdminsSuccess(action.payload)),
+            map(
+               () => slice.actions.bulkEnableAdminsSuccess({ uuids: action.payload.uuids })
+            ),
 
-            catchError(err => of(slice.actions.bulkEnableAdminsFailure(extractError(err, "Failed to enable selected administrators"))))
+            catchError(
+               err => of(slice.actions.bulkEnableAdminsFailure({ error: extractError(err, "Failed to enable selected administrators") }))
+            )
 
          )
 
@@ -430,7 +454,7 @@ const bulkEnableAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkEnableAdminsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -447,11 +471,15 @@ const disableAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.disableAdmin(action.payload).pipe(
+         action => deps.apiClients.admins.disableAdmin(action.payload.uuid).pipe(
 
-            map(() => slice.actions.disableAdminSuccess(action.payload)),
+            map(
+               () => slice.actions.disableAdminSuccess({ uuid: action.payload.uuid })
+            ),
 
-            catchError(err => of(slice.actions.disableAdminFailure(extractError(err, "Failed to disable administrator"))))
+            catchError(
+               err => of(slice.actions.disableAdminFailure({ error: extractError(err, "Failed to disable administrator") }))
+            )
 
          )
 
@@ -471,7 +499,7 @@ const disableAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.disableAdminFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -488,11 +516,15 @@ const bulkDisableAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.admins.bulkDisableAdmin(action.payload).pipe(
+         action => deps.apiClients.admins.bulkDisableAdmin(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkDisableAdminsSuccess(action.payload)),
+            map(
+               () => slice.actions.bulkDisableAdminsSuccess({ uuids: action.payload.uuids })
+            ),
 
-            catchError(err => of(slice.actions.bulkDisableAdminsFailure(extractError(err, "Failed to disable selected administrators"))))
+            catchError(
+               err => of(slice.actions.bulkDisableAdminsFailure({ error: extractError(err, "Failed to disable selected administrators") }))
+            )
 
          )
 
@@ -511,7 +543,7 @@ const bulkDisableAdminFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkDisableAdminsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )

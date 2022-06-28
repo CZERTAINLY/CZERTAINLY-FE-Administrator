@@ -3,10 +3,14 @@ import { AttributeModel } from "models/attributes/AttributeModel";
 import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models/ra-profiles";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 
 export type State = {
 
    checkedRows: string[];
+
+   deleteErrorMessage: string;
+   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
 
    raProfile?: RaProfileModel;
    raProfiles: RaProfileModel[];
@@ -16,8 +20,8 @@ export type State = {
 
    acmeDetails?: RaAcmeLinkModel;
 
-   issuanceAttributes?: AttributeDescriptorModel[];
-   revocationAttributes?: AttributeDescriptorModel[];
+   issuanceAttributesDescriptors?: AttributeDescriptorModel[];
+   revocationAttributesDescriptors?: AttributeDescriptorModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -31,7 +35,7 @@ export type State = {
    isCreating: boolean;
    isDeleting: boolean;
    isBulkDeleting: boolean;
-   isEditing: boolean;
+   isUpdating: boolean;
    isEnabling: boolean;
    isBulkEnabling: boolean;
    isDisabling: boolean;
@@ -45,6 +49,9 @@ export const initialState: State = {
 
    checkedRows: [],
 
+   deleteErrorMessage: "",
+   bulkDeleteErrorMessages: [],
+
    raProfiles: [],
 
    isFetchingList: false,
@@ -57,7 +64,7 @@ export const initialState: State = {
    isCreating: false,
    isDeleting: false,
    isBulkDeleting: false,
-   isEditing: false,
+   isUpdating: false,
    isEnabling: false,
    isDisabling: false,
    isBulkEnabling: false,
@@ -76,9 +83,24 @@ export const slice = createSlice({
 
    reducers: {
 
-      setCheckedRows(state, action: PayloadAction<string[]>) {
+      resetState: (state, action: PayloadAction<void>) => {
 
-         state.checkedRows = action.payload;
+         state = initialState;
+
+      },
+
+
+      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+
+         state.checkedRows = action.payload.checkedRows;
+
+      },
+
+
+      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+
+         state.deleteErrorMessage = "";
+         state.bulkDeleteErrorMessages = [];
 
       },
 
@@ -91,22 +113,22 @@ export const slice = createSlice({
       },
 
 
-      listRaProfilesSuccess: (state, action: PayloadAction<RaProfileModel[]>) => {
+      listRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: RaProfileModel[] }>) => {
 
-         state.raProfiles = action.payload;
+         state.raProfiles = action.payload.raProfiles;
          state.isFetchingList = false;
 
       },
 
 
-      listRaProfilesFailure: (state, action: PayloadAction<string>) => {
+      listRaProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false;
 
       },
 
 
-      listAuthorizedClients: (state, action: PayloadAction<string>) => {
+      listAuthorizedClients: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.authorizedClients = undefined;
          state.isFetchingAuthorizedClients = true;
@@ -114,22 +136,22 @@ export const slice = createSlice({
       },
 
 
-      listAuthorizedClientsSuccess: (state, action: PayloadAction<RaAuthorizedClientModel[]>) => {
+      listAuthorizedClientsSuccess: (state, action: PayloadAction<{ authorizedClientsUuids: RaAuthorizedClientModel[] }>) => {
 
-         state.authorizedClients = action.payload.map(client => client.uuid);
+         state.authorizedClients = action.payload.authorizedClientsUuids.map(client => client.uuid);
          state.isFetchingAuthorizedClients = false;
 
       },
 
 
-      listAuthorizedClientsFailure: (state, action: PayloadAction<string>) => {
+      listAuthorizedClientsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingAuthorizedClients = false;
 
       },
 
 
-      getRaProfileDetail: (state, action: PayloadAction<string>) => {
+      getRaProfileDetail: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.raProfile = undefined;
          state.isFetchingDetail = true;
@@ -137,15 +159,15 @@ export const slice = createSlice({
       },
 
 
-      getRaProfileDetailSuccess: (state, action: PayloadAction<RaProfileModel>) => {
+      getRaProfileDetailSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
 
          state.isFetchingDetail = false;
-         state.raProfile = action.payload;
+         state.raProfile = action.payload.raProfile;
 
       },
 
 
-      getRaProfileDetailFailure: (state, action: PayloadAction<string>) => {
+      getRaProfileDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false;
 
@@ -164,14 +186,14 @@ export const slice = createSlice({
       },
 
 
-      createRaProfileSuccess: (state, action: PayloadAction<string>) => {
+      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isCreating = false;
 
       },
 
 
-      createRaProfileFailure: (state, action: PayloadAction<string>) => {
+      createRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isCreating = false;
 
@@ -186,98 +208,98 @@ export const slice = createSlice({
          attributes: AttributeModel[]
       }>) => {
 
-         state.isEditing = true;
+         state.isUpdating = true;
 
       },
 
 
-      updateRaProfileSuccess: (state, action: PayloadAction<RaProfileModel>) => {
+      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
 
-         state.isEditing = false;
-         state.raProfile = action.payload;
-
-      },
-
-
-      updateRaProfileFailure: (state, action: PayloadAction<string>) => {
-
-         state.isEditing = false;
+         state.isUpdating = false;
+         state.raProfile = action.payload.raProfile;
 
       },
 
 
-      enableRaProfile: (state, action: PayloadAction<string>) => {
+      updateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isUpdating = false;
+
+      },
+
+
+      enableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isEnabling = true;
 
       },
 
 
-      enableRaProfileSuccess: (state, action: PayloadAction<string>) => {
+      enableRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isEnabling = false;
 
-         const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload);
+         const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload.uuid);
          if (raProfile) raProfile.enabled = true;
 
-         if (state.raProfile?.uuid === action.payload) state.raProfile.enabled = true;
+         if (state.raProfile?.uuid === action.payload.uuid) state.raProfile.enabled = true;
 
       },
 
 
-      enableRaProfileFailure: (state, action: PayloadAction<string>) => {
+      enableRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isEnabling = false;
 
       },
 
 
-      disableRaProfile: (state, action: PayloadAction<string>) => {
+      disableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDisabling = true;
 
       },
 
 
-      disableRaProfileSuccess: (state, action: PayloadAction<string>) => {
+      disableRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDisabling = false;
 
-         const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload);
+         const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload.uuid);
          if (raProfile) raProfile.enabled = false;
 
-         if (state.raProfile?.uuid === action.payload) state.raProfile.enabled = false;
+         if (state.raProfile?.uuid === action.payload.uuid) state.raProfile.enabled = false;
 
       },
 
 
-      disableRaProfileFailure: (state, action: PayloadAction<string>) => {
+      disableRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDisabling = false;
 
       },
 
 
-      deleteRaProfile: (state, action: PayloadAction<string>) => {
+      deleteRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteRaProfileSuccess: (state, action: PayloadAction<string>) => {
+      deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = false;
 
-         const index = state.raProfiles.findIndex(raProfile => raProfile.uuid === action.payload);
+         const index = state.raProfiles.findIndex(raProfile => raProfile.uuid === action.payload.uuid);
          if (index !== -1) state.raProfiles.splice(index, 1);
 
-         if (state.raProfile?.uuid === action.payload) state.raProfile = undefined;
+         if (state.raProfile?.uuid === action.payload.uuid) state.raProfile = undefined;
 
       },
 
 
-      deleteRaProfileFailure: (state, action: PayloadAction<string>) => {
+      deleteRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false;
 
@@ -296,29 +318,29 @@ export const slice = createSlice({
       },
 
 
-      activateAcmeSuccess: (state, action: PayloadAction<RaAcmeLinkModel>) => {
+      activateAcmeSuccess: (state, action: PayloadAction<{ raAcmelink: RaAcmeLinkModel }>) => {
 
          state.isActivatingAcme = false;
-         state.acmeDetails = action.payload;
+         state.acmeDetails = action.payload.raAcmelink;
 
       },
 
 
-      activateAcmeFailure: (state, action: PayloadAction<string>) => {
+      activateAcmeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isActivatingAcme = false;
 
       },
 
 
-      deactivateAcme: (state, action: PayloadAction<string>) => {
+      deactivateAcme: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeactivatingAcme = true;
 
       },
 
 
-      deactivateAcmeSuccess: (state, action: PayloadAction<string>) => {
+      deactivateAcmeSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeactivatingAcme = false;
          state.acmeDetails = undefined;
@@ -326,153 +348,161 @@ export const slice = createSlice({
       },
 
 
-      deactivateAcmeFailure: (state, action: PayloadAction<string>) => {
+      deactivateAcmeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeactivatingAcme = false;
 
       },
 
 
-      getAcmeDetails: (state, action: PayloadAction<string>) => {
+      getAcmeDetails: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isFetchingAcmeDetails = true;
 
       },
 
 
-      getAcmeDetailsSuccess: (state, action: PayloadAction<RaAcmeLinkModel>) => {
+      getAcmeDetailsSuccess: (state, action: PayloadAction<{ raAcmeLink: RaAcmeLinkModel }>) => {
 
          state.isFetchingAcmeDetails = false;
-         state.acmeDetails = action.payload;
+         state.acmeDetails = action.payload.raAcmeLink;
 
       },
 
 
-      getAcmeDetailsFailure: (state, action: PayloadAction<string>) => {
+      getAcmeDetailsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingAcmeDetails = false;
 
       },
 
 
-      bulkDeleteRaProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
+         state.bulkDeleteErrorMessages = [];
          state.isBulkDeleting = true;
 
       },
 
 
-      bulkDeleteRaProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDeleteRaProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkDeleting = false;
 
-         state.raProfiles = state.raProfiles.filter(p => !action.payload.includes(p.uuid));
+         action.payload.uuids.forEach(
 
-         if (state.raProfile && action.payload.includes(state.raProfile.uuid)) state.raProfile = undefined;
+            uuid => {
+               const index = state.raProfiles.findIndex(raProfile => raProfile.uuid === uuid);
+               if (index >= 0) state.raProfiles.splice(index, 1);
+            }
+
+         );
+
+         if (state.raProfile && action.payload.uuids.includes(state.raProfile.uuid)) state.raProfile = undefined;
 
       },
 
 
-      bulkDeleteRaProfilesFailure: (state, action: PayloadAction<string>) => {
+      bulkDeleteRaProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDeleting = false;
 
       },
 
 
-      bulkEnableRaProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkEnableRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkEnabling = true;
 
       },
 
 
-      bulkEnableRaProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkEnableRaProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkEnabling = false;
 
          state.raProfiles = state.raProfiles.map(
-            raProfile => ({ ...raProfile, enabled: action.payload.includes(raProfile.uuid) ? true : raProfile.enabled })
+            raProfile => ({ ...raProfile, enabled: action.payload.uuids.includes(raProfile.uuid) ? true : raProfile.enabled })
          );
 
-         if (state.raProfile && action.payload.includes(state.raProfile.uuid)) state.raProfile.enabled = true;
+         if (state.raProfile && action.payload.uuids.includes(state.raProfile.uuid)) state.raProfile.enabled = true;
 
       },
 
 
-      bulkEnableRaProfilesFailure: (state, action: PayloadAction<string>) => {
+      bulkEnableRaProfilesFailure: (state, action: PayloadAction<{ error: string }>) => {
 
          state.isBulkEnabling = false;
 
       },
 
 
-      bulkDisableRaProfiles: (state, action: PayloadAction<string[]>) => {
+      bulkDisableRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkDisabling = true;
 
       },
 
 
-      bulkDisableRaProfilesSuccess: (state, action: PayloadAction<string[]>) => {
+      bulkDisableRaProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkDisabling = false;
 
          state.raProfiles = state.raProfiles.map(
-            raProfile => ({ ...raProfile, enabled: action.payload.includes(raProfile.uuid) ? false : raProfile.enabled })
+            raProfile => ({ ...raProfile, enabled: action.payload.uuids.includes(raProfile.uuid) ? false : raProfile.enabled })
          );
 
-         if (state.raProfile && action.payload.includes(state.raProfile.uuid)) state.raProfile.enabled = false;
+         if (state.raProfile && action.payload.uuids.includes(state.raProfile.uuid)) state.raProfile.enabled = false;
 
       },
 
 
-      bulkDisableRaProfilesFailure: (state, action: PayloadAction<string>) => {
+      bulkDisableRaProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDisabling = false;
 
       },
 
 
-      listIssuanceAttributes: (state, action: PayloadAction<string>) => {
+      listIssuanceAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isFetchingIssuanceAttributes = true;
 
       },
 
 
-      listIssuanceAttributesSuccess: (state, action: PayloadAction<AttributeDescriptorModel[]>) => {
+      listIssuanceAttributesDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingIssuanceAttributes = false;
 
-         state.issuanceAttributes = action.payload;
+         state.issuanceAttributesDescriptors = action.payload.attributesDescriptors;
 
       },
 
 
-      listIssuanceAttributesFailure: (state, action: PayloadAction<string>) => {
+      listIssuanceAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingIssuanceAttributes = false;
 
       },
 
 
-      listRevocationAttributes: (state, action: PayloadAction<string>) => {
+      listRevocationAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isFetchinRevocationAttributes = true;
 
       },
 
 
-      listRevocationAttributesSuccess: (state, action: PayloadAction<AttributeDescriptorModel[]>) => {
+      listRevocationAttributesSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchinRevocationAttributes = false;
-         state.revocationAttributes = action.payload;
+         state.revocationAttributesDescriptors = action.payload.attributesDescriptors;
 
       },
 
 
-      listRevocationAttributesFailure: (state, action: PayloadAction<string>) => {
+      listRevocationAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
          state.isFetchinRevocationAttributes = false;
       }
 
@@ -490,20 +520,20 @@ const raProfiles = createSelector(state, (state: State) => state.raProfiles);
 const authorizedClients = createSelector(state, (state: State) => state.authorizedClients);
 const attributes = createSelector(state, (state: State) => state.attributes);
 const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
-const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributes);
-const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributes);
+const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
+const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingAuthorizedClients = createSelector(state, (state: State) => state.isFetchingAuthorizedClients);
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
 const isFetchingIssuanceAttributes = createSelector(state, (state: State) => state.isFetchingIssuanceAttributes);
-const isFetchinRevocationAttributes = createSelector(state, (state: State) => state.isFetchinRevocationAttributes);
+const isFetchingRevocationAttributes = createSelector(state, (state: State) => state.isFetchinRevocationAttributes);
 const isFetchingAcmeDetails = createSelector(state, (state: State) => state.isFetchingAcmeDetails);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
-const isEditing = createSelector(state, (state: State) => state.isEditing);
+const isUpdating = createSelector(state, (state: State) => state.isUpdating);
 const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkEnabling = createSelector(state, (state: State) => state.isBulkEnabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
@@ -526,25 +556,29 @@ export const selectors = {
    acmeDetails,
    issuanceAttributes,
    revocationAttributes,
+
    isFetchingList,
    isFetchingDetail,
    isFetchingAuthorizedClients,
    isFetchingAttributes,
    isFetchingIssuanceAttributes,
-   isFetchingRevocationAttributes: isFetchinRevocationAttributes,
+   isFetchingRevocationAttributes,
    isFetchingAcmeDetails,
    isCreating,
    isDeleting,
    isBulkDeleting,
-   isUpdating: isEditing,
+   isUpdating,
    isEnabling,
    isBulkEnabling,
    isDisabling,
    isBulkDisabling,
    isActivatingAcme,
    isDeactivatingAcme
+
 };
 
+
 export const actions = slice.actions;
+
 
 export default slice.reducer;

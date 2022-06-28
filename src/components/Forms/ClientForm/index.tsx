@@ -74,9 +74,11 @@ function ClientForm({ title }: Props) {
 
       dispatch(
          certActions.listCertificates({
-            itemsPerPage: 100,
-            pageNumber: 1,
-            filters: [],
+            query: {
+               itemsPerPage: 100,
+               pageNumber: 1,
+               filters: [],
+            }
          })
       );
 
@@ -86,7 +88,7 @@ function ClientForm({ title }: Props) {
 
    useEffect(() => {
 
-      if (params.id && (!clientSelector || clientSelector.uuid !== params.id)) dispatch(clientActions.getClientDetail(params.id));
+      if (params.id && (!clientSelector || clientSelector.uuid !== params.id)) dispatch(clientActions.getClientDetail({ uuid: params.id }));
 
       if (params.id && clientSelector?.uuid === params.id) {
 
@@ -203,9 +205,11 @@ function ClientForm({ title }: Props) {
 
       dispatch(
          certActions.listCertificates({
-            itemsPerPage: 100,
-            pageNumber: currentPage,
-            filters: [],
+            query: {
+               itemsPerPage: 100,
+               pageNumber: currentPage,
+               filters: [],
+            }
          })
       );
 
