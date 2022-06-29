@@ -82,7 +82,7 @@ interface Props {
   ) => void;
 }
 
-function RaProfileForm({
+function RAProfileForm({
   editMode,
   isSubmitting = false,
   onCancel,
@@ -346,5 +346,5 @@ function RaProfileForm({
   );
 }
 
-export default RaProfileForm;
+export default RAProfileForm;
 */
