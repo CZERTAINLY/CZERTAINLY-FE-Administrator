@@ -1,13 +1,29 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Action } from "redux";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import React, { useMemo } from "react";
 import { Container } from "reactstrap";
-import ConfirmEditDialog from "components/ConfirmActionDialog";
-import Spinner from "components/Spinner";
-import Widget from "components/Widget";
+
+import AuthorityForm from "components/Forms/AuthorityForm";
+
+export default function RaProfilesEdit() {
+
+   const title = useMemo(
+      () => (
+         <h5>
+            Edit <span className="fw-semi-bold">Certification Authority</span>
+         </h5>
+      ),
+      []
+   );
+
+   return (
+      <Container className="themed-container" fluid>
+         <AuthorityForm title={title} />
+      </Container>
+   );
+
+}
+
+/*
 import { actions, selectors } from "ducks/ca-authorities";
-import { selectors as callbackSelectors } from "ducks/connectors";
 import AuthorityForm from "components/AuthorityForm";
 
 function AuthorityEdit() {
@@ -109,3 +125,4 @@ function AuthorityEdit() {
 }
 
 export default AuthorityEdit;
+*/

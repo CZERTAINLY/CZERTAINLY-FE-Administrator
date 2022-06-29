@@ -249,7 +249,7 @@ function ConnectorList() {
    );
 
 
-   const connectorRowHeaders: TableHeader[] = useMemo(
+   const connectorsRowHeaders: TableHeader[] = useMemo(
 
       () => [
          {
@@ -323,59 +323,58 @@ function ConnectorList() {
 
    return (
 
-      <div>
-         <Container className="themed-container" fluid>
+      <Container className="themed-container" fluid>
 
-            <Widget title={title} busy={isBusy}>
+         <Widget title={title} busy={isBusy}>
 
-               <br />
+            <br />
 
-               <CustomTable
-                  headers={connectorRowHeaders}
-                  data={connectorList}
-                  onCheckedRowsChanged={setCheckedRows}
-                  hasCheckboxes={true}
-                  hasPagination={true}
-                  canSearch={true}
-               />
-
-            </Widget>
-
-            <Dialog
-               isOpen={confirmDelete}
-               caption={`Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-               body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?}`}
-               toggle={() => setConfirmDelete(false)}
-               buttons={[
-                  { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                  { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-               ]}
+            <CustomTable
+               headers={connectorsRowHeaders}
+               data={connectorList}
+               onCheckedRowsChanged={setCheckedRows}
+               hasCheckboxes={true}
+               hasPagination={true}
+               canSearch={true}
             />
 
-            <Dialog
-               isOpen={confirmAuthorize}
-               caption={`Authorize ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-               body={`You are about to authorize a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
-               toggle={() => setConfirmAuthorize(false)}
-               buttons={[
-                  { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
-                  { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
-               ]}
-            />
+         </Widget>
 
-            <Dialog
-               isOpen={confirmForceDelete}
-               caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-               body={forceDeleteBody}
-               toggle={() => setConfirmForceDelete(false)}
-               buttons={[
-                  { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                  { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
-               ]}
-            />
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?}`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
 
-         </Container>
-      </div>
+         <Dialog
+            isOpen={confirmAuthorize}
+            caption={`Authorize ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={`You are about to authorize a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
+            toggle={() => setConfirmAuthorize(false)}
+            buttons={[
+               { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
+               { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={confirmForceDelete}
+            caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={forceDeleteBody}
+            toggle={() => setConfirmForceDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+
    );
 }
 

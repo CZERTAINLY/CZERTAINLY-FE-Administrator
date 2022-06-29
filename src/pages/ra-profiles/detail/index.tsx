@@ -19,6 +19,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import ProgressButton from "components/ProgressButton";
 import ToolTip from "components/ToolTip";
+import classNames from "classnames";
 
 
 export default function RaProfileDetail() {
@@ -78,6 +79,7 @@ export default function RaProfileDetail() {
    useEffect(
 
       () => {
+         if (!params.id) return;
          dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
          dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: params.id }));
          dispatch(raProfilesActions.listRevocationAttributes({ uuid: params.id }));
@@ -189,7 +191,7 @@ export default function RaProfileDetail() {
    );
 
 
-   const attributesTitle = useMemo(
+   const raProfileTitle = useMemo(
       () => (
 
          <div>
@@ -206,7 +208,6 @@ export default function RaProfileDetail() {
 
       ), [buttons]
    );
-
 
 
    const availableClients: { value: string; label: string; }[] = useMemo(
@@ -306,12 +307,14 @@ export default function RaProfileDetail() {
             id: "name",
             content: "Client Name",
             sortable: true,
-            sort: "asc"
+            sort: "asc",
+            width: "auto"
          },
          {
             id: "dn",
             content: "Client DN",
             sortable: true,
+            width: "auto"
          },
          {
             id: "status",
@@ -476,6 +479,8 @@ export default function RaProfileDetail() {
                "ACME",
                <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable ? true : false : undefined} />,
                <ProgressButton
+                  className="btn btn-primary btn-sm"
+                  type="button"
                   title={acmeDetails?.acmeAvailable ? "Deactivate" : "Activate"}
                   inProgressTitle={acmeDetails?.acmeAvailable ? "Deactivating..." : "Activating..."}
                   inProgress={isActivatingAcme || isDeactivatingAcme}
@@ -536,7 +541,7 @@ export default function RaProfileDetail() {
 
             <Col>
 
-               <Widget title={attributesTitle} busy={isBusy}>
+               <Widget title={raProfileTitle} busy={isBusy}>
 
                   <br />
 
@@ -558,7 +563,7 @@ export default function RaProfileDetail() {
                      !raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? <></> : (
                         <>
                            <br />
-                           <Label>RA profile attributes</Label>
+                           <Label>RA profile Attributes</Label>
                            <AttributeViewer attributes={raProfile?.attributes} />
                         </>
                      )

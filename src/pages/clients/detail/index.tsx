@@ -196,18 +196,19 @@ export default function ClientDetail() {
          {
             id: "description",
             content: "Description",
+            width: "auto",
          },
          {
             id: "status",
             content: "Status",
             align: "center",
-            width: "0"
+            width: "0%"
          },
          {
             id: "actions",
             content: "Actions",
             align: "center",
-            width: "0"
+            width: "0%"
          }
       ],
       []

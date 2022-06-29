@@ -2,34 +2,43 @@ import React from "react";
 import { Button, Spinner } from "reactstrap";
 
 interface Props {
-  disabled?: boolean;
-  inProgress: boolean;
-  title: string;
-  inProgressTitle?: string;
-  color?: string;
-  onClick?: () => void;
+   disabled?: boolean;
+   inProgress: boolean;
+   title: string;
+   inProgressTitle?: string;
+   color?: string;
+   className?: string;
+   type?: "submit" | "reset" | "button";
+   onClick?: () => void;
 }
 
 function ProgressButton({
-  inProgress,
-  title,
-  inProgressTitle = title,
-  disabled = false,
-  color = "primary",
-  onClick
+   inProgress,
+   title,
+   inProgressTitle = title,
+   disabled = false,
+   color = "primary",
+   className = "btn btn-primary",
+   type = "submit",
+   onClick
 }: Props) {
-  return (
-    <Button color={color} type="submit" disabled={disabled || inProgress} onClick={onClick}>
-      {inProgress ? (
-        <div>
-          <Spinner color="light" size="sm" />
-          <span>&nbsp;{inProgressTitle}</span>
-        </div>
-      ) : (
-        title
-      )}
-    </Button>
-  );
+
+   return (
+
+      <Button  className={className} color={color} type={type} disabled={disabled || inProgress} onClick={onClick}>
+
+         {inProgress ? (
+            <div>
+               <Spinner color="light" size="sm" />
+               <span>&nbsp;{inProgressTitle}</span>
+            </div>
+         ) : (
+            title
+         )}
+
+      </Button>
+
+   );
 }
 
 export default ProgressButton;

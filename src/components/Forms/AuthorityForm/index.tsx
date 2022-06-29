@@ -32,7 +32,7 @@ export default function RaProfileForm({
 
    return (
       <div>
-         <h1>RAProfileForm</h1>
+         <h1>Certification Authority</h1>
       </div>
    );
 

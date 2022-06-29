@@ -407,3 +407,9 @@ export const selectors = {
    isBulkForceDeleting
 
 };
+
+
+export const actions = slice.actions;
+
+
+export default slice.reducer;
