@@ -13,6 +13,7 @@ import { createNewResource } from "utils/net";
 import * as model from "./model";
 
 const baseUrl = "/api/v1/connectors";
+const baseUrlCallback = "/api/v1";
 
 export class ConnectorManagementBackend implements model.ConnectorManagementApi {
 
@@ -195,41 +196,38 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   /*allback(
-      connectorUuid: string,
-      functionGroup: string,
-      kind: string,
-      request: {
-         uuid: string,
-         name: string,
-         pathVariables: any,
-         queryParameters: any,
-         requestBody: any
-      },
-   ): Observable<any> {
+   callback(authorityUuidOrconnectorUuid: string, functionGroupOrRequest: string | model.ConnectorCallbackRequestDTO, kind?: string, request?: model.ConnectorCallbackRequestDTO): Observable<any> {
 
       // Authority calback API
-      if (authorityUuid) {
+
+      if (typeof functionGroupOrRequest === "object") {
 
          return this._fetchService.request(
+
             new HttpRequestOptions(
-               `${baseUrlCallback}/${authorityUuid}/callback`,
+               `${baseUrlCallback}/${authorityUuidOrconnectorUuid}/callback`,
                "POST",
-               requestBody
+               request
             )
+
          );
 
       }
 
       // RA Profile callback API
+
+      if ((typeof functionGroupOrRequest !== "string") || !kind || !request) throw new HttpErrorResponse({ status: 500, statusText: "Invalid callback arguments"});
+
       return this._fetchService.request(
+
          new HttpRequestOptions(
-            `${baseUrl}/${connectorUuid}/${functionGroup}/${kind}/callback`,
+            `${baseUrl}/${authorityUuidOrconnectorUuid}/${functionGroupOrRequest}/${kind}/callback`,
             "POST",
-            requestBody
+            request
          )
+
       );
 
-   }*/
+   }
 
 }

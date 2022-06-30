@@ -10,6 +10,7 @@ import { dbData } from "mocks/db";
 
 import * as model from "./model";
 import { AuthType, FunctionGroupCode } from "types/connectors";
+import { ConnectorCallbackRequestDTO } from "./model";
 
 
 export class ConnectorManagementMock implements model.ConnectorManagementApi {
@@ -421,7 +422,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   callback(connectorUuid: string, request: any): Observable<any> {
+   callback(authorityUuidOrconnectorUuid: string, functionGroupOrRequest: string | model.ConnectorCallbackRequestDTO, kind?: string, request?: model.ConnectorCallbackRequestDTO): Observable<any> {
 
       return of([
          {

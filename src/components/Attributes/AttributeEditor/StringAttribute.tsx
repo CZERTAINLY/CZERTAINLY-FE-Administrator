@@ -42,7 +42,7 @@ export function StringAttribute({
 
             ?
 
-            descriptor.multiSelect && attribute.content instanceof Array
+            descriptor.multiSelect && Array.isArray(attribute.content)
 
                ?
 
@@ -79,7 +79,7 @@ export function StringAttribute({
 
    const options = useMemo(
 
-      () => (descriptor.content instanceof Array ? descriptor.content : []).map(
+      () => (Array.isArray(descriptor.content) ? descriptor.content : []).map(
 
          content => ({
             value: content.value as string,

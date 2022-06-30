@@ -33,7 +33,7 @@ export function BooleanAttribute({
                `__attribute__${id}__${descriptor.name}`,
                descriptor.content
                   ?
-                  descriptor.content instanceof Array
+                  Array.isArray(descriptor.content)
                      ?
                      descriptor.content.map(
                         content => ({
@@ -58,7 +58,7 @@ export function BooleanAttribute({
 
                ?
 
-               descriptor.multiSelect && attribute.content instanceof Array
+               descriptor.multiSelect && Array.isArray(attribute.content)
 
                   ?
 
@@ -89,7 +89,7 @@ export function BooleanAttribute({
 
    const options = useMemo(
 
-      () => (descriptor.content instanceof Array ? descriptor.content : []).map(
+      () => (Array.isArray(descriptor.content) ? descriptor.content : []).map(
 
          content => ({
             value: content.value as string,

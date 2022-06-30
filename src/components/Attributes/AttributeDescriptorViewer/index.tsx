@@ -20,7 +20,7 @@ export default function AttributeDescriptorViewer({
 
          if (!attributeDescriptor.content) return "";
 
-         if (attributeDescriptor.content instanceof Array) {
+         if (Array.isArray(attributeDescriptor.content)) {
 
             return attributeDescriptor.content.map(
                content => content.value
@@ -93,7 +93,7 @@ export default function AttributeDescriptorViewer({
                      {
                         id: "defaults", columns: [<b>Defaults</b>, attributeDescriptor.content
                            ?
-                           attributeDescriptor.content instanceof Array
+                           Array.isArray(attributeDescriptor.content)
                               ?
                               attributeDescriptor.content.map(content => content.value.toString()).join(", ")
                               :

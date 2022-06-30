@@ -46,6 +46,7 @@ export default function AuthorityForm({
    );
 
 
+
    const authoritySelector = useSelector(selectors.authority);
    const authorityProviders = useSelector(selectors.authorityProviders);
    const authorityProviderAttributeDescriptors = useSelector(selectors.authorityProviderAttributeDescriptors);
@@ -363,11 +364,13 @@ export default function AuthorityForm({
                         <h6>Authority Attributes</h6>
                         <hr />
 
-
                         <AttributeEditor
                            id="authority"
                            attributeDescriptors={authorityProviderAttributeDescriptors}
                            attributes={authority?.attributes}
+                           connectorUuid={authorityProvider.uuid}
+                           functionGroup={"authorityProvider"}
+                           kind={values.storeKind.value}
                         />
                      </>
 

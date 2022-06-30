@@ -23,57 +23,57 @@ export default function AttributeViewer({
          const typeMap = {
 
             "BOOLEAN":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value !== undefined ? content.value ? "true" : "false" : "Not set").join(", ")
                   :
                   attribute.content.value ? "True" : "False",
 
             "INTEGER":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? parseInt(attribute.content.value as string, 10).toString() : "Not set",
 
             "FLOAT":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? parseFloat(attribute.content.value as string).toString() : "Not set",
 
             "STRING":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",
 
             "TEXT":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",
 
             "DATE":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",
 
             "TIME":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",
 
 
             "DATETIME":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",
 
 
             "FILE":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(
                      content =>
                         content.value ?
@@ -90,13 +90,13 @@ export default function AttributeViewer({
             "SECRET": "*****",
 
             "CREDENTIAL":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",
 
             "JSON":
-               attribute.content instanceof Array ?
+               Array.isArray(attribute.content) ?
                   attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
                   :
                   attribute.content.value ? attribute.content.value as string : "Not set",

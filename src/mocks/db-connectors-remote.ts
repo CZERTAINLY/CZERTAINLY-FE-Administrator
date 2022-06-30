@@ -431,7 +431,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: false,
                   multiSelect: false,
                   description: "Credential for the communication",
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [
@@ -454,7 +454,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: true,
                   multiSelect: true,
                   description: "List of available projects",
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "/v1/discoveryProvider/listAvailableProjects",
                      callbackMethod: "POST",
                      mappings: [
@@ -484,7 +484,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: true,
                   multiSelect: true,
                   description: "List of available reports",
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "/v1/discoveryProvider/listAvailableReports/{projectId}",
                      callbackMethod: "POST",
                      mappings: [
@@ -678,7 +678,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: false,
                   multiSelect: false,
                   description: "Credential for the communication",
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [
@@ -723,7 +723,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   visible: true,
                   list: true,
                   multiSelect: true,
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "/v1/discoveryProvider/listCertificateAuthority/{caInstance}",
                      callbackMethod: "GET",
                      mappings: [
@@ -746,7 +746,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   visible: true,
                   list: true,
                   multiSelect: true,
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "/v1/discoveryProvider/listTemplate/{caInstance}",
                      callbackMethod: "GET",
                      mappings: [
@@ -959,7 +959,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: false,
                   multiSelect: false,
                   description: "Credential for the communication",
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [
@@ -1161,7 +1161,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                   list: false,
                   multiSelect: false,
                   description: "SoftKeyStore Credential representing EJBCA administrator for the communication",
-                  callback: {
+                  attributeCallback: {
                      callbackContext: "core/getCredentials",
                      callbackMethod: "GET",
                      mappings: [

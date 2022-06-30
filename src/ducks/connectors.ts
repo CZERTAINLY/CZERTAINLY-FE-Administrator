@@ -19,11 +19,12 @@ export type State = {
    connectorHealth?: ConnectorHealthModel;
    connectorAttributes?: AttributeDescriptorCollectionModel;
    connectorConnectionDetails?: FunctionGroupModel[];
+   connectors: ConnectorModel[];
+
+   callbackData: { [key: string]: any }
 
    deleteErrorMessage: string;
    bulkDeleteErrorMessages: DeleteObjectErrorModel[];
-
-   connectors: ConnectorModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -40,6 +41,7 @@ export type State = {
    isBulkReconnecting: boolean;
    isAuthorizing: boolean;
    isBulkAuthorizing: boolean;
+   isRunningCallback: boolean;
 
 };
 
@@ -49,6 +51,8 @@ export const initialState: State = {
    checkedRows: [],
 
    connectors: [],
+
+   callbackData: {},
 
    deleteErrorMessage: "",
    bulkDeleteErrorMessages: [],
@@ -67,7 +71,8 @@ export const initialState: State = {
    isReconnecting: false,
    isBulkReconnecting: false,
    isAuthorizing: false,
-   isBulkAuthorizing: false
+   isBulkAuthorizing: false,
+   isRunningCallback: false
 
 };
 
@@ -489,7 +494,7 @@ export const slice = createSlice({
       },
 
 
-      bulkReconnectConnectorsSuccess: (state, action: PayloadAction<{ uuids: string [] }>) => {
+      bulkReconnectConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkReconnecting = false;
 
@@ -542,7 +547,43 @@ export const slice = createSlice({
 
          state.isBulkAuthorizing = false;
 
+      },
+
+
+      callback: (state, action: PayloadAction<{
+         authorityUuid?: string,
+         connectorUuid?: string,
+         functionGroup?: FunctionGroupCode,
+         kind?: string,
+         attributeDescriptor: AttributeDescriptorModel
+      }>) => {
+
+         const key = action.payload.authorityUuid
+            ?
+            `${action.payload.authorityUuid}-${action.payload.attributeDescriptor.name}`
+            :
+            `${action.payload.connectorUuid}-${action.payload.functionGroup}-${action.payload.kind}-${action.payload.attributeDescriptor.name}`;
+         ;
+
+         if (state.callbackData[key]) state.callbackData[key] = undefined;
+
+         state.isRunningCallback = true;
+
+      },
+
+
+      callbackSuccess: (state, action: PayloadAction<{ callbackDataKey: string, data: any }>) => {
+
+         state.callbackData[action.payload.callbackDataKey] = action.payload.data;
+         state.isRunningCallback = false;
+      },
+
+
+      callbackFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isRunningCallback = false;
       }
+
 
    }
 
@@ -560,6 +601,7 @@ const connector = createSelector(state, state => state.connector);
 const connectorHealth = createSelector(state, state => state.connectorHealth);
 const connectorAttributes = createSelector(state, state => state.connectorAttributes);
 const connectorConnectionDetails = createSelector(state, state => state.connectorConnectionDetails);
+const callbackData = createSelector(state, state => state.callbackData);
 
 const connectors = createSelector(state, state => state.connectors);
 
@@ -579,6 +621,7 @@ const isReconnecting = createSelector(state, state => state.isReconnecting);
 const isBulkReconnecting = createSelector(state, state => state.isBulkReconnecting);
 const isAuthorizing = createSelector(state, state => state.isAuthorizing);
 const isBulkAuthorizing = createSelector(state, state => state.isBulkAuthorizing);
+const isRunningCallback = createSelector(state, state => state.isRunningCallback);
 
 
 export const selectors = {
@@ -595,6 +638,7 @@ export const selectors = {
    connectorAttributes,
    connectorConnectionDetails,
    connectors,
+   callbackData,
 
    isFetchingList,
    isFetchingDetail,
@@ -611,7 +655,8 @@ export const selectors = {
    isReconnecting,
    isBulkReconnecting,
    isAuthorizing,
-   isBulkAuthorizing
+   isBulkAuthorizing,
+   isRunningCallback
 
 };
 

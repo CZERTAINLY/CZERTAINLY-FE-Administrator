@@ -19,13 +19,21 @@ interface Props {
    id: string;
    attributeDescriptors: AttributeDescriptorModel[];
    attributes?: AttributeModel[];
+   authorityUuid?: string;
+   connectorUuid?: string;
+   functionGroup?: string;
+   kind?: string;
 }
 
 
 export default function AttributeEditor({
    id,
    attributeDescriptors,
-   attributes = []
+   attributes = [],
+   authorityUuid,
+   connectorUuid,
+   functionGroup,
+   kind
 }: Props) {
 
    const fields: { [key in AttributeType]: Function } = {
@@ -65,7 +73,11 @@ export default function AttributeEditor({
                      {fields[descriptor.type]({
                         id,
                         descriptor,
-                        attribute: attributes.find(attribute => attribute.name === descriptor.name)
+                        attribute: attributes.find(attribute => attribute.name === descriptor.name),
+                        authorityUuid,
+                        connectorUuid,
+                        functionGroup,
+                        kind
                      }) || null}
                   </div>
                )

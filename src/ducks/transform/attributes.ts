@@ -48,10 +48,10 @@ export function transformAttributeDescriptorDTOToModel(attributeDescriptor: Attr
       multiSelect: attributeDescriptor.multiSelect,
       description: attributeDescriptor.description,
       validationRegex: attributeDescriptor.validationRegex ? new RegExp(attributeDescriptor.validationRegex) : undefined,
-      callback: !attributeDescriptor.callback ? undefined : {
-         callbackContext: attributeDescriptor.callback.callbackContext,
-         callbackMethod: attributeDescriptor.callback.callbackMethod,
-         mappings: attributeDescriptor.callback.mappings.map(
+      callback: !attributeDescriptor.attributeCallback ? undefined : {
+         callbackContext: attributeDescriptor.attributeCallback.callbackContext,
+         callbackMethod: attributeDescriptor.attributeCallback.callbackMethod,
+         mappings: attributeDescriptor.attributeCallback.mappings.map(
             mapping => ({
                from: mapping.from ? mapping.from : undefined,
                attributeType: mapping.attributeType ? mapping.attributeType : undefined,

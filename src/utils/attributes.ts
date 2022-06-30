@@ -60,7 +60,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
          case "INTEGER":
             if (descriptor.list) {
-               if (attributes[attribute] instanceof Array)
+               if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
                else
                   content = { value: attributes[attribute].value }
@@ -71,7 +71,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
          case "FLOAT":
             if (descriptor.list) {
-               if (attributes[attribute] instanceof Array)
+               if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
                else
                   content = { value: attributes[attribute].value }
@@ -82,7 +82,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
          case "STRING":
             if (descriptor.list) {
-               if (attributes[attribute] instanceof Array)
+               if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
                else
                   content = { value: attributes[attribute].value }
@@ -122,8 +122,14 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             break;
 
          case "CREDENTIAL":
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
+            if (descriptor.list) {
+               if (Array.isArray(attributes[attribute]))
+                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+               else
+                  content = attributes[attribute].value;
+            } else {
+               content = attributes[attribute];
+            }
             break;
 
          case "JSON":

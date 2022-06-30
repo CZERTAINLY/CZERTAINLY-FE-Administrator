@@ -10,6 +10,8 @@ import { actions as alertActions } from "./alerts";
 import { transformConnectorDTOToModel, transformFunctionGroupDTOtoModel } from "./transform/connectors";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO, transformConnectorHealthDTOToModel, transfromAttributeDescriptorCollectionDTOToModel } from "./transform/attributes";
 import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
+import { ConnectorCallbackRequestDTO } from "api/connectors";
+import { AttributeCallbackMappingTarget } from "types/attributes";
 
 
 const listConnectors: AppEpic = (action$, state, deps) => {
@@ -237,44 +239,6 @@ const getConnectorHealthFailure: AppEpic = (action$, state, deps) => {
    )
 
 }
-
-
-/*const connectorCallback: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.connectorCallback.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.connectors..pipe(
-
-            catchError(err => of(slice.actions.connectorCallbackFailure(extractError(err, "Failed to "))))
-
-         )
-
-      )
-   )
-
-}
-
-
-const connectorCallbackFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.connectorCallbackFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
-      )
-
-   )
-
-}
-*/
 
 
 const createConnector: AppEpic = (action$, state, deps) => {
@@ -814,6 +778,104 @@ const bulkForceDeleteConnectorsFailure: AppEpic = (action$, state, deps) => {
 }
 
 
+const callback: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.callback.match
+      ),
+      switchMap(
+
+         action => {
+
+            const targets: { [key in AttributeCallbackMappingTarget]: any } = {
+               pathVariable: {},
+               requestParameter: {},
+               body: {}
+            }
+
+            action.payload.attributeDescriptor.callback?.mappings.forEach(
+
+               mapping => {
+
+                  const value: any = mapping.value || mapping.from;
+
+                  mapping.targets.forEach(
+                     target => {
+                        targets[target][mapping.to] = value
+                     }
+                  )
+
+
+               }
+
+            );
+
+            const data: ConnectorCallbackRequestDTO = {
+               name: action.payload.attributeDescriptor.name,
+               uuid: action.payload.attributeDescriptor.uuid,
+               pathVariables: targets.pathVariable,
+               queryParameters: targets.requestParameter,
+               requestBody: targets.body
+            };
+
+            const key = action.payload.authorityUuid
+               ?
+               `${action.payload.authorityUuid}-${action.payload.attributeDescriptor.name}`
+               :
+               `${action.payload.connectorUuid}-${action.payload.functionGroup}-${action.payload.kind}-${action.payload.attributeDescriptor.name}`;
+            ;
+
+            return (
+
+               action.payload.authorityUuid
+                  ?
+                  deps.apiClients.connectors.callback(action.payload.authorityUuid, data)
+                  :
+                  deps.apiClients.connectors.callback(
+                     action.payload.connectorUuid!,
+                     action.payload.functionGroup!,
+                     action.payload.kind!,
+                     data
+                  )
+
+            ).pipe(
+
+               map(
+                  data => slice.actions.callbackSuccess({ callbackDataKey: key, data })
+               )
+
+            )
+
+         }
+
+      ),
+
+      catchError(err => of(slice.actions.callbackFailure({ error: extractError(err, "Failed to perform connector callback") })))
+
+   )
+
+}
+
+
+const callbackFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.callbackFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+
 const epics = [
    listConnectors,
    listConnectorsFailure,
@@ -825,8 +887,6 @@ const epics = [
    getAllConnectorAllAttributesDescriptorsFailure,
    getConnectorHealth,
    getConnectorHealthFailure,
-   //connectorCallback,
-   //connectorCallbackFailure,
    createConnector,
    createConnectorSuccess,
    createConnectorFailure,
@@ -852,6 +912,8 @@ const epics = [
    bulkForceDeleteConnectors,
    bulkForceDeleteConnectorsSuccess,
    bulkForceDeleteConnectorsFailure,
+   callback,
+   callbackFailure
 ];
 
 
