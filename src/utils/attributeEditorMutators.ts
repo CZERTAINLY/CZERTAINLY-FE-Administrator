@@ -1,4 +1,4 @@
-import { MutableState, Tools } from "final-form";
+import { fieldSubscriptionItems, MutableState, Tools } from "final-form";
 
 export function mutators<T>() {
 
@@ -14,6 +14,16 @@ export function mutators<T>() {
       },
 
       clearAttributes: (args: any[], state: MutableState<T>, tools: Tools<T>) => {
+
+         const attributes = Object.keys(state.fields).filter(k => k.startsWith("__attribute__"))
+
+         attributes.forEach(
+            attribute => {
+               tools.setIn(state, `fields.${attribute}`, undefined);
+               tools.setIn(state, `formState.initialValues.${attribute}`, undefined);
+            }
+         );
+
       }
 
    }

@@ -17,7 +17,7 @@ import { FunctionGroupCode } from "types/connectors";
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel,
+   attribute?: AttributeModel,
    authorityUuid: string,
    connectorUuid: string,
    functionGroup: FunctionGroupCode,
@@ -26,7 +26,7 @@ interface Props {
 
 export function CredentialAttribute({
    id,
-   descriptor: attributeDescriptor,
+   descriptor,
    attribute,
    authorityUuid,
    connectorUuid,
@@ -44,9 +44,9 @@ export function CredentialAttribute({
 
       () => {
          const uuid = attribute ? `:${attribute.uuid}` : "";
-         return `${attributeDescriptor.name}:Credential${uuid}`;
+         return `${descriptor.name}:Credential${uuid}`;
       },
-      [attribute, attributeDescriptor.name]
+      [attribute, descriptor.name]
 
    )
 
@@ -54,26 +54,24 @@ export function CredentialAttribute({
 
       () => {
 
-         if (!attribute || !attribute.content) return;
-
-         if ((attributeDescriptor.content && !Array.isArray(attributeDescriptor.content)) || !attributeDescriptor.list || attributeDescriptor.multiSelect || (!attributeDescriptor.content && !attributeDescriptor.callback)) {
-            dispatch(alertActions.error(`Attribute descriptor ${attributeDescriptor.name} is invalid`));
+         if ((descriptor.content && !Array.isArray(descriptor.content)) || !descriptor.list || descriptor.multiSelect || (!descriptor.content && !descriptor.callback)) {
+            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} is invalid`));
             return;
          }
 
-         if (Array.isArray(attribute.content)) {
-            dispatch(alertActions.error(`Attribute ${attributeDescriptor.name} has invalid content`));
+         if (attribute && Array.isArray(attribute.content)) {
+            dispatch(alertActions.error(`Attribute ${descriptor.name} has invalid content`));
             return;
          }
 
-         if (attributeDescriptor.callback) {
+         if (descriptor.callback) {
 
             dispatch(
                connectorActions.callback({
                   connectorUuid,
                   functionGroup,
                   kind,
-                  attributeDescriptor,
+                  attributeDescriptor: descriptor,
                })
             )
 
@@ -82,15 +80,15 @@ export function CredentialAttribute({
          const initialValues = { ...form.getState().values };
 
          initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
-         initialValues[`__attribute__${id}__`][baseFieldId] = { label: attribute.content.value, value: attribute.content };
+         initialValues[`__attribute__${id}__`][baseFieldId] = (attribute?.content) && (!Array.isArray(attribute.content)) ? { label: attribute.content.value, value: attribute.content } : undefined;
 
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, { label: attribute.content.value, value: attribute.content });
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, (attribute?.content) && (!Array.isArray(attribute.content)) ? { label: attribute.content.value, value: attribute.content } : undefined);
 
       },
 
-      [baseFieldId, attributeDescriptor, attribute, form, id, dispatch, connectorUuid, functionGroup, kind]
+      [baseFieldId, descriptor, attribute, form, id, dispatch, connectorUuid, functionGroup, kind]
    )
 
 
@@ -100,9 +98,9 @@ export function CredentialAttribute({
 
          const key = authorityUuid
             ?
-            `${authorityUuid}-${attributeDescriptor.name}`
+            `${authorityUuid}-${descriptor.name}`
             :
-            `${connectorUuid}-${functionGroup}-${kind}-${attributeDescriptor.name}`;
+            `${connectorUuid}-${functionGroup}-${kind}-${descriptor.name}`;
          ;
 
          if (callbackValues[key]) {
@@ -138,7 +136,7 @@ export function CredentialAttribute({
 
          }
 
-         return (Array.isArray(attributeDescriptor.content) ? attributeDescriptor.content : []).map(
+         return (Array.isArray(descriptor.content) ? descriptor.content : []).map(
 
             content => ({
                value: content,
@@ -148,7 +146,7 @@ export function CredentialAttribute({
          )
 
       },
-      [attributeDescriptor.content, attributeDescriptor.name, authorityUuid, baseFieldId, callbackValues, connectorUuid, form, functionGroup, id, kind]
+      [descriptor.content, descriptor.name, authorityUuid, baseFieldId, callbackValues, connectorUuid, form, functionGroup, id, kind]
 
    )
 
@@ -159,18 +157,18 @@ export function CredentialAttribute({
 
          const vals = [];
 
-         if (attributeDescriptor.required) vals.push(validateRequired());
+         if (descriptor.required) vals.push(validateRequired());
 
          return composeValidators.apply(undefined, vals);
 
       },
 
-      [attributeDescriptor.required]
+      [descriptor.required]
 
    );
 
 
-   return !attributeDescriptor ? <></> : (
+   return !descriptor ? <></> : (
 
       <FormGroup row={false}>
 
@@ -180,13 +178,13 @@ export function CredentialAttribute({
 
                <>
 
-                  {attributeDescriptor.visible ? (
+                  {descriptor.visible ? (
 
-                     <Label for={`__attribute__${id}__.${baseFieldId}`}>{attributeDescriptor.label}</Label>
+                     <Label for={`__attribute__${id}__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 
-                  {!attributeDescriptor.list || !attributeDescriptor.visible ? <></> : (
+                  {!descriptor.list || !descriptor.visible ? <></> : (
 
                      <>
                         <Select
@@ -194,11 +192,11 @@ export function CredentialAttribute({
                            maxMenuHeight={140}
                            menuPlacement="auto"
                            options={options}
-                           placeholder={`Select ${attributeDescriptor.label}`}
+                           placeholder={`Select ${descriptor.label}`}
                            styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                           isDisabled={attributeDescriptor.readOnly}
-                           isMulti={attributeDescriptor.multiSelect}
-                           isClearable={!attributeDescriptor.required}
+                           isDisabled={descriptor.readOnly}
+                           isMulti={descriptor.multiSelect}
+                           isClearable={!descriptor.required}
                         />
 
                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>

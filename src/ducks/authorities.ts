@@ -91,6 +91,13 @@ export const slice = createSlice({
       },
 
 
+      cleatAuthorityProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.authorityProviderAttributeDescriptors = [];
+
+      },
+
+
       listAuthorityProviders: (state, action: PayloadAction<void>) => {
 
          state.authorityProviders = undefined;

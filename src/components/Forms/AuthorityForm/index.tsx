@@ -10,7 +10,8 @@ import { validateRequired, composeValidators, validateAlphaNumeric } from "utils
 import { ConnectorModel } from "models/connectors";
 import { AuthorityModel } from "models/authorities";
 
-import { actions, selectors } from "ducks/authorities";
+import { actions as alertActions } from "ducks/alerts";
+import { actions as authorityActions, selectors as authoritySelectors } from "ducks/authorities";
 
 import { mutators } from "utils/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes";
@@ -47,15 +48,15 @@ export default function AuthorityForm({
 
 
 
-   const authoritySelector = useSelector(selectors.authority);
-   const authorityProviders = useSelector(selectors.authorityProviders);
-   const authorityProviderAttributeDescriptors = useSelector(selectors.authorityProviderAttributeDescriptors);
+   const authoritySelector = useSelector(authoritySelectors.authority);
+   const authorityProviders = useSelector(authoritySelectors.authorityProviders);
+   const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors);
 
-   const isFetchingAuthorityDetail = useSelector(selectors.isFetchingDetail);
-   const isFetchingAuthorityProviders = useSelector(selectors.isFetchingAuthorityProviders);
-   const isFetchingAttributeDescriptors = useSelector(selectors.isFetchingAuthorityProviderAttributeDescriptors);
-   const isCreating = useSelector(selectors.isCreating);
-   const isUpdating = useSelector(selectors.isUpdating);
+   const isFetchingAuthorityDetail = useSelector(authoritySelectors.isFetchingDetail);
+   const isFetchingAuthorityProviders = useSelector(authoritySelectors.isFetchingAuthorityProviders);
+   const isFetchingAttributeDescriptors = useSelector(authoritySelectors.isFetchingAuthorityProviderAttributeDescriptors);
+   const isCreating = useSelector(authoritySelectors.isCreating);
+   const isUpdating = useSelector(authoritySelectors.isUpdating);
 
    const [init, setInit] = useState(true);
 
@@ -71,30 +72,47 @@ export default function AuthorityForm({
 
       () => {
 
+         if (init) {
+            dispatch(authorityActions.resetState());
+            setInit(false);
+         }
+
          if (editMode && (!authoritySelector || authoritySelector.uuid !== params.id)) {
-            dispatch(actions.getAuthorityDetail({ uuid: params.id }));
+            dispatch(authorityActions.getAuthorityDetail({ uuid: params.id }));
          }
 
          if (init) {
-            dispatch(actions.listAuthorityProviders());
+            dispatch(authorityActions.listAuthorityProviders());
          }
 
          if (editMode && authoritySelector?.uuid === params.id) {
             setAuthority(authoritySelector);
          }
 
-         if (editMode && authoritySelector?.uuid === params.id && authorityProviders && authorityProviders.length > 0) {
-            const provider = authorityProviders.find(p => p.uuid === authoritySelector.connectorUuid);
-            if (provider) {
-               setAuthorityProvider(provider);
-               dispatch(actions.getAuthorityProviderAttributesDescriptors({ uuid: authoritySelector.connectorUuid, kind: authoritySelector.kind }));
-            }
-         }
-
-         if (init) setInit(false);
-
       },
       [dispatch, editMode, params.id, authoritySelector, authorityProviders, isFetchingAuthorityProviders, init]
+
+   );
+
+   useEffect(
+
+      () => {
+
+         if (!authorityProvider && editMode && authoritySelector?.uuid === params.id && authorityProviders && authorityProviders.length > 0) {
+
+            const provider = authorityProviders.find(p => p.uuid === authoritySelector.connectorUuid);
+
+            if (provider) {
+               setAuthorityProvider(provider);
+               dispatch(authorityActions.getAuthorityProviderAttributesDescriptors({ uuid: authoritySelector.connectorUuid, kind: authoritySelector.kind }));
+            } else {
+               dispatch(alertActions.error("Authority provider not found"));
+            }
+
+         }
+
+      },
+      [authorityProvider, dispatch, editMode, params.id, authoritySelector, authorityProviders, isFetchingAuthorityProviders]
 
    );
 
@@ -102,6 +120,8 @@ export default function AuthorityForm({
    const onAuthorityProviderChange = useCallback(
 
       (event) => {
+
+         dispatch(authorityActions.cleatAuthorityProviderAttributeDescriptors());
 
          if (!event.value || !authorityProviders) return;
          const provider = authorityProviders.find(p => p.uuid === event.value);
@@ -120,7 +140,7 @@ export default function AuthorityForm({
       (event) => {
 
          if (!event.value || !authorityProvider) return;
-         dispatch(actions.getAuthorityProviderAttributesDescriptors({ uuid: authorityProvider.uuid, kind: event.value }));
+         dispatch(authorityActions.getAuthorityProviderAttributesDescriptors({ uuid: authorityProvider.uuid, kind: event.value }));
 
       },
       [dispatch, authorityProvider]
@@ -134,14 +154,14 @@ export default function AuthorityForm({
 
          if (editMode) {
 
-            dispatch(actions.updateAuthority({
+            dispatch(authorityActions.updateAuthority({
                uuid: params.id,
                attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
             }));
 
          } else {
 
-            dispatch(actions.createAuthority({
+            dispatch(authorityActions.createAuthority({
                name: values.name!,
                connectorUuid: values.authorityProvider!.value,
                kind: values.storeKind?.value!,
@@ -219,7 +239,7 @@ export default function AuthorityForm({
 
          <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
 
-            {({ handleSubmit, pristine, submitting, values, valid }) => (
+            {({ handleSubmit, pristine, submitting, values, valid, form }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
 
@@ -263,7 +283,7 @@ export default function AuthorityForm({
                                  menuPlacement="auto"
                                  options={optionsForAuthorityProviders}
                                  placeholder="Select Authority Provider"
-                                 onChange={(event) => { onAuthorityProviderChange(event); input.onChange(event); }}
+                                 onChange={(event) => { onAuthorityProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
                                  styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                               />
 

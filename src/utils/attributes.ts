@@ -47,7 +47,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
       const descriptor = descriptors?.find(d => d.name === attributeName);
 
       if (!descriptor) continue;
-      if (!attributes[attribute]) continue;
+      if (attributes[attribute] === undefined) continue;
 
       let content: any;
 
@@ -142,7 +142,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
       }
 
-      if (!content || !content.value) continue;
+      if (content === undefined || !content.value === undefined) continue;
 
       const attr: AttributeModel = {
          name: attributeName,

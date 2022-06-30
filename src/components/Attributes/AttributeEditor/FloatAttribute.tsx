@@ -1,17 +1,20 @@
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
 
+import { useDispatch } from "react-redux";
+
+import { actions as alertActions } from "ducks/alerts";
+
 import { useEffect, useMemo } from "react";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
-import { composeValidators, validateFloat, validatePattern, validateRequired } from "utils/validators";
+import { composeValidators, validateFloat, validateRequired } from "utils/validators";
+import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 
 interface Props {
    id: string;
-   descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   descriptor: AttributeDescriptorModel;
+   attribute?: AttributeModel;
 }
 
 export function FloatAttribute({
@@ -19,6 +22,8 @@ export function FloatAttribute({
    descriptor,
    attribute,
 }: Props): JSX.Element {
+
+   const dispatch = useDispatch();
 
    const form = useForm();
 
@@ -36,58 +41,35 @@ export function FloatAttribute({
 
       () => {
 
-         if (!attribute || !attribute.content) return;
+         if ((descriptor.content && Array.isArray(descriptor.content)) || descriptor.list || descriptor.multiSelect || (!descriptor.content && !descriptor.callback)) {
+            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} is invalid`));
+            return;
+         }
 
-         const attributeValue = descriptor.list
+         if (descriptor.callback) {
+            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} callback not expected`));
+            return;
+         }
 
-            ?
-
-            descriptor.multiSelect && Array.isArray(attribute.content)
-
-               ?
-
-               attribute.content.map(
-                  content => ({
-                     value: content.value,
-                     label: content.value
-                  })
-               )
-
-               :
-
-               ({
-                  value: (attribute.content as AttributeContentModel).value,
-                  label: (attribute.content as AttributeContentModel).value
-               })
-
-            :
-
-            (attribute.content as AttributeContentModel).value
+         if (attribute && Array.isArray(attribute.content)) {
+            dispatch(alertActions.error(`Attribute ${descriptor.name} has invalid content`));
+            return;
+         }
 
          const initialValues = { ...form.getState().values };
+
+         const initialValue = (attribute?.content as AttributeContentModel)?.value || descriptor.content?.value || undefined;
+
          initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
-         initialValues[`__attribute__${id}__`][baseFieldId] = attributeValue;
+         initialValues[`__attribute__${id}__`][baseFieldId] = initialValue;
+
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, attributeValue);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, initialValue);
 
       },
 
-      [baseFieldId, descriptor, attribute, form, id]
-   )
-
-
-   const options = useMemo(
-
-      () => (Array.isArray(descriptor.content) ? descriptor.content : []).map(
-
-         content => ({
-            value: content.value as string,
-            label: content.value as string
-         }) as SingleValue<{ value: string; label: string }>,
-
-      ),
-      [descriptor.content]
+      [descriptor, attribute, form.mutators, id, form, baseFieldId, dispatch]
    )
 
 
@@ -97,22 +79,21 @@ export function FloatAttribute({
 
          const vals = [];
 
-         vals.push(validateFloat());
          if (descriptor.required) vals.push(validateRequired());
-         if (descriptor.validationRegex) vals.push(validatePattern(descriptor.validationRegex));
+         vals.push(validateFloat());
 
          return composeValidators.apply(undefined, vals);
 
       },
 
-      [descriptor.required, descriptor.validationRegex]
+      [descriptor.required]
 
    );
 
 
    return !descriptor ? <></> : (
 
-      <FormGroup row={false}>
+      <FormGroup>
 
          <Field name={`__attribute__${id}__.${baseFieldId}`} validate={validators}>
 
@@ -122,45 +103,21 @@ export function FloatAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__${id}__.${baseFieldId}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__${id}__.${baseFieldId}`}>&nbsp;{descriptor.label}</Label>
 
                   ) : null}
 
-                  {descriptor.list && descriptor.visible ? (
+                  <Input
+                     {...input}
+                     id={`__attribute__${id}__.${baseFieldId}`}
+                     type={descriptor.visible ? "text" : "hidden"}
+                     placeholder={`Enter ${descriptor.label}`}
+                     disabled={descriptor.readOnly}
+                     valid={!meta.error && meta.touched}
+                     invalid={!!meta.error && meta.touched}
+                  />
 
-                     <>
-                        <Select
-                           {...input}
-                           maxMenuHeight={140}
-                           menuPlacement="auto"
-                           options={options}
-                           placeholder={`Select ${descriptor.label}`}
-                           styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                           isDisabled={descriptor.readOnly}
-                           isMulti={descriptor.multiSelect}
-                           isClearable={!descriptor.required}
-                        />
-
-                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
-
-                     </>
-
-                  ) : (
-                     <>
-
-                        <Input
-                           {...input}
-                           valid={!meta.error && meta.touched}
-                           invalid={!!meta.error && meta.touched}
-                           type={descriptor.visible ? "text" : "hidden"}
-                           placeholder={`Enter ${descriptor.label}`}
-                           disabled={descriptor.readOnly}
-                        />
-
-                        <FormFeedback>{meta.error}</FormFeedback>
-
-                     </>
-                  )}
+                  <FormFeedback>{meta.error}</FormFeedback>
 
                </>
 

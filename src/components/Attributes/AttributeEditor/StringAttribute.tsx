@@ -65,8 +65,10 @@ export function StringAttribute({
             (attribute.content as AttributeContentModel).value
 
          const initialValues = { ...form.getState().values };
+
          initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
          initialValues[`__attribute__${id}__`][baseFieldId] = attributeValue;
+
          form.setConfig("initialValues", initialValues);
 
          form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, attributeValue);

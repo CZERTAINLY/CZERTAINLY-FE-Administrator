@@ -1,12 +1,15 @@
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
 
+import { useDispatch } from "react-redux";
+
+import { actions as alertActions } from "ducks/alerts";
+
 import { useEffect, useMemo } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
-import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
-import { composeValidators, validateFloat, validateRequired } from "utils/validators";
+import { composeValidators, validateRequired } from "utils/validators";
+import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 
 interface Props {
    id: string;
@@ -20,100 +23,69 @@ export function BooleanAttribute({
    attribute,
 }: Props): JSX.Element {
 
+   const dispatch = useDispatch();
+
    const form = useForm();
+
+   const baseFieldId = useMemo(
+
+      () => {
+         const uuid = attribute ? `:${attribute.uuid}` : "";
+         return `${descriptor.name}:Boolean${uuid}`;
+      },
+      [attribute, descriptor.name]
+
+   )
 
    useEffect(
 
       () => {
 
-         if (!attribute || !attribute.content) {
-
-            form.mutators.setAttribute(
-
-               `__attribute__${id}__${descriptor.name}`,
-               descriptor.content
-                  ?
-                  Array.isArray(descriptor.content)
-                     ?
-                     descriptor.content.map(
-                        content => ({
-                           value: content.value,
-                           label: content.value,
-                        })
-                     )
-                     :
-                     (descriptor.content as AttributeContentModel).value
-                  :
-                  undefined
-            );
-
+         if ((descriptor.content && Array.isArray(descriptor.content)) || descriptor.list || descriptor.multiSelect || (!descriptor.content && !descriptor.callback)) {
+            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} is invalid`));
             return;
-
          }
 
+         if (descriptor.callback) {
+            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} callback not expected`));
+            return;
+         }
 
-         form.mutators.setAttribute(`__attribute__${id}__${descriptor.name}`,
+         if (attribute && Array.isArray(attribute.content)) {
+            dispatch(alertActions.error(`Attribute ${descriptor.name} has invalid content`));
+            return;
+         }
 
-            descriptor.list
+         const initialValues = { ...form.getState().values };
 
-               ?
+         const initialValue = (attribute?.content as AttributeContentModel)?.value || descriptor.content?.value || false;
 
-               descriptor.multiSelect && Array.isArray(attribute.content)
+         initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
+         initialValues[`__attribute__${id}__`][baseFieldId] = initialValue;
 
-                  ?
+         form.setConfig("initialValues", initialValues);
 
-                  attribute.content.map(
-                     content => ({
-                        value: content.value,
-                        label: content.value
-                     })
-                  )
-
-                  :
-
-                  ({
-                     value: (attribute.content as AttributeContentModel).value,
-                     label: (attribute.content as AttributeContentModel).value
-                  })
-
-               :
-
-               (attribute.content as AttributeContentModel).value
-
-         );
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, initialValue);
 
       },
 
-      [descriptor, attribute, form.mutators, id]
+      [descriptor, attribute, form.mutators, id, form, baseFieldId, dispatch]
    )
 
-   const options = useMemo(
-
-      () => (Array.isArray(descriptor.content) ? descriptor.content : []).map(
-
-         content => ({
-            value: content.value as string,
-            label: content.value as string
-         }) as SingleValue<{ value: string; label: string }>,
-
-      ),
-      [descriptor.content]
-   )
 
    const validators: any = useMemo(
 
       () => {
 
-         const vals = [];
+         const vals: any[] = [];
 
-         if (descriptor.required) vals.push(validateRequired());
-         vals.push(validateFloat());
+         // if (descriptor.required) vals.push(validateRequired());
 
          return composeValidators.apply(undefined, vals);
 
       },
 
-      [descriptor.required]
+      []
 
    );
 
@@ -122,45 +94,26 @@ export function BooleanAttribute({
 
       <FormGroup>
 
-         <Field name={`__attribute__${id}__${descriptor.name}`} validate={validators}>
+         <Field name={`__attribute__${id}__.${baseFieldId}`} validate={validators} type="checkbox">
 
             {({ input, meta }) => (
 
                <>
 
+                  <Input
+                     {...input}
+                     id={`__attribute__${id}__.${baseFieldId}`}
+                     type={descriptor.visible ? "checkbox" : "hidden"}
+                     placeholder={`Enter ${descriptor.label}`}
+                     disabled={descriptor.readOnly}
+                  />
+
+
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__${id}__${descriptor.name}`}>{descriptor.label}</Label>
+                     <Label for={`__attribute__${id}__.${baseFieldId}`}>&nbsp;{descriptor.label}</Label>
 
                   ) : null}
-
-                  {descriptor.list && descriptor.visible ? (
-
-                     <>
-                        <Select
-                           {...input}
-                           maxMenuHeight={140}
-                           menuPlacement="auto"
-                           options={options}
-                           placeholder={`Select ${descriptor.label}`}
-                           styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                           isDisabled={descriptor.readOnly}
-                           isMulti={true}
-                           isClearable={!descriptor.required}
-
-                        />
-
-                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
-                     </>
-
-                  ) : (
-                     <Input
-                        {...input}
-                        type={descriptor.visible ? "checkbox" : "hidden"}
-                        placeholder={`Enter ${descriptor.label}`}
-                        disabled={descriptor.readOnly}
-                     />
-                  )}
 
                </>
 
