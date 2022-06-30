@@ -7,15 +7,19 @@ import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, In
 
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
-import { actions, selectors } from "ducks/credentials";
 import { CredentialModel } from "models/credentials";
-import Select from "react-select/";
 import { ConnectorModel } from "models/connectors";
+
+import { actions, selectors } from "ducks/credentials";
+
+import { collectFormAttributes } from "utils/attributes";
+import { mutators } from "utils/attributeEditorMutators";
+
+import Select from "react-select/";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
-import { mutators } from "utils/attributeEditorMutators";
 import ProgressButton from "components/ProgressButton";
-import { collectFormAttributes } from "utils/attributes";
+
 
 
 interface FormValues {
@@ -50,15 +54,17 @@ export default function CredentialForm({
    const isFetchingCredentialDetail = useSelector(selectors.isFetchingDetail);
    const isFetchingCredentialProviders = useSelector(selectors.isFetchingCredentialProviders);
    const isFetchingAttributeDescriptors = useSelector(selectors.isFetchingCredentialProviderAttributeDescriptors);
-   const isCreatingCredential = useSelector(selectors.isCreating);
-   const isUpdatingCredential = useSelector(selectors.isUpdating);
+   const isCreating = useSelector(selectors.isCreating);
+   const isUpdating = useSelector(selectors.isUpdating);
+
+   const [init, setInit] = useState(true);
 
    const [credential, setCredential] = useState<CredentialModel>();
    const [credentialProvider, setCredentialProvider] = useState<ConnectorModel>();
 
    const isBusy = useMemo(
-      () => isFetchingCredentialDetail || isFetchingCredentialProviders || isCreatingCredential || isUpdatingCredential || isFetchingAttributeDescriptors,
-      [isFetchingCredentialDetail, isFetchingCredentialProviders, isCreatingCredential, isUpdatingCredential, isFetchingAttributeDescriptors]
+      () => isFetchingCredentialDetail || isFetchingCredentialProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
+      [isFetchingCredentialDetail, isFetchingCredentialProviders, isCreating, isUpdating, isFetchingAttributeDescriptors]
    );
 
    useEffect(
@@ -69,7 +75,7 @@ export default function CredentialForm({
             dispatch(actions.getCredentialDetail({ uuid: params.id }));
          }
 
-         if (!credentialProviders) {
+         if (init) {
             dispatch(actions.listCredentialProviders());
          }
 
@@ -85,8 +91,10 @@ export default function CredentialForm({
             }
          }
 
+         if (init) setInit(false);
+
       },
-      [dispatch, editMode, params.id, credentialSelector, credentialProviders]
+      [dispatch, editMode, params.id, credentialSelector, credentialProviders, isFetchingCredentialProviders, init]
 
    );
 

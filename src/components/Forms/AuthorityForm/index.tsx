@@ -1,15 +1,37 @@
-import { useMemo } from "react";
-import { useDispatch } from "react-redux";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Form, Field } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+
+import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
+
+import { ConnectorModel } from "models/connectors";
+import { AuthorityModel } from "models/authorities";
+
+import { actions, selectors } from "ducks/authorities";
+
+import { mutators } from "utils/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes";
+
+import Select from "react-select/";
+import Widget from "components/Widget";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import ProgressButton from "components/ProgressButton";
+
 
 interface FormValues {
+   name: string | undefined;
+   authorityProvider: { value: string; label: string } | undefined;
+   storeKind: { value: string; label: string } | undefined;
 }
 
-interface Props {
+export interface Props {
    title: string | JSX.Element;
 }
 
-export default function RaProfileForm({
+export default function AuthorityForm({
    title
 }: Props) {
 
@@ -21,329 +43,368 @@ export default function RaProfileForm({
    const editMode = useMemo(
       () => params.id !== undefined,
       [params.id]
+   );
+
+
+   const authoritySelector = useSelector(selectors.authority);
+   const authorityProviders = useSelector(selectors.authorityProviders);
+   const authorityProviderAttributeDescriptors = useSelector(selectors.authorityProviderAttributeDescriptors);
+
+   const isFetchingAuthorityDetail = useSelector(selectors.isFetchingDetail);
+   const isFetchingAuthorityProviders = useSelector(selectors.isFetchingAuthorityProviders);
+   const isFetchingAttributeDescriptors = useSelector(selectors.isFetchingAuthorityProviderAttributeDescriptors);
+   const isCreating = useSelector(selectors.isCreating);
+   const isUpdating = useSelector(selectors.isUpdating);
+
+   const [init, setInit] = useState(true);
+
+   const [authority, setAuthority] = useState<AuthorityModel>();
+   const [authorityProvider, setAuthorityProvider] = useState<ConnectorModel>();
+
+   const isBusy = useMemo(
+      () => isFetchingAuthorityDetail || isFetchingAuthorityProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
+      [isFetchingAuthorityDetail, isFetchingAuthorityProviders, isCreating, isUpdating, isFetchingAttributeDescriptors]
+   );
+
+   useEffect(
+
+      () => {
+
+         if (editMode && (!authoritySelector || authoritySelector.uuid !== params.id)) {
+            dispatch(actions.getAuthorityDetail({ uuid: params.id }));
+         }
+
+         if (init) {
+            dispatch(actions.listAuthorityProviders());
+         }
+
+         if (editMode && authoritySelector?.uuid === params.id) {
+            setAuthority(authoritySelector);
+         }
+
+         if (editMode && authoritySelector?.uuid === params.id && authorityProviders && authorityProviders.length > 0) {
+            const provider = authorityProviders.find(p => p.uuid === authoritySelector.connectorUuid);
+            if (provider) {
+               setAuthorityProvider(provider);
+               dispatch(actions.getAuthorityProviderAttributesDescriptors({ uuid: authoritySelector.connectorUuid, kind: authoritySelector.kind }));
+            }
+         }
+
+         if (init) setInit(false);
+
+      },
+      [dispatch, editMode, params.id, authoritySelector, authorityProviders, isFetchingAuthorityProviders, init]
+
+   );
+
+
+   const onAuthorityProviderChange = useCallback(
+
+      (event) => {
+
+         if (!event.value || !authorityProviders) return;
+         const provider = authorityProviders.find(p => p.uuid === event.value);
+
+         if (!provider) return;
+         setAuthorityProvider(provider);
+
+      },
+      [authorityProviders]
+
+   );
+
+
+   const onKindChange = useCallback(
+
+      (event) => {
+
+         if (!event.value || !authorityProvider) return;
+         dispatch(actions.getAuthorityProviderAttributesDescriptors({ uuid: authorityProvider.uuid, kind: event.value }));
+
+      },
+      [dispatch, authorityProvider]
+
+   );
+
+
+   const onSubmit = useCallback(
+
+      (values: FormValues, form: any) => {
+
+         if (editMode) {
+
+            dispatch(actions.updateAuthority({
+               uuid: params.id,
+               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+            }));
+
+         } else {
+
+            dispatch(actions.createAuthority({
+               name: values.name!,
+               connectorUuid: values.authorityProvider!.value,
+               kind: values.storeKind?.value!,
+               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+            }));
+
+         }
+
+      },
+      [editMode, dispatch, params.id, authorityProviderAttributeDescriptors]
+   );
+
+
+   const onCancel = useCallback(
+      () => {
+         history.goBack();
+      },
+      [history]
    )
 
-   /*
-   const authorities = useSelector(authoritySelectors.selectAuthorities);
 
-   const profileAttributes = useSelector(selectors.selectAttributes);
-   const callbackResponse = useSelector(callbackSelectors.callbackResponse);
-   */
+   const submitTitle = useMemo(
+      () => editMode ? "Save" : "Create",
+      [editMode]
+   )
+
+
+   const inProgressTitle = useMemo(
+      () => editMode ? "Saving..." : "Creating...",
+      [editMode]
+   )
+
+
+   const optionsForAuthorityProviders = useMemo(
+
+      () => authorityProviders?.map(
+         provider => ({
+            label: provider.name,
+            value: provider.uuid,
+         })
+      ),
+      [authorityProviders]
+
+   );
+
+
+   const optionsForKinds = useMemo(
+
+      () => authorityProvider?.functionGroups.find(
+         fg => fg.functionGroupCode === "authorityProvider"
+      )?.kinds.map(
+         kind => ({
+            label: kind,
+            value: kind
+         })
+      ) ?? [],
+      [authorityProvider]
+
+   );
+
+
+   const defaultValues: FormValues = useMemo(
+      () => ({
+         name: editMode ? authority?.name || undefined : undefined,
+         authorityProvider: editMode ? authority ? { value: authority.connectorUuid, label: authority.connectorName } : undefined : undefined,
+         storeKind: editMode ? authority ? { value: authority?.kind, label: authority?.kind } : undefined : undefined,
+      }),
+      [editMode, authority]
+   );
+
 
    return (
-      <div>
-         <h1>Certification Authority</h1>
-      </div>
+
+      <Widget title={title} busy={isBusy}>
+
+         <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
+
+            {({ handleSubmit, pristine, submitting, values, valid }) => (
+
+               <BootstrapForm onSubmit={handleSubmit}>
+
+                  <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+
+                     {({ input, meta }) => (
+
+                        <FormGroup>
+
+                           <Label for="name">Certification Authority Name</Label>
+
+                           <Input
+                              {...input}
+                              valid={!meta.error && meta.touched}
+                              invalid={!!meta.error && meta.touched}
+                              type="text"
+                              placeholder="Enter the Certification Authority Name"
+                              disabled={editMode}
+                           />
+
+                           <FormFeedback>{meta.error}</FormFeedback>
+
+                        </FormGroup>
+                     )}
+
+                  </Field>
+
+                  {!editMode ? (
+
+                     <Field name="authorityProvider" validate={validateRequired()}>
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="authorityProvider">Authority Provider</Label>
+
+                              <Select
+                                 {...input}
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={optionsForAuthorityProviders}
+                                 placeholder="Select Authority Provider"
+                                 onChange={(event) => { onAuthorityProviderChange(event); input.onChange(event); }}
+                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                              />
+
+                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                  ) : (
+
+                     <Field name="authorityProvider" format={(value) => value ? value.label : ""} validate={validateRequired()}>
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="authorityProvider">Authority Provider</Label>
+
+                              <Input
+                                 {...input}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type="text"
+                                 placeholder="Authority Provider Name"
+                                 disabled={editMode}
+                              />
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                  )}
+
+                  {!editMode && optionsForKinds?.length ? (
+
+                     <Field name="storeKind" validate={validateRequired()}>
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="storeKind">Kind</Label>
+
+                              <Select
+                                 {...input}
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={optionsForKinds}
+                                 placeholder="Select Key Store Kind"
+                                 onChange={(event) => { onKindChange(event); input.onChange(event); }}
+                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                              />
+
+                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+
+                           </FormGroup>
+                        )}
+                     </Field>
+
+                  ) : null}
+
+                  {editMode && authority?.kind ? (
+
+                     <Field name="storeKind" format={(value) => value ? value.label : ""}>
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="storeKind">Kind</Label>
+
+                              <Input
+                                 {...input}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type="text"
+                                 placeholder="Authority Kind"
+                                 disabled={editMode}
+                              />
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                  ) : null}
+
+                  {authorityProvider && values.storeKind && authorityProviderAttributeDescriptors && authorityProviderAttributeDescriptors.length > 0 ? (
+
+                     <>
+                        <hr />
+                        <h6>Authority Attributes</h6>
+                        <hr />
+
+
+                        <AttributeEditor
+                           id="authority"
+                           attributeDescriptors={authorityProviderAttributeDescriptors}
+                           attributes={authority?.attributes}
+                        />
+                     </>
+
+                  ) : null}
+
+                  {
+
+                     <div className="d-flex justify-content-end">
+
+                        <ButtonGroup>
+
+                           <ProgressButton
+                              title={submitTitle}
+                              inProgressTitle={inProgressTitle}
+                              inProgress={submitting}
+                              disabled={(editMode ? pristine : false) || !valid}
+                           />
+
+                           <Button
+                              color="default"
+                              onClick={onCancel}
+                              disabled={submitting}
+                           >
+                              Cancel
+                           </Button>
+
+                        </ButtonGroup>
+
+                     </div>
+                  }
+
+               </BootstrapForm>
+            )}
+         </Form>
+
+      </Widget>
+
    );
 
 }
-
-/*
-import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Button,
-  ButtonGroup,
-  Col,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Row,
-} from "reactstrap";
-
-import ProgressButton from "components/ProgressButton";
-import { actions, selectors } from "ducks/ra-profiles";
-import { RaProfile, RaProfileDetail } from "models";
-import { useInputValue } from "utils/hooks";
-import {
-  actions as callbackActions,
-  selectors as callbackSelectors,
-} from "ducks/connectors";
-import {
-  actions as authorityActions,
-  selectors as authoritySelectors,
-} from "ducks/ca-authorities";
-import DynamicForm from "components/DynamicForm";
-import { attributeCombiner } from "utils/commons";
-import { AttributeResponse } from "models/attributes";
-
-interface Props {
-  editMode?: boolean;
-  raProfile?: (RaProfile & RaProfileDetail) | null;
-  isSubmitting?: boolean;
-  onCancel: () => void;
-  onSubmit: (
-    authorityInstanceUuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeResponse[]
-  ) => void;
-}
-
-function RaProfileForm({
-  editMode,
-  isSubmitting = false,
-  onCancel,
-  onSubmit,
-  raProfile,
-}: Props) {
-  const dispatch = useDispatch();
-
-  const authorities = useSelector(authoritySelectors.selectAuthorities);
-  const profileAttributes = useSelector(selectors.selectAttributes);
-  const callbackResponse = useSelector(callbackSelectors.callbackResponse);
-
-  const [name, setname] = useState(raProfile?.name || "");
-  const [description, setDescription] = useState(raProfile?.description || "");
-  const [authorityUuid, setAuthorityId] = useState("0");
-  const [connectorUuid, setConnectorUuid] = useState("");
-  const [caAuthorityName, setCaAuthorityName] = useState("");
-  const [editableAttributes, setEditableAttributes]: any = useState([]);
-  const [attributes, setAttributes] = useState(profileAttributes);
-  const [passAttributes, setPassAttributes] = useState<any>(profileAttributes);
-  const [passEditAttributes, setPassEditAttributes] =
-    useState(profileAttributes);
-
-  const onname = useInputValue(setname);
-  const onDescription = useInputValue(setDescription);
-
-  const onAuthority = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const id = event.target.value.split(",")[0];
-      const connectorUuid = event.target.value.split(",")[1];
-      setAuthorityId(id.toString());
-      setConnectorUuid(connectorUuid);
-      dispatch(actions.requestAttribute(id.toString()));
-    },
-    [dispatch]
-  );
-
-  useEffect(() => {
-    setPassAttributes(profileAttributes);
-    setAttributes(profileAttributes);
-    setPassEditAttributes(profileAttributes);
-  }, [profileAttributes]);
-
-  const onFormSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      let changedAttributes: AttributeResponse[] = [];
-      if (!editMode) {
-        changedAttributes = attributes;
-      } else {
-        for (let i of attributes) {
-          if (
-            JSON.stringify(editableAttributes).indexOf(JSON.stringify(i)) < 0 ||
-            !!i.value
-          )
-            if (
-              typeof i.value === "object" &&
-              typeof i.value.id == "undefined"
-            ) {
-              try {
-                i.value = i.value[0];
-              } catch {
-                console.warn("Non List Items");
-              }
-            }
-          changedAttributes.push(i);
-        }
-      }
-      onSubmit(authorityUuid, name, description, changedAttributes);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [authorityUuid, onSubmit, name, description, attributes]
-  );
-
-  useEffect(() => {
-    dispatch(authorityActions.requestAuthoritiesList());
-    if (editMode) {
-      if (
-        typeof raProfile?.authorityInstanceUuid == "string" ||
-        typeof raProfile?.authorityInstanceUuid == "number"
-      ) {
-        setAuthorityId(raProfile?.authorityInstanceUuid);
-        dispatch(actions.requestAttribute(raProfile?.authorityInstanceUuid));
-      }
-    }
-  }, [dispatch, raProfile, editMode]);
-
-  useEffect(() => {
-    if (authorities.length > 0) {
-      for (let i of authorities) {
-        if (
-          i?.uuid?.toString() === raProfile?.authorityInstanceUuid?.toString()
-        ) {
-          setCaAuthorityName(i.name);
-        }
-      }
-    }
-  }, [authorities, raProfile]);
-
-  useEffect(() => {
-    setname(raProfile?.name || "");
-    setDescription(raProfile?.description || "");
-  }, [raProfile]);
-
-  useEffect(() => {
-    if (editMode && authorities.length > 0) {
-      for (let i of authorities) {
-        if (i.uuid === raProfile?.authorityInstanceUuid) {
-          setConnectorUuid(i.connectorUuid);
-        }
-      }
-    }
-  }, [editMode, authorities, raProfile]);
-
-  useEffect(() => {
-    const raLength = raProfile?.attributes || [];
-    if (raLength.length > 0 && editMode) {
-      const edtAttributes = attributeCombiner(
-        raProfile?.attributes || [],
-        profileAttributes
-      );
-      setEditableAttributes(edtAttributes);
-      setPassEditAttributes(edtAttributes);
-    }
-  }, [profileAttributes, raProfile, editMode]);
-
-  function updateAttributes(formAttributes: AttributeResponse) {
-    let updated = attributes.length !== 0 ? attributes : profileAttributes;
-    let updateAttributes: AttributeResponse[] = [];
-    for (let i of updated) {
-      if (i.uuid === formAttributes.uuid) {
-        updateAttributes.push(formAttributes);
-      } else {
-        updateAttributes.push(i);
-      }
-    }
-    setAttributes(updateAttributes);
-  }
-
-  function updateAttributesEdit(formAttributes: AttributeResponse) {
-    let updated = attributes.length !== 0 ? attributes : editableAttributes;
-    let updateAttributes: AttributeResponse[] = [];
-    for (let i of updated) {
-      if (i.uuid === formAttributes.uuid) {
-        updateAttributes.push(formAttributes);
-      } else {
-        updateAttributes.push(i);
-      }
-    }
-    setAttributes(updateAttributes);
-  }
-
-  const submitTitle = editMode ? "Save" : "Create";
-  const inProgressTitle = editMode ? "Saving..." : "Creating...";
-
-  return (
-    <Form onSubmit={onFormSubmit}>
-      <Row form>
-        <Col>
-          <FormGroup>
-            <Label for="name">RA Profile Name</Label>
-            <Input
-              type="text"
-              name="name"
-              placeholder="RA Profile Name"
-              value={name}
-              onChange={onname}
-              disabled={editMode}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label for="description">Description</Label>
-            <textarea
-              name="description"
-              className="form-control"
-              placeholder="Description / Comment"
-              value={description}
-              onChange={onDescription}
-            />
-          </FormGroup>
-          {!editMode ? (
-            <FormGroup>
-              <Label for="authority">Select Authority</Label>
-              <Input
-                type="select"
-                name="authority"
-                required
-                onChange={onAuthority}
-              >
-                <option key="select" value="select">
-                  Select
-                </option>
-                {Object.values(authorities).map((value) => (
-                  <option
-                    key={value.name}
-                    value={[value.uuid, value.connectorUuid]}
-                  >
-                    {value.name}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
-          ) : (
-            <FormGroup>
-              <Label for="authority">Select Authority</Label>
-              <Input
-                type="text"
-                name="authority"
-                required
-                disabled
-                value={caAuthorityName}
-              />
-            </FormGroup>
-          )}
-          {!editMode ? (
-            <DynamicForm
-              fieldInfo={
-                authorityUuid !== "0"
-                  ? JSON.parse(JSON.stringify(passAttributes))
-                  : []
-              }
-              attributeFunction={updateAttributes}
-              actions={callbackActions}
-              connectorUuid={connectorUuid}
-              callbackSelector={callbackResponse}
-              setPassAttribute={setPassAttributes}
-              authorityUuid={authorityUuid}
-            />
-          ) : (
-            <DynamicForm
-              fieldInfo={
-                authorityUuid !== "0"
-                  ? JSON.parse(JSON.stringify(passEditAttributes))
-                  : []
-              }
-              attributeFunction={updateAttributesEdit}
-              editMode={true}
-              actions={callbackActions}
-              connectorUuid={connectorUuid}
-              callbackSelector={callbackResponse}
-              setPassAttribute={setPassEditAttributes}
-              authorityUuid={authorityUuid}
-            />
-          )}
-        </Col>
-      </Row>
-      <div className="d-flex justify-content-end">
-        <ButtonGroup>
-          <Button color="default" onClick={onCancel} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <ProgressButton
-            title={submitTitle}
-            inProgressTitle={inProgressTitle}
-            inProgress={isSubmitting}
-          />
-        </ButtonGroup>
-      </div>
-    </Form>
-  );
-}
-
-export default RaProfileForm;
-*/

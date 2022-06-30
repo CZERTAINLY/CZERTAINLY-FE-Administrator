@@ -3,7 +3,7 @@ import { Container } from "reactstrap";
 
 import CredentialForm from "components/Forms/CredentialForm";
 
-export default function CredentialEdit() {
+export default function Edit() {
 
    const title = useMemo(
       () => (

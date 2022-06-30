@@ -73,9 +73,9 @@ export const slice = createSlice({
       },
 
 
-      getProfileSuccess: (state, action: PayloadAction<UserProfileModel>) => {
+      getProfileSuccess: (state, action: PayloadAction<{ userProfile: UserProfileModel }>) => {
 
-         state.userProfile = action.payload;
+         state.userProfile = action.payload.userProfile;
          state.isFetchingProfile = false;
 
       },

@@ -155,7 +155,7 @@ const createAdminSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`./detail/${action.payload}`);
+            history.push(`./detail/${action.payload.uuid}`);
             return EMPTY;
          }
 
@@ -281,7 +281,7 @@ const deleteAdmin: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.admins.deleteAdmin(action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.deleteAdminSuccess(action.payload)
+               () => slice.actions.deleteAdminSuccess({ uuid: action.payload.uuid })
             ),
             catchError(
                err => of(slice.actions.deleteAdminFailure({ error: extractError(err, "Failed to delete administrator") }))

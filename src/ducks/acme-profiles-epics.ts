@@ -167,7 +167,7 @@ const createAcmeProfileSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`./detail/${action.payload}`);
+            history.push(`./detail/${action.payload.uuid}`);
             return EMPTY;
          }
 

@@ -114,7 +114,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorityProviderAttributeDescriptors: (state, action: PayloadAction<{ uuid: string, kind: string, functionGroup: string }>) => {
+      getAuthorityProviderAttributesDescriptors: (state, action: PayloadAction<{ uuid: string, kind: string }>) => {
 
          state.authorityProviderAttributeDescriptors = [];
          state.isFetchingAuthorityProviderAttributeDescriptors = true;
@@ -122,7 +122,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorityProviderAttributeDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
+      getAuthorityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
 
          state.authorityProviderAttributeDescriptors = action.payload.attributeDescriptor;
          state.isFetchingAuthorityProviderAttributeDescriptors = false;
@@ -195,8 +195,6 @@ export const slice = createSlice({
       createAuthority: (state, action: PayloadAction<{
          name: string,
          connectorUuid: string,
-         credential: any,
-         status: string,
          attributes: AttributeModel[],
          kind: string,
       }>) => {
@@ -220,7 +218,7 @@ export const slice = createSlice({
       },
 
 
-      updateAuthority: (state, action: PayloadAction<{ authority: AuthorityModel }>) => {
+      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeModel[] }>) => {
 
          state.isUpdating = true;
 
@@ -343,7 +341,7 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteAuthorityFailure: (state, action: PayloadAction<string>) => {
+      bulkForceDeleteAuthorityFailure: (state, action: PayloadAction<{ error: string }>) => {
 
          state.isBulkForceDeleting = false;
 

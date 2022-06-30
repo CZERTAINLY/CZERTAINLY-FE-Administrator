@@ -50,7 +50,7 @@ export default function AuthorityDetail() {
 
       () => {
          if (!authority) return;
-         history.push(`/authorities/edit/${authority.uuid}`);
+         history.push(`../../authorities/edit/${authority.uuid}`);
       },
       [authority, history]
    );

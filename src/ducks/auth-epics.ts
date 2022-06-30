@@ -3,19 +3,10 @@ import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 
-import { UserProfileModel, Role } from 'models';
+import { UserProfileDtoToModel } from './transform/auth';
 import { extractError } from 'utils/net';
-import { UserProfileDTO } from 'api/auth';
+
 import * as slice from './auth';
-
-
-const dtoToModel = (profile: UserProfileDTO): UserProfileModel => ({
-   username: profile.username,
-   name: profile.name,
-   surname: profile.surname,
-   email: profile.email,
-   role: profile.role === "superAdministrator" ? Role.SuperAdmin : Role.Admin,
-});
 
 
 const login: AppEpic = action$ => {
@@ -47,7 +38,7 @@ const getProfile: AppEpic = (action$, state, deps) => {
          () => deps.apiClients.auth.getProfile().pipe(
 
             map(
-               profile => slice.actions.getProfileSuccess(dtoToModel(profile))
+               profile => slice.actions.getProfileSuccess({ userProfile: UserProfileDtoToModel(profile) })
             ),
 
             catchError(
@@ -81,7 +72,7 @@ const updateProfile: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               () => slice.actions.updateProfileSuccess(action.payload)
+               () => slice.actions.updateProfileSuccess({ userProfile: action.payload.userProfile })
             ),
 
             catchError(

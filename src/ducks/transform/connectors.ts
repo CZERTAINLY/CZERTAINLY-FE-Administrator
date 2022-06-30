@@ -6,16 +6,16 @@ import { transformAttributeDTOToModel } from "./attributes";
 
 export const functionGroupCodeToGroupFilter: { [code in FunctionGroupCode]: FunctionGroupFilter } = {
    "credentialProvider": "CREDENTIAL_PROVIDER",
-   "legacyAuthorityProvider": "AUTHORITY_PROVIDER",
-   "authorityProvider": "LEGACY_AUTHORITY_PROVIDER",
+   "legacyAuthorityProvider": "LEGACY_AUTHORITY_PROVIDER",
+   "authorityProvider": "AUTHORITY_PROVIDER",
    "discoveryProvider": "DISCOVERY_PROVIDER"
 }
 
 
 export const functionGroupFilterToGroupCode: { [filter in FunctionGroupFilter]: FunctionGroupCode } = {
    "CREDENTIAL_PROVIDER": "credentialProvider",
-   "AUTHORITY_PROVIDER": "legacyAuthorityProvider",
-   "LEGACY_AUTHORITY_PROVIDER": "authorityProvider",
+   "AUTHORITY_PROVIDER": "authorityProvider",
+   "LEGACY_AUTHORITY_PROVIDER": "legacyAuthorityProvider",
    "DISCOVERY_PROVIDER": "discoveryProvider"
 }
 

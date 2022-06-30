@@ -203,7 +203,7 @@ const createClientSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`./detail/${action.payload}`);
+            history.push(`./detail/${action.payload.uuid}`);
             return EMPTY;
          }
 
@@ -437,7 +437,7 @@ const authorizeClient: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               () => slice.actions.authorizeClientSuccess(action.payload)
+               () => slice.actions.authorizeClientSuccess({ clientUuid: action.payload.clientUuid, raProfile: action.payload.raProfile })
             ),
             catchError(
                err => of(slice.actions.authorizeClientFailure({ error: extractError(err, "Failed to authorize client") }))
@@ -481,7 +481,7 @@ const unauthorizeClient: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.clients.unauthorizeClient(action.payload.clientUuid, action.payload.raProfile.uuid).pipe(
 
             map(
-               () => slice.actions.unauthorizeClientSuccess(action.payload)
+               () => slice.actions.unauthorizeClientSuccess({ clientUuid: action.payload.clientUuid, raProfile: action.payload.raProfile })
             ),
 
             catchError(
@@ -654,9 +654,9 @@ const bulkDisableClients: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.clients.bulkDisableClient(action.payload.uuids).pipe(
 
-            map(() => slice.actions.bulkDisableClientsSuccess(action.payload)),
+            map(() => slice.actions.bulkDisableClientsSuccess({ uuids: action.payload.uuids })),
 
-            catchError(err => of(slice.actions.bulkDisableClientsFailure(extractError(err, "Failed to disable clients"))))
+            catchError(err => of(slice.actions.bulkDisableClientsFailure({ error: extractError(err, "Failed to disable clients") })))
 
          )
 
@@ -675,7 +675,7 @@ const bulkDisableClientsFailure: AppEpic = (action$, state, deps) => {
          slice.actions.bulkDisableClientsFailure.match
       ),
       map(
-         action => alertActions.error(action.payload || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )

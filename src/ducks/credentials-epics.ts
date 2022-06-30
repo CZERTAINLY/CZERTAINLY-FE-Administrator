@@ -117,7 +117,7 @@ const listCredentialProviders: AppEpic = (action$, state, deps) => {
 
             map(
                providers => slice.actions.listCredentialProvidersSuccess({
-                  credentialProviderList: providers.map(provider => transformConnectorDTOToModel(provider))
+                  connectors: providers.map(provider => transformConnectorDTOToModel(provider))
                })
             ),
             catchError((err) =>
@@ -231,7 +231,7 @@ const createCredentialSuccess: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
          action => {
-            history.push(`./detail/${action.payload}`);
+            history.push(`./detail/${action.payload.uuid}`);
             return EMPTY;
          }
       )

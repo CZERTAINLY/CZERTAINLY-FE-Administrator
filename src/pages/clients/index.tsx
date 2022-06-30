@@ -4,7 +4,7 @@ import { useRouteMatch } from 'react-router-dom';
 
 import ClientAdd from './add';
 import ClientDetail from './detail';
-import ClientEdit from './edit';
+import Edit from './edit';
 import ClientsList from './list';
 
 export default function Clients() {
@@ -15,7 +15,7 @@ export default function Clients() {
          <Route path={path} component={ClientsList} exact />
          <Route path={`${path}/list`} component={ClientsList} exact />
          <Route path={`${path}/detail/:id`} component={ClientDetail} exact />
-         <Route path={`${path}/edit/:id`} component={ClientEdit} exact />
+         <Route path={`${path}/edit/:id`} component={Edit} exact />
          <Route path={`${path}/add`} component={ClientAdd} exact />
       </Switch>
    );

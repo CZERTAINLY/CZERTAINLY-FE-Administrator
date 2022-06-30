@@ -3,7 +3,7 @@ import { Container } from "reactstrap";
 
 import ConnectorForm from "components/Forms/ConnectorForm";
 
-export default function ConnectorAdd() {
+export default function Add() {
 
    const title = useMemo(
       () => (

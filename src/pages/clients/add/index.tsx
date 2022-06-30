@@ -3,7 +3,7 @@ import { Container } from "reactstrap";
 
 import ClientForm from "components/Forms/ClientForm";
 
-export default function ClientEdit() {
+export default function Add() {
 
    const title = useMemo(
       () => (

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Container, Table } from "reactstrap";
+import { Container, Table } from "reactstrap";
 
 import { actions, selectors } from "ducks/authorities";
 

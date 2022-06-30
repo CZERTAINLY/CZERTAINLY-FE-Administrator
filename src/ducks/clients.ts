@@ -480,7 +480,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDisableClientsFailure: (state, action: PayloadAction<string>) => {
+      bulkDisableClientsFailure: (state, action: PayloadAction<{ error: string }>) => {
 
          state.isBulkDisabling = false;
 

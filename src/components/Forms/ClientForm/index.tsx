@@ -224,7 +224,8 @@ function ClientForm({ title }: Props) {
 
    const defaultValues = {
       name: editMode ? client?.name : "",
-      inputType: editMode ? optionsForInput[1] : optionsForInput[0]
+      inputType: editMode ? optionsForInput[1] : optionsForInput[0],
+      description: editMode ? client?.description || "" : ""
    }
 
 

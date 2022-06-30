@@ -3,7 +3,7 @@ import { Container } from "reactstrap";
 
 import AuthorityForm from "components/Forms/AuthorityForm";
 
-export default function RaProfilesEdit() {
+export default function Add() {
 
    const title = useMemo(
       () => (

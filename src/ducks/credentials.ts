@@ -95,10 +95,10 @@ export const slice = createSlice({
       },
 
 
-      listCredentialProvidersSuccess: (state, action: PayloadAction<{ credentialProviderList: ConnectorModel[] }>) => {
+      listCredentialProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorModel[] }>) => {
 
          state.isFetchingCredentialProviders = false;
-         state.credentialProviders = action.payload.credentialProviderList;
+         state.credentialProviders = action.payload.connectors;
 
       },
 
