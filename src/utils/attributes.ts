@@ -61,22 +61,22 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
          case "INTEGER":
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+                  content = attributes[attribute].map((lv: any) => ({ value: parseInt(lv.value) }));
                else
-                  content = { value: attributes[attribute].value }
+                  content = { value: parseInt(attributes[attribute].value) }
             } else {
-               content = { value: attributes[attribute] };
+               content = { value: parseInt(attributes[attribute]) };
             }
             break;
 
          case "FLOAT":
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+                  content = attributes[attribute].map((lv: any) => ({ value: parseFloat(lv.value) }));
                else
-                  content = { value: attributes[attribute].value }
+                  content = { value: parseFloat(attributes[attribute].value) }
             } else {
-               content = { value: attributes[attribute] };
+               content = { value: parseFloat(attributes[attribute]) };
             }
             break;
 
