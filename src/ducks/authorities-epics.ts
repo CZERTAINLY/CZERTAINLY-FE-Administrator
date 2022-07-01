@@ -291,6 +291,27 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
 }
 
 
+const updateAuthoritySuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateAuthoritySuccess.match
+      ),
+
+      switchMap(
+
+         action => {
+            history.push(`../detail/${action.payload.authority.uuid}`);
+            return EMPTY;
+         }
+      )
+
+   );
+
+}
+
+
 const updateAuthorityFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -450,6 +471,7 @@ const epics = [
    createAuthoritySuccess,
    createAuthorityFailure,
    updateAuthority,
+   updateAuthoritySuccess,
    updateAuthorityFailure,
    deleteAuthority,
    deleteAuthorityFailure,
