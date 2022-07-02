@@ -120,10 +120,16 @@ export const slice = createSlice({
 
          state.isRevoking = false;
 
-         const accountIndex = state.accounts.findIndex(account => account.uuid === action.payload.uuid);
-         if (accountIndex >= 0) state.accounts.splice(accountIndex, 1);
+         const account = state.accounts.find(account => account.uuid === action.payload.uuid);
+         if (account) {
+            account.status = "revoked";
+            account.enabled = false;
+         }
 
-         if (state.account?.uuid === action.payload.uuid) state.account = undefined;
+         if (state.account?.uuid === action.payload.uuid) {
+            state.account.status = "revoked";
+            state.account.enabled = false;
+         }
 
       },
 
@@ -202,14 +208,20 @@ export const slice = createSlice({
 
             uuid => {
 
-               const accountIndex = state.accounts.findIndex(account => account.uuid === uuid);
-               if (accountIndex >= 0) state.accounts.splice(accountIndex, 1);
+               const account = state.accounts.find(account => account.uuid === uuid);
+               if (account) {
+                  account.status = "revoked";
+                  account.enabled = false;
+               }
 
             }
 
          );
 
-         if (state.account && action.payload.uuids.includes(state.account?.uuid)) state.account = undefined;
+         if (state.account && action.payload.uuids.includes(state.account?.uuid)) {
+            state.account.status = "revoked";
+            state.account.enabled = false;
+         }
 
 
       },

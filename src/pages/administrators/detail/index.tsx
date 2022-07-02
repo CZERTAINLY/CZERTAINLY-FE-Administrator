@@ -34,6 +34,7 @@ export default function AdministratorDetail() {
 
    useEffect(
       () => {
+         if (!params.id) return;
          dispatch(actions.getAdminDetail({ uuid: params.id }));
       },
       [params.id, dispatch]
@@ -175,6 +176,7 @@ export default function AdministratorDetail() {
 
 
    return (
+
       <Container className="themed-container" fluid>
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
             <Col>

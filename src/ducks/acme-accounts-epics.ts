@@ -1,5 +1,6 @@
-import { of } from "rxjs";
+import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
+import history from "browser-history";
 
 import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
@@ -124,6 +125,22 @@ const revokeAcmeAccount: AppEpic = (action$, state$, deps) => {
       )
 
    );
+
+}
+
+
+const revokeAcmeAccountSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.revokeAcmeAccountSuccess.match
+      ),
+      map(
+         action => slice.actions.getAcmeAccount({ uuid: action.payload.uuid })
+      ),
+
+   )
 
 }
 
@@ -365,6 +382,7 @@ const epics = [
    listAcmeAccounts,
    getAccountDetail,
    revokeAcmeAccount,
+   revokeAcmeAccountSuccess,
    enableAcmeAccount,
    disableAcmeAccount,
    bulkRevokeAcmeAccounts,

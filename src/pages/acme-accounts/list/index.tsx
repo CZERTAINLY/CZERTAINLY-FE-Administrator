@@ -212,7 +212,7 @@ function AcmeAccountList() {
             body={`You are about to revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}. Is this what you want to do?`}
             toggle={() => setConfirmRevoke(false)}
             buttons={[
-               { color: "danger", onClick: onRevokeConfirmed, body: "Yes, delete" },
+               { color: "danger", onClick: onRevokeConfirmed, body: "Yes, revoke" },
                { color: "secondary", onClick: () => setConfirmRevoke(false), body: "Cancel" },
             ]}
          />
