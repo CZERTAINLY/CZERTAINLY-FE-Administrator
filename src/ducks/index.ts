@@ -32,27 +32,26 @@ import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialCredentialsState, slice as credentialsSlice} from "./credentials";
 import credentialsEpics from "./credentials-epics";
 
+import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } from "./acme-accounts";
+import acmeAccountsEpics from "./acme-accounts-epics";
+
 import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
 import acmeProfilesEpics from "./acme-profiles-epics";
 
 import { initialState as initialAuthoritiesState, slice as authoritiesSlice } from "./authorities";
 import authoritiesEpics from "./authorities-epics";
 
-/*
-import { initialState as initialAcmeAccountState, State as AcmeAccountState, statePath as acmeAccountStatePath } from "./acme-accounts";
-*/
-
-/*
-import acmeAccountEpics from "./acme-accounts-epics";
-*/
 
 export interface EpicDependencies {
    apiClients: ApiClients;
 }
 
+
 export type AppState = Observable<ReturnType<typeof reducers>>;
 
+
 export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
+
 
 export const initialState = {
    [alertsSlice.name]: initialAlertsState,
@@ -64,13 +63,11 @@ export const initialState = {
    [connectorsSlice.name]: initialConnectorsState,
    [raProfilesSlice.name]: initialRaProfilesState,
    [credentialsSlice.name]: initialCredentialsState,
+   [acmeAccountsSlice.name]: initialAcmeAccountsState,
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
    [authoritiesSlice.name]: initialAuthoritiesState,
-
-   /*
-      [acmeAccountStatePath]: initialAcmeAccountState,
-   */
 };
+
 
 export const reducers = combineReducers<typeof initialState, any>({
    [alertsSlice.name]: alertsSlice.reducer,
@@ -82,13 +79,9 @@ export const reducers = combineReducers<typeof initialState, any>({
    [connectorsSlice.name]: connectorsSlice.reducer,
    [raProfilesSlice.name]: raProfilesSlice.reducer,
    [credentialsSlice.name]: credentialsSlice.reducer,
+   [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
    [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
    [authoritiesSlice.name]: authoritiesSlice.reducer,
-
-   /*
-   [acmeAccountStatePath]: acmeAccountReducer,
-   [acmeProfilesStatePath]: acmeProfilesReducer,
-   */
 });
 
 
@@ -102,11 +95,7 @@ export const epics = combineEpics(
    ...connectorsEpics,
    ...raProfilesEpics,
    ...credentialsEpics,
+   ...acmeAccountsEpics,
    ...acmeProfilesEpics,
    ...authoritiesEpics
-
-   /*
-  ,
-  ...acmeAccountEpics,
-  ...acmeProfileEpics*/
 );
