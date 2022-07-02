@@ -10,7 +10,6 @@ import { dbData } from "mocks/db";
 
 import * as model from "./model";
 import { AuthType, FunctionGroupCode } from "types/connectors";
-import { ConnectorCallbackRequestDTO } from "./model";
 
 
 export class ConnectorManagementMock implements model.ConnectorManagementApi {

@@ -8,7 +8,7 @@ import { actions as alertActions } from "ducks/alerts";
 import { useEffect, useMemo } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
 import { Field, useForm } from "react-final-form";
-import { composeValidators, validateRequired } from "utils/validators";
+import { composeValidators } from "utils/validators";
 import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 
 interface Props {

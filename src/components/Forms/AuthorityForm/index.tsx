@@ -46,8 +46,6 @@ export default function AuthorityForm({
       [params.id]
    );
 
-
-
    const authoritySelector = useSelector(authoritySelectors.authority);
    const authorityProviders = useSelector(authoritySelectors.authorityProviders);
    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors);
@@ -130,7 +128,7 @@ export default function AuthorityForm({
          setAuthorityProvider(provider);
 
       },
-      [authorityProviders]
+      [dispatch, authorityProviders]
 
    );
 
