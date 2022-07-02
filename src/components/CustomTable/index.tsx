@@ -12,6 +12,7 @@ export interface TableHeader {
    align?: "left" | "center" | "right";
    sortable?: boolean;
    sort?: "asc" | "desc";
+   sortType?: "string" | "numeric";
    width?: string;
 }
 
@@ -190,6 +191,7 @@ function CustomTable({
          if (!hdr) return;
 
          const sort = hdr.sort === "asc" ? "desc" : "asc";
+         const sortType = hdr.sortType === "numeric" ? "numeric" : "string";
          const column = tblHeaders?.findIndex(header => header.id === sortColumn);
          if (column === undefined || column === -1) return;
 
@@ -201,12 +203,24 @@ function CustomTable({
          )
 
          const sortedData = [...tblData].sort(
+
             (a, b) => {
-               const aVal = typeof a.columns[column] === "string" ? a.columns[column] : jsxInnerText(a.columns[column] as JSX.Element);
-               const bVal = typeof b.columns[column] === "string" ? b.columns[column] : jsxInnerText(b.columns[column] as JSX.Element);
+
+               let aVal: string | number = typeof a.columns[column] === "string" ? a.columns[column] as string : jsxInnerText(a.columns[column] as JSX.Element);
+               let bVal: string | number = typeof b.columns[column] === "string" ? b.columns[column] as string : jsxInnerText(b.columns[column] as JSX.Element);
+
+               if (sortType === "numeric") {
+                  aVal = parseFloat(aVal);
+                  bVal = parseFloat(bVal);
+                  if (aVal === bVal) return 0;
+                  return aVal > bVal ? (sort === "asc" ? 1 : -1) : (sort === "asc" ? -1 : 1);
+               }
+
                if (aVal === bVal) return 0;
                return aVal > bVal ? (sort === "asc" ? 1 : -1) : (sort === "asc" ? -1 : 1);
+
             }
+
          )
 
          setTblHeaders(headers);
