@@ -26,7 +26,7 @@ const listCredentials: AppEpic = (action$, state, deps) => {
 
             map(
                credentials => slice.actions.listCredentialsSuccess({
-                  credentialList: credentials.map(credentialDTO => transformCredentialDtoToModel(credentialDTO))
+                  credentialList: credentials.map(transformCredentialDtoToModel)
                })
             ),
 
@@ -117,7 +117,7 @@ const listCredentialProviders: AppEpic = (action$, state, deps) => {
 
             map(
                providers => slice.actions.listCredentialProvidersSuccess({
-                  connectors: providers.map(provider => transformConnectorDTOToModel(provider))
+                  connectors: providers.map(transformConnectorDTOToModel)
                })
             ),
             catchError((err) =>
@@ -160,7 +160,7 @@ const getCredentialProviderAttributeDescriptors: AppEpic = (action$, state, deps
 
             map(
                attributeDescriptors => slice.actions.getCredentialProviderAttributesDescriptorsSuccess({
-                  credentialProviderAttributesDescriptors: attributeDescriptors.map(attributeDescriptor => transformAttributeDescriptorDTOToModel(attributeDescriptor))
+                  credentialProviderAttributesDescriptors: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
             catchError(
@@ -326,7 +326,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.credentials.updateCredential(
             action.payload.uuid,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.attributes.map(transformAttributeModelToDTO)
          ).pipe(
 
             map(

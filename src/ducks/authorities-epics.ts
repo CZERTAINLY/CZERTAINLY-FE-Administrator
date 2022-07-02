@@ -24,7 +24,7 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
             map(
 
                authorities => slice.actions.listAuthoritiesSuccess({
-                  authorityList: authorities.map(profileDto => transformAuthorityDtoToModel(profileDto))
+                  authorityList: authorities.map(transformAuthorityDtoToModel)
                })
 
             ),
@@ -116,7 +116,7 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
 
             map(
                providers => slice.actions.listAuthorityProvidersSuccess({
-                  connectors: providers.map(provider => transformConnectorDTOToModel(provider))
+                  connectors: providers.map(transformConnectorDTOToModel)
                })
             ),
             catchError((err) =>
@@ -160,7 +160,7 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
 
             map(
                attributeDescriptors => slice.actions.getAuthorityProviderAttributesDescriptorsSuccess({
-                  attributeDescriptor: attributeDescriptors.map(attributeDescriptor => transformAttributeDescriptorDTOToModel(attributeDescriptor))
+                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
             catchError(
@@ -202,7 +202,7 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.createNewAuthority(
             action.payload.name,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.attributes.map(transformAttributeModelToDTO),
             action.payload.connectorUuid,
             action.payload.kind
          ).pipe(
@@ -272,7 +272,7 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.updateAuthority(
             action.payload.uuid,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.attributes.map(transformAttributeModelToDTO),
          ).pipe(
 
             map(

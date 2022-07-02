@@ -25,7 +25,7 @@ const listLogs: AppEpic = (action$, state, deps) => {
 
             map(
                pagedAuditLog => slice.actions.listLogsSuccess({
-                  data: pagedAuditLog.items.map(item => transformAuditLogDTOToModel(item)),
+                  data: pagedAuditLog.items.map(transformAuditLogDTOToModel),
                   page: pagedAuditLog.page,
                   size: pagedAuditLog.size,
                   total: pagedAuditLog.totalPages

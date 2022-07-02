@@ -24,7 +24,7 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
 
             map(
                list => slice.actions.listRaProfilesSuccess({
-                  raProfiles: list.map(profile => transformRaProfileDtoToModel(profile))
+                  raProfiles: list.map(transformRaProfileDtoToModel)
                })
             ),
 
@@ -111,7 +111,7 @@ const listAuthorizedClients: AppEpic = (action$, state$, deps) => {
 
             map(
                clients => slice.actions.listAuthorizedClientsSuccess({
-                  authorizedClientsUuids: clients.map(client => transformRaAuthorizedClientDtoToModel(client))
+                  authorizedClientsUuids: clients.map(transformRaAuthorizedClientDtoToModel)
                })
             ),
 
@@ -156,7 +156,7 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.createRaProfile(
             action.payload.authorityInstanceUuid,
             action.payload.name,
-            action.payload.attributes.map(attr => transformAttributeModelToDTO(attr)),
+            action.payload.attributes.map(transformAttributeModelToDTO),
             action.payload.description
          ).pipe(
 
@@ -226,7 +226,7 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.updateRaProfile(
             action.payload.profileUuid,
             action.payload.authorityInstanceUuid,
-            action.payload.attributes.map(attr => transformAttributeModelToDTO(attr)),
+            action.payload.attributes.map(transformAttributeModelToDTO),
             action.payload.enabled,
             action.payload.description
          ).pipe(
@@ -408,8 +408,8 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.activateAcme(
             action.payload.uuid,
             action.payload.acmeProfileUuid,
-            action.payload.issueCertificateAttributes.map(attr => transformAttributeModelToDTO(attr)),
-            action.payload.revokeCertificateAttributes.map(attr => transformAttributeModelToDTO(attr)),
+            action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
+            action.payload.revokeCertificateAttributes.map(transformAttributeModelToDTO),
          ).pipe(
 
             map(
@@ -551,7 +551,7 @@ const listIssuanceAttributes: AppEpic = (action$, state$, deps) => {
             map(
                issuanceAttributes => slice.actions.listIssuanceAttributesDescriptorsSuccess({
                   uuid: action.payload.uuid,
-                  attributesDescriptors: issuanceAttributes.map(issuanceAttribute => transformAttributeDescriptorDTOToModel(issuanceAttribute))
+                  attributesDescriptors: issuanceAttributes.map(transformAttributeDescriptorDTOToModel)
                })
             ),
 
@@ -598,7 +598,7 @@ const listRevocationAttributes: AppEpic = (action$, state$, deps) => {
             map(
                revocationAttributes => slice.actions.listRevocationAttributesSuccess({
                   uuid: action.payload.uuid,
-                  attributesDescriptors: revocationAttributes.map(revocationAttribute => transformAttributeDescriptorDTOToModel(revocationAttribute))
+                  attributesDescriptors: revocationAttributes.map(transformAttributeDescriptorDTOToModel)
                })
             ),
 

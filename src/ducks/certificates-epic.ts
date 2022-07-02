@@ -27,7 +27,7 @@ const listCertificates: AppEpic = (action$, state, deps) => {
             ).pipe(
 
                map(
-                  list => slice.actions.listCertificatesSuccess({ certificateList: list.certificates.map(cert => transformCertDTOToModel(cert)) })
+                  list => slice.actions.listCertificatesSuccess({ certificateList: list.certificates.map(transformCertDTOToModel)})
                ),
 
                catchError(err => of(slice.actions.listCertificatesFailure({ error: extractError(err, "Failed to get certificates list") })))

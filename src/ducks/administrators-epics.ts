@@ -26,7 +26,7 @@ const listAdmins: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.admins.getAdminsList().pipe(
 
-            map(list => slice.actions.listAdminsSuccess({ adminList: list.map(adminDto => transformAdminDtoToModel(adminDto)) })),
+            map(list => slice.actions.listAdminsSuccess({ adminList: list.map(transformAdminDtoToModel) })),
 
             catchError(err => of(slice.actions.listAdminFailure({ error: extractError(err, "Failed to get administrators list") })))
 

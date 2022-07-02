@@ -27,7 +27,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
 
             map(
                list => slice.actions.listConnectorsSuccess({
-                  connectorList: list.map(connectorDto => transformConnectorDTOToModel(connectorDto))
+                  connectorList: list.map(transformConnectorDTOToModel)
                }),
 
                catchError(
@@ -122,7 +122,7 @@ const getConnectorAttributesDescriptors: AppEpic = (action$, state, deps) => {
                attrs => slice.actions.getConnectorAttributeDescriptorsSuccess({
                   functionGroup: action.payload.functionGroup,
                   kind: action.payload.kind,
-                  attributes: attrs.map(attr => transformAttributeDescriptorDTOToModel(attr))
+                  attributes: attrs.map(transformAttributeDescriptorDTOToModel)
                })
             ),
 
@@ -254,7 +254,7 @@ const createConnector: AppEpic = (action$, state, deps) => {
             action.payload.name,
             action.payload.url,
             action.payload.authType,
-            action.payload.authAttributes?.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.authAttributes?.map(transformAttributeModelToDTO)
          ).pipe(
 
             switchMap(
@@ -333,7 +333,7 @@ const updateConnector: AppEpic = (action$, state, deps) => {
             action.payload.uuid,
             action.payload.url,
             action.payload.authType,
-            action.payload.authAttributes?.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.authAttributes?.map(transformAttributeModelToDTO)
          ).pipe(
 
             map(
@@ -443,7 +443,7 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
             map(
                errors => slice.actions.bulkDeleteConnectorsSuccess({
                   uuids: action.payload.uuids,
-                  errors: errors.map(error => transformDeleteObjectErrorDtoToModel(error))
+                  errors: errors.map(transformDeleteObjectErrorDtoToModel)
                })
             ),
 
@@ -487,7 +487,7 @@ const connectConnector: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.connectors.connectToConnector(
             action.payload.url,
             action.payload.authType,
-            action.payload.authAttributes?.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.authAttributes?.map(transformAttributeModelToDTO)
          ).pipe(
 
             map(

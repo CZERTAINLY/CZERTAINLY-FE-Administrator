@@ -23,7 +23,7 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
 
             map(
                acmeProfiles => slice.actions.listAcmeProfilesSuccess(
-                  { acmeProfileList: acmeProfiles.map(acmeProfile => transformAcmeProfileListDtoToModel(acmeProfile)) }
+                  { acmeProfileList: acmeProfiles.map(transformAcmeProfileListDtoToModel) }
                ),
                catchError(
                   err => of(slice.actions.listAcmeProfilesFailed({ error: extractError(err, "Failed to get ACME Profiles list") }))
@@ -112,8 +112,8 @@ const createAcmeProfile: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.acmeProfiles.createAcmeProfile(
             action.payload.name,
-            action.payload.issueCertificateAttributes.map(attribute => transformAttributeModelToDTO(attribute)),
-            action.payload.revokeCertificateAttributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
+            action.payload.revokeCertificateAttributes.map(transformAttributeModelToDTO),
             action.payload.description,
             action.payload.termsOfServiceUrl,
             action.payload.websiteUrl,
@@ -190,8 +190,8 @@ const updateAcmeProfile: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.acmeProfiles.updateAcmeProfile(
             action.payload.uuid,
-            action.payload.issueCertificateAttributes.map(attribute => transformAttributeModelToDTO(attribute)),
-            action.payload.revokeCertificateAttributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
+            action.payload.revokeCertificateAttributes.map(transformAttributeModelToDTO),
             action.payload.description,
             action.payload.termsOfServiceUrl,
             action.payload.websiteUrl,

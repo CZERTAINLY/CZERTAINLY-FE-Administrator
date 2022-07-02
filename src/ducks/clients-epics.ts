@@ -27,7 +27,7 @@ const listClients: AppEpic = (action$, state, deps) => {
          () => deps.apiClients.clients.getClientsList().pipe(
 
             map(
-               list => slice.actions.listClientsSuccess({ clientList: list.map(clientDto => transformClientDTOToModel(clientDto)) })
+               list => slice.actions.listClientsSuccess({ clientList: list.map(transformClientDTOToModel) })
             ),
             catchError(
                err => of(slice.actions.listClientsFailure({ error: extractError(err, "Failed to get clients list") }))
@@ -116,7 +116,7 @@ const getAuthorizedProfiles: AppEpic = (action$, state, deps) => {
             map(
                profiles => slice.actions.getAuthorizedProfilesSuccess({
                   clientUuid: action.payload.clientUuid,
-                  authorizedProfiles: profiles.map(profileDto => transformClientAuthorizedProfileDTOToModel(profileDto))
+                  authorizedProfiles: profiles.map(transformClientAuthorizedProfileDTOToModel)
                })
             ),
             catchError(
