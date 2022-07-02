@@ -1,4 +1,8 @@
-import React, { useCallback, useEffect } from "react";
+export default function AcmeAccountDetail() {
+   return <>Acme Account Detail</>
+}
+
+/*import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
@@ -24,7 +28,7 @@ function AcmeAccountDetail() {
   const isFetchingAccounts = useSelector(selectors.isFetching);
   const accountDetails = useSelector(selectors.selectSelectedAccount);
   const confirmDeleteId = useSelector(selectors.selectConfirmDeleteAccountId);
-  const isRevoking = useSelector(selectors.isDeleting);
+  const isRevoking = useSelector(selectors.isRevoking);
 
   const history = useHistory();
   const { params } = useRouteMatch();
@@ -267,3 +271,4 @@ function AcmeAccountDetail() {
 }
 
 export default AcmeAccountDetail;
+*/

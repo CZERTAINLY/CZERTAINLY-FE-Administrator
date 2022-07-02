@@ -1,23 +1,19 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 import { AcmeAccountListModel, AcmeAccountModel } from "models/acme-accounts";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 
 
 export type State = {
 
    checkedRows: string[];
 
-   deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
-
    account?: AcmeAccountModel;
    accounts: AcmeAccountListModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
-   isDeleting: boolean;
-   isBulkDeleting: boolean;
+   isRevoking: boolean;
+   isBulkRevoking: boolean;
    isEnabling: boolean;
    isBulkEnabling: boolean;
    isDisabling: boolean;
@@ -30,15 +26,12 @@ export const initialState: State = {
 
    checkedRows: [],
 
-   deleteErrorMessage: "",
-   bulkDeleteErrorMessages: [],
-
    accounts: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
-   isDeleting: false,
-   isBulkDeleting: false,
+   isRevoking: false,
+   isBulkRevoking: false,
    isEnabling: false,
    isBulkEnabling: false,
    isDisabling: false,
@@ -70,13 +63,6 @@ export const slice = createSlice({
 
       },
 
-
-      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-
-         state.deleteErrorMessage = "";
-         state.bulkDeleteErrorMessages = [];
-
-      },
 
 
       listAcmeAccounts: (state, action: PayloadAction<void>) => {
@@ -125,14 +111,14 @@ export const slice = createSlice({
 
       revokeAcmeAccount: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isDeleting = true
+         state.isRevoking = true
 
       },
 
 
       revokeAcmeAccountSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isDeleting = false;
+         state.isRevoking = false;
 
          const accountIndex = state.accounts.findIndex(account => account.uuid === action.payload.uuid);
          if (accountIndex >= 0) state.accounts.splice(accountIndex, 1);
@@ -144,7 +130,7 @@ export const slice = createSlice({
 
       revokeAcmeAccountFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isDeleting = false
+         state.isRevoking = false
 
       },
 
@@ -203,14 +189,14 @@ export const slice = createSlice({
 
       bulkRevokeAcmeAccounts: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isBulkDeleting = true
+         state.isBulkRevoking = true
 
       },
 
 
       bulkRevokeAcmeAccountsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isBulkDeleting = false;
+         state.isBulkRevoking = false;
 
          action.payload.uuids.forEach(
 
@@ -231,7 +217,7 @@ export const slice = createSlice({
 
       bulkRevokeAcmeAccountsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isBulkDeleting = false;
+         state.isBulkRevoking = false;
 
       },
 
@@ -308,16 +294,13 @@ const state = createFeatureSelector<State>(slice.name);
 
 const checkedRows = createSelector(state, state => state.checkedRows);
 
-const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
-const bulkDeleteErrorMessages = createSelector(state, state => state.bulkDeleteErrorMessages);
-
 const account = createSelector(state, state => state.account);
 const accounts = createSelector(state, state => state.accounts);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
-const isDeleting = createSelector(state, state => state.isDeleting);
-const isBulkDeleting = createSelector(state, state => state.isBulkDeleting);
+const isDeleting = createSelector(state, state => state.isRevoking);
+const isBulkDeleting = createSelector(state, state => state.isBulkRevoking);
 const isEnabling = createSelector(state, state => state.isEnabling);
 const isBulkEnabling = createSelector(state, state => state.isBulkEnabling);
 const isDisabling = createSelector(state, state => state.isDisabling);
@@ -330,16 +313,13 @@ export const selectors = {
 
    checkedRows,
 
-   deleteErrorMessage,
-   bulkDeleteErrorMessages,
-
    account,
    accounts,
 
    isFetchingList,
    isFetchingDetail,
-   isDeleting,
-   isBulkDeleting,
+   isRevoking: isDeleting,
+   isBulkRevoking: isBulkDeleting,
    isEnabling,
    isBulkEnabling,
    isDisabling,
