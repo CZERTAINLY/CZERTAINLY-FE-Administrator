@@ -6,14 +6,18 @@ import AccountsList from "./list";
 import AccountDetail from "./detail";
 
 function AcmeAccounts() {
-  const { path } = useRouteMatch();
 
-  return (
-    <Switch>
-      <Route path={path} component={AccountsList} exact />
-      <Route path={`${path}/detail/:id`} component={AccountDetail} exact />
-    </Switch>
-  );
+   const { path } = useRouteMatch();
+
+   return (
+
+      <Switch>
+         <Route path={path} component={AccountsList} exact />
+         <Route path={`${path}/detail/:id`} component={AccountDetail} exact />
+      </Switch>
+
+   );
+
 }
 
 export default AcmeAccounts;

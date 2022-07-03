@@ -1,6 +1,5 @@
-import { EMPTY, of } from "rxjs";
+import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
-import history from "browser-history";
 
 import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
