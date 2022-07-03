@@ -116,11 +116,13 @@ function AcmeAccountList() {
             content: <MDBColumnName columnName="ACME Profile Name" />,
             sortable: true,
             sort: "asc",
-            width: "20%"
+            width: "20%",
+            align: "center"
          },
          {
             id: "RA Profile Name",
             content: <MDBColumnName columnName="RA Profile Name" />,
+            align: "center",
             sortable: true,
             width: "20%",
          },

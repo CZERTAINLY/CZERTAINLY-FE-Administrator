@@ -181,12 +181,14 @@ function CredentialList() {
             sortable: true,
             id: "kind",
             width: "20%",
+            align: "center"
          },
          {
             content: <MDBColumnName columnName="Credential Provider" />,
             sortable: true,
             id: "credentialProviderName",
             width: "25%",
+            align: "center"
          },
       ],
       []

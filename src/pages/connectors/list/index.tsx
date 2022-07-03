@@ -271,6 +271,7 @@ function ConnectorList() {
             sortable: true,
             id: "kinds",
             width: "15%",
+            align: "center"
          },
          {
             content: <MDBColumnName columnName="URL" />,
