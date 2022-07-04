@@ -92,8 +92,8 @@ export default function RaProfileForm({
          description: editMode ? acmeProfile?.description || "" : "",
          dnsIpAddress: editMode ? acmeProfile?.dnsResolverIp || "" : "",
          dnsPort: editMode ? acmeProfile?.dnsResolverPort || "" : "",
-         retryInterval: editMode ? acmeProfile?.retryInterval || "-1" : "-1",
-         orderValidity: editMode ? acmeProfile?.validity || "-1" : "-1",
+         retryInterval: editMode ? acmeProfile?.retryInterval || -1 : -1,
+         orderValidity: editMode ? acmeProfile?.validity || -1 : -1,
          termsUrl: editMode ? acmeProfile?.termsOfServiceUrl || "" : "",
          webSite: editMode ? acmeProfile?.websiteUrl || "" : "",
          termsChangeUrl: editMode ? acmeProfile?.termsOfServiceChangeUrl || "" : "",
@@ -271,6 +271,7 @@ export default function RaProfileForm({
                                  <Label for="validity">Order Validity (In seconds)</Label>
 
                                  <Input
+                                    {...input}
                                     type="number"
                                     placeholder="Enter Order Validity"
                                     valid={!meta.error && meta.touched}
