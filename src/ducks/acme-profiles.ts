@@ -252,14 +252,14 @@ export const slice = createSlice({
 
       enableAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isUpdating = true;
+         state.isEnabling = true;
 
       },
 
 
       enableAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isUpdating = false;
+         state.isEnabling = false;
 
          const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === action.payload.uuid);
 
@@ -272,21 +272,21 @@ export const slice = createSlice({
 
       enableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isUpdating = false;
+         state.isEnabling = false;
 
       },
 
 
       disableAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isUpdating = true;
+         state.isDisabling = true;
 
       },
 
 
       disableAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isUpdating = false;
+         state.isDisabling = false;
 
          const profileIndex = state.acmeProfiles.findIndex(profile => profile.uuid === action.payload.uuid);
 
@@ -299,21 +299,21 @@ export const slice = createSlice({
 
       disableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isUpdating = false;
+         state.isDisabling = false;
 
       },
 
 
       bulkDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isDeleting = true;
+         state.isBulkDeleting = true;
 
       },
 
 
       bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
-         state.isDeleting = false;
+         state.isBulkDeleting = false;
 
          if (action.payload.errors.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
@@ -336,21 +336,21 @@ export const slice = createSlice({
 
       bulkDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isDeleting = false;
+         state.isBulkDeleting = false;
 
       },
 
 
       bulkForceDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isDeleting = true;
+         state.isBulkForceDeleting = true;
 
       },
 
 
       bulkForceDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isDeleting = false;
+         state.isBulkForceDeleting = false;
 
          action.payload.uuids.forEach(
 
@@ -368,21 +368,21 @@ export const slice = createSlice({
 
       bulkForceDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isDeleting = false;
+         state.isBulkForceDeleting = false;
 
       },
 
 
       bulkEnableAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isUpdating = true;
+         state.isBulkEnabling = true;
 
       },
 
 
       bulkEnableAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isUpdating = false;
+         state.isBulkEnabling = false;
 
          action.payload.uuids.forEach(
 
@@ -400,21 +400,21 @@ export const slice = createSlice({
 
       bulkEnableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isUpdating = false
+         state.isBulkEnabling = false
 
       },
 
 
       bulkDisableAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isUpdating = true;
+         state.isBulkDisabling = true;
 
       },
 
 
       bulkDisableAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isUpdating = false;
+         state.isBulkDisabling = false;
 
          action.payload.uuids.forEach(
 
@@ -432,7 +432,7 @@ export const slice = createSlice({
 
       bulkDisableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isUpdating = false
+         state.isBulkDisabling = false
 
       },
 
