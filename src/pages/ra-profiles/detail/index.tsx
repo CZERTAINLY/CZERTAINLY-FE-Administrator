@@ -81,7 +81,7 @@ export default function RaProfileDetail() {
          if (!params.id) return;
          dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
          dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: params.id }));
-         dispatch(raProfilesActions.listRevocationAttributes({ uuid: params.id }));
+         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ uuid: params.id }));
          dispatch(raProfilesActions.getAcmeDetails({ uuid: params.id }));
       },
       [params.id, dispatch]

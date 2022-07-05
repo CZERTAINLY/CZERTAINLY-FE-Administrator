@@ -5,16 +5,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, FormText, Row, Col } from "reactstrap";
 
-import { validateRequired, composeValidators, validateAlphaNumeric, validateCustomIp, validateInteger } from "utils/validators";
+import { validateRequired, composeValidators, validateAlphaNumeric, validateCustomIp, validateInteger, validateCustomUrl } from "utils/validators";
 
 import { AcmeProfileModel } from "models/acme-profiles";
+import { RaProfileModel } from "models/ra-profiles";
 
 import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from "ducks/acme-profiles";
+import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
 import { collectFormAttributes } from "utils/attributes";
 import { mutators } from "utils/attributeEditorMutators";
 
-import Select from "react-select/";
+import Select from "react-select";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
@@ -42,14 +44,20 @@ export default function RaProfileForm({
    );
 
    const acmeProfileSelector = useSelector(acmeProfileSelectors.acmeProfile);
+   const raProfiles = useSelector(raProfileSelectors.raProfiles);
+   const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
+   const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
 
    const isFetchingDetail = useSelector(acmeProfileSelectors.isFetchingDetail);
    const isCreating = useSelector(acmeProfileSelectors.isCreating);
    const isUpdating = useSelector(acmeProfileSelectors.isUpdating);
 
-   const [init, setInit] = useState(true);
+   const isFetchingRaProfilesList = useSelector(raProfileSelectors.isFetchingList);
+   const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
+   const isFetchingRevocationAttributes = useSelector(raProfileSelectors.isFetchingRevocationAttributes);
 
    const [acmeProfile, setAcmeProfile] = useState<AcmeProfileModel>();
+   const [raProfile, setRaProfile] = useState<RaProfileModel>();
 
 
    const isBusy = useMemo(
@@ -77,11 +85,68 @@ export default function RaProfileForm({
    );
 
 
+   useEffect(
+
+      () => {
+         dispatch(raProfileActions.listRaProfiles());
+      },
+      [dispatch]
+
+   );
+
+
+   useEffect(
+
+      () => {
+
+         if (raProfile) {
+            dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: raProfile.uuid }));
+            dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: raProfile.uuid }));
+         }
+
+         if (acmeProfile) {
+            setRaProfile(acmeProfile.raProfile);
+         }
+
+      },
+      [dispatch, raProfile, acmeProfile]
+
+   )
+
+
    const onSubmit = useCallback(
 
       (values: FormValues) => {
       },
       []
+
+   );
+
+
+   const onRaProfileChange = useCallback(
+
+      (value: string) => {
+
+         dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: value }));
+         dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: value }));
+
+      },
+      [dispatch]
+
+   );
+
+
+   const optionsForRaProfiles = useMemo(
+
+      () => raProfiles.map(
+
+         raProfile => ({
+            value: raProfile.uuid,
+            label: raProfile.name
+         })
+
+      ),
+      [raProfiles]
 
    );
 
@@ -100,16 +165,15 @@ export default function RaProfileForm({
          disableOrders: editMode ? acmeProfile?.termsOfServiceChangeDisable || false : false,
          requireAgreement: editMode ? acmeProfile?.requireTermsOfService || false : false,
          requireContact: editMode ? acmeProfile?.requireContact || false : false,
-         defaultRaProfile: editMode ? acmeProfile?.raProfile || { value: acmeProfile?.raProfile?.uuid, label: acmeProfile?.raProfile?.name } : undefined
+         raProfile: editMode ? acmeProfile?.raProfile ? optionsForRaProfiles.find(raProfile => raProfile.value === acmeProfile.raProfile?.uuid) : undefined : undefined
       }),
-      [editMode, acmeProfile]
+      [editMode, acmeProfile, optionsForRaProfiles]
    );
 
 
    return (
 
       <Widget title={title} busy={isBusy}>
-
 
          <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
 
@@ -128,6 +192,7 @@ export default function RaProfileForm({
 
                            <Input
                               {...input}
+                              id="name"
                               type="text"
                               placeholder="ACME Profile Name"
                               valid={!meta.error && meta.touched}
@@ -154,6 +219,7 @@ export default function RaProfileForm({
 
                            <Input
                               {...input}
+                              id="description"
                               type="textarea"
                               placeholder="Description / Comment"
                               valid={!meta.error && meta.touched}
@@ -179,10 +245,11 @@ export default function RaProfileForm({
 
                                  <FormGroup>
 
-                                    <Label for="dnsResolverIp">DNS Resolver IP address</Label>
+                                    <Label for="dnsIpAddress">DNS Resolver IP address</Label>
 
                                     <Input
                                        {...input}
+                                       id="dnsIpAddress"
                                        type="text"
                                        placeholder="Enter DNS Resolver IP address. If not provided system default will be used"
                                        valid={!meta.error && meta.touched}
@@ -207,10 +274,11 @@ export default function RaProfileForm({
 
                                  <FormGroup>
 
-                                    <Label for="dnsResolverPort">DNS Resolver port number</Label>
+                                    <Label for="dnsPort">DNS Resolver port number</Label>
 
                                     <Input
                                        {...input}
+                                       id="dnsPort"
                                        type="number"
                                        placeholder="Enter DNS Resolver port number"
                                        valid={!meta.error && meta.touched}
@@ -244,6 +312,7 @@ export default function RaProfileForm({
 
                                     <Input
                                        {...input}
+                                       id="retryInterval"
                                        type="number"
                                        placeholder="Enter Retry Interval"
                                        valid={!meta.error && meta.touched}
@@ -266,21 +335,22 @@ export default function RaProfileForm({
 
                               {({ input, meta }) => (
 
-                              <FormGroup>
+                                 <FormGroup>
 
-                                 <Label for="validity">Order Validity (In seconds)</Label>
+                                    <Label for="orderValidity">Order Validity (In seconds)</Label>
 
-                                 <Input
-                                    {...input}
-                                    type="number"
-                                    placeholder="Enter Order Validity"
-                                    valid={!meta.error && meta.touched}
-                                    invalid={!!meta.error && meta.touched}
-                                 />
+                                    <Input
+                                       {...input}
+                                       id="orderValidity"
+                                       type="number"
+                                       placeholder="Enter Order Validity"
+                                       valid={!meta.error && meta.touched}
+                                       invalid={!!meta.error && meta.touched}
+                                    />
 
-                                 <FormFeedback>{meta.error}</FormFeedback>
+                                    <FormFeedback>{meta.error}</FormFeedback>
 
-                              </FormGroup>
+                                 </FormGroup>
 
                               )}
 
@@ -289,6 +359,248 @@ export default function RaProfileForm({
                         </Col>
 
                      </Row>
+
+                  </Widget>
+
+
+                  <Widget title="Terms of Service Configuration">
+
+                     <Row xs="1" sm="1" md="2" lg="2" xl="2">
+
+                        <Col>
+
+                           <Field name="termsUrl" validate={composeValidators((value: string) => validateCustomUrl(value))}>
+
+                              {({ input, meta }) => (
+
+                                 <FormGroup>
+
+                                    <Label for="termsUrl">Terms of Service URL</Label>
+
+                                    <Input
+                                       {...input}
+                                       id="termsUrl"
+                                       type="text"
+                                       placeholder="Enter Terms of Service URL"
+                                       valid={!meta.error && meta.touched}
+                                       invalid={!!meta.error && meta.touched}
+                                    />
+
+                                    <FormFeedback>{meta.error}</FormFeedback>
+
+                                 </FormGroup>
+
+                              )}
+
+                           </Field>
+
+                        </Col>
+
+                        <Col>
+
+                           <Field name="webSite">
+
+                              {({ input, meta }) => (
+
+
+                                 <FormGroup>
+
+                                    <Label for="websiteUrl">Website URL</Label>
+
+                                    <Input
+                                       {...input}
+                                       id="websiteUrl"
+                                       type="text"
+                                       placeholder="Enter Website URL"
+                                       valid={!meta.error && meta.touched}
+                                       invalid={!!meta.error && meta.touched}
+                                    />
+
+                                    <FormFeedback>{meta.error}</FormFeedback>
+
+                                 </FormGroup>
+
+                              )}
+
+                           </Field>
+
+                        </Col>
+                     </Row>
+
+                     {!editMode ? <></> : (
+
+                        <Row xs="1" sm="1" md="2" lg="2" xl="2">
+
+                           <Col>
+
+                              <Field name="termsChangeUrl" validate={composeValidators((value: string) => validateCustomUrl(value))}>
+
+                                 {({ input, meta }) => (
+
+                                    <FormGroup>
+
+                                       <Label for="termsChangeUrl">Changes of Terms of Service URL</Label>
+
+                                       <Input
+                                          {...input}
+                                          id="termsChangeUrl"
+                                          type="text"
+                                          name="termsOfServiceChangeUrl"
+                                          placeholder="Enter Changes of Terms of Service URL"
+                                          valid={!meta.error && meta.touched}
+                                          invalid={!!meta.error && meta.touched}
+                                       />
+
+                                       <FormFeedback>{meta.error}</FormFeedback>
+
+                                    </FormGroup>
+
+                                 )}
+
+                              </Field>
+
+                           </Col>
+
+                           <Col className="align-items-center">
+
+                              <Field name="disableOrders" type="checkbox">
+
+                                 {({ input, meta }) => (
+
+                                    <FormGroup>
+
+                                       <br />
+                                       <br />
+
+                                       <Input
+                                          {...input}
+                                          id="disableOrders"
+                                          type="checkbox"
+                                       />
+
+                                       <Label for="disableOrders">
+                                          &nbsp;Disable new Orders (Changes in Terms of Service)
+                                       </Label>
+
+                                    </FormGroup>
+
+                                 )}
+
+                              </Field>
+
+                           </Col>
+
+                        </Row>
+
+                     )}
+
+                     <Field name="requireAgreement" type="checkbox">
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Input
+                                 {...input}
+                                 id="requireAgreement"
+                                 type="checkbox"
+                              />
+
+                              <Label for="requireAgreement">
+                                 &nbsp;Require agree on Terms Of Service for new account
+                              </Label>
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                     <Field name="requireContact" type="checkbox">
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Input
+                                 {...input}
+                                 id="requireContact"
+                                 type="checkbox"
+                              />
+
+                              <Label for="requireContact">
+                                 &nbsp;Require contact information for new Accounts
+                              </Label>
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                  </Widget>
+
+
+                  <Widget title="RA Profile Configuration" busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingRevocationAttributes}>
+
+                     <Field name="raProfile">
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="raProfile">Default RA Profile</Label>
+
+                              <Select
+                                 {...input}
+                                 id="raProfile"
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={optionsForRaProfiles}
+                                 placeholder="Select to change RA Profile if needed"
+                                 onChange={(event: any) => { onRaProfileChange(event.value); input.onChange(event) }}
+                              />
+
+                           </FormGroup>
+
+
+                        )}
+
+                     </Field>
+
+                     {!raProfileIssuanceAttrDescs || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? <></> : (
+
+                        <FormGroup>
+
+                           <Label for="issuanceAttributes">Issuance Attributes</Label>
+
+                           <AttributeEditor
+                              id="issuanceAttributes"
+                              attributeDescriptors={raProfileIssuanceAttrDescs}
+                              attributes={acmeProfile?.issueCertificateAttributes}
+                           />
+
+                        </FormGroup>
+
+                     )}
+
+
+                     {!raProfileIssuanceAttrDescs || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? <></> : (
+
+                        <FormGroup>
+
+                           <Label for="revocationAttributes">Revocation Attributes</Label>
+
+                           <AttributeEditor
+                              id="revocationAttributes"
+                              attributeDescriptors={raProfileRevocationAttrDescs}
+                              attributes={acmeProfile?.issueCertificateAttributes}
+                           />
+
+
+                        </FormGroup>
+
+                     )}
 
                   </Widget>
 

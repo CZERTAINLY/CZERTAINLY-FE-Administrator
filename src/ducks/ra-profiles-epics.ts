@@ -537,7 +537,7 @@ const getAcmeDetailsFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listIssuanceAttributes: AppEpic = (action$, state$, deps) => {
+const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
@@ -567,7 +567,7 @@ const listIssuanceAttributes: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listIssuanceAttributesFailure: AppEpic = (action$, state$, deps) => {
+const listIssuanceAttributeDescriptorsFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
@@ -583,12 +583,12 @@ const listIssuanceAttributesFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listRevocationAttributes: AppEpic = (action$, state$, deps) => {
+const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.listRevocationAttributes.match
+         slice.actions.listRevocationAttributeDescriptors.match
       ),
 
       switchMap(
@@ -596,14 +596,14 @@ const listRevocationAttributes: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.getRevocationAttributes(action.payload.uuid).pipe(
 
             map(
-               revocationAttributes => slice.actions.listRevocationAttributesSuccess({
+               revocationAttributes => slice.actions.listRevocationAttributeDescriptorsSuccess({
                   uuid: action.payload.uuid,
                   attributesDescriptors: revocationAttributes.map(transformAttributeDescriptorDTOToModel)
                })
             ),
 
             catchError(
-               err => of(slice.actions.listRevocationAttributesFailure({ error: extractError(err, "Failed to list revocation attributes") }))
+               err => of(slice.actions.listRevocationAttributeDescriptorsFailure({ error: extractError(err, "Failed to list revocation attributes") }))
             )
 
          )
@@ -615,12 +615,12 @@ const listRevocationAttributes: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listRevocationAttributesFailure: AppEpic = (action$, state$, deps) => {
+const listRevocationAttributeDescriptorsFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.listRevocationAttributesFailure.match
+         slice.actions.listRevocationAttributeDescriptorsFailure.match
       ),
 
       map(
@@ -788,10 +788,10 @@ const epics = [
    deactivateAcmeFailure,
    getAcmeDetails,
    getAcmeDetailsFailure,
-   listIssuanceAttributes,
-   listIssuanceAttributesFailure,
-   listRevocationAttributes,
-   listRevocationAttributesFailure,
+   listIssuanceAttributeDescriptors,
+   listIssuanceAttributeDescriptorsFailure,
+   listRevocationAttributeDescriptors,
+   listRevocationAttributeDescriptorsFailure,
    bulkEnableProfiles,
    bulkEnableProfilesFailure,
    bulkDisableProfiles,

@@ -487,14 +487,14 @@ export const slice = createSlice({
       },
 
 
-      listRevocationAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
+      listRevocationAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isFetchinRevocationAttributes = true;
 
       },
 
 
-      listRevocationAttributesSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+      listRevocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchinRevocationAttributes = false;
          state.revocationAttributesDescriptors = action.payload.attributesDescriptors;
@@ -502,7 +502,7 @@ export const slice = createSlice({
       },
 
 
-      listRevocationAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listRevocationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
          state.isFetchinRevocationAttributes = false;
       }
 

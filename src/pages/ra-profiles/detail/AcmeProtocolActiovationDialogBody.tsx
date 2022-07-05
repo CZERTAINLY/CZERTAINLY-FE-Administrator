@@ -54,7 +54,7 @@ export default function AcmeProtocolActiovationDialogBody({
          dispatch(acmeProfilesActions.listAcmeProfiles());
          if (!raProfileUuid) return;
          dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: raProfileUuid }));
-         dispatch(raProfilesActions.listRevocationAttributes({ uuid: raProfileUuid }));
+         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ uuid: raProfileUuid }));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [visible]
