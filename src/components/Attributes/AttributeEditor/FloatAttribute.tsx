@@ -1,20 +1,17 @@
+import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
 
-import { useDispatch } from "react-redux";
-
-import { actions as alertActions } from "ducks/alerts";
-
 import { useEffect, useMemo } from "react";
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
+import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
-import { composeValidators, validateFloat, validateRequired } from "utils/validators";
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
+import { composeValidators, validateFloat, validatePattern, validateRequired } from "utils/validators";
 
 interface Props {
    id: string;
-   descriptor: AttributeDescriptorModel;
-   attribute?: AttributeModel;
+   descriptor: AttributeDescriptorModel,
+   attribute: AttributeModel
 }
 
 export function FloatAttribute({
@@ -23,15 +20,13 @@ export function FloatAttribute({
    attribute,
 }: Props): JSX.Element {
 
-   const dispatch = useDispatch();
-
    const form = useForm();
 
    const baseFieldId = useMemo(
 
       () => {
          const uuid = attribute ? `:${attribute.uuid}` : "";
-         return `${descriptor.name}:Float${uuid}`;
+         return `${descriptor.name}:String${uuid}`;
       },
       [attribute, descriptor.name]
 
@@ -41,35 +36,60 @@ export function FloatAttribute({
 
       () => {
 
-         if ((descriptor.content && Array.isArray(descriptor.content)) || descriptor.list || descriptor.multiSelect || (!descriptor.content && !descriptor.callback)) {
-            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} is invalid`));
-            return;
-         }
+         if (!attribute || !attribute.content) return;
 
-         if (descriptor.callback) {
-            dispatch(alertActions.error(`Attribute descriptor ${descriptor.name} callback not expected`));
-            return;
-         }
+         const attributeValue = descriptor.list
 
-         if (attribute && Array.isArray(attribute.content)) {
-            dispatch(alertActions.error(`Attribute ${descriptor.name} has invalid content`));
-            return;
-         }
+            ?
+
+            descriptor.multiSelect && Array.isArray(attribute.content)
+
+               ?
+
+               attribute.content.map(
+                  content => ({
+                     value: content.value,
+                     label: content.value
+                  })
+               )
+
+               :
+
+               ({
+                  value: (attribute.content as AttributeContentModel).value,
+                  label: (attribute.content as AttributeContentModel).value
+               })
+
+            :
+
+            (attribute.content as AttributeContentModel).value
 
          const initialValues = { ...form.getState().values };
 
-         const initialValue = (attribute?.content as AttributeContentModel)?.value || descriptor.content?.value || undefined;
-
          initialValues[`__attribute__${id}__`] = initialValues[`__attribute__${id}__`] || {};
-         initialValues[`__attribute__${id}__`][baseFieldId] = initialValue;
+         initialValues[`__attribute__${id}__`][baseFieldId] = attributeValue;
 
          form.setConfig("initialValues", initialValues);
 
-         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, initialValue);
+         form.mutators.setAttribute(`__attribute__${id}__.${baseFieldId}`, attributeValue);
 
       },
 
-      [descriptor, attribute, form.mutators, id, form, baseFieldId, dispatch]
+      [baseFieldId, descriptor, attribute, form, id]
+   )
+
+
+   const options = useMemo(
+
+      () => (Array.isArray(descriptor.content) ? descriptor.content : []).map(
+
+         content => ({
+            value: content.value as string,
+            label: content.value as string
+         }) as SingleValue<{ value: string; label: string }>,
+
+      ),
+      [descriptor.content]
    )
 
 
@@ -79,21 +99,22 @@ export function FloatAttribute({
 
          const vals = [];
 
-         if (descriptor.required) vals.push(validateRequired());
          vals.push(validateFloat());
+         if (descriptor.required) vals.push(validateRequired());
+         if (descriptor.validationRegex) vals.push(validatePattern(descriptor.validationRegex));
 
          return composeValidators.apply(undefined, vals);
 
       },
 
-      [descriptor.required]
+      [descriptor.required, descriptor.validationRegex]
 
    );
 
 
    return !descriptor ? <></> : (
 
-      <FormGroup>
+      <FormGroup row={false}>
 
          <Field name={`__attribute__${id}__.${baseFieldId}`} validate={validators}>
 
@@ -103,21 +124,49 @@ export function FloatAttribute({
 
                   {descriptor.visible ? (
 
-                     <Label for={`__attribute__${id}__.${baseFieldId}`}>&nbsp;{descriptor.label}</Label>
+                     <Label for={`__attribute__${id}__.${baseFieldId}`}>{descriptor.label}</Label>
 
                   ) : null}
 
-                  <Input
-                     {...input}
-                     id={`__attribute__${id}__.${baseFieldId}`}
-                     type={descriptor.visible ? "text" : "hidden"}
-                     placeholder={`Enter ${descriptor.label}`}
-                     disabled={descriptor.readOnly}
-                     valid={!meta.error && meta.touched}
-                     invalid={!!meta.error && meta.touched}
-                  />
+                  {descriptor.list && descriptor.visible ? (
 
-                  <FormFeedback>{meta.error}</FormFeedback>
+                     <>
+                        <Select
+                           {...input}
+                           maxMenuHeight={140}
+                           menuPlacement="auto"
+                           options={options}
+                           placeholder={`Select ${descriptor.label}`}
+                           styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                           isDisabled={descriptor.readOnly}
+                           isMulti={descriptor.multiSelect}
+                           isClearable={!descriptor.required}
+                        />
+
+                        <FormText>{descriptor.description}</FormText>
+
+                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
+                     </>
+
+                  ) : (
+                     <>
+
+                        <Input
+                           {...input}
+                           valid={!meta.error && meta.touched}
+                           invalid={!!meta.error && meta.touched}
+                           type={descriptor.visible ? "text" : "hidden"}
+                           placeholder={`Enter ${descriptor.label}`}
+                           disabled={descriptor.readOnly}
+                        />
+
+                        <FormText>{descriptor.description}</FormText>
+
+                        <FormFeedback>{meta.error}</FormFeedback>
+
+                     </>
+                  )}
 
                </>
 

@@ -3,7 +3,7 @@ import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorM
 import { AttributeModel } from "models/attributes/AttributeModel";
 
 import { useEffect, useMemo } from "react";
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
 import { composeValidators, validatePattern, validateRequired } from "utils/validators";
@@ -142,6 +142,8 @@ export function StringAttribute({
                            isClearable={!descriptor.required}
                         />
 
+                        <FormText>{descriptor.description}</FormText>
+
                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
                      </>
@@ -157,6 +159,8 @@ export function StringAttribute({
                            placeholder={`Enter ${descriptor.label}`}
                            disabled={descriptor.readOnly}
                         />
+
+                        <FormText>{descriptor.description}</FormText>
 
                         <FormFeedback>{meta.error}</FormFeedback>
 
