@@ -9,7 +9,6 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import StatusBadge from "components/StatusBadge";
-import StatusCircle from "components/StatusCircle";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import { MDBBadge } from "mdbreact";

@@ -144,7 +144,7 @@ export const slice = createSlice({
          termsOfServiceUrl: string,
          dnsResolverIp: string,
          dnsResolverPort: string,
-         raProfileUuid: string,
+         raProfileUuid: string | undefined,
          websiteUrl: string,
          retryInterval: number,
          termsOfServiceChangeDisable: boolean,
@@ -177,12 +177,11 @@ export const slice = createSlice({
 
       updateAcmeProfile: (state, action: PayloadAction<{
          uuid: string,
-         name: string,
          description: string,
          termsOfServiceUrl: string,
          dnsResolverIp: string,
          dnsResolverPort: string,
-         raProfileUuid: string,
+         raProfileUuid: string | undefined,
          websiteUrl: string,
          retryInterval: number,
          termsOfServiceChangeDisable: boolean,

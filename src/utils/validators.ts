@@ -11,9 +11,9 @@ export const validatePattern = (pattern: RegExp, message?: string) =>
          ? undefined
          : message || `Value must conform to ${pattern}`;
 
-export const validateInteger = () => validatePattern(/^\d+$/, "Value must be an integer");
+export const validateInteger = () => validatePattern(/^[+-]?(\d*)$/, "Value must be an integer");
 
-export const validateFloat = () => validatePattern(/^\d+\.\d+$/, "Value must be a float");
+export const validateFloat = () => validatePattern(/^[+-]?(\d*[.])?\d+$/, "Value must be a float without an exponent.");
 
 export const validateAlphaNumeric = () =>
    validatePattern(
@@ -34,23 +34,23 @@ export const validateUrl = () =>
    );
 
 export const validateCustom = (pattern: string, value: string) => {
-   return new RegExp(pattern).test(value);
+   return !value || new RegExp(pattern).test(value) ? undefined : `Value must conform to '${pattern}'`;
 };
 
 export const validateCustomUrl = (value: string) => {
-   return new RegExp(
+   return !value || new RegExp(
       /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/g
-   ).test(value);
+   ).test(value) ? undefined : "Value must be a valid url";
 };
 
 export const validateCustomIp = (value: string) => {
-   return new RegExp(
+   return !value || new RegExp(
       /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
-   ).test(value);
+   ).test(value) ? undefined : "Value must be a valid ip address";
 };
 
 export const validateCustomPort = (value: string) => {
-   return new RegExp(
+   return !value || new RegExp(
       /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/
-   ).test(value);
+   ).test(value) ? undefined : "Value must be a valid port";
 };

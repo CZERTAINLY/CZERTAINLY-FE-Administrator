@@ -223,7 +223,28 @@ const updateAcmeProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const editAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
+const updateAcmeProfileSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateAcmeProfileSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            history.push(`../detail/${action.payload.acmeProfile.uuid}`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
+
+const updateAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
@@ -509,7 +530,7 @@ const bulkDisableAcmeProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action=> deps.apiClients.acmeProfiles.bulkDisableAcmeProfile(action.payload.uuids).pipe(
+         action => deps.apiClients.acmeProfiles.bulkDisableAcmeProfile(action.payload.uuids).pipe(
 
             map(
                () => slice.actions.bulkDisableAcmeProfilesSuccess({ uuids: action.payload.uuids })
@@ -549,7 +570,8 @@ const epics = [
    getAcmeProfileDetail,
    getAcmeProfileDetailFailed,
    updateAcmeProfile,
-   editAcmeProfileFailed,
+   updateAcmeProfileSuccess,
+   updateAcmeProfileFailed,
    createAcmeProfile,
    createAcmeProfileFailed,
    createAcmeProfileSuccess,
