@@ -3,10 +3,10 @@ import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorM
 import { AttributeModel } from "models/attributes/AttributeModel";
 
 import { useEffect, useMemo } from "react";
-import { FormGroup, FormText, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import Select, { SingleValue } from "react-select";
 import { Field, useForm } from "react-final-form";
-import { composeValidators, validateRequired } from "utils/validators";
+import { composeValidators, validatePattern, validateRequired } from "utils/validators";
 
 interface Props {
    id: string;
@@ -14,7 +14,7 @@ interface Props {
    attribute?: AttributeModel
 }
 
-export function JsonAttribute({
+export function StringAttribute({
    id,
    descriptor,
    attribute,
@@ -26,7 +26,7 @@ export function JsonAttribute({
 
       () => {
          const uuid = attribute ? `:${attribute.uuid}` : "";
-         return `${descriptor.name}:Json${uuid}`;
+         return `${descriptor.name}:String${uuid}`;
       },
       [attribute, descriptor.name]
 
@@ -90,7 +90,6 @@ export function JsonAttribute({
 
       ),
       [descriptor.content]
-
    )
 
 
@@ -101,12 +100,13 @@ export function JsonAttribute({
          const vals = [];
 
          if (descriptor.required) vals.push(validateRequired());
+         if (descriptor.validationRegex) vals.push(validatePattern(descriptor.validationRegex));
 
          return composeValidators.apply(undefined, vals);
 
       },
 
-      [descriptor.required]
+      [descriptor.required, descriptor.validationRegex]
 
    );
 
@@ -142,14 +142,29 @@ export function JsonAttribute({
                            isClearable={!descriptor.required}
                         />
 
-                        <FormText>{descriptor.description}</FormText>
+                        <FormText color={ descriptor.required ? "dark" : undefined }>{descriptor.required ? "* " : ""}{descriptor.description}</FormText>
 
                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
                      </>
 
                   ) : (
-                     <></>
+                     <>
+
+                        <Input
+                           {...input}
+                           valid={!meta.error && meta.touched}
+                           invalid={!!meta.error && meta.touched}
+                           type={descriptor.visible ? "text" : "hidden"}
+                           placeholder={`Enter ${descriptor.label}`}
+                           disabled={descriptor.readOnly}
+                        />
+
+                        <FormText color={ descriptor.required ? "dark" : undefined }>{descriptor.required ? "* " : ""}{descriptor.description}</FormText>
+
+                        <FormFeedback>{meta.error}</FormFeedback>
+
+                     </>
                   )}
 
                </>

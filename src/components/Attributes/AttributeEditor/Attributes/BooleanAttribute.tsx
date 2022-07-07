@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { actions as alertActions } from "ducks/alerts";
 
 import { useEffect, useMemo } from "react";
-import { FormGroup, Input, Label } from "reactstrap";
+import { FormGroup, FormText, Input, Label } from "reactstrap";
 import { Field, useForm } from "react-final-form";
 import { composeValidators } from "utils/validators";
 import { AttributeContentModel } from "models/attributes/AttributeContentModel";
@@ -114,6 +114,8 @@ export function BooleanAttribute({
                      <Label for={`__attribute__${id}__.${baseFieldId}`}>&nbsp;{descriptor.label}</Label>
 
                   ) : null}
+
+                  <FormText color={descriptor.required ? "dark" : undefined} style={{ marginTop: "-0.6em" }}>{descriptor.required ? "* " : ""}{descriptor.description}</FormText>
 
                </>
 

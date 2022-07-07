@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { FormGroup, Label } from "reactstrap";
+import { FormGroup, FormText, Label } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -14,6 +14,7 @@ import { Field, useForm } from "react-final-form";
 import { composeValidators, validateRequired } from "utils/validators";
 import { FunctionGroupCode } from "types/connectors";
 
+
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
@@ -23,6 +24,7 @@ interface Props {
    functionGroup: FunctionGroupCode,
    kind: string
 }
+
 
 export function CredentialAttribute({
    id,
@@ -200,6 +202,8 @@ export function CredentialAttribute({
                         />
 
                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
+                        <FormText color={ descriptor.required ? "dark" : undefined }>{descriptor.required ? "* " : ""}{descriptor.description}</FormText>
 
                      </>
 

@@ -2,7 +2,7 @@ import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorM
 import { AttributeModel } from "models/attributes/AttributeModel";
 
 import { useCallback, useEffect, useMemo } from "react";
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { Field, useForm } from "react-final-form";
 import { composeValidators, validatePattern, validateRequired } from "utils/validators";
 import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
@@ -223,6 +223,8 @@ export function FileAttribute({
                               />
 
                               <FormFeedback>{meta.error}</FormFeedback>
+
+                              <FormText color={ descriptor.required ? "dark" : undefined }>{descriptor.required ? "* " : ""}{descriptor.description}</FormText>
 
                            </>
 
