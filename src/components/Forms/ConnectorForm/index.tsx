@@ -19,6 +19,7 @@ import { actions as conenctorActions, selectors as connectorSelectors } from "du
 import { AuthType } from "types/connectors";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { MDBBadge } from "mdbreact";
+import {attributeFieldNameTransform} from "../../../utils/attributes";
 
 
 interface FormValues {
@@ -419,14 +420,14 @@ function ConnectorForm({ title }: Props) {
 
                                  <tr>
 
-                                    <td>Functional Group(s)</td>
+                                    <td>Function Group(s)</td>
                                     <td>
                                        {connectionDetails.map(
                                           functionGroup => (
                                              <div>
-                                                <Badge style={{ backgroundColor: "Bronze" }} pill>
-                                                   {functionGroup?.name}
-                                                </Badge>
+                                                <MDBBadge color="primary" searchvalue={attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}>
+                                                    {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                </MDBBadge>
                                                 &nbsp;
                                              </div>
                                           )
@@ -458,7 +459,7 @@ function ConnectorForm({ title }: Props) {
 
                                              <>
 
-                                                {functionGroup.name}
+                                                 {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
 
                                                 <div className="pull-right mt-n-xs">
                                                    {

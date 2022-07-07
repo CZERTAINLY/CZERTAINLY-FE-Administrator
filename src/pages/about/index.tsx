@@ -16,8 +16,7 @@ function About() {
             <ul>
 
                <li>
-                  Developer:
-                  <a href="https://www.3key.company" target="_blank" rel="noopener noreferrer">3Key Company s.r.o.</a>
+                  Developer: <a href="https://www.3key.company" target="_blank" rel="noopener noreferrer">3Key Company s.r.o.</a>
                </li>
 
             </ul>
@@ -32,8 +31,8 @@ function About() {
             </p>
 
             <p>
-               <a href="mailto: support@czertainly.com">CZERTAINLY Support Email</a>
-               or use the
+               <a href="mailto: support@czertainly.com">CZERTAINLY Support Email</a><br />
+               or use the <br />
                <a href="https://czertainly.atlassian.net/servicedesk/customer/portal/1" target="_blank" rel="noopener noreferrer">CZERTAINLY Support Portal</a>
             </p>
 

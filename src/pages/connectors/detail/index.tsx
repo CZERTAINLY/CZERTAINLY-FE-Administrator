@@ -19,6 +19,7 @@ import InventoryStatusBadge from "components/ConnectorStatus";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 import Dialog from "components/Dialog";
+import {attributeFieldNameTransform} from "../../../utils/attributes";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -385,7 +386,7 @@ export default function ConnectorDetail() {
    const functionGroupSelectData = connector?.functionGroups?.map(
 
       group => ({
-         label: group.name,
+         label: attributeFieldNameTransform[group?.name || ""] || group?.name,
          value: group.functionGroupCode
       })
 
@@ -463,7 +464,7 @@ export default function ConnectorDetail() {
                   <Select
                      maxMenuHeight={140}
                      options={functionGroupSelectData}
-                     value={{ label: currentFunctionGroup?.name, value: currentFunctionGroup?.functionGroupCode }}
+                     value={{ label: attributeFieldNameTransform[currentFunctionGroup?.name || ""] || currentFunctionGroup?.name, value: currentFunctionGroup?.functionGroupCode }}
                      menuPlacement="auto"
                      onChange={(event) => onFunctionGroupChange(event?.value || "")}
                   />
