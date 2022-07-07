@@ -7,7 +7,7 @@ import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
 
-import { AttributeDTO } from "api/_common/attributeDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 export class AuthorityManagementMock implements model.AuthorityManagementApi {
@@ -165,8 +165,9 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
                   kind,
                   attributes,
                   status: "",
+                  raProfileAttributes: [],
                   issueAttributes: [],
-                  revokeAttributes: []
+                  revokeAttributes: [],
                })
 
                return uuid;
@@ -218,7 +219,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
    }
 
 
-   listRAProfileAttributes(uuid: string): Observable<AttributeDTO[]> {
+   listRAProfileAttributesDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.authorities.find(authority => authority.uuid === uuid)
@@ -229,7 +230,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
 
             authority => {
                if (!authority) throw new HttpErrorResponse({ status: 404 });
-               return authority.attributes || [];
+               return authority.raProfileAttributes || [];
             }
 
          )

@@ -42,7 +42,6 @@ export default function RaProfileDetail() {
 
    const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
    const isFetchingAuthorizedClients = useSelector(raProfilesSelectors.isFetchingAuthorizedClients);
-   const isFetchingAttributes = useSelector(raProfilesSelectors.isFetchingAttributes);
    const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
 
    const isDeleting = useSelector(raProfilesSelectors.isDeleting);
@@ -555,7 +554,7 @@ export default function RaProfileDetail() {
 
             <Col>
 
-               <Widget title="Attributes" busy={isBusy || isFetchingAttributes}>
+               <Widget title="Attributes" busy={isBusy}>
 
                   {
 

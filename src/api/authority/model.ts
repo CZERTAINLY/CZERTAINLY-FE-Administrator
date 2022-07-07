@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { AttributeDTO } from "api/_common/attributeDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 
@@ -18,6 +18,8 @@ export interface AuthorityManagementApi {
 
    validateRAProfileAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void>;
 
+   listRAProfileAttributesDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]>;
+
    getAuthorityDetail(uuid: string): Observable<AuthorityDTO>;
 
    updateAuthority(uuid: string, attributes: AttributeDTO[]): Observable<AuthorityDTO>;
@@ -29,8 +31,6 @@ export interface AuthorityManagementApi {
    createNewAuthority(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string>;
 
    bulkDeleteAuthority(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
-
-   listRAProfileAttributes(uuid: string): Observable<AttributeDTO[]>;
 
    bulkForceDeleteAuthority(uuids: string[]): Observable<void>;
 

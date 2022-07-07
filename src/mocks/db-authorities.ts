@@ -3,6 +3,7 @@ import { AuthorityDTO } from "api/authority";
 
 
 export interface DbAuthority extends AuthorityDTO {
+   raProfileAttributes: AttributeDescriptorDTO[];
    issueAttributes: AttributeDescriptorDTO[];
    revokeAttributes: AttributeDescriptorDTO[];
 }
@@ -29,6 +30,9 @@ export const dbAuthorities: DbAuthoritiesList = {
             name: "url",
             content: { value: "https://lab01.3key.company/ejbca/ejbcaws/ejbcaws?wsdl" }
          },
+      ],
+
+      raProfileAttributes: [
       ],
 
       issueAttributes: [

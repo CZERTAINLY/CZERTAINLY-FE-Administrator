@@ -11,7 +11,7 @@ import { composeValidators, validateInteger, validatePattern, validateRequired }
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   attribute?: AttributeModel
 }
 
 export function IntegerAttribute({

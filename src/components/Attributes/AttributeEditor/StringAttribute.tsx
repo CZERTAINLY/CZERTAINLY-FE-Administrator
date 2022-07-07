@@ -11,7 +11,7 @@ import { composeValidators, validatePattern, validateRequired } from "utils/vali
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   attribute?: AttributeModel
 }
 
 export function StringAttribute({

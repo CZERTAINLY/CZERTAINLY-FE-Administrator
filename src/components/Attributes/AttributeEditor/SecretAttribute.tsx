@@ -12,7 +12,7 @@ import { actions } from "ducks/alerts";
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   attribute?: AttributeModel
 }
 
 export function SecretAttribute({

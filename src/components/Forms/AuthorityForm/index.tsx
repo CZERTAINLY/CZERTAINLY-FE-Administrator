@@ -119,7 +119,7 @@ export default function AuthorityForm({
 
       (event) => {
 
-         dispatch(authorityActions.cleatAuthorityProviderAttributeDescriptors());
+         dispatch(authorityActions.clearAuthorityProviderAttributeDescriptors());
 
          if (!event.value || !authorityProviders) return;
          const provider = authorityProviders.find(p => p.uuid === event.value);

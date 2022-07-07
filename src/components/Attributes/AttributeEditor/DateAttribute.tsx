@@ -4,7 +4,7 @@ import { AttributeModel } from "models/attributes/AttributeModel";
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   attribute?: AttributeModel
 }
 
 export function DateAttribute({

@@ -5,7 +5,7 @@ import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 
 import { createNewResource } from "utils/net";
-import { AttributeDTO } from "api/_common/attributeDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 import * as model from "./model";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
@@ -106,10 +106,10 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
    }
 
 
-   listRAProfileAttributes(uuid: string): Observable<AttributeDTO[]> {
+   listRAProfileAttributesDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}`, "GET", uuid)
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfile/attributes`, "GET")
       );
 
    }

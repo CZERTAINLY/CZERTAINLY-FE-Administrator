@@ -4,6 +4,7 @@ import { Form, Field } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row, Col } from "reactstrap";
+import Select from "react-select";
 
 import { validateRequired, composeValidators, validateAlphaNumeric, validateCustomIp, validateInteger, validateCustomUrl } from "utils/validators";
 
@@ -15,11 +16,13 @@ import { actions as raProfileActions, selectors as raProfileSelectors } from "du
 
 import { mutators } from "utils/attributeEditorMutators";
 
-import Select from "react-select";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+
 import { collectFormAttributes } from "utils/attributes";
+
+
 
 interface FormValues {
    name: string;
@@ -178,7 +181,7 @@ export default function RaProfileForm({
    );
 
 
-   const onCancel = useCallback(
+   const onCancelClick = useCallback(
 
       () => {
          history.push(`../detail/${params.id}`);
@@ -242,7 +245,6 @@ export default function RaProfileForm({
 
          <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
 
-
             {({ handleSubmit, pristine, submitting, valid }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
@@ -286,7 +288,7 @@ export default function RaProfileForm({
                               {...input}
                               id="description"
                               type="textarea"
-                              placeholder="Description / Comment"
+                              placeholder="Enter Description / Comment"
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
                            />
@@ -681,7 +683,7 @@ export default function RaProfileForm({
                            disabled={pristine || submitting || !valid}
                         />
 
-                        <Button color="default" onClick={onCancel} disabled={submitting}>
+                        <Button color="default" onClick={onCancelClick} disabled={submitting}>
                            Cancel
                         </Button>
 

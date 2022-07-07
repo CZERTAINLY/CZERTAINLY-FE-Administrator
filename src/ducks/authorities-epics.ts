@@ -191,6 +191,50 @@ const getAuthorityProviderAttributesDescriptorsFailure: AppEpic = (action$, stat
 
 
 
+const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getRAProfilesAttributesDescriptors.match
+      ),
+      switchMap(
+         action => deps.apiClients.authorities.listRAProfileAttributesDescriptors(action.payload.authorityUuid).pipe(
+
+            map(
+               descriptors => slice.actions.getRAProfilesAttributesDescriptorsSuccess({
+                  authorityUuid: action.payload.authorityUuid,
+                  attributesDescriptors: descriptors.map(transformAttributeDescriptorDTOToModel)
+               })
+            ),
+            catchError(
+               err => of(slice.actions.getRAProfilesAttributesDescriptorsFailure({ error: extractError(err, "Failed to get RA Profile Attribute Descriptor list") }))
+            )
+
+         )
+
+      )
+
+   );
+
+}
+
+
+const getRAProfilesAttributesDescriptorsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getRAProfilesAttributesDescriptorsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+}
+
 const createAuthority: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -467,6 +511,8 @@ const epics = [
    listAuthorityProvidersFailure,
    getAuthorityProviderAttributesDescriptors,
    getAuthorityProviderAttributesDescriptorsFailure,
+   getRAProfilesAttributesDescriptors,
+   getRAProfilesAttributesDescriptorsFailure,
    createAuthority,
    createAuthoritySuccess,
    createAuthorityFailure,

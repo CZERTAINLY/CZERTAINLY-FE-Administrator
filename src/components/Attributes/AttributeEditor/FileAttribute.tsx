@@ -10,7 +10,7 @@ import { FileAttributeContentModel } from "models/attributes/FileAttributeConten
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   attribute?: AttributeModel
 }
 
 export function FileAttribute({

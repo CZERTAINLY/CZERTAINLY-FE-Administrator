@@ -21,9 +21,11 @@ export type State = {
 
    authorityProviders?: ConnectorModel[];
    authorityProviderAttributeDescriptors?: AttributeDescriptorModel[];
+   raProfileAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingAuthorityProviders: boolean;
    isFetchingAuthorityProviderAttributeDescriptors: boolean;
+   isFetchingRAProfilesAttributesDescriptors: boolean;
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -48,6 +50,7 @@ export const initialState: State = {
 
    isFetchingAuthorityProviders: false,
    isFetchingAuthorityProviderAttributeDescriptors: false,
+   isFetchingRAProfilesAttributesDescriptors: false,
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -91,9 +94,16 @@ export const slice = createSlice({
       },
 
 
-      cleatAuthorityProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
+      clearAuthorityProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
 
          state.authorityProviderAttributeDescriptors = [];
+
+      },
+
+
+      clearRAProfilesAttributesDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.raProfileAttributeDescriptors = [];
 
       },
 
@@ -140,6 +150,28 @@ export const slice = createSlice({
       getAuthorityProviderAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingAuthorityProviderAttributeDescriptors = false;
+
+      },
+
+
+      getRAProfilesAttributesDescriptors: (state, action: PayloadAction<{ authorityUuid: string }>) => {
+
+         state.isFetchingRAProfilesAttributesDescriptors = true;
+
+      },
+
+
+      getRAProfilesAttributesDescriptorsSuccess: (state, action: PayloadAction<{ authorityUuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+
+         state.isFetchingRAProfilesAttributesDescriptors = false;
+         state.raProfileAttributeDescriptors = action.payload.attributesDescriptors;
+
+      },
+
+
+      getRAProfilesAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingRAProfilesAttributesDescriptors = false;
 
       },
 
@@ -372,9 +404,11 @@ const authorityProviderAttributeDescriptors = createSelector(state, state => sta
 
 const authority = createSelector(state, state => state.authority);
 const authorities = createSelector(state, state => state.authorities);
+const raProfileAttributeDescriptors = createSelector(state, state => state.raProfileAttributeDescriptors);
 
 const isFetchingAuthorityProviders = createSelector(state, state => state.isFetchingAuthorityProviders);
 const isFetchingAuthorityProviderAttributeDescriptors = createSelector(state, state => state.isFetchingAuthorityProviderAttributeDescriptors);
+const isFetchingRAProfilesAttributesDescriptors = createSelector(state, state => state.isFetchingRAProfilesAttributesDescriptors);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
@@ -399,9 +433,11 @@ export const selectors = {
 
    authority,
    authorities,
+   raProfileAttributeDescriptors,
 
    isFetchingAuthorityProviders,
    isFetchingAuthorityProviderAttributeDescriptors,
+   isFetchingRAProfilesAttributesDescriptors,
 
    isFetchingList,
    isFetchingDetail,

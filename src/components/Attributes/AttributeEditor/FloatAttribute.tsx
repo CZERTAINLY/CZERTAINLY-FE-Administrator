@@ -11,7 +11,7 @@ import { composeValidators, validateFloat, validatePattern, validateRequired } f
 interface Props {
    id: string;
    descriptor: AttributeDescriptorModel,
-   attribute: AttributeModel
+   attribute?: AttributeModel
 }
 
 export function FloatAttribute({
