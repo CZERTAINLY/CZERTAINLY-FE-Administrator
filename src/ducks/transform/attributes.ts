@@ -1,10 +1,11 @@
 import { AttributeDescriptorDTO, AttributeDTO, AttributeDescriptorCollectionDTO } from "api/_common/attributeDTO";
-import { ConnectorHealthDTO } from "api/connectors";
+import { AttributeCallbackDataDTO, ConnectorHealthDTO } from "api/connectors";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeDescriptorCollectionModel } from "models/attributes/AttributeDescriptorCollectionModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
 import { ConnectorHealthModel, ConnectorHealthPartModel } from "models/connectors";
 import { FunctionGroupCode } from "types/connectors";
+import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
 
 
 export function transformAttributeDTOToModel(attribute: AttributeDTO): AttributeModel {
@@ -109,5 +110,18 @@ export function transformConnectorHealthDTOToModel(health: ConnectorHealthDTO): 
       description: health.description,
       parts
    }
+
+}
+
+
+export function transformAttributeCallbackDataModelToDto(attributeCallbackData: AttributeCallbackDataModel): AttributeCallbackDataDTO {
+
+   return {
+      uuid: attributeCallbackData.uuid,
+      name: attributeCallbackData.name,
+      pathVariables: attributeCallbackData.pathVariable,
+      queryParameters: attributeCallbackData.queryParameter,
+      requestBody: attributeCallbackData.body
+   };
 
 }

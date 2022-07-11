@@ -421,7 +421,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
    }
 
 
-   callback(authorityUuidOrconnectorUuid: string, functionGroupOrRequest: string | model.ConnectorCallbackRequestDTO, kind?: string, request?: model.ConnectorCallbackRequestDTO): Observable<any> {
+   callback(url: string, data: model.AttributeCallbackDataDTO): Observable<any> {
 
       return of([
          {

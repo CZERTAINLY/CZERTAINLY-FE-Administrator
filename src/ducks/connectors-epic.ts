@@ -8,10 +8,8 @@ import { extractError } from "utils/net";
 import { slice } from "./connectors";
 import { actions as alertActions } from "./alerts";
 import { transformConnectorDTOToModel, transformFunctionGroupDTOtoModel } from "./transform/connectors";
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO, transformConnectorHealthDTOToModel, transfromAttributeDescriptorCollectionDTOToModel } from "./transform/attributes";
+import { transformAttributeCallbackDataModelToDto, transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO, transformConnectorHealthDTOToModel, transfromAttributeDescriptorCollectionDTOToModel } from "./transform/attributes";
 import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
-import { ConnectorCallbackRequestDTO } from "api/connectors";
-import { AttributeCallbackMappingTarget } from "types/attributes";
 
 
 const listConnectors: AppEpic = (action$, state, deps) => {
@@ -789,62 +787,20 @@ const callback: AppEpic = (action$, state, deps) => {
 
          action => {
 
-            const targets: { [key in AttributeCallbackMappingTarget]: any } = {
-               pathVariable: {},
-               requestParameter: {},
-               body: {}
-            }
-
-            action.payload.attributeDescriptor.callback?.mappings.forEach(
-
-               mapping => {
-
-                  const value: any = mapping.value || mapping.from;
-
-                  mapping.targets.forEach(
-                     target => {
-                        targets[target][mapping.to] = value
-                     }
-                  )
-
-
-               }
-
-            );
-
-            const data: ConnectorCallbackRequestDTO = {
-               name: action.payload.attributeDescriptor.name,
-               uuid: action.payload.attributeDescriptor.uuid,
-               pathVariables: targets.pathVariable,
-               queryParameters: targets.requestParameter,
-               requestBody: targets.body
-            };
-
-            const key = action.payload.authorityUuid
-               ?
-               `${action.payload.authorityUuid}-${action.payload.attributeDescriptor.name}`
-               :
-               `${action.payload.connectorUuid}-${action.payload.functionGroup}-${action.payload.kind}-${action.payload.attributeDescriptor.name}`;
-            ;
-
             return (
 
-               action.payload.authorityUuid
-                  ?
-                  deps.apiClients.connectors.callback(action.payload.authorityUuid, data)
-                  :
-                  deps.apiClients.connectors.callback(
-                     action.payload.connectorUuid!,
-                     action.payload.functionGroup!,
-                     action.payload.kind!,
-                     data
-                  )
+               deps.apiClients.connectors.callback(
+                  action.payload.url,
+                  transformAttributeCallbackDataModelToDto(action.payload.callbackData)
+               )
 
             ).pipe(
 
                map(
-                  data => slice.actions.callbackSuccess({ callbackDataKey: key, data })
-               )
+                  data => slice.actions.callbackSuccess({ callbackId: action.payload.callbackId, data })
+               ),
+
+               catchError(err => of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId, error: extractError(err, "Connector callback failure") })))
 
             )
 
@@ -852,7 +808,7 @@ const callback: AppEpic = (action$, state, deps) => {
 
       ),
 
-      catchError(err => of(slice.actions.callbackFailure({ error: extractError(err, "Failed to perform connector callback") })))
+      catchError(err => of(slice.actions.callbackFailure({ callbackId: "", error: extractError(err, "Failed to perform connector callback") })))
 
    )
 
@@ -873,7 +829,6 @@ const callbackFailure: AppEpic = (action$, state, deps) => {
    )
 
 }
-
 
 
 const epics = [

@@ -461,13 +461,13 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         {
                            from: "apiUrl",
                            to: "apiUrl",
-                           targets: ["body"]
+                           targets: ["body"],
                         },
                         {
                            from: "apiKey",
                            attributeType: "CREDENTIAL",
                            to: "credentialKind",
-                           targets: ["body"]
+                           targets: ["body"],
                         }
                      ]
                   },
@@ -491,18 +491,18 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
                         {
                            from: "apiUrl",
                            to: "apiUrl",
-                           targets: ["body"]
+                           targets: ["body"],
                         },
                         {
                            from: "project",
                            to: "projectId",
-                           targets: ["pathVariable"]
+                           targets: ["body"],
                         },
                         {
                            from: "apiKey",
                            attributeType: "CREDENTIAL",
                            to: "credentialKind",
-                           targets: ["body"]
+                           targets: ["body"],
                         }
                      ]
                   },

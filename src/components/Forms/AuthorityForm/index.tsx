@@ -387,7 +387,7 @@ export default function AuthorityForm({
                            attributeDescriptors={authorityProviderAttributeDescriptors}
                            attributes={authority?.attributes}
                            connectorUuid={authorityProvider.uuid}
-                           functionGroup={"authorityProvider"}
+                           functionGroupCode={"authorityProvider"}
                            kind={values.storeKind.value}
                         />
                      </>

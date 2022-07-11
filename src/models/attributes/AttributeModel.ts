@@ -5,6 +5,6 @@ export interface AttributeModel {
    uuid?: string;
    name: string;
    label?: string;
-   type?: AttributeType
+   type?: AttributeType;
    content?: AttributeContentModel | AttributeContentModel[];
 }

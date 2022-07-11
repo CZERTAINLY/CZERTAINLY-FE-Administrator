@@ -1,5 +1,6 @@
 import { FunctionGroupCode } from "types/connectors";
-import { AttributeCallbackMappingTarget, AttributeType, AttributeValue } from "types/attributes";
+import { AttributeCallbackMappingTarget_AttributeCallbackModel, AttributeType, AttributeValue } from "types/attributes";
+import { HttpMethod } from "ts-rest-client";
 
 
 export interface AttributeContentDTO {
@@ -12,14 +13,14 @@ export interface AttibuteCallbackMappingDTO {
    from?: string;
    attributeType?: AttributeType;
    to: string;
-   targets: AttributeCallbackMappingTarget[];
+   targets: AttributeCallbackMappingTarget_AttributeCallbackModel[];
    value?: any;
 }
 
 
 export interface AttributeCallbackDescriptorDTO {
    callbackContext: string;
-   callbackMethod: string;
+   callbackMethod: HttpMethod;
    mappings: AttibuteCallbackMappingDTO[];
 }
 
@@ -68,7 +69,7 @@ export interface AttributeDTO {
    uuid?: string;
    name: string;
    label?: string;
-   type?: AttributeType
+   type?: AttributeType;
    content?: AttributeContentDTO;
 }
 

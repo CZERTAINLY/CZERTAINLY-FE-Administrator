@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Form, Field } from "react-final-form";
-import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
 
 import ProgressButton from "components/ProgressButton";
 

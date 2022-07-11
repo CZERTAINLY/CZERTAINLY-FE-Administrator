@@ -116,9 +116,20 @@ export default function RaProfileForm({
 
 
    const onSubmit = useCallback(
-      () => {
+
+      (values: FormValues) => {
+
+         const attributeValues = collectFormAttributes(
+            "ra-profile",
+            raProfileAttributeDescriptors,
+            values
+         );
+
+         return attributeValues;
+
       },
-      []
+      [raProfileAttributeDescriptors]
+
    );
 
 
@@ -236,7 +247,8 @@ export default function RaProfileForm({
 
                   {!raProfileAttributeDescriptors ? <></> : (
                      <AttributeEditor
-                        id="ra-profile-attributes"
+                        id="ra-profile"
+                        authorityUuid={raProfile?.authorityInstanceUuid}
                         attributeDescriptors={raProfileAttributeDescriptors}
                         attributes={raProfile?.attributes}
                      />

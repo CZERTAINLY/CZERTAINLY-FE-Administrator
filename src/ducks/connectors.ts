@@ -9,6 +9,8 @@ import { AuthType, FunctionGroupCode } from "types/connectors";
 import { ConnectorHealthModel, ConnectorModel, FunctionGroupModel } from "models/connectors";
 
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
+import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 
 
 export type State = {
@@ -41,7 +43,7 @@ export type State = {
    isBulkReconnecting: boolean;
    isAuthorizing: boolean;
    isBulkAuthorizing: boolean;
-   isRunningCallback: boolean;
+   isRunningCallback: { [key: string]: boolean };
 
 };
 
@@ -72,7 +74,7 @@ export const initialState: State = {
    isBulkReconnecting: false,
    isAuthorizing: false,
    isBulkAuthorizing: false,
-   isRunningCallback: false
+   isRunningCallback: {}
 
 };
 
@@ -551,37 +553,29 @@ export const slice = createSlice({
 
 
       callback: (state, action: PayloadAction<{
-         authorityUuid?: string,
-         connectorUuid?: string,
-         functionGroup?: FunctionGroupCode,
-         kind?: string,
-         attributeDescriptor: AttributeDescriptorModel
+         callbackId: string,
+         url: string,
+         callbackData: AttributeCallbackDataModel,
       }>) => {
 
-         const key = action.payload.authorityUuid
-            ?
-            `${action.payload.authorityUuid}-${action.payload.attributeDescriptor.name}`
-            :
-            `${action.payload.connectorUuid}-${action.payload.functionGroup}-${action.payload.kind}-${action.payload.attributeDescriptor.name}`;
-         ;
+         if (state.callbackData[action.payload.callbackId]) state.callbackData[action.payload.callbackId] = undefined;
 
-         if (state.callbackData[key]) state.callbackData[key] = undefined;
-
-         state.isRunningCallback = true;
+         state.isRunningCallback[action.payload.callbackId] = true;
 
       },
 
 
-      callbackSuccess: (state, action: PayloadAction<{ callbackDataKey: string, data: any }>) => {
+      callbackSuccess: (state, action: PayloadAction<{ callbackId: string, data: AttributeContentModel | AttributeContentModel[] }>) => {
 
-         state.callbackData[action.payload.callbackDataKey] = action.payload.data;
-         state.isRunningCallback = false;
+         state.callbackData[action.payload.callbackId] = action.payload.data;
+         state.isRunningCallback[action.payload.callbackId] = false;
+
       },
 
 
-      callbackFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      callbackFailure: (state, action: PayloadAction<{ callbackId: string, error: string | undefined }>) => {
 
-         state.isRunningCallback = false;
+         state.isRunningCallback[action.payload.callbackId] = false;
       }
 
 

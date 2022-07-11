@@ -51,12 +51,12 @@ export interface ConnectorHealthDTO {
 }
 
 
-export interface ConnectorCallbackRequestDTO {
+export interface AttributeCallbackDataDTO {
    uuid: string,
    name: string,
-   pathVariables: any,
-   queryParameters: any,
-   requestBody: any
+   pathVariables: { [key: string]: any },
+   queryParameters: { [key: string]: any },
+   requestBody: { [key: string]: any }
 }
 
 
@@ -92,7 +92,6 @@ export interface ConnectorManagementApi {
 
    bulkAuthorizeConnectors(uuids: string[]): Observable<void>;
 
-   callback(authorityUuid: string, request: ConnectorCallbackRequestDTO): Observable<any>;
-   callback(connectorUuid: string, FunctionGroup: string, kind: string, request: ConnectorCallbackRequestDTO): Observable<any>;
+   callback(url: string, data: AttributeCallbackDataDTO): Observable<any>;
 
 }

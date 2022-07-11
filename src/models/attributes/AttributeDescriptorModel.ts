@@ -1,5 +1,5 @@
 import { AttributeType } from "types/attributes";
-import { AttributeCallbackDescriptorModel } from "./AttributeCallbackDescriptorModel";
+import { AttributeDescriptorCallbackModel } from "./AttributeDescriptorCallbackModel";
 import { AttributeContentModel } from "./AttributeContentModel";
 
 export interface AttributeDescriptorModel {
@@ -15,6 +15,6 @@ export interface AttributeDescriptorModel {
    list: boolean;
    multiSelect: boolean;
    validationRegex?: RegExp;
-   callback?: AttributeCallbackDescriptorModel;
+   callback?: AttributeDescriptorCallbackModel;
    content?: AttributeContentModel | AttributeContentModel[];
 }
