@@ -11,7 +11,7 @@ import { composeValidators, validateRequired } from "utils/validators";
 interface Props {
    name: string;
    descriptor: AttributeDescriptorModel | undefined;
-   options?: { labe: string, value: any }[];
+   options?: { label: string, value: any }[];
 }
 
 
@@ -133,7 +133,6 @@ export function Attribute({
             {({ input, meta }) => (
 
                <>
-
 
                   {
                      descriptor.visible ? (

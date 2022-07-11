@@ -44,6 +44,9 @@ export default function AttributeEditor({
 
    const callbackData = useSelector(connectorSelectors.callbackData);
 
+   // stores options for selects from the attribute descriptor content and is updated by callbacks
+   const [_callbackData, _setCallbackData] = useState<{ [callbackId: string]: AttributeContentModel[] }>({});
+
    const [_previousCallbackData, _setPreviousCallbackData] = useState<{ [urlid: string]: any }>({});
 
 
@@ -135,7 +138,7 @@ export default function AttributeEditor({
 
          const formAttributes = !(formState.values[`__attributes__${id}__`]) ? undefined : formState.values[`__attributes__${id}__`];
          const formMappingName = mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : "";
-         const formAttribute = formAttributes ? Object.keys(formAttributes).find(key => key.startsWith(`${formMappingName}:`)) : undefined;
+         const formAttribute = formAttributes ? Object.keys(formAttributes).find(key => key.startsWith(`${formMappingName}`)) : undefined;
 
          // only lists are supported now, because of this the 'value' is added to the path as the list selected option is { label: "", value: "" }
          const formMappingPath = mapping.from ? mapping.from.includes(".") ? "value." + mapping.from.split(".").slice(1).join(".") : "value" : "value";
@@ -208,7 +211,7 @@ export default function AttributeEditor({
                callbackData.uuid = descriptor.uuid;
                callbackData.name = descriptor.name;
 
-               const callbackId = authorityUuid ? `${authorityUuid}-${descriptor.name}` : `${connectorUuid}-${functionGroupCode}-${kind}-${descriptor.name}`;
+               const callbackId = `__attributes__${id}__.${descriptor.name}`;
 
                const url = authorityUuid
                   ?
@@ -247,7 +250,7 @@ export default function AttributeEditor({
          if (updatePrevCbData) setPreviousCallbackData(prevCbData);
 
       },
-      [attributeDescriptors, authorityUuid, buildCallbackMappings, connectorUuid, dispatch, functionGroupCode, kind, previousCallbackData, setPreviousCallbackData]
+      [attributeDescriptors, authorityUuid, buildCallbackMappings, connectorUuid, dispatch, functionGroupCode, id, kind, previousCallbackData, setPreviousCallbackData]
 
    )
 
@@ -281,22 +284,25 @@ export default function AttributeEditor({
 
 
    /**
-    * Obtains values from attribute callbacks and prepares options for the select inputs
+    * Obtains values from attribute callbacks prepares options for the selects
     */
    useEffect(
 
       () => {
 
-         console.log("Callback data: ", callbackData);
+         for (const callbackId in callbackData) {
+            if (callbackData[callbackId] !== _callbackData[callbackId]) _setCallbackData({ ..._callbackData, [callbackId]: callbackData[callbackId] });
+         }
 
       },
-      [callbackData]
+      [callbackData, _callbackData]
 
    )
 
 
    /**
-    * Setups final form values and initial values for attributes
+    * Setups "static"options for selects
+    * Setups final form values and initial values and for attributes
     */
    useEffect(
 
@@ -306,9 +312,20 @@ export default function AttributeEditor({
 
             descriptor => {
 
-               const attribute = attributes.find(a => a.name === descriptor.name);
-
                const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+
+               if (descriptor.list && Array.isArray(descriptor.content) && !_callbackData[formAttributeName]) {
+
+                  _setCallbackData({
+                     ..._callbackData,
+                     [formAttributeName]: descriptor.content
+                  })
+
+               }
+
+               if (formState.values[`__attributes__${id}__`] !== undefined && formState.values[`__attributes__${id}__`][descriptor.name] !== undefined) return;
+
+               const attribute = attributes.find(a => a.name === descriptor.name);
 
                if (descriptor.type === "FILE") {
 
@@ -382,7 +399,7 @@ export default function AttributeEditor({
          )
 
       },
-      [attributeDescriptors, attributes, form.mutators, id]
+      [attributeDescriptors, attributes, form.mutators, id, _callbackData, formState.values]
 
    )
 
@@ -398,7 +415,6 @@ export default function AttributeEditor({
 
          const attrs: JSX.Element[] = [];
 
-
          for (const group in groupedAttributesDescriptors) attrs.push(
 
             <Widget key={group} title={<h6>{group === "__" ? "" : group}</h6>}>
@@ -411,7 +427,10 @@ export default function AttributeEditor({
 
                         <div key={descriptor.name}>
 
-                           <Attribute name={`__attributes__${id}__.${descriptor.name}`} descriptor={descriptor} />
+                           <Attribute
+                              name={`__attributes__${id}__.${descriptor.name}`}
+                              descriptor={descriptor}
+                              options={_callbackData[`__attributes__${id}__.${descriptor.name}`]?.map(data => ({ label: data.value.toString(), value: data.value })) } />
 
                         </div>
 
@@ -451,7 +470,7 @@ export default function AttributeEditor({
          return attrs;
 
       },
-      [attributes, formState.values, groupedAttributesDescriptors, id]
+      [attributes, formState.values, groupedAttributesDescriptors, id, _callbackData]
 
    );
 

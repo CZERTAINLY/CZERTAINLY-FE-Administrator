@@ -1,5 +1,5 @@
 import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import history from "browser-history";
 
 import { AppEpic } from "ducks";
@@ -783,28 +783,24 @@ const callback: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.callback.match
       ),
-      switchMap(
+      mergeMap(
 
-         action => {
+         action => deps.apiClients.connectors.callback(
 
-            return (
+            action.payload.url,
+            transformAttributeCallbackDataModelToDto(action.payload.callbackData)
 
-               deps.apiClients.connectors.callback(
-                  action.payload.url,
-                  transformAttributeCallbackDataModelToDto(action.payload.callbackData)
-               )
+         ).pipe(
 
-            ).pipe(
+            map(
+               data => {
+                  return slice.actions.callbackSuccess({ callbackId: action.payload.callbackId, data })
+               }
+            ),
 
-               map(
-                  data => slice.actions.callbackSuccess({ callbackId: action.payload.callbackId, data })
-               ),
+            catchError(err => of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId, error: extractError(err, "Connector callback failure") })))
 
-               catchError(err => of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId, error: extractError(err, "Connector callback failure") })))
-
-            )
-
-         }
+         )
 
       ),
 
