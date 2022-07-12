@@ -116,6 +116,12 @@ export const slice = createSlice({
       },
 
 
+      clearCallbackData: (state, action: PayloadAction<void>) => {
+
+         state.callbackData = {};
+
+      },
+
       listConnectors: (state, action: PayloadAction<void>) => {
 
          state.checkedRows = [];

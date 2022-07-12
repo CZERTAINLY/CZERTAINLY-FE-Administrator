@@ -6,20 +6,24 @@ export const composeValidators = (...validators: any[]) => (value: string) =>
 export const validateRequired = () => (value: any) => value ? undefined : "Required Field";
 
 export const validatePattern = (pattern: RegExp, message?: string) =>
-   (value: any) =>
-      !value || pattern.test(value)
+   (value: any) => {
+      return !value || pattern.test(value)
          ? undefined
          : message || `Value must conform to ${pattern}`;
+   }
 
 export const validateInteger = () => validatePattern(/^[+-]?(\d*)$/, "Value must be an integer");
 
 export const validateFloat = () => validatePattern(/^[+-]?(\d*[.])?\d+$/, "Value must be a float without an exponent.");
 
-export const validateAlphaNumeric = () =>
-   validatePattern(
+export const validateAlphaNumeric = () => {
+
+   return validatePattern(
       /^([a-zA-Z0-9À-ž]+([ '-/][a-zA-Z0-9À-ž]+)*)+$/,
       "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe or slash"
    );
+
+}
 
 export const validateEmail = () =>
    validatePattern(

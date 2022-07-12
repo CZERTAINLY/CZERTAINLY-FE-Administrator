@@ -293,6 +293,8 @@ export default function RaProfileForm({
                               invalid={!!meta.error && meta.touched}
                            />
 
+                           <FormFeedback>{meta.error}</FormFeedback>
+
                         </FormGroup>
 
                      )}

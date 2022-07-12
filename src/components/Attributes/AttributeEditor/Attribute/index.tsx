@@ -126,8 +126,6 @@ export function Attribute({
 
    const createSelect = (descriptor: AttributeDescriptorModel): JSX.Element => {
 
-      console.log(descriptor.name, options);
-
       return (
 
          <Field name={name} validate={buildValidators()} type={type[descriptor.type]}>
@@ -336,7 +334,7 @@ export function Attribute({
 
                   {
                      descriptor.visible && descriptor.type === "BOOLEAN" ? (
-                        <Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
+                        <>&nbsp;<Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label></>
                      ) : <></>
                   }
 
