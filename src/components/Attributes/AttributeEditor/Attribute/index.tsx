@@ -126,6 +126,8 @@ export function Attribute({
 
    const createSelect = (descriptor: AttributeDescriptorModel): JSX.Element => {
 
+      console.log(descriptor.name, options);
+
       return (
 
          <Field name={name} validate={buildValidators()} type={type[descriptor.type]}>
@@ -140,7 +142,7 @@ export function Attribute({
                      ) : <></>
                   }
 
-                  < Select
+                  <Select
                      {...input}
                      maxMenuHeight={140}
                      menuPlacement="auto"
@@ -186,7 +188,7 @@ export function Attribute({
 
             {
                descriptor.visible ? (
-                  <Label for={`${name}.value`}>{descriptor.label}{descriptor.required ? "* " : ""}</Label>
+                  <Label for={`${name}.value`}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
                ) : <></>
             }
 
@@ -196,7 +198,7 @@ export function Attribute({
 
                   <div style={{ flexGrow: 1 }}>
 
-                     <Label for={`${name}.value`}>File content</Label>
+                     <Label for={`${name}-value`}>File content</Label>
 
                      <Field name={`${name}.value`} validate={buildValidators()} type={type[descriptor.type]}>
 
@@ -206,7 +208,7 @@ export function Attribute({
 
                               <Input
                                  {...input}
-                                 id={`${name}.value`}
+                                 id={`${name}-value`}
                                  valid={!meta.error && meta.touched}
                                  invalid={!!meta.error && meta.touched}
                                  type={descriptor.visible ? "text" : "hidden"}
@@ -223,7 +225,7 @@ export function Attribute({
 
                      </Field>
 
-                     <FormText color={descriptor.required ? "dark" : undefined}>{descriptor.required ? "* " : ""}{descriptor.description}</FormText>
+                     <FormText color={descriptor.required ? "dark" : undefined}>{descriptor.description}</FormText>
 
                   </div>
 
@@ -232,7 +234,7 @@ export function Attribute({
 
                   <div style={{ width: "13rem" }}>
 
-                     <Label for={`${name}.contentType`}>Content type</Label>
+                     <Label for={`${name}-contentType`}>Content type</Label>
 
                      <Field name={`${name}.contentType`}>
 
@@ -240,7 +242,7 @@ export function Attribute({
 
                            <Input
                               {...input}
-                              id={`${name}.contentType`}
+                              id={`${name}-contentType`}
                               type={descriptor.visible ? "text" : "hidden"}
                               placeholder="File not selected"
                               disabled={true}
@@ -257,7 +259,7 @@ export function Attribute({
 
                   <div style={{ width: "10rem" }}>
 
-                     <Label for={`${name}.fileName`}>File name</Label>
+                     <Label for={`${name}-fileName`}>File name</Label>
 
                      <Field name={`${name}.fileName`}>
 
@@ -265,7 +267,7 @@ export function Attribute({
 
                            <Input
                               {...input}
-                              id={`${name}.fileName`}
+                              id={`${name}-fileName`}
                               type={descriptor.visible ? "text" : "hidden"}
                               placeholder="File not selected"
                               disabled={true}
@@ -282,11 +284,11 @@ export function Attribute({
 
                   <div>
 
-                     <Label for="input-file">&nbsp;</Label><br />
+                     <Label for={name}>&nbsp;</Label><br />
 
-                     <Label className="btn btn-default" for="input-file" style={{ margin: 0 }}>Select file...</Label>
+                     <Label className="btn btn-default" for={name} style={{ margin: 0 }}>Select file...</Label>
 
-                     <Input id="input-file" type="file" style={{ display: "none" }} onChange={onFileChanged} />
+                     <Input id={name} type="file" style={{ display: "none" }} onChange={onFileChanged} />
 
                   </div>
 
@@ -318,7 +320,7 @@ export function Attribute({
 
                   {
                      descriptor.visible && descriptor.type !== "BOOLEAN" ? (
-                        <Label for={name}>&nbsp;{descriptor.label}{descriptor.required ? "* " : ""}</Label>
+                        <Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
                      ) : <></>
                   }
 
@@ -334,7 +336,7 @@ export function Attribute({
 
                   {
                      descriptor.visible && descriptor.type === "BOOLEAN" ? (
-                        <Label for={name}>&nbsp;{descriptor.label}{descriptor.required ? "* " : ""}</Label>
+                        <Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
                      ) : <></>
                   }
 

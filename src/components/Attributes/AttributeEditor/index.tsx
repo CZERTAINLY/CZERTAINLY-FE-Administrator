@@ -16,6 +16,11 @@ import { Attribute } from "./Attribute";
 import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
 
 
+// same empty array is used to prevent re-rendering of the component
+// !!! never modify the attributes field inside of the component !!!
+const emptyAttributes: AttributeModel[] = [];
+
+
 interface Props {
    id: string;
    attributeDescriptors: AttributeDescriptorModel[];
@@ -30,7 +35,7 @@ interface Props {
 export default function AttributeEditor({
    id,
    attributeDescriptors,
-   attributes = [],
+   attributes = emptyAttributes,
    authorityUuid,
    connectorUuid,
    functionGroupCode,
@@ -42,39 +47,23 @@ export default function AttributeEditor({
    const form = useForm();
    const formState = useFormState();
 
+   // data from callbacks
    const callbackData = useSelector(connectorSelectors.callbackData);
 
-   // stores options for selects from the attribute descriptor content and is updated by callbacks
-   const [_callbackData, _setCallbackData] = useState<{ [callbackId: string]: AttributeContentModel[] }>({});
+   // used to check if descritors have changed
+   const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModel[]>();
 
-   const [_previousCallbackData, _setPreviousCallbackData] = useState<{ [urlid: string]: any }>({});
+   // used to check if attributes have changed
+   const [prevAttributes, setPrevAttributes] = useState<AttributeModel[]>();
 
+   // options for selects
+   const [options, setOptions] = useState<{ [attributeName: string]: { label: string, value: any }[] }>({});
 
-   /** Helper to have the stata avaialbe during the current call */
-   let previousCallbackData = _previousCallbackData;
-   const setPreviousCallbackData = useCallback(
+   // stores previous values of form in order to be possible to detect attribute changes
+   const [previousFormValues, setPreviousFormValues] = useState<{ [name: string]: any }>({});
 
-      (data: { [urlid: string]: any }) => {
-         // eslint-disable-next-line react-hooks/exhaustive-deps
-         previousCallbackData = data;
-         _setPreviousCallbackData(data);
-      },
-      [_setPreviousCallbackData]
-
-   );
-
-
-   /**
-    * Clean form attributes and previous form state when attribute descriptors or attributes are changed
-    */
-   useEffect(
-      () => {
-         // variables are passed just to prevent linting error, otherwise they are unused
-         form.mutators.clearAttributes(attributeDescriptors, attributes);
-         setPreviousCallbackData({});
-      },
-      [attributeDescriptors, attributes, form.mutators, setPreviousCallbackData]
-   );
+   // stores previous callback data in order to be possible to detect what data changed
+   const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any; }>({});
 
 
    /**
@@ -157,7 +146,7 @@ export default function AttributeEditor({
     * Builds mappingg of values taken from the form, attribute or attribute descriptor
     * for the callback as defined by the API
     */
-   const buildCallbackMappings = useCallback(
+   const buildDynamicCallbackMappings = useCallback(
 
       (descriptor: AttributeDescriptorModel): AttributeCallbackDataModel => {
 
@@ -188,69 +177,42 @@ export default function AttributeEditor({
 
 
    /**
-    * Performs the attribute callback on first render or when the form attribute values changes
-    * Unfortunately, this effect is called everytime any of the form values changes so performance is not as good as it could be
-    * On the first render, all callback has to be called
-    * On other renders just those callback with the 'from' mapping defined and only when for the particulat form attribute values changes
+    * Builds mappings for callback from the attribute descriptor
     */
-   useEffect(
+   const buildStaticCallbackMappings = useCallback(
 
-      () => {
+      (descriptor: AttributeDescriptorModel): AttributeCallbackDataModel | undefined => {
 
-         const prevCbData = { ...previousCallbackData };
-         let updatePrevCbData: boolean = false;
+         let isDynamicMapping = false;
 
-         attributeDescriptors.forEach(
+         const data: AttributeCallbackDataModel = {
+            uuid: "",
+            name: "",
+            pathVariable: {},
+            queryParameter: {},
+            body: {}
+         };
 
-            descriptor => {
+         descriptor.callback?.mappings.forEach(
 
-               if (!descriptor.callback) return;
+            mapping => {
 
-               const callbackData = buildCallbackMappings(descriptor);
+               if (mapping.from) isDynamicMapping = true;
 
-               callbackData.uuid = descriptor.uuid;
-               callbackData.name = descriptor.name;
-
-               const callbackId = `__attributes__${id}__.${descriptor.name}`;
-
-               const url = authorityUuid
-                  ?
-                  `${authorityUuid}/callback`
-                  :
-                  `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                  ;
-
-
-               const callbackDataStringified = JSON.stringify(callbackData);
-
-               if (previousCallbackData[callbackId + url] !== callbackDataStringified) {
-
-                  let send = true;
-
-                  for (const v in callbackData.pathVariable) if (callbackData.pathVariable[v] === undefined) send = false;
-                  for (const v in callbackData.queryParameter) if (callbackData.queryParameter[v] === undefined) send = false;
-                  for (const v in callbackData.body) if (callbackData.body[v] === undefined) send = false;
-
-                  if (send) dispatch(connectorActions.callback({
-                     callbackId,
-                     url,
-                     callbackData
-                  }));
-
-
-                  prevCbData[callbackId + url] = callbackDataStringified;
-                  updatePrevCbData = true;
-
-               }
+               mapping.targets.forEach(
+                  target => {
+                     data[target][mapping.to] = mapping.value
+                  }
+               )
 
             }
 
          );
 
-         if (updatePrevCbData) setPreviousCallbackData(prevCbData);
+         return isDynamicMapping ? undefined : data;
 
       },
-      [attributeDescriptors, authorityUuid, buildCallbackMappings, connectorUuid, dispatch, functionGroupCode, id, kind, previousCallbackData, setPreviousCallbackData]
+      []
 
    )
 
@@ -284,29 +246,33 @@ export default function AttributeEditor({
 
 
    /**
-    * Obtains values from attribute callbacks prepares options for the selects
+    * Clean form attributes and previous form state whenever passed attribute descriptors or attributes changed
     */
    useEffect(
-
       () => {
 
-         for (const callbackId in callbackData) {
-            if (callbackData[callbackId] !== _callbackData[callbackId]) _setCallbackData({ ..._callbackData, [callbackId]: callbackData[callbackId] });
-         }
+         // variables are passed just to prevent linting error, they are unused in the clearAttributes function
+         form.mutators.clearAttributes(attributeDescriptors, attributes);
 
       },
-      [callbackData, _callbackData]
-
-   )
+      [attributeDescriptors, attributes, form.mutators]
+   );
 
 
    /**
-    * Setups "static"options for selects
-    * Setups final form values and initial values and for attributes
+    * Called on first render
+    * Setups final form values and initial values (based on descriptors and attributes passed)
+    * Setups "static" options for selects from the attribute descriptors
+    * Performs initial callbacks
     */
    useEffect(
 
       () => {
+
+         // run this effect only when attribute descripotors or attributes changed
+         if (attributeDescriptors === prevDescriptors && attributes === prevAttributes) return;
+
+         let newOptions: { [attributeName: string]: { label: string; value: any; }[] } = {};
 
          attributeDescriptors.forEach(
 
@@ -314,18 +280,53 @@ export default function AttributeEditor({
 
                const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
-               if (descriptor.list && Array.isArray(descriptor.content) && !_callbackData[formAttributeName]) {
+               const attribute = attributes.find(a => a.name === descriptor.name);
 
-                  _setCallbackData({
-                     ..._callbackData,
-                     [formAttributeName]: descriptor.content
-                  })
+
+               // Build "static" options from the descriptor
+
+               if (descriptor.list && Array.isArray(descriptor.content)) {
+
+                  newOptions = { ...newOptions, [formAttributeName]: descriptor.content.map(data => ({ label: data.value as string, value: data })) };
 
                }
 
-               if (formState.values[`__attributes__${id}__`] !== undefined && formState.values[`__attributes__${id}__`][descriptor.name] !== undefined) return;
 
-               const attribute = attributes.find(a => a.name === descriptor.name);
+               // Perform initial callbacks based on "static" mappings
+
+               if (descriptor.callback) {
+
+                  const mappings = buildStaticCallbackMappings(descriptor);
+
+                  if (mappings) {
+
+                     console.log(mappings);
+
+                     mappings.name = descriptor.name;
+                     mappings.uuid = descriptor.uuid;
+
+                     const url = authorityUuid
+                        ?
+                        `${authorityUuid}/callback`
+                        :
+                        `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
+                        ;
+
+                     dispatch(
+
+                        connectorActions.callback({
+                           callbackId: formAttributeName,
+                           url,
+                           callbackData: mappings
+                        })
+
+                     );
+
+                  }
+
+               }
+
+               // Set initial values from the attribute
 
                if (descriptor.type === "FILE") {
 
@@ -346,6 +347,7 @@ export default function AttributeEditor({
                   return;
 
                }
+
 
                let formAttributeValue = undefined;
 
@@ -398,15 +400,178 @@ export default function AttributeEditor({
 
          )
 
+         setOptions({ ...options, ...newOptions });
+
+         setPrevDescriptors(attributeDescriptors);
+         setPrevAttributes(attributes);
+
       },
-      [attributeDescriptors, attributes, form.mutators, id, _callbackData, formState.values]
+      [id, attributeDescriptors, attributes, form.mutators, buildStaticCallbackMappings, options, dispatch, authorityUuid, connectorUuid, functionGroupCode, kind, prevDescriptors, prevAttributes]
 
    )
 
+
+   /**
+    * Called on every form change
+    * Evaluates changed attributes and eventually performs a callback whenever necessary
+    */
+   useEffect(
+
+      () => {
+
+         if (previousFormValues === formState.values) return;
+
+         const changedAttributes: { [name: string]: { previous: any, current: any } } = {};
+
+         for (const key in formState.values) {
+
+            if (key.startsWith("__attributes__")) {
+
+               for (const attrKey in formState.values[key]) {
+
+                  if (previousFormValues[key] === undefined || previousFormValues[key][attrKey] === undefined || previousFormValues[key][attrKey] !== formState.values[key][attrKey]) {
+
+                     changedAttributes[attrKey] = {
+                        previous: previousFormValues[key] !== undefined && previousFormValues[key][attrKey] !== undefined ? previousFormValues[key][attrKey] : undefined,
+                        current: formState.values[key][attrKey]
+                     }
+
+                  }
+
+               }
+
+            }
+
+         }
+
+         if (Object.keys(changedAttributes).length > 0) {
+            console.group("Attributes changed");
+            console.log(changedAttributes);
+            console.groupEnd();
+         }
+
+         setPreviousFormValues(formState.values);
+
+      },
+      [previousFormValues, formState.values]
+
+   );
+
+
+   /**
+    * Called on first render
+    * Fills the form with passed attribute values
+    * "Static callbacks" for predefined values are performed
+    * If attributes were passed to the attribute form, "dynamic callbacks" are performed
+    */
+   /*useEffect(
+
+      () => {
+
+         attributeDescriptors.forEach(
+
+            descriptor => {
+
+               if (!descriptor.callback) return;
+
+               const callbackData = buildCallbackMappings(descriptor);
+
+               callbackData.uuid = descriptor.uuid;
+               callbackData.name = descriptor.name;
+
+               const callbackId = `__attributes__${id}__.${descriptor.name}`;
+
+               const url = authorityUuid
+                  ?
+                  `${authorityUuid}/callback`
+                  :
+                  `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
+                  ;
+
+
+               const callbackDataStringified = JSON.stringify(callbackData);
+
+               if (previousCallbackData[callbackId + url] !== callbackDataStringified) {
+
+                  let send = true;
+
+                  for (const v in callbackData.pathVariable) if (callbackData.pathVariable[v] === undefined) send = false;
+                  for (const v in callbackData.queryParameter) if (callbackData.queryParameter[v] === undefined) send = false;
+                  for (const v in callbackData.body) if (callbackData.body[v] === undefined) send = false;
+
+                  if (send) {
+
+                     form.mutators.setAttribute(`__attributes__${id}__.${descriptor.name}`, undefined);
+
+                     dispatch(
+
+                        connectorActions.callback({
+                           callbackId,
+                           url,
+                           callbackData
+                        })
+
+                     );
+
+                  }
+
+
+                  prevCbData[callbackId + url] = callbackDataStringified;
+                  updatePrevCbData = true;
+
+               }
+
+            }
+
+         );
+
+         if (updatePrevCbData) setPreviousCallbackData(prevCbData);
+
+      },
+      [id, functionGroupCode, kind, authorityUuid, attributeDescriptors, connectorUuid]
+
+   )*/
+
+
+
+
+   /**
+    * Obtains values from attribute callbacks and updates the form values / options accordingly
+    */
+   useEffect(
+
+      () => {
+
+         if (previousCallbackData === callbackData) return;
+
+         for (const callbackId in callbackData) {
+
+            if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
+
+            console.log("Callback data changed", callbackId, callbackData[callbackId]);
+
+            // Update options
+
+            if (Array.isArray(callbackData[callbackId])) {
+               setOptions({ ...options, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) });
+            }
+
+            // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
+
+         }
+
+         setPreviousCallbackData(callbackData);
+
+      },
+      [callbackData, options, previousCallbackData]
+
+   )
+
+
+
+
    /*
       Attribute Form Rendering
-      All values are stored in the final form state already
-      Options for selects are prepared in the useEffect hook above
    */
 
    const attrs = useMemo(
@@ -430,30 +595,7 @@ export default function AttributeEditor({
                            <Attribute
                               name={`__attributes__${id}__.${descriptor.name}`}
                               descriptor={descriptor}
-                              options={_callbackData[`__attributes__${id}__.${descriptor.name}`]?.map(data => ({ label: data.value.toString(), value: data.value })) } />
-
-                        </div>
-
-                     )
-
-                  )
-
-               }
-
-
-               <pre>{JSON.stringify(formState.values, null, 3)}</pre>
-
-               {
-                  groupedAttributesDescriptors[group].map(
-
-                     descriptor => (
-
-                        <div key={`__${descriptor.name}`}>
-
-                           <hr />
-                           <pre>id={id}</pre>
-                           <pre>descriptor={JSON.stringify(descriptor, null, 3)}</pre>
-                           <pre>attribute={JSON.stringify(attributes.find(a => a.name === descriptor.name), null, 3)}</pre>
+                              options={options[`__attributes__${id}__.${descriptor.name}`]} />
 
                         </div>
 
@@ -470,7 +612,7 @@ export default function AttributeEditor({
          return attrs;
 
       },
-      [attributes, formState.values, groupedAttributesDescriptors, id, _callbackData]
+      [id, groupedAttributesDescriptors, options]
 
    );
 

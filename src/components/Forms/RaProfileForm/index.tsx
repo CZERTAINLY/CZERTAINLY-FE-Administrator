@@ -67,6 +67,7 @@ export default function RaProfileForm({
 
       () => {
          dispatch(authoritiesActions.listAuthorities());
+         dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
          if (editMode) dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
       },
       [dispatch, editMode, params.id]
