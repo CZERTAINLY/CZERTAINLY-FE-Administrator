@@ -23,6 +23,9 @@ import { FormApi } from "final-form";
 
 
 interface FormValues {
+   name: string;
+   description: string;
+   authority: { value: any; label: string } | undefined;
 }
 
 interface Props {
@@ -93,7 +96,7 @@ export default function RaProfileForm({
 
    const onAuthorityChange = useCallback(
 
-      (authorityUuid: string, form: FormApi) => {
+      (authorityUuid: string, form: FormApi<FormValues>) => {
 
          form.mutators.clearAttributes();
          if (raProfile) setRaProfile({ ...raProfile, attributes: [] });
@@ -120,16 +123,33 @@ export default function RaProfileForm({
 
       (values: FormValues) => {
 
-         const attributeValues = collectFormAttributes(
-            "ra-profile",
-            raProfileAttributeDescriptors,
-            values
-         );
+         if (editMode) {
 
-         return attributeValues;
+            dispatch(
+               raProfilesActions.updateRaProfile({
+                  profileUuid: params.id,
+                  authorityInstanceUuid: values.authority!.value,
+                  enabled: raProfile!.enabled,
+                  description: values.description,
+                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+               })
+            );
+
+         } else {
+
+            dispatch(
+               raProfilesActions.createRaProfile({
+                  name: values.name,
+                  description: values.description,
+                  authorityInstanceUuid: values.authority!.value,
+                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+               })
+            );
+
+         }
 
       },
-      [raProfileAttributeDescriptors]
+      [dispatch, editMode, params.id, raProfile, raProfileAttributeDescriptors]
 
    );
 
