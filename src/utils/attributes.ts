@@ -63,7 +63,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: parseInt(lv.value) }));
                else
-                  content = { value: parseInt(attributes[attribute].value) }
+                  content = { value: parseInt(attributes[attribute].value.value) }
             } else {
                content = { value: parseInt(attributes[attribute]) };
             }
@@ -74,7 +74,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: parseFloat(lv.value) }));
                else
-                  content = { value: parseFloat(attributes[attribute].value) }
+                  content = { value: parseFloat(attributes[attribute].value.value) }
             } else {
                content = { value: parseFloat(attributes[attribute]) };
             }
@@ -85,7 +85,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
                else
-                  content = { value: attributes[attribute].value }
+                  content = { value: attributes[attribute].value.value };
             } else {
                content = { value: attributes[attribute] };
             }
@@ -133,8 +133,14 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             break;
 
          case "JSON":
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
+            if (descriptor.list) {
+               if (Array.isArray(attributes[attribute]))
+                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+               else
+                  content = attributes[attribute].value;
+            } else {
+               content = attributes[attribute];
+            }
             break;
 
          default:
