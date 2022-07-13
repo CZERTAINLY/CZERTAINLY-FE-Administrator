@@ -150,6 +150,7 @@ export default function RaProfileDetail() {
       () => {
          if (!raProfile) return;
          dispatch(raProfilesActions.deleteRaProfile({ uuid: raProfile.uuid }));
+         setConfirmDelete(false);
       },
       [dispatch, raProfile]
 

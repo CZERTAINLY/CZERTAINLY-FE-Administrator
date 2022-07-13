@@ -5,7 +5,7 @@ import Select from "react-select";
 import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/es/Input";
 import { AttributeType } from "types/attributes";
-import { composeValidators, validateRequired } from "utils/validators";
+import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
 
 
 interface Props {
@@ -116,6 +116,9 @@ export function Attribute({
       const validators: any[] = [];
 
       if (descriptor.required) validators.push(validateRequired());
+      if (descriptor.type === "INTEGER") validators.push(validateInteger());
+      if (descriptor.type === "FLOAT") validators.push(validateFloat());
+      if (descriptor.validationRegex) validators.push(validatePattern(descriptor.validationRegex));
 
       const composed = composeValidators.apply(undefined, validators);
 
@@ -158,7 +161,7 @@ export function Attribute({
                         <>
                            <FormText color={descriptor.required ? "dark" : undefined} style={{ marginTop: "0.2em" }}>{descriptor.description}</FormText>
 
-                           <FormFeedback>{meta.error}</FormFeedback>
+                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
                         </>
 
                      ) : <></>
