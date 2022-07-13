@@ -25,8 +25,9 @@ yarn-error.log*
 
 # IDE files
 .idea/
+./vscode/
 
 #Proxy Files
-#src/gateway_client_key.pem
-#src/gateway_client_cert.pem
-#src/setupProxy.js
+src/gateway_client_key.pem
+src/gateway_client_cert.pem
+src/setupProxy.js
