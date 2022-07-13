@@ -5,6 +5,8 @@ import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup } from 're
 import { Field, Form } from "react-final-form";
 import Select from 'react-select';
 
+import { mutators } from "utils/attributeEditorMutators";
+
 import { validateRequired } from 'utils/validators';
 
 import AttributeEditor from 'components/Attributes/AttributeEditor';
@@ -115,7 +117,7 @@ export default function AcmeProtocolActiovationDialogBody({
 
    return (
       <>
-         <Form onSubmit={onActivateAcmeSubmit}>
+         <Form onSubmit={onActivateAcmeSubmit} mutators={{ ...mutators() }} >
 
             {({ handleSubmit, pristine, submitting, valid }) => (
 
