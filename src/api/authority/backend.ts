@@ -118,7 +118,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
    bulkForceDeleteAuthority(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)
+         new HttpRequestOptions(`${baseUrl}/force`, "DELETE", uuids)
       );
 
    }

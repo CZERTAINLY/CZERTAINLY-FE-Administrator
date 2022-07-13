@@ -378,7 +378,7 @@ function ConnectorForm({ title }: Props) {
 
                      <div className="d-flex justify-content-end">
 
-                        <ButtonGroup>.
+                        <ButtonGroup>
 
                            <Button
 
