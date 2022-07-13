@@ -22,10 +22,7 @@ import Credentials from "pages/credentials";
 import Authorities from "pages/authorities";
 import AcmeAccounts from "pages/acme-accounts";
 import AcmeProfiles from "pages/acme-profiles";
-
-/*
 import Profile from "pages/profile";
-*/
 
 function Layout() {
 
@@ -62,10 +59,7 @@ function Layout() {
                   <Route path="/app/authorities" component={Authorities} />
                   <Route path="/app/acmeaccounts" component={AcmeAccounts} />
                   <Route path="/app/acmeprofiles" component={AcmeProfiles} />
-
-                  {/*
                   <Route path="/app/profile" component={Profile} />
-                  */}
 
                </Switch>
 
