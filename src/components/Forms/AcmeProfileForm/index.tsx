@@ -94,6 +94,7 @@ export default function RaProfileForm({
 
          if (editMode && acmeProfileSelector?.uuid === params.id) {
             setAcmeProfile(acmeProfileSelector);
+            setRaProfile(acmeProfileSelector.raProfile);
          }
 
       },
@@ -110,20 +111,6 @@ export default function RaProfileForm({
       [dispatch]
 
    );
-
-
-   useEffect(
-
-      () => {
-
-         if (acmeProfile) {
-            setRaProfile(acmeProfile.raProfile);
-         }
-
-      },
-      [acmeProfile]
-
-   )
 
 
    useEffect(
@@ -206,12 +193,13 @@ export default function RaProfileForm({
 
       (form: FormApi<FormValues>, value: string) => {
 
-         setRaProfile(undefined);
-         dispatch(raProfileActions.clearIssuanceAttributesDescriptors());
-         dispatch(raProfileActions.clearRevocationAttributesDescriptors());
-         form.mutators.clearAttributes();
-
-         if (!value) return;
+         if (!value) {
+            setRaProfile(undefined);
+            dispatch(raProfileActions.clearIssuanceAttributesDescriptors());
+            dispatch(raProfileActions.clearRevocationAttributesDescriptors());
+            form.mutators.clearAttributes();
+            return;
+         }
 
          setRaProfile(raProfiles.find(p => p.uuid === value) || undefined);
 
