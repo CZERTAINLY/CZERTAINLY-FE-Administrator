@@ -105,6 +105,20 @@ export const slice = createSlice({
       },
 
 
+      clearIssuanceAttributesDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.issuanceAttributesDescriptors = undefined;
+
+      },
+
+
+      clearRevocationAttributesDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.revocationAttributesDescriptors = undefined;
+
+      },
+
+
       listRaProfiles: (state, action: PayloadAction<void>) => {
 
          state.raProfiles = [];

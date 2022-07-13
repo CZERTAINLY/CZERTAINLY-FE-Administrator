@@ -21,6 +21,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 
 import { collectFormAttributes } from "utils/attributes";
+import { FormApi } from "final-form";
 
 
 
@@ -115,17 +116,27 @@ export default function RaProfileForm({
 
       () => {
 
-         if (raProfile) {
-            dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: raProfile.uuid }));
-            dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: raProfile.uuid }));
-         }
-
          if (acmeProfile) {
             setRaProfile(acmeProfile.raProfile);
          }
 
       },
-      [dispatch, raProfile, acmeProfile]
+      [acmeProfile]
+
+   )
+
+
+   useEffect(
+
+      () => {
+
+         if (raProfile) {
+            dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: raProfile.uuid }));
+            dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: raProfile.uuid }));
+         }
+
+      },
+      [dispatch, raProfile]
 
    )
 
@@ -193,14 +204,22 @@ export default function RaProfileForm({
 
    const onRaProfileChange = useCallback(
 
-      (value: string) => {
+      (form: FormApi<FormValues>, value: string) => {
 
-         if (value) return;
+         setRaProfile(undefined);
+         dispatch(raProfileActions.clearIssuanceAttributesDescriptors());
+         dispatch(raProfileActions.clearRevocationAttributesDescriptors());
+         form.mutators.clearAttributes();
+
+         if (!value) return;
+
+         setRaProfile(raProfiles.find(p => p.uuid === value) || undefined);
+
          dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: value }));
          dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: value }));
 
       },
-      [dispatch]
+      [dispatch, raProfiles]
 
    );
 
@@ -246,7 +265,7 @@ export default function RaProfileForm({
 
          <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
 
-            {({ handleSubmit, pristine, submitting, valid }) => (
+            {({ handleSubmit, pristine, submitting, valid, form }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
 
@@ -629,7 +648,9 @@ export default function RaProfileForm({
                                  options={optionsForRaProfiles}
                                  placeholder="Select to change RA Profile if needed"
                                  isClearable={true}
-                                 onChange={(event: any) => { onRaProfileChange(event.value); input.onChange(event) }}
+                                 onChange={(event: any) => {
+                                    onRaProfileChange(form, event ? event.value : undefined); input.onChange(event)
+                                 }}
                               />
 
                            </FormGroup>
@@ -639,7 +660,7 @@ export default function RaProfileForm({
 
                      </Field>
 
-                     {!raProfileIssuanceAttrDescs || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? <></> : (
+                     {!raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? <></> : (
 
                         <FormGroup>
 
@@ -656,7 +677,7 @@ export default function RaProfileForm({
                      )}
 
 
-                     {!raProfileIssuanceAttrDescs || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? <></> : (
+                     {!raProfile || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? <></> : (
 
                         <FormGroup>
 
