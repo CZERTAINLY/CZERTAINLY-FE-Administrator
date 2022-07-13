@@ -342,13 +342,9 @@ export default function AttributeEditor({
                      formAttributeValue = [{ label: attribute!.content.value, value: attribute!.content }]
 
 
-                  } else if (Array.isArray(descriptor?.content)) {
+                  } else {
 
-                     formAttributeValue = descriptor.content.map(content => ({ label: content.value, value: content }))
-
-                  } else if (descriptor?.content) {
-
-                     formAttributeValue = [{ label: descriptor!.content.value, value: descriptor!.content }]
+                     formAttributeValue = undefined;
 
                   }
 
@@ -358,9 +354,9 @@ export default function AttributeEditor({
 
                      formAttributeValue = { label: (attribute.content as AttributeContentModel).value, value: attribute.content }
 
-                  } else if (descriptor.content) {
+                  } else {
 
-                     formAttributeValue = { label: (descriptor.content as AttributeContentModel).value, value: descriptor.content }
+                     formAttributeValue = undefined;
 
                   }
 

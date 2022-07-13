@@ -399,6 +399,27 @@ const deleteAuthority: AppEpic = (action$, state$, deps) => {
 }
 
 
+const deleteAuthoritySuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteAuthoritySuccess.match
+      ),
+      switchMap(
+
+         () => {
+            history.push(`../`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
+
 const deleteAuthorityFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -520,6 +541,7 @@ const epics = [
    updateAuthoritySuccess,
    updateAuthorityFailure,
    deleteAuthority,
+   deleteAuthoritySuccess,
    deleteAuthorityFailure,
    bulkDeleteAuthority,
    bulkDeleteAuthorityFailure,

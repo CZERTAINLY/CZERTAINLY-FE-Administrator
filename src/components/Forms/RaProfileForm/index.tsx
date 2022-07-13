@@ -241,7 +241,7 @@ export default function RaProfileForm({
 
                   </Field>
 
-                  <Field name="authority">
+                  <Field name="authority" validate={validateRequired()}>
 
                      {({ input, meta }) => (
 
@@ -257,7 +257,10 @@ export default function RaProfileForm({
                               options={optionsForAuthorities}
                               placeholder="Select to change RA Profile if needed"
                               onChange={(event: any) => { onAuthorityChange(event.value, form); input.onChange(event) }}
+                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                            />
+
+                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
                         </FormGroup>
 
@@ -269,7 +272,7 @@ export default function RaProfileForm({
                   {!raProfileAttributeDescriptors ? <></> : (
                      <AttributeEditor
                         id="ra-profile"
-                        authorityUuid={raProfile?.authorityInstanceUuid}
+                        authorityUuid={raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value}
                         attributeDescriptors={raProfileAttributeDescriptors}
                         attributes={raProfile?.attributes}
                      />

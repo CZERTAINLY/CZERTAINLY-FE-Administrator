@@ -248,6 +248,28 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
+const updateRaProfileSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateRaProfileSuccess.match
+      ),
+
+      switchMap(
+
+         action => {
+            history.push(`../detail/${action.payload.raProfile.uuid}`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
+
 const updateRaProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -376,6 +398,27 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
       )
 
    );
+
+}
+
+
+const deleteRaProfileSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteRaProfileSuccess.match
+      ),
+      switchMap(
+
+         () => {
+            history.push(`../`);
+            return EMPTY;
+         }
+
+      )
+
+   )
 
 }
 
@@ -775,12 +818,14 @@ const epics = [
    createRaProfileFailure,
    createRaProfileSuccess,
    updateRaProfile,
+   updateRaProfileSuccess,
    updateRaProfileFailure,
    enableRaProfile,
    enableRaProfileFailure,
    disableRaProfile,
    disableRaProfileFailure,
    deleteRaProfile,
+   deleteRaProfileSuccess,
    deleteRaProfileFailure,
    activateAcme,
    activateAcmeFailure,

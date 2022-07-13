@@ -287,6 +287,26 @@ const deleteAcmeProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
+const deleteAcmeProfileSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteAcmeProfileSuccess.match
+      ),
+      switchMap(
+
+         () => {
+            history.push(`../`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
 const deleteAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -576,19 +596,19 @@ const epics = [
    createAcmeProfileFailed,
    createAcmeProfileSuccess,
    deleteAcmeProfile,
-   enableAcmeProfile,
-   disableAcmeProfile,
-   bulkDeleteAcmeProfiles,
-   bulkForceDeleteAcmeProfiles,
-   bulkEnableAcmeProfiles,
-   bulkDisableAcmeProfiles,
-   createAcmeProfileFailed,
+   deleteAcmeProfileSuccess,
    deleteAcmeProfileFailed,
+   enableAcmeProfile,
    enableAcmeProfileFailed,
+   disableAcmeProfile,
    disableAcmeProfileFailed,
+   bulkDeleteAcmeProfiles,
    bulkDeleteAcmeProfilesFailed,
+   bulkForceDeleteAcmeProfiles,
    bulkForceDeleteAcmeProfilesFailed,
+   bulkEnableAcmeProfiles,
    bulkEnableAcmeProfilesFailed,
+   bulkDisableAcmeProfiles,
    bulkDisableAcmeProfilesFailed
 ];
 
