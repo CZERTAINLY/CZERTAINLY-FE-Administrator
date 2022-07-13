@@ -160,7 +160,7 @@ export default function RaProfileForm({
                termsOfServiceChangeDisable: values.disableOrders,
                requireTermsOfService: values.requireAgreement,
                requireContact: values.requireContact,
-               raProfileUuid: values.raProfile ? values.raProfile.value : undefined,
+               raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
                issueCertificateAttributes: collectFormAttributes("issuanceAttributes", raProfileIssuanceAttrDescs, values),
                revokeCertificateAttributes: collectFormAttributes("revocationAttributes", raProfileRevocationAttrDescs, values)
             }));
@@ -180,7 +180,7 @@ export default function RaProfileForm({
                termsOfServiceChangeDisable: values.disableOrders,
                requireTermsOfService: values.requireAgreement,
                requireContact: values.requireContact,
-               raProfileUuid: values.raProfile ? values.raProfile.value : undefined,
+               raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
                issueCertificateAttributes: collectFormAttributes("issuanceAttributes", raProfileIssuanceAttrDescs, values),
                revokeCertificateAttributes: collectFormAttributes("revocationAttributes", raProfileRevocationAttrDescs, values)
             }));
@@ -218,8 +218,18 @@ export default function RaProfileForm({
          dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: value }));
          dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: value }));
 
+         if (acmeProfile) {
+
+            setAcmeProfile({
+               ...acmeProfile,
+               issueCertificateAttributes: [],
+               revokeCertificateAttributes: []
+            });
+
+         }
+
       },
-      [dispatch, raProfiles]
+      [dispatch, raProfiles, acmeProfile]
 
    );
 
