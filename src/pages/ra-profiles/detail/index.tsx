@@ -476,7 +476,7 @@ export default function RaProfileDetail() {
             id: "acme",
             columns: [
                "ACME",
-               <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable ? true : false : undefined} />,
+               <StatusBadge enabled={acmeDetails ? acmeDetails.acmeAvailable ? true : false : false} />,
                <ProgressButton
                   className="btn btn-primary btn-sm"
                   type="button"

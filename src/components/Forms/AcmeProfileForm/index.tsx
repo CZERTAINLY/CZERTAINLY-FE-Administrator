@@ -195,6 +195,7 @@ export default function RaProfileForm({
 
       (value: string) => {
 
+         if (value) return;
          dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: value }));
          dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: value }));
 
@@ -627,6 +628,7 @@ export default function RaProfileForm({
                                  menuPlacement="auto"
                                  options={optionsForRaProfiles}
                                  placeholder="Select to change RA Profile if needed"
+                                 isClearable={true}
                                  onChange={(event: any) => { onRaProfileChange(event.value); input.onChange(event) }}
                               />
 
