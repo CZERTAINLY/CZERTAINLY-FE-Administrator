@@ -317,7 +317,7 @@ export default function CredentialForm({
                                  maxMenuHeight={140}
                                  menuPlacement="auto"
                                  options={optionsForKinds}
-                                 placeholder="Select Key Store Kind"
+                                 placeholder="Select Kind"
                                  onChange={(event) => { onKindChange(event); input.onChange(event); }}
                                  styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                               />

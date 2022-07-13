@@ -344,7 +344,7 @@ function ConnectorList() {
          <Dialog
             isOpen={confirmDelete}
             caption={`Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-            body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
