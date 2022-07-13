@@ -218,8 +218,18 @@ export default function RaProfileForm({
          dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: value }));
          dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: value }));
 
+         if (acmeProfile) {
+
+            setAcmeProfile({
+               ...acmeProfile,
+               issueCertificateAttributes: [],
+               revokeCertificateAttributes: []
+            });
+
+         }
+
       },
-      [dispatch, raProfiles]
+      [dispatch, raProfiles, acmeProfile]
 
    );
 
