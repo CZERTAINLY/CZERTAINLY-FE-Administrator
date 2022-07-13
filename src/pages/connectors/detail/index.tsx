@@ -20,6 +20,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 import Dialog from "components/Dialog";
 import {attributeFieldNameTransform} from "../../../utils/attributes";
+import { inventoryStatus } from "utils/connector";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -221,6 +222,8 @@ export default function ConnectorDetail() {
 
          if (!connector) return [];
 
+         const connectorStatus = inventoryStatus(connector.status);
+
          return [
             {
                id: "uuid",
@@ -236,7 +239,7 @@ export default function ConnectorDetail() {
             },
             {
                id: "status",
-               columns: ["Status", <InventoryStatusBadge status={connector?.status} />]
+               columns: ["Status", <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>]
             },
             {
                id: "authType",

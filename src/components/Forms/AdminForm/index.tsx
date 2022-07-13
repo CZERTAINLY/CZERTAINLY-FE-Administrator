@@ -508,13 +508,11 @@ function AdminForm({ title }: Props) {
                      {({ input }) => (
 
                         <FormGroup check>
-
-                           <Input
-                              {...input}
-                              type="checkbox"
-                           />
-
                            <Label check>
+                              <Input
+                                 {...input}
+                                 type="checkbox"
+                              />
                               &nbsp;Superadmin
                            </Label>
 
