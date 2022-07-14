@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect, Router } from "react-router";
+import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import history from "browser-history";
 
@@ -22,19 +23,23 @@ function App() {
 
          <ToastContainer autoClose={5000} hideProgressBar />
 
-         <Router history={history}>
+         <BrowserRouter basename="/administrator">
 
-            <Switch>
+            <Router history={history} >
 
-               <Route path="/" render={redirect} exact/>
-               <Route path="/administrator" render={redirect} exact/>
-               <Route path="/app" render={redirect} exact/>
-               <Route path="/login" component={Login} exact />
-               <PrivateRoute component={Layout} />
+               <Switch>
 
-            </Switch>
+                  <Route path="/" render={redirect} exact />
+                  <Route path="/administrator" render={redirect} exact />
+                  <Route path="/app" render={redirect} exact />
+                  <Route path="/login" component={Login} exact />
+                  <PrivateRoute component={Layout} />
 
-         </Router>
+               </Switch>
+
+            </Router>
+
+         </BrowserRouter>
 
       </div>
    );
