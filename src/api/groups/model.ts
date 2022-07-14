@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 
 export interface GroupDTO {
   uuid: string;
-  name?: string;
+  name: string;
   description?: string;
 }
 

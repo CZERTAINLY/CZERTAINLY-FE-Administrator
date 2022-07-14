@@ -1,7 +1,7 @@
 import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 
-import { dbData, createGroup } from "mocks/db";
+import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
 import { HttpErrorResponse } from "ts-rest-client";
@@ -10,11 +10,22 @@ export class GroupManagementMock implements model.GroupManagementApi {
   createNewGroup(name: string, description: string): Observable<string> {
     return of(null).pipe(
       delay(randomDelay()),
-      map(() => createGroup(name, description))
-    );
+         map(
+            () => {
+              const uuid = crypto.randomUUID();
+              dbData.groups.push({
+                uuid,
+                name,
+                description
+              });
+              return uuid;
+          }
+        )
+      );
   }
 
-  getGroupsList(): Observable<model.GroupInfoResponse[]> {
+
+  getGroupsList(): Observable<model.GroupDTO[]> {
     return of(dbData.groups).pipe(
       delay(randomDelay()),
       map((groups) =>
@@ -27,7 +38,7 @@ export class GroupManagementMock implements model.GroupManagementApi {
     );
   }
 
-  getGroupDetail(uuid: string): Observable<model.GroupDetailResponse> {
+  getGroupDetail(uuid: string): Observable<model.GroupDTO> {
     return of(
       dbData.groups.find((c) => c.uuid.toString() === uuid.toString())
     ).pipe(
@@ -84,7 +95,7 @@ export class GroupManagementMock implements model.GroupManagementApi {
     uuid: string,
     name: string,
     description: string
-  ): Observable<model.GroupDetailResponse> {
+  ): Observable<model.GroupDTO> {
     return of(
       dbData.groups.findIndex((c) => c.uuid.toString() === uuid.toString())
     ).pipe(
@@ -93,9 +104,9 @@ export class GroupManagementMock implements model.GroupManagementApi {
         if (idx < 0) {
           throw new HttpErrorResponse({ status: 404 });
         }
-        console.log(description);
-        console.log("Updated group");
         let detail = dbData.groups[idx];
+        detail.name = name;
+        detail.description = description;
         return detail;
       })
     );

@@ -40,7 +40,7 @@ function Sidebar() {
                   { _key: "/app/acmeprofiles", name: "ACME Profiles", link: "/app/acmeprofiles" },
                ]}
             />
-
+            <LinksGroup _key="/app/groups" header="Groups" headerLink="/app/groups" />
             <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
 
             {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}

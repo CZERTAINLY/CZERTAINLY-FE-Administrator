@@ -136,5 +136,11 @@ export const dbData: DBData = {
       dbRaProfiles["DEMO-RA-PROFILE2"]
    ],
 
+   groups: [
+      dbGroups["Group1"],
+      dbGroups["Group2"],
+      dbGroups["Group3"],
+   ]
+
 };
 

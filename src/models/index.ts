@@ -5,3 +5,4 @@ export * from "./administrators";
 export * from "./clients";
 
 export * from "./alerts";
+export * from "./groups";
