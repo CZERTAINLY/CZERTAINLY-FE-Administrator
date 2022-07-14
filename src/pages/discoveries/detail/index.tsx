@@ -243,10 +243,6 @@ export default function DiscoveryDetail() {
    );
 
 
-
-
-
-
    return (
 
       <Container className="themed-container" fluid>

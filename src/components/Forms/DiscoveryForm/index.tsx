@@ -256,7 +256,6 @@ export default function DiscoveryForm({
                         <AttributeEditor
                            id="discovery"
                            attributeDescriptors={discoveryProviderAttributeDescriptors}
-                           attributes={[]}
                            connectorUuid={discoveryProvider.uuid}
                            functionGroupCode={"discoveryProvider"}
                            kind={values.storeKind.value}
