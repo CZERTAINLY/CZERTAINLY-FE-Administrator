@@ -10,6 +10,7 @@ import { CertificateManagementApi, CertificateManagementBackend, CertificateMana
 import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountManagementMock } from "./acme-account";
 import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
+import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
 
 export interface ApiClients {
    auth: AuthApi;
@@ -24,6 +25,7 @@ export interface ApiClients {
    acmeAccounts: AcmeAccountManagementApi;
    acmeProfiles: AcmeProfilesManagementApi;
    groups: GroupManagementApi;
+   discoveries: DiscoveryManagementApi;
 }
 
 export const backendClient: ApiClients = {
@@ -39,6 +41,7 @@ export const backendClient: ApiClients = {
    acmeAccounts: new AcmeAccountManagementBackend(),
    acmeProfiles: new AcmeProfilesManagementBackend(),
    groups: new GroupManagementBackend(),
+   discoveries: new DiscoveryManagementBackend(),
 };
 
 export const mockClient: ApiClients = {
@@ -54,4 +57,5 @@ export const mockClient: ApiClients = {
    acmeAccounts: new AcmeAccountManagementMock(),
    acmeProfiles: new AcmeProfilesManagementMock(),
    groups: new GroupManagementMock(),
+   discoveries: new DiscoveryManagementMock(),
 };
