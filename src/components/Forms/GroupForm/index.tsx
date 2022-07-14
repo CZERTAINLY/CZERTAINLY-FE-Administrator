@@ -70,11 +70,7 @@ function GroupForm({ title }: Props) {
   const onCancelClick = useCallback(
 
     () => {
-      if(editMode) {
-        history.push(`../detail/${params.id}`);
-      }else{
-        history.push(".");
-      }
+      history.goBack()
     },
     [history, params.id, editMode]
 
