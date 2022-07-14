@@ -112,9 +112,9 @@ export default function RaProfileForm({
    const onCancelClick = useCallback(
 
       () => {
-         history.push(`../detail/${params.id}`);
+         history.goBack()
       },
-      [history, params.id]
+      [history,]
 
    );
 
