@@ -12,6 +12,7 @@ import { DbRaProfile } from "./db-ra-profiles";
 
 import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
 import { GroupDTO } from "api/groups";
+import { DashboardDTO } from "api/dashboard";
 
 
 export interface DBData {
@@ -41,5 +42,7 @@ export interface DBData {
    raProfiles: DbRaProfile[];
 
    groups: GroupDTO[];
+
+   dashboard: DashboardDTO;
 
 }
