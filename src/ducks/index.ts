@@ -41,6 +41,9 @@ import acmeProfilesEpics from "./acme-profiles-epics";
 import { initialState as initialAuthoritiesState, slice as authoritiesSlice } from "./authorities";
 import authoritiesEpics from "./authorities-epics";
 
+import { initialState as initialGroupState, slice as groupSlice } from "./groups";
+import groupEpics from "./groups-epics";
+
 
 export interface EpicDependencies {
    apiClients: ApiClients;
@@ -66,6 +69,7 @@ export const initialState = {
    [acmeAccountsSlice.name]: initialAcmeAccountsState,
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
    [authoritiesSlice.name]: initialAuthoritiesState,
+   [groupSlice.name]: initialGroupState, 
 };
 
 
@@ -82,6 +86,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
    [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
    [authoritiesSlice.name]: authoritiesSlice.reducer,
+   [groupSlice.name]: groupSlice.reducer,
 });
 
 
@@ -97,5 +102,6 @@ export const epics = combineEpics(
    ...credentialsEpics,
    ...acmeAccountsEpics,
    ...acmeProfilesEpics,
-   ...authoritiesEpics
+   ...authoritiesEpics,
+   ...groupEpics,
 );
