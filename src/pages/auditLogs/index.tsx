@@ -54,90 +54,143 @@ function AuditLogs() {
    const lastPage = useCallback(() => setPage(totalPages || 0), [setPage, totalPages]);
 
 
-   useEffect(() => {
-      dispatch(auditLogActions.listObjects());
-      dispatch(auditLogActions.listOperations());
-      dispatch(auditLogActions.listStatuses());
-   }, [dispatch]);
+   useEffect(
+
+      () => {
+
+         dispatch(auditLogActions.listObjects());
+         dispatch(auditLogActions.listOperations());
+         dispatch(auditLogActions.listStatuses());
+
+      },
+      [dispatch]
+
+   );
 
 
    // load when anything except page changes
-   useEffect(() => {
-      dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
+   useEffect(
+
+      () => {
+
+         dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
+
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [pageSize, sort, filters, dispatch]);
+      [pageSize, sort, filters, dispatch]
+
+   );
 
 
    // load when page changes but not loaded
-   useEffect(() => {
-      if (logData && logData[page - 1]) return;
-      dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
+   useEffect(
+
+      () => {
+
+         if (logData && logData[page - 1]) return;
+
+         dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
+
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [logData, page])
+      [logData, page]
+
+   );
 
 
-   useEffect(() => {
+   useEffect(
 
-      if (loadedPageNumber === undefined) return;
+      () => {
 
-      const data = { ...logData };
-      data[loadedPageNumber] = logs;
+         if (loadedPageNumber === undefined) return;
 
-      setLogData(data);
+         const data = { ...logData };
+         data[loadedPageNumber] = logs;
 
+         setLogData(data);
+
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [logs, loadedPageNumber]);
+      [logs, loadedPageNumber]
+
+   );
 
 
    const onPageSizeChange = useCallback(
+
       (event: React.ChangeEvent<HTMLInputElement>) => {
+
          setLogData({});
          setPageSize(+event.target.value);
          setPage(1);
+
       },
       [setPageSize]
+
    );
 
 
    const onSortChange = useCallback(
+
       (sortColumn: string | null, direction: string | null) => {
+
          if (!sortColumn || !direction) {
             setSort(undefined);
          } else {
             setSort(`${sortColumn},${direction}`);
          }
+
       },
       [setSort]
+
    );
 
 
    const onFiltersChanged = useCallback(
+
       (filters: FilterValues) => {
+
          const filterValues = Object.entries(filters).reduce(
             (acc, [key, value]) =>
-               value ? { ...acc, [key]: value.toString() } : acc,
-            {}
+               value ? { ...acc, [key]: value.toString() } : acc, {}
          );
 
          setLogData({});
          setFilters(filterValues);
+
       },
       [setFilters]
+
    );
 
 
-   const onClearFilters = useCallback(() => {
-      setLogData({});
-      setFilters(undefined);
-   }, [setFilters]);
+   const onClearFilters = useCallback(
+
+      () => {
+
+         setLogData({});
+         setFilters(undefined);
+
+      },
+      [setFilters]
+
+   );
 
 
-   const lineBreakFormatter = (content: any) => {
-      return <div style={{ wordBreak: "break-word" }}>{content}</div>;
-   };
+   const lineBreakFormatter = useCallback(
+
+      (content: any) => {
+
+         return <div style={{ wordBreak: "break-word" }}>{content}</div>;
+
+      },
+      []
+
+   );
 
 
    const queryString = useMemo(
+
       () => (
          filters
             ?
@@ -145,31 +198,37 @@ function AuditLogs() {
             : ""
       ),
       [filters]
+
    )
 
 
    const auditLogsTitle = useMemo(
+
       () => (
+
          <div className="d-flex justify-content-between align-items-center">
+
             <h5>
                <span className="fw-semi-bold">Audit Logs</span>
             </h5>
+
             <a
                href={`/api/v1/logs/export?${queryString}`}
                className={styles.exportButton}
             >
                Export
             </a>
+
          </div>
       ),
       [queryString]
+
    );
 
 
    return (
 
       <Container className="themed-container" fluid>
-
 
          <Widget title="Filter Audit Logs" busy={isFilterBusy}>
 

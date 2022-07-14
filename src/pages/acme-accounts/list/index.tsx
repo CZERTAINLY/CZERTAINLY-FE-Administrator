@@ -35,59 +35,83 @@ function AcmeAccountList() {
 
 
    useEffect(
+
       () => {
+
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listAcmeAccounts());
+
       },
       [dispatch]
+
    );
 
 
    const onEnableClick = useCallback(
+
       () => {
+
          dispatch(actions.bulkEnableAcmeAccounts({ uuids: checkedRows }));
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const onDisableClick = useCallback(
+
       () => {
+
          dispatch(actions.bulkDisableAcmeAccounts({ uuids: checkedRows }));
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const onRevokeConfirmed = useCallback(
+
       () => {
+
          dispatch(actions.bulkRevokeAcmeAccounts({ uuids: checkedRows }));
          setConfirmRevoke(false);
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const setCheckedRows = useCallback(
+
       (rows: (string | number)[]) => {
+
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
       },
       [dispatch]
+
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "cross-circle", disabled: checkedRows.length === 0, tooltip: "Revoke", onClick: () => { setConfirmRevoke(true); } },
          { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
       [checkedRows, onEnableClick, onDisableClick]
+
    );
 
 
    const title = useMemo(
+
       () => (
+
          <div>
 
             <div className="pull-right mt-n-xs">
@@ -99,13 +123,17 @@ function AcmeAccountList() {
             </h5>
 
          </div>
+
       ),
       [buttons]
+
    );
 
 
    const acmeAccountsTableHeader: TableHeader[] = useMemo(
+
       () => [
+
          {
             id: "accountId",
             content: <MDBColumnName columnName="Account Id" />,
@@ -150,6 +178,7 @@ function AcmeAccountList() {
          }
       ],
       []
+
    );
 
 

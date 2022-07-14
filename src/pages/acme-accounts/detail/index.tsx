@@ -33,8 +33,11 @@ export default function AcmeAccountDetail() {
    useEffect(
 
       () => {
+
          if (!params.id) return;
+
          dispatch(actions.getAcmeAccount({ uuid: params.id }));
+
       },
       [params.id, dispatch]
 
@@ -44,8 +47,11 @@ export default function AcmeAccountDetail() {
    const onEnableClick = useCallback(
 
       () => {
+
          if (!acmeAccount) return;
+
          dispatch(actions.enableAcmeAccount({ uuid: acmeAccount.uuid }));
+
       },
       [acmeAccount, dispatch]
 
@@ -55,8 +61,11 @@ export default function AcmeAccountDetail() {
    const onDisableClick = useCallback(
 
       () => {
+
          if (!acmeAccount) return;
+
          dispatch(actions.disableAcmeAccount({ uuid: acmeAccount.uuid }));
+
       },
       [acmeAccount, dispatch]
 
@@ -90,6 +99,7 @@ export default function AcmeAccountDetail() {
    const title = useMemo(
 
       () => (
+
          <div>
 
             <div className="pull-right mt-n-xs">
@@ -101,6 +111,7 @@ export default function AcmeAccountDetail() {
             </h5>
 
          </div>
+
       ),
       [buttons]
 
@@ -222,6 +233,7 @@ export default function AcmeAccountDetail() {
 
 
    return (
+
       <Container className="themed-container" fluid>
 
          <Widget title={title} busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}>
@@ -254,6 +266,7 @@ export default function AcmeAccountDetail() {
          />
 
       </Container>
+
    );
 
 }

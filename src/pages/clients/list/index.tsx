@@ -35,64 +35,93 @@ export default function ClientList() {
 
 
    useEffect(
+
       () => {
+
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listClients());
+
       },
+
       [dispatch]
    );
 
 
    const onAddClick = useCallback(
+
       () => {
+
          history.push("/app/clients/add");
+
       },
       [history]
+
    );
 
 
    const onEnableClick = useCallback(
+
       () => {
+
          dispatch(actions.bulkEnableClients({ uuids: checkedRows }));
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const onDisableClick = useCallback(
+
       () => {
+
          dispatch(actions.bulkDisableClients({ uuids: checkedRows }));
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const onDeleteClick = useCallback(
+
       () => {
+
          setConfirmDelete(true);
+
       },
       []
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          dispatch(actions.bulkDeleteClients({ uuids: checkedRows }));
          setConfirmDelete(false);
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const setCheckedRows = useCallback(
+
       (rows: (string | number)[]) => {
+
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
       },
+
       [dispatch]
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { onDeleteClick() } },
@@ -102,7 +131,9 @@ export default function ClientList() {
       [checkedRows, onAddClick, onDeleteClick, onEnableClick, onDisableClick]
    );
 
+
    const title = useMemo(
+
       () => (
          <div>
 
@@ -118,10 +149,12 @@ export default function ClientList() {
          </div>
       ),
       [buttons]
+
    );
 
 
    const clientTableHeader: TableHeader[] = useMemo(
+
       () => [
          {
             content: <MDBColumnName columnName="Name" />,
@@ -150,6 +183,7 @@ export default function ClientList() {
          },
       ],
       []
+
    );
 
 

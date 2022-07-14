@@ -33,51 +33,76 @@ export default function AdministratorDetail() {
 
 
    useEffect(
+
       () => {
+
          if (!params.id) return;
+
          dispatch(actions.getAdminDetail({ uuid: params.id }));
+
       },
       [params.id, dispatch]
+
    );
 
 
    const onEditClick = useCallback(
+
       () => {
+
          history.push(`../../administrators/edit/${administrator?.uuid}`);
+
       },
       [administrator, history]
+
    );
 
 
    const onEnableClick = useCallback(
+
       () => {
+
          if (!administrator) return;
+
          dispatch(actions.enableAdmin({ uuid: administrator.uuid }));
+
       },
       [administrator, dispatch]
+
    );
 
 
    const onDisableClick = useCallback(
+
       () => {
+
          if (!administrator) return;
+
          dispatch(actions.disableAdmin({ uuid: administrator.uuid }));
+
       },
       [administrator, dispatch]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          if (!administrator) return;
+
          dispatch(actions.deleteAdmin({ uuid: administrator.uuid }));
          setConfirmDelete(false);
+
       },
       [administrator, dispatch]
+
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
@@ -85,10 +110,12 @@ export default function AdministratorDetail() {
          { icon: "times", disabled: !(administrator?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
       [administrator, onEditClick, onDisableClick, onEnableClick]
+
    );
 
 
    const attributesTitle = useMemo(
+
       () => (
 
          <div>
@@ -104,20 +131,26 @@ export default function AdministratorDetail() {
          </div>
 
       ), [buttons]
+
    );
 
 
    const certificateTitle = useMemo(
+
       () => (
+
          <h5>
             Administrator Certificate <span className="fw-semi-bold">Details</span>
          </h5>
+
       ),
       []
+
    );
 
 
    const detailHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "property",
@@ -129,6 +162,7 @@ export default function AdministratorDetail() {
          },
       ],
       []
+
    );
 
 
@@ -178,6 +212,7 @@ export default function AdministratorDetail() {
    return (
 
       <Container className="themed-container" fluid>
+
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
             <Col>
 
@@ -197,6 +232,7 @@ export default function AdministratorDetail() {
                   <CertificateAttributes certificate={administrator?.certificate} />
                </Widget>
             </Col>
+
          </Row>
 
          <Dialog

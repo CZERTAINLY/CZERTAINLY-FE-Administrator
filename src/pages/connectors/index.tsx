@@ -9,17 +9,21 @@ import ConnectorsList from "./list";
 
 function Connectors() {
 
-  const { path } = useRouteMatch();
+   const { path } = useRouteMatch();
 
-  return (
-    <Switch>
-      <Route path={path} component={ConnectorsList} exact />
-      <Route path={`${path}/list`} component={ConnectorsList} exact />
-      <Route path={`${path}/detail/:id`} component={ConnectorDetail} exact />
-      <Route path={`${path}/edit/:id`} component={ConnectorEdit} exact />
-      <Route path={`${path}/add`} component={Add} exact />
-    </Switch>
-  );
+   return (
+
+      <Switch>
+
+         <Route path={path} component={ConnectorsList} exact />
+         <Route path={`${path}/list`} component={ConnectorsList} exact />
+         <Route path={`${path}/detail/:id`} component={ConnectorDetail} exact />
+         <Route path={`${path}/edit/:id`} component={ConnectorEdit} exact />
+         <Route path={`${path}/add`} component={Add} exact />
+
+      </Switch>
+
+   );
 
 }
 

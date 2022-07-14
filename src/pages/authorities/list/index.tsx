@@ -39,62 +39,86 @@ function AuthorityList() {
    useEffect(
 
       () => {
+
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.listAuthorities());
+
       },
       [dispatch]
 
    );
 
    useEffect(
+
       () => {
+
          setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
+
       },
       [bulkDeleteErrorMessages]
+
    );
 
 
    const onAddClick = useCallback(
+
       () => {
+
          history.push(`${path}/add`);
+
       },
       [history, path]
+
    );
 
 
    const setCheckedRows = useCallback(
+
       (rows: (string | number)[]) => {
+
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
       },
       [dispatch]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          setConfirmDelete(false);
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkDeleteAuthority({ uuids: checkedRows }));
+
       },
       [dispatch, checkedRows]
+
    );
 
 
    const onForceDeleteConfirmed = useCallback(
+
       () => {
+
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkForceDeleteAuthority({ uuids: checkedRows }));
+
       },
       [dispatch, checkedRows]
+
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
       ],
       [checkedRows, onAddClick]
+
    );
 
 
@@ -266,6 +290,7 @@ function AuthorityList() {
          />
 
       </Container>
+
    );
 }
 

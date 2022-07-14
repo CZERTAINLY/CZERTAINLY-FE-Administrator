@@ -12,8 +12,10 @@ function AcmeAccounts() {
    return (
 
       <Switch>
+
          <Route path={path} component={AccountsList} exact />
          <Route path={`${path}/detail/:id`} component={AccountDetail} exact />
+
       </Switch>
 
    );

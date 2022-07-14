@@ -53,12 +53,17 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
       switch (descriptor.type) {
 
+
          case "BOOLEAN":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = { value: attributes[attribute] };
+
             break;
 
+
          case "INTEGER":
+
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: parseInt(lv.value) }));
@@ -67,7 +72,9 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             } else {
                content = { value: parseInt(attributes[attribute]) };
             }
+
             break;
+
 
          case "FLOAT":
             if (descriptor.list) {
@@ -80,7 +87,9 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             }
             break;
 
+
          case "STRING":
+
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
@@ -89,39 +98,59 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             } else {
                content = { value: attributes[attribute] };
             }
+
             break;
 
+
          case "TEXT":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = { value: attributes[attribute] };
+
             break;
 
          case "DATE":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = { value: attributes[attribute] };
+
             break;
+
 
          case "TIME":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = { value: attributes[attribute] };
+
             break;
+
 
          case "DATETIME":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = { value: attributes[attribute] };
+
             break;
+
 
          case "FILE":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = attributes[attribute];
+
             break;
+
 
          case "SECRET":
+
             if (descriptor.list || descriptor.multiSelect) continue;
             content = { value: attributes[attribute] };
+
             break;
+
 
          case "CREDENTIAL":
+
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
@@ -130,9 +159,12 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             } else {
                content = attributes[attribute];
             }
+
             break;
+
 
          case "JSON":
+
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
                   content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
@@ -141,9 +173,12 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
             } else {
                content = attributes[attribute];
             }
+
             break;
 
+
          default:
+
             continue;
 
       }

@@ -15,7 +15,6 @@ import { Col, Container, Row, Table } from "reactstrap";
 
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import InventoryStatusBadge from "components/ConnectorStatus";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 import Dialog from "components/Dialog";
@@ -55,17 +54,22 @@ export default function ConnectorDetail() {
 
 
    useEffect(
+
       () => {
+
          setFunctionGroup(undefined);
          dispatch(actions.getConnectorDetail({ uuid: params.id }));
          dispatch(actions.getConnectorHealth({ uuid: params.id }));
          dispatch(actions.getConnectorAllAttributesDescriptors({ uuid: params.id }));
+
       },
       [params.id, dispatch]
+
    );
 
 
    useEffect(
+
       () => {
 
          if (!connector || connector.functionGroups.length === 0) {
@@ -84,10 +88,12 @@ export default function ConnectorDetail() {
 
       },
       [connector]
+
    );
 
 
    useEffect(
+
       () => {
 
          let attrs: AttributeDescriptorModel[] | undefined = undefined;
@@ -101,57 +107,80 @@ export default function ConnectorDetail() {
 
       },
       [attributes, connector, currentFunctionGroup, currentFunctionGroupKind]
+
    );
 
 
    const onEditClick = useCallback(
+
       () => {
+
          history.push(`../../connectors/edit/${connector?.uuid}`);
+
       },
       [connector, history]
+
    );
 
 
    const onReconnectClick = useCallback(
+
       () => {
+
          if (!connector) return;
          dispatch(actions.reconnectConnector({ uuid: connector.uuid }));
+
       },
+
       [connector, dispatch]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          if (!connector) return;
          dispatch(actions.deleteConnector({ uuid: connector.uuid }));
          setConfirmDelete(false);
+
       },
       [connector, dispatch]
+
    );
 
 
    const onAuthorizeConfirmed = useCallback(
+
       () => {
+
          if (!connector) return;
          setConfirmAuthorize(false);
          dispatch(actions.authorizeConnector({ uuid: connector.uuid }));
+
       },
       [dispatch, connector]
+
    );
 
 
    const onForceDeleteConnector = useCallback(
+
       () => {
+
          if (!connector) return;
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkForceDeleteConnectors({ uuids: [connector.uuid], successRedirect: `../` }));
+
       },
       [connector, dispatch]
+
    )
 
 
    const onFunctionGroupChange = useCallback(
+
       (groupCode: string) => {
 
          const group = (connector?.functionGroups || []).find(group => group.functionGroupCode === groupCode);
@@ -159,6 +188,7 @@ export default function ConnectorDetail() {
 
       },
       [connector]
+
    );
 
 
@@ -171,12 +201,15 @@ export default function ConnectorDetail() {
 
 
    const widgetButtons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
          { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true) } }
-      ], [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize, connector]
+      ],
+      [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize, connector]
+
    );
 
 
@@ -203,6 +236,7 @@ export default function ConnectorDetail() {
 
 
    const attributesHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "property",
@@ -214,10 +248,12 @@ export default function ConnectorDetail() {
          },
       ],
       []
+
    )
 
 
    const attributesData: TableDataRow[] = useMemo(
+
       () => {
 
          if (!connector) return [];
@@ -250,10 +286,12 @@ export default function ConnectorDetail() {
 
       },
       [connector]
+
    )
 
 
    const functionalityHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "functionGroup",
@@ -265,6 +303,7 @@ export default function ConnectorDetail() {
          },
       ],
       []
+
    )
 
 
@@ -292,6 +331,7 @@ export default function ConnectorDetail() {
 
       ),
       [connector]
+
    );
 
 
@@ -343,6 +383,7 @@ export default function ConnectorDetail() {
 
 
    const endPointsHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "name",
@@ -380,7 +421,6 @@ export default function ConnectorDetail() {
 
          })
       ),
-
       [currentFunctionGroup]
 
    );

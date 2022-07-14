@@ -7,11 +7,11 @@ import { selectors } from "ducks/auth";
 import LinksGroup from "./LinksGroup";
 import style from "./Sidebar.module.scss";
 import logo from "images/czertainly_white_H.svg";
-import { inIframe } from "utils/commons";
+import { inIFrame } from "utils/inIFrame";
 
 function Sidebar() {
    const isSuperAdmin = useSelector(selectors.isSuperAdmin);
-   const inFrame = inIframe();
+   const inFrame = inIFrame();
    return (
 
       <nav className={style.root}>

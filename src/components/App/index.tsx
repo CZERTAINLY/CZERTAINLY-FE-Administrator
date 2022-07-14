@@ -10,11 +10,11 @@ import PrivateRoute from "components/PrivateRoute";
 
 import Login from "pages/login";
 
-import { inIframe } from "utils/commons";
+import { inIFrame } from "utils/inIFrame";
 
 function App() {
 
-   const isInFrame = inIframe();
+   const isInFrame = inIFrame();
    const redirect = () => !isInFrame ? <Redirect to="/app/home" /> : <Redirect to="/app/raprofiles" />
 
    return (

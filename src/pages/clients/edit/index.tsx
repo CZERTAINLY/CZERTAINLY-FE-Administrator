@@ -7,9 +7,9 @@ export default function Edit() {
 
    const title = useMemo(
       () => (
-      <h5>
-         Edit <span className="fw-semi-bold">Client</span>
-      </h5>
+         <h5>
+            Edit <span className="fw-semi-bold">Client</span>
+         </h5>
       ),
       []
    )

@@ -39,7 +39,7 @@ export function transformFunctionGroupDTOtoModel(functionGroup: FunctionGroupDTO
       uuid: functionGroup.uuid,
       name: functionGroup.name,
       functionGroupCode: functionGroup.functionGroupCode,
-      kinds: functionGroup.kinds ? [ ...functionGroup.kinds ] : [],
+      kinds: functionGroup.kinds ? [...functionGroup.kinds] : [],
       endPoints: functionGroup.endPoints ? functionGroup.endPoints.map(endpoint => transformEndPointDTOToModel(endpoint)) : []
    }
 

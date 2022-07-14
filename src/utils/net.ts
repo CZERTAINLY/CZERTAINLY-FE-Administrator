@@ -1,13 +1,17 @@
 import { Observable, from } from "rxjs";
 import { HttpErrorResponse, StringMap } from "ts-rest-client";
 
+
 export function createNewResource(
    url: string,
    body: any,
    headers?: any
 ): Observable<string | null> {
+
    return from(doFetch(url, body, headers));
+
 }
+
 
 async function doFetch(
    url: string,
@@ -18,16 +22,20 @@ async function doFetch(
    let errorResponse = null;
 
    try {
-      const response = await fetch(url, {
 
-         body: JSON.stringify(body),
-         headers: {
-            "Content-Type": "application/json",
-            ...(headers || {}),
-         },
-         method: "POST",
+      const response = await fetch(
+         url,
+         {
 
-      });
+            body: JSON.stringify(body),
+            headers: {
+               "Content-Type": "application/json",
+               ...(headers || {}),
+            },
+            method: "POST",
+
+         }
+      );
 
 
       if (response.ok) {
@@ -35,12 +43,14 @@ async function doFetch(
          return data.uuid;
       }
 
-
       const responseHeaders = {} as StringMap;
+
       if (response.headers) {
          response.headers.forEach((value, key) => (responseHeaders[key] = value));
       }
+
       const error = await getResponseBody(response);
+
       errorResponse = new HttpErrorResponse({
          headers: responseHeaders,
          status: response.status,
@@ -48,7 +58,9 @@ async function doFetch(
          url: response.url,
          error,
       });
+
    } catch (err) {
+
       let error: Event;
 
       if (err instanceof Event) {
@@ -61,26 +73,26 @@ async function doFetch(
          error,
          url,
       });
+
    }
 
    throw errorResponse;
+
 }
+
 
 function getResponseBody(response: Response): Promise<any> {
 
    const contentType = response.headers.get("Content-Type");
 
-   if (response.status === 204) {
-      return Promise.resolve(null);
-   }
+   if (response.status === 204) return Promise.resolve(null);
 
-   if (contentType?.includes("application/json")) {
-      return response.json();
-
-   }
+   if (contentType?.includes("application/json")) return response.json();
 
    return response.text();
+
 }
+
 
 export function extractError(err: HttpErrorResponse, headline: string): string {
 
@@ -94,4 +106,5 @@ export function extractError(err: HttpErrorResponse, headline: string): string {
    }
 
    return err.error.message ? `${headline}: ${err.error.message}` : headline;
+
 }

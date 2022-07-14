@@ -1,6 +1,7 @@
 import { AuthType, FunctionGroupCode, Status } from "types/connectors";
 import { AttributeModel } from "./attributes/AttributeModel";
 
+
 export interface EndpointModel {
    uuid?: string;
    name: string;
@@ -9,6 +10,7 @@ export interface EndpointModel {
    required: boolean;
 }
 
+
 export interface FunctionGroupModel {
    uuid: string;
    name: string;
@@ -16,6 +18,7 @@ export interface FunctionGroupModel {
    kinds: string[];
    endPoints: EndpointModel[];
 }
+
 
 export interface ConnectorModel {
    uuid: string;

@@ -111,12 +111,15 @@ function CredentialList() {
                <thead>
 
                   <tr>
+
                      <th>
                         <b>Name</b>
                      </th>
+
                      <th>
                         <b>Dependencies</b>
                      </th>
+
                   </tr>
 
                </thead>

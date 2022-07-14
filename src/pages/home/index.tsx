@@ -9,9 +9,7 @@ function Home() {
 
       <Container className="themed-container" fluid>
 
-         <Widget
-            title={<h2><span className="fw-semi-bold">Welcome to CZERTAINLY!</span></h2>}
-         >
+         <Widget title={<h2><span className="fw-semi-bold">Welcome to CZERTAINLY!</span></h2>}>
 
             <p>The only tool you need for your certificate management.</p>
 
@@ -21,17 +19,21 @@ function Home() {
             </p>
 
             <ul>
+
                <li>
                   provide a higher level abstraction on top of certification authority
                   configuration
                </li>
+
                <li>
                   introduce agility – change the service configuration on the fly,
                   without impact on integrated clients
                </li>
+
                <li>
                   streamline integration procedure and reduce time and costs needed
                </li>
+
             </ul>
 
             <p>
@@ -110,8 +112,11 @@ function Home() {
                </Widget>
 
             </Col>
+
          </Row>
+
       </Container>
+
    );
 }
 

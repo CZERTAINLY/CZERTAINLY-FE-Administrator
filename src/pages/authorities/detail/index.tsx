@@ -27,9 +27,7 @@ export default function AuthorityDetail() {
 
    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
-
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-
 
    const isBusy = useMemo(
       () => isFetching || isDeleting,
@@ -38,30 +36,42 @@ export default function AuthorityDetail() {
 
 
    useEffect(
+
       () => {
+
          if (!params.id) return;
+
          dispatch(actions.getAuthorityDetail({ uuid: params.id }));
+
       },
       [dispatch, params.id]
+
    )
 
 
    const onEditClick = useCallback(
 
       () => {
+
          if (!authority) return;
+
          history.push(`../../authorities/edit/${authority.uuid}`);
+
       },
       [authority, history]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
 
       () => {
+
          if (!authority) return;
+
          dispatch(actions.deleteAuthority({ uuid: authority.uuid }));
          setConfirmDelete(false);
+
       },
       [authority, dispatch]
 
@@ -71,8 +81,11 @@ export default function AuthorityDetail() {
    const onForceDeleteAuthority = useCallback(
 
       () => {
+
          if (!authority) return;
+
          dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid] }));
+
       },
       [authority, dispatch]
 
@@ -80,15 +93,18 @@ export default function AuthorityDetail() {
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
       ],
       [onEditClick]
+
    );
 
 
    const authorityTitle = useMemo(
+
       () => (
 
          <div>
@@ -103,7 +119,9 @@ export default function AuthorityDetail() {
 
          </div>
 
-      ), [buttons]
+      ),
+      [buttons]
+
    );
 
 

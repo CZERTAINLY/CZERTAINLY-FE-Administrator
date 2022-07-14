@@ -1,5 +1,6 @@
 import { CertificateModel } from "models";
 
+
 export interface ClientModel {
   uuid: string;
   name: string;
@@ -8,6 +9,7 @@ export interface ClientModel {
   description: string;
   serialNumber: string;
 }
+
 
 export interface ClientAuthorizedRaProfileModel {
    uuid: string;

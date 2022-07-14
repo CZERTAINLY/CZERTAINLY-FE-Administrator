@@ -37,51 +37,75 @@ export default function AdministratorDetail() {
 
 
    useEffect(
+
       () => {
+
          if (!params.id) return;
+
          dispatch(actions.getAcmeProfile({ uuid: params.id }));
+
       },
       [params.id, dispatch]
    );
 
 
    const onEditClick = useCallback(
+
       () => {
+
          history.push(`../../acmeprofiles/edit/${acmeProfile?.uuid}`);
+
       },
       [acmeProfile, history]
+
    );
 
 
    const onEnableClick = useCallback(
+
       () => {
+
          if (!acmeProfile) return;
+
          dispatch(actions.enableAcmeProfile({ uuid: acmeProfile.uuid }));
+
       },
       [acmeProfile, dispatch]
+
    );
 
 
    const onDisableClick = useCallback(
+
       () => {
+
          if (!acmeProfile) return;
+
          dispatch(actions.disableAcmeProfile({ uuid: acmeProfile.uuid }));
+
       },
       [acmeProfile, dispatch]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          if (!acmeProfile) return;
+
          dispatch(actions.deleteAcmeProfile({ uuid: acmeProfile.uuid }));
          setConfirmDelete(false);
+
       },
       [acmeProfile, dispatch]
+
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
@@ -89,10 +113,12 @@ export default function AdministratorDetail() {
          { icon: "times", disabled: !(acmeProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
       [acmeProfile, onEditClick, onDisableClick, onEnableClick]
+
    );
 
 
    const detailsTitle = useMemo(
+
       () => (
 
          <div>
@@ -107,11 +133,14 @@ export default function AdministratorDetail() {
 
          </div>
 
-      ), [buttons]
+      ),
+      [buttons]
+
    );
 
 
    const tableHeader: TableHeader[] = useMemo(
+
       () => [
          {
             id: "property",
@@ -123,6 +152,7 @@ export default function AdministratorDetail() {
          },
       ],
       []
+
    );
 
 

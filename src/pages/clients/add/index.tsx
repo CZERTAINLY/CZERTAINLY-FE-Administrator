@@ -6,12 +6,14 @@ import ClientForm from "components/Forms/ClientForm";
 export default function Add() {
 
    const title = useMemo(
+
       () => (
          <h5>
             Add <span className="fw-semi-bold">Client</span>
          </h5>
       ),
       []
+
    );
 
    return (

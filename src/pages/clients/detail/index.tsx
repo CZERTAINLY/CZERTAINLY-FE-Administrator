@@ -45,65 +45,96 @@ export default function ClientDetail() {
 
 
    useEffect(
+
       () => {
+
          if (!params.id) return;
+
          dispatch(clientActions.getClientDetail({ uuid: params.id }));
          dispatch(clientActions.getAuthorizedProfiles({ clientUuid: params.id }));
          dispatch(raProfileActions.listRaProfiles());
+
       },
       [params.id, dispatch]
+
    );
 
 
    const onEditClick = useCallback(
+
       () => {
+
          if (!client) return;
+
          history.push(`../../clients/edit/${client?.uuid}`);
+
       },
       [client, history]
+
    )
 
 
    const onEnableClick = useCallback(
+
       () => {
+
          if (!client) return;
+
          dispatch(clientActions.enableClient({ uuid: client.uuid }));
+
       },
       [client, dispatch]
+
    )
 
 
    const onDisableClick = useCallback(
+
       () => {
+
          if (!client) return;
+
+
          dispatch(clientActions.disableClient({ uuid: client.uuid }));
-      }
-      , [client, dispatch]
+      },
+      [client, dispatch]
+
    )
 
 
    const onAuthorizeRaProfileClick = useCallback(
+
       () => {
+
          if (!client || !selectedProfile) return;
+
          const raProfile = raProfiles.find(p => p.uuid === selectedProfile.value);
          if (!raProfile) return;
+
          dispatch(clientActions.authorizeClient({ clientUuid: client.uuid, raProfile }));
+
       },
       [client, selectedProfile, dispatch, raProfiles]
    )
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          setConfirmDelete(false);
+
          if (!client) return;
+
          dispatch(clientActions.deleteClient({ uuid: client.uuid }));
+
       },
       [dispatch, client]
    )
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
@@ -111,10 +142,12 @@ export default function ClientDetail() {
          { icon: "times", disabled: !(client?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
       [client, onEditClick, onDisableClick, onEnableClick]
+
    );
 
 
    const attributesTitle = useMemo(
+
       () => (
 
          <div>
@@ -129,21 +162,26 @@ export default function ClientDetail() {
 
          </div>
 
-      ), [buttons]
+      ),
+      [buttons]
+
    );
 
 
    const certificateTitle = useMemo(
+
       () => (
          <h5>
             Client Certificate <span className="fw-semi-bold">Details</span>
          </h5>
       ),
       []
+
    );
 
 
    const detailHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "property",
@@ -155,6 +193,7 @@ export default function ClientDetail() {
          },
       ],
       []
+
    );
 
 
@@ -212,6 +251,7 @@ export default function ClientDetail() {
          }
       ],
       []
+
    );
 
 
@@ -222,9 +262,13 @@ export default function ClientDetail() {
          authorizedProfile => ({
             id: authorizedProfile.uuid,
             columns: [
+
                authorizedProfile.name,
+
                authorizedProfile.description,
+
                <StatusBadge enabled={authorizedProfile.enabled} />,
+
                <Button
                   className="btn btn-link p-0"
                   color="white"
@@ -244,6 +288,7 @@ export default function ClientDetail() {
          })
       ),
       [authorizedProfiles, dispatch, client]
+
    )
 
 
@@ -264,21 +309,28 @@ export default function ClientDetail() {
 
 
    useEffect(
+
       () => {
+
          if (!availableProfiles || availableProfiles.length === 0) {
             setSelectedProfile(null);
             return;
          }
+
          setSelectedProfile(availableProfiles[0]);
+
       },
       [availableProfiles, setSelectedProfile]
+
    )
 
 
    return (
 
       <Container className="themed-container" fluid>
+
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
+
             <Col>
 
                <Widget title={attributesTitle} busy={isFetchingDetail || isEnabling || isDisabling}>
@@ -299,6 +351,7 @@ export default function ClientDetail() {
                </Widget>
 
             </Col>
+
          </Row>
 
          <Widget title="Authorized RA Profiles" busy={isFetchingAuthorizedProfiles || isAuthorizing || isUnauthorizing}>
@@ -319,7 +372,7 @@ export default function ClientDetail() {
                name="profileselect"
                options={availableProfiles}
                value={selectedProfile}
-               onChange={option => setSelectedProfile(option || null) }
+               onChange={option => setSelectedProfile(option || null)}
             />
 
             <br />
@@ -355,6 +408,7 @@ export default function ClientDetail() {
          />
 
       </Container>
+
    );
 
 }

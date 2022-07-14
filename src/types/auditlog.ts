@@ -17,12 +17,12 @@ export type AuditLogOperation =
    "CONNECT" |
    "FORCE_DELETE" |
    "APPROVE"
-;
+   ;
 
 export type AuditLogOperationStatus =
    "FAILURE" |
    "SUCCESS"
-;
+   ;
 
 export type AuditLogSourceTarget =
    "ACCESS" |
@@ -49,4 +49,4 @@ export type AuditLogSourceTarget =
    "LOCALHOST" |
    "RA_PROFILE" |
    "STATISTICS"
-;
+   ;

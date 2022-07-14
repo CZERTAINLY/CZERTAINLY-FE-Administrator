@@ -35,56 +35,81 @@ export default function AdministratorsList() {
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
    useEffect(
+
       () => {
+
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listAcmeProfiles());
+
       },
       [dispatch]
+
    );
 
 
    const onAddClick = useCallback(
+
       () => {
+
          history.push(`${path}/add`);
+
       },
       [history, path]
+
    );
 
 
    const onEnableClick = useCallback(
+
       () => {
+
          dispatch(actions.bulkEnableAcmeProfiles({ uuids: checkedRows }));
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const onDisableClick = useCallback(
+
       () => {
+
          dispatch(actions.bulkDisableAcmeProfiles({ uuids: checkedRows }));
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
+
          dispatch(actions.bulkDeleteAcmeProfiles({ uuids: checkedRows }));
          setConfirmDelete(false);
+
       },
       [checkedRows, dispatch]
+
    );
 
 
    const setCheckedRows = useCallback(
+
       (rows: (string | number)[]) => {
+
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
       },
       [dispatch]
+
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
@@ -92,11 +117,14 @@ export default function AdministratorsList() {
          { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
       [checkedRows, onAddClick, onEnableClick, onDisableClick]
+
    );
 
 
    const title = useMemo(
+
       () => (
+
          <div>
 
             <div className="pull-right mt-n-xs">
@@ -108,12 +136,15 @@ export default function AdministratorsList() {
             </h5>
 
          </div>
+
       ),
       [buttons]
+
    );
 
 
    const acmeProfilesnTableHeader: TableHeader[] = useMemo(
+
       () => [
          {
             id: "name",
@@ -150,6 +181,7 @@ export default function AdministratorsList() {
          },
       ],
       []
+
    );
 
 
@@ -177,6 +209,7 @@ export default function AdministratorsList() {
          })
       ),
       [acmeProfiles, path]
+
    );
 
 
