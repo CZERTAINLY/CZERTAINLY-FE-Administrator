@@ -1,382 +1,382 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useRouteMatch } from "react-router-dom";
-import { Button, Container, Table } from "reactstrap";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import { Container, Table } from "reactstrap";
 
-import Spinner from "components/Spinner";
-import Widget from "components/Widget";
 import { actions, selectors } from "ducks/connectors";
-import { fieldNameTransform } from "utils/fieldNameTransform";
-import MDBColumnName from "components/MDBColumnName";
-import { FunctionGroup } from "api/connectors";
-import ToolTip from "components/ToolTip";
 
-import {
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import MDBColumnName from "components/MDBColumnName";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+
+import { attributeFieldNameTransform } from "utils/attributes";
+import { FunctionGroupModel } from "models/connectors";
 import { inventoryStatus } from "utils/connector";
-import CustomTable from "components/CustomTable";
 
 const { MDBBadge } = require("mdbreact");
 
 function ConnectorList() {
-  const connectors = useSelector(selectors.selectConnectors);
-  const isFetching = useSelector(selectors.isFetching);
-  const isDeleting = useSelector(selectors.isDeletingConnector);
-  const isEditing = useSelector(selectors.isEditing);
-  const confirmDeleteId = useSelector(selectors.selectConfirmDeleteConnectorId);
-  const confirmAuthorizeId = useSelector(
-    selectors.selectConfirmAuthorizeConnectorId
-  );
-  const deleteErrorMessages = useSelector(selectors.selectDeleteConnectorError);
-  const dispatch = useDispatch();
-  const { path } = useRouteMatch();
-  const [checkedRows, setCheckedRows] = useState<string[]>([]);
 
-  const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
-  const [duplicateRows, setDuplicateRows] = useState<(string | number)[]>([]);
+   const dispatch = useDispatch();
+   const history = useHistory();
 
-  useEffect(() => {
-    dispatch(actions.requestConnectorsList());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+   const { path } = useRouteMatch();
 
-  useEffect(() => {
-    if (deleteErrorMessages?.length > 0) {
-      setDeleteErrorModalOpen(true);
-    } else {
-      setDeleteErrorModalOpen(false);
-    }
-  }, [deleteErrorMessages]);
+   const checkedRows = useSelector(selectors.checkedRows);
+   const connectors = useSelector(selectors.connectors);
 
-  const onConfirmDelete = useCallback(() => {
-    dispatch(actions.confirmBulkDeleteConnector(checkedRows));
-    setDuplicateRows(checkedRows);
-    setCheckedRows([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, confirmDeleteId]);
+   const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
-  const onConfirmAuthorize = useCallback(() => {
-    dispatch(actions.confirmBulkAuthorizeConnector(checkedRows));
-  }, [dispatch, checkedRows]);
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+   const isForceDeleting = useSelector(selectors.isBulkForceDeleting);
+   const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
+   const isBulkAuthorizing = useSelector(selectors.isBulkAuthorizing);
 
-  const onCancelAuthorize = useCallback(
-    () => dispatch(actions.cancelAuthorizeConnector()),
-    [dispatch]
-  );
+   const isBusy = isFetching || isDeleting || isBulkDeleting || isForceDeleting || isBulkReconnecting || isBulkAuthorizing;
 
-  const onForceDeleteCancel = useCallback(() => {
-    dispatch(actions.cancelForceDeleteConnector());
-    setDeleteErrorModalOpen(false);
-  }, [dispatch]);
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+   const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
+   const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
-  const onCancelDelete = useCallback(
-    () => dispatch(actions.cancelDeleteConnector()),
-    [dispatch]
-  );
 
-  const getKindsForDisplay = (kinds: string[]) => {
-    return kinds.map(function (kind) {
-      return (
-        <>
-          <MDBBadge color="secondary" searchvalue={kind}>
-            {kind}
-          </MDBBadge>
-          &nbsp;
-        </>
-      );
-    });
-  };
+   useEffect(
+      () => {
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.listConnectors());
+      },
+      [dispatch]
+   );
 
-  const onDeleteConnector = (event: any) => {
-    dispatch(actions.confirmBulkDeleteConnectorRequest(checkedRows));
-  };
 
-  const onAuthorizeConnector = (event: any) => {
-    dispatch(actions.confirmBulkAuthorizeConnector(checkedRows));
-  };
+   useEffect(
+      () => {
+         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
+      },
+      [bulkDeleteErrorMessages]
+   );
 
-  const onReconnectConnector = () => {
-    dispatch(actions.requestBulkReconnectConnector(checkedRows));
-    setCheckedRows([]);
-  };
 
-  const onForceDeleteConnector = (event: any) => {
-    dispatch(actions.requestBulkForceDeleteConnector(duplicateRows));
-    setDuplicateRows([]);
-    setDeleteErrorModalOpen(false);
-  };
+   const onAddClick = useCallback(
+      () => {
+         history.push(`${path}/add`);
+      },
+      [history, path]
+   );
 
-  const title = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link
-          to={`${path}/add`}
-          className="btn btn-link"
-          data-for="add"
-          data-tip
-        >
-          <i className="fa fa-plus" />
-          <ToolTip id="add" message="Add new connector" />
-        </Link>
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={(event) => onDeleteConnector(event)}
-          data-for="delete"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-trash" />
-          ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
-          )}
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onReconnectConnector}
-          data-for="reconnect"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          <i className="fa fa-plug" />
-          <ToolTip id="reconnect" message="Reconnect" />
-        </Button>
-        <Button
-          className="btn btn-link"
-          color="white"
-          data-for="authorize"
-          onClick={onAuthorizeConnector}
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          <i className="fa fa-check" />
-          <ToolTip id="authorize" message="Authorize" />
-        </Button>
-      </div>
-      <h5 className="mt-0">
-        <span className="fw-semi-bold">Connector Store</span>
-      </h5>
-    </div>
-  );
+   const onReconnectClick = useCallback(
+      () => {
+         dispatch(actions.bulkReconnectConnectors({ uuids: checkedRows }));
+      },
+      [checkedRows, dispatch]
+   );
 
-  const getFunctionGroupTable = (functionGroups: FunctionGroup[]) => {
-    return (
-      <table style={{ border: "none" }}>
-        <tbody>
-          {functionGroups.map(function (group) {
-            return (
-              <tr style={{ border: "none" }}>
-                <td style={{ border: "none" }}>
-                  <MDBBadge
-                    color="primary"
-                    searchvalue={
-                      fieldNameTransform[group.name || ""] || group.name
-                    }
-                  >
-                    {fieldNameTransform[group.name || ""] || group.name}
+
+   const setCheckedRows = useCallback(
+      (rows: (string | number)[]) => {
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+      },
+      [dispatch]
+   );
+
+
+   const onDeleteConfirmed = useCallback(
+      () => {
+         setConfirmDelete(false);
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.bulkDeleteConnectors({ uuids: checkedRows }));
+      },
+      [dispatch, checkedRows]
+   );
+
+
+   const onForceDeleteConfirmed = useCallback(
+      () => {
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.bulkForceDeleteConnectors({ uuids: checkedRows }));
+      },
+      [dispatch, checkedRows]
+   );
+
+
+   const onAuthorizeConfirmed = useCallback(
+      () => {
+         setConfirmAuthorize(false);
+         dispatch(actions.bulkAuthorizeConnectors({ uuids: checkedRows }));
+      },
+      [dispatch, checkedRows]
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true); } }
+      ],
+      [checkedRows, onAddClick, onReconnectClick]
+   );
+
+
+   const title = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               <span className="fw-semi-bold">Connector Store</span>
+            </h5>
+
+         </div>
+
+      ),
+      [buttons]
+
+   );
+
+
+   const getKinds = useCallback(
+
+      (functionGroups: FunctionGroupModel[]) => {
+
+         return functionGroups.map(
+
+            group => (
+
+               <div key={group.uuid}>
+
+                  {group.kinds.map(
+
+                     kind => (
+                        <span key={kind}>
+                           <MDBBadge color="secondary" searchvalue={kind}>
+                              {kind}
+                           </MDBBadge>
+                           &nbsp;
+                        </span>
+                     )
+
+                  )}
+
+               </div>
+
+            )
+
+         )
+
+      },
+      []
+
+   );
+
+
+   const getFunctionGroups = useCallback(
+
+      (functionGroups: FunctionGroupModel[]) => {
+
+         return functionGroups.map(
+
+            group => (
+
+               <div key={group.uuid}>
+                  <MDBBadge color="primary" searchvalue={attributeFieldNameTransform[group.name || ""] || group.name}>
+                     {attributeFieldNameTransform[group.name || ""] || group.name}
                   </MDBBadge>
-                </td>
-                <td style={{ border: "none" }}>
-                  {getKindsForDisplay(group.kinds)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    );
-  };
+               </div>
 
-  const getFunctionGroupTableContent = (functionGroups: FunctionGroup[]) => {
-    return functionGroups.map(function (group) {
-      const groupName =
-        fieldNameTransform[group.name || ""] || group.name || "";
-      const groupKinds = group.kinds.join(" ");
+            )
 
-      return groupName + groupKinds;
-    });
-  };
+         )
+      },
+      []
 
-  const connectorList = () => {
-    let rows: any = [];
-    for (let connector of connectors) {
-      let connectorStatus = inventoryStatus(connector.status || "");
-      let column: any = {};
-      column["name"] = {
-        content: connector.name,
-        styledContent: (
-          <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>
-        ),
-        lineBreak: true,
-      };
-      column["functions"] = {
-        content: getFunctionGroupTableContent(
-          connector.functionGroups || []
-        ).join(""),
-        styledContent: getFunctionGroupTable(connector.functionGroups || []),
-        lineBreak: true,
-      };
-      column["url"] = {
-        content: connector.url,
-        lineBreak: true,
-      };
-      column["status"] = {
-        content: connector.status,
-        styledContent: (
-          <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
-        ),
-        lineBreak: true,
-      };
-      rows.push({
-        id: connector.uuid,
-        column: column,
-        data: connector,
-      });
-    }
-    return rows;
-  };
+   );
 
-  const connectorRowHeaders = [
-    {
-      styledContent: <MDBColumnName columnName="Name" />,
-      content: "name",
-      sort: false,
-      id: "connectorName",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Function Groups & Kinds" />,
-      content: "functions",
-      sort: false,
-      id: "connectorFunctions",
-      width: "35%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="URL" />,
-      content: "url",
-      sort: false,
-      id: "connectorUrl",
-      width: "30%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Status" />,
-      content: "status",
-      sort: false,
-      id: "connectorStatus",
-      width: "10%",
-    },
-  ];
 
-  return (
-    <div>
-      <Container className="themed-container" fluid>
-        <Widget title={title}>
-          <br />
-          <CustomTable
-            checkedRows={checkedRows}
-            checkedRowsFunction={setCheckedRows}
-            data={connectors}
-            headers={connectorRowHeaders}
-            rows={connectorList()}
-          />
-        </Widget>
-        <MDBModal
-          overflowScroll={false}
-          isOpen={confirmDeleteId !== ""}
-          toggle={onCancelDelete}
-        >
-          <MDBModalHeader toggle={onCancelDelete}>
-            Delete Connector
-          </MDBModalHeader>
-          <MDBModalBody>
-            You are about to delete connectors. Is this what you want to do?
-          </MDBModalBody>
-          <MDBModalFooter>
-            <Button color="danger" onClick={onConfirmDelete}>
-              Yes, delete
-            </Button>
-            <Button color="secondary" onClick={onCancelDelete}>
-              Cancel
-            </Button>
-          </MDBModalFooter>
-        </MDBModal>
-        <MDBModal
-          overflowScroll={false}
-          isOpen={confirmAuthorizeId !== ""}
-          toggle={onCancelAuthorize}
-        >
-          <MDBModalHeader toggle={onCancelAuthorize}>
-            Authorize Connector
-          </MDBModalHeader>
-          <MDBModalBody>
-            You are about authorize a connector. Is this what you want to do?
-          </MDBModalBody>
-          <MDBModalFooter>
-            <Button color="success" onClick={onConfirmAuthorize}>
-              Yes, Authorize
-            </Button>
-            <Button color="secondary" onClick={onCancelAuthorize}>
-              Cancel
-            </Button>
-          </MDBModalFooter>
-        </MDBModal>
+   const forceDeleteBody = useMemo(
 
-        <MDBModal
-          overflowScroll={false}
-          isOpen={deleteErrorModalOpen}
-          toggle={onForceDeleteCancel}
-        >
-          <MDBModalHeader toggle={onForceDeleteCancel}>
-            Delete Connector
-          </MDBModalHeader>
-          <MDBModalBody>
-            Failed to delete some of the connectors. Please find the details
-            below
+      () => (
+
+         <div>
+
+            <div>Failed to delete {checkedRows.length > 1 ? "Connectors" : "a Connector"}. Please find the details below:</div>
+
             <Table className="table-hover" size="sm">
-              <thead>
-                <tr>
-                  <th>
-                    <b>Name</b>
-                  </th>
-                  <th>
-                    <b>Dependencies</b>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {deleteErrorMessages?.map(function (message) {
-                  return (
-                    <tr>
-                      <td>{message.name}</td>
-                      <td>{message.message}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </MDBModalBody>
-          <MDBModalFooter>
-            <Button color="danger" onClick={onForceDeleteConnector}>
-              Force
-            </Button>
-            <Button color="secondary" onClick={onForceDeleteCancel}>
-              Cancel
-            </Button>
-          </MDBModalFooter>
-        </MDBModal>
 
-        <Spinner active={isFetching || isDeleting || isEditing} />
+               <thead>
+
+                  <tr>
+                     <th>
+                        <b>Name</b>
+                     </th>
+                     <th>
+                        <b>Dependencies</b>
+                     </th>
+                  </tr>
+
+               </thead>
+
+               <tbody>
+
+                  {bulkDeleteErrorMessages?.map(
+                     message => (
+                        <tr>
+                           <td>{message.name}</td>
+                           <td>{message.message}</td>
+                        </tr>
+                     )
+                  )}
+
+               </tbody>
+
+            </Table >
+
+         </div>
+
+      ),
+      [bulkDeleteErrorMessages, checkedRows.length]
+
+   );
+
+
+   const connectorsRowHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            id: "connectorName",
+            width: "25%",
+         },
+         {
+            content: <MDBColumnName columnName="Function Groups" />,
+            align: "center",
+            sortable: true,
+            id: "connectorFunctions",
+            width: "15%",
+         },
+         {
+            content: <MDBColumnName columnName="Kinds" />,
+            sortable: true,
+            id: "kinds",
+            width: "15%",
+            align: "center"
+         },
+         {
+            content: <MDBColumnName columnName="URL" />,
+            sortable: true,
+            id: "connectorUrl",
+         },
+         {
+            content: <MDBColumnName columnName="Status" />,
+            sortable: true,
+            id: "connectorStatus",
+            width: "5%",
+         },
+      ],
+      []
+
+   );
+
+
+   const connectorList: TableDataRow[] = useMemo(
+
+      () => connectors.map(
+
+         connector => {
+
+            const connectorStatus = inventoryStatus(connector.status);
+
+            return {
+               id: connector.uuid,
+               columns: [
+
+                  <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>,
+
+                  <>{getFunctionGroups(connector.functionGroups)}</>,
+
+                  <>{getKinds(connector.functionGroups)}</>,
+
+                  <>{connector.url}</>,
+
+                  <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
+
+               ],
+            }
+         }
+
+      ),
+      [connectors, path, getFunctionGroups, getKinds]
+
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+
+            <CustomTable
+               headers={connectorsRowHeaders}
+               data={connectorList}
+               onCheckedRowsChanged={setCheckedRows}
+               hasCheckboxes={true}
+               hasPagination={true}
+               canSearch={true}
+            />
+
+         </Widget>
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={confirmAuthorize}
+            caption={`Authorize ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={`You are about to authorize a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
+            toggle={() => setConfirmAuthorize(false)}
+            buttons={[
+               { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
+               { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={confirmForceDelete}
+            caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={forceDeleteBody}
+            toggle={() => setConfirmForceDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+            ]}
+         />
+
       </Container>
-    </div>
-  );
+
+   );
 }
 
 export default ConnectorList;

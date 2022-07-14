@@ -1,25 +1,18 @@
-import { CertificateDetailResponse } from "models";
+import { CertificateModel } from "models";
 
-export interface Administrator {
-  uuid: string;
-  name: string;
-  surname: string;
-  username: string;
-  certificate: CertificateDetailResponse;
-  superAdmin: boolean;
-  enabled: boolean;
-  serialNumber?: string;
-}
+export type AdministratorRole = "administrator" | "superAdministrator";
 
-export interface AdministratorDetail {
-  uuid: string;
-  name: string;
-  surname: string;
-  username: string;
-  email: string;
-  description: string;
-  certificate: CertificateDetailResponse;
-  superAdmin: boolean;
-  enabled: boolean;
-  serialNumber?: string;
+export interface AdministratorModel {
+
+   uuid: string;
+   serialNumber: string;
+   name: string;
+   username: string;
+   surname: string;
+   email: string;
+   role: AdministratorRole;
+   description: string;
+   certificate: CertificateModel;
+   enabled: boolean;
+
 }

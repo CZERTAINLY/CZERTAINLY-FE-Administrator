@@ -1,59 +1,112 @@
-import { Epic } from "redux-observable";
 import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
-import { isOfType } from "typesafe-actions";
+
+import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
-import { EpicDependencies, State as AppState } from "./app-state";
-import { Action, Actions, actions } from "./certificates";
 
-const getCertificatesList: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.ListRequest)),
-    switchMap(({ searchField }) =>
-      apiClients.certificates.getCertificatesList(searchField).pipe(
-        map((certificates) =>
-          Array.isArray(certificates.certificates)
-            ? actions.receiveCertificatesList(certificates)
-            : actions.failCertificatesList(
-                "Failed to retrieve certificates list"
-              )
-        ),
-        catchError((err) =>
-          of(
-            actions.failCertificatesList(
-              extractError(err, "Failed to retrieve certificates list")
+import * as slice from "./certificates";
+import { actions as alertActions } from "./alerts";
+import { transformCertDTOToModel } from "./transform/certificates";
+
+
+const listCertificates: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listCertificates.match
+      ),
+      switchMap(
+
+         action => {
+
+            return deps.apiClients.certificates.getCertificatesList(
+               action.payload.query.itemsPerPage,
+               action.payload.query.pageNumber,
+               action.payload.query.filters
+            ).pipe(
+
+               map(
+                  list => slice.actions.listCertificatesSuccess({ certificateList: list.certificates.map(transformCertDTOToModel)})
+               ),
+
+               catchError(err => of(slice.actions.listCertificatesFailure({ error: extractError(err, "Failed to get certificates list") })))
+
             )
-          )
-        )
-      )
-    )
-  );
+         }
 
-const getCertificateDetail: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DetailRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.certificates.getCertificateDetail(uuid).pipe(
-        map((certificates) => actions.receiveCertificateDetail(certificates)),
-        catchError((err) =>
-          of(
-            actions.failCertificateDetail(
-              extractError(err, "Failed to retrieve certificates information")
+      )
+
+   )
+
+}
+
+
+const listCertificatesFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listCertificatesFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const getCertificateDetail: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateDetail.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.getCertificateDetail(action.payload.uuid).pipe(
+
+            map(
+               certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertDTOToModel(certificate) })
+            ),
+            catchError(
+               err => of(slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }))
             )
-          )
-        )
-      )
-    )
-  );
 
-const epics = [getCertificatesList, getCertificateDetail];
+         )
+
+      )
+
+   )
+
+}
+
+
+const getCertificateDetailFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateDetailFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const epics = [
+   listCertificates,
+   listCertificatesFailure,
+   getCertificateDetail,
+   getCertificateDetailFailure
+];
+
 
 export default epics;

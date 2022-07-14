@@ -1,30 +1,29 @@
-import { AttributeResponse } from "./attributes";
+import { AttributeModel } from "./attributes/AttributeModel";
 
-export interface RaProfile {
-  uuid: string;
-  name: string;
-  enabled: boolean;
-  authorityInstanceUuid: string;
-  description?: string;
-  authorityInstanceName: string;
-  enabledProtocols?: string[];
+export interface RaProfileModel {
+   uuid: string;
+   name: string;
+   enabled: boolean;
+   description?: string;
+   authorityInstanceUuid: string;
+   authorityInstanceName: string;
+   attributes: AttributeModel[];
+   enabledProtocols?: string[];
 }
 
-export interface RaProfileDetail {
-  uuid: string;
-  name: string;
-  description?: string;
-  authorityInstanceUuid: string;
-  attributes?: AttributeResponse[];
-  enabled: boolean;
-  authorityInstanceName: string;
+
+export interface RaAuthorizedClientModel {
+   uuid: string;
+   name: string;
+   enabled: boolean;
 }
 
-export interface RaAcmeLink {
-  directoryUrl?: string;
-  uuid: string;
-  name: string;
-  acmeAvailable: boolean;
-  issueCertificateAttributes: any;
-  revokeCertificateAttributes: any;
+
+export interface RaAcmeLinkModel {
+   uuid?: string;
+   name?: string;
+   directoryUrl?: string;
+   issueCertificateAttributes?: AttributeModel[];
+   revokeCertificateAttributes?: AttributeModel[];
+   acmeAvailable: boolean;
 }

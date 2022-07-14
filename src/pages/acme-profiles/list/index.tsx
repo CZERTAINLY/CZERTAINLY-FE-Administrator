@@ -1,296 +1,249 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
-import Spinner from "components/Spinner";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import { Container } from "reactstrap";
+
 import { actions, selectors } from "ducks/acme-profiles";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
-import { useHistory } from "react-router";
-import {
-  MDBBadge,
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
-import ToolTip from "components/ToolTip";
-import CustomTable from "components/CustomTable";
+import StatusBadge from "components/StatusBadge";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+import { MDBBadge } from "mdbreact";
 
-function AcmeProfileList() {
-  const profiles = useSelector(selectors.selectProfiles);
-  const isFetching = useSelector(selectors.isFetching);
-  const isDeleting = useSelector(selectors.isDeleting);
-  const isEditing = useSelector(selectors.isEditing);
-  const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
-  const [checkedRows, setCheckedRows] = useState<(string | number)[]>([]);
-  const [duplicateRows, setDuplicateRows] = useState<(string | number)[]>([]);
-  const deleteErrorMessages = useSelector(selectors.selectDeleteProfileError);
-  const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
+export default function AdministratorsList() {
 
-  const dispatch = useDispatch();
-  const { path } = useRouteMatch();
-  const history = useHistory();
+   const dispatch = useDispatch();
+   const history = useHistory();
 
-  useEffect(() => {
-    dispatch(actions.requestAcmeProfilesList());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+   const { path } = useRouteMatch();
 
-  useEffect(() => {
-    if (deleteErrorMessages?.length > 0) {
-      setDeleteErrorModalOpen(true);
-    } else {
-      setDeleteErrorModalOpen(false);
-    }
-  }, [deleteErrorMessages]);
+   const checkedRows = useSelector(selectors.checkedRows);
+   const acmeProfiles = useSelector(selectors.acmeProfiles);
 
-  const onConfirmDelete = useCallback(() => {
-    dispatch(actions.confirmBulkDeleteProfile(checkedRows));
-    setDuplicateRows(checkedRows);
-    setCheckedRows([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, confirmDeleteId]);
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+   const isUpdating = useSelector(selectors.isUpdating);
+   const isBulkEnabling = useSelector(selectors.isBulkEnabling);
+   const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-  const onCancelDelete = useCallback(
-    () => dispatch(actions.cancelBulkDeleteProfile()),
-    [dispatch]
-  );
+   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
-  const onDeleteProfile = () => {
-    dispatch(actions.confirmBulkDeleteProfileRequest(checkedRows));
-  };
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const onEnableProfile = () => {
-    dispatch(actions.requestBulkEnableProfile(checkedRows));
-    setCheckedRows([]);
-  };
+   useEffect(
 
-  const onDisableProfile = () => {
-    dispatch(actions.requestBulkDisableProfile(checkedRows));
-    setCheckedRows([]);
-  };
+      () => {
 
-  const onForceDeleteCancel = useCallback(() => {
-    dispatch(actions.cancelBulkForceDeleteProfile());
-    setDeleteErrorModalOpen(false);
-  }, [dispatch]);
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         dispatch(actions.listAcmeProfiles());
 
-  const onForceDeleteProfile = (event: any) => {
-    dispatch(
-      actions.requestBulkForceDeleteProfile(duplicateRows, false, history)
-    );
-    setDuplicateRows([]);
-    setDeleteErrorModalOpen(false);
-  };
+      },
+      [dispatch]
 
-  const title = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link to={`${path}/add`} className="btn btn-link">
-          <i className="fa fa-plus" />
-        </Link>
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDeleteProfile}
-          data-for="delete"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-trash" />
-          ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
-          )}
+   );
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnableProfile}
-          data-for="enable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
+   const onAddClick = useCallback(
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+      () => {
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisableProfile}
-          data-for="disable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
+         history.push(`${path}/add`);
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
-      <h5 className="mt-0">
-        List of <span className="fw-semi-bold">ACME Profiles</span>
-      </h5>
-    </div>
-  );
+      },
+      [history, path]
 
-  const profilesList = () => {
-    let rows: any = [];
-    for (let profile of profiles) {
-      let column: any = {};
-      column["name"] = {
-        content: profile.name,
-        styledContent: (
-          <Link to={`${path}/detail/${profile.uuid}`}>{profile.name}</Link>
-        ),
-        lineBreak: true,
-      };
-      column["description"] = {
-        content: profile.description,
-        lineBreak: true,
-      };
-      column["raProfileName"] = {
-        content: profile.raProfileName || "",
-        styledContent: (
-          <MDBBadge color="info">{profile.raProfileName || ""}</MDBBadge>
-        ),
-        lineBreak: true,
-      };
+   );
 
-      column["directoryUrl"] = {
-        content: profile.directoryUrl,
-        lineBreak: true,
-      };
-      column["status"] = {
-        content: profile.enabled ? "enabled" : "disabled",
-        styledContent: <StatusBadge enabled={profile.enabled} />,
-        lineBreak: true,
-      };
-      rows.push({
-        id: profile.uuid,
-        column: column,
-        data: profile,
-      });
-    }
-    return rows;
-  };
 
-  const profileRowHeaders = [
-    {
-      styledContent: <MDBColumnName columnName="Name" />,
-      content: "name",
-      sort: false,
-      id: "acmeProfileName",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Description" />,
-      content: "description",
-      sort: false,
-      id: "acmeProfileDescription",
-      width: "20%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="RA Profile Name" />,
-      content: "raProfileName",
-      sort: false,
-      id: "acmeRaProfileName",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Directory URL" />,
-      content: "directoryUrl",
-      sort: false,
-      id: "acmeDirectoryUrl",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Status" />,
-      content: "status",
-      sort: false,
-      id: "acmeProfileStatus",
-      width: "10%",
-    },
-  ];
+   const onEnableClick = useCallback(
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <br />
-        <CustomTable
-          checkedRows={checkedRows}
-          checkedRowsFunction={setCheckedRows}
-          data={profiles}
-          headers={profileRowHeaders}
-          rows={profilesList()}
-        />
-      </Widget>
-      <MDBModal
-        overflowScroll={false}
-        isOpen={confirmDeleteId !== ""}
-        toggle={onCancelDelete}
-      >
-        <MDBModalHeader toggle={onCancelDelete}>Delete Profile</MDBModalHeader>
-        <MDBModalBody>
-          You are about to delete ACME Profile(s) which may have associated ACME
-          Account(s). When deleted the ACME Account(s) will be revoked.
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onConfirmDelete}>
-            Yes, delete
-          </Button>
-          <Button color="secondary" onClick={onCancelDelete}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
+      () => {
 
-      <MDBModal
-        overflowScroll={false}
-        isOpen={deleteErrorModalOpen}
-        toggle={onForceDeleteCancel}
-      >
-        <MDBModalHeader toggle={onForceDeleteCancel}>
-          Delete ACME Profile
-        </MDBModalHeader>
-        <MDBModalBody>
-          <b>
-            Failed to delete ACME Profiles it has some dependent RA Profiles.
-            Please find the details below &nbsp;
-          </b>
-          <br />
-          <br />
-          {deleteErrorMessages?.map(function (message) {
-            return message.message;
-          })}
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onForceDeleteProfile}>
-            Force
-          </Button>
-          <Button color="secondary" onClick={onForceDeleteCancel}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
+         dispatch(actions.bulkEnableAcmeProfiles({ uuids: checkedRows }));
 
-      <Spinner active={isFetching || isDeleting || isEditing} />
-    </Container>
-  );
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDisableAcmeProfiles({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDeleteConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDeleteAcmeProfiles({ uuids: checkedRows }));
+         setConfirmDelete(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const setCheckedRows = useCallback(
+
+      (rows: (string | number)[]) => {
+
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
+      },
+      [dispatch]
+
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onAddClick, onEnableClick, onDisableClick]
+
+   );
+
+
+   const title = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">ACME Profiles</span>
+            </h5>
+
+         </div>
+
+      ),
+      [buttons]
+
+   );
+
+
+   const acmeProfilesnTableHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "name",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            width: "10%"
+         },
+         {
+            id: "description",
+            content: <MDBColumnName columnName="Description" />,
+            sortable: true,
+            width: "10%"
+         },
+         {
+            id: "raProfileName",
+            content: <MDBColumnName columnName="RA Profile Name" />,
+            sortable: true,
+            width: "10%",
+            align: "center"
+         },
+         {
+            id: "directoryUrl",
+            content: <MDBColumnName columnName="Directory URL" />,
+            sortable: true,
+            width: "auto"
+         },
+         {
+            id: "status",
+            content: <MDBColumnName columnName="Status" />,
+            align: "center",
+            sortable: true,
+            width: "7%"
+         },
+      ],
+      []
+
+   );
+
+
+   const acmeProfilesTableData: TableDataRow[] = useMemo(
+
+      () => acmeProfiles.map(
+
+         acmeProfile => ({
+
+            id: acmeProfile.uuid,
+
+            columns: [
+
+               <Link to={`${path}/detail/${acmeProfile.uuid}`}>{acmeProfile.name}</Link>,
+
+               acmeProfile.description || "",
+
+               <MDBBadge color="info">{acmeProfile.raProfileName}</MDBBadge>,
+
+               acmeProfile.directoryUrl || "",
+
+               <StatusBadge enabled={acmeProfile.enabled} />,
+
+            ]
+         })
+      ),
+      [acmeProfiles, path]
+
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+            <CustomTable
+               headers={acmeProfilesnTableHeader}
+               data={acmeProfilesTableData}
+               onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
+               hasCheckboxes={true}
+               hasPagination={true}
+            />
+
+         </Widget>
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete ${checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"} which may have associated ACME
+                   Account(s). When deleted the ACME Account(s) will be revoked. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+   );
+
 }
-
-export default AcmeProfileList;

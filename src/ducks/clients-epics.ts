@@ -1,443 +1,718 @@
-import { Epic } from "redux-observable";
-import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { isOfType } from "typesafe-actions";
+import { EMPTY, of } from "rxjs";
+import { catchError, filter, map, switchMap } from "rxjs/operators";
+import history from "browser-history";
 
-import { ClientDetailResponse, ClientInfoResponse } from "api/clients";
-import { Client, ClientDetails } from "models";
-import { readCertificate } from "utils/file";
+import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
-import { EpicDependencies, State as AppState } from "./app-state";
-import { Action, Actions, actions, selectors } from "./clients";
-import {
-  Action as ProfileAction,
-  actions as profileActions,
-  selectors as profileSelectors,
-} from "./ra-profiles";
-import { useHistory } from "react-router";
 
-const getAuthorizedProfiles: Epic<Action, Action, AppState, EpicDependencies> =
-  (action$, _, { apiClients }) =>
-    action$.pipe(
-      filter(isOfType(Actions.AuthListRequest)),
-      switchMap(({ uuid }) =>
-        apiClients.clients.getClientAuth(uuid).pipe(
-          map((profiles) =>
-            actions.receiveAuthorizedProfiles(
-              profiles.map((p) => p.uuid.toString())
+import * as slice from "./clients";
+import { actions as alertActions } from "./alerts";
+
+import { readFileString$ } from "utils/readFile";
+import { getCertificateInformation } from "utils/certificate";
+
+import { transformCertModelToDTO } from "./transform/certificates";
+import { transformClientAuthorizedProfileDTOToModel, transformClientDTOToModel } from "./transform/clients";
+
+
+const listClients: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listClients.match
+      ),
+      switchMap(
+
+         () => deps.apiClients.clients.getClientsList().pipe(
+
+            map(
+               list => slice.actions.listClientsSuccess({ clientList: list.map(transformClientDTOToModel) })
+            ),
+            catchError(
+               err => of(slice.actions.listClientsFailure({ error: extractError(err, "Failed to get clients list") }))
             )
-          ),
-          catchError((err) =>
-            of(
-              actions.failAuthorizedProfiles(
-                extractError(
-                  err,
-                  "Failed to retrieve authorized profiles of the client"
-                )
-              )
-            )
-          )
-        )
+
+         )
+
       )
-    );
 
-const getClientsList: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.ListRequest)),
-    switchMap(() =>
-      apiClients.clients.getClientsList().pipe(
-        map((clients) =>
-          Array.isArray(clients)
-            ? actions.receiveClientsList(clients.map(mapClient))
-            : actions.failClientsList("Failed to retrieve clients list")
-        ),
-        catchError((err) =>
-          of(
-            actions.failClientsList(
-              extractError(err, "Failed to retrieve clients list")
-            )
-          )
-        )
+   )
+
+};
+
+
+const listClientsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listClientsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
-    )
-  );
 
-const fetchAdditionalDetailData: Epic<
-  Action | ProfileAction,
-  Action | ProfileAction,
-  AppState,
-  EpicDependencies
-> = (action$, state$) =>
-  action$.pipe(
-    filter(isOfType(Actions.DetailRequest)),
-    mergeMap(({ uuid }) => {
-      const result = [];
-      const clients = selectors.selectClients(state$.value);
-      const profiles = profileSelectors.selectProfiles(state$.value);
+   )
 
-      result.push(actions.requestAuthorizedProfiles(uuid));
+};
 
-      if (!clients.find((c) => c.uuid === uuid)) {
-        result.push(actions.requestClientsList());
-      }
-      if (!profiles.length) {
-        result.push(profileActions.requestRaProfilesList());
-      }
 
-      return result;
-    })
-  );
+const getClientDetail: AppEpic = (action$, state, deps) => {
 
-const getClientDetail: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DetailRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.getClientDetail(uuid).pipe(
-        map((client) =>
-          actions.receiveClientDetail(mapClientDetail(uuid, client))
-        ),
-        catchError((err) =>
-          of(
-            actions.failClientDetail(
-              extractError(err, "Failed to retrieve client information")
+   return action$.pipe(
+
+      filter(
+         slice.actions.getClientDetail.match
+      ),
+
+      switchMap(
+
+         action => deps.apiClients.clients.getClientDetail(action.payload.uuid).pipe(
+
+            map(
+               detail => slice.actions.getClientDetailSuccess({ client: transformClientDTOToModel(detail) })
+            ),
+            catchError(
+               err => of(slice.actions.getClientDetailFailure({ error: extractError(err, "Failed to load client detail") }))
             )
-          )
-        )
-      )
-    )
-  );
 
-const authorizeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.AuthorizeProfileRequest)),
-    switchMap(({ clientId, profileId }) =>
-      apiClients.clients.authorizeProfile(clientId, profileId).pipe(
-        map(() => actions.receiveAuthorizeProfile(clientId, profileId)),
-        catchError((err) =>
-          of(
-            actions.failAuthorizeProfile(
-              extractError(err, `Failed to authorize profile ${profileId}`)
+         )
+
+      )
+
+   )
+
+};
+
+
+const getClientDetailFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getClientDetailFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const getAuthorizedProfiles: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getAuthorizedProfiles.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.getAuthorizedProfiles(action.payload.clientUuid).pipe(
+
+            map(
+               profiles => slice.actions.getAuthorizedProfilesSuccess({
+                  clientUuid: action.payload.clientUuid,
+                  authorizedProfiles: profiles.map(transformClientAuthorizedProfileDTOToModel)
+               })
+            ),
+            catchError(
+               err => of(slice.actions.getAuthorizedProfilesFailure({ error: extractError(err, "Failed to get authorized profiles") }))
             )
-          )
-        )
-      )
-    )
-  );
 
-const unauthorizeProfile: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.UnauthorizeRequest)),
-    switchMap(({ clientId, profileId }) =>
-      apiClients.clients.unauthorizeProfile(clientId, profileId).pipe(
-        map(() => actions.receiveUnauthorizeProfile(clientId, profileId)),
-        catchError(() =>
-          of(
-            actions.failUnauthorizeProfile(
-              clientId,
-              profileId,
-              `Failed to unauthorize profile ${profileId}`
-            )
-          )
-        )
-      )
-    )
-  );
+         )
 
-const createClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.CreateRequest)),
-    switchMap(
-      ({ name, certificate, description, enabled, certificateUuid, history }) =>
-        readCertificate(certificate).pipe(
-          switchMap((clientCertificate) =>
-            apiClients.clients
-              .createNewClient(
-                name,
-                clientCertificate,
-                description,
-                enabled,
-                certificateUuid
-              )
-              .pipe(
-                map((uuid) => {
-                  history.push(`./detail/${uuid}`);
-                  return actions.receiveCreateClient(uuid);
-                }),
-                catchError((err) =>
-                  of(
-                    actions.failCreateClient(
-                      extractError(err, "Failed to create client")
-                    )
+      )
+
+   )
+
+};
+
+
+const getAuthorizedProfilesFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getAuthorizedProfilesFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const createClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.createClient.match
+      ),
+
+      switchMap(
+
+         action => (action.payload.certificate ? readFileString$(action.payload.certificate) : of("")).pipe(
+
+            switchMap(
+
+               certificateContent => deps.apiClients.clients.createNewClient(
+                  action.payload.name,
+                  action.payload.description,
+                  false,
+                  action.payload.certificateUuid,
+                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
+               ).pipe(
+
+                  map(
+                     uuid => slice.actions.createClientSuccess({ uuid })
+                  ),
+                  catchError(
+                     err => of(slice.actions.createClientFailure({ error: extractError(err, "Failed to create client") }))
                   )
-                )
-              )
-          ),
-          catchError(() =>
-            of(actions.failCreateClient("Failed to read client certificate"))
-          )
-        )
-    )
-  );
 
-const startDeleteClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DeleteRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.getClientAuth(uuid).pipe(
-        map((profiles) => {
-          if (Array.isArray(profiles) && profiles.length > 0) {
-            return actions.confirmDeleteClientRequest(uuid, useHistory());
-          }
-          return actions.confirmDeleteClient(uuid, useHistory());
-        }),
-        catchError(() =>
-          of(
-            actions.failDeleteClient(
-              "Cannot delete client: Failed to retrieve authorized profiles of the client"
-            )
-          )
-        )
+               )
+
+            ),
+            catchError(
+               err => of(slice.actions.createClientFailure({ error: extractError(err, "Failed to create client") }))
+            ),
+
+         )
+
       )
-    )
-  );
 
-const deleteClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.ConfirmDelete)),
-    switchMap(({ uuid, history }) =>
-      apiClients.clients.deleteClient(uuid).pipe(
-        map(() => {
-          history.push("..");
-          return actions.receiveDeleteClient(uuid);
-        }),
-        catchError((err) =>
-          of(
-            actions.failDeleteClient(
-              extractError(err, "Failed to delete client")
-            )
-          )
-        )
+   )
+
+};
+
+
+const createClientSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.createClientSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            history.push(`./detail/${action.payload.uuid}`);
+            return EMPTY;
+         }
+
       )
-    )
-  );
 
-const enableClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.EnableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.enableClient(uuid).pipe(
-        map(() => actions.receiveEnableClient(uuid)),
-        catchError((err) =>
-          of(
-            actions.failEnableClient(
-              extractError(err, "Failed to enable client")
-            )
-          )
-        )
+   )
+
+};
+
+
+const createClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.createClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
-    )
-  );
 
-const disableClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.DisableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.disableClient(uuid).pipe(
-        map(() => actions.receiveDisableClient(uuid)),
-        catchError((err) =>
-          of(
-            actions.failDisableClient(
-              extractError(err, "Failed to disable client")
-            )
-          )
-        )
-      )
-    )
-  );
+   )
 
-const bulkDeleteClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.BulkConfirmDelete)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.bulkDeleteClient(uuid).pipe(
-        map(() => actions.receiveBulkDeleteClient(uuid)),
-        catchError((err) =>
-          of(
-            actions.failBulkDeleteClient(
-              extractError(err, "Failed to delete client")
-            )
-          )
-        )
-      )
-    )
-  );
+};
 
-const bulkEnableClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.BulkEnableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.bulkEnableClient(uuid).pipe(
-        map(() => actions.receiveBulkEnableClient(uuid)),
-        catchError((err) =>
-          of(
-            actions.failBulkEnableClient(
-              extractError(err, "Failed to enable client")
-            )
-          )
-        )
-      )
-    )
-  );
 
-const bulkDisableClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.BulkDisableRequest)),
-    switchMap(({ uuid }) =>
-      apiClients.clients.bulkDisableClient(uuid).pipe(
-        map(() => actions.receiveBulkDisableClient(uuid)),
-        catchError((err) =>
-          of(
-            actions.failBulkDisableClient(
-              extractError(err, "Failed to disable client")
-            )
-          )
-        )
-      )
-    )
-  );
+const updateClient: AppEpic = (action$, state, deps) => {
 
-const updateClient: Epic<Action, Action, AppState, EpicDependencies> = (
-  action$,
-  _,
-  { apiClients }
-) =>
-  action$.pipe(
-    filter(isOfType(Actions.UpdateRequest)),
-    switchMap(({ uuid, certificate, description, certificateUuid, history }) =>
-      (certificate ? readCertificate(certificate) : of("")).pipe(
-        switchMap((clientCertificate) =>
-          apiClients.clients
-            .updateClient(
-              uuid,
-              clientCertificate || undefined,
-              description,
-              certificateUuid
-            )
-            .pipe(
-              map((client) => {
-                history.push(`../detail/${uuid}`);
-                return actions.receiveUpdateClient(
-                  mapClientDetail(uuid, client)
-                );
-              }),
-              catchError((err) =>
-                of(
-                  actions.failUpdateClient(
-                    extractError(err, "Failed to update client")
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateClient.match
+      ),
+
+
+      switchMap(
+
+         action => (action.payload.certificate ? readFileString$(action.payload.certificate) : of("")).pipe(
+
+
+            switchMap(
+
+               certificateContent => deps.apiClients.clients.updateClient(
+                  action.payload.uuid,
+                  action.payload.description,
+                  action.payload.certificateUuid,
+                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
+               ).pipe(
+
+                  map(
+                     clientDTO => slice.actions.updateClientSuccess({ client: transformClientDTOToModel(clientDTO) })
+                  ),
+                  catchError(
+                     err => of(slice.actions.updateClientFailure({ error: extractError(err, "Failed to update client") }))
                   )
-                )
-              )
-            )
-        ),
-        catchError((err) =>
-          of(
-            actions.failUpdateClient(
-              extractError(err, "Failed to read certificate")
-            )
-          )
-        )
-      )
-    )
-  );
 
-function mapClient(client: ClientInfoResponse): Client {
-  return {
-    ...client,
-    uuid: client.uuid.toString(),
-    name: client.name.toString(),
-    certificate: client.certificate,
-    enabled: client.enabled,
-  };
+               )
+            ),
+
+            catchError(
+               err => of(slice.actions.updateClientFailure({ error: extractError(err, "Failed to update client") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const updateClientSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateClientSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            history.push(`../detail/${action.payload.client.uuid}`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+};
+
+
+const updateClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const deleteClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteClient.match
+      ),
+
+      switchMap(
+
+         action => deps.apiClients.clients.deleteClient(action.payload.uuid).pipe(
+
+            map(
+               () => slice.actions.deleteClientSuccess({ uuid: action.payload.uuid })
+            ),
+
+            catchError(
+               err => of(slice.actions.deleteClientFailure({ error: extractError(err, "Failed to delete client") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const deleteClientSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteClientSuccess.match
+      ),
+      switchMap(
+
+         () => {
+            history.push(`../`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+};
+
+
+const deleteClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const bulkDeleteClients: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteClients.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.bulkDeleteClient(action.payload.uuids).pipe(
+
+            map(
+               () => slice.actions.bulkDeleteClientsSuccess({ uuids: action.payload.uuids })
+            ),
+            catchError(
+               err => of(slice.actions.bulkDeleteClientsFailure({ error: extractError(err, "Failed to delete selected clients") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const bulkDeleteClientsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteClientsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const authorizeClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.authorizeClient.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.authorizeClient(
+            action.payload.clientUuid,
+            action.payload.raProfile.uuid
+         ).pipe(
+
+            map(
+               () => slice.actions.authorizeClientSuccess({ clientUuid: action.payload.clientUuid, raProfile: action.payload.raProfile })
+            ),
+            catchError(
+               err => of(slice.actions.authorizeClientFailure({ error: extractError(err, "Failed to authorize client") }))
+            )
+
+         )
+
+      )
+
+
+   )
+
+};
+
+
+const authorizeClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.authorizeClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const unauthorizeClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.unauthorizeClient.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.unauthorizeClient(action.payload.clientUuid, action.payload.raProfile.uuid).pipe(
+
+            map(
+               () => slice.actions.unauthorizeClientSuccess({ clientUuid: action.payload.clientUuid, raProfile: action.payload.raProfile })
+            ),
+
+            catchError(
+               err => of(slice.actions.unauthorizeClientFailure({ error: extractError(err, "Failed to unauthorize client") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const unauthorizeClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.unauthorizeClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
 }
 
-function mapClientDetail(
-  uuid: string,
-  data: ClientDetailResponse
-): ClientDetails {
-  return {
-    uuid,
-    certificate: data.certificate,
-    name: data.name,
-    description: data.description,
-    enabled: data.enabled,
-    serialNumber: data.serialNumber,
-  };
-}
+
+const enableClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.enableClient.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.enableClient(action.payload.uuid).pipe(
+
+            map(
+               () => slice.actions.enableClientSuccess({ uuid: action.payload.uuid })
+            ),
+
+            catchError(
+               err => of(slice.actions.enableClientFailure({ error: extractError(err, "Failed to enable client") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const enableClientFailed: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.enableClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const bulkEnableClients: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkEnableClients.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.bulkEnableClient(action.payload.uuids).pipe(
+
+            map(
+               () => slice.actions.bulkEnableClientsSuccess({ uuids: action.payload.uuids })
+            ),
+            catchError(
+               err => of(slice.actions.bulkEnableClientsFailure({ error: extractError(err, "Failed to enable clients") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const bulkEnableClientsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkEnableClientsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const disableClient: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.disableClient.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.disableClient(action.payload.uuid).pipe(
+
+            map(
+               () => slice.actions.disableClientSuccess({ uuid: action.payload.uuid })
+            ),
+            catchError(
+               err => of(slice.actions.disableClientFailure({ error: extractError(err, "Failed to disable client") }))
+            )
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const disableClientFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.disableClientFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
+
+const bulkDisableClients: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDisableClients.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clients.bulkDisableClient(action.payload.uuids).pipe(
+
+            map(() => slice.actions.bulkDisableClientsSuccess({ uuids: action.payload.uuids })),
+
+            catchError(err => of(slice.actions.bulkDisableClientsFailure({ error: extractError(err, "Failed to disable clients") })))
+
+         )
+
+      )
+
+   )
+
+};
+
+
+const bulkDisableClientsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDisableClientsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+};
+
 
 const epics = [
-  authorizeProfile,
-  createClient,
-  startDeleteClient,
-  deleteClient,
-  enableClient,
-  disableClient,
-  bulkDeleteClient,
-  bulkEnableClient,
-  bulkDisableClient,
-  getClientsList,
-  getClientDetail,
-  fetchAdditionalDetailData,
-  getAuthorizedProfiles,
-  unauthorizeProfile,
-  updateClient,
+   listClients,
+   listClientsFailure,
+   getClientDetail,
+   getClientDetailFailure,
+   getAuthorizedProfiles,
+   getAuthorizedProfilesFailure,
+   createClient,
+   createClientSuccess,
+   createClientFailure,
+   updateClient,
+   updateClientSuccess,
+   updateClientFailure,
+   deleteClient,
+   deleteClientSuccess,
+   deleteClientFailure,
+   bulkDeleteClients,
+   bulkDeleteClientsFailure,
+   authorizeClient,
+   authorizeClientFailure,
+   unauthorizeClient,
+   unauthorizeClientFailure,
+   enableClient,
+   enableClientFailed,
+   bulkEnableClients,
+   bulkEnableClientsFailure,
+   disableClient,
+   disableClientFailure,
+   bulkDisableClients,
+   bulkDisableClientsFailure,
 ];
 
 export default epics;

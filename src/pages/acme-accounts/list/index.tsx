@@ -1,258 +1,258 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
-import Spinner from "components/Spinner";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
+import { Container } from "reactstrap";
+
 import { actions, selectors } from "ducks/acme-accounts";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
-import {
-  MDBBadge,
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
-import ToolTip from "components/ToolTip";
-import CustomTable from "components/CustomTable";
-import {acmeAccountStatus} from "../../../utils/acmeAccount";
+import StatusBadge from "components/StatusBadge";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+import { MDBBadge } from "mdbreact";
+import { acmeAccountStatus } from "utils/acmeAccount";
 
 function AcmeAccountList() {
-  const accounts = useSelector(selectors.selectAccounts);
-  const isFetching = useSelector(selectors.isFetching);
-  const isDeleting = useSelector(selectors.isDeleting);
-  const confirmDeleteId = useSelector(selectors.selectConfirmDeleteAccountId);
-  const [checkedRows, setCheckedRows] = useState<(string | number)[]>([]);
 
-  const dispatch = useDispatch();
-  const { path } = useRouteMatch();
+   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(actions.requestAcmeAccountList());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+   const { path } = useRouteMatch();
 
-  const onConfirmDelete = useCallback(() => {
-    dispatch(actions.confirmBulkDeleteAccount(checkedRows));
-    setCheckedRows([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, confirmDeleteId]);
+   const checkedRows = useSelector(selectors.checkedRows);
+   const acmeAccounts = useSelector(selectors.accounts);
 
-  const onCancelDelete = useCallback(
-    () => dispatch(actions.cancelBulkDeleteAccount()),
-    [dispatch]
-  );
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isRevoking = useSelector(selectors.isRevoking);
+   const isBulkDeleting = useSelector(selectors.isBulkRevoking);
+   const isBulkEnabling = useSelector(selectors.isBulkEnabling);
+   const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-  const onDeleteAccount = () => {
-    dispatch(actions.confirmBulkDeleteAccountRequest(checkedRows));
-  };
+   const isBusy = isFetching || isRevoking || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
-  const onEnableAccount = () => {
-    dispatch(actions.requestBulkEnableAccount(checkedRows));
-    setCheckedRows([]);
-  };
+   const [confirmRevoke, setConfirmRevoke] = useState<boolean>(false);
 
-  const onDisableAccount = () => {
-    dispatch(actions.requestBulkDisableAccount(checkedRows));
-    setCheckedRows([]);
-  };
 
-  const title = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDeleteAccount}
-          data-for="revoke"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-times-circle" aria-hidden="true" />
-          ) : (
-            <i
-              className="fa fa-times-circle"
-              aria-hidden="true"
-              style={{ color: "black" }}
+   useEffect(
+
+      () => {
+
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         dispatch(actions.listAcmeAccounts());
+
+      },
+      [dispatch]
+
+   );
+
+
+   const onEnableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkEnableAcmeAccounts({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDisableAcmeAccounts({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onRevokeConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkRevokeAcmeAccounts({ uuids: checkedRows }));
+         setConfirmRevoke(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const setCheckedRows = useCallback(
+
+      (rows: (string | number)[]) => {
+
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
+      },
+      [dispatch]
+
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "cross-circle", disabled: checkedRows.length === 0, tooltip: "Revoke", onClick: () => { setConfirmRevoke(true); } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onEnableClick, onDisableClick]
+
+   );
+
+
+   const title = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">ACME Accounts</span>
+            </h5>
+
+         </div>
+
+      ),
+      [buttons]
+
+   );
+
+
+   const acmeAccountsTableHeader: TableHeader[] = useMemo(
+
+      () => [
+
+         {
+            id: "accountId",
+            content: <MDBColumnName columnName="Account Id" />,
+            width: "auto"
+         },
+         {
+            id: "ACME Profile Name",
+            content: <MDBColumnName columnName="ACME Profile Name" />,
+            sortable: true,
+            sort: "asc",
+            width: "20%",
+            align: "center"
+         },
+         {
+            id: "RA Profile Name",
+            content: <MDBColumnName columnName="RA Profile Name" />,
+            align: "center",
+            sortable: true,
+            width: "20%",
+         },
+         {
+            id: "internalState",
+            content: <MDBColumnName columnName="Internal State" />,
+            sortable: true,
+            width: "10%",
+            align: "center"
+         },
+         {
+            id: "accountStatus",
+            content: <MDBColumnName columnName="Account Status" />,
+            sortable: true,
+            width: "10%",
+            align: "center"
+         },
+         {
+            id: "totalOrders",
+            content: <MDBColumnName columnName="Total Orders" />,
+            sortable: true,
+            sortType: "numeric",
+            width: "10%",
+            align: "center"
+         }
+      ],
+      []
+
+   );
+
+
+   const acmeAccountsTableData: TableDataRow[] = useMemo(
+
+      () => acmeAccounts.map(
+
+         acmeAccount => {
+
+            const accountStatus = acmeAccountStatus(acmeAccount.status);
+
+            return {
+
+               id: acmeAccount.uuid,
+
+               columns: [
+
+                  <Link to={`${path}/detail/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
+
+                  <MDBBadge color="info">{acmeAccount.acmeProfileName}</MDBBadge>,
+
+                  <MDBBadge color="info">{acmeAccount.raProfileName}</MDBBadge>,
+
+                  <StatusBadge enabled={acmeAccount.enabled} />,
+
+                  <MDBBadge color={accountStatus[1]}>{accountStatus[0]}</MDBBadge>,
+
+                  acmeAccount.totalOrders.toString(),
+
+               ]
+
+            }
+         }
+
+      ),
+      [acmeAccounts, path]
+
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+            <CustomTable
+               headers={acmeAccountsTableHeader}
+               data={acmeAccountsTableData}
+               onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
+               hasCheckboxes={true}
+               hasPagination={true}
             />
-          )}
 
-          <ToolTip id="revoke" message="Revoke" />
-        </Button>
+         </Widget>
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnableAccount}
-          data-for="enable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
+         <Dialog
+            isOpen={confirmRevoke}
+            caption={`Revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}`}
+            body={`You are about to revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}. Is this what you want to do?`}
+            toggle={() => setConfirmRevoke(false)}
+            buttons={[
+               { color: "danger", onClick: onRevokeConfirmed, body: "Yes, revoke" },
+               { color: "secondary", onClick: () => setConfirmRevoke(false), body: "Cancel" },
+            ]}
+         />
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+      </Container>
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisableAccount}
-          data-for="disable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
+   );
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
-      <h5 className="mt-0">
-        List of <span className="fw-semi-bold">ACME Accounts</span>
-      </h5>
-    </div>
-  );
 
-  const accountsList = () => {
-    let rows: any = [];
-    for (let account of accounts) {
-      let accountStatus = acmeAccountStatus(account.status || "");
-      let column: any = {};
-      column["accountId"] = {
-        content: account.accountId,
-        styledContent: (
-          <Link to={`${path}/detail/${account.uuid}`}>{account.accountId}</Link>
-        ),
-        lineBreak: true,
-      };
-      column["acmeProfileName"] = {
-        content: account.acmeProfileName,
-        styledContent: (
-          <MDBBadge color="info">{account.acmeProfileName}</MDBBadge>
-        ),
-        lineBreak: true,
-      };
-      column["raProfileName"] = {
-        content: account.raProfileName,
-        styledContent: (
-          <MDBBadge color="info">{account.raProfileName}</MDBBadge>
-        ),
-        lineBreak: true,
-      };
-      column["state"] = {
-        content: account.enabled ? "enabled" : "disabled",
-        styledContent: <StatusBadge enabled={account.enabled} />,
-        lineBreak: true,
-      };
-      column["status"] = {
-        content: account.status,
-        styledContent: (
-            <MDBBadge color={accountStatus[1]}>{accountStatus[0]}</MDBBadge>
-        ),
-        lineBreak: true,
-      };
-      column["totalOrders"] = {
-        content: account.totalOrders.toString(),
-        lineBreak: true,
-      };
-      rows.push({
-        id: account.uuid,
-        column: column,
-        data: account,
-      });
-    }
-    return rows;
-  };
-
-  const accountRowHeaders = [
-    {
-      styledContent: <MDBColumnName columnName="Account Id" />,
-      content: "accountId",
-      sort: false,
-      id: "accountId",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="ACME Profile Name" />,
-      content: "acmeProfileName",
-      sort: false,
-      id: "acmeProfileName",
-      width: "20%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="RA Profile Name" />,
-      content: "raProfileName",
-      sort: false,
-      id: "raProfileName",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Internal State" />,
-      content: "state",
-      sort: false,
-      id: "state",
-      width: "10%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Account Status" />,
-      content: "status",
-      sort: false,
-      id: "status",
-      width: "10%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Total Orders" />,
-      content: "totalOrders",
-      sort: false,
-      id: "totalOrders",
-      width: "10%",
-    },
-  ];
-
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <br />
-        <CustomTable
-          checkedRows={checkedRows}
-          checkedRowsFunction={setCheckedRows}
-          data={accounts}
-          headers={accountRowHeaders}
-          rows={accountsList()}
-        />
-      </Widget>
-      <MDBModal
-        overflowScroll={false}
-        isOpen={confirmDeleteId !== ""}
-        toggle={onCancelDelete}
-      >
-        <MDBModalHeader toggle={onCancelDelete}>Revoke Account</MDBModalHeader>
-        <MDBModalBody>
-          You are about to revoke ACME Account(s). Any new Orders will not be
-          processed for this Account(s). After revoking you cannot re-enable the
-          Account(s).
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onConfirmDelete}>
-            Yes, Revoke
-          </Button>
-          <Button color="secondary" onClick={onCancelDelete}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
-      <Spinner active={isFetching || isDeleting} />
-    </Container>
-  );
 }
 
 export default AcmeAccountList;

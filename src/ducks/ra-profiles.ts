@@ -1,828 +1,598 @@
-import { History } from "history";
-import { createSelector } from "reselect";
-import { ActionType, createCustomAction, getType } from "typesafe-actions";
-
-import { RaAcmeLink, RaProfile, RaProfileDetail } from "models";
-import { arrayReducer, createFeatureSelector } from "utils/ducks";
-import { createErrorAlertAction } from "./alerts";
-import { Action as ClientAction, actions as clientActions } from "./clients";
-import { AttributeResponse } from "models/attributes";
-
-export const statePath = "raProfiles";
-
-export enum Actions {
-  AuthListRequest = "@@profiles/LIST_AUTHORIZATIONS",
-  AuthListSuccess = "@@profiles/LIST_AUTHORIZATIONS_SUCCESS",
-  AuthListFailure = "@@profiles/LIST_AUTHORIZATIONS_FAILURE",
-  ListRequest = "@@profiles/LIST_REQUEST",
-  ListSuccess = "@@profiles/LIST_SUCCESS",
-  ListFailure = "@@profiles/LIST_FAILURE",
-  DeleteRequest = "@@profiles/DELETE_REQUEST",
-  ConfirmDeleteRequest = "@@profiles/CONFIRM_DELETE_REQUEST",
-  ConfirmDelete = "@@profiles/CONFIRM_DELETE",
-  CancelDelete = "@@profiles/CANCEL_DELETE",
-  DeleteSuccess = "@@profiles/DELETE_SUCCESS",
-  DeleteFailure = "@@profiles/DELETE_FAILURE",
-  DisableRequest = "@@profiles/DISABLE_REQUEST",
-  EnableRequest = "@@profiles/ENABLE_REQUEST",
-  EnableSuccess = "@@profiles/ENABLE_SUCCESS",
-  EnableFailure = "@@profiles/ENABLE_FAILURE",
-  DisableSuccess = "@@profiles/DISABLE_SUCCESS",
-  DisableFailure = "@@profiles/DISABLE_FAILURE",
-
-  BulkDeleteRequest = "@@profiles/BULK_DELETE_REQUEST",
-  BulkConfirmDeleteRequest = "@@profiles/BULK_CONFIRM_DELETE_REQUEST",
-  BulkConfirmDelete = "@@profiles/BULK_CONFIRM_DELETE",
-  BulkCancelDelete = "@@profiles/BULK_CANCEL_DELETE",
-  BulkDeleteSuccess = "@@profiles/BULK_DELETE_SUCCESS",
-  BulkDeleteFailure = "@@profiles/BULK_DELETE_FAILURE",
-  BulkDisableRequest = "@@profiles/BULK_DISABLE_REQUEST",
-  BulkEnableRequest = "@@profiles/BULK_ENABLE_REQUEST",
-  BulkEnableSuccess = "@@profiles/BULK_ENABLE_SUCCESS",
-  BulkEnableFailure = "@@profiles/BULK_ENABLE_FAILURE",
-  BulkDisableSuccess = "@@profiles/BULK_DISABLE_SUCCESS",
-  BulkDisableFailure = "@@profiles/BULK_DISABLE_FAILURE",
-
-  DetailRequest = "@@profiles/DETAIL_REQUEST",
-  DetailSuccess = "@@profiles/DETAIL_SUCCESS",
-  DetailFailure = "@@profiles/DETAIL_FAILURE",
-  AttributeRequest = "@@profiles/ATTRIBUTE_REQUEST",
-  AttributeSuccess = "@@profiles/ATTRIBUTE_SUCCESS",
-  AttributeFailure = "@@profiles/ATTRIBUTE_FAILURE",
-  CreateRequest = "@@profiles/CREATE_REQUEST",
-  CreateSuccess = "@@profiles/CREATE_SUCCESS",
-  CreateFailure = "@@profiles/CREATE_FAILURE",
-  UpdateProfileRequest = "@@profiles/UPDATE_PROFILE_REQUEST",
-  UpdateProfileSuccess = "@@profiles/UPDATE_PROFILE_SUCCESS",
-  UpdateProfileFailure = "@@profiles/UPDATE_PROFILE_FAILURE",
-
-  RevokeAttributesRequest = "@@profiles/REVOKE_ATTRIBUTES_REQUEST",
-  RevokeAttributesSuccess = "@@profiles/REVOKE_ATTRIBUTES_SUCCESS",
-  RevokeAttributesFailure = "@@profiles/REVOKE_ATTRIBUTES_FAILURE",
-
-  IssuanceAttributesRequest = "@@profiles/ISSUANCE_ATTRIBUTES_REQUEST",
-  IssuanceAttributesSuccess = "@@profiles/ISSUANCE_ATTRIBUTES_SUCCESS",
-  IssuanceAttributesFailure = "@@profiles/ISSUANCE_ATTRIBUTES_FAILURE",
-
-  ActivateAcmeRequest = "@@profiles/ACTIVATE_ACME_REQUEST",
-  ActivateAcmeSuccess = "@@profiles/ACTIVATE_ACME_SUCCESS",
-  ActivateAcmeFailure = "@@profiles/ACTIVATE_ACME_FAILURE",
-
-  DeactivateAcmeRequest = "@@profiles/DEACTIVATE_ACME_REQUEST",
-  DeactivateAcmeSuccess = "@@profiles/DEACTIVATE_ACME_SUCCESS",
-  DeactivateAcmeFailure = "@@profiles/DEACTIVATE_ACME_FAILURE",
-
-  AcmeDetailsRequest = "@@profiles/ACME_DETAILS_REQUEST",
-  AcmeDetailsSuccess = "@@profiles/ACME_DETAILS_SUCCESS",
-  AcmeDetailsFailure = "@@profiles/ACME_DETAILS_FAILURE",
-}
-
-export const actions = {
-  requestAuthorizedClients: createCustomAction(
-    Actions.AuthListRequest,
-    (uuid: string) => ({ uuid })
-  ),
-  receiveAuthorizedClients: createCustomAction(
-    Actions.AuthListSuccess,
-    (clients: string[]) => ({ clients })
-  ),
-  failAuthorizedClients: createCustomAction(
-    Actions.AuthListFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestRaProfilesList: createCustomAction(Actions.ListRequest),
-  receiveRaProfilesList: createCustomAction(
-    Actions.ListSuccess,
-    (profiles: RaProfile[]) => ({ profiles })
-  ),
-  failRaProfilesList: createCustomAction(
-    Actions.ListFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestDeleteProfile: createCustomAction(
-    Actions.DeleteRequest,
-    (uuid: string | number) => ({ uuid })
-  ),
-  confirmDeleteProfileRequest: createCustomAction(
-    Actions.ConfirmDeleteRequest,
-    (uuid: string | number, history: History) => ({ uuid, history })
-  ),
-  confirmDeleteProfile: createCustomAction(
-    Actions.ConfirmDelete,
-    (uuid: string | number, history: History) => ({ uuid, history })
-  ),
-  cancelDeleteProfile: createCustomAction(Actions.CancelDelete),
-  receiveDeleteProfile: createCustomAction(
-    Actions.DeleteSuccess,
-    (uuid: string | number) => ({ uuid })
-  ),
-  failDeleteProfile: createCustomAction(
-    Actions.DeleteFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestEnableProfile: createCustomAction(
-    Actions.EnableRequest,
-    (uuid: string | number) => ({ uuid })
-  ),
-  receiveEnableProfile: createCustomAction(
-    Actions.EnableSuccess,
-    (uuid: string | number) => ({ uuid })
-  ),
-  failEnableProfile: createCustomAction(
-    Actions.EnableFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestDisableProfile: createCustomAction(
-    Actions.DisableRequest,
-    (uuid: string | number) => ({ uuid })
-  ),
-  receiveDisableProfile: createCustomAction(
-    Actions.DisableSuccess,
-    (uuid: string | number) => ({ uuid })
-  ),
-  failDisableProfile: createCustomAction(
-    Actions.DisableFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestBulkDeleteProfile: createCustomAction(
-    Actions.BulkDeleteRequest,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  confirmBulkDeleteProfileRequest: createCustomAction(
-    Actions.BulkConfirmDeleteRequest,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  confirmBulkDeleteProfile: createCustomAction(
-    Actions.BulkConfirmDelete,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  cancelBulkDeleteProfile: createCustomAction(Actions.BulkCancelDelete),
-  receiveBulkDeleteProfile: createCustomAction(
-    Actions.BulkDeleteSuccess,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  failBulkDeleteProfile: createCustomAction(
-    Actions.BulkDeleteFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestBulkEnableProfile: createCustomAction(
-    Actions.BulkEnableRequest,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  receiveBulkEnableProfile: createCustomAction(
-    Actions.BulkEnableSuccess,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  failBulkEnableProfile: createCustomAction(
-    Actions.BulkEnableFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestBulkDisableProfile: createCustomAction(
-    Actions.BulkDisableRequest,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  receiveBulkDisableProfile: createCustomAction(
-    Actions.BulkDisableSuccess,
-    (uuid: (string | number)[]) => ({ uuid })
-  ),
-  failBulkDisableProfile: createCustomAction(
-    Actions.BulkDisableFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestProfileDetail: createCustomAction(
-    Actions.DetailRequest,
-    (uuid: string) => ({ uuid })
-  ),
-  receiveProfileDetail: createCustomAction(
-    Actions.DetailSuccess,
-    (profile: RaProfileDetail) => ({ profile })
-  ),
-  failProfileDetail: createCustomAction(
-    Actions.DetailFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestAttribute: createCustomAction(
-    Actions.AttributeRequest,
-    (authorityUuid: string) => ({
-      authorityUuid,
-    })
-  ),
-  receiveAttribute: createCustomAction(
-    Actions.AttributeSuccess,
-    (attributes: AttributeResponse[]) => ({ attributes })
-  ),
-  failAttribute: createCustomAction(
-    Actions.AttributeFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestCreateRaProfile: createCustomAction(
-    Actions.CreateRequest,
-    (
-      authorityInstanceUuid: string,
-      name: string,
-      description: string,
-      attributes: AttributeResponse[],
-      history: History<unknown>
-    ) => ({
-      authorityInstanceUuid,
-      name,
-      description,
-      attributes,
-      history,
-    })
-  ),
-  receiveCreateRaProfile: createCustomAction(
-    Actions.CreateSuccess,
-    (uuid: string) => ({ uuid })
-  ),
-  failCreateRaProfile: createCustomAction(
-    Actions.CreateFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestUpdateProfile: createCustomAction(
-    Actions.UpdateProfileRequest,
-    (
-      authorityInstanceUuid: string,
-      uuid: string,
-      name: string,
-      description: string,
-      attributes: AttributeResponse[],
-      history: History<unknown>
-    ) => ({
-      authorityInstanceUuid,
-      uuid,
-      name,
-      description,
-      attributes,
-      history,
-    })
-  ),
-  receiveUpdateProfile: createCustomAction(
-    Actions.UpdateProfileSuccess,
-    (profile: RaProfileDetail) => ({ profile })
-  ),
-  failUpdateProfile: createCustomAction(
-    Actions.UpdateProfileFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestIssuanceAttributes: createCustomAction(
-    Actions.IssuanceAttributesRequest,
-    (raProfileUuid: string) => ({
-      raProfileUuid,
-    })
-  ),
-  receiveIssuanceAttributes: createCustomAction(
-    Actions.IssuanceAttributesSuccess,
-    (attributes: AttributeResponse[]) => ({ attributes })
-  ),
-  failIssuanceAttributes: createCustomAction(
-    Actions.IssuanceAttributesFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestRevokeAttributes: createCustomAction(
-    Actions.RevokeAttributesRequest,
-    (raProfileUuid: string) => ({
-      raProfileUuid,
-    })
-  ),
-  receiveRevokeAttributes: createCustomAction(
-    Actions.RevokeAttributesSuccess,
-    (attributes: AttributeResponse[]) => ({ attributes })
-  ),
-  failRevokeAttributes: createCustomAction(
-    Actions.RevokeAttributesFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestAcmeDetails: createCustomAction(
-    Actions.AcmeDetailsRequest,
-    (uuid: string) => ({
-      uuid,
-    })
-  ),
-  receiveAcmeDetails: createCustomAction(
-    Actions.AcmeDetailsSuccess,
-    (acmeDetails: RaAcmeLink) => ({ acmeDetails })
-  ),
-  failAcmeDetails: createCustomAction(
-    Actions.AcmeDetailsFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestActivateAcme: createCustomAction(
-    Actions.ActivateAcmeRequest,
-    (
-      uuid: string,
-      acmeProfileUuid: string,
-      issueCertificateAttributes: AttributeResponse[],
-      revokeCertificateAttributes: AttributeResponse[]
-    ) => ({
-      uuid,
-      acmeProfileUuid,
-      issueCertificateAttributes,
-      revokeCertificateAttributes,
-    })
-  ),
-  receiveActivateAcme: createCustomAction(
-    Actions.ActivateAcmeSuccess,
-    (acmeDetails: RaAcmeLink) => ({ acmeDetails })
-  ),
-  failActivateAcme: createCustomAction(
-    Actions.ActivateAcmeFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-
-  requestDeactivateAcme: createCustomAction(
-    Actions.DeactivateAcmeRequest,
-    (uuid: string) => ({
-      uuid,
-    })
-  ),
-  receiveDeactivateAcme: createCustomAction(
-    Actions.DeactivateAcmeSuccess,
-    () => ({})
-  ),
-  failDeactivateAcme: createCustomAction(
-    Actions.DeactivateAcmeFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-};
-
-export type Action = ActionType<typeof actions>;
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
+import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models/ra-profiles";
+import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 
 export type State = {
-  isFetchingList: boolean;
-  isFetchingDetail: boolean;
-  isFetchingClient: boolean;
-  attributes: AttributeResponse[];
-  isFetchingAttributes: boolean;
-  isCreating: boolean;
-  isDeleting: boolean;
-  isEditing: boolean;
-  profiles: RaProfile[];
-  authorizedClients: string[];
-  selectedProfile: RaProfileDetail | null;
-  confirmDeleteProfile: string;
-  issuanceAttributes: AttributeResponse[];
-  revocationAttributes: AttributeResponse[];
-  isActivatingAcme: boolean;
-  isDeactivatingAcme: boolean;
-  isFetchingAcme: boolean;
-  acmeDetails: RaAcmeLink | null;
+
+   checkedRows: string[];
+
+   deleteErrorMessage: string;
+   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+
+   raProfile?: RaProfileModel;
+   raProfiles: RaProfileModel[];
+
+   authorizedClients?: string[];
+   attributes?: AttributeModel[];
+
+   acmeDetails?: RaAcmeLinkModel;
+
+   issuanceAttributesDescriptors?: AttributeDescriptorModel[];
+   revocationAttributesDescriptors?: AttributeDescriptorModel[];
+
+   isFetchingList: boolean;
+   isFetchingDetail: boolean;
+   isFetchingAuthorizedClients: boolean;
+   isFetchingAttributes: boolean;
+   isFetchingIssuanceAttributes: boolean;
+   isFetchinRevocationAttributes: boolean;
+
+   isFetchingAcmeDetails: boolean;
+
+   isCreating: boolean;
+   isDeleting: boolean;
+   isBulkDeleting: boolean;
+   isUpdating: boolean;
+   isEnabling: boolean;
+   isBulkEnabling: boolean;
+   isDisabling: boolean;
+   isBulkDisabling: boolean;
+   isActivatingAcme: boolean;
+   isDeactivatingAcme: boolean;
+
 };
 
 export const initialState: State = {
-  isFetchingList: false,
-  isFetchingDetail: false,
-  isFetchingAttributes: false,
-  isFetchingClient: false,
-  isCreating: false,
-  isDeleting: false,
-  isEditing: false,
-  attributes: [],
-  profiles: [],
-  authorizedClients: [],
-  selectedProfile: null,
-  confirmDeleteProfile: "",
-  issuanceAttributes: [],
-  revocationAttributes: [],
-  isActivatingAcme: false,
-  isDeactivatingAcme: false,
-  isFetchingAcme: false,
-  acmeDetails: null,
+
+   checkedRows: [],
+
+   deleteErrorMessage: "",
+   bulkDeleteErrorMessages: [],
+
+   raProfiles: [],
+
+   isFetchingList: false,
+   isFetchingDetail: false,
+   isFetchingAuthorizedClients: false,
+   isFetchingAttributes: false,
+   isFetchingIssuanceAttributes: false,
+   isFetchinRevocationAttributes: false,
+   isFetchingAcmeDetails: false,
+   isCreating: false,
+   isDeleting: false,
+   isBulkDeleting: false,
+   isUpdating: false,
+   isEnabling: false,
+   isDisabling: false,
+   isBulkEnabling: false,
+   isBulkDisabling: false,
+   isActivatingAcme: false,
+   isDeactivatingAcme: false,
+
 };
 
-function authorizedProfile(
-  state: State,
-  clientId: string,
-  profileId: string
-): State {
-  if (!state.selectedProfile || state.selectedProfile.uuid !== profileId) {
-    return state;
-  }
 
-  return {
-    ...state,
-    authorizedClients: [...state.authorizedClients, clientId],
-  };
-}
+export const slice = createSlice({
 
-function optimisticUnauthorizeClient(
-  state: State,
-  clientId: string,
-  profileId: string
-): State {
-  if (!state.selectedProfile || state.selectedProfile.uuid !== profileId) {
-    return state;
-  }
+   name: "raprofiles",
 
-  const clientIdx = state.authorizedClients.indexOf(clientId);
-  if (clientIdx < 0) {
-    return state;
-  }
+   initialState,
 
-  const authorizedClients = [...state.authorizedClients];
-  authorizedClients.splice(clientIdx, 1);
+   reducers: {
 
-  return {
-    ...state,
-    authorizedClients,
-  };
-}
+      resetState: (state, action: PayloadAction<void>) => {
 
-function unauthorizeFailed(
-  state: State,
-  clientId: string,
-  profileId: string
-): State {
-  if (!state.selectedProfile || state.selectedProfile.uuid !== profileId) {
-    return state;
-  }
+         state = initialState;
 
-  return {
-    ...state,
-    authorizedClients: [...state.authorizedClients, clientId],
-  };
-}
+      },
 
-export function reducer(
-  state: State = initialState,
-  action: Action | ClientAction
-): State {
-  switch (action.type) {
-    case getType(actions.requestAuthorizedClients):
-      return { ...state, authorizedClients: [], isFetchingClient: true };
-    case getType(actions.receiveAuthorizedClients):
-      return {
-        ...state,
-        authorizedClients: action.clients,
-        isFetchingClient: false,
-      };
-    case getType(actions.failAuthorizedClients):
-      return { ...state, isFetchingClient: false };
-    case getType(actions.requestRaProfilesList):
-      return { ...state, profiles: [], isFetchingList: true };
-    case getType(actions.receiveRaProfilesList):
-      return { ...state, profiles: action.profiles, isFetchingList: false };
-    case getType(actions.failRaProfilesList):
-      return { ...state, isFetchingList: false };
-    case getType(actions.requestProfileDetail):
-      return { ...state, isFetchingDetail: true, selectedProfile: null };
-    case getType(actions.receiveProfileDetail):
-      return {
-        ...state,
-        isFetchingDetail: false,
-        selectedProfile: action.profile,
-      };
-    case getType(actions.failProfileDetail):
-      return { ...state, isFetchingDetail: false };
 
-    case getType(actions.requestAttribute):
-      return {
-        ...state,
-        isFetchingDetail: true,
-        isFetchingAttributes: true,
-        attributes: [],
-      };
-    case getType(actions.receiveAttribute):
-      return {
-        ...state,
-        isFetchingDetail: false,
-        isFetchingAttributes: false,
-        attributes: action.attributes,
-      };
-    case getType(actions.failAttribute):
-      return { ...state, isFetchingDetail: false, isFetchingAttributes: false };
+      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
-    case getType(actions.requestCreateRaProfile):
-      return { ...state, isCreating: true };
-    case getType(actions.receiveCreateRaProfile):
-      return { ...state, isCreating: false };
-    case getType(actions.failCreateRaProfile):
-      return { ...state, isCreating: false };
+         state.checkedRows = action.payload.checkedRows;
 
-    case getType(actions.requestDeleteProfile):
-      return { ...state, isDeleting: true };
-    case getType(actions.confirmDeleteProfileRequest):
-      return { ...state, confirmDeleteProfile: action.uuid, isDeleting: true };
-    case getType(actions.cancelDeleteProfile):
-      return { ...state, confirmDeleteProfile: "", isDeleting: false };
-    case getType(actions.confirmDeleteProfile):
-      return { ...state, confirmDeleteProfile: "", isDeleting: true };
-    case getType(actions.failDeleteProfile):
-      return { ...state, isDeleting: false };
-    case getType(actions.receiveDeleteProfile):
-      return {
-        ...state,
-        isDeleting: false,
-      };
-    case getType(actions.requestEnableProfile):
-    case getType(actions.requestDisableProfile):
-      return { ...state, isEditing: true };
-    case getType(actions.failEnableProfile):
-    case getType(actions.failDisableProfile):
-      return { ...state, isEditing: false };
-    case getType(actions.receiveEnableProfile):
-      let detailEnable = state.selectedProfile || ({} as RaProfileDetail);
-      detailEnable["enabled"] = true;
-      return {
-        ...state,
-        isEditing: false,
-        selectedProfile: detailEnable,
-      };
-    case getType(actions.receiveDisableProfile):
-      let detailDisable = state.selectedProfile || ({} as RaProfileDetail);
-      detailDisable["enabled"] = false;
-      return {
-        ...state,
-        isEditing: false,
-        selectedProfile: detailDisable,
-      };
+      },
 
-    case getType(actions.requestBulkDeleteProfile):
-      return { ...state, isDeleting: true };
-    case getType(actions.confirmBulkDeleteProfileRequest):
-      return { ...state, confirmDeleteProfile: action.uuid, isDeleting: true };
-    case getType(actions.cancelBulkDeleteProfile):
-      return { ...state, confirmDeleteProfile: "", isDeleting: false };
-    case getType(actions.confirmBulkDeleteProfile):
-      return { ...state, confirmDeleteProfile: "", isDeleting: true };
-    case getType(actions.failBulkDeleteProfile):
-      return { ...state, isDeleting: false };
-    case getType(actions.receiveBulkDeleteProfile):
-      let updated: RaProfile[] = [];
-      for (let i of state.profiles) {
-        if (!action.uuid.includes(i.uuid)) {
-          updated.push(i);
-        }
+
+      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+
+         state.deleteErrorMessage = "";
+         state.bulkDeleteErrorMessages = [];
+
+      },
+
+
+      clearIssuanceAttributesDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.issuanceAttributesDescriptors = undefined;
+
+      },
+
+
+      clearRevocationAttributesDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.revocationAttributesDescriptors = undefined;
+
+      },
+
+
+      listRaProfiles: (state, action: PayloadAction<void>) => {
+
+         state.raProfiles = [];
+         state.isFetchingList = true;
+
+      },
+
+
+      listRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: RaProfileModel[] }>) => {
+
+         state.raProfiles = action.payload.raProfiles;
+         state.isFetchingList = false;
+
+      },
+
+
+      listRaProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingList = false;
+
+      },
+
+
+      listAuthorizedClients: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.authorizedClients = undefined;
+         state.isFetchingAuthorizedClients = true;
+
+      },
+
+
+      listAuthorizedClientsSuccess: (state, action: PayloadAction<{ authorizedClientsUuids: RaAuthorizedClientModel[] }>) => {
+
+         state.authorizedClients = action.payload.authorizedClientsUuids.map(client => client.uuid);
+         state.isFetchingAuthorizedClients = false;
+
+      },
+
+
+      listAuthorizedClientsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingAuthorizedClients = false;
+
+      },
+
+
+      getRaProfileDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.raProfile = undefined;
+         state.isFetchingDetail = true;
+
+      },
+
+
+      getRaProfileDetailSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
+
+         state.isFetchingDetail = false;
+         state.raProfile = action.payload.raProfile;
+
+      },
+
+
+      getRaProfileDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingDetail = false;
+
+      },
+
+
+      createRaProfile: (state, action: PayloadAction<{
+         authorityInstanceUuid: string,
+         name: string,
+         description: string,
+         attributes: AttributeModel[]
+      }>) => {
+
+         state.isCreating = true;
+
+      },
+
+
+      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isCreating = false;
+
+      },
+
+
+      createRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isCreating = false;
+
+      },
+
+
+      updateRaProfile: (state, action: PayloadAction<{
+         profileUuid: string,
+         authorityInstanceUuid: string,
+         description: string,
+         enabled: boolean,
+         attributes: AttributeModel[]
+      }>) => {
+
+         state.isUpdating = true;
+
+      },
+
+
+      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
+
+         state.isUpdating = false;
+         state.raProfile = action.payload.raProfile;
+
+      },
+
+
+      updateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isUpdating = false;
+
+      },
+
+
+      enableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isEnabling = true;
+
+      },
+
+
+      enableRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isEnabling = false;
+
+         const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload.uuid);
+         if (raProfile) raProfile.enabled = true;
+
+         if (state.raProfile?.uuid === action.payload.uuid) state.raProfile.enabled = true;
+
+      },
+
+
+      enableRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isEnabling = false;
+
+      },
+
+
+      disableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDisabling = true;
+
+      },
+
+
+      disableRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDisabling = false;
+
+         const raProfile = state.raProfiles.find(raProfile => raProfile.uuid === action.payload.uuid);
+         if (raProfile) raProfile.enabled = false;
+
+         if (state.raProfile?.uuid === action.payload.uuid) state.raProfile.enabled = false;
+
+      },
+
+
+      disableRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isDisabling = false;
+
+      },
+
+
+      deleteRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDeleting = true;
+
+      },
+
+
+      deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDeleting = false;
+
+         const index = state.raProfiles.findIndex(raProfile => raProfile.uuid === action.payload.uuid);
+         if (index !== -1) state.raProfiles.splice(index, 1);
+
+         if (state.raProfile?.uuid === action.payload.uuid) state.raProfile = undefined;
+
+      },
+
+
+      deleteRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isDeleting = false;
+
+      },
+
+
+      activateAcme: (state, action: PayloadAction<{
+         uuid: string,
+         acmeProfileUuid: string,
+         issueCertificateAttributes: AttributeModel[],
+         revokeCertificateAttributes: AttributeModel[]
+      }>) => {
+
+         state.isActivatingAcme = true;
+
+      },
+
+
+      activateAcmeSuccess: (state, action: PayloadAction<{ raAcmelink: RaAcmeLinkModel }>) => {
+
+         state.isActivatingAcme = false;
+         state.acmeDetails = action.payload.raAcmelink;
+
+      },
+
+
+      activateAcmeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isActivatingAcme = false;
+
+      },
+
+
+      deactivateAcme: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDeactivatingAcme = true;
+
+      },
+
+
+      deactivateAcmeSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDeactivatingAcme = false;
+         state.acmeDetails = undefined;
+
+      },
+
+
+      deactivateAcmeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isDeactivatingAcme = false;
+
+      },
+
+
+      getAcmeDetails: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isFetchingAcmeDetails = true;
+
+      },
+
+
+      getAcmeDetailsSuccess: (state, action: PayloadAction<{ raAcmeLink: RaAcmeLinkModel }>) => {
+
+         state.isFetchingAcmeDetails = false;
+         state.acmeDetails = action.payload.raAcmeLink;
+
+      },
+
+
+      getAcmeDetailsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingAcmeDetails = false;
+
+      },
+
+
+      bulkDeleteRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.bulkDeleteErrorMessages = [];
+         state.isBulkDeleting = true;
+
+      },
+
+
+      bulkDeleteRaProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDeleting = false;
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               const index = state.raProfiles.findIndex(raProfile => raProfile.uuid === uuid);
+               if (index >= 0) state.raProfiles.splice(index, 1);
+            }
+
+         );
+
+         if (state.raProfile && action.payload.uuids.includes(state.raProfile.uuid)) state.raProfile = undefined;
+
+      },
+
+
+      bulkDeleteRaProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkDeleting = false;
+
+      },
+
+
+      bulkEnableRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkEnabling = true;
+
+      },
+
+
+      bulkEnableRaProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkEnabling = false;
+
+         state.raProfiles = state.raProfiles.map(
+            raProfile => ({ ...raProfile, enabled: action.payload.uuids.includes(raProfile.uuid) ? true : raProfile.enabled })
+         );
+
+         if (state.raProfile && action.payload.uuids.includes(state.raProfile.uuid)) state.raProfile.enabled = true;
+
+      },
+
+
+      bulkEnableRaProfilesFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isBulkEnabling = false;
+
+      },
+
+
+      bulkDisableRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDisabling = true;
+
+      },
+
+
+      bulkDisableRaProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDisabling = false;
+
+         state.raProfiles = state.raProfiles.map(
+            raProfile => ({ ...raProfile, enabled: action.payload.uuids.includes(raProfile.uuid) ? false : raProfile.enabled })
+         );
+
+         if (state.raProfile && action.payload.uuids.includes(state.raProfile.uuid)) state.raProfile.enabled = false;
+
+      },
+
+
+      bulkDisableRaProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkDisabling = false;
+
+      },
+
+
+      listIssuanceAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isFetchingIssuanceAttributes = true;
+
+      },
+
+
+      listIssuanceAttributesDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+
+         state.isFetchingIssuanceAttributes = false;
+
+         state.issuanceAttributesDescriptors = action.payload.attributesDescriptors;
+
+      },
+
+
+      listIssuanceAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingIssuanceAttributes = false;
+
+      },
+
+
+      listRevocationAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isFetchinRevocationAttributes = true;
+
+      },
+
+
+      listRevocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+
+         state.isFetchinRevocationAttributes = false;
+         state.revocationAttributesDescriptors = action.payload.attributesDescriptors;
+
+      },
+
+
+      listRevocationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+         state.isFetchinRevocationAttributes = false;
       }
-      return {
-        ...state,
-        isDeleting: false,
-        profiles: updated,
-      };
-    case getType(actions.requestBulkEnableProfile):
-    case getType(actions.requestBulkDisableProfile):
-      return { ...state, isEditing: true };
-    case getType(actions.failBulkEnableProfile):
-    case getType(actions.failBulkDisableProfile):
-      return { ...state, isEditing: false };
-    case getType(actions.receiveBulkEnableProfile):
-      let updatedEnable: RaProfile[] = [];
-      for (let i of state.profiles) {
-        if (!action.uuid.includes(i.uuid)) {
-          updatedEnable.push(i);
-        } else {
-          i.enabled = true;
-          updatedEnable.push(i);
-        }
-      }
-      return {
-        ...state,
-        isEditing: false,
-        profiles: updatedEnable,
-      };
-    case getType(actions.receiveBulkDisableProfile):
-      let updatedDisable: RaProfile[] = [];
-      for (let i of state.profiles) {
-        if (!action.uuid.includes(i.uuid)) {
-          updatedDisable.push(i);
-        } else {
-          i.enabled = false;
-          updatedDisable.push(i);
-        }
-      }
-      return {
-        ...state,
-        isEditing: false,
-        profiles: updatedDisable,
-      };
 
-    case getType(actions.requestUpdateProfile):
-      return { ...state, isEditing: true };
-    case getType(actions.receiveUpdateProfile):
-      return {
-        ...state,
-        isEditing: false,
-        selectedProfile: action.profile,
-        profiles: arrayReducer(
-          state.profiles,
-          action.profile.uuid,
-          (profile) => ({ ...profile, name: action.profile.name })
-        ),
-      };
-    case getType(actions.failUpdateProfile):
-      return { ...state, isEditing: false };
-    case getType(clientActions.receiveAuthorizeProfile):
-      return authorizedProfile(state, action.clientId, action.profileId);
-    case getType(clientActions.requestUnauthorizeProfile):
-      return optimisticUnauthorizeClient(
-        state,
-        action.clientId,
-        action.profileId
-      );
-    case getType(clientActions.failUnauthorizeProfile):
-      return unauthorizeFailed(state, action.clientId, action.profileId);
+   }
+});
 
-    case getType(actions.requestIssuanceAttributes):
-      return { ...state, isFetchingAttributes: true, issuanceAttributes: [] };
-    case getType(actions.receiveIssuanceAttributes):
-      return {
-        ...state,
-        isFetchingAttributes: false,
-        issuanceAttributes: action.attributes,
-      };
-    case getType(actions.failIssuanceAttributes):
-      return { ...state, isFetchingAttributes: false, issuanceAttributes: [] };
 
-    case getType(actions.requestRevokeAttributes):
-      return { ...state, isFetchingAttributes: true, revocationAttributes: [] };
-    case getType(actions.receiveRevokeAttributes):
-      return {
-        ...state,
-        isFetchingAttributes: false,
-        revocationAttributes: action.attributes,
-      };
-    case getType(actions.failRevokeAttributes):
-      return {
-        ...state,
-        isFetchingAttributes: false,
-        revocationAttributes: [],
-      };
+const state = createFeatureSelector<State>(slice.name);
 
-    case getType(actions.requestAcmeDetails):
-      return { ...state, isFetchingAcme: true, acmeDetails: null };
-    case getType(actions.receiveAcmeDetails):
-      return {
-        ...state,
-        isFetchingAcme: false,
-        acmeDetails: action.acmeDetails,
-      };
-    case getType(actions.failAcmeDetails):
-      return {
-        ...state,
-        isFetchingAcme: false,
-        acmeDetails: null,
-      };
+const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
-    case getType(actions.requestActivateAcme):
-      return { ...state, isActivatingAcme: true };
-    case getType(actions.receiveActivateAcme):
-      return {
-        ...state,
-        isActivatingAcme: false,
-        acmeDetails: action.acmeDetails,
-      };
-    case getType(actions.failActivateAcme):
-      return {
-        ...state,
-        isActivatingAcme: false,
-        acmeDetails: action.acmeDetails,
-      };
+const raProfile = createSelector(state, (state: State) => state.raProfile);
+const raProfiles = createSelector(state, (state: State) => state.raProfiles);
 
-    case getType(actions.requestDeactivateAcme):
-      return { ...state, isDeactivatingAcme: true };
-    case getType(actions.receiveDeactivateAcme):
-      return {
-        ...state,
-        isDeactivatingAcme: false,
-        acmeDetails: null,
-      };
-    case getType(actions.failDeactivateAcme):
-      return {
-        ...state,
-        isDeactivatingAcme: false,
-      };
+const authorizedClients = createSelector(state, (state: State) => state.authorizedClients);
+const attributes = createSelector(state, (state: State) => state.attributes);
+const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
+const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
+const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
-    default:
-      return state;
-  }
-}
+const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
+const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
+const isFetchingAuthorizedClients = createSelector(state, (state: State) => state.isFetchingAuthorizedClients);
+const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
+const isFetchingIssuanceAttributes = createSelector(state, (state: State) => state.isFetchingIssuanceAttributes);
+const isFetchingRevocationAttributes = createSelector(state, (state: State) => state.isFetchinRevocationAttributes);
+const isFetchingAcmeDetails = createSelector(state, (state: State) => state.isFetchingAcmeDetails);
+const isCreating = createSelector(state, (state: State) => state.isCreating);
+const isDeleting = createSelector(state, (state: State) => state.isDeleting);
+const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
+const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const isEnabling = createSelector(state, (state: State) => state.isEnabling);
+const isBulkEnabling = createSelector(state, (state: State) => state.isBulkEnabling);
+const isDisabling = createSelector(state, (state: State) => state.isDisabling);
+const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
+const isActivatingAcme = createSelector(state, (state: State) => state.isActivatingAcme);
+const isDeactivatingAcme = createSelector(state, (state: State) => state.isDeactivatingAcme);
 
-const selectState = createFeatureSelector<State>(statePath);
-
-const isFetching = createSelector(
-  selectState,
-  (state) =>
-    state.isFetchingList ||
-    state.isFetchingDetail ||
-    state.isFetchingAttributes ||
-    state.isFetchingClient ||
-    state.isFetchingClient ||
-    state.isActivatingAcme ||
-    state.isDeactivatingAcme
-);
-
-const isCreating = createSelector(selectState, (state) => state.isCreating);
-
-const isDeleting = createSelector(selectState, (state) => state.isDeleting);
-
-const isEditing = createSelector(selectState, (state) => state.isEditing);
-
-const isActivatingAcme = createSelector(
-  selectState,
-  (state) => state.isActivatingAcme
-);
-
-const isFetchingAcme = createSelector(
-  selectState,
-  (state) => state.isFetchingAcme
-);
-
-const isDeactivatingAcme = createSelector(
-  selectState,
-  (state) => state.isDeactivatingAcme
-);
-
-const isFetchingAttributes = createSelector(
-  selectState,
-  (state) => state.isFetchingAttributes
-);
-
-const selectProfiles = createSelector(selectState, (state) => state.profiles);
-
-const selectAuthorizedClientIds = createSelector(
-  selectState,
-  (state) => state.authorizedClients
-);
-
-const selectSelectedProfile = createSelector(
-  selectState,
-  (state) => state.selectedProfile
-);
-
-const selectProfileDetail = createSelector(
-  selectProfiles,
-  selectSelectedProfile,
-  selectAuthorizedClientIds,
-  (profiles, selectedProfile, authClients) => {
-    if (!selectedProfile) {
-      return null;
-    }
-
-    const profile = profiles.find(
-      (p) => p.uuid.toString() === selectedProfile.uuid.toString()
-    );
-    if (!profile) {
-      return null;
-    }
-
-    return {
-      ...profile,
-      ...selectedProfile,
-      authClients,
-    };
-  }
-);
-
-const selectConfirmDeleteProfileId = createSelector(
-  selectState,
-  (state) => state.confirmDeleteProfile
-);
-
-const selectAttributes = createSelector(
-  selectState,
-  (state) => state.attributes
-);
-
-const selectIssuanceAttributes = createSelector(
-  selectState,
-  (state) => state.issuanceAttributes
-);
-
-const selectRevocationAttributes = createSelector(
-  selectState,
-  (state) => state.revocationAttributes
-);
-
-const selectAcmeDetails = createSelector(
-  selectState,
-  (state) => state.acmeDetails
-);
 
 export const selectors = {
-  selectState,
-  isCreating,
-  isDeleting,
-  isEditing,
-  isFetching,
-  isFetchingAttributes,
-  selectProfiles,
-  selectAuthorizedClientIds,
-  selectSelectedProfile,
-  selectProfileDetail,
-  selectConfirmDeleteProfileId,
-  selectAttributes,
-  selectIssuanceAttributes,
-  selectRevocationAttributes,
-  isActivatingAcme,
-  isDeactivatingAcme,
-  isFetchingAcme,
-  selectAcmeDetails,
+
+   state,
+
+   checkedRows,
+
+   raProfile,
+   raProfiles,
+
+   authorizedClients,
+   attributes,
+   acmeDetails,
+   issuanceAttributes,
+   revocationAttributes,
+
+   isFetchingList,
+   isFetchingDetail,
+   isFetchingAuthorizedClients,
+   isFetchingAttributes,
+   isFetchingIssuanceAttributes,
+   isFetchingRevocationAttributes,
+   isFetchingAcmeDetails,
+   isCreating,
+   isDeleting,
+   isBulkDeleting,
+   isUpdating,
+   isEnabling,
+   isBulkEnabling,
+   isDisabling,
+   isBulkDisabling,
+   isActivatingAcme,
+   isDeactivatingAcme
+
 };
+
+
+export const actions = slice.actions;
+
+
+export default slice.reducer;

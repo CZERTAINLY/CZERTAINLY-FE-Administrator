@@ -1,0 +1,286 @@
+DTO objects do not match API spec
+DTO Objects are mixed with Business Objects
+API call definitions does not follow API Spec (there are types used internally for whatever...)
+Mocks does not follow API Spec
+Mocks does not work properly (especially bulk updates can't work, but a lot of other bugs also exist)
+
+----
+
+- Complete refactoring of API
+   - Renaming of DTO objects to contain the DTO postfix
+   - Renaming of DTO objects to better describe what they are used for
+   - Synchronizing DTO interfaces with API Spec
+   - Rework of backend calls according to DTO changes
+   - Rework of MOCKS to follow API Spec and DTO changes
+
+
+- Complete refactoring of MOCKS objects (database)
+   - Reworked database to follow API Spec
+   - Database splitted to multiple files (better readability and maintainability)
+
+- Complete refactorung of MOCK functionality
+   - Reworked all mocks to follow API spec
+   - Fixed many bugs and incompleteness of mock code
+
+- Code beautification (Increased code readibility)
+   - Long files splitted to multiple ones
+   - Changed indentation of all files
+   - Changed spacing between blocks of code (especially RXJS related)
+
+- Refactored components (enhanced, simplified, beautified, fixed all warnings in console and during compilation):
+   Layout, Footer, Header, Private route, Sidebar + Links, Widget, CustomTable
+
+- Widget => added spinner
+
+- Widget buttons => New separate component
+
+- Custom table
+   - Simplified code, removed for-of loops, using filters, maps and so on
+   - Fixed problems with component array keys
+   - Fixed pagination which didn't work for me at all
+
+
+- Administrators (all parts of the code according to above changes)
+
+- Audit logs (all parts of the code according to above changes, reworked to use Ducks)
+
+- Certificates
+   - removed parts of code duplicating structures
+   - exetended work with binary certificate parsing (still not fully done)
+
+
+- Removed external dependencies
+
+
+In progress:
+
+- Migrated to Redux-Toolkit, still in progress ()
+   - simplified store definition & configuration, better readability
+
+- Refactoring of model objects according to changes in code (DTO)
+
+- Currently connectors
+   - clients / connectors ducks refactored
+   - clients / connectors pages in progress
+
+
+
+
+
+- ??? Migration to React 18 ??? (if in time till end of next week)
+
+
+
+New ACME Profile bugs
+   - Acme profile name (hint text = ra profile name)
+   - DNS port can start from 0
+   - Retry interval can be set to negative value
+   - Order validity can be set to negative value
+
+
+To Be Refactored in future:
+---------------------------
+
+   - Custom Table should be a single component used throughout the application
+   - React-select not styled in the bootrtrap way and does not support validation messages
+
+
+-----
+
+- API Doc
+
+ - Logs: additionalData is type of object, not string
+
+
+- Doc:
+   - It would be great if methods are sorted and grouped somehow more logically in documentation (i.e. listings, CRUD, other functions i.e. enable/disable, bulks)
+   - Also, naming of the functions should be more "programmer" way
+
+   - https://docs.czertainly.com/api/core-connector/#operation/listConnectors_1_1
+      - enum does not match required values. These are not "credentialProvider" "legacyAuthorityProvider" "authorityProvider" "discoveryProvider", but CREDENTIAL_PROVIDER, LEGACY_AUTHORITY_PROVIDER, AUTHORITY_PROVIDER, DISCOVERY_PROVIDER
+      - this should be unified with values the server returns
+
+- Attribute must contain a validtion error message
+
+- API
+   - Incomplete implementation on server side?
+      - listCertificateProfiles
+      - listCAsInProfile
+      - listEntityProfiles
+
+   - time to time there are confusing names, i.e. Authority -> List RA Profile Attributes
+      - it evokes me to think that RA profiles are searched for Authorities then list of attributes set in the RA Profile is returned
+
+   - structures for attributes should be reviewed
+      - now there are various structures used throughout the API
+         - Attribute Descriptor (definition of attribute, its possible values and so on)
+         - Set Attribute Value (uuid, name, value)
+         - Get Attribute Value (uuid, name, value, label, type)
+
+   - When object is created through the API it should be returned in order to be possible to avoid list reloading
+
+   - Some endpoinds can be merged togeter and work based on arguments passed (i.e. connectors -> getAttributes, getAllAttributes)
+
+   - Admin create / update => if certificate is passed and it exists already in DB the error is returned instead of the existing certificate is used
+
+   - Connectors
+      - Should not delete return same thing as bulkDelete
+
+   - Router -> HASH??? Really???? Wtf Pradeep
+
+
+--- For Pradeep
+
+Code styling
+
+   Make is as simple as possible, keep it short
+   Make it readable by others
+   Make it clean
+   Use empty lines to make code more readable
+   Note about indentation => 2, 3, 4? I am using 3. 2 makes code unreadable, 4 are too much - simply, for me 3 looks best, but it is probably personal preference
+   Use functional programming whenever possible (expecially mapping, filtering and so on)
+   Learn lambdas and use them, instead of anonymous functions (its same but it looks better) ->
+      - avoid using (var) whenever possible
+      - map directly, if possible, withou code blocks
+      - again, make it as simple as possible
+
+   Ifs
+      - use ? operator whenever possible and when it will look better
+      - for single command after if statement it is not necessary to use code block
+      - avoid else whenever possible (usually it is: if not something, throw, if something, return)
+      - if else is used, always use code block for both branches
+
+   Split method args, generics, simply method definition on separate lines ONLY when its longer than half of the 24" monitor
+      - nobody will print, nobody is using small screens for development anymore, if notebook screen is used, its just usually emergency situation
+
+   Method / Lambda naming
+      - if method is called based on user action, name it so (i.e. onclick={onDeleteClick})
+
+   Switch/case - avoid whenever possible
+
+   With - ({a, b, c}) - It should not be used as it is not immediately clear what is going on in the code and it is necessary to navigate throught
+      the code
+
+   Typescript
+      - we are using TypeScript to help us with:
+         - intellisense
+         - self descriptive code
+         - avoiding bugs
+
+      - avoid any, whenever possible -> type everything what can be typed
+      - limit strings with unions whenever possible
+
+
+API =>
+   Implement API client as API is specified, everything else belongs to business logic
+   - all calls should exactly follow the spec, including objects
+   - don't worry to write multiple similar interfaces (i.e. AttributeDTO, AttributeDescriptorDTO and so on)
+      - split it as it is required by API, simplification can't help in this case
+
+   Follow the implementation completely. Othrerwise others will be confused when will be checking
+   - don't join functions togeter, follow the spec and function/method = endpoind
+   - always completely implement endpoint spec (complete method args, complete interfaces, including mandatory / not mandatory args)
+   - use correct data types and don't try to help yoursef by strange unions (ie: uuid : string | number), refactor completely rather
+   - never exclude args, or object properties not used in the code
+   - unused endpoints does not need to have implementation
+   - sanitize responses and errors properly, according to the API spec
+   - if something changes in the spec (i.e. numeric Id changes to string UUID), refactor immediately all affected functions,
+     don't mix new with old, make sure you include these changes to estimates
+
+Interfaces =>
+
+   sort methods and properties logically
+      uuid, name, description - first
+      list, crud, other methods,
+      keep related methods/properties close (i.e delete, bulk delete or enable/disable)
+      follow same order in implementation - its hard to find something when it is not like that
+
+Mocks, mock DB =>
+   Follow code styling
+   Make it logical
+   Make it simple
+   Split to multiple files
+   Try to make it as close as possible to mocked functionality
+
+DON'T BE AFRAID TO REFACTOR IMMEDIATELY OR LEARN TO WRITE DOWN, WHAT HAS TO BE REFACTORED ASAP (during closest release stabilization phase)
+
+
+Architecture
+
+   Don't mix DTOs with BLOs
+   - Although it seems to be a lot of work (it is), the best practice is to transform between these types all the time. It separates
+     layers each from other, prevents bugs and so on.
+
+React
+
+   Avoid passing components using props whenever possible. It makes code undebugable. It is much better to pass down the data and generate the
+   view there. This is not always possible, but, should be preferred all the time.
+
+   Use keys for all mapped data - this is necessarty to React works properly, effectively and it prevents displaying of warnings and errors in the console
+
+HTML
+
+   Make it readable. Use empty lines, don't split so much tags to multiple lines (when there are so many attributes, do that)
+
+
+
+
+
+---------------------------------------------------------------------
+Pradeep - Changes
+---------------------------------------------------------------------
+
+Converted the following ducks to toolkit
+1. RA Profile
+2. Credential
+3. ACME Profile
+4. ACME Account
+5. Authorities
+
+
+To be updated in the ducks.
+
+Authority and Credentials - Implement methods in the API to get the attributes for the respective provider
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------
+
+MS-ADCS-Connector
+http://ms-adcs-connector-service:8080
+
+
+	lab02-ADCS
+		MS-ADCS-Connector
+		ADCS
+		lab02.3key.company
+		5985
+		lab02-ADCS
+
+	xx
+		MS-ADCS-Connector
+		ADCS
+		lab02.3key.company
+		5985
+		lab02-ADCS
+
+	test
+		MS-ADCS-Connector
+		ADCS
+		38.242.225.187
+		5985
+		lab02-ADCS
+
+
+
+-----------
+

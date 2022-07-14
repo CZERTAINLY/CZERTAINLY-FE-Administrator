@@ -164,7 +164,8 @@
   > tfoot > tr > th,
   > tfoot > tr > td {
     padding: 4px;
-  }
+    vertical-align: middle;
+   }
 
   &.table-no-border {
     margin-left: -4px;
@@ -219,3 +220,13 @@ pre {
     }
   }
 }
+
+.btn-sm {
+   line-height: 0.8;
+}
+
+.form-check-input {
+   position: relative;
+   margin: 0;
+}
+

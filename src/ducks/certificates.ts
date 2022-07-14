@@ -1,109 +1,122 @@
-import { CertificateDetailResponse } from "models";
-import {
-  CertificateRequestInfo,
-  CertificateResponseDto,
-} from "models/certificates";
-import { createSelector } from "reselect";
-import { ActionType, createCustomAction, getType } from "typesafe-actions";
+import { CertificateModel } from "models/certificate";
 import { createFeatureSelector } from "utils/ducks";
-import { createErrorAlertAction } from "./alerts";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+
+export interface CertificateListQueryFilter {
+   field: string;
+   condition: string;
+   value?: any;
+}
+
+
+export interface CertificateListQuery {
+   itemsPerPage: number;
+   pageNumber: number;
+   filters: CertificateListQueryFilter[];
+}
+
 
 export const statePath = "certificates";
 
-export enum Actions {
-  DetailRequest = "@@certificates/DETAIL_REQUEST",
-  DetailSuccess = "@@certificates/DETAIL_SUCCESS",
-  DetailFailure = "@@certificates/DETAIL_FAILURE",
-  ListRequest = "@@certificates/LIST_REQUEST",
-  ListSuccess = "@@certificates/LIST_SUCCESS",
-  ListFailure = "@@certificates/LIST_FAILURE",
-}
-
-export const actions = {
-  requestCertificateDetail: createCustomAction(
-    Actions.DetailRequest,
-    (uuid: string) => ({ uuid })
-  ),
-  receiveCertificateDetail: createCustomAction(
-    Actions.DetailSuccess,
-    (data: CertificateDetailResponse) => ({ data })
-  ),
-  failCertificateDetail: createCustomAction(
-    Actions.DetailFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-  requestCertificatesList: createCustomAction(
-    Actions.ListRequest,
-    (searchField: CertificateRequestInfo) => ({
-      searchField,
-    })
-  ),
-  receiveCertificatesList: createCustomAction(
-    Actions.ListSuccess,
-    (certificates: CertificateResponseDto) => ({ certificates })
-  ),
-  failCertificatesList: createCustomAction(
-    Actions.ListFailure,
-    (error?: string) => createErrorAlertAction(error)
-  ),
-};
-
-export type Action = ActionType<typeof actions>;
 
 export type State = {
-  certificates: CertificateDetailResponse[];
-  isFetchingList: boolean;
-  isFetchingDetail: boolean;
+
+   certificates: CertificateModel[];
+   certificateDetail?: CertificateModel;
+
+   isFetchingList: boolean;
+   isFetchingDetail: boolean;
+
 };
+
 
 export const initialState: State = {
-  certificates: [],
-  isFetchingList: false,
-  isFetchingDetail: false,
+
+   certificates: [],
+   isFetchingList: false,
+   isFetchingDetail: false,
+
 };
 
-export function reducer(state: State = initialState, action: Action): State {
-  switch (action.type) {
-    case getType(actions.requestCertificatesList):
-      return {
-        ...state,
-        certificates: [],
-        isFetchingList: true,
-      };
-    case getType(actions.receiveCertificatesList):
-      return {
-        ...state,
-        isFetchingList: false,
-        certificates: action.certificates.certificates,
-      };
-    case getType(actions.failCertificatesList):
-      return { ...state, isFetchingList: false };
 
-    default:
-      return state;
-  }
-}
+export const slice = createSlice({
 
-const selectState = createFeatureSelector<State>(statePath);
+   name: "certificates",
 
-const selectCertificates = createSelector(
-  selectState,
-  (state) => state.certificates
-);
+   initialState,
 
-const isFetchingList = createSelector(
-  selectState,
-  (state) => state.isFetchingList
-);
+   reducers: {
 
-const isFetchingDetail = createSelector(
-  selectState,
-  (state) => state.isFetchingDetail
-);
+      listCertificates: (state, action: PayloadAction<{ query: CertificateListQuery }>) => {
+
+         state.certificates = [];
+         state.isFetchingList = true;
+
+      },
+
+
+      listCertificatesSuccess: (state, action: PayloadAction<{ certificateList: CertificateModel[] }>) => {
+
+         state.isFetchingList = false;
+         state.certificates = action.payload.certificateList;
+
+      },
+
+
+      listCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingList = false;
+
+      },
+
+
+      getCertificateDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.certificateDetail = undefined;
+         state.isFetchingDetail = true;
+
+      },
+
+
+      getCertificateDetailSuccess: (state, action: PayloadAction<{ certificate: CertificateModel }>) => {
+
+         state.isFetchingDetail = false;
+         state.certificateDetail = action.payload.certificate;
+
+      },
+
+
+      getCertificateDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingDetail = false;
+
+      }
+
+   }
+
+})
+
+
+const state = createFeatureSelector<State>(statePath);
+
+const isFetchingList = createSelector(state, (state) => state.isFetchingList);
+const isFetchingDetail = createSelector(state,(state) => state.isFetchingDetail);
+
+const certificates = createSelector(state, (state) => state.certificates);
+const certificateDetail = createSelector(state, (state) => state.certificateDetail);
+
 
 export const selectors = {
-  selectState,
-  selectCertificates,
-  isFetchingList,
-  isFetchingDetail,
+   state,
+   certificates,
+   certificateDetail,
+   isFetchingList,
+   isFetchingDetail,
 };
+
+
+export const actions = slice.actions;
+
+
+export default slice.reducer;
