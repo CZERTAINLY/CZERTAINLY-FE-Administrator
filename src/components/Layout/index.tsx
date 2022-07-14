@@ -23,6 +23,7 @@ import Authorities from "pages/authorities";
 import AcmeAccounts from "pages/acme-accounts";
 import AcmeProfiles from "pages/acme-profiles";
 import Profile from "pages/profile";
+import Groups from "pages/group";
 
 function Layout() {
 
@@ -60,6 +61,7 @@ function Layout() {
                   <Route path="/app/acmeaccounts" component={AcmeAccounts} />
                   <Route path="/app/acmeprofiles" component={AcmeProfiles} />
                   <Route path="/app/profile" component={Profile} />
+                  <Route path="/app/groups" component={Groups} />
 
                </Switch>
 

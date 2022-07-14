@@ -27,6 +27,7 @@ function App() {
             <Switch>
 
                <Route path="/" render={redirect} exact/>
+               <Route path="/administrator" render={redirect} exact/>
                <Route path="/app" render={redirect} exact/>
                <Route path="/login" component={Login} exact />
                <PrivateRoute component={Layout} />
