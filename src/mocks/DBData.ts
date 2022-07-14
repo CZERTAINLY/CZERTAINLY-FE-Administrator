@@ -11,6 +11,7 @@ import { DbCredential } from "./db-credentials";
 import { DbRaProfile } from "./db-ra-profiles";
 
 import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
+import { GroupDTO } from "api/groups";
 
 
 export interface DBData {
@@ -38,5 +39,7 @@ export interface DBData {
    credentials: DbCredential[];
 
    raProfiles: DbRaProfile[];
+
+   groups: GroupDTO[];
 
 }
