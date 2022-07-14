@@ -25,6 +25,7 @@ function Sidebar() {
          <ul className={style.nav}>
 
             {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
+            <LinksGroup _key="/app/dashboard" header="Dashboard" headerLink="/app/dashboard" />
             <LinksGroup _key="/app/raprofiles" header="RA Profiles" headerLink="/app/raprofiles" />
             {isSuperAdmin ? (<LinksGroup _key="/app/administrators" header="Administrators" headerLink="/app/administrators" />) : null}
             <LinksGroup _key="/app/clients" header="Clients" headerLink="/app/clients" />

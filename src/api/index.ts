@@ -6,7 +6,12 @@ import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMoc
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
 import { ConnectorManagementApi, ConnectorManagementBackend, ConnectorManagementMock } from "./connectors";
+<<<<<<< HEAD
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
+=======
+import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
+import { CertificateManagementApi, CertificateManagementBackend, CertificateManagementMock } from "./certificates";
+>>>>>>> b0ce50b (Add dashboard to the FE)
 import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountManagementMock } from "./acme-account";
 import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
@@ -19,6 +24,7 @@ export interface ApiClients {
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
+   dashboard: DashboardManagementApi;
    authorities: AuthorityManagementApi;
    certificates: CertificateInventoryApi;
    acmeAccounts: AcmeAccountManagementApi;
@@ -36,6 +42,7 @@ export const backendClient: ApiClients = {
    credentials: new CredentialManagementBackend(),
    authorities: new AuthorityManagementBackend(),
    connectors: new ConnectorManagementBackend(),
+   dashboard: new DashboardManagementBackend(),
    acmeAccounts: new AcmeAccountManagementBackend(),
    acmeProfiles: new AcmeProfilesManagementBackend(),
    groups: new GroupManagementBackend(),
@@ -51,6 +58,7 @@ export const mockClient: ApiClients = {
    credentials: new CredentialManagementMock(),
    authorities: new AuthorityManagementMock(),
    connectors: new ConnectorManagementMock(),
+   dashboard: new DashboardManagementMock(),
    acmeAccounts: new AcmeAccountManagementMock(),
    acmeProfiles: new AcmeProfilesManagementMock(),
    groups: new GroupManagementMock(),
