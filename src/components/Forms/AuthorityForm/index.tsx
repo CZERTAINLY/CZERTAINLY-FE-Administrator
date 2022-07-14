@@ -98,6 +98,11 @@ export default function AuthorityForm({
 
          if (!authorityProvider && editMode && authoritySelector?.uuid === params.id && authorityProviders && authorityProviders.length > 0) {
 
+            if (!authoritySelector.connectorUuid) {
+               dispatch(alertActions.error("Authority provider was probably deleted"));
+               return;
+            }
+
             const provider = authorityProviders.find(p => p.uuid === authoritySelector.connectorUuid);
 
             if (provider) {
