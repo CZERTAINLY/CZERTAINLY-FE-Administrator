@@ -283,6 +283,7 @@ export default function DiscoveryDetail() {
             <br />
 
             <CustomTable
+               hasPagination={true}
                headers={certificateHeaders}
                data={certificateData}
             />
