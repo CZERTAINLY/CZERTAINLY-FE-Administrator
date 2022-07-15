@@ -25,6 +25,7 @@ import AcmeProfiles from "pages/acme-profiles";
 import Profile from "pages/profile";
 import Groups from "pages/group";
 import Discovery from "pages/discoveries";
+import Dashboard from "pages/dashboard";
 
 function Layout() {
 
@@ -56,6 +57,7 @@ function Layout() {
                   <Route path="/app/about" component={About} />
                   <Route path="/app/clients" component={Clients} />
                   <Route path="/app/connectors" component={Connectors} />
+                  <Route path="/app/dashboard" component={Dashboard} />
                   <Route path="/app/raprofiles" component={RaProfiles} />
                   <Route path="/app/credentials" component={Credentials} />
                   <Route path="/app/authorities" component={Authorities} />

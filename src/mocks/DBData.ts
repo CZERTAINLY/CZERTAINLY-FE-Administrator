@@ -13,6 +13,7 @@ import { DbDiscovery } from "./db-discoveries";
 
 import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
 import { GroupDTO } from "api/groups";
+import { DashboardDTO } from "api/dashboard";
 
 
 export interface DBData {
@@ -44,5 +45,6 @@ export interface DBData {
    groups: GroupDTO[];
 
    discoveries: DbDiscovery[];
+   dashboard: DashboardDTO;
 
 }
