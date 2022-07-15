@@ -6,7 +6,7 @@ import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMoc
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
 import { ConnectorManagementApi, ConnectorManagementBackend, ConnectorManagementMock } from "./connectors";
-import { CertificateManagementApi, CertificateManagementBackend, CertificateManagementMock } from "./certificates";
+import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
 import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountManagementMock } from "./acme-account";
 import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 
@@ -19,7 +19,7 @@ export interface ApiClients {
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
    authorities: AuthorityManagementApi;
-   certificates: CertificateManagementApi;
+   certificates: CertificateInventoryApi;
    acmeAccounts: AcmeAccountManagementApi;
    acmeProfiles: AcmeProfilesManagementApi;
 }
@@ -27,7 +27,7 @@ export interface ApiClients {
 export const backendClient: ApiClients = {
    auth: new AuthBackend(),
    admins: new AdministratorsManagementBackend(),
-   certificates: new CertificateManagementBackend(),
+   certificates: new CertificateInventoryBackend(),
    auditLogs: new AuditLogsBackend(),
    clients: new ClientManagementBackend(),
    profiles: new ProfilesManagementBackend(),
@@ -41,7 +41,7 @@ export const backendClient: ApiClients = {
 export const mockClient: ApiClients = {
    auth: new AuthMock(),
    admins: new AdministatorManagementMock(),
-   certificates: new CertificateManagementMock(),
+   certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
    clients: new ClientManagementMock(),
    profiles: new ProfilesManagementMock(),

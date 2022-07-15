@@ -1,5 +1,7 @@
 import { Observable } from "rxjs";
 
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } from "types/certificate";
+
 
 export interface CertificateRAProfileDTO {
    uuid: string;
@@ -20,6 +22,35 @@ export interface CertificateGroupDTO {
    uuid: string;
    name: string;
    description: string;
+}
+
+
+export interface CertificateEventHistoryDTO {
+   uuid: string;
+   certificateUuid: string;
+   created: string;
+   createdBy: string;
+   event: CertificateEvent;
+   status: "SUCCESS" | "FAILED";
+   message: string;
+   additionalInformation: { [ property: string ]: any };
+}
+
+
+export interface CertificateBulkDeleteResultDTO {
+   status: "SUCCESS" | "FAILED" | "PARTIAL";
+   failedItems: number;
+   message: string;
+}
+
+
+export interface AvailableCertificateFilterDTO {
+   field: CertificateFilterField;
+   label: string;
+   type: "string" | "number" | "list" | "date";
+   conditions: CertificateFilterCondition[];
+   value?: string;
+   multiValue?: boolean;
 }
 
 
@@ -106,7 +137,8 @@ export interface CertificateListDTO {
 }
 
 
-export interface CertificateManagementApi {
+export interface CertificateInventoryApi {
+
 
    getCertificatesList(
       itemsPerPage?: number,
@@ -116,5 +148,71 @@ export interface CertificateManagementApi {
 
 
    getCertificateDetail(uuid: string): Observable<CertificateDTO>;
+
+
+   getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]>;
+
+
+   uploadCertificate(certificate: string): Observable<string>;
+
+
+   deleteCertificate(uuid: string): Observable<void>;
+
+
+   updateGroup(uuid: string, groupUuid: string): Observable<void>;
+
+
+   // updateEntity(uuid: string, entityUuid: string): Observable<void>;
+
+
+   updateRaProfile(uuid: string, raProfileUuid: string): Observable<void>;
+
+
+   updateOwner(uuid: string, owner: string): Observable<void>;
+
+
+   bulkUpdateGroup(
+      certificateIds: (string | number)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+
+
+   /*
+   bulkUpdateEntity(
+      certificateIds: (string | number)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+   */
+
+
+   bulkUpdateRaProfile(
+      certificateIds: (string | number)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+
+
+   bulkUpdateOwner(
+      certificateIds: (string | number)[],
+      owner: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+
+
+   bulkDeleteCertificate(
+      certificateIds: (string | number)[],
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<CertificateBulkDeleteResultDTO>;
+
+
+   getAvailableCertificateFilters(): Observable<AvailableCertificateFilterDTO[]>;
+
 
 }

@@ -1,8 +1,49 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } from "types/certificate";
 
 
 interface CertificateValidationResultRecordModel {
    status: "success" | "failed" | "warning" | "revoked" | "not_checked" | "invalid" | "expiring" | "expired";
+}
+
+
+export interface CertificateListQueryFilterModel {
+   field: string;
+   condition: string;
+   value?: any;
+}
+
+
+export interface CertificateListQueryModel {
+   itemsPerPage: number;
+   pageNumber: number;
+   filters: CertificateListQueryFilterModel[];
+}
+
+
+export interface AvailableCertificateFilterModel {
+
+   field: CertificateFilterField;
+   label: string;
+   type: "string" | "number" | "list" | "date";
+   conditions: CertificateFilterCondition[];
+   value?: string;
+   multiValue?: boolean;
+
+}
+
+
+export interface CertificateEventHistoryModel {
+
+   uuid: string;
+   certificateUuid: string;
+   created: string;
+   createdBy: string;
+   event: CertificateEvent;
+   status: "SUCCESS" | "FAILED";
+   message: string;
+   additionalInformation: { [ property: string ]: any };
+
 }
 
 

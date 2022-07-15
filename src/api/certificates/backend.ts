@@ -1,18 +1,22 @@
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
+import { createNewResource } from "utils/net";
 
 import * as model from "./model";
+import { CertificateEventHistoryDTO } from "./model";
 
 const baseUrl = "/api/v1/certificate";
 
-export class CertificateManagementBackend implements model.CertificateManagementApi {
+export class CertificateInventoryBackend implements model.CertificateInventoryApi {
 
    private _fetchService: FetchHttpService;
 
    constructor() {
       this._fetchService = new FetchHttpService();
    }
+
 
    getCertificatesList(
       itemsPerPage?: number,
@@ -21,20 +25,198 @@ export class CertificateManagementBackend implements model.CertificateManagement
    ): Observable<model.CertificateListDTO> {
 
       return this._fetchService.request(
-
          new HttpRequestOptions(baseUrl, "POST", {
             itemsPerPage,
             pageNumber,
             filters
          })
-
       );
 
    }
 
+
    getCertificateDetail(uuid: string): Observable<model.CertificateDTO> {
+
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
       );
+
    }
+
+
+   getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/history`, "GET")
+      );
+
+   }
+
+
+   uploadCertificate(certificate: string): Observable<string> {
+
+      return createNewResource(`${baseUrl}/upload`, {
+         certificate,
+      }).pipe(
+         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+      );
+
+   }
+
+
+   deleteCertificate(uuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+      );
+
+   }
+
+
+   updateGroup(uuid: string, groupUuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/group`, "PUT", {
+            groupUuid,
+         })
+      );
+
+   }
+
+
+   /*
+   updateEntity(uuid: string, entityUuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/entity`, "PUT", {
+            entityUuid,
+         })
+      );
+
+   }
+   */
+
+
+   updateRaProfile(uuid: string, raProfileUuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/ra-profile`, "PUT", {
+            raProfileUuid,
+         })
+      );
+
+   }
+
+
+   updateOwner(uuid: string, owner: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/owner`, "PUT", {
+            owner,
+         })
+      );
+
+   }
+
+
+   bulkUpdateGroup(
+      certificateIds: (string | number)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/group`, "PUT", {
+            uuid,
+            certificateUuids: certificateIds,
+            filters: allSelect ? inFilter : null,
+         })
+      );
+
+   }
+
+
+   /*
+   bulkUpdateEntity(
+      certificateIds: (string | number)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/entity`, "PUT", {
+            uuid,
+            certificateUuids: certificateIds,
+            filters: allSelect ? inFilter : null,
+         })
+      );
+
+   }
+   */
+
+
+   bulkUpdateRaProfile(
+      certificateIds: (string | number)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/ra-profile`, "PUT", {
+            uuid,
+            certificateUuids: certificateIds,
+            filters: allSelect ? inFilter : null,
+         })
+      );
+
+   }
+
+
+   bulkUpdateOwner(
+      certificateIds: (string | number)[],
+      owner: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/owner`, "PUT", {
+            owner,
+            certificateUuids: certificateIds,
+            filters: allSelect ? inFilter : null,
+         })
+      );
+
+   }
+
+
+   bulkDeleteCertificate(
+      certificateIds: (string | number)[],
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<model.CertificateBulkDeleteResultDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/delete`, "POST", {
+            uuids: certificateIds,
+            filters: allSelect ? inFilter : null,
+         })
+      );
+
+   }
+
+
+   getAvailableCertificateFilters(): Observable<model.AvailableCertificateFilterDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/search`, "GET")
+      );
+
+   }
+
+
+
 }

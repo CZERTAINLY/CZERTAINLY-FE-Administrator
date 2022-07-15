@@ -1,5 +1,5 @@
-import { CertificateDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
-import { CertificateModel } from "models";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
+import { AvailableCertificateFilterModel, CertificateModel } from "models";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -138,6 +138,20 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
          name: certificate.raProfile.name,
          enabled: certificate.raProfile.enabled
       } : undefined
+   }
+
+}
+
+
+export function transformAvailableCertificateFilterDTOToModel(availableCertificateFilter: AvailableCertificateFilterDTO): AvailableCertificateFilterModel {
+
+   return {
+      field: availableCertificateFilter.field,
+      label: availableCertificateFilter.label,
+      type: availableCertificateFilter.type,
+      conditions: [ ...availableCertificateFilter.conditions ],
+      value: availableCertificateFilter.value,
+      multiValue: availableCertificateFilter.multiValue
    }
 
 }
