@@ -148,7 +148,7 @@ export const dbData: DBData = {
       dbDiscoveries["Discovery1"],
       dbDiscoveries["Discovery2"],
       dbDiscoveries["Discovery3"],
-   ]
+   ],
    dashboard: dbDashboard,
 
 };
