@@ -469,6 +469,22 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 };
 
 
+const updateRaProfileFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateRaProfileFailure.match
+      ),
+      map(
+        action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
 
 
 
