@@ -1,5 +1,6 @@
-import { AvailableCertificateFilterDTO, CertificateDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
-import { AvailableCertificateFilterModel, CertificateModel } from "models";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
+import { RaProfileDTO } from "api/profiles";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel } from "models";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -152,6 +153,33 @@ export function transformAvailableCertificateFilterDTOToModel(availableCertifica
       conditions: [ ...availableCertificateFilter.conditions ],
       value: availableCertificateFilter.value,
       multiValue: availableCertificateFilter.multiValue
+   }
+
+}
+
+
+export function transformCertificateHistoryDTOToModel(certificateHistory: CertificateEventHistoryDTO): CertificateEventHistoryModel {
+
+   return {
+      uuid: certificateHistory.uuid,
+      certificateUuid: certificateHistory.certificateUuid,
+      event: certificateHistory.event,
+      message: certificateHistory.message,
+      status: certificateHistory.status,
+      created: certificateHistory.created,
+      createdBy: certificateHistory.createdBy,
+      additionalInformation: JSON.parse(JSON.stringify(certificateHistory.additionalInformation))
+   }
+
+}
+
+
+export function transformRaProfileDtoToCertificaeModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
+
+   return {
+      uuid: raProfile.uuid,
+      name: raProfile.name,
+      enabled: raProfile.enabled,
    }
 
 }

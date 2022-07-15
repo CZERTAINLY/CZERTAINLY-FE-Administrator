@@ -6,15 +6,12 @@ import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMoc
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
 import { ConnectorManagementApi, ConnectorManagementBackend, ConnectorManagementMock } from "./connectors";
-<<<<<<< HEAD
-import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
-=======
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
-import { CertificateManagementApi, CertificateManagementBackend, CertificateManagementMock } from "./certificates";
->>>>>>> b0ce50b (Add dashboard to the FE)
+import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
 import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountManagementMock } from "./acme-account";
 import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
+import { OperationsApi, OperationsBackend, OperationsMock } from "./operations";
 
 export interface ApiClients {
    auth: AuthApi;
@@ -30,6 +27,7 @@ export interface ApiClients {
    acmeAccounts: AcmeAccountManagementApi;
    acmeProfiles: AcmeProfilesManagementApi;
    groups: GroupManagementApi;
+   operations: OperationsApi;
 }
 
 export const backendClient: ApiClients = {
@@ -46,6 +44,7 @@ export const backendClient: ApiClients = {
    acmeAccounts: new AcmeAccountManagementBackend(),
    acmeProfiles: new AcmeProfilesManagementBackend(),
    groups: new GroupManagementBackend(),
+   operations: new OperationsBackend(),
 };
 
 export const mockClient: ApiClients = {
@@ -62,4 +61,5 @@ export const mockClient: ApiClients = {
    acmeAccounts: new AcmeAccountManagementMock(),
    acmeProfiles: new AcmeProfilesManagementMock(),
    groups: new GroupManagementMock(),
+   operations: new OperationsMock(),
 };

@@ -1,3 +1,4 @@
+import { GroupDTO } from "api/groups";
 import { Observable } from "rxjs";
 
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } from "types/certificate";
@@ -6,7 +7,7 @@ import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } 
 export interface CertificateRAProfileDTO {
    uuid: string;
    name: string;
-   enabled: string;
+   enabled: boolean;
 }
 
 
@@ -15,13 +16,6 @@ export interface CertificateEntityDTO {
    name: string;
    description?: string;
    entityType: "server" | "router" | "HSM" | "switch" | "loadBallancer" | "firewall" | "MDM" | "cloud";
-}
-
-
-export interface CertificateGroupDTO {
-   uuid: string;
-   name: string;
-   description: string;
 }
 
 
@@ -121,7 +115,7 @@ export interface CertificateDTO {
 
    certificateValidationResult?: CertificateValidationResultRecordDTO;
    entity?: CertificateEntityDTO;
-   group?: CertificateGroupDTO;
+   group?: GroupDTO;
    owner?: string;
    raProfile?: CertificateRAProfileDTO;
 

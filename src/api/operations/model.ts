@@ -15,7 +15,7 @@ export interface OperationsApi {
       raProfileUuid: string,
       pkcs10: string,
       attributes: AttributeDTO[],
-   ): Observable<string>;
+   ): Observable<{ uuid: string, certificateData: string }>;
 
 
    revokeCertificate(

@@ -1,5 +1,6 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } from "types/certificate";
+import { GroupModel } from "./groups";
 
 
 interface CertificateValidationResultRecordModel {
@@ -79,17 +80,10 @@ interface CertificateMetaModel {
 }
 
 
-interface CertificateGroupModel {
+export interface CertificateRAProfileModel {
    uuid: string;
    name: string;
-   description: string;
-}
-
-
-interface CertificateRAProfileModel {
-   uuid: string;
-   name: string;
-   enabled: string;
+   enabled: boolean;
 }
 
 
@@ -119,7 +113,7 @@ export interface CertificateModel {
 
    certificateValidationResult?: CertificateValidationResultRecordModel;
    entity?: CertificateEntityModel;
-   group?: CertificateGroupModel;
+   group?: GroupModel;
    owner?: string;
    raProfile?: CertificateRAProfileModel;
 

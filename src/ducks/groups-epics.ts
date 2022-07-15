@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
 import { slice } from "./groups";
 import history from "browser-history";
-import { transformGroupsDtoToModel } from "./transform/groups";
+import { transformGroupDtoToModel } from "./transform/groups";
 
 
 const listGroups: AppEpic = (action$, state$, deps) => {
@@ -22,7 +22,7 @@ const listGroups: AppEpic = (action$, state$, deps) => {
 
             map(
                list => slice.actions.listGroupsSuccess({
-                  groups: list.map(transformGroupsDtoToModel)
+                  groups: list.map(transformGroupDtoToModel)
                })
             ),
 
@@ -64,7 +64,7 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
 
             map(
                groupDto => slice.actions.getGroupDetailSuccess({
-                  group: transformGroupsDtoToModel(groupDto)
+                  group: transformGroupDtoToModel(groupDto)
                })
             ),
 
@@ -181,7 +181,7 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               groupDTO => slice.actions.updateGroupSuccess({ group: transformGroupsDtoToModel(groupDTO) })
+               groupDTO => slice.actions.updateGroupSuccess({ group: transformGroupDtoToModel(groupDTO) })
             ),
 
             catchError(
