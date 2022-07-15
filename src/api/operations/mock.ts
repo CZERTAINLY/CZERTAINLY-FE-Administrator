@@ -12,7 +12,7 @@ export class OperationsMock implements model.OperationsApi {
       raProfileUuid: string,
       pkcs10: string,
       attributes: AttributeDTO[],
-   ): Observable<string> {
+   ): Observable<{ uuid: string, certificateData: string }> {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 

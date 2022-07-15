@@ -22,7 +22,7 @@ export class OperationsBackend implements model.OperationsApi {
       raProfileUuid: string,
       pkcs10: string,
       attributes: AttributeDTO[],
-   ): Observable<string> {
+   ): Observable<{ uuid: string, certificateData: string }> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}${raProfileUuid}/issue`, "POST", {
