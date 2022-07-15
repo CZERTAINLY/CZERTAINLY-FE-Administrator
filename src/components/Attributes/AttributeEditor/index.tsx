@@ -147,11 +147,14 @@ export default function AttributeEditor({
          const formMappingPath = mapping.from ? mapping.from.includes(".") ? "value." + mapping.from.split(".").slice(1).join(".") : "value" : "value";
          const currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
 
-         return currentContent || attributeFromValue || descriptor.content;
+         const depDescriptor = attributeDescriptors.find(d => d.name === mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : "");
+         const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
+
+         return currentContent || attributeFromValue || depDescriptorValue;
 
       },
 
-      [attributes, formState.values, getAttributeValue, getObjectPropertyValue, id]
+      [attributeDescriptors, attributes, formState.values, getAttributeValue, getObjectPropertyValue, id]
 
    );
 

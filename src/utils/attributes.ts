@@ -66,7 +66,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: parseInt(lv.value) }));
+                  content = attributes[attribute].map((lv: any) => parseInt(lv.value));
                else
                   content = { value: parseInt(attributes[attribute].value.value) }
             } else {
@@ -79,7 +79,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
          case "FLOAT":
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: parseFloat(lv.value) }));
+                  content = attributes[attribute].map((lv: any) => parseFloat(lv.value));
                else
                   content = { value: parseFloat(attributes[attribute].value.value) }
             } else {
@@ -92,7 +92,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+                  content = attributes[attribute].map((lv: any) => lv.value);
                else
                   content = { value: attributes[attribute].value.value };
             } else {
@@ -153,7 +153,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
             if (descriptor.list) {
                if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+                  content = attributes[attribute].map((lv: any) => lv.value);
                else
                   content = attributes[attribute].value;
             } else {
@@ -166,8 +166,9 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
          case "JSON":
 
             if (descriptor.list) {
-               if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => ({ value: lv.value }));
+               if (Array.isArray(attributes[attribute])) {
+                  content = attributes[attribute].map((lv: any) => lv.value);
+               }
                else
                   content = attributes[attribute].value;
             } else {
