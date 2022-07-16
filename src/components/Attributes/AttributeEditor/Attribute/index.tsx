@@ -101,9 +101,9 @@ export function Attribute({
       "FLOAT": "number",         // possibly list
       "STRING": "text",          // possibly list
       "TEXT": "textarea",        // not list
-      "DATE": "text",            // not list
-      "TIME": "text",            // not list
-      "DATETIME": "text",        // not list
+      "DATE": "date",            // not list
+      "TIME": "time",            // not list
+      "DATETIME": "datetime-local",        // not list
       "FILE": "file",            // not list
       "SECRET": "password",      // not list
       "CREDENTIAL": "text",      // list only
