@@ -23,14 +23,14 @@ function App() {
 
          <ToastContainer autoClose={5000} hideProgressBar />
 
-         <BrowserRouter basename="/administrator">
+         <BrowserRouter basename={(window as any).__ENV__.BASE_URL}>
 
             <Router history={history} >
 
                <Switch>
 
                   <Route path="/" render={redirect} exact />
-                  <Route path="/administrator" render={redirect} exact />
+                  <Route path={(window as any).__ENV__.BASE_URL} render={redirect} exact />
                   <Route path="/app" render={redirect} exact />
                   <Route path="/login" component={Login} exact />
                   <PrivateRoute component={Layout} />

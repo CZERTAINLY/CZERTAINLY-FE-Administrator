@@ -24,6 +24,7 @@ import AcmeAccounts from "pages/acme-accounts";
 import AcmeProfiles from "pages/acme-profiles";
 import Profile from "pages/profile";
 import Groups from "pages/group";
+import Discovery from "pages/discoveries";
 import Dashboard from "pages/dashboard";
 
 function Layout() {
@@ -64,6 +65,10 @@ function Layout() {
                   <Route path="/app/acmeprofiles" component={AcmeProfiles} />
                   <Route path="/app/profile" component={Profile} />
                   <Route path="/app/groups" component={Groups} />
+<<<<<<< HEAD
+=======
+                  <Route path="/app/discovery" component={Discovery} />
+>>>>>>> 4a7fb3f7da8f616267ef0da34603aeb672fc8c5a
 
                </Switch>
 

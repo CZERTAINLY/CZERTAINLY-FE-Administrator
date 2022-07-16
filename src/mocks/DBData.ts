@@ -9,6 +9,7 @@ import { DbConnector } from "./db-connectors";
 import { DbRemoteConnector } from "./db-connectors-remote";
 import { DbCredential } from "./db-credentials";
 import { DbRaProfile } from "./db-ra-profiles";
+import { DbDiscovery } from "./db-discoveries";
 
 import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
 import { GroupDTO } from "api/groups";
@@ -43,6 +44,7 @@ export interface DBData {
 
    groups: GroupDTO[];
 
+   discoveries: DbDiscovery[];
    dashboard: DashboardDTO;
 
 }
