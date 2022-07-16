@@ -1,6 +1,33 @@
-.btn-link:hover {
-  background-color: $gray-200;
-}
+.btn-link {
+   font-weight: $font-weight-normal;
+   color: $link-color;
+   background-color: transparent;
+   border: none;
+
+   @include hover {
+     color: $link-hover-color;
+     text-decoration: $link-hover-decoration;
+     background-color: $gray-200;
+     border-color: transparent;
+   }
+
+   &:focus,
+   &.focus {
+     text-decoration: $link-hover-decoration;
+     border-color: transparent;
+     background-color: $gray-200;
+     box-shadow: none;
+   }
+
+   &:disabled,
+   &.disabled {
+     color: $btn-link-disabled-color;
+     background-color: transparent;
+     pointer-events: none;
+   }
+
+   // No need for an active state here
+ }
 
 // Container
 
