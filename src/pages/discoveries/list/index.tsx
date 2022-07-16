@@ -142,14 +142,15 @@ function DiscoveryList() {
             content: <MDBColumnName columnName="Status" />,
             align: "center",
             sortable: true,
-            id: "discoveryProvider",
+            id: "status",
             width: "15%",
          },
          {
             content: <MDBColumnName columnName="Total Certificates" />,
             align: "center",
             sortable: true,
-            id: "discoveryProvider",
+            sortType: "numeric",
+            id: "totalCertificates",
             width: "15%",
          },
       ],
@@ -173,7 +174,7 @@ function DiscoveryList() {
                <MDBBadge color="primary" >{discovery.connectorName}</MDBBadge>,
 
                <MDBBadge color="secondary" >{discovery.kind}</MDBBadge>,
-               
+
                <DiscoveryStatusBadge status={discovery.status} />,
 
                discovery.totalCertificatesDiscovered?.toString() || "0"
