@@ -9,9 +9,6 @@ import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorM
 import { CertificateRevocationReason } from "types/certificate";
 
 
-export const statePath = "certificates";
-
-
 export type State = {
 
    checkedRows: string[];
@@ -636,7 +633,7 @@ export const slice = createSlice({
 })
 
 
-const state = createFeatureSelector<State>(statePath);
+const state = createFeatureSelector<State>(slice.name);
 
 const availableCertificateFilters = createSelector(state, state => state.availableFilters);
 
