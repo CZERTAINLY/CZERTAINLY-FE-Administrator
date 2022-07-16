@@ -1,5 +1,5 @@
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-import { Observable, of } from "rxjs";
+import { Observable } from "rxjs";
 import { HttpErrorResponse } from "ts-rest-client";
 import { CertificateRevocationReason } from "types/certificate";
 
