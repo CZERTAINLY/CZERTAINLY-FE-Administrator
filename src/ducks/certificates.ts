@@ -635,6 +635,10 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
+const checkedRows = createSelector(state, state => state.checkedRows);
+
+const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
+
 const availableCertificateFilters = createSelector(state, state => state.availableFilters);
 
 const certificates = createSelector(state, state => state.certificates);
@@ -672,6 +676,8 @@ const isFetchingRevocationAttributes = createSelector(state, state => state.isFe
 
 export const selectors = {
    state,
+   checkedRows,
+   deleteErrorMessage,
    availableCertificateFilters,
    certificates,
    certificateDetail,
