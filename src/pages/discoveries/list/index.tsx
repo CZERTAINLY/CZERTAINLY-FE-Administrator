@@ -35,8 +35,8 @@ function DiscoveryList() {
    useEffect(
 
       () => {
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listDiscoveries());
-
       },
       [dispatch]
 
