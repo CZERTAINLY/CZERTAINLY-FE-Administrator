@@ -99,11 +99,11 @@ export default function CertificateList() {
 
             <DropdownMenu>
 
-               <DropdownItem onClick={() => {/*downloadFileZip(checkedRows, certData, "pem")} */ }}>
+               <DropdownItem key="pem" onClick={() => {/*downloadFileZip(checkedRows, certData, "pem")} */ }}>
                   PEM (.pem)
                </DropdownItem>
 
-               <DropdownItem onClick={() => {/*downloadFileZip(checkedRows, certData, "cer") */ }}>
+               <DropdownItem key="der" onClick={() => {/*downloadFileZip(checkedRows, certData, "cer") */ }}>
                   DER (.cer)
                </DropdownItem>
 

@@ -191,6 +191,7 @@ function CustomTable({
             filtered.sort(
 
                (a, b) => {
+
                   const aVal = typeof a.columns[sortColumnIndex] === "string" ? (a.columns[sortColumnIndex] as string).toLowerCase() : jsxInnerText(a.columns[sortColumnIndex] as JSX.Element).toLowerCase();
                   const bVal = typeof b.columns[sortColumnIndex] === "string" ? (b.columns[sortColumnIndex] as string).toLowerCase() : jsxInnerText(b.columns[sortColumnIndex] as JSX.Element).toLowerCase();
 
@@ -502,7 +503,7 @@ function CustomTable({
 
       ),
 
-      [tblData, pageSize, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
+      [tblData, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
 
    );
 
@@ -536,6 +537,12 @@ function CustomTable({
    ) : undefined;
 
 
+   const canSort: boolean = useMemo(
+      () => headers?.some(header => header.sortable) || false,
+      [headers]
+   )
+
+
    return (
 
       <div className={styles.customTable}>
@@ -545,7 +552,7 @@ function CustomTable({
                ?
                <>
                   <div className="pull-right mt-n-xs">
-                     <Input cle id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
+                     <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
                   </div>
                   <br />
                   <br />
@@ -563,7 +570,7 @@ function CustomTable({
             </Table>
          </div>
 
-         {paginationData ? <div><FormText>Please note the search and sort functionality is applied only to the the single data page<br /><br /></FormText></div> : <></>}
+         {paginationData && (canSearch || canSort) ? <div><FormText>Please note the search and sort functionality is applied only to the the single data page<br /><br /></FormText></div> : <></>}
 
          {!hasPagination ? <></> : (
 
@@ -576,7 +583,7 @@ function CustomTable({
                         paginationData
                            ?
                            paginationData.itemsPerPageOptions.map(
-                              option => <option>{option}</option>
+                              option => <option key={option}>{option}</option>
                            )
                            :
                            <>

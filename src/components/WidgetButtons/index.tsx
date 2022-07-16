@@ -81,7 +81,7 @@ function WidgetButtons({ buttons }: Props) {
 
       return button.custom
          ?
-         ( <>{ button.custom }</>)
+         ( <span key={button.icon + button.tooltip}>{ button.custom }</span>)
          :
          (
             <Button {...btnProps}>
