@@ -4,14 +4,14 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "components/Spinner";
 import { actions, selectors } from "ducks/dashboard";
-import CountBadge from "components/DashboardItem/CountBadge";
-import CertificateByGroupChart from "components/DashboardItem/CertificateByGroup";
-import CertificateByRaProfileChart from "components/DashboardItem/CertificateByRaProfiles";
-import CertificateTypesChart from "components/DashboardItem/CertificateByTypes";
-import CertificateExpiryChart from "components/DashboardItem/CertificateByExpiry";
-import CertificateKeySizeChart from "components/DashboardItem/CertificateByKeySize";
-import CertificateConstraintsChart from "components/DashboardItem/CertificateByConstraints";
-import CertificateByStatusChart from "components/DashboardItem/CertificateByStatus";
+import CountBadge from "components/pages/dashboard/DashboardItem/CountBadge";
+import CertificateByGroupChart from "components/pages/dashboard/DashboardItem/CertificateByGroup";
+import CertificateByRaProfileChart from "components/pages/dashboard/DashboardItem/CertificateByRaProfiles";
+import CertificateTypesChart from "components/pages/dashboard/DashboardItem/CertificateByTypes";
+import CertificateExpiryChart from "components/pages/dashboard/DashboardItem/CertificateByExpiry";
+import CertificateKeySizeChart from "components/pages/dashboard/DashboardItem/CertificateByKeySize";
+import CertificateConstraintsChart from "components/pages/dashboard/DashboardItem/CertificateByConstraints";
+import CertificateByStatusChart from "components/pages/dashboard/DashboardItem/CertificateByStatus";
 
 function Dashboard() {
   const dashboard = useSelector(selectors.dashboard);

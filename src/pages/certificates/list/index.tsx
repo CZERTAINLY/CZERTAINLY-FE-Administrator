@@ -6,7 +6,7 @@ import { Button, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, L
 import { actions, selectors } from "ducks/certificates";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import MDBColumnName from "components/MDBColumnName";
-import CertificateStatusIcon from "components/CertificateStatusIcon";
+import CertificateStatusIcon from "components/pages/connectors/CertificateStatusIcon";
 import { dateFormatter } from "utils/dateUtil";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";

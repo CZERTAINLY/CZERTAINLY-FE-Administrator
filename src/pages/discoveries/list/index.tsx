@@ -10,7 +10,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import DiscoveryStatusBadge from "components/DiscoveryStatus";
+import DiscoveryStatusBadge from "components/pages/discoveries/DiscoveryStatus";
 
 const { MDBBadge } = require("mdbreact");
 

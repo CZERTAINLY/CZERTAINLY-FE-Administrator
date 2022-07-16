@@ -10,8 +10,8 @@ import { selectors } from "ducks/audit";
 
 import { AuditLogModel } from "models";
 
-import AuditLogsFilters, { FormValues as FilterValues, } from "components/AuditLogsFilters";
-import ObjectValues from "components/ObjectValues";
+import AuditLogsFilters, { FormValues as FilterValues, } from "components/pages/auditLogs/AuditLogsFilters";
+import ObjectValues from "components/pages/auditLogs/ObjectValues";
 import Widget from "components/Widget";
 import SortColumnHeader from "components/SortColumnHeader";
 import SortTableHeader from "components/SortTableHeader";

@@ -9,7 +9,7 @@ import Select from "react-select";
 import { actions as clientActions, selectors as clientSelectors } from "ducks/clients";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 
-import AcmeProtocolActiovationDialogBody from "./AcmeProtocolActiovationDialogBody";
+import AcmeProtocolActiovationDialogBody from "../../../components/pages/ra-profiles/AcmeProtocolActiovationDialogBody";
 
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
