@@ -4,9 +4,10 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle";
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes";
    tooltip?: string;
    disabled: boolean;
+   custom?: React.ReactNode;
    onClick: (event: React.MouseEvent) => void
 }
 
@@ -24,6 +25,11 @@ const colors = {
    "plug": "auto",
    "pencil": "auto",
    "cross-circle": "black",
+   "upload": "auto",
+   "download": "auto",
+   "group": "auto",
+   "user": "auto",
+   "cubes": "auto",
 };
 
 
@@ -34,7 +40,12 @@ const classNames = {
    "check": "fa fa-check",
    "plug": "fa fa-plug",
    "pencil": "fa fa-pencil-square-o",
-   "cross-circle": "fa fa-times-circle"
+   "cross-circle": "fa fa-times-circle",
+   "upload": "fa fa-upload",
+   "download": "fa fa-download",
+   "group": "fa fa-group",
+   "user": "fa fa-user-o",
+   "cubes": "fa fa-cubes",
 }
 
 
@@ -68,12 +79,16 @@ function WidgetButtons({ buttons }: Props) {
          style = { color: colors[button.icon] }
       }
 
-      return (
-         <Button {...btnProps}>
-            <i className={classNames[button.icon]} style={style} />
-            {toolTip}
-         </Button>
-      )
+      return button.custom
+         ?
+         ( <>{ button.custom }</>)
+         :
+         (
+            <Button {...btnProps}>
+               <i className={classNames[button.icon]} style={style} />
+               {toolTip}
+            </Button>
+         )
 
    }
 
