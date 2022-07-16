@@ -7,7 +7,7 @@ import { extractError } from "utils/net";
 import * as slice from "./certificates";
 import { actions as alertActions } from "./alerts";
 import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDtoToCertificaeModel } from "./transform/certificates";
-import { transformAttributeModelToDTO } from "./transform/attributes";
+import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformGroupDtoToModel } from "./transform/groups";
 
 
@@ -477,7 +477,7 @@ const updateRaProfileFailure: AppEpic = (action$, state, deps) => {
          slice.actions.updateRaProfileFailure.match
       ),
       map(
-        action => alertActions.error(action.payload.error || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -485,9 +485,444 @@ const updateRaProfileFailure: AppEpic = (action$, state, deps) => {
 }
 
 
+const updateOwner: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateOwner.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.updateOwner(
+            action.payload.uuid,
+            action.payload.owner,
+         ).pipe(
+
+            map(
+               () => slice.actions.updateOwnerSuccess({
+                  uuid: action.payload.uuid,
+                  owner: action.payload.owner
+               }),
+            ),
+            catchError(
+               err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to update owner") }))
+            )
+
+         )
+
+      )
+
+   )
+
+}
 
 
+const updateOwnerFailure: AppEpic = (action$, state, deps) => {
 
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateOwnerFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateGroup.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.bulkUpdateGroup(
+            action.payload.uuids,
+            action.payload.groupUuid,
+            action.payload.inFilter,
+            action.payload.allSelect,
+         ).pipe(
+
+            switchMap(
+
+               () => deps.apiClients.groups.getGroupDetail(action.payload.groupUuid).pipe(
+
+                  map(
+
+                     group => slice.actions.bulkUpdateGroupSuccess({
+                        uuids: action.payload.uuids,
+                        group,
+                        inFilter: action.payload.inFilter,
+                        allSelect: action.payload.allSelect,
+                     })
+
+                  ),
+
+                  catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") })))
+
+               )
+
+            ),
+
+            catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkUpdateGroupFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateGroupFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateRaProfile.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.bulkUpdateRaProfile(
+            action.payload.uuids,
+            action.payload.raProfileUuid,
+            action.payload.inFilter,
+            action.payload.allSelect,
+         ).pipe(
+
+            switchMap(
+
+               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.raProfileUuid).pipe(
+
+                  map(
+
+                     raProfile => slice.actions.bulkUpdateRaProfileSuccess({
+                        uuids: action.payload.uuids,
+                        raProfile,
+                        inFilter: action.payload.inFilter,
+                        allSelect: action.payload.allSelect,
+                     })
+
+                  ),
+
+                  catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") })))
+
+               )
+
+            ),
+
+            catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkUpdateRaProfileFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateRaProfileFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateOwner.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.bulkUpdateOwner(
+            action.payload.uuids,
+            action.payload.owner,
+            action.payload.inFilter,
+            action.payload.allSelect,
+         ).pipe(
+
+            map(
+
+               () => slice.actions.bulkUpdateOwnerSuccess({
+                  uuids: action.payload.uuids,
+                  owner: action.payload.owner,
+                  inFilter: action.payload.inFilter,
+                  allSelect: action.payload.allSelect,
+               }),
+
+            ),
+
+            catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update owner") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkUpdateOwnerFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateOwnerFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const bulkDelete: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDelete.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.bulkDeleteCertificate(
+            action.payload.uuids,
+            action.payload.inFilter,
+            action.payload.allSelect,
+         ).pipe(
+
+            map(
+
+               () => slice.actions.bulkDeleteSuccess({
+                  uuids: action.payload.uuids,
+                  inFilter: action.payload.inFilter,
+                  allSelect: action.payload.allSelect,
+               }),
+
+            ),
+
+            catchError(err => of(slice.actions.bulkDeleteFailure({ error: extractError(err, "Failed to bulk delete certificates") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const bulkDeleteFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const uploadCertificate: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.uploadCertificate.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.uploadCertificate(
+            action.payload.certificate
+         ).pipe(
+
+            switchMap(
+
+               uuid => deps.apiClients.certificates.getCertificateDetail(uuid).pipe(
+
+                  map(
+
+                     certificate => slice.actions.uploadCertificateSuccess({
+                        uuid,
+                        certificate,
+                     })
+
+                  ),
+
+                  catchError(err => of(slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") })))
+
+               )
+
+            ),
+
+            catchError(err => of(slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const uploadCertificateFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.uploadCertificateFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getIssuanceAttributes.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.operations.getIssuanceAttributes(
+            action.payload.raProfileUuid,
+         ).pipe(
+
+            map(
+
+               attributes => slice.actions.getIssuanceAttributesSuccess({
+                  raProfileUuid: action.payload.raProfileUuid,
+                  issuanceAttributes: attributes.map(attribute => transformAttributeDescriptorDTOToModel(attribute)),
+               }),
+
+            ),
+
+            catchError(err => of(slice.actions.getIssuanceAttributesFailure({ error: extractError(err, "Failed to get issuance attributes") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const getIssuanceAttributesFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getIssuanceAttributesFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const getRevocationAttributes: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getRevocationAttributes.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.operations.getRevocationAttributes(
+            action.payload.raProfileUuid,
+         ).pipe(
+
+            map(
+
+               attributes => slice.actions.getRevocationAttributesSuccess({
+                  raProfileUuid: action.payload.raProfileUuid,
+                  revocationAttributes: attributes.map(attribute => transformAttributeDescriptorDTOToModel(attribute)),
+               }),
+
+            ),
+
+            catchError(err => of(slice.actions.getRevocationAttributesFailure({ error: extractError(err, "Failed to get revocation attributes") })))
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const getRevocationAttributesFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getRevocationAttributesFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
 
 
 const epics = [
@@ -510,6 +945,22 @@ const epics = [
    updateGroupFailure,
    updateRaProfile,
    updateRaProfileFailure,
+   updateOwner,
+   updateOwnerFailure,
+   bulkUpdateGroup,
+   bulkUpdateGroupFailure,
+   bulkUpdateRaProfile,
+   bulkUpdateRaProfileFailure,
+   bulkUpdateOwner,
+   bulkUpdateOwnerFailure,
+   bulkDelete,
+   bulkDeleteFailure,
+   uploadCertificate,
+   uploadCertificateFailure,
+   getIssuanceAttributes,
+   getIssuanceAttributesFailure,
+   getRevocationAttributes,
+   getRevocationAttributesFailure,
 ];
 
 

@@ -120,7 +120,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
 
    bulkUpdateGroup(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -139,7 +139,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
    /*
    bulkUpdateEntity(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -158,7 +158,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
 
    bulkUpdateRaProfile(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -176,7 +176,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
 
    bulkUpdateOwner(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       owner: string,
       inFilter: any,
       allSelect: boolean
@@ -194,7 +194,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
 
    bulkDeleteCertificate(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       inFilter: any,
       allSelect: boolean
    ): Observable<model.CertificateBulkDeleteResultDTO> {

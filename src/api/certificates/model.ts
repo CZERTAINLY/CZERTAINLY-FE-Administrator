@@ -166,8 +166,8 @@ export interface CertificateInventoryApi {
 
 
    bulkUpdateGroup(
-      certificateIds: (string | number)[],
-      uuid: string,
+      uuids: string[],
+      groupUuid: string,
       inFilter: any,
       allSelect: boolean
    ): Observable<void>;
@@ -175,7 +175,7 @@ export interface CertificateInventoryApi {
 
    /*
    bulkUpdateEntity(
-      certificateIds: (string | number)[],
+      certificateIds: (string)[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -184,15 +184,15 @@ export interface CertificateInventoryApi {
 
 
    bulkUpdateRaProfile(
-      certificateIds: (string | number)[],
-      uuid: string,
+      uuids: string[],
+      profileUuid: string,
       inFilter: any,
       allSelect: boolean
    ): Observable<void>;
 
 
    bulkUpdateOwner(
-      certificateIds: (string | number)[],
+      uuids: string[],
       owner: string,
       inFilter: any,
       allSelect: boolean
@@ -200,7 +200,7 @@ export interface CertificateInventoryApi {
 
 
    bulkDeleteCertificate(
-      certificateIds: (string | number)[],
+      uuids: string[],
       inFilter: any,
       allSelect: boolean
    ): Observable<CertificateBulkDeleteResultDTO>;

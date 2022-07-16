@@ -135,7 +135,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
 
    bulkUpdateGroup(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -148,7 +148,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
    /*
    bulkUpdateEntity(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -157,7 +157,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
 
    bulkUpdateRaProfile(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       uuid: string,
       inFilter: any,
       allSelect: boolean
@@ -169,7 +169,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
 
    bulkUpdateOwner(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       owner: string,
       inFilter: any,
       allSelect: boolean
@@ -181,7 +181,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
 
    bulkDeleteCertificate(
-      certificateIds: (string | number)[],
+      certificateIds: string[],
       inFilter: any,
       allSelect: boolean
    ): Observable<model.CertificateBulkDeleteResultDTO> {

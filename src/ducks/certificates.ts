@@ -14,13 +14,17 @@ export const statePath = "certificates";
 
 export type State = {
 
+   checkedRows: string[];
+
+   deleteErrorMessage: string;
+
    availableFilters: AvailableCertificateFilterModel[];
 
    certificates: CertificateModel[];
    certificateDetail?: CertificateModel;
    certificateHistory?: CertificateEventHistoryModel[];
-   issuanceAttributes?: AttributeDescriptorModel[];
-   revocationAttributes?: AttributeDescriptorModel[];
+   issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
+   revocationAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
 
    isFetchingAvailableFilters: boolean;
 
@@ -54,9 +58,15 @@ export type State = {
 
 export const initialState: State = {
 
+   checkedRows: [],
+
+   deleteErrorMessage: "",
+
    availableFilters: [],
 
    certificates: [],
+   issuanceAttributes: {},
+   revocationAttributes: {},
 
    isFetchingAvailableFilters: false,
 
@@ -95,6 +105,27 @@ export const slice = createSlice({
    initialState,
 
    reducers: {
+
+      resetState: (state, action: PayloadAction<void>) => {
+
+         state = initialState;
+
+      },
+
+
+      setCheckedRows: (state, action: PayloadAction<string[]>) => {
+
+         state.checkedRows = action.payload;
+
+      },
+
+
+      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+
+         state.deleteErrorMessage = "";
+
+      },
+
 
       listCertificates: (state, action: PayloadAction<{ query: CertificateListQueryModel }>) => {
 
@@ -284,6 +315,7 @@ export const slice = createSlice({
 
       deleteCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
 
+         state.deleteErrorMessage = "";
          state.isDeleting = true;
 
       },
@@ -305,6 +337,7 @@ export const slice = createSlice({
       deleteCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false;
+         state.deleteErrorMessage = action.payload.error || "Unknown error";
 
       },
 
@@ -390,14 +423,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateGroup: (state, action: PayloadAction<{ uuids: string[], groupUuid: string }>) => {
+      bulkUpdateGroup: (state, action: PayloadAction<{ uuids: string[], groupUuid: string, inFilter: any, allSelect: boolean }>) => {
 
          state.isBulkUpdatingGroup = true;
 
       },
 
 
-      bulkUpdateGroupSuccess: (state, action: PayloadAction<{ uuids: string[], group: GroupModel }>) => {
+      bulkUpdateGroupSuccess: (state, action: PayloadAction<{ uuids: string[], group: GroupModel, inFilter: any, allSelect: boolean }>) => {
 
          state.isBulkUpdatingGroup = false;
 
@@ -425,14 +458,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateRaProfile: (state, action: PayloadAction<{ uuids: string[], raProfileUuid: string }>) => {
+      bulkUpdateRaProfile: (state, action: PayloadAction<{ uuids: string[], raProfileUuid: string, inFilter: any, allSelect: boolean }>) => {
 
          state.isBulkUpdatingRaProfile = true;
 
       },
 
 
-      bulkUpdateRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[], raProfile: CertificateRAProfileModel }>) => {
+      bulkUpdateRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[], raProfile: CertificateRAProfileModel, inFilter: any, allSelect: boolean }>) => {
 
          state.isBulkUpdatingRaProfile = false;
 
@@ -460,14 +493,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateOwner: (state, action: PayloadAction<{ uuids: string[], owner: string }>) => {
+      bulkUpdateOwner: (state, action: PayloadAction<{ uuids: string[], owner: string, inFilter: any, allSelect: boolean}>) => {
 
          state.isBulkUpdatingOwner = true;
 
       },
 
 
-      bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[], owner: string }>) => {
+      bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[], owner: string, inFilter: any, allSelect: boolean }>) => {
 
          state.isBulkUpdatingOwner = false;
 
@@ -495,14 +528,15 @@ export const slice = createSlice({
       },
 
 
-      bulkDelete: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkDelete: (state, action: PayloadAction<{ uuids: string[], inFilter: any, allSelect: boolean  }>) => {
 
+         state.deleteErrorMessage = "";
          state.isBulkDeleting = true;
 
       },
 
 
-      bulkDeleteSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkDeleteSuccess: (state, action: PayloadAction<{ uuids: string[], inFilter: any, allSelect: boolean  }>) => {
 
          state.isBulkDeleting = false;
 
@@ -526,6 +560,7 @@ export const slice = createSlice({
       bulkDeleteFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDeleting = false;
+         state.deleteErrorMessage = action.payload.error || "Unknown error";
 
       },
 
@@ -562,7 +597,7 @@ export const slice = createSlice({
       getIssuanceAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, issuanceAttributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingIssuanceAttributes = false;
-         state.issuanceAttributes = action.payload.issuanceAttributes;
+         state.issuanceAttributes[action.payload.raProfileUuid] = action.payload.issuanceAttributes;
 
       },
 
@@ -584,7 +619,7 @@ export const slice = createSlice({
       getRevocationAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, revocationAttributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingRevocationAttributes = false;
-         state.revocationAttributes = action.payload.revocationAttributes;
+         state.revocationAttributes[action.payload.raProfileUuid] = action.payload.revocationAttributes;
 
       },
 
