@@ -31,8 +31,6 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                map(
                   list => slice.actions.listCertificatesSuccess({
                      certificateList: list.certificates.map(transformCertDTOToModel),
-                     itemsPerPage: list.itemsPerPage,
-                     pageNumber: list.pageNumber,
                      totalItems: list.totalItems,
                      totalPages: list.totalPages,
                   })

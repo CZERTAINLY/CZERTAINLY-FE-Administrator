@@ -124,8 +124,6 @@ export interface CertificateDTO {
 
 export interface CertificateListDTO {
    certificates: CertificateDTO[];
-   itemsPerPage: number;
-   pageNumber: number;
    totalPages: number;
    totalItems: number;
 }

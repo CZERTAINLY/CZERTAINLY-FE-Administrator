@@ -1,6 +1,16 @@
 import React, { useCallback } from "react";
 import { Container } from "reactstrap";
 
+
+export default function AddCertificate() {
+
+   return (
+      <></>
+   )
+
+}
+
+/*
 import Widget from "components/Widget";
 import { actions, selectors } from "ducks/certificates";
 import { selectors as callbackSelectors } from "ducks/connectors";
@@ -54,3 +64,4 @@ function CreateCertificate() {
 }
 
 export default CreateCertificate;
+*/

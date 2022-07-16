@@ -18,8 +18,6 @@ export type State = {
    availableFilters: AvailableCertificateFilterModel[];
 
    certificates: CertificateModel[];
-   itemsPerPage: number;
-   pageNumber: number;
    totalPages: number;
    totalItems: number;
 
@@ -67,8 +65,6 @@ export const initialState: State = {
    availableFilters: [],
 
    certificates: [],
-   itemsPerPage: 0,
-   pageNumber: 0,
    totalPages: 0,
    totalItems: 0,
 
@@ -144,8 +140,6 @@ export const slice = createSlice({
 
       listCertificatesSuccess: (state, action: PayloadAction<{
          certificateList: CertificateModel[],
-         itemsPerPage: number,
-         pageNumber: number,
          totalPages: number,
          totalItems: number
       }>) => {
@@ -154,8 +148,6 @@ export const slice = createSlice({
          state.certificates = action.payload.certificateList;
          state.totalItems = action.payload.totalItems;
          state.totalPages = action.payload.totalPages;
-         state.itemsPerPage = action.payload.itemsPerPage;
-         state.pageNumber = action.payload.pageNumber;
 
       },
 
@@ -662,8 +654,6 @@ const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessa
 const availableCertificateFilters = createSelector(state, state => state.availableFilters);
 
 const certificates = createSelector(state, state => state.certificates);
-const itemsPerPage = createSelector(state, state => state.itemsPerPage);
-const pageNumber = createSelector(state, state => state.pageNumber);
 const totalItems = createSelector(state, state => state.totalItems);
 const totalPages = createSelector(state, state => state.totalPages);
 
@@ -705,8 +695,6 @@ export const selectors = {
    deleteErrorMessage,
    availableCertificateFilters,
    certificates,
-   itemsPerPage,
-   pageNumber,
    totalItems,
    totalPages,
    certificateDetail,

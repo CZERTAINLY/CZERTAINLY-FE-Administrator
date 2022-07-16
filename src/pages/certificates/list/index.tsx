@@ -1,8 +1,335 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch, useHistory } from "react-router-dom";
-import { Button, Container, Input, Label } from "reactstrap";
+import { Button, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, UncontrolledButtonDropdown } from "reactstrap";
 
+import { actions, selectors } from "ducks/certificates";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import MDBColumnName from "components/MDBColumnName";
+import CertificateStatusIcon from "components/CertificateStatusIcon";
+import { dateFormatter } from "utils/dateUtil";
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import ToolTip from "components/ToolTip";
+
+export default function CertificateList() {
+
+   const dispatch = useDispatch();
+   const history = useHistory();
+
+   const { path } = useRouteMatch();
+
+   const checkedRows = useSelector(selectors.checkedRows);
+
+   const certificates = useSelector(selectors.certificates);
+
+   const totalItems = useSelector(selectors.totalItems);
+   const totalPages = useSelector(selectors.totalPages);
+
+   const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
+   const isFetchingList = useSelector(selectors.isFetchingList);
+   const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
+   const isIssuing = useSelector(selectors.isIssuing);
+   const isRevoking = useSelector(selectors.isRevoking);
+   const isRenewing = useSelector(selectors.isRenewing);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+   const isUpdatingGroup = useSelector(selectors.isUpdatingGroup);
+   const isUpdatingRaProfile = useSelector(selectors.isUpdatingRaProfile);
+   const isUpdatingOwner = useSelector(selectors.isUpdatingOwner);
+   const isBulkUpdatingGroup = useSelector(selectors.isBulkUpdatingGroup);
+   const isBulkUpdatingRaProfile = useSelector(selectors.isBulkUpdatingRaProfile);
+   const isBulkUpdatingOwner = useSelector(selectors.isBulkUpdatingOwner);
+   const isUploading = useSelector(selectors.isUploading);
+   const isFetchingIssuanceAttributes = useSelector(selectors.isFetchingIssuanceAttributes);
+   const isFetchingRevocationAttributes = useSelector(selectors.isFetchingRevocationAttributes);
+
+   const [pageSize, setPageSize] = useState(10);
+   const [pageNumber, setPageNumber] = useState(1);
+
+   const isBusy = isFetchingAvailablFilters || isFetchingList || isFetchingDetail || isFetchingHistory || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading || isFetchingIssuanceAttributes || isFetchingRevocationAttributes;
+
+
+   useEffect(
+
+      () => {
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         dispatch(actions.getAvailableCertificateFilters());
+      },
+      [dispatch]
+
+   );
+
+   useEffect(
+
+      () => {
+         dispatch(actions.listCertificates({ query: { filters: [], itemsPerPage: pageSize, pageNumber } }));
+      },
+      [dispatch, pageSize, pageNumber]
+
+   );
+
+
+   const setCheckedRows = useCallback(
+      (rows: (string | number)[]) => {
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+      },
+      [dispatch]
+   );
+
+
+   const downloadDropDown = useMemo(
+      () => (
+
+         <UncontrolledButtonDropdown>
+
+            <DropdownToggle
+               color="light"
+               caret
+               className="btn btn-link"
+               data-for="download"
+               data-tip
+               disabled={checkedRows.length === 0}
+            >
+               <i className="fa fa-download" aria-hidden="true" />
+               <ToolTip id="download" message="Download" />
+            </DropdownToggle>
+
+            <DropdownMenu>
+
+               <DropdownItem onClick={() => {/*downloadFileZip(checkedRows, certData, "pem")} */ }}>
+                  PEM (.pem)
+               </DropdownItem>
+
+               <DropdownItem onClick={() => {/*downloadFileZip(checkedRows, certData, "cer") */ }}>
+                  DER (.cer)
+               </DropdownItem>
+
+            </DropdownMenu>
+
+         </UncontrolledButtonDropdown>
+
+      ),
+      [checkedRows.length]
+
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create Certificate", onClick: () => { /*onAddClick();*/ } },
+         { icon: "upload", disabled: false, tooltip: "Upload Certificate", onClick: () => { /*setConfirmDelete(true);*/ } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete Certificate", onClick: () => { /*onReconnectClick()*/ } },
+         { icon: "group", disabled: checkedRows.length === 0, tooltip: "Set Oroup", onClick: () => { /*setConfirmAuthorize(true);*/ } },
+         { icon: "user", disabled: checkedRows.length === 0, tooltip: "Set Owner", onClick: () => { /*setConfirmAuthorize(true);*/ } },
+         { icon: "cubes", disabled: true, tooltip: "Set Entity", onClick: () => { /*setConfirmAuthorize(true);*/ } },
+         { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Set RA Profile", onClick: () => { /*setConfirmAuthorize(true);*/ } },
+         { icon: "download", disabled: checkedRows.length === 0, tooltip: "Download", custom: downloadDropDown, onClick: () => { /*setConfirmAuthorize(true);*/ } }
+      ],
+      [checkedRows.length, downloadDropDown]
+   );
+
+
+   const title = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+
+            </div>
+
+            <h5 className="mt-0">
+               <span className="fw-semi-bold">List of certificates</span>
+            </h5>
+
+         </div>
+
+      ),
+      [buttons]
+
+   );
+
+   const certificatesRowHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            content: <MDBColumnName columnName="Status" />,
+            sortable: true,
+            align: "center",
+            id: "status",
+            width: "5%"
+         },
+         {
+            content: <MDBColumnName columnName="Common Name" />,
+            sortable: true,
+            id: "commonName",
+            width: "10%"
+         },
+         {
+            content: <MDBColumnName columnName="Valid From" />,
+            sortable: true,
+            sortType: "date",
+            id: "validFrom",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Expires At" />,
+            sortable: true,
+            sortType: "date",
+            id: "expiresAt",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Entity" />,
+            sortable: true,
+            id: "entity",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Group" />,
+            sortable: true,
+            id: "group",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="RA Profile" />,
+            sortable: true,
+            id: "raProfile",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Owner" />,
+            sortable: true,
+            id: "owner",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Serial number" />,
+            sortable: true,
+            id: "serialNumber",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Public Key Algorithm" />,
+            sortable: true,
+            id: "publicKeyAlgorithm",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Issuer Common Name" />,
+            sortable: true,
+            id: "issuerCommonName",
+            width: "15%"
+         },
+         {
+            content: <MDBColumnName columnName="Certificate Type" />,
+            sortable: true,
+            id: "certificateType",
+            width: "15%"
+         },
+      ],
+      []
+
+   );
+
+   const certificateList: TableDataRow[] = useMemo(
+
+      () => certificates.map(
+
+         certificate => {
+
+            return {
+
+               id: certificate.uuid,
+               columns: [
+
+                  <CertificateStatusIcon status={certificate.status} id={certificate.fingerprint || certificate.serialNumber} />,
+
+                  <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
+
+                  dateFormatter(certificate.notBefore),
+
+                  dateFormatter(certificate.notAfter),
+
+                  certificate.entity?.name || "Unassigned",
+
+                  certificate.group?.name || "Unassigned",
+
+                  certificate.raProfile?.name || "Unassigned",
+
+                  certificate.owner || "Unassigned",
+
+                  certificate.serialNumber,
+
+                  certificate.signatureAlgorithm,
+
+                  certificate.issuerCommonName,
+
+                  certificate.certificateType,
+
+               ]
+
+            }
+
+         }
+
+      ),
+      [certificates, path]
+
+   );
+
+
+   const paginationData = useMemo(
+
+      () => ({
+         page: pageNumber,
+         totalItems: totalItems,
+         pageSize: pageSize,
+         totalPages: Math.ceil(totalItems / pageSize),
+         itemsPerPageOptions: [5, 10, 20, 50, 100, 200, 500, 1000],
+      }),
+      [pageSize, pageNumber, totalItems]
+
+   );
+
+
+
+   return (
+
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+
+            <CustomTable
+               headers={certificatesRowHeaders}
+               data={certificateList}
+               onCheckedRowsChanged={setCheckedRows}
+               hasCheckboxes={true}
+               hasPagination={true}
+               canSearch={true}
+               paginationData={paginationData}
+               onPageChanged={setPageNumber}
+               onPageSizeChanged={setPageSize}
+            />
+
+         </Widget>
+
+      </Container>
+
+   )
+
+}
+
+
+/*
 import Spinner from "components/Spinner";
 import { actions, selectors } from "ducks/certificates";
 import {
@@ -584,3 +911,4 @@ function CertificateList() {
 }
 
 export default CertificateList;
+*/

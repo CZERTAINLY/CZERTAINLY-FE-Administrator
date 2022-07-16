@@ -2,7 +2,17 @@ import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
-import {
+
+
+export default function CertificateDetail() {
+
+   return (
+      <></>
+   )
+
+}
+
+/*import {
   Badge,
   Container,
   Input,
@@ -997,3 +1007,4 @@ function CertificateDetail() {
 }
 
 export default CertificateDetail;
+*/
