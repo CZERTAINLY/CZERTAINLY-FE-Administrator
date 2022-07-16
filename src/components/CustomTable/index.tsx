@@ -71,7 +71,20 @@ function CustomTable({
    useEffect(
 
       () => {
-         const sorted = [...data];
+
+         const sorted = searchKey
+            ?
+            [...data].filter(
+               row => {
+                  let rowStr = "";
+                  row.columns.forEach(col => rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element));
+                  return rowStr.toLowerCase().includes(searchKey.toLowerCase());
+               }
+            )
+
+            :
+            [...data]
+            ;
 
          const sortColumn = headers.findIndex(h => h.sort);
 
@@ -82,8 +95,8 @@ function CustomTable({
             sorted.sort(
 
                (a, b) => {
-                  const aVal = typeof a.columns[sortColumn] === "string" ? a.columns[sortColumn] : jsxInnerText(a.columns[sortColumn] as JSX.Element);
-                  const bVal = typeof b.columns[sortColumn] === "string" ? b.columns[sortColumn] : jsxInnerText(b.columns[sortColumn] as JSX.Element);
+                  const aVal = typeof a.columns[sortColumn] === "string" ? (a.columns[sortColumn] as string).toLowerCase() : jsxInnerText(a.columns[sortColumn] as JSX.Element).toLowerCase();
+                  const bVal = typeof b.columns[sortColumn] === "string" ? (b.columns[sortColumn] as string).toLowerCase() : jsxInnerText(b.columns[sortColumn] as JSX.Element).toLowerCase();
                   if (aVal === bVal) return 0;
                   return aVal > bVal ? (sortDirection === "asc" ? 1 : -1) : (sortDirection === "asc" ? -1 : 1);
                }
@@ -95,7 +108,7 @@ function CustomTable({
          setTblCheckedRows(tblCheckedRows.filter(row => data.find(data => data.id === row)));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [data]
+      [data, searchKey]
 
    );
 
@@ -319,81 +332,78 @@ function CustomTable({
 
    const body = useMemo(
 
-      () => (
-         searchKey
+      () => tblData.filter(
 
-            ? tblData.filter(
-               row => {
-                  let rowStr = "";
-                  row.columns.forEach(col => rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element));
-                  return rowStr.toLowerCase().includes(searchKey.toLowerCase());
-               }
-            )
-            : tblData).map(
+         (row, index) => {
+            if (pageSize === 0) return true;
+            return index >= (page - 1) * pageSize && index < page * pageSize;
+         }
 
-               (row, index) => (
+      ).map(
 
-                  <Fragment key={row.id}>
+         (row, index) => (
 
-                     <tr {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
+            <Fragment key={row.id}>
 
-                        {!hasCheckboxes ? (<></>) : (
-                           <td>
-                              <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
-                           </td>
-                        )}
+               <tr {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
 
-                        {row.columns.map(
+                  {!hasCheckboxes ? (<></>) : (
+                     <td>
+                        <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
+                     </td>
+                  )}
 
-                           (column, index) => (
+                  {row.columns.map(
 
-                              <td key={index} className={styles.dataCell} style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}>
+                     (column, index) => (
 
-                                 <div>{column ? column : <>&nbsp;</>}</div>
+                        <td key={index} className={styles.dataCell} style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}>
 
-                                 {
-                                    row.detailColumns && row.detailColumns[index] && expandedRow === row.id ? (
-                                       <div className={styles.detail}>{row.detailColumns[index]}</div>
-                                    ) : (
-                                       <></>
-                                    )
-                                 }
+                           <div>{column ? column : <>&nbsp;</>}</div>
 
-                              </td>
+                           {
+                              row.detailColumns && row.detailColumns[index] && expandedRow === row.id ? (
+                                 <div className={styles.detail}>{row.detailColumns[index]}</div>
+                              ) : (
+                                 <></>
+                              )
+                           }
 
+                        </td>
+
+                     )
+
+                  )}
+
+                  {!hasDetails ? (<></>) : (
+
+                     <td className="w-25">
+
+                        <div className={styles.showMore} onClick={() => expandedRow === row.id ? setExpandedRow(undefined) : setExpandedRow(row.id)}>
+                           {expandedRow === row.id ? "Show less..." : "Show more..."}
+                        </div>
+
+                        {
+                           row.detailColumns && row.detailColumns[headers.length] && expandedRow === row.id ? (
+                              <div className={styles.detail}>{row.detailColumns[headers.length]}</div>
+                           ) : (
+                              <></>
                            )
+                        }
 
-                        )}
+                     </td>
+                  )}
 
-                        {!hasDetails ? (<></>) : (
+               </tr>
 
-                           <td className="w-25">
-
-                              <div className={styles.showMore} onClick={() => expandedRow === row.id ? setExpandedRow(undefined) : setExpandedRow(row.id)}>
-                                 {expandedRow === row.id ? "Show less..." : "Show more..."}
-                              </div>
-
-                              {
-                                 row.detailColumns && row.detailColumns[headers.length] && expandedRow === row.id ? (
-                                    <div className={styles.detail}>{row.detailColumns[headers.length]}</div>
-                                 ) : (
-                                    <></>
-                                 )
-                              }
-
-                           </td>
-                        )}
-
-                     </tr>
-
-                  </Fragment>
+            </Fragment>
 
 
-               )
+         )
 
-            ),
+      ),
 
-      [hasCheckboxes, hasDetails, tblCheckedRows, headers, tblHeaders, tblData, searchKey, expandedRow, onRowToggleSelection, onRowCheckboxClick,]
+      [tblData, pageSize, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
 
    );
 
@@ -436,7 +446,7 @@ function CustomTable({
                ?
                <>
                   <div className="pull-right mt-n-xs">
-                     <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
+                     <Input cle id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
                   </div>
                   <br />
                   <br />
@@ -449,7 +459,7 @@ function CustomTable({
 
          <div className="table-responsive">
             <Table className={cx("table-hover", styles.logsTable)} size="sm">
-               {!hasHeader ? <></> :<thead><tr>{header}</tr></thead> }
+               {!hasHeader ? <></> : <thead><tr>{header}</tr></thead>}
                <tbody>{body}</tbody>
             </Table>
          </div>
@@ -470,9 +480,14 @@ function CustomTable({
 
                {pagination}
 
-               <span>
-                  {`Showing ${(page - 1) * pageSize + 1} to ${page !== totalPages ? page * pageSize : tblData.length % pageSize || pageSize} of ${tblData.length} entries`}
-               </span>
+               <div style={{textAlign: "right"}}>
+                  <div>
+                     Showing {(page - 1) * pageSize + 1} to {page !== totalPages ? page * pageSize : tblData.length % pageSize || pageSize} of {tblData.length} entries
+                  </div>
+
+                  {searchKey && (data.length - tblData.length > 0)  ? (<div>{data.length - tblData.length} entries filtered</div>) : <></>}
+               </div>
+
 
             </div>
 
