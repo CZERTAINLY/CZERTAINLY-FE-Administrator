@@ -18,6 +18,11 @@ export type State = {
    availableFilters: AvailableCertificateFilterModel[];
 
    certificates: CertificateModel[];
+   itemsPerPage: number;
+   pageNumber: number;
+   totalPages: number;
+   totalItems: number;
+
    certificateDetail?: CertificateModel;
    certificateHistory?: CertificateEventHistoryModel[];
    issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
@@ -62,6 +67,11 @@ export const initialState: State = {
    availableFilters: [],
 
    certificates: [],
+   itemsPerPage: 0,
+   pageNumber: 0,
+   totalPages: 0,
+   totalItems: 0,
+
    issuanceAttributes: {},
    revocationAttributes: {},
 
@@ -132,10 +142,20 @@ export const slice = createSlice({
       },
 
 
-      listCertificatesSuccess: (state, action: PayloadAction<{ certificateList: CertificateModel[] }>) => {
+      listCertificatesSuccess: (state, action: PayloadAction<{
+         certificateList: CertificateModel[],
+         itemsPerPage: number,
+         pageNumber: number,
+         totalPages: number,
+         totalItems: number
+      }>) => {
 
          state.isFetchingList = false;
          state.certificates = action.payload.certificateList;
+         state.totalItems = action.payload.totalItems;
+         state.totalPages = action.payload.totalPages;
+         state.itemsPerPage = action.payload.itemsPerPage;
+         state.pageNumber = action.payload.pageNumber;
 
       },
 
@@ -642,6 +662,11 @@ const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessa
 const availableCertificateFilters = createSelector(state, state => state.availableFilters);
 
 const certificates = createSelector(state, state => state.certificates);
+const itemsPerPage = createSelector(state, state => state.itemsPerPage);
+const pageNumber = createSelector(state, state => state.pageNumber);
+const totalItems = createSelector(state, state => state.totalItems);
+const totalPages = createSelector(state, state => state.totalPages);
+
 const certificateDetail = createSelector(state, state => state.certificateDetail);
 const certificateHistory = createSelector(state, state => state.certificateHistory);
 const issuanceAttributes = createSelector(state, state => state.issuanceAttributes);
@@ -680,6 +705,10 @@ export const selectors = {
    deleteErrorMessage,
    availableCertificateFilters,
    certificates,
+   itemsPerPage,
+   pageNumber,
+   totalItems,
+   totalPages,
    certificateDetail,
    certificateHistory,
    issuanceAttributes,
