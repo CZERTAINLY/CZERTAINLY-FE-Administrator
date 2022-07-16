@@ -120,9 +120,9 @@ export const slice = createSlice({
       },
 
 
-      setCheckedRows: (state, action: PayloadAction<string[]>) => {
+      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
-         state.checkedRows = action.payload;
+         state.checkedRows = action.payload.checkedRows;
 
       },
 
