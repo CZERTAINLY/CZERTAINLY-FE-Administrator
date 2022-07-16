@@ -1,6 +1,6 @@
 import cx from "classnames";
 import React, { useCallback, useState, useEffect, useMemo, Fragment, } from "react";
-import { Input, Pagination, PaginationItem, PaginationLink, Table, } from "reactstrap";
+import { FormText, Input, Pagination, PaginationItem, PaginationLink, Table, } from "reactstrap";
 
 import styles from "./CustomTable.module.scss";
 import { jsxInnerText } from "utils/jsxInnerText";
@@ -12,15 +12,17 @@ export interface TableHeader {
    align?: "left" | "center" | "right";
    sortable?: boolean;
    sort?: "asc" | "desc";
-   sortType?: "string" | "numeric";
+   sortType?: "string" | "numeric" | "date";
    width?: string;
 }
+
 
 export interface TableDataRow {
    id: number | string;
    columns: (string | JSX.Element)[];
    detailColumns?: (string | JSX.Element)[];
 }
+
 
 interface Props {
    headers: TableHeader[];
@@ -30,7 +32,16 @@ interface Props {
    hasCheckboxes?: boolean;
    hasPagination?: boolean;
    hasDetails?: boolean;
+   paginationData?: {
+      page: number;
+      totalItems: number;
+      pageSize: number;
+      totalPages: number;
+      itemsPerPageOptions: number[];
+   }
    onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
+   onPageSizeChanged?: (pageSize: number) => void;
+   onPageChanged?: (page: number) => void;
 }
 
 
@@ -42,7 +53,10 @@ function CustomTable({
    hasCheckboxes,
    hasPagination,
    hasDetails,
-   onCheckedRowsChanged
+   paginationData,
+   onCheckedRowsChanged,
+   onPageSizeChanged,
+   onPageChanged,
 }: Props) {
 
    const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
@@ -52,19 +66,91 @@ function CustomTable({
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(10);
    const [totalPages, setTotalPages] = useState(1);
+
    const [searchKey, setSearchKey] = useState<string>("");
+   const [sortColumn, setSortColumn] = useState<string>("");
+   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
    const [expandedRow, setExpandedRow] = useState<string | number>();
 
-   const firstPage = useCallback(() => setPage(1), [setPage]);
-   const prevPage = useCallback(() => setPage(page - 1), [page, setPage]);
-   const nextPage = useCallback(() => setPage(page + 1), [page, setPage]);
-   const lastPage = useCallback(() => setPage(totalPages), [setPage, totalPages]);
+
+   const firstPage = useCallback(
+      () => {
+
+         if (paginationData) {
+            if (onPageChanged) onPageChanged(1);
+         } else {
+            setPage(1);
+         }
+
+      },
+      [onPageChanged, paginationData]
+   );
+
+
+   const prevPage = useCallback(
+      () => {
+
+         if (paginationData) {
+            if (onPageChanged) onPageChanged(paginationData.page - 1);
+         } else {
+            setPage(page - 1)
+         }
+
+      },
+      [onPageChanged, page, paginationData]
+   );
+
+
+   const nextPage = useCallback(
+      () => {
+
+         if (paginationData) {
+            if (onPageChanged) onPageChanged(paginationData.page + 1);
+         } else {
+            setPage(page + 1)
+         }
+      },
+      [onPageChanged, page, paginationData]
+   );
+
+
+   const lastPage = useCallback(
+      () => {
+
+         if (paginationData) {
+            if (onPageChanged) onPageChanged(paginationData.totalPages);
+         } else {
+            setPage(totalPages)
+         }
+
+      },
+      [onPageChanged, paginationData, totalPages]
+   );
 
 
    useEffect(
-      () => { setTblHeaders(headers); },
+      () => {
+         setTblHeaders(headers);
+      },
       [headers]
+
+   );
+
+
+   useEffect(
+      () => {
+
+         if (!tblHeaders) return;
+
+         const sortCol = tblHeaders.find(h => h.sort);
+
+         if (sortCol) {
+            setSortColumn(sortCol.id);
+            setSortOrder(sortCol.sort || "asc");
+         }
+      },
+      [tblHeaders]
    );
 
 
@@ -72,7 +158,7 @@ function CustomTable({
 
       () => {
 
-         const sorted = searchKey
+         const filtered = searchKey
             ?
             [...data].filter(
                row => {
@@ -86,29 +172,55 @@ function CustomTable({
             [...data]
             ;
 
-         const sortColumn = headers.findIndex(h => h.sort);
+         const sortCol = tblHeaders ? tblHeaders.find(h => h.sort) : undefined;
 
-         if (sortColumn >= 0) {
+         if (!tblHeaders || !sortCol) {
 
-            const sortDirection = headers[sortColumn].sort;
+            setTblCheckedRows(tblCheckedRows.filter(row => data.find(data => data.id === row)));
+            setTblData(filtered);
+            return;
 
-            sorted.sort(
+         }
+
+         const sortColumnIndex = tblHeaders.findIndex(h => h.sort);
+
+         if (sortColumnIndex >= 0) {
+
+            const sortDirection = sortCol.sort || "asc";
+
+            filtered.sort(
 
                (a, b) => {
-                  const aVal = typeof a.columns[sortColumn] === "string" ? (a.columns[sortColumn] as string).toLowerCase() : jsxInnerText(a.columns[sortColumn] as JSX.Element).toLowerCase();
-                  const bVal = typeof b.columns[sortColumn] === "string" ? (b.columns[sortColumn] as string).toLowerCase() : jsxInnerText(b.columns[sortColumn] as JSX.Element).toLowerCase();
-                  if (aVal === bVal) return 0;
-                  return aVal > bVal ? (sortDirection === "asc" ? 1 : -1) : (sortDirection === "asc" ? -1 : 1);
+                  const aVal = typeof a.columns[sortColumnIndex] === "string" ? (a.columns[sortColumnIndex] as string).toLowerCase() : jsxInnerText(a.columns[sortColumnIndex] as JSX.Element).toLowerCase();
+                  const bVal = typeof b.columns[sortColumnIndex] === "string" ? (b.columns[sortColumnIndex] as string).toLowerCase() : jsxInnerText(b.columns[sortColumnIndex] as JSX.Element).toLowerCase();
+
+                  switch (sortCol.sortType) {
+
+                     case "date":
+                        const aDate = new Date(aVal.replace(/ at /g, " "));
+                        const bDate = new Date(bVal.replace(/ at /g, " "));
+                        return sortDirection === "asc" ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+
+                     case "numeric":
+                        return sortDirection === "asc" ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
+
+                     default:
+                        if (aVal === bVal) return 0;
+                        return aVal > bVal ? (sortDirection === "asc" ? 1 : -1) : (sortDirection === "asc" ? -1 : 1);
+
+                  }
+
                }
 
             );
          }
 
-         setTblData(sorted);
+         setTblData(filtered);
          setTblCheckedRows(tblCheckedRows.filter(row => data.find(data => data.id === row)));
+
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [data, searchKey]
+      [data, searchKey, sortColumn, sortOrder]
 
    );
 
@@ -200,13 +312,14 @@ function CustomTable({
          if (!tblHeaders) return;
 
          const sortColumn = e.currentTarget.getAttribute("data-id");
+
          const hdr = tblHeaders?.find(header => header.id === sortColumn);
          if (!hdr) return;
 
-         const sort = hdr.sort === "asc" ? "desc" : "asc";
-         const sortType = hdr.sortType === "numeric" ? "numeric" : "string";
          const column = tblHeaders?.findIndex(header => header.id === sortColumn);
          if (column === undefined || column === -1) return;
+
+         const sort = hdr.sort === "asc" ? "desc" : "asc";
 
          const headers: TableHeader[] = tblHeaders.map(
             header => ({
@@ -215,31 +328,10 @@ function CustomTable({
             })
          )
 
-         const sortedData = [...tblData].sort(
-
-            (a, b) => {
-
-               let aVal: string | number = typeof a.columns[column] === "string" ? a.columns[column] as string : jsxInnerText(a.columns[column] as JSX.Element);
-               let bVal: string | number = typeof b.columns[column] === "string" ? b.columns[column] as string : jsxInnerText(b.columns[column] as JSX.Element);
-
-               if (sortType === "numeric") {
-                  aVal = parseFloat(aVal);
-                  bVal = parseFloat(bVal);
-                  if (aVal === bVal) return 0;
-                  return aVal > bVal ? (sort === "asc" ? 1 : -1) : (sort === "asc" ? -1 : 1);
-               }
-
-               if (aVal === bVal) return 0;
-               return aVal > bVal ? (sort === "asc" ? 1 : -1) : (sort === "asc" ? -1 : 1);
-
-            }
-
-         )
-
          setTblHeaders(headers);
-         setTblData(sortedData);
 
-      }, [tblHeaders, tblData]
+      },
+      [tblHeaders]
 
    );
 
@@ -247,10 +339,17 @@ function CustomTable({
    const onPageSizeChange = useCallback(
 
       (event: React.ChangeEvent<HTMLInputElement>) => {
-         setPageSize(+event.target.value);
+
+         if (onPageSizeChanged) {
+            onPageSizeChanged(parseInt(event.target.value));
+            return;
+         }
+
+         setPageSize(parseInt(event.target.value));
          setPage(1);
+
       },
-      [setPageSize]
+      [onPageSizeChanged]
 
    );
 
@@ -336,7 +435,7 @@ function CustomTable({
 
          (row, index) => {
             if (pageSize === 0) return true;
-            return index >= (page - 1) * pageSize && index < page * pageSize;
+            return paginationData ? true : index >= (page - 1) * pageSize && index < page * pageSize;
          }
 
       ).map(
@@ -408,27 +507,27 @@ function CustomTable({
    );
 
 
-   const pagination = tblData.length > pageSize ? (
+   const pagination = (paginationData ? paginationData.totalItems > paginationData.pageSize : tblData.length > pageSize) ? (
 
       <Pagination size="sm" aria-label="Navigation">
 
-         <PaginationItem disabled={page === 1}>
+         <PaginationItem disabled={(paginationData ? paginationData.page : page) === 1}>
             <PaginationLink first onClick={firstPage} />
          </PaginationItem>
 
-         <PaginationItem disabled={page === 1}>
+         <PaginationItem disabled={(paginationData ? paginationData.page : page) === 1}>
             <PaginationLink previous onClick={prevPage} />
          </PaginationItem>
 
          <PaginationItem active>
-            <PaginationLink>{page}</PaginationLink>
+            <PaginationLink>{paginationData ? paginationData.page : page}</PaginationLink>
          </PaginationItem>
 
-         <PaginationItem disabled={page === totalPages}>
+         <PaginationItem disabled={paginationData ? paginationData.page === paginationData.totalPages : page === totalPages}>
             <PaginationLink next onClick={nextPage} />
          </PaginationItem>
 
-         <PaginationItem disabled={page === totalPages}>
+         <PaginationItem disabled={paginationData ? paginationData.page === paginationData.totalPages : page === totalPages}>
             <PaginationLink last onClick={lastPage} />
          </PaginationItem>
 
@@ -464,28 +563,51 @@ function CustomTable({
             </Table>
          </div>
 
+         {paginationData ? <div><FormText>Please note the search and sort functionality is applied only to the the single data page<br /><br /></FormText></div> : <></>}
 
          {!hasPagination ? <></> : (
 
             <div className={styles.paginationContainer}>
 
                <div>
-                  <Input type="select" value={pageSize} onChange={onPageSizeChange}>
-                     <option>10</option>
-                     <option>20</option>
-                     <option>50</option>
-                     <option>100</option>
+                  <Input type="select" value={paginationData ? paginationData.pageSize : pageSize} onChange={onPageSizeChange}>
+
+                     {
+                        paginationData
+                           ?
+                           paginationData.itemsPerPageOptions.map(
+                              option => <option>{option}</option>
+                           )
+                           :
+                           <>
+                              <option>10</option>
+                              <option>20</option>
+                              <option>50</option>
+                              <option>100</option>
+                           </>
+                     }
+
                   </Input>
                </div>
 
                {pagination}
 
-               <div style={{textAlign: "right"}}>
-                  <div>
-                     Showing {(page - 1) * pageSize + 1} to {page !== totalPages ? page * pageSize : tblData.length % pageSize || pageSize} of {tblData.length} entries
-                  </div>
+               <div style={{ textAlign: "right" }}>
 
-                  {searchKey && (data.length - tblData.length > 0)  ? (<div>{data.length - tblData.length} entries filtered</div>) : <></>}
+                  {
+                     paginationData
+                        ?
+                        <div>
+                           Showing {paginationData.page * paginationData.pageSize + 1} to {paginationData.page * paginationData.pageSize + paginationData.pageSize} of {paginationData.totalItems}
+                        </div>
+                        :
+                        <div>
+                           Showing {(page - 1) * pageSize + 1} to {page !== totalPages ? page * pageSize : tblData.length % pageSize || pageSize} of {tblData.length} entries
+                        </div>
+                  }
+
+                  {searchKey && (data.length - tblData.length > 0) ? (<div>{data.length - tblData.length} of loaded entries filtered</div>) : <></>}
+
                </div>
 
 
