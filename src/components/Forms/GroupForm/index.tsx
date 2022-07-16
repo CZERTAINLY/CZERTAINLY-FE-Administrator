@@ -72,7 +72,7 @@ function GroupForm({ title }: Props) {
     () => {
       history.goBack()
     },
-    [history, params.id, editMode]
+    [history]
 
   );
 
