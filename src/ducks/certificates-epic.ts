@@ -343,6 +343,22 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
 
 }
 
+const getCertificateHistoryFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateHistoryFailure.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
 
 const deleteCertificate: AppEpic = (action$, state, deps) => {
 
@@ -987,6 +1003,7 @@ const epics = [
    getIssuanceAttributesFailure,
    getRevocationAttributes,
    getRevocationAttributesFailure,
+   getCertificateHistoryFailure
 ];
 
 

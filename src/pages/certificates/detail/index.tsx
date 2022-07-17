@@ -19,6 +19,7 @@ import ToolTip from "components/ToolTip";
 import Select from "react-select";
 import { CertificateRevocationReason } from "types/certificate";
 import CertificateRenewDialog from "components/pages/certificates/CertificateRenewDialog";
+import CertificateEventStatus from "components/pages/certificates/CertificateHistoryStatus";
 
 
 export default function CertificateDetail() {
@@ -31,6 +32,8 @@ export default function CertificateDetail() {
 
   const groups = useSelector(groupSelectors.groups);
   const raProfiles = useSelector(raProfileSelectors.raProfiles);
+
+  const eventHistory = useSelector(selectors.certificateHistory);
 
   const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
   const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
@@ -50,6 +53,8 @@ export default function CertificateDetail() {
   const [updateGroup, setUpdateGroup] = useState<boolean>(false);
   const [updateOwner, setUpdateOwner] = useState<boolean>(false);
   const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
+
+  const [currentInfoId, setCurrentInfoId] = useState("");
 
   const [group, setGroup] = useState<string>();
   const [owner, setOwner] = useState<string>();
@@ -458,6 +463,106 @@ const revokeBody = useMemo(
 
   );
 
+  const historyHeaders: TableHeader[] = useMemo(
+
+    () => [
+       {
+          id: "time",
+          content: "Time",
+       },
+       {
+          id: "user",
+          content: "User",
+       },
+       {
+        id: "event",
+        content: "Event",
+      },
+      {
+        id: "status",
+        content: "Status",
+      },
+      {
+        id: "message",
+        content: "Message",
+      },
+      {
+        id: "additionalMessage",
+        content: "Additional Message",
+      },
+    ],
+    []
+
+ );
+
+  const historyEntry:TableDataRow[] = useMemo(
+    () => !eventHistory ? [] : eventHistory.map(function (history) {
+      return (
+          {"id": history.uuid, 
+          "columns": [dateFormatter(history.created), 
+
+                      history.createdBy, 
+
+                      history.event, 
+
+                      <CertificateEventStatus status={history.status} />, 
+                      
+                      <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
+
+                      history.additionalInformation ? (
+                        <Button
+                          color="white"
+                          data-for={`addInfo${history.uuid}`}
+                          data-tip
+                          onClick={() => setCurrentInfoId(history.uuid)}
+                        >
+
+                          <i className="fa fa-info-circle" aria-hidden="true"></i>
+
+                          <ToolTip
+                            id={`addInfo${history.uuid}`}
+                            message="View Additional Information"
+                          />
+
+                        </Button>
+                      ) : ""
+              ]
+          }
+      )
+    }),[eventHistory, certificate]
+  );
+
+
+
+  const additionalInfoEntry = (): any => {
+    let returnList = [];
+    if (!currentInfoId) return;
+    const currentHistory = eventHistory?.filter(
+      (history) => history.uuid === currentInfoId
+    );
+    for (let [key, value] of Object.entries(
+      currentHistory![0]?.additionalInformation
+    )) {
+      returnList.push(
+        <tr>
+          <td>{key}</td>
+          <td>
+            <p
+              style={{
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
+              {value as string}
+            </p>
+          </td>
+        </tr>
+      );
+    }
+    return returnList;
+  };
+
+
 
   const attributeHeaders: TableHeader[] = useMemo(
 
@@ -769,7 +874,6 @@ const revokeBody = useMemo(
            <Col>
               <Widget title={metaTitle}>
                  <br />
-                 <Label>Metadata</Label>
                  <CustomTable
                     headers={detailHeaders}
                     data={metaData}
@@ -777,6 +881,14 @@ const revokeBody = useMemo(
               </Widget>
            </Col>
         </Row>
+
+        <Widget title={historyTitle}>
+                 <br />
+                 <CustomTable
+                    headers={historyHeaders}
+                    data={historyEntry}
+                 />
+              </Widget>
 
 
         <Dialog
@@ -841,6 +953,15 @@ const revokeBody = useMemo(
                { color: "primary", onClick: onRevoke, body: "Revoke" },
                { color: "secondary", onClick: () => setRevoke(false), body: "Cancel" },
             ]}
+         />
+
+         <Dialog
+            isOpen={currentInfoId !== ""}
+            caption={`Additional Information`}
+            body={additionalInfoEntry()}
+            toggle={() => setCurrentInfoId("")}
+            buttons={[]}
+            size="lg"
          />
      </Container>
 

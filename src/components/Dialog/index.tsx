@@ -16,6 +16,7 @@ interface Props {
    caption?: string | JSX.Element;
    body?: string | JSX.Element;
    buttons?: DialogButton[];
+   size?: "sm" | "lg";
 }
 
 
@@ -23,7 +24,7 @@ export default function Dialog(props: Props) {
 
    return (
 
-      <MDBModal overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
+      <MDBModal size={props.size || undefined} overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
 
          <MDBModalHeader toggle={() => { if (props.toggle) props.toggle() }}>
             {props.caption}
