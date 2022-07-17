@@ -1,6 +1,4 @@
-
-
-import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch, useHistory } from "react-router-dom";
 import { Button, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, UncontrolledButtonDropdown } from "reactstrap";
@@ -15,6 +13,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import ToolTip from "components/ToolTip";
 import CertificateInventoryFilter from "components/pages/certificates/CertificateInventoryFilter";
 import { CertificateListQueryFilterModel } from "models";
+import Dialog from "components/Dialog";
 
 export default function CertificateList() {
 
@@ -53,8 +52,14 @@ export default function CertificateList() {
 
    const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>([]);
 
-   const isBusy = isFetchingAvailablFilters || isFetchingList || isFetchingDetail || isFetchingHistory || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading || isFetchingIssuanceAttributes || isFetchingRevocationAttributes;
+   const [upload, setUpload] = useState<boolean>(false);
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+   const [updateGroup, setUpdateGroup] = useState<boolean>(false);
+   const [updateOwner, setUpdateOwner] = useState<boolean>(false);
+   const [updateEntity, setUpdateEntity] = useState<boolean>(false);
+   const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
+   const isBusy = isFetchingAvailablFilters || isFetchingList || isFetchingDetail || isFetchingHistory || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading || isFetchingIssuanceAttributes || isFetchingRevocationAttributes;
 
    useEffect(
 
@@ -100,6 +105,15 @@ export default function CertificateList() {
 
    );
 
+   const onAddClick = useCallback(
+
+      () => {
+         history.push(`${path}/add`);
+      },
+      [history, path]
+
+   );
+
 
    const downloadDropDown = useMemo(
       () => (
@@ -140,16 +154,16 @@ export default function CertificateList() {
 
    const buttons: WidgetButtonProps[] = useMemo(
       () => [
-         { icon: "plus", disabled: false, tooltip: "Create Certificate", onClick: () => { /*onAddClick();*/ } },
-         { icon: "upload", disabled: false, tooltip: "Upload Certificate", onClick: () => { /*setConfirmDelete(true);*/ } },
-         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete Certificate", onClick: () => { /*onReconnectClick()*/ } },
-         { icon: "group", disabled: checkedRows.length === 0, tooltip: "Set Oroup", onClick: () => { /*setConfirmAuthorize(true);*/ } },
-         { icon: "user", disabled: checkedRows.length === 0, tooltip: "Set Owner", onClick: () => { /*setConfirmAuthorize(true);*/ } },
-         { icon: "cubes", disabled: true, tooltip: "Set Entity", onClick: () => { /*setConfirmAuthorize(true);*/ } },
-         { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Set RA Profile", onClick: () => { /*setConfirmAuthorize(true);*/ } },
-         { icon: "download", disabled: checkedRows.length === 0, tooltip: "Download", custom: downloadDropDown, onClick: () => { /*setConfirmAuthorize(true);*/ } }
+         { icon: "plus", disabled: false, tooltip: "Create Certificate", onClick: () => { onAddClick(); } },
+         { icon: "upload", disabled: false, tooltip: "Upload Certificate", onClick: () => { setUpload(true); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete Certificate", onClick: () => { setConfirmDelete(true) } },
+         { icon: "group", disabled: checkedRows.length === 0, tooltip: "Update Group", onClick: () => { setUpdateGroup(true) } },
+         { icon: "user", disabled: checkedRows.length === 0, tooltip: "Update Owner", onClick: () => { setUpdateOwner(true) } },
+         { icon: "cubes", disabled: true, tooltip: "Update Entity", onClick: () => { setUpdateEntity(true) } },
+         { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Update RA Profile", onClick: () => { setUpdateRaProfile(true) } },
+         { icon: "download", disabled: checkedRows.length === 0, tooltip: "Download", custom: downloadDropDown, onClick: () => { } }
       ],
-      [checkedRows.length, downloadDropDown]
+      [checkedRows.length, downloadDropDown, onAddClick]
    );
 
 
@@ -346,6 +360,79 @@ export default function CertificateList() {
             />
 
          </Widget>
+
+
+         <Dialog
+            isOpen={upload}
+            caption={`Upload Certificate`}
+            body={`Upload`}
+            toggle={() => setUpload(false)}
+            buttons={[
+               { color: "danger", onClick: () => { }, body: "Upload" },
+               { color: "secondary", onClick: () => setUpload(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={checkedRows.length === 1 ? `Delete certificate` : `Delete certificates`}
+            body={`You are about to delete ${checkedRows.length} certificate${checkedRows.length === 1 ? "" : "s"}. Are you sure?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: () => { }, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={updateGroup}
+            caption={`Update Group`}
+            body={`Update Group`}
+            toggle={() => setUpdateGroup(false)}
+            buttons={[
+               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "secondary", onClick: () => setUpdateGroup(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={updateOwner}
+            caption={`Update Owner`}
+            body={`Update Owner`}
+            toggle={() => setUpdateOwner(false)}
+            buttons={[
+               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "secondary", onClick: () => setUpdateOwner(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={updateEntity}
+            caption={`Update Entity`}
+            body={`Update Entity`}
+            toggle={() => setUpdateEntity(false)}
+            buttons={[
+               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "secondary", onClick: () => setUpdateEntity(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={updateRaProfile}
+            caption={`Update RA Profile`}
+            body={`Update RA Profile`}
+            toggle={() => setUpdateRaProfile(false)}
+            buttons={[
+               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "secondary", onClick: () => setUpdateRaProfile(false), body: "Cancel" },
+            ]}
+         />
+
 
       </Container>
 
