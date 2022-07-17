@@ -1,7 +1,6 @@
-import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO, CertificateValidationResultModel } from "api/certificates";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
 import { RaProfileDTO } from "api/profiles";
 import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel } from "models";
-import { join } from "path";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -143,7 +142,7 @@ export function transformAvailableCertificateFilterDTOToModel(availableCertifica
       field: availableCertificateFilter.field,
       label: availableCertificateFilter.label,
       type: availableCertificateFilter.type,
-      conditions: [ ...availableCertificateFilter.conditions ],
+      conditions: [...availableCertificateFilter.conditions],
       value: availableCertificateFilter.value,
       multiValue: availableCertificateFilter.multiValue
    }

@@ -9,7 +9,9 @@ interface Props {
 }
 
 function CertificateByStatusChart({ data }: Props) {
+
   const getOptions = (data: DashboardDict): any => {
+
     let value = {
       labels: getLabels(data),
       theme: {
@@ -58,19 +60,28 @@ function CertificateByStatusChart({ data }: Props) {
         },
       },
     };
+
     return value;
+
   };
 
   return (
+
     <Widget title={<p style={{ fontWeight: 700 }}>Certificate By Status</p>}>
+
       <ReactApexChart
+
         options={getOptions(data || {})}
         series={getValues(data || {})}
         type="donut"
         //width={380}
+
       />
+
     </Widget>
+
   );
+
 }
 
 export default CertificateByStatusChart;

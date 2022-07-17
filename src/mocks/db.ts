@@ -132,7 +132,7 @@ export const dbData: DBData = {
       dbCredentials["ejbca-admin"]
    ],
 
-    raProfiles: [
+   raProfiles: [
       dbRaProfiles["localhostProfile"],
       dbRaProfiles["DEMO-PROFILE"],
       dbRaProfiles["DEMO-RA-PROFILE2"]

@@ -110,14 +110,14 @@ export default function DiscoveryForm({
    const onSubmit = useCallback(
 
       (values: FormValues, form: any) => {
-            dispatch(discoveryActions.createDiscovery({
-               name: values.name!,
-               connectorUuid: values.discoveryProvider!.value,
-               kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("discovery", discoveryProviderAttributeDescriptors, values)
-            }));
+         dispatch(discoveryActions.createDiscovery({
+            name: values.name!,
+            connectorUuid: values.discoveryProvider!.value,
+            kind: values.storeKind?.value!,
+            attributes: collectFormAttributes("discovery", discoveryProviderAttributeDescriptors, values)
+         }));
 
-         },
+      },
       [dispatch, discoveryProviderAttributeDescriptors]
    );
 
@@ -194,55 +194,55 @@ export default function DiscoveryForm({
 
                   </Field>
 
-                     <Field name="discoveryProvider" validate={validateRequired()}>
+                  <Field name="discoveryProvider" validate={validateRequired()}>
 
-                        {({ input, meta }) => (
+                     {({ input, meta }) => (
 
-                           <FormGroup>
+                        <FormGroup>
 
-                              <Label for="discoveryProvider">Discovery Provider</Label>
+                           <Label for="discoveryProvider">Discovery Provider</Label>
 
-                              <Select
-                                 {...input}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForDiscoveryProviders}
-                                 placeholder="Select Discovery Provider"
-                                 onChange={(event) => { onDiscoveryProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
-                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                              />
+                           <Select
+                              {...input}
+                              maxMenuHeight={140}
+                              menuPlacement="auto"
+                              options={optionsForDiscoveryProviders}
+                              placeholder="Select Discovery Provider"
+                              onChange={(event) => { onDiscoveryProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
+                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                           />
 
-                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
-                           </FormGroup>
+                        </FormGroup>
 
-                        )}
+                     )}
 
-                     </Field>
+                  </Field>
 
-                     {discoveryProvider ? <Field name="storeKind" validate={validateRequired()}>
+                  {discoveryProvider ? <Field name="storeKind" validate={validateRequired()}>
 
-                           {({ input, meta }) => (
+                     {({ input, meta }) => (
 
-                              <FormGroup>
+                        <FormGroup>
 
-                                 <Label for="storeKind">Kind</Label>
+                           <Label for="storeKind">Kind</Label>
 
-                                 <Select
-                                    {...input}
-                                    maxMenuHeight={140}
-                                    menuPlacement="auto"
-                                    options={optionsForKinds}
-                                    placeholder="Select Kind"
-                                    onChange={(event) => { onKindChange(event); input.onChange(event); }}
-                                    styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                                 />
+                           <Select
+                              {...input}
+                              maxMenuHeight={140}
+                              menuPlacement="auto"
+                              options={optionsForKinds}
+                              placeholder="Select Kind"
+                              onChange={(event) => { onKindChange(event); input.onChange(event); }}
+                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                           />
 
-                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
 
-                              </FormGroup>
-                           )}
-                        </Field> : undefined}
+                        </FormGroup>
+                     )}
+                  </Field> : undefined}
 
 
 

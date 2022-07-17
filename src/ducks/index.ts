@@ -32,7 +32,7 @@ import dashboardEpics from "./dashboard-epics";
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
 import raProfilesEpics from "./ra-profiles-epics";
 
-import { initialState as initialCredentialsState, slice as credentialsSlice} from "./credentials";
+import { initialState as initialCredentialsState, slice as credentialsSlice } from "./credentials";
 import credentialsEpics from "./credentials-epics";
 
 import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } from "./acme-accounts";

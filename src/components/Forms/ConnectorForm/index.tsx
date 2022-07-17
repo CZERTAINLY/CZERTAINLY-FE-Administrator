@@ -7,7 +7,7 @@ import ProgressButton from "components/ProgressButton";
 
 import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
 
-import InventoryStatusBadge from "components/pages/connectors/ConnectorStatus";
+import InventoryStatusBadge from "components/pages/connectors/ConnectorStatus/";
 import Widget from "components/Widget";
 import Select from "react-select";
 
@@ -19,7 +19,7 @@ import { actions as conenctorActions, selectors as connectorSelectors } from "du
 import { AuthType } from "types/connectors";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { MDBBadge } from "mdbreact";
-import {attributeFieldNameTransform} from "../../../utils/attributes";
+import { attributeFieldNameTransform } from "../../../utils/attributes";
 
 
 interface FormValues {
@@ -426,7 +426,7 @@ function ConnectorForm({ title }: Props) {
                                           functionGroup => (
                                              <div>
                                                 <MDBBadge color="primary" searchvalue={attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}>
-                                                    {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                   {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
                                                 </MDBBadge>
                                                 &nbsp;
                                              </div>
@@ -459,7 +459,7 @@ function ConnectorForm({ title }: Props) {
 
                                              <>
 
-                                                 {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
 
                                                 <div className="pull-right mt-n-xs">
                                                    {

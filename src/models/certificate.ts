@@ -1,5 +1,5 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
-import { CertificateValidationResultModel, ValidationResult } from "api/certificates";
+import { CertificateValidationResultModel } from "api/certificates";
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status } from "types/certificate";
 import { GroupModel } from "./groups";
 
