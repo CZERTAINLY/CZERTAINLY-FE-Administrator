@@ -319,7 +319,6 @@ export const slice = createSlice({
 
 
       getCertificateHistoryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
          state.isFetchingHistory = false;
 
       },

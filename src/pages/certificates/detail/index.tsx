@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 
-import { Badge, Button, Col, Container, Input, Label, Row } from "reactstrap";
+import { Badge, Button, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, Row, UncontrolledButtonDropdown } from "reactstrap";
 
 import { actions, selectors } from "ducks/certificates";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/groups";
@@ -19,6 +19,8 @@ import ToolTip from "components/ToolTip";
 import Select from "react-select";
 import { CertificateRevocationReason } from "types/certificate";
 import CertificateRenewDialog from "components/pages/certificates/CertificateRenewDialog";
+import CertificateEventStatus from "components/pages/certificates/CertificateHistoryStatus";
+import { downloadFile, formatPEM } from "utils/certificate";
 
 
 export default function CertificateDetail() {
@@ -31,6 +33,8 @@ export default function CertificateDetail() {
 
   const groups = useSelector(groupSelectors.groups);
   const raProfiles = useSelector(raProfileSelectors.raProfiles);
+
+  const eventHistory = useSelector(selectors.certificateHistory);
 
   const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
   const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
@@ -50,6 +54,8 @@ export default function CertificateDetail() {
   const [updateGroup, setUpdateGroup] = useState<boolean>(false);
   const [updateOwner, setUpdateOwner] = useState<boolean>(false);
   const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
+
+  const [currentInfoId, setCurrentInfoId] = useState("");
 
   const [group, setGroup] = useState<string>();
   const [owner, setOwner] = useState<string>();
@@ -83,7 +89,7 @@ export default function CertificateDetail() {
        if (!params.id || !updateGroup) return;
        dispatch(groupAction.listGroups());
     },
-    [dispatch, updateGroup]
+    [dispatch, updateGroup, params.id]
  )
 
  useEffect(
@@ -113,7 +119,7 @@ useEffect(
      if (!params.id || !updateGroup) return;
      dispatch(groupAction.listGroups());
   },
-  [dispatch, updateGroup]
+  [dispatch, updateGroup, params.id]
 )
 
 
@@ -124,7 +130,7 @@ useEffect(
      if (!params.id || !revoke) return;
      dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
   },
-  [dispatch, revoke]
+  [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
 )
 
 
@@ -136,7 +142,7 @@ useEffect(
      if (!params.id || !updateRaProfile) return;
      dispatch(raProfileAction.listRaProfiles());
   },
-  [dispatch, updateRaProfile]
+  [dispatch, updateRaProfile, params.id]
 )
 
 
@@ -262,14 +268,59 @@ const onUpdateRaProfile = useCallback(
 
    );
 
+   const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
+
+   const downloadDropDown = useMemo(
+    () => (
+
+       <UncontrolledButtonDropdown>
+
+          <DropdownToggle
+             color="light"
+             caret
+             className="btn btn-link"
+             data-for="download"
+             data-tip
+          >
+             <i className="fa fa-download" aria-hidden="true" />
+             <ToolTip id="download" message="Download" />
+          </DropdownToggle>
+
+          <DropdownMenu>
+
+             <DropdownItem key="pem" onClick={() => downloadFile(
+                  formatPEM(certificate?.certificateContent || ""),
+                  fileNameToDownload + ".pem"
+                )
+              }>
+                PEM (.pem)
+             </DropdownItem>
+
+             <DropdownItem key="der" onClick={() => {downloadFile(
+                  Buffer.from(certificate?.certificateContent || "", "base64"),
+                  fileNameToDownload + ".cer"
+                )}}>
+                DER (.cer)
+             </DropdownItem>
+
+          </DropdownMenu>
+
+       </UncontrolledButtonDropdown>
+
+    ),
+    [certificate, fileNameToDownload, ]
+
+ );
+
   const buttons: WidgetButtonProps[] = useMemo(
 
      () => [
         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
         { icon: "retweet", disabled: certificate?.raProfile === undefined, tooltip: "Renew", onClick: () => { setRenew(true); } },
         { icon: "minus-square", disabled: certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
+        { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
      ],
-     [certificate]
+     [certificate, downloadDropDown]
   );
 
 
@@ -457,6 +508,106 @@ const revokeBody = useMemo(
      []
 
   );
+
+  const historyHeaders: TableHeader[] = useMemo(
+
+    () => [
+       {
+          id: "time",
+          content: "Time",
+       },
+       {
+          id: "user",
+          content: "User",
+       },
+       {
+        id: "event",
+        content: "Event",
+      },
+      {
+        id: "status",
+        content: "Status",
+      },
+      {
+        id: "message",
+        content: "Message",
+      },
+      {
+        id: "additionalMessage",
+        content: "Additional Message",
+      },
+    ],
+    []
+
+ );
+
+  const historyEntry:TableDataRow[] = useMemo(
+    () => !eventHistory ? [] : eventHistory.map(function (history) {
+      return (
+          {"id": history.uuid, 
+          "columns": [dateFormatter(history.created), 
+
+                      history.createdBy, 
+
+                      history.event, 
+
+                      <CertificateEventStatus status={history.status} />, 
+                      
+                      <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
+
+                      history.additionalInformation ? (
+                        <Button
+                          color="white"
+                          data-for={`addInfo${history.uuid}`}
+                          data-tip
+                          onClick={() => setCurrentInfoId(history.uuid)}
+                        >
+
+                          <i className="fa fa-info-circle" aria-hidden="true"></i>
+
+                          <ToolTip
+                            id={`addInfo${history.uuid}`}
+                            message="View Additional Information"
+                          />
+
+                        </Button>
+                      ) : ""
+              ]
+          }
+      )
+    }),[eventHistory]
+  );
+
+
+
+  const additionalInfoEntry = (): any => {
+    let returnList = [];
+    if (!currentInfoId) return;
+    const currentHistory = eventHistory?.filter(
+      (history) => history.uuid === currentInfoId
+    );
+    for (let [key, value] of Object.entries(
+      currentHistory![0]?.additionalInformation
+    )) {
+      returnList.push(
+        <tr>
+          <td>{key}</td>
+          <td>
+            <p
+              style={{
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
+              {value as string}
+            </p>
+          </td>
+        </tr>
+      );
+    }
+    return returnList;
+  };
+
 
 
   const attributeHeaders: TableHeader[] = useMemo(
@@ -769,7 +920,6 @@ const revokeBody = useMemo(
            <Col>
               <Widget title={metaTitle}>
                  <br />
-                 <Label>Metadata</Label>
                  <CustomTable
                     headers={detailHeaders}
                     data={metaData}
@@ -777,6 +927,14 @@ const revokeBody = useMemo(
               </Widget>
            </Col>
         </Row>
+
+        <Widget title={historyTitle} busy={isFetchingHistory}>
+                 <br />
+                 <CustomTable
+                    headers={historyHeaders}
+                    data={historyEntry}
+                 />
+              </Widget>
 
 
         <Dialog
@@ -841,6 +999,15 @@ const revokeBody = useMemo(
                { color: "primary", onClick: onRevoke, body: "Revoke" },
                { color: "secondary", onClick: () => setRevoke(false), body: "Cancel" },
             ]}
+         />
+
+         <Dialog
+            isOpen={currentInfoId !== ""}
+            caption={`Additional Information`}
+            body={additionalInfoEntry()}
+            toggle={() => setCurrentInfoId("")}
+            buttons={[]}
+            size="lg"
          />
      </Container>
 

@@ -161,7 +161,7 @@ export function transformCertificateHistoryDTOToModel(certificateHistory: Certif
       status: certificateHistory.status,
       created: certificateHistory.created,
       createdBy: certificateHistory.createdBy,
-      additionalInformation: JSON.parse(JSON.stringify(certificateHistory.additionalInformation))
+      additionalInformation: certificateHistory.additionalInformation
    }
 
 }
