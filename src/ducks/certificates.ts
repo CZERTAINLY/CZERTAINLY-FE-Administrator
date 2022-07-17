@@ -11,6 +11,8 @@ import { CertificateRevocationReason } from "types/certificate";
 
 export type State = {
 
+   forceRefreshList: boolean;
+
    checkedRows: string[];
 
    deleteErrorMessage: string;
@@ -57,6 +59,8 @@ export type State = {
 
 
 export const initialState: State = {
+
+   forceRefreshList: false,
 
    checkedRows: [],
 
@@ -112,6 +116,13 @@ export const slice = createSlice({
       resetState: (state, action: PayloadAction<void>) => {
 
          state = initialState;
+
+      },
+
+
+      setForceRefreshList: (state, action: PayloadAction<{ forceRefreshList: boolean }>) => {
+
+         state.forceRefreshList = action.payload.forceRefreshList;
 
       },
 
@@ -584,6 +595,7 @@ export const slice = createSlice({
       uploadCertificateSuccess: (state, action: PayloadAction<{ uuid: string, certificate: CertificateModel }>) => {
 
          state.isUploading = false;
+         state.forceRefreshList = true;
          state.certificates.push(action.payload.certificate);
 
       },
@@ -647,6 +659,8 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
+const forceRefreshList = createSelector(state, (state) => state.forceRefreshList);
+
 const checkedRows = createSelector(state, state => state.checkedRows);
 
 const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
@@ -691,6 +705,7 @@ const isFetchingRevocationAttributes = createSelector(state, state => state.isFe
 
 export const selectors = {
    state,
+   forceRefreshList,
    checkedRows,
    deleteErrorMessage,
    availableCertificateFilters,

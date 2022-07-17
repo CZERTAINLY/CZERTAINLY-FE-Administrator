@@ -33,15 +33,6 @@ export default function CertificateUploadDialog() {
          const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
          const fileContent = fileInfo.split(",")[1];
 
-         if (!allowedContentTypes.includes(contentType)) {
-            setError("Invalid certificate file content type");
-            setFile("");
-            setContentType("");
-            setFileName("");
-            setCertificate(undefined);
-            return;
-         }
-
          setFileName(fileName);
          setContentType(contentType);
 

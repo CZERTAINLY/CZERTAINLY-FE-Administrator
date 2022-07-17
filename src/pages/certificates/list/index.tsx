@@ -23,6 +23,8 @@ export default function CertificateList() {
 
    const { path } = useRouteMatch();
 
+   const forceRefreshList = useSelector(selectors.forceRefreshList);
+
    const checkedRows = useSelector(selectors.checkedRows);
 
    const certificates = useSelector(selectors.certificates);
@@ -71,6 +73,17 @@ export default function CertificateList() {
       [dispatch]
 
    );
+
+   useEffect(
+
+      () => {
+         dispatch(actions.listCertificates({ query: { filters, itemsPerPage: pageSize, pageNumber } }));
+         dispatch(actions.setForceRefreshList({ forceRefreshList: false }));
+      },
+      [dispatch, filters, pageSize, pageNumber]
+
+   );
+
 
 
    useEffect(
