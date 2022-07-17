@@ -10,22 +10,6 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
 };
 
 
-export const attributeFieldTypeTransform: { [name: string]: string } = {
-   BOOLEAN: "checkbox",
-   INTEGER: "number",
-   FLOAT: "number",
-   STRING: "string",
-   TEXT: "textarea",
-   DATE: "date",
-   TIME: "time",
-   DATETIME: "datetime",
-   FILE: "file",
-   SECRET: "password",
-   CREDENTIAL: "select",
-   JSON: "select"
-};
-
-
 export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModel[] | undefined, values: Record<string, any>): AttributeModel[] {
 
    if (!descriptors || !values[`__attributes__${id}__`]) return [];
@@ -112,7 +96,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
          case "DATE":
 
             if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
+            content = { value: new Date(attributes[attribute]).toISOString() };
 
             break;
 
@@ -128,7 +112,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
          case "DATETIME":
 
             if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
+            content = { value: new Date(attributes[attribute]).toISOString()};
 
             break;
 

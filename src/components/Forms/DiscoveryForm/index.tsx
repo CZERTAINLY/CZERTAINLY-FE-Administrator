@@ -220,29 +220,29 @@ export default function DiscoveryForm({
 
                      </Field>
 
-                     <Field name="storeKind" validate={validateRequired()}>
+                     {discoveryProvider ? <Field name="storeKind" validate={validateRequired()}>
 
-                        {({ input, meta }) => (
+                           {({ input, meta }) => (
 
-                           <FormGroup>
+                              <FormGroup>
 
-                              <Label for="storeKind">Kind</Label>
+                                 <Label for="storeKind">Kind</Label>
 
-                              <Select
-                                 {...input}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForKinds}
-                                 placeholder="Select Kind"
-                                 onChange={(event) => { onKindChange(event); input.onChange(event); }}
-                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                              />
+                                 <Select
+                                    {...input}
+                                    maxMenuHeight={140}
+                                    menuPlacement="auto"
+                                    options={optionsForKinds}
+                                    placeholder="Select Kind"
+                                    onChange={(event) => { onKindChange(event); input.onChange(event); }}
+                                    styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                                 />
 
-                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
+                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
 
-                           </FormGroup>
-                        )}
-                     </Field>
+                              </FormGroup>
+                           )}
+                        </Field> : undefined}
 
 
 
