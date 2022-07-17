@@ -17,6 +17,7 @@ import Dialog from "components/Dialog";
 import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
 import CertificateGroupDialog from "components/pages/certificates/CertificateGroupDialog";
 import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
+import CertificateRAProfileDialog from "components/pages/certificates/CertificateRAProfileDialog";
 
 export default function CertificateList() {
 
@@ -473,12 +474,9 @@ export default function CertificateList() {
          <Dialog
             isOpen={updateRaProfile}
             caption={`Update RA Profile`}
-            body={`Update RA Profile`}
+            body={<CertificateRAProfileDialog uuids={checkedRows} onCancel={() => setUpdateRaProfile(false)} onUpdate={() => setUpdateRaProfile(false) } />}
             toggle={() => setUpdateRaProfile(false)}
-            buttons={[
-               { color: "primary", onClick: () => { }, body: "Update" },
-               { color: "secondary", onClick: () => setUpdateRaProfile(false), body: "Cancel" },
-            ]}
+            buttons={[]}
          />
 
 
