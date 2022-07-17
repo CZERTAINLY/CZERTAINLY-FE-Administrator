@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch, useHistory } from "react-router-dom";
-import { Button, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, UncontrolledButtonDropdown } from "reactstrap";
+import { Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
 import { actions, selectors } from "ducks/certificates";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
@@ -25,8 +25,6 @@ export default function CertificateList() {
    const history = useHistory();
 
    const { path } = useRouteMatch();
-
-   const forceRefreshList = useSelector(selectors.forceRefreshList);
 
    const checkedRows = useSelector(selectors.checkedRows);
 

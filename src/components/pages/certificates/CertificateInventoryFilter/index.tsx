@@ -1,7 +1,7 @@
 import cx from "classnames";
 import styles from "./CertificateInventoryFilter.module.scss";
 
-import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectors, actions } from "ducks/certificates"
