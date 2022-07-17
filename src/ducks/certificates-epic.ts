@@ -1,5 +1,6 @@
-import { of } from "rxjs";
+import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
+import history from "browser-history";
 
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
@@ -219,7 +220,7 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               operation => slice.actions.renewCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData })
+               operation => slice.actions.renewCertificateSuccess({uuid: operation.uuid})
             ),
             catchError(
                err => of(slice.actions.renewCertificateFailure({ error: extractError(err, "Failed to renew certificate") }))
@@ -233,6 +234,26 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
 
 }
 
+const renewCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.renewCertificateSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            history.push(`./${action.payload.uuid}`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+};
+
 
 const renewCertificateFailure: AppEpic = (action$, state, deps) => {
 
@@ -242,7 +263,7 @@ const renewCertificateFailure: AppEpic = (action$, state, deps) => {
          slice.actions.renewCertificateFailure.match
       ),
       map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    )
@@ -939,6 +960,7 @@ const epics = [
    revokeCertificate,
    revokeCertificateFailure,
    renewCertificate,
+   renewCertificateSuccess,
    renewCertificateFailure,
    getAvailableCertificateFilters,
    getAvailableCertificateFiltersFailure,
