@@ -26,6 +26,7 @@ export class OperationsBackend implements model.OperationsApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}${raProfileUuid}/issue`, "POST", {
+            raProfileUuid,
             pkcs10,
             attributes,
          })
