@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectors, actions } from "ducks/certificates";
+import { actions } from "ducks/certificates";
 import { selectors as groupsSelectors, actions as groupsActions } from "ducks/groups";
 
 import Select, { SingleValue } from "react-select";
@@ -57,7 +57,7 @@ export default function CertificateGroupDialog({
 
          <FormGroup>
 
-            <Label for="group">File name</Label>
+            <Label for="group">Group</Label>
 
             <Select
                id="group"
