@@ -1,5 +1,6 @@
 import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
+
 import history from "browser-history";
 
 import { AppEpic } from "ducks";
@@ -140,6 +141,27 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
 }
 
 
+const issueCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.issueCertificateSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            history.push(`./detail/${action.payload.uuid}`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
+
 const issueCertificateFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -220,7 +242,7 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               operation => slice.actions.renewCertificateSuccess({uuid: operation.uuid})
+               operation => slice.actions.renewCertificateSuccess({ uuid: operation.uuid })
             ),
             catchError(
                err => of(slice.actions.renewCertificateFailure({ error: extractError(err, "Failed to renew certificate") }))
@@ -972,6 +994,7 @@ const epics = [
    getCertificateDetail,
    getCertificateDetailFailure,
    issueCertificate,
+   issueCertificateSuccess,
    issueCertificateFailure,
    revokeCertificate,
    revokeCertificateFailure,
