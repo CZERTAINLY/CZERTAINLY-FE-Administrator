@@ -26,7 +26,7 @@ export type State = {
    certificateDetail?: CertificateModel;
    certificateHistory?: CertificateEventHistoryModel[];
    issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
-   revocationAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
+   revocationAttributes: AttributeDescriptorModel[];
 
    isFetchingAvailableFilters: boolean;
 
@@ -73,7 +73,7 @@ export const initialState: State = {
    totalItems: 0,
 
    issuanceAttributes: {},
-   revocationAttributes: {},
+   revocationAttributes: [],
 
    isFetchingAvailableFilters: false,
 
@@ -241,7 +241,7 @@ export const slice = createSlice({
 
          if (cerificateIndex >= 0) state.certificates.splice(cerificateIndex, 1);
 
-         if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail = undefined;
+         if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.status = "revoked";
 
       },
 
@@ -266,17 +266,9 @@ export const slice = createSlice({
 
       renewCertificateSuccess: (state, action: PayloadAction<{
          uuid: string;
-         certificateData: string;
       }>) => {
 
          state.isRenewing = false;
-
-         const certificateIndex = state.certificates.findIndex(certificate => certificate.uuid === action.payload.uuid);
-
-         if (certificateIndex >= 0) state.certificates[certificateIndex] = certificatePEM2CertificateModel(action.payload.certificateData);
-
-         if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail = certificatePEM2CertificateModel(action.payload.certificateData);
-
       },
 
 
@@ -640,7 +632,7 @@ export const slice = createSlice({
       getRevocationAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, revocationAttributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingRevocationAttributes = false;
-         state.revocationAttributes[action.payload.raProfileUuid] = action.payload.revocationAttributes;
+         state.revocationAttributes = action.payload.revocationAttributes;
 
       },
 

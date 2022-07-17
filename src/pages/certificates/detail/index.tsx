@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 
-import { Badge, Col, Container, Label, Row } from "reactstrap";
+import { Badge, Button, Col, Container, Input, Label, Row } from "reactstrap";
 
 import { actions, selectors } from "ducks/certificates";
+import { actions as groupAction, selectors as groupSelectors } from "ducks/groups";
+import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
@@ -13,6 +15,10 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { dateFormatter } from "utils/dateUtil";
 import CertificateValidationStatus from "components/pages/certificates/CertificateValidationStatus";
 import CertificateStatus from "components/pages/certificates/CertificateStatus";
+import ToolTip from "components/ToolTip";
+import Select from "react-select";
+import { CertificateRevocationReason } from "types/certificate";
+import CertificateRenewDialog from "components/pages/certificates/CertificateRenewDialog";
 
 
 export default function CertificateDetail() {
@@ -22,6 +28,12 @@ export default function CertificateDetail() {
   const { params } = useRouteMatch<{ id: string }>();
 
   const certificate = useSelector(selectors.certificateDetail);
+
+  const groups = useSelector(groupSelectors.groups);
+  const raProfiles = useSelector(raProfileSelectors.raProfiles);
+
+  const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
+  const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
 
   const isFetching = useSelector(selectors.isFetchingDetail);
   const isDeleting = useSelector(selectors.isDeleting);
@@ -33,6 +45,16 @@ export default function CertificateDetail() {
   const isRenewing = useSelector(selectors.isRenewing);
 
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const [renew, setRenew] = useState<boolean>(false);
+  const [revoke, setRevoke] = useState<boolean>(false);
+  const [updateGroup, setUpdateGroup] = useState<boolean>(false);
+  const [updateOwner, setUpdateOwner] = useState<boolean>(false);
+  const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
+
+  const [group, setGroup] = useState<string>();
+  const [owner, setOwner] = useState<string>();
+  const [raProfile, setRaProfile] = useState<string>();
+  const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
   const isBusy = useMemo(
      () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing,
@@ -54,6 +76,69 @@ export default function CertificateDetail() {
 
   )
 
+  useEffect(
+
+    () => {
+
+       if (!params.id || !updateGroup) return;
+       dispatch(groupAction.listGroups());
+    },
+    [dispatch, updateGroup]
+ )
+
+ useEffect(
+
+  () => {
+
+     setGroupOptions(groups.map(group => ({ value: group.uuid, label: group.name })));
+  },
+  [dispatch, groups]
+)
+
+useEffect(
+
+  () => {
+
+     setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name })));
+  },
+  [dispatch, raProfiles]
+)
+
+ 
+
+ useEffect(
+
+  () => {
+
+     if (!params.id || !updateGroup) return;
+     dispatch(groupAction.listGroups());
+  },
+  [dispatch, updateGroup]
+)
+
+
+useEffect(
+
+  () => {
+
+     if (!params.id || !revoke) return;
+     dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
+  },
+  [dispatch, revoke]
+)
+
+
+
+ useEffect(
+
+  () => {
+
+     if (!params.id || !updateRaProfile) return;
+     dispatch(raProfileAction.listRaProfiles());
+  },
+  [dispatch, updateRaProfile]
+)
+
 
   const onDeleteConfirmed = useCallback(
 
@@ -69,16 +154,242 @@ export default function CertificateDetail() {
 
   );
 
+  const onCancelGroupUpdate = useCallback(
+
+    () => {
+      setUpdateGroup(false);
+      setGroup(undefined);
+
+    },
+    [setUpdateGroup, setGroup]
+ );
+
+ const onCancelOwnerUpdate = useCallback(
+
+  () => {
+    setUpdateOwner(false);
+    setOwner(undefined);
+
+  },
+  [setUpdateOwner, setOwner]
+);
+
+const onCancelRaProfileUpdate = useCallback(
+
+  () => {
+    setUpdateRaProfile(false);
+    setRaProfile(undefined);
+
+  },
+  [setUpdateRaProfile, setRaProfile]
+);
+
+
+  const onUpdateGroup = useCallback(
+
+    () => {
+
+       if (!certificate || !group) return;
+
+       dispatch(actions.updateGroup({ uuid: certificate.uuid, groupUuid: group }));
+       setUpdateGroup(false);
+
+    },
+    [certificate, dispatch, group]
+
+  );
+
+ const onUpdateOwner = useCallback(
+
+  () => {
+
+     if (!certificate || !owner) return;
+
+     dispatch(actions.updateOwner({ uuid: certificate.uuid,  owner: owner }));
+     setUpdateOwner(false);
+
+  },
+  [certificate, dispatch, owner]
+
+  );
+
+const onUpdateRaProfile = useCallback(
+
+  () => {
+
+     if (!certificate || !raProfile) return;
+
+     dispatch(actions.updateRaProfile({ uuid: certificate.uuid,  raProfileUuid: raProfile }));
+     setUpdateRaProfile(false);
+
+  },
+  [certificate, dispatch, raProfile]
+
+  
+  );
+
+  const onRevoke = useCallback(
+
+    () => {
+  
+       if (!certificate) return;
+  
+       dispatch(actions.revokeCertificate({ uuid: certificate.uuid,  reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "" }));
+       setRevoke(false);
+  
+    },
+    [certificate, dispatch, revokeReason, ]
+  
+    
+    );
+
+    const onRenew = useCallback(
+
+      (data: { fileName: string, contentType: string, fileContent: string }) => {
+
+         if (data.fileContent) {
+
+            try {
+               dispatch(actions.renewCertificate({uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || ""}));
+            } catch (error) {
+            }
+         }
+
+         setRenew(false);
+
+      },
+      [dispatch, certificate]
+
+   );
 
   const buttons: WidgetButtonProps[] = useMemo(
 
      () => [
         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+        { icon: "retweet", disabled: certificate?.raProfile === undefined, tooltip: "Renew", onClick: () => { setRenew(true); } },
+        { icon: "minus-square", disabled: certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
      ],
-     []
-
+     [certificate]
   );
 
+
+  const updateOwnerBody = useMemo(
+
+    () => (
+
+       <div>
+        <Label for="Owner Name">Owner</Label>
+          <Input
+            type="text"
+            placeholder="Enter the owner name / Email"
+            onChange={(event) => setOwner(event.target.value)}
+          ></Input>
+       </div>
+
+    ),
+    [setOwner]
+
+ );
+
+ const updateGroupBody = useMemo(
+
+  () => {
+     return (<div>
+      <Select
+          maxMenuHeight={140}
+          menuPlacement="auto"
+          options={groupOptions}
+          placeholder={`Select Group`}
+          onChange = {(event) => setGroup(event?.value)}
+      />
+     </div>
+  )
+     },
+  [setGroup, groupOptions]
+
+);
+
+
+const updateRaProfileBody = useMemo(
+
+  () => {
+     return (<div>
+      <Select
+          maxMenuHeight={140}
+          menuPlacement="auto"
+          options={raProfileOptions}
+          placeholder={`Select RA Profile`}
+          onChange = {(event) => setRaProfile(event?.value)}
+      />
+     </div>
+  )
+     },
+  [setRaProfile, raProfileOptions]
+
+);
+
+
+const revokeBody = useMemo(
+
+  () => {
+    let options = [
+      {
+         "label":"UNSPECIFIED",
+         "value":'UNSPECIFIED'
+      },
+      {
+         "label":"KEY_COMPROMISE",
+         "value":'KEY_COMPROMISE'
+      },
+      {
+         "label":"CA_COMPROMISE",
+         "value":'CA_COMPROMISE'
+      },
+      {
+         "label":"AFFILIATION_CHANGED",
+         "value":'AFFILIATION_CHANGED'
+      },
+      {
+         "label":"SUPERSEDED",
+         "value":'SUPERSEDED'
+      },
+      {
+         "label":"CESSATION_OF_OPERATION",
+         "value":'CESSATION_OF_OPERATION'
+      },
+      {
+         "label":"CERTIFICATE_HOLD",
+         "value":'CERTIFICATE_HOLD'
+      },
+      {
+         "label":"PRIVILEGE_WITHDRAWN",
+         "value":'PRIVILEGE_WITHDRAWN'
+      },
+      {
+         "label":"A_A_COMPROMISE",
+         "value":'A_A_COMPROMISE'
+      },
+      {
+         "label":"REMOVE_FROM_CRL",
+         "value":'REMOVE_FROM_CRL'
+      }
+   ]
+
+     return (<div>
+      <Select
+          maxMenuHeight={140}
+          menuPlacement="auto"
+          options={options}
+          placeholder={`Select Revocation Reason`}
+          onChange = {(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
+      />
+
+     </div>
+  )
+     },
+  [setRevokeReason]
+
+);
 
   const certificateTitle = useMemo(
 
@@ -186,7 +497,6 @@ export default function CertificateDetail() {
   const metaData: TableDataRow[] = useMemo(
 
      () => !certificate ? [] : Object.entries(certificate.meta || {}).map(function([key, value]) {
-      console.log(key, value);  
       return (
            {
               id: key,
@@ -207,7 +517,19 @@ export default function CertificateDetail() {
           },
           {
             id: "owner",
-            columns: ["owner", certificate.owner || "Unassigned"],
+            columns: ["Owner", certificate.owner || "Unassigned",
+                              <Button
+                                className="btn btn-link"
+                                size="sm"
+                                color="secondary"
+                                data-for="updateOwner"
+                                data-tip
+                                onClick={() => setUpdateOwner(true)}
+                              >
+                                <i className="fa fa-refresh" />
+                                <ToolTip id="updateOwner" message="Update Owner" />
+                              </Button>
+                              ],
          },
          {
           id: "group",
@@ -215,20 +537,38 @@ export default function CertificateDetail() {
                             <Link to={`../../groups/detail/${certificate?.group.uuid}`}>
                               {certificate?.group.name}
                             </Link>
-                          ) : (
-                            "Unassigned"
-                          )
+                          ) :"Unassigned",
+                        <Button
+                          className="btn btn-link"
+                          size="sm"
+                          color="secondary"
+                          data-for="updateGroup"
+                          data-tip
+                          onClick={() => setUpdateGroup(true)}
+                        >
+                          <i className="fa fa-refresh" />
+                          <ToolTip id="updateGroup" message="Update Group" />
+                        </Button>
           ],
        },
        {
         id: "raProfile",
         columns: ["RA Profile", certificate?.raProfile?.name ? (
-                          <Link to={`../../groups/raProfile/${certificate?.raProfile.uuid}`}>
+                          <Link to={`../../raProfiles/detail/${certificate?.raProfile.uuid}`}>
                             {certificate?.raProfile.name}
                           </Link>
-                        ) : (
-                          "Unassigned"
-                        )
+                        ) : "Unassigned",
+                        <Button
+                          className="btn btn-link"
+                          size="sm"
+                          color="secondary"
+                          data-for="updateRaProfile"
+                          data-tip
+                          onClick={() => setUpdateRaProfile(true)}
+                        >
+                          <i className="fa fa-refresh" />
+                          <ToolTip id="updateRaProfile" message="Update RA Profile" />
+                        </Button>
         ],
      },
      {
@@ -244,7 +584,6 @@ export default function CertificateDetail() {
     () => {
       let sanList:TableDataRow[] = [];
       for(let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})){
-        console.log(value)
         if(value && value.length > 0){
           sanList.push({
             id: key,
@@ -444,6 +783,59 @@ export default function CertificateDetail() {
               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
            ]}
         />
+
+          <Dialog
+            isOpen={updateGroup}
+            caption={`Update Group`}
+            body={updateGroupBody}
+            toggle={() => onCancelGroupUpdate()}
+            buttons={[
+               { color: "primary", onClick: () => onUpdateGroup(), body: "Update", disabled: true ? group === undefined : false},
+               { color: "secondary", onClick: () => onCancelGroupUpdate(), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={updateOwner}
+            caption={`Update Owner`}
+            body={updateOwnerBody}
+            toggle={() => onCancelOwnerUpdate()}
+            buttons={[
+               { color: "primary", onClick: onUpdateOwner, body: "Update" ,disabled: true ? owner === undefined : false},
+               { color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel"},
+            ]}
+         />
+
+         <Dialog
+            isOpen={updateRaProfile}
+            caption={`Update RA Profile`}
+            body={updateRaProfileBody}
+            toggle={() => onCancelRaProfileUpdate()}
+            buttons={[
+               { color: "primary", onClick: onUpdateRaProfile, body: "Update", disabled: true ? raProfile === undefined : false },
+               { color: "secondary", onClick: () => onCancelRaProfileUpdate(), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={renew}
+            caption={`Renew Certificate`}
+            body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew}/>}
+            toggle={() => setRenew(false)}
+            buttons={[]}
+         />
+
+         <Dialog
+            isOpen={revoke}
+            caption={`revoke Certificate`}
+            body={revokeBody}
+            toggle={() => setRevoke(false)}
+            buttons={[
+               { color: "primary", onClick: onRevoke, body: "Revoke" },
+               { color: "secondary", onClick: () => setRevoke(false), body: "Cancel" },
+            ]}
+         />
      </Container>
 
   )

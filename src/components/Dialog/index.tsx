@@ -6,7 +6,7 @@ interface DialogButton {
    color: string;
    body: string | JSX.Element;
    onClick: (formData?: any) => void;
-
+   disabled?: boolean;
 }
 
 
@@ -38,7 +38,7 @@ export default function Dialog(props: Props) {
             {!props.buttons ? <></> : props.buttons.map(
 
                (button, index) => (
-                  <Button key={index} color={button.color} onClick={() => button.onClick()}>
+                  <Button key={index} color={button.color} onClick={() => button.onClick()} disabled={button.disabled || false}>
                      {button.body}
                   </Button>
                )
