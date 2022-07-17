@@ -2,7 +2,6 @@ import { AvailableCertificateFilterModel, CertificateEventHistoryModel, Certific
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeModel } from "models/attributes/AttributeModel";
-import { certificatePEM2CertificateModel } from "utils/certificate";
 import { CertificateRAProfileModel } from "models/certificate";
 import { GroupModel } from "models/groups";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
@@ -16,6 +15,8 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
+
+   lastQuery?: CertificateListQueryModel;
 
    availableFilters: AvailableCertificateFilterModel[];
 
@@ -145,6 +146,7 @@ export const slice = createSlice({
 
          state.certificates = [];
          state.isFetchingList = true;
+         state.lastQuery = action.payload.query;
 
       },
 
