@@ -9,11 +9,28 @@ import { selectors, actions } from "ducks/certificates"
 import Select, { MultiValue, SingleValue } from "react-select";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { CertificateListQueryFilterModel } from "models/certificate";
 import Dialog from "components/Dialog";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
+import { CertificateFilterCondition } from "types/certificate";
 
+
+const noValue: { [condition in CertificateFilterCondition]: boolean } = {
+   "EQUALS": true,
+   "NOT_EQUALS": true,
+   "GREATER": false,
+   "LESSER": false,
+   "CONTAINS": false,
+   "NOT_CONTAINS": false,
+   "STARTS_WITH": false,
+   "ENDS_WITH": false,
+   "EMPTY": true,
+   "NOT_EMPTY": true,
+   "SUCCESS": true,
+   "FAILED": true,
+   "UNKNOWN": true,
+   "NOT_CHECKED": true
+}
 
 interface Props {
    onFiltersChanged: (filters: CertificateListQueryFilterModel[]) => void;
@@ -36,7 +53,7 @@ export default function CertificateInventoryFilter({
    const [confirmClear, setConfirmClear] = useState(false);
 
    const [filterField, setFilterField] = useState<SingleValue<{ label: string, value: string }> | undefined>(undefined);
-   const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string, value: string }> | undefined>(undefined);
+   const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string, value: CertificateFilterCondition }> | undefined>(undefined);
    const [filterValue, setFilterValue] = useState<string | SingleValue<string | string[] | { label: string, value: string }> | MultiValue<string | string[] | { label: string, value: string }> | undefined>(undefined);
 
 
@@ -102,7 +119,7 @@ export default function CertificateInventoryFilter({
 
       () => {
 
-         if (!filterField || !filterCondition || !filterValue) return;
+         if (!filterField || !filterCondition /*|| !filterValue*/) return;
 
          if (selectedFilter >= filters.length) {
             setSelectedFilter(-1);
@@ -114,7 +131,7 @@ export default function CertificateInventoryFilter({
             const newFilters = [...filters, {
                field: filterField.value,
                condition: filterCondition.value,
-               value: typeof filterValue === "string" ? filterValue : Array.isArray(filterValue) ? filterValue.map(v => (v as any).value) : (filterValue as any).value
+               value: filterValue ? typeof filterValue === "string" ? filterValue : Array.isArray(filterValue) ? filterValue.map(v => (v as any).value) : (filterValue as any).value : ""
             }]
 
             setFilters(newFilters);
@@ -126,7 +143,7 @@ export default function CertificateInventoryFilter({
             const newFilters = [...filters.slice(0, selectedFilter), {
                field: filterField.value,
                condition: filterCondition.value,
-               value: typeof filterValue === "string" ? filterValue : Array.isArray(filterValue) ? filterValue.map(v => (v as any).value) : (filterValue as any).value
+               value: filterValue ? typeof filterValue === "string" ? filterValue : Array.isArray(filterValue) ? filterValue.map(v => (v as any).value) : (filterValue as any).value : ""
             }, ...filters.slice(selectedFilter + 1)]
 
 
@@ -205,13 +222,13 @@ export default function CertificateInventoryFilter({
                   <Col>
                      <FormGroup>
 
-                        <Label for="conditions">Filter Conditions</Label>
+                        <Label for="conditions">Filter Condition</Label>
 
                         <Select
                            id="conditions"
                            options={filterField ? currentFieldData?.conditions.map(c => ({ label: c, value: c })) : undefined}
                            value={filterCondition || null}
-                           onChange={(e) => { setFilterCondition(e); }}
+                           onChange={(e) => { setFilterCondition(e); if (e && noValue[e.value]) { setFilterValue(undefined) } }}
                            isDisabled={!filterField}
                         />
 
@@ -234,7 +251,7 @@ export default function CertificateInventoryFilter({
                                     value={filterValue as string || ""}
                                     onChange={(e) => { setFilterValue(e.target.value) }}
                                     placeholder="Enter filter value"
-                                    disabled={!filterField}
+                                    disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                                  />
                               ) : (
                                  <Select
@@ -260,7 +277,7 @@ export default function CertificateInventoryFilter({
                      <Button
                         style={{ width: "100%" }}
                         color="primary"
-                        disabled={!filterField || !filterCondition || !filterValue}
+                        disabled={!filterField || !filterCondition /*|| !filterValue*/}
                         onClick={onUpdateFilterClick}
                      >
                         {selectedFilter === -1 ? "Add" : "Update"}

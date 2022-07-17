@@ -10,7 +10,7 @@ interface CertificateValidationResultRecordModel {
 
 export interface CertificateListQueryFilterModel {
    field: string;
-   condition: string;
+   condition: CertificateFilterCondition;
    value?: any;
 }
 
