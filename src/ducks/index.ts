@@ -76,7 +76,7 @@ export const initialState = {
    [acmeAccountsSlice.name]: initialAcmeAccountsState,
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
    [authoritiesSlice.name]: initialAuthoritiesState,
-   [groupSlice.name]: initialGroupState, 
+   [groupSlice.name]: initialGroupState,
    [discoverySlice.name]: initialDiscoveryState,
 };
 

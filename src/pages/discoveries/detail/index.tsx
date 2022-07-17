@@ -11,7 +11,7 @@ import Dialog from "components/Dialog";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeViewer from "components/Attributes/AttributeViewer";
-import DiscoveryStatusBadge from "components/DiscoveryStatus";
+import DiscoveryStatusBadge from "components/pages/discoveries/DiscoveryStatus";
 import { dateFormatter } from "utils/dateUtil";
 
 export default function DiscoveryDetail() {
@@ -92,13 +92,13 @@ export default function DiscoveryDetail() {
       [buttons]
 
    );
-  
+
     const metaTitle = (
       <h5>
         <span className="fw-semi-bold">Meta Data</span>
       </h5>
     );
-  
+
     const certificatesTitle = (
       <h5>
         <span className="fw-semi-bold">Discovered Certificates</span>
@@ -155,7 +155,7 @@ export default function DiscoveryDetail() {
    );
 
    const metaData: TableDataRow[] = useMemo(
-      
+
       () => !discovery ? [] : Object.entries(discovery.meta).map(function([key, value]) {
          return (
             {

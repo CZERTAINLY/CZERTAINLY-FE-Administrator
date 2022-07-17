@@ -1,10 +1,13 @@
+import { GroupDTO } from "api/groups";
 import { Observable } from "rxjs";
+
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
 
 
 export interface CertificateRAProfileDTO {
    uuid: string;
    name: string;
-   enabled: string;
+   enabled: boolean;
 }
 
 
@@ -12,14 +15,36 @@ export interface CertificateEntityDTO {
    uuid: string;
    name: string;
    description?: string;
-   entityType: "server" | "router" | "HSM" | "switch" | "loadBallancer" | "firewall" | "MDM" | "cloud";
+   entityType: "server" | "router" | "HSM" | "switch" | "loadBalancer" | "firewall" | "MDM" | "cloud";
 }
 
 
-export interface CertificateGroupDTO {
+export interface CertificateEventHistoryDTO {
    uuid: string;
-   name: string;
-   description: string;
+   certificateUuid: string;
+   created: string;
+   createdBy: string;
+   event: CertificateEvent;
+   status: "SUCCESS" | "FAILED";
+   message: string;
+   additionalInformation: { [ property: string ]: any };
+}
+
+
+export interface CertificateBulkDeleteResultDTO {
+   status: "SUCCESS" | "FAILED" | "PARTIAL";
+   failedItems: number;
+   message: string;
+}
+
+
+export interface AvailableCertificateFilterDTO {
+   field: CertificateFilterField;
+   label: string;
+   type: "string" | "number" | "list" | "date";
+   conditions: CertificateFilterCondition[];
+   value?: string;
+   multiValue?: boolean;
 }
 
 
@@ -42,8 +67,6 @@ export interface CertificateSubjectAlternativeNamesDTO {
 
 export interface CertificateMetaDTO {
    [key: string]: string;
-   discoverySource: string;
-   cipherSuite: string;
 }
 
 
@@ -52,15 +75,14 @@ export interface CertificateListFilterDTO {
    condition: string;
    value?: any;
 }
+ 
+ export interface ValidationResult {
+   status: ValidationStatus;
+   message: string;
+ }
 
-
-export interface CertificateValidationResultRecordDTO {
-   status: "success" | "failed" | "warning" | "revoked" | "not_checked" | "invalid" | "expiring" | "expired";
-}
-
-
-export interface CertificateValidationResultDTO {
-   [key: string]: CertificateValidationResultRecordDTO;
+export interface CertificateValidationResultModel {
+   [key: string]: ValidationResult;
 }
 
 
@@ -81,16 +103,16 @@ export interface CertificateDTO {
    keyUsage: string[];
    extendedKeyUsage?: string[];
    basicConstraints: string;
-   status: "valid" | "revoked" | "expired" | "unknown" | "expiring" | "new" | "invalid";
+   status: Status;
    fingerprint: string;
    certificateType?: "X509" | "SSH";
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesDTO;
    meta?: CertificateMetaDTO;
 
-   certificateValidationResult?: CertificateValidationResultRecordDTO;
+   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityDTO;
-   group?: CertificateGroupDTO;
+   group?: GroupDTO;
    owner?: string;
    raProfile?: CertificateRAProfileDTO;
 
@@ -99,14 +121,13 @@ export interface CertificateDTO {
 
 export interface CertificateListDTO {
    certificates: CertificateDTO[];
-   itemsPerPage: number;
-   pageNumber: number;
    totalPages: number;
    totalItems: number;
 }
 
 
-export interface CertificateManagementApi {
+export interface CertificateInventoryApi {
+
 
    getCertificatesList(
       itemsPerPage?: number,
@@ -116,5 +137,71 @@ export interface CertificateManagementApi {
 
 
    getCertificateDetail(uuid: string): Observable<CertificateDTO>;
+
+
+   getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]>;
+
+
+   uploadCertificate(certificate: string): Observable<string>;
+
+
+   deleteCertificate(uuid: string): Observable<void>;
+
+
+   updateGroup(uuid: string, groupUuid: string): Observable<void>;
+
+
+   // updateEntity(uuid: string, entityUuid: string): Observable<void>;
+
+
+   updateRaProfile(uuid: string, raProfileUuid: string): Observable<void>;
+
+
+   updateOwner(uuid: string, owner: string): Observable<void>;
+
+
+   bulkUpdateGroup(
+      uuids: string[],
+      groupUuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+
+
+   /*
+   bulkUpdateEntity(
+      certificateIds: (string)[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+   */
+
+
+   bulkUpdateRaProfile(
+      uuids: string[],
+      profileUuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+
+
+   bulkUpdateOwner(
+      uuids: string[],
+      owner: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+
+
+   bulkDeleteCertificate(
+      uuids: string[],
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<CertificateBulkDeleteResultDTO>;
+
+
+   getAvailableCertificateFilters(): Observable<AvailableCertificateFilterDTO[]>;
+
 
 }

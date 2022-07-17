@@ -7,7 +7,8 @@ import { CredentialManagementApi, CredentialManagementBackend, CredentialManagem
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
 import { ConnectorManagementApi, ConnectorManagementBackend, ConnectorManagementMock } from "./connectors";
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
-import { CertificateManagementApi, CertificateManagementBackend, CertificateManagementMock } from "./certificates";
+import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
+import { OperationsApi, OperationsBackend, OperationsMock } from "./operations";
 import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountManagementMock } from "./acme-account";
 import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
@@ -23,17 +24,18 @@ export interface ApiClients {
    connectors: ConnectorManagementApi;
    dashboard: DashboardManagementApi;
    authorities: AuthorityManagementApi;
-   certificates: CertificateManagementApi;
+   certificates: CertificateInventoryApi;
    acmeAccounts: AcmeAccountManagementApi;
    acmeProfiles: AcmeProfilesManagementApi;
    groups: GroupManagementApi;
+   operations: OperationsApi;
    discoveries: DiscoveryManagementApi;
 }
 
 export const backendClient: ApiClients = {
    auth: new AuthBackend(),
    admins: new AdministratorsManagementBackend(),
-   certificates: new CertificateManagementBackend(),
+   certificates: new CertificateInventoryBackend(),
    auditLogs: new AuditLogsBackend(),
    clients: new ClientManagementBackend(),
    profiles: new ProfilesManagementBackend(),
@@ -44,13 +46,14 @@ export const backendClient: ApiClients = {
    acmeAccounts: new AcmeAccountManagementBackend(),
    acmeProfiles: new AcmeProfilesManagementBackend(),
    groups: new GroupManagementBackend(),
+   operations: new OperationsBackend(),
    discoveries: new DiscoveryManagementBackend(),
 };
 
 export const mockClient: ApiClients = {
    auth: new AuthMock(),
    admins: new AdministatorManagementMock(),
-   certificates: new CertificateManagementMock(),
+   certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
    clients: new ClientManagementMock(),
    profiles: new ProfilesManagementMock(),
@@ -61,5 +64,6 @@ export const mockClient: ApiClients = {
    acmeAccounts: new AcmeAccountManagementMock(),
    acmeProfiles: new AcmeProfilesManagementMock(),
    groups: new GroupManagementMock(),
+   operations: new OperationsMock(),
    discoveries: new DiscoveryManagementMock(),
 };

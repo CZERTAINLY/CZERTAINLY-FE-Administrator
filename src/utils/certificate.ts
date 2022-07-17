@@ -213,3 +213,34 @@ export const emptyCertificate: CertificateModel = {
    subjectAlternativeNames: {}
 }
 
+export function downloadFile(content: any, fileName: string) {
+   const element = document.createElement("a");
+   const file = new Blob([content], {
+     type: "text/plain",
+   });
+   element.href = URL.createObjectURL(file);
+   element.download = fileName;
+   document.body.appendChild(element); // Required for this to work in FireFox
+   element.click();
+ }
+
+ export function formatPEM(pemString: string) {
+   const PEM_STRING_LENGTH = pemString.length,
+     LINE_LENGTH = 64;
+   const wrapNeeded = PEM_STRING_LENGTH > LINE_LENGTH;
+ 
+   if (wrapNeeded) {
+     let formattedString = "",
+       wrapIndex = 0;
+ 
+     for (let i = LINE_LENGTH; i < PEM_STRING_LENGTH; i += LINE_LENGTH) {
+       formattedString += pemString.substring(wrapIndex, i) + "\r\n";
+       wrapIndex = i;
+     }
+ 
+     formattedString += pemString.substring(wrapIndex, PEM_STRING_LENGTH);
+     return `-----BEGIN CERTIFICATE-----\n${formattedString}\n-----END CERTIFICATE-----`;
+   } else {
+     return `-----BEGIN CERTIFICATE-----\n${pemString}\n-----END CERTIFICATE-----`;
+   }
+ }

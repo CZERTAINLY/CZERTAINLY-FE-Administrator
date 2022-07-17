@@ -511,20 +511,27 @@ export default function AttributeEditor({
 
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
 
+            if (!callbackData[callbackId]) continue;
+
             // Update options
 
             if (Array.isArray(callbackData[callbackId])) {
                setOptions({ ...options, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) });
+               continue;
             }
 
             // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
+            if (callbackData[callbackId].value) {
+               form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
+               continue;
+            }
 
          }
 
          setPreviousCallbackData(callbackData);
 
       },
-      [callbackData, options, previousCallbackData]
+      [callbackData, form.mutators, options, previousCallbackData]
 
    )
 

@@ -39,7 +39,7 @@ function AuthorityList() {
    useEffect(
 
       () => {
-
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.listAuthorities());
 

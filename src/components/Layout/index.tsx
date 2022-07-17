@@ -26,6 +26,7 @@ import Profile from "pages/profile";
 import Groups from "pages/group";
 import Discovery from "pages/discoveries";
 import Dashboard from "pages/dashboard";
+import Certificates from "pages/certificates";
 
 function Layout() {
 
@@ -53,7 +54,7 @@ function Layout() {
                <Switch>
                   <Route path="/app/home" component={Home} />
                   <Route path="/app/audit" component={AuditLogs} />
-                  {isSuperAdmin ? ( <Route path="/app/administrators" component={Administrators} /> ) : null}
+                  {isSuperAdmin ? (<Route path="/app/administrators" component={Administrators} />) : null}
                   <Route path="/app/about" component={About} />
                   <Route path="/app/clients" component={Clients} />
                   <Route path="/app/connectors" component={Connectors} />
@@ -66,6 +67,7 @@ function Layout() {
                   <Route path="/app/profile" component={Profile} />
                   <Route path="/app/groups" component={Groups} />
                   <Route path="/app/discovery" component={Discovery} />
+                  <Route path="/app/certificates" component={Certificates} />
 
                </Switch>
 

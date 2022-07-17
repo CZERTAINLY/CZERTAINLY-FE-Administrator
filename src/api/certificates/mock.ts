@@ -7,7 +7,7 @@ import * as model from "./model";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 
-export class CertificateManagementMock implements model.CertificateManagementApi {
+export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
 
    getCertificatesList(
@@ -86,6 +86,114 @@ export class CertificateManagementMock implements model.CertificateManagementApi
          )
 
       );
+
+   }
+
+
+   getCertificateHistory(uuid: string): Observable<model.CertificateEventHistoryDTO[]> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   uploadCertificate(certificate: string): Observable<string> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+   }
+
+
+   deleteCertificate(uuid: string): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   updateGroup(uuid: string, groupUuid: string): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   // updateEntity(uuid: string, entityUuid: string): Observable<void>;
+
+
+   updateRaProfile(uuid: string, raProfileUuid: string): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   updateOwner(uuid: string, owner: string): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   bulkUpdateGroup(
+      certificateIds: string[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   /*
+   bulkUpdateEntity(
+      certificateIds: string[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void>;
+   */
+
+
+   bulkUpdateRaProfile(
+      certificateIds: string[],
+      uuid: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   bulkUpdateOwner(
+      certificateIds: string[],
+      owner: string,
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<void> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   bulkDeleteCertificate(
+      certificateIds: string[],
+      inFilter: any,
+      allSelect: boolean
+   ): Observable<model.CertificateBulkDeleteResultDTO> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+   }
+
+
+   getAvailableCertificateFilters(): Observable<model.AvailableCertificateFilterDTO[]> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 
    }
 

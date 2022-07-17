@@ -1,5 +1,7 @@
-import { CertificateDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
-import { CertificateModel } from "models";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO, CertificateValidationResultModel } from "api/certificates";
+import { RaProfileDTO } from "api/profiles";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel } from "models";
+import { join } from "path";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -19,7 +21,7 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
       signatureAlgorithm: certificate.signatureAlgorithm,
       keySize: certificate.keySize,
       keyUsage: JSON.parse(JSON.stringify(certificate.keyUsage)),
-      extendedKeyUsage: certificate.keyUsage ? JSON.parse(JSON.stringify(certificate.keyUsage)) : undefined,
+      extendedKeyUsage: certificate.extendedKeyUsage ? JSON.parse(JSON.stringify(certificate.extendedKeyUsage)) : undefined,
       basicConstraints: certificate.basicConstraints,
       status: certificate.status,
       fingerprint: certificate.fingerprint,
@@ -38,14 +40,9 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
          x400Address: sanClone.x400Address
       },
 
-      meta: certificate.meta ? {
-         cipherSuite: certificate.meta.cipherSuite,
-         discoverySource: certificate.meta.discoverySource
-      } : undefined,
+      meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
 
-      certificateValidationResult: certificate.certificateValidationResult ? {
-         status: certificate.certificateValidationResult.status
-      } : undefined,
+      certificateValidationResult: certificate.certificateValidationResult ? certificate.certificateValidationResult : undefined,
 
       entity: certificate.entity ? {
          uuid: certificate.entity.uuid,
@@ -90,7 +87,7 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
       signatureAlgorithm: certificate.signatureAlgorithm,
       keySize: certificate.keySize,
       keyUsage: JSON.parse(JSON.stringify(certificate.keyUsage)),
-      extendedKeyUsage: certificate.keyUsage ? JSON.parse(JSON.stringify(certificate.keyUsage)) : undefined,
+      extendedKeyUsage: certificate.extendedKeyUsage ? JSON.parse(JSON.stringify(certificate.extendedKeyUsage)) : undefined,
       basicConstraints: certificate.basicConstraints,
       status: certificate.status,
       fingerprint: certificate.fingerprint,
@@ -109,10 +106,7 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
          x400Address: sanClone.x400Address
       },
 
-      meta: certificate.meta ? {
-         cipherSuite: certificate.meta.cipherSuite,
-         discoverySource: certificate.meta.discoverySource
-      } : undefined,
+      meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
 
       certificateValidationResult: certificate.certificateValidationResult ? {
          status: certificate.certificateValidationResult.status
@@ -138,6 +132,47 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
          name: certificate.raProfile.name,
          enabled: certificate.raProfile.enabled
       } : undefined
+   }
+
+}
+
+
+export function transformAvailableCertificateFilterDTOToModel(availableCertificateFilter: AvailableCertificateFilterDTO): AvailableCertificateFilterModel {
+
+   return {
+      field: availableCertificateFilter.field,
+      label: availableCertificateFilter.label,
+      type: availableCertificateFilter.type,
+      conditions: [ ...availableCertificateFilter.conditions ],
+      value: availableCertificateFilter.value,
+      multiValue: availableCertificateFilter.multiValue
+   }
+
+}
+
+
+export function transformCertificateHistoryDTOToModel(certificateHistory: CertificateEventHistoryDTO): CertificateEventHistoryModel {
+
+   return {
+      uuid: certificateHistory.uuid,
+      certificateUuid: certificateHistory.certificateUuid,
+      event: certificateHistory.event,
+      message: certificateHistory.message,
+      status: certificateHistory.status,
+      created: certificateHistory.created,
+      createdBy: certificateHistory.createdBy,
+      additionalInformation: certificateHistory.additionalInformation
+   }
+
+}
+
+
+export function transformRaProfileDtoToCertificaeModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
+
+   return {
+      uuid: raProfile.uuid,
+      name: raProfile.name,
+      enabled: raProfile.enabled,
    }
 
 }

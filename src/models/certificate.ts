@@ -1,8 +1,46 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
+import { CertificateValidationResultModel, ValidationResult } from "api/certificates";
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status } from "types/certificate";
+import { GroupModel } from "./groups";
 
 
-interface CertificateValidationResultRecordModel {
-   status: "success" | "failed" | "warning" | "revoked" | "not_checked" | "invalid" | "expiring" | "expired";
+export interface CertificateListQueryFilterModel {
+   field: string;
+   condition: CertificateFilterCondition;
+   value?: any;
+}
+
+
+export interface CertificateListQueryModel {
+   itemsPerPage: number;
+   pageNumber: number;
+   filters: CertificateListQueryFilterModel[];
+}
+
+
+export interface AvailableCertificateFilterModel {
+
+   field: CertificateFilterField;
+   label: string;
+   type: "string" | "number" | "list" | "date";
+   conditions: CertificateFilterCondition[];
+   value?: string | string[];
+   multiValue?: boolean;
+
+}
+
+
+export interface CertificateEventHistoryModel {
+
+   uuid: string;
+   certificateUuid: string;
+   created: string;
+   createdBy: string;
+   event: CertificateEvent;
+   status: "SUCCESS" | "FAILED";
+   message: string;
+   additionalInformation: { [property: string]: any };
+
 }
 
 
@@ -27,28 +65,19 @@ interface CertificateEntityModel {
    uuid: string;
    name: string;
    description?: string;
-   entityType: "server" | "router" | "HSM" | "switch" | "loadBallancer" | "firewall" | "MDM" | "cloud";
+   entityType: "server" | "router" | "HSM" | "switch" | "loadBalancer" | "firewall" | "MDM" | "cloud";
 }
 
 
 interface CertificateMetaModel {
    [key: string]: string;
-   discoverySource: string;
-   cipherSuite: string;
 }
 
 
-interface CertificateGroupModel {
+export interface CertificateRAProfileModel {
    uuid: string;
    name: string;
-   description: string;
-}
-
-
-interface CertificateRAProfileModel {
-   uuid: string;
-   name: string;
-   enabled: string;
+   enabled: boolean;
 }
 
 
@@ -69,16 +98,16 @@ export interface CertificateModel {
    keyUsage: string[];
    extendedKeyUsage?: string[];
    basicConstraints: string;
-   status: "valid" | "revoked" | "expired" | "unknown" | "expiring" | "new" | "invalid";
+   status: Status;
    fingerprint: string;
    certificateType?: "X509" | "SSH";
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
    meta?: CertificateMetaModel;
 
-   certificateValidationResult?: CertificateValidationResultRecordModel;
+   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityModel;
-   group?: CertificateGroupModel;
+   group?: GroupModel;
    owner?: string;
    raProfile?: CertificateRAProfileModel;
 
@@ -113,7 +142,6 @@ export interface X509Certificate {
    readonly publicKey: PublicKey;
    readonly publicKeyRaw: Buffer;
    //readonly tbsCertificate: ASN1;
-
 
    commonName: string,
    issuerCommonName: string,

@@ -10,7 +10,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import DiscoveryStatusBadge from "components/DiscoveryStatus";
+import DiscoveryStatusBadge from "components/pages/discoveries/DiscoveryStatus";
 
 const { MDBBadge } = require("mdbreact");
 
@@ -35,8 +35,8 @@ function DiscoveryList() {
    useEffect(
 
       () => {
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.listDiscoveries());
-
       },
       [dispatch]
 
@@ -142,14 +142,15 @@ function DiscoveryList() {
             content: <MDBColumnName columnName="Status" />,
             align: "center",
             sortable: true,
-            id: "discoveryProvider",
+            id: "status",
             width: "15%",
          },
          {
             content: <MDBColumnName columnName="Total Certificates" />,
             align: "center",
             sortable: true,
-            id: "discoveryProvider",
+            sortType: "numeric",
+            id: "totalCertificates",
             width: "15%",
          },
       ],
@@ -173,7 +174,7 @@ function DiscoveryList() {
                <MDBBadge color="primary" >{discovery.connectorName}</MDBBadge>,
 
                <MDBBadge color="secondary" >{discovery.kind}</MDBBadge>,
-               
+
                <DiscoveryStatusBadge status={discovery.status} />,
 
                discovery.totalCertificatesDiscovered?.toString() || "0"

@@ -5,8 +5,8 @@ interface DialogButton {
 
    color: string;
    body: string | JSX.Element;
-   onClick: () => void;
-
+   onClick: (formData?: any) => void;
+   disabled?: boolean;
 }
 
 
@@ -16,6 +16,7 @@ interface Props {
    caption?: string | JSX.Element;
    body?: string | JSX.Element;
    buttons?: DialogButton[];
+   size?: "sm" | "lg";
 }
 
 
@@ -23,7 +24,7 @@ export default function Dialog(props: Props) {
 
    return (
 
-      <MDBModal overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
+      <MDBModal size={props.size || undefined} overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
 
          <MDBModalHeader toggle={() => { if (props.toggle) props.toggle() }}>
             {props.caption}
@@ -38,7 +39,7 @@ export default function Dialog(props: Props) {
             {!props.buttons ? <></> : props.buttons.map(
 
                (button, index) => (
-                  <Button key={index} color={button.color} onClick={button.onClick}>
+                  <Button key={index} color={button.color} onClick={() => button.onClick()} disabled={button.disabled || false}>
                      {button.body}
                   </Button>
                )

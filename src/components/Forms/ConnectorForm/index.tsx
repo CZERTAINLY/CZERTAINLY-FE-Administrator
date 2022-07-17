@@ -7,7 +7,7 @@ import ProgressButton from "components/ProgressButton";
 
 import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
 
-import InventoryStatusBadge from "components/ConnectorStatus";
+import InventoryStatusBadge from "components/pages/connectors/ConnectorStatus";
 import Widget from "components/Widget";
 import Select from "react-select";
 

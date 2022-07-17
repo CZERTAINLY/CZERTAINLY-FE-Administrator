@@ -39,6 +39,7 @@ function CredentialList() {
 
    useEffect(
       () => {
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.listCredentials());
       },
