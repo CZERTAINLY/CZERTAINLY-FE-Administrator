@@ -93,6 +93,14 @@ export default function CertificateList() {
    );
 
 
+   const onPageSizeChanged = useCallback(
+
+      (pageSize: number) => { setPageSize(pageSize); setPageNumber(1); },
+      [setPageSize, setPageNumber]
+
+   );
+
+
    const downloadDropDown = useMemo(
       () => (
 
@@ -334,7 +342,7 @@ export default function CertificateList() {
                canSearch={true}
                paginationData={paginationData}
                onPageChanged={setPageNumber}
-               onPageSizeChanged={setPageSize}
+               onPageSizeChanged={onPageSizeChanged}
             />
 
          </Widget>
