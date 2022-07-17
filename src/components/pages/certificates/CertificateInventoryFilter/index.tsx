@@ -17,8 +17,8 @@ import { CertificateFilterCondition } from "types/certificate";
 const empty: CertificateListQueryFilterModel[] = [];
 
 const noValue: { [condition in CertificateFilterCondition]: boolean } = {
-   "EQUALS": true,
-   "NOT_EQUALS": true,
+   "EQUALS": false,
+   "NOT_EQUALS": false,
    "GREATER": false,
    "LESSER": false,
    "CONTAINS": false,
@@ -113,7 +113,9 @@ export default function CertificateInventoryFilter({
             return;
          }
 
-         setFilterValue(filters[selectedFilter].value.map((v: string) => ({ label: v, value: v })));
+         if (Array.isArray(filters[selectedFilter].value)) {
+            setFilterValue(filters[selectedFilter].value.map((v: string) => ({ label: v, value: v })));
+         }
 
       },
       [availableFilters, filters, selectedFilter]
@@ -279,7 +281,7 @@ export default function CertificateInventoryFilter({
                                        onChange={(e) => { setFilterValue(e); }}
                                        isMulti={availableFilters.find(f => f.field === filterField?.value)?.multiValue}
                                        isClearable={true}
-                                       isDisabled={!filterField}
+                                       isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                                     />
                                  )
                            }
@@ -314,7 +316,7 @@ export default function CertificateInventoryFilter({
                         <Badge key={f.field + i} className={cx(styles.filterBadge)} onClick={() => toggleFilter(i)} data-selected={selectedFilter === i ? "true" : "false"}>
                            '{f.field}'&nbsp;
                            {f.condition}&nbsp;
-                           {Array.isArray(f.value) ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : `'${f.value}'`}
+                           {Array.isArray(f.value) && f.value.length > 1 ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : f.value ? `'${f.value}'` : ""}
 
                            <span
                               className={cx(styles.filterBadgeSpan)}
