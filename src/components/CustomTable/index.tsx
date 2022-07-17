@@ -605,7 +605,7 @@ function CustomTable({
                      paginationData
                         ?
                         <div>
-                           Showing {paginationData.page * paginationData.pageSize + 1} to {paginationData.page * paginationData.pageSize + paginationData.pageSize} of {paginationData.totalItems}
+                           Showing {paginationData.page * paginationData.pageSize + 1} to {paginationData.page * paginationData.pageSize + paginationData.pageSize} items of {paginationData.totalItems}
                         </div>
                         :
                         <div>
