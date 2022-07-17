@@ -18,6 +18,7 @@ import CertificateUploadDialog from "components/pages/certificates/CertificateUp
 import CertificateGroupDialog from "components/pages/certificates/CertificateGroupDialog";
 import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
 import CertificateRAProfileDialog from "components/pages/certificates/CertificateRAProfileDialog";
+import { downloadFileZip } from "utils/download";
 
 
 export default function CertificateList() {
@@ -182,11 +183,11 @@ export default function CertificateList() {
 
                <DropdownMenu>
 
-                  <DropdownItem key="pem" onClick={() => {/*downloadFileZip(checkedRows, certData, "pem")} */ }}>
+                  <DropdownItem key="pem" onClick={() => {downloadFileZip(checkedRows, certificates, "pem")} }>
                      PEM (.pem)
                   </DropdownItem>
 
-                  <DropdownItem key="der" onClick={() => {/*downloadFileZip(checkedRows, certData, "cer") */ }}>
+                  <DropdownItem key="der" onClick={() => {downloadFileZip(checkedRows, certificates, "cer")} }>
                      DER (.cer)
                   </DropdownItem>
 
@@ -195,7 +196,7 @@ export default function CertificateList() {
             </UncontrolledButtonDropdown>
 
          ),
-         [checkedRows.length]
+         [certificates, checkedRows]
 
       );
 

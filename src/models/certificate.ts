@@ -39,7 +39,7 @@ export interface CertificateEventHistoryModel {
    event: CertificateEvent;
    status: "SUCCESS" | "FAILED";
    message: string;
-   additionalInformation: { [ property: string ]: any };
+   additionalInformation: { [property: string]: any };
 
 }
 
@@ -142,7 +142,6 @@ export interface X509Certificate {
    readonly publicKey: PublicKey;
    readonly publicKeyRaw: Buffer;
    //readonly tbsCertificate: ASN1;
-
 
    commonName: string,
    issuerCommonName: string,
