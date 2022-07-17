@@ -38,7 +38,7 @@ export default function Dialog(props: Props) {
             {!props.buttons ? <></> : props.buttons.map(
 
                (button, index) => (
-                  <Button key={index} color={button.color} onClick={() => button.onClick}>
+                  <Button key={index} color={button.color} onClick={() => button.onClick()}>
                      {button.body}
                   </Button>
                )
