@@ -435,6 +435,7 @@ function CustomTable({
       () => tblData.filter(
 
          (row, index) => {
+            if (!hasPagination) return true;
             if (pageSize === 0) return true;
             return paginationData ? true : index >= (page - 1) * pageSize && index < page * pageSize;
          }
@@ -503,7 +504,7 @@ function CustomTable({
 
       ),
 
-      [tblData, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
+      [tblData, hasPagination, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
 
    );
 
