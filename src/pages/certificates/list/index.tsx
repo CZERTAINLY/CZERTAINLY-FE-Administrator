@@ -19,6 +19,7 @@ import CertificateGroupDialog from "components/pages/certificates/CertificateGro
 import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
 import CertificateRAProfileDialog from "components/pages/certificates/CertificateRAProfileDialog";
 
+
 export default function CertificateList() {
 
    const dispatch = useDispatch();
@@ -54,7 +55,7 @@ export default function CertificateList() {
    const [pageSize, setPageSize] = useState(10);
    const [pageNumber, setPageNumber] = useState(1);
 
-   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>([]);
+   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>();
 
    const [upload, setUpload] = useState<boolean>(false);
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -75,25 +76,16 @@ export default function CertificateList() {
 
    );
 
+
    useEffect(
 
       () => {
+         if (!filters) return;
          dispatch(actions.listCertificates({ query: { filters, itemsPerPage: pageSize, pageNumber } }));
          dispatch(actions.setForceRefreshList({ forceRefreshList: false }));
          dispatch(actions.setCheckedRows({checkedRows: []}));
       },
       [dispatch, filters, pageSize, pageNumber]
-
-   );
-
-
-
-   useEffect(
-
-      () => {
-         dispatch(actions.listCertificates({ query: { filters, itemsPerPage: pageSize, pageNumber } }));
-      },
-      [dispatch, pageSize, pageNumber, filters]
 
    );
 
