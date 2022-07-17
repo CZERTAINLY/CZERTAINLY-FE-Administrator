@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 
-import { Badge, Button, Col, Container, Input, Label, Row } from "reactstrap";
+import { Badge, Button, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, Row, UncontrolledButtonDropdown } from "reactstrap";
 
 import { actions, selectors } from "ducks/certificates";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/groups";
@@ -20,6 +20,7 @@ import Select from "react-select";
 import { CertificateRevocationReason } from "types/certificate";
 import CertificateRenewDialog from "components/pages/certificates/CertificateRenewDialog";
 import CertificateEventStatus from "components/pages/certificates/CertificateHistoryStatus";
+import { downloadFile, formatPEM } from "utils/certificate";
 
 
 export default function CertificateDetail() {
@@ -88,7 +89,7 @@ export default function CertificateDetail() {
        if (!params.id || !updateGroup) return;
        dispatch(groupAction.listGroups());
     },
-    [dispatch, updateGroup]
+    [dispatch, updateGroup, params.id]
  )
 
  useEffect(
@@ -118,7 +119,7 @@ useEffect(
      if (!params.id || !updateGroup) return;
      dispatch(groupAction.listGroups());
   },
-  [dispatch, updateGroup]
+  [dispatch, updateGroup, params.id]
 )
 
 
@@ -129,7 +130,7 @@ useEffect(
      if (!params.id || !revoke) return;
      dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
   },
-  [dispatch, revoke]
+  [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
 )
 
 
@@ -141,7 +142,7 @@ useEffect(
      if (!params.id || !updateRaProfile) return;
      dispatch(raProfileAction.listRaProfiles());
   },
-  [dispatch, updateRaProfile]
+  [dispatch, updateRaProfile, params.id]
 )
 
 
@@ -267,14 +268,59 @@ const onUpdateRaProfile = useCallback(
 
    );
 
+   const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
+
+   const downloadDropDown = useMemo(
+    () => (
+
+       <UncontrolledButtonDropdown>
+
+          <DropdownToggle
+             color="light"
+             caret
+             className="btn btn-link"
+             data-for="download"
+             data-tip
+          >
+             <i className="fa fa-download" aria-hidden="true" />
+             <ToolTip id="download" message="Download" />
+          </DropdownToggle>
+
+          <DropdownMenu>
+
+             <DropdownItem key="pem" onClick={() => downloadFile(
+                  formatPEM(certificate?.certificateContent || ""),
+                  fileNameToDownload + ".pem"
+                )
+              }>
+                PEM (.pem)
+             </DropdownItem>
+
+             <DropdownItem key="der" onClick={() => {downloadFile(
+                  Buffer.from(certificate?.certificateContent || "", "base64"),
+                  fileNameToDownload + ".cer"
+                )}}>
+                DER (.cer)
+             </DropdownItem>
+
+          </DropdownMenu>
+
+       </UncontrolledButtonDropdown>
+
+    ),
+    [certificate, fileNameToDownload, ]
+
+ );
+
   const buttons: WidgetButtonProps[] = useMemo(
 
      () => [
         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
         { icon: "retweet", disabled: certificate?.raProfile === undefined, tooltip: "Renew", onClick: () => { setRenew(true); } },
         { icon: "minus-square", disabled: certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
+        { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
      ],
-     [certificate]
+     [certificate, downloadDropDown]
   );
 
 
@@ -529,7 +575,7 @@ const revokeBody = useMemo(
               ]
           }
       )
-    }),[eventHistory, certificate]
+    }),[eventHistory]
   );
 
 
@@ -882,7 +928,7 @@ const revokeBody = useMemo(
            </Col>
         </Row>
 
-        <Widget title={historyTitle}>
+        <Widget title={historyTitle} busy={isFetchingHistory}>
                  <br />
                  <CustomTable
                     headers={historyHeaders}
