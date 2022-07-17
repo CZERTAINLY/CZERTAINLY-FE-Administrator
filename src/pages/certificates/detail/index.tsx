@@ -435,6 +435,12 @@ const revokeBody = useMemo(
     </h5>
   );
 
+  const historyTitle = (
+    <h5>
+      <span className="fw-semi-bold">Certificate Event History</span>
+    </h5>
+  );
+
 
   const detailHeaders: TableHeader[] = useMemo(
 
