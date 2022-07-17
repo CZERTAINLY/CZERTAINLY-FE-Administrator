@@ -1,19 +1,18 @@
 import CertificateAttributes from "components/CertificateAttributes";
 import { CertificateModel } from "models";
 import { useCallback, useState } from "react";
-import { Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
+import { Button, ButtonGroup, Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 import { getCertificateInformation } from "utils/certificate";
 
-const allowedContentTypes = [
-   "application/pkix-cert",
-   "application/x-x509-ca-cert",
-   "application/x-x509-user-cert",
-   "application/x-pem-file",
-   "application/x-pkcs12"
-];
+interface Props {
+   onCancel: () => void,
+   onUpload: (data: { fileContent: string, fileName: string, contentType: string }) => void
+}
 
-
-export default function CertificateUploadDialog() {
+export default function CertificateUploadDialog({
+   onCancel,
+   onUpload,
+}: Props) {
 
    const [fileName, setFileName] = useState("");
    const [contentType, setContentType] = useState("");
@@ -62,7 +61,7 @@ export default function CertificateUploadDialog() {
          }
 
          if (!crt) {
-             setError("Failed to decode passed file. Certificate will not be shown.");
+            setError("Failed to decode passed file. Certificate will not be shown.");
          } else {
             setError("");
          }
@@ -203,9 +202,36 @@ export default function CertificateUploadDialog() {
 
          </div>
 
-         {error && <><br/><div className="text-muted" style={{textAlign: "center"}}>{error}</div><FormText style={{textAlign: "center"}}>Possibly the certificate can be decoded on the server side</FormText></>}
+         {error && <><br /><div className="text-muted" style={{ textAlign: "center" }}>{error}</div><FormText style={{ textAlign: "center" }}>Possibly the certificate can be decoded on the server side</FormText></>}
 
-         {certificate && <><br /><CertificateAttributes certificate={certificate} /></> }
+         {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
+
+         <br />
+
+         <div className="d-flex justify-content-end">
+
+            <ButtonGroup>
+
+               <Button
+                  color="primary"
+                  onClick={() => onUpload({ fileContent: file, fileName, contentType })}
+                  disabled={!file}
+               >
+                  Upload
+               </Button>
+
+               <Button
+                  color="default"
+                  onClick={onCancel}
+               >
+                  Cancel
+               </Button>
+
+
+
+            </ButtonGroup>
+
+         </div>
 
 
       </div>

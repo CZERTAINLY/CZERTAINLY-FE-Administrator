@@ -400,12 +400,9 @@ export default function CertificateList() {
          <Dialog
             isOpen={upload}
             caption={`Upload Certificate`}
-            body={<CertificateUploadDialog />}
+            body={<CertificateUploadDialog onCancel={() => setUpload(false)} onUpload={(data) => onUploadClick(data)} />}
             toggle={() => setUpload(false)}
-            buttons={[
-               { color: "primary", onClick: (data) => { onUploadClick(data) }, body: "Upload" },
-               { color: "secondary", onClick: () => setUpload(false), body: "Cancel" },
-            ]}
+            buttons={[]}
          />
 
 
