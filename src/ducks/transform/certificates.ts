@@ -1,6 +1,7 @@
-import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO, CertificateValidationResultModel } from "api/certificates";
 import { RaProfileDTO } from "api/profiles";
 import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel } from "models";
+import { join } from "path";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -39,14 +40,9 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
          x400Address: sanClone.x400Address
       },
 
-      meta: certificate.meta ? {
-         cipherSuite: certificate.meta.cipherSuite,
-         discoverySource: certificate.meta.discoverySource
-      } : undefined,
+      meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
 
-      certificateValidationResult: certificate.certificateValidationResult ? {
-         status: certificate.certificateValidationResult.status
-      } : undefined,
+      certificateValidationResult: certificate.certificateValidationResult ? certificate.certificateValidationResult : undefined,
 
       entity: certificate.entity ? {
          uuid: certificate.entity.uuid,
@@ -110,10 +106,7 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
          x400Address: sanClone.x400Address
       },
 
-      meta: certificate.meta ? {
-         cipherSuite: certificate.meta.cipherSuite,
-         discoverySource: certificate.meta.discoverySource
-      } : undefined,
+      meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
 
       certificateValidationResult: certificate.certificateValidationResult ? {
          status: certificate.certificateValidationResult.status

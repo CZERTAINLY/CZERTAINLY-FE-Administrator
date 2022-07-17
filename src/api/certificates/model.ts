@@ -1,7 +1,7 @@
 import { GroupDTO } from "api/groups";
 import { Observable } from "rxjs";
 
-import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } from "types/certificate";
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
 
 
 export interface CertificateRAProfileDTO {
@@ -15,7 +15,7 @@ export interface CertificateEntityDTO {
    uuid: string;
    name: string;
    description?: string;
-   entityType: "server" | "router" | "HSM" | "switch" | "loadBallancer" | "firewall" | "MDM" | "cloud";
+   entityType: "server" | "router" | "HSM" | "switch" | "loadBalancer" | "firewall" | "MDM" | "cloud";
 }
 
 
@@ -67,8 +67,6 @@ export interface CertificateSubjectAlternativeNamesDTO {
 
 export interface CertificateMetaDTO {
    [key: string]: string;
-   discoverySource: string;
-   cipherSuite: string;
 }
 
 
@@ -77,15 +75,14 @@ export interface CertificateListFilterDTO {
    condition: string;
    value?: any;
 }
+ 
+ export interface ValidationResult {
+   status: ValidationStatus;
+   message: string;
+ }
 
-
-export interface CertificateValidationResultRecordDTO {
-   status: "success" | "failed" | "warning" | "revoked" | "not_checked" | "invalid" | "expiring" | "expired";
-}
-
-
-export interface CertificateValidationResultDTO {
-   [key: string]: CertificateValidationResultRecordDTO;
+export interface CertificateValidationResultModel {
+   [key: string]: ValidationResult;
 }
 
 
@@ -106,14 +103,14 @@ export interface CertificateDTO {
    keyUsage: string[];
    extendedKeyUsage?: string[];
    basicConstraints: string;
-   status: "valid" | "revoked" | "expired" | "unknown" | "expiring" | "new" | "invalid";
+   status: Status;
    fingerprint: string;
    certificateType?: "X509" | "SSH";
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesDTO;
    meta?: CertificateMetaDTO;
 
-   certificateValidationResult?: CertificateValidationResultRecordDTO;
+   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityDTO;
    group?: GroupDTO;
    owner?: string;

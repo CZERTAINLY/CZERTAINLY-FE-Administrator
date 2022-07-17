@@ -1,11 +1,7 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
-import { CertificateEvent, CertificateFilterCondition, CertificateFilterField } from "types/certificate";
+import { CertificateValidationResultModel, ValidationResult } from "api/certificates";
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status } from "types/certificate";
 import { GroupModel } from "./groups";
-
-
-interface CertificateValidationResultRecordModel {
-   status: "success" | "failed" | "warning" | "revoked" | "not_checked" | "invalid" | "expiring" | "expired";
-}
 
 
 export interface CertificateListQueryFilterModel {
@@ -69,14 +65,12 @@ interface CertificateEntityModel {
    uuid: string;
    name: string;
    description?: string;
-   entityType: "server" | "router" | "HSM" | "switch" | "loadBallancer" | "firewall" | "MDM" | "cloud";
+   entityType: "server" | "router" | "HSM" | "switch" | "loadBalancer" | "firewall" | "MDM" | "cloud";
 }
 
 
 interface CertificateMetaModel {
    [key: string]: string;
-   discoverySource: string;
-   cipherSuite: string;
 }
 
 
@@ -104,14 +98,14 @@ export interface CertificateModel {
    keyUsage: string[];
    extendedKeyUsage?: string[];
    basicConstraints: string;
-   status: "valid" | "revoked" | "expired" | "unknown" | "expiring" | "new" | "invalid";
+   status: Status;
    fingerprint: string;
    certificateType?: "X509" | "SSH";
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
    meta?: CertificateMetaModel;
 
-   certificateValidationResult?: CertificateValidationResultRecordModel;
+   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityModel;
    group?: GroupModel;
    owner?: string;
