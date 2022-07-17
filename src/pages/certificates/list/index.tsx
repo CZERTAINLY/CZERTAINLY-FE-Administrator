@@ -14,6 +14,7 @@ import ToolTip from "components/ToolTip";
 import CertificateInventoryFilter from "components/pages/certificates/CertificateInventoryFilter";
 import { CertificateListQueryFilterModel } from "models";
 import Dialog from "components/Dialog";
+import CertificateUploadDialog from "components/pages/connectors/CertificateUploadDialog";
 
 export default function CertificateList() {
 
@@ -105,12 +106,33 @@ export default function CertificateList() {
 
    );
 
+
    const onAddClick = useCallback(
 
       () => {
          history.push(`${path}/add`);
       },
       [history, path]
+
+   );
+
+
+   const onUploadClick = useCallback(
+
+      (data: { fileName: string, contentType: string, fileContent: string }) => {
+
+         if (data.fileContent) {
+
+            try {
+               dispatch(actions.uploadCertificate({ certificate: data.fileContent }));
+            } catch (error) {
+            }
+         }
+
+         setUpload(false);
+
+      },
+      [dispatch]
 
    );
 
@@ -365,10 +387,10 @@ export default function CertificateList() {
          <Dialog
             isOpen={upload}
             caption={`Upload Certificate`}
-            body={`Upload`}
+            body={<CertificateUploadDialog />}
             toggle={() => setUpload(false)}
             buttons={[
-               { color: "danger", onClick: () => { }, body: "Upload" },
+               { color: "primary", onClick: (data) => { onUploadClick(data) }, body: "Upload" },
                { color: "secondary", onClick: () => setUpload(false), body: "Cancel" },
             ]}
          />
@@ -392,7 +414,7 @@ export default function CertificateList() {
             body={`Update Group`}
             toggle={() => setUpdateGroup(false)}
             buttons={[
-               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "primary", onClick: () => { }, body: "Update" },
                { color: "secondary", onClick: () => setUpdateGroup(false), body: "Cancel" },
             ]}
          />
@@ -404,7 +426,7 @@ export default function CertificateList() {
             body={`Update Owner`}
             toggle={() => setUpdateOwner(false)}
             buttons={[
-               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "primary", onClick: () => { }, body: "Update" },
                { color: "secondary", onClick: () => setUpdateOwner(false), body: "Cancel" },
             ]}
          />
@@ -416,7 +438,7 @@ export default function CertificateList() {
             body={`Update Entity`}
             toggle={() => setUpdateEntity(false)}
             buttons={[
-               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "primary", onClick: () => { }, body: "Update" },
                { color: "secondary", onClick: () => setUpdateEntity(false), body: "Cancel" },
             ]}
          />
@@ -428,7 +450,7 @@ export default function CertificateList() {
             body={`Update RA Profile`}
             toggle={() => setUpdateRaProfile(false)}
             buttons={[
-               { color: "danger", onClick: () => { }, body: "Update" },
+               { color: "primary", onClick: () => { }, body: "Update" },
                { color: "secondary", onClick: () => setUpdateRaProfile(false), body: "Cancel" },
             ]}
          />
