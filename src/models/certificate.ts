@@ -28,7 +28,7 @@ export interface AvailableCertificateFilterModel {
    label: string;
    type: "string" | "number" | "list" | "date";
    conditions: CertificateFilterCondition[];
-   value?: string;
+   value?: string | string[];
    multiValue?: boolean;
 
 }

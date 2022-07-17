@@ -1,3 +1,5 @@
+
+
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch, useHistory } from "react-router-dom";
@@ -11,6 +13,8 @@ import { dateFormatter } from "utils/dateUtil";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import ToolTip from "components/ToolTip";
+import CertificateInventoryFilter from "components/pages/certificates/CertificateInventoryFilter";
+import { CertificateListQueryFilterModel } from "models";
 
 export default function CertificateList() {
 
@@ -24,7 +28,6 @@ export default function CertificateList() {
    const certificates = useSelector(selectors.certificates);
 
    const totalItems = useSelector(selectors.totalItems);
-   const totalPages = useSelector(selectors.totalPages);
 
    const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
@@ -48,6 +51,8 @@ export default function CertificateList() {
    const [pageSize, setPageSize] = useState(10);
    const [pageNumber, setPageNumber] = useState(1);
 
+   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>([]);
+
    const isBusy = isFetchingAvailablFilters || isFetchingList || isFetchingDetail || isFetchingHistory || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading || isFetchingIssuanceAttributes || isFetchingRevocationAttributes;
 
 
@@ -56,18 +61,18 @@ export default function CertificateList() {
       () => {
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
-         dispatch(actions.getAvailableCertificateFilters());
       },
       [dispatch]
 
    );
 
+
    useEffect(
 
       () => {
-         dispatch(actions.listCertificates({ query: { filters: [], itemsPerPage: pageSize, pageNumber } }));
+         dispatch(actions.listCertificates({ query: { filters, itemsPerPage: pageSize, pageNumber } }));
       },
-      [dispatch, pageSize, pageNumber]
+      [dispatch, pageSize, pageNumber, filters]
 
    );
 
@@ -291,7 +296,7 @@ export default function CertificateList() {
          totalItems: totalItems,
          pageSize: pageSize,
          totalPages: Math.ceil(totalItems / pageSize),
-         itemsPerPageOptions: [5, 10, 20, 50, 100, 200, 500, 1000],
+         itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
       }),
       [pageSize, pageNumber, totalItems]
 
@@ -304,9 +309,13 @@ export default function CertificateList() {
 
       <Container className="themed-container" fluid>
 
-         <Widget title={title} busy={isBusy}>
+         <br />
 
-            <br />
+         <CertificateInventoryFilter
+            onFiltersChanged={filters => setFilters(filters)}
+         />
+
+         <Widget title={title} busy={isBusy}>
 
             <CustomTable
                headers={certificatesRowHeaders}
