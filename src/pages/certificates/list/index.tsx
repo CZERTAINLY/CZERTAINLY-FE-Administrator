@@ -14,7 +14,8 @@ import ToolTip from "components/ToolTip";
 import CertificateInventoryFilter from "components/pages/certificates/CertificateInventoryFilter";
 import { CertificateListQueryFilterModel } from "models";
 import Dialog from "components/Dialog";
-import CertificateUploadDialog from "components/pages/connectors/CertificateUploadDialog";
+import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
+import CertificateGroupDialog from "components/pages/certificates/CertificateGroupDialog";
 
 export default function CertificateList() {
 
@@ -79,6 +80,7 @@ export default function CertificateList() {
       () => {
          dispatch(actions.listCertificates({ query: { filters, itemsPerPage: pageSize, pageNumber } }));
          dispatch(actions.setForceRefreshList({ forceRefreshList: false }));
+         dispatch(actions.setCheckedRows({checkedRows: []}));
       },
       [dispatch, filters, pageSize, pageNumber]
 
@@ -114,7 +116,10 @@ export default function CertificateList() {
 
    const onPageSizeChanged = useCallback(
 
-      (pageSize: number) => { setPageSize(pageSize); setPageNumber(1); },
+      (pageSize: number) => {
+         setPageSize(pageSize);
+         setPageNumber(1);
+      },
       [setPageSize, setPageNumber]
 
    );
@@ -150,41 +155,57 @@ export default function CertificateList() {
    );
 
 
-   const downloadDropDown = useMemo(
-      () => (
+   const onDeleteConfirmed = useCallback(
 
-         <UncontrolledButtonDropdown>
+      () => {
 
-            <DropdownToggle
-               color="light"
-               caret
-               className="btn btn-link"
-               data-for="download"
-               data-tip
-               disabled={checkedRows.length === 0}
-            >
-               <i className="fa fa-download" aria-hidden="true" />
-               <ToolTip id="download" message="Download" />
-            </DropdownToggle>
+         if (checkedRows.length === 0) return;
 
-            <DropdownMenu>
+         dispatch(actions.bulkDelete({ uuids: checkedRows, allSelect: false, inFilter: filters }));
+         setConfirmDelete(false);
 
-               <DropdownItem key="pem" onClick={() => {/*downloadFileZip(checkedRows, certData, "pem")} */ }}>
-                  PEM (.pem)
-               </DropdownItem>
-
-               <DropdownItem key="der" onClick={() => {/*downloadFileZip(checkedRows, certData, "cer") */ }}>
-                  DER (.cer)
-               </DropdownItem>
-
-            </DropdownMenu>
-
-         </UncontrolledButtonDropdown>
-
-      ),
-      [checkedRows.length]
+      },
+      [checkedRows, dispatch, filters]
 
    );
+
+
+
+   const downloadDropDown = useMemo(
+         () => (
+
+            <UncontrolledButtonDropdown>
+
+               <DropdownToggle
+                  color="light"
+                  caret
+                  className="btn btn-link"
+                  data-for="download"
+                  data-tip
+                  disabled={checkedRows.length === 0}
+               >
+                  <i className="fa fa-download" aria-hidden="true" />
+                  <ToolTip id="download" message="Download" />
+               </DropdownToggle>
+
+               <DropdownMenu>
+
+                  <DropdownItem key="pem" onClick={() => {/*downloadFileZip(checkedRows, certData, "pem")} */ }}>
+                     PEM (.pem)
+                  </DropdownItem>
+
+                  <DropdownItem key="der" onClick={() => {/*downloadFileZip(checkedRows, certData, "cer") */ }}>
+                     DER (.cer)
+                  </DropdownItem>
+
+               </DropdownMenu>
+
+            </UncontrolledButtonDropdown>
+
+         ),
+         [checkedRows.length]
+
+      );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
@@ -412,7 +433,7 @@ export default function CertificateList() {
             body={`You are about to delete ${checkedRows.length} certificate${checkedRows.length === 1 ? "" : "s"}. Are you sure?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
-               { color: "danger", onClick: () => { }, body: "Yes, delete" },
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
             ]}
          />
@@ -421,12 +442,9 @@ export default function CertificateList() {
          <Dialog
             isOpen={updateGroup}
             caption={`Update Group`}
-            body={`Update Group`}
+            body={<CertificateGroupDialog uuids={checkedRows} onCancel={() => setUpdateGroup(false)} onUpdate={() => setUpdateGroup(false) } />}
             toggle={() => setUpdateGroup(false)}
-            buttons={[
-               { color: "primary", onClick: () => { }, body: "Update" },
-               { color: "secondary", onClick: () => setUpdateGroup(false), body: "Cancel" },
-            ]}
+            buttons={[]}
          />
 
 
