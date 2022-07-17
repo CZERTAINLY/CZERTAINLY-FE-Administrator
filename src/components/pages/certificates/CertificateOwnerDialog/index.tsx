@@ -52,10 +52,10 @@ export default function CertificateOwnerDialog({
 
          <FormGroup>
 
-            <Label for="group">File name</Label>
+            <Label for="owner">File name</Label>
 
             <Input
-               id="group"
+               id="owner"
                type="text"
                value={owner}
                onChange={(e) => setOwner(e.target.value)}
