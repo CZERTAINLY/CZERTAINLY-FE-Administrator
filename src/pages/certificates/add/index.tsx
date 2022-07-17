@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import AuthorityForm from "components/Forms/AuthorityForm";
 import CertificateIssueForm from "components/Forms/CertificateIssueForm";
 
 export default function Add() {

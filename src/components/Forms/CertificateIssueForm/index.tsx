@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Form, Field } from "react-final-form";
-import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, FormText, Input, Label, Row, } from "reactstrap";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormGroup, Input, Label, Row, } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -10,7 +10,6 @@ import { mutators } from "utils/attributeEditorMutators";
 
 import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
 import { actions as raProfileActions, selectors as raProfileSelectors, } from "ducks/ra-profiles";
-import { actions as connectorsActions, selectors as connectorsSelectors } from "ducks/connectors";
 
 import ProgressButton from "components/ProgressButton";
 
