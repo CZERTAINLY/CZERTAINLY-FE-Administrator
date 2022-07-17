@@ -194,76 +194,76 @@ export default function CertificateList() {
       () => [
          {
             content: <MDBColumnName columnName="Status" />,
-            sortable: true,
+            //sortable: true,
             align: "center",
             id: "status",
             width: "5%"
          },
          {
             content: <MDBColumnName columnName="Common Name" />,
-            sortable: true,
+            //sortable: true,
             id: "commonName",
             width: "10%"
          },
          {
             content: <MDBColumnName columnName="Valid From" />,
-            sortable: true,
-            sortType: "date",
+            //sortable: true,
+            //sortType: "date",
             id: "validFrom",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Expires At" />,
-            sortable: true,
-            sortType: "date",
+            //sortable: true,
+            //sortType: "date",
             id: "expiresAt",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Entity" />,
-            sortable: true,
+            //sortable: true,
             id: "entity",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Group" />,
-            sortable: true,
+            //sortable: true,
             id: "group",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="RA Profile" />,
-            sortable: true,
+            //sortable: true,
             id: "raProfile",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Owner" />,
-            sortable: true,
+            //sortable: true,
             id: "owner",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Serial number" />,
-            sortable: true,
+            //sortable: true,
             id: "serialNumber",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Public Key Algorithm" />,
-            sortable: true,
+            //sortable: true,
             id: "publicKeyAlgorithm",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Issuer Common Name" />,
-            sortable: true,
+            //sortable: true,
             id: "issuerCommonName",
             width: "15%"
          },
          {
             content: <MDBColumnName columnName="Certificate Type" />,
-            sortable: true,
+            //sortable: true,
             id: "certificateType",
             width: "15%"
          },
@@ -353,7 +353,7 @@ export default function CertificateList() {
                onCheckedRowsChanged={setCheckedRows}
                hasCheckboxes={true}
                hasPagination={true}
-               canSearch={true}
+               canSearch={false}
                paginationData={paginationData}
                onPageChanged={setPageNumber}
                onPageSizeChanged={onPageSizeChanged}
