@@ -605,11 +605,11 @@ function CustomTable({
                      paginationData
                         ?
                         <div>
-                           Showing {paginationData.page * paginationData.pageSize + 1} to {paginationData.page * paginationData.pageSize + paginationData.pageSize} items of {paginationData.totalItems}
+                           Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to {(paginationData.page - 1) * paginationData.pageSize + paginationData.pageSize > paginationData.totalItems ? paginationData.totalItems : (paginationData.page - 1) * paginationData.pageSize + paginationData.pageSize} items of {paginationData.totalItems}
                         </div>
                         :
                         <div>
-                           Showing {(page - 1) * pageSize + 1} to {page !== totalPages ? page * pageSize : tblData.length % pageSize || pageSize} of {tblData.length} entries
+                           Showing {(page - 1) * pageSize + 1} to {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of {tblData.length} entries
                         </div>
                   }
 

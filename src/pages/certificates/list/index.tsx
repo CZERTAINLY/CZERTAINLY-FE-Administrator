@@ -85,6 +85,14 @@ export default function CertificateList() {
    );
 
 
+   const onFiltersChanged = useCallback(
+
+      fltrs => { if (fltrs !== filters) setFilters(fltrs); setPageNumber(1); },
+      [filters]
+
+   );
+
+
    const downloadDropDown = useMemo(
       () => (
 
@@ -312,7 +320,7 @@ export default function CertificateList() {
          <br />
 
          <CertificateInventoryFilter
-            onFiltersChanged={filters => setFilters(filters)}
+            onFiltersChanged={onFiltersChanged}
          />
 
          <Widget title={title} busy={isBusy}>

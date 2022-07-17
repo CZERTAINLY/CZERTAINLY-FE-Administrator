@@ -14,6 +14,7 @@ import Dialog from "components/Dialog";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { CertificateFilterCondition } from "types/certificate";
 
+const empty: CertificateListQueryFilterModel[] = [];
 
 const noValue: { [condition in CertificateFilterCondition]: boolean } = {
    "EQUALS": true,
@@ -47,7 +48,7 @@ export default function CertificateInventoryFilter({
 
    const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailablFilters);
 
-   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>([]);
+   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>(empty);
    const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 
    const [confirmClear, setConfirmClear] = useState(false);
@@ -324,7 +325,7 @@ export default function CertificateInventoryFilter({
             body={`You are about to clear Certificate Inventory Filters. Is this what you want to do?`}
             toggle={() => setConfirmClear(false)}
             buttons={[
-               { color: "danger", onClick: () => { setFilters([]); setConfirmClear(false) }, body: "Yes, clear" },
+               { color: "danger", onClick: () => { setFilters(empty); setConfirmClear(false) }, body: "Yes, clear" },
                { color: "secondary", onClick: () => setConfirmClear(false), body: "Cancel" },
             ]}
 
