@@ -16,6 +16,7 @@ import { CertificateListQueryFilterModel } from "models";
 import Dialog from "components/Dialog";
 import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
 import CertificateGroupDialog from "components/pages/certificates/CertificateGroupDialog";
+import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
 
 export default function CertificateList() {
 
@@ -215,7 +216,7 @@ export default function CertificateList() {
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete Certificate", onClick: () => { setConfirmDelete(true) } },
          { icon: "group", disabled: checkedRows.length === 0, tooltip: "Update Group", onClick: () => { setUpdateGroup(true) } },
          { icon: "user", disabled: checkedRows.length === 0, tooltip: "Update Owner", onClick: () => { setUpdateOwner(true) } },
-         { icon: "cubes", disabled: true, tooltip: "Update Entity", onClick: () => { setUpdateEntity(true) } },
+         // { icon: "cubes", disabled: true, tooltip: "Update Entity", onClick: () => { setUpdateEntity(true) } },
          { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Update RA Profile", onClick: () => { setUpdateRaProfile(true) } },
          { icon: "download", disabled: checkedRows.length === 0, tooltip: "Download", custom: downloadDropDown, onClick: () => { } }
       ],
@@ -451,12 +452,9 @@ export default function CertificateList() {
          <Dialog
             isOpen={updateOwner}
             caption={`Update Owner`}
-            body={`Update Owner`}
+            body={<CertificateOwnerDialog uuids={checkedRows} onCancel={() => setUpdateOwner(false)} onUpdate={() => setUpdateOwner(false) } />}
             toggle={() => setUpdateOwner(false)}
-            buttons={[
-               { color: "primary", onClick: () => { }, body: "Update" },
-               { color: "secondary", onClick: () => setUpdateOwner(false), body: "Cancel" },
-            ]}
+            buttons={[]}
          />
 
 
