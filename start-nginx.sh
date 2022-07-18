@@ -3,12 +3,18 @@
 export EXISTING_VARS=$(printenv | awk -F= '{print $1}' | sed 's/^/\$/g' | paste -sd,);
 
 configFile=/usr/share/nginx/html/config.js
-cat $configFile | envsubst $EXISTING_VARS | tee $configFile
+tmpConfigFile=/usr/share/nginx/html/config.js.tmp
+envsubst $EXISTING_VARS < $configFile > $tmpConfigFile
+mv $tmpConfigFile $configFile
 
 nginxFile=/etc/nginx/conf.d/default.conf
-cat $nginxFile | envsubst $EXISTING_VARS | tee $nginxFile
+tmpNginxFile=/etc/nginx/conf.d/default.conf.tmp
+envsubst $EXISTING_VARS < $nginxFile > $tmpNginxFile
+mv $tmpNginxFile $nginxFile
 
 indexFile=/usr/share/nginx/html/index.html
-cat $indexFile | sed 's/"\/administrator/"\'"$BASE_URL"'/g' | tee $indexFile
+tmpIndexFile=/usr/share/nginx/html/index.html.tmp
+sed 's/"\/administrator/"\'"$BASE_URL"'/g' $indexFile > $tmpIndexFile
+mv $tmpIndexFile $indexFile
 
 nginx -g 'daemon off;'
