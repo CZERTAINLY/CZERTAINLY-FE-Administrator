@@ -102,7 +102,7 @@ export function extractError(err: HttpErrorResponse, headline: string): string {
 
    if (err.status === 422) {
       if (typeof err.error === "string") return `${headline} ${err.error}`;
-      return `${headline} ${err.error.join(", ")}`;
+      return `${headline}. ${err.error.join(", ")}`;
    }
 
    return err.error.message ? `${headline}: ${err.error.message}` : headline;
