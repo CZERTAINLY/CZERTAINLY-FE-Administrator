@@ -92,7 +92,7 @@ export interface AcmeProfilesManagementApi {
 
    bulkForceDeleteAcmeProfiles(uuids: string[]): Observable<void>;
 
-   deleteRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void>;
+   updateRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void>;
 
 
 }

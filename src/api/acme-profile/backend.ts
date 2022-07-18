@@ -177,10 +177,10 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
 
    }
 
-   deleteRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
+   updateRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "DELETE")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "PUT")
       );
 
    }
