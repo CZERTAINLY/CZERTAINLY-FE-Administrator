@@ -378,7 +378,7 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
 
    }
 
-   deleteRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
+   updateRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
 
       return of(
          null
