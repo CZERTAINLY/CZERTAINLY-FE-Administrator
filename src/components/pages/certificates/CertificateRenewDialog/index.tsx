@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Button, ButtonGroup, Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
+import { Button, ButtonGroup, FormGroup, FormText, Input, Label } from "reactstrap";
 
 interface Props {
    onCancel: () => void,
@@ -96,20 +96,20 @@ export default function CertificateRenewDialog({
       <div>
 
          <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
-                  <FormGroup>
+            <FormGroup>
 
-                     <Label for="fileName">File name</Label>
+               <Label for="fileName">File name</Label>
 
-                     <Input
-                        id="fileName"
-                        type="text"
-                        placeholder="File not selected"
-                        disabled={true}
-                        style={{ textAlign: "center" }}
-                        value={fileName}
-                     />
+               <Input
+                  id="fileName"
+                  type="text"
+                  placeholder="File not selected"
+                  disabled={true}
+                  style={{ textAlign: "center" }}
+                  value={fileName}
+               />
 
-                  </FormGroup>
+            </FormGroup>
 
 
 

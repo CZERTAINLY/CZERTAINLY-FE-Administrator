@@ -23,7 +23,7 @@ export function getOrCreateCertificate(certificateContent: string | undefined, c
    const dtoctr: CertificateDTO = {
       ...mcrt,
       subjectAlternativeNames: {
-         dNSName:  mcrt.subjectAlternativeNames?.dNSName || [],
+         dNSName: mcrt.subjectAlternativeNames?.dNSName || [],
          directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
          ediPartyName: mcrt.subjectAlternativeNames?.ediPartyName || [],
          iPAddress: mcrt.subjectAlternativeNames?.iPAddress || [],

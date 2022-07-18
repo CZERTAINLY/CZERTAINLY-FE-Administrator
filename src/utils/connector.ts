@@ -26,5 +26,7 @@ export function inventoryStatus(status: String) {
 
       default:
          return [status || "Unknown", "dark"];
+
    }
+
 }

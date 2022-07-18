@@ -6,16 +6,22 @@ import DiscoveryDetail from "./detail";
 import DiscoveryList from "./list";
 
 function Discovery() {
+
   const { path } = useRouteMatch();
 
   return (
+
     <Switch>
+
       <Route path={path} component={DiscoveryList} exact />
       <Route path={`${path}/list`} component={DiscoveryList} exact />
       <Route path={`${path}/detail/:id`} component={DiscoveryDetail} exact />
       <Route path={`${path}/add`} component={DiscoveryAdd} exact />
+
     </Switch>
+
   );
+
 }
 
 export default Discovery;

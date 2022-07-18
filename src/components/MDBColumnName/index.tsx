@@ -5,7 +5,9 @@ interface Props {
 }
 
 function MDBColumnName({ columnName }: Props) {
+
   return <strong>{columnName}</strong>;
+
 }
 
 export default MDBColumnName;

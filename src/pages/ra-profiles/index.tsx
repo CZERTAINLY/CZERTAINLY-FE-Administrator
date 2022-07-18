@@ -19,6 +19,7 @@ function RaProfiles() {
          <Route path={`${path}/detail/:id`} component={ProfileDetail} exact />
          <Route path={`${path}/edit/:id`} component={ProfileEdit} exact />
          <Route path={`${path}/add`} component={ProfileAdd} exact />
+
       </Switch>
 
    );

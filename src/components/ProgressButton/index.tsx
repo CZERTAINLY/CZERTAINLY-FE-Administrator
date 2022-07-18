@@ -25,7 +25,7 @@ function ProgressButton({
 
    return (
 
-      <Button  className={className} color={color} type={type} disabled={disabled || inProgress} onClick={onClick}>
+      <Button className={className} color={color} type={type} disabled={disabled || inProgress} onClick={onClick}>
 
          {inProgress ? (
             <div>
