@@ -485,7 +485,8 @@ const connectConnector: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.connectors.connectToConnector(
             action.payload.url,
             action.payload.authType,
-            action.payload.authAttributes?.map(transformAttributeModelToDTO)
+            action.payload.authAttributes?.map(transformAttributeModelToDTO),
+            action.payload.uuid
          ).pipe(
 
             map(
