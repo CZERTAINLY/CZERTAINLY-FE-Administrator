@@ -166,7 +166,7 @@ function ConnectorForm({ title }: Props) {
 
    const onConnectClick = (values: FormValues) => {
       if (editMode) {
-         dispatch(conenctorActions.reconnectConnector({ uuid: connector!.uuid }));
+         dispatch(conenctorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
       } else {
          dispatch(conenctorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
       }
