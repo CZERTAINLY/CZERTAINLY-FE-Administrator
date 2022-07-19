@@ -405,8 +405,28 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
       )
 
    )
-
 }
+
+const deleteCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteCertificateSuccess.match
+      ),
+      switchMap(
+
+         () => {
+            history.push(`../`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+};
+
 
 
 const deleteCertificateFailure: AppEpic = (action$, state, deps) => {
@@ -1005,6 +1025,7 @@ const epics = [
    getAvailableCertificateFiltersFailure,
    getCertificateHistory,
    deleteCertificate,
+   deleteCertificateSuccess,
    deleteCertificateFailure,
    updateGroup,
    updateGroupFailure,

@@ -1,4 +1,4 @@
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryModel, CertificateModel } from "models/certificate";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryFilterModel, CertificateListQueryModel, CertificateModel } from "models/certificate";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeModel } from "models/attributes/AttributeModel";
@@ -19,6 +19,7 @@ export type State = {
    lastQuery?: CertificateListQueryModel;
 
    availableFilters: AvailableCertificateFilterModel[];
+   currentFilters: CertificateListQueryFilterModel[];
 
    certificates: CertificateModel[];
    totalPages: number;
@@ -68,6 +69,7 @@ export const initialState: State = {
    deleteErrorMessage: "",
 
    availableFilters: [],
+   currentFilters: [], // used just in the filter
 
    certificates: [],
    totalPages: 0,
@@ -138,6 +140,13 @@ export const slice = createSlice({
       clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
 
          state.deleteErrorMessage = "";
+
+      },
+
+
+      setCurrentFilters: (state, action: PayloadAction<{ currentFilters: CertificateListQueryFilterModel[] }>) => {
+
+         state.currentFilters = action.payload.currentFilters;
 
       },
 
@@ -659,6 +668,7 @@ const checkedRows = createSelector(state, state => state.checkedRows);
 const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
 
 const availableCertificateFilters = createSelector(state, state => state.availableFilters);
+const currentCertificateFilters = createSelector(state, state => state.currentFilters);
 
 const certificates = createSelector(state, state => state.certificates);
 const totalItems = createSelector(state, state => state.totalItems);
@@ -702,6 +712,7 @@ export const selectors = {
    checkedRows,
    deleteErrorMessage,
    availableCertificateFilters,
+   currentCertificateFilters,
    certificates,
    totalItems,
    totalPages,
