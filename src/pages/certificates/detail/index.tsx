@@ -25,238 +25,238 @@ import { downloadFile, formatPEM } from "utils/certificate";
 
 export default function CertificateDetail() {
 
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-   const { params } = useRouteMatch<{ id: string }>();
+  const { params } = useRouteMatch<{ id: string }>();
 
-   const certificate = useSelector(selectors.certificateDetail);
+  const certificate = useSelector(selectors.certificateDetail);
 
-   const groups = useSelector(groupSelectors.groups);
-   const raProfiles = useSelector(raProfileSelectors.raProfiles);
+  const groups = useSelector(groupSelectors.groups);
+  const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
-   const eventHistory = useSelector(selectors.certificateHistory);
+  const eventHistory = useSelector(selectors.certificateHistory);
 
-   const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
-   const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
+  const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
+  const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
 
-   const isFetching = useSelector(selectors.isFetchingDetail);
-   const isDeleting = useSelector(selectors.isDeleting);
-   const isUpdatingRaProfile = useSelector(selectors.isUpdatingRaProfile);
-   const isUpdatingGroup = useSelector(selectors.isUpdatingGroup);
-   const isUpdatingOwner = useSelector(selectors.isUpdatingOwner);
-   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
-   const isRevoking = useSelector(selectors.isRevoking);
-   const isRenewing = useSelector(selectors.isRenewing);
+  const isFetching = useSelector(selectors.isFetchingDetail);
+  const isDeleting = useSelector(selectors.isDeleting);
+  const isUpdatingRaProfile = useSelector(selectors.isUpdatingRaProfile);
+  const isUpdatingGroup = useSelector(selectors.isUpdatingGroup);
+  const isUpdatingOwner = useSelector(selectors.isUpdatingOwner);
+  const isFetchingHistory = useSelector(selectors.isFetchingHistory);
+  const isRevoking = useSelector(selectors.isRevoking);
+  const isRenewing = useSelector(selectors.isRenewing);
 
-   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-   const [renew, setRenew] = useState<boolean>(false);
-   const [revoke, setRevoke] = useState<boolean>(false);
-   const [updateGroup, setUpdateGroup] = useState<boolean>(false);
-   const [updateOwner, setUpdateOwner] = useState<boolean>(false);
-   const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const [renew, setRenew] = useState<boolean>(false);
+  const [revoke, setRevoke] = useState<boolean>(false);
+  const [updateGroup, setUpdateGroup] = useState<boolean>(false);
+  const [updateOwner, setUpdateOwner] = useState<boolean>(false);
+  const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
-   const [currentInfoId, setCurrentInfoId] = useState("");
+  const [currentInfoId, setCurrentInfoId] = useState("");
 
-   const [group, setGroup] = useState<string>();
-   const [owner, setOwner] = useState<string>();
-   const [raProfile, setRaProfile] = useState<string>();
-   const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
+  const [group, setGroup] = useState<string>();
+  const [owner, setOwner] = useState<string>();
+  const [raProfile, setRaProfile] = useState<string>();
+  const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
-   const isBusy = useMemo(
-      () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing,
-      [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing]
-   );
+  const isBusy = useMemo(
+     () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing,
+     [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing]
+  );
 
 
-   useEffect(
+  useEffect(
 
-      () => {
+     () => {
 
-         if (!params.id) return;
-         dispatch(actions.resetState())
-         dispatch(actions.getCertificateDetail({ uuid: params.id }));
-         dispatch(actions.getCertificateHistory({ uuid: params.id }));
+        if (!params.id) return;
+        dispatch(actions.resetState())
+        dispatch(actions.getCertificateDetail({ uuid: params.id }));
+        dispatch(actions.getCertificateHistory({ uuid: params.id }));
 
-      },
-      [dispatch, params.id]
+     },
+     [dispatch, params.id]
 
-   )
+  )
 
-   useEffect(
+  useEffect(
 
-      () => {
+    () => {
 
-         if (!params.id || !updateGroup) return;
-         dispatch(groupAction.listGroups());
-      },
-      [dispatch, updateGroup, params.id]
-   )
+       if (!params.id || !updateGroup) return;
+       dispatch(groupAction.listGroups());
+    },
+    [dispatch, updateGroup, params.id]
+ )
 
-   useEffect(
+ useEffect(
 
-      () => {
+  () => {
 
-         setGroupOptions(groups.map(group => ({ value: group.uuid, label: group.name })));
-      },
-      [dispatch, groups]
-   )
+     setGroupOptions(groups.map(group => ({ value: group.uuid, label: group.name })));
+  },
+  [dispatch, groups]
+)
 
-   useEffect(
+useEffect(
 
-      () => {
+  () => {
 
-         setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name })));
-      },
-      [dispatch, raProfiles]
-   )
+     setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name })));
+  },
+  [dispatch, raProfiles]
+)
 
 
 
-   useEffect(
+ useEffect(
 
-      () => {
+  () => {
 
-         if (!params.id || !updateGroup) return;
-         dispatch(groupAction.listGroups());
-      },
-      [dispatch, updateGroup, params.id]
-   )
+     if (!params.id || !updateGroup) return;
+     dispatch(groupAction.listGroups());
+  },
+  [dispatch, updateGroup, params.id]
+)
 
 
-   useEffect(
+useEffect(
 
-      () => {
+  () => {
 
-         if (!params.id || !revoke) return;
-         dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
-      },
-      [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
-   )
+     if (!params.id || !revoke) return;
+     dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
+  },
+  [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
+)
 
 
 
-   useEffect(
+ useEffect(
 
-      () => {
+  () => {
 
-         if (!params.id || !updateRaProfile) return;
-         dispatch(raProfileAction.listRaProfiles());
-      },
-      [dispatch, updateRaProfile, params.id]
-   )
+     if (!params.id || !updateRaProfile) return;
+     dispatch(raProfileAction.listRaProfiles());
+  },
+  [dispatch, updateRaProfile, params.id]
+)
 
 
-   const onDeleteConfirmed = useCallback(
+  const onDeleteConfirmed = useCallback(
 
-      () => {
+     () => {
 
-         if (!certificate) return;
+        if (!certificate) return;
 
-         dispatch(actions.deleteCertificate({ uuid: certificate.uuid }));
-         setConfirmDelete(false);
+        dispatch(actions.deleteCertificate({ uuid: certificate.uuid }));
+        setConfirmDelete(false);
 
-      },
-      [certificate, dispatch]
+     },
+     [certificate, dispatch]
 
-   );
+  );
 
-   const onCancelGroupUpdate = useCallback(
+  const onCancelGroupUpdate = useCallback(
 
-      () => {
-         setUpdateGroup(false);
-         setGroup(undefined);
+    () => {
+      setUpdateGroup(false);
+      setGroup(undefined);
 
-      },
-      [setUpdateGroup, setGroup]
-   );
+    },
+    [setUpdateGroup, setGroup]
+ );
 
-   const onCancelOwnerUpdate = useCallback(
+ const onCancelOwnerUpdate = useCallback(
 
-      () => {
-         setUpdateOwner(false);
-         setOwner(undefined);
+  () => {
+    setUpdateOwner(false);
+    setOwner(undefined);
 
-      },
-      [setUpdateOwner, setOwner]
-   );
+  },
+  [setUpdateOwner, setOwner]
+);
 
-   const onCancelRaProfileUpdate = useCallback(
+const onCancelRaProfileUpdate = useCallback(
 
-      () => {
-         setUpdateRaProfile(false);
-         setRaProfile(undefined);
+  () => {
+    setUpdateRaProfile(false);
+    setRaProfile(undefined);
 
-      },
-      [setUpdateRaProfile, setRaProfile]
-   );
+  },
+  [setUpdateRaProfile, setRaProfile]
+);
 
 
-   const onUpdateGroup = useCallback(
+  const onUpdateGroup = useCallback(
 
-      () => {
+    () => {
 
-         if (!certificate || !group) return;
+       if (!certificate || !group) return;
 
-         dispatch(actions.updateGroup({ uuid: certificate.uuid, groupUuid: group }));
-         setUpdateGroup(false);
+       dispatch(actions.updateGroup({ uuid: certificate.uuid, groupUuid: group }));
+       setUpdateGroup(false);
 
-      },
-      [certificate, dispatch, group]
+    },
+    [certificate, dispatch, group]
 
-   );
+  );
 
-   const onUpdateOwner = useCallback(
+ const onUpdateOwner = useCallback(
 
-      () => {
+  () => {
 
-         if (!certificate || !owner) return;
+     if (!certificate || !owner) return;
 
-         dispatch(actions.updateOwner({ uuid: certificate.uuid, owner: owner }));
-         setUpdateOwner(false);
+     dispatch(actions.updateOwner({ uuid: certificate.uuid,  owner: owner }));
+     setUpdateOwner(false);
 
-      },
-      [certificate, dispatch, owner]
+  },
+  [certificate, dispatch, owner]
 
-   );
+  );
 
-   const onUpdateRaProfile = useCallback(
+const onUpdateRaProfile = useCallback(
 
-      () => {
+  () => {
 
-         if (!certificate || !raProfile) return;
+     if (!certificate || !raProfile) return;
 
-         dispatch(actions.updateRaProfile({ uuid: certificate.uuid, raProfileUuid: raProfile }));
-         setUpdateRaProfile(false);
+     dispatch(actions.updateRaProfile({ uuid: certificate.uuid,  raProfileUuid: raProfile }));
+     setUpdateRaProfile(false);
 
-      },
-      [certificate, dispatch, raProfile]
+  },
+  [certificate, dispatch, raProfile]
 
 
-   );
+  );
 
-   const onRevoke = useCallback(
+  const onRevoke = useCallback(
 
-      () => {
+    () => {
 
-         if (!certificate) return;
+       if (!certificate) return;
 
-         dispatch(actions.revokeCertificate({ uuid: certificate.uuid, reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "" }));
-         setRevoke(false);
+       dispatch(actions.revokeCertificate({ uuid: certificate.uuid,  reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "" }));
+       setRevoke(false);
 
-      },
-      [certificate, dispatch, revokeReason,]
+    },
+    [certificate, dispatch, revokeReason, ]
 
 
-   );
+    );
 
-   const onRenew = useCallback(
+    const onRenew = useCallback(
 
       (data: { fileName: string, contentType: string, fileContent: string }) => {
 
          if (data.fileContent) {
 
             try {
-               dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || "" }));
+               dispatch(actions.renewCertificate({uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || ""}));
             } catch (error) {
             }
          }
@@ -271,686 +271,690 @@ export default function CertificateDetail() {
    const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
 
    const downloadDropDown = useMemo(
-      () => (
+    () => (
 
-         <UncontrolledButtonDropdown>
+       <UncontrolledButtonDropdown>
 
-            <DropdownToggle
-               color="light"
-               caret
-               className="btn btn-link"
-               data-for="download"
-               data-tip
-            >
-               <i className="fa fa-download" aria-hidden="true" />
-               <ToolTip id="download" message="Download" />
-            </DropdownToggle>
+          <DropdownToggle
+             color="light"
+             caret
+             className="btn btn-link"
+             data-for="download"
+             data-tip
+          >
+             <i className="fa fa-download" aria-hidden="true" />
+             <ToolTip id="download" message="Download" />
+          </DropdownToggle>
 
-            <DropdownMenu>
+          <DropdownMenu>
 
-               <DropdownItem key="pem" onClick={() => downloadFile(
+             <DropdownItem key="pem" onClick={() => downloadFile(
                   formatPEM(certificate?.certificateContent || ""),
                   fileNameToDownload + ".pem"
-               )
-               }>
-                  PEM (.pem)
-               </DropdownItem>
+                )
+              }>
+                PEM (.pem)
+             </DropdownItem>
 
-               <DropdownItem key="der" onClick={() => {
-                  downloadFile(
-                     Buffer.from(certificate?.certificateContent || "", "base64"),
-                     fileNameToDownload + ".cer"
-                  )
-               }}>
-                  DER (.cer)
-               </DropdownItem>
+             <DropdownItem key="der" onClick={() => {downloadFile(
+                  Buffer.from(certificate?.certificateContent || "", "base64"),
+                  fileNameToDownload + ".cer"
+                )}}>
+                DER (.cer)
+             </DropdownItem>
 
-            </DropdownMenu>
+          </DropdownMenu>
 
-         </UncontrolledButtonDropdown>
+       </UncontrolledButtonDropdown>
 
-      ),
-      [certificate, fileNameToDownload,]
+    ),
+    [certificate, fileNameToDownload, ]
 
-   );
+ );
 
-   const buttons: WidgetButtonProps[] = useMemo(
+  const buttons: WidgetButtonProps[] = useMemo(
 
-      () => [
-         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "retweet", disabled: certificate?.raProfile === undefined, tooltip: "Renew", onClick: () => { setRenew(true); } },
-         { icon: "minus-square", disabled: certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
-         { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
-      ],
-      [certificate, downloadDropDown]
-   );
+     () => [
+        { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+        { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
+        { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
+        { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
+     ],
+     [certificate, downloadDropDown]
+  );
 
 
-   const updateOwnerBody = useMemo(
+  const updateOwnerBody = useMemo(
 
-      () => (
+    () => (
 
-         <div>
-            <Label for="Owner Name">Owner</Label>
-            <Input
-               type="text"
-               placeholder="Enter the owner name / Email"
-               onChange={(event) => setOwner(event.target.value)}
-            ></Input>
-         </div>
+       <div>
+        <Label for="Owner Name">Owner</Label>
+          <Input
+            type="text"
+            placeholder="Enter the owner name / Email"
+            onChange={(event) => setOwner(event.target.value)}
+          ></Input>
+       </div>
 
-      ),
-      [setOwner]
+    ),
+    [setOwner]
 
-   );
+ );
 
-   const updateGroupBody = useMemo(
+ const updateGroupBody = useMemo(
 
-      () => {
-         return (<div>
-            <Select
-               maxMenuHeight={140}
-               menuPlacement="auto"
-               options={groupOptions}
-               placeholder={`Select Group`}
-               onChange={(event) => setGroup(event?.value)}
-            />
-         </div>
-         )
+  () => {
+     return (<div>
+      <Select
+          maxMenuHeight={140}
+          menuPlacement="auto"
+          options={groupOptions}
+          placeholder={`Select Group`}
+          onChange = {(event) => setGroup(event?.value)}
+      />
+     </div>
+  )
+     },
+  [setGroup, groupOptions]
+
+);
+
+
+const updateRaProfileBody = useMemo(
+
+  () => {
+     return (<div>
+      <Select
+          maxMenuHeight={140}
+          menuPlacement="auto"
+          options={raProfileOptions}
+          placeholder={`Select RA Profile`}
+          onChange = {(event) => setRaProfile(event?.value)}
+      />
+     </div>
+  )
+     },
+  [setRaProfile, raProfileOptions]
+
+);
+
+
+const revokeBody = useMemo(
+
+  () => {
+    let options = [
+      {
+         "label":"UNSPECIFIED",
+         "value":'UNSPECIFIED'
       },
-      [setGroup, groupOptions]
-
-   );
-
-
-   const updateRaProfileBody = useMemo(
-
-      () => {
-         return (<div>
-            <Select
-               maxMenuHeight={140}
-               menuPlacement="auto"
-               options={raProfileOptions}
-               placeholder={`Select RA Profile`}
-               onChange={(event) => setRaProfile(event?.value)}
-            />
-         </div>
-         )
+      {
+         "label":"KEY_COMPROMISE",
+         "value":'KEY_COMPROMISE'
       },
-      [setRaProfile, raProfileOptions]
-
-   );
-
-
-   const revokeBody = useMemo(
-
-      () => {
-         let options = [
-            {
-               "label": "UNSPECIFIED",
-               "value": 'UNSPECIFIED'
-            },
-            {
-               "label": "KEY_COMPROMISE",
-               "value": 'KEY_COMPROMISE'
-            },
-            {
-               "label": "CA_COMPROMISE",
-               "value": 'CA_COMPROMISE'
-            },
-            {
-               "label": "AFFILIATION_CHANGED",
-               "value": 'AFFILIATION_CHANGED'
-            },
-            {
-               "label": "SUPERSEDED",
-               "value": 'SUPERSEDED'
-            },
-            {
-               "label": "CESSATION_OF_OPERATION",
-               "value": 'CESSATION_OF_OPERATION'
-            },
-            {
-               "label": "CERTIFICATE_HOLD",
-               "value": 'CERTIFICATE_HOLD'
-            },
-            {
-               "label": "PRIVILEGE_WITHDRAWN",
-               "value": 'PRIVILEGE_WITHDRAWN'
-            },
-            {
-               "label": "A_A_COMPROMISE",
-               "value": 'A_A_COMPROMISE'
-            },
-            {
-               "label": "REMOVE_FROM_CRL",
-               "value": 'REMOVE_FROM_CRL'
-            }
-         ]
-
-         return (<div>
-            <Select
-               maxMenuHeight={140}
-               menuPlacement="auto"
-               options={options}
-               placeholder={`Select Revocation Reason`}
-               onChange={(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
-            />
-
-         </div>
-         )
+      {
+         "label":"CA_COMPROMISE",
+         "value":'CA_COMPROMISE'
       },
-      [setRevokeReason]
+      {
+         "label":"AFFILIATION_CHANGED",
+         "value":'AFFILIATION_CHANGED'
+      },
+      {
+         "label":"SUPERSEDED",
+         "value":'SUPERSEDED'
+      },
+      {
+         "label":"CESSATION_OF_OPERATION",
+         "value":'CESSATION_OF_OPERATION'
+      },
+      {
+         "label":"CERTIFICATE_HOLD",
+         "value":'CERTIFICATE_HOLD'
+      },
+      {
+         "label":"PRIVILEGE_WITHDRAWN",
+         "value":'PRIVILEGE_WITHDRAWN'
+      },
+      {
+         "label":"A_A_COMPROMISE",
+         "value":'A_A_COMPROMISE'
+      },
+      {
+         "label":"REMOVE_FROM_CRL",
+         "value":'REMOVE_FROM_CRL'
+      }
+   ]
 
-   );
+     return (<div>
+      <Select
+          maxMenuHeight={140}
+          menuPlacement="auto"
+          options={options}
+          placeholder={`Select Revocation Reason`}
+          onChange = {(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
+      />
 
-   const certificateTitle = useMemo(
+     </div>
+  )
+     },
+  [setRevokeReason]
 
-      () => (
+);
 
-         <div>
+  const certificateTitle = useMemo(
 
-            <div className="pull-right mt-n-xs">
-               <WidgetButtons buttons={buttons} />
-            </div>
+     () => (
 
-            <h5>
-               Certificate <span className="fw-semi-bold">Details</span>
-            </h5>
+        <div>
 
-         </div>
+           <div className="pull-right mt-n-xs">
+              <WidgetButtons buttons={buttons} />
+           </div>
 
-      ),
-      [buttons]
+           <h5>
+              Certificate <span className="fw-semi-bold">Details</span>
+           </h5>
 
-   );
+        </div>
+
+     ),
+     [buttons]
+
+  );
 
    const metaTitle = (
-      <h5>
-         <span className="fw-semi-bold">Meta Data</span>
-      </h5>
+     <h5>
+       <span className="fw-semi-bold">Meta Data</span>
+     </h5>
    );
 
    const validationTitle = (
-      <h5>
-         <span className="fw-semi-bold">Validation Results</span>
-      </h5>
+     <h5>
+       <span className="fw-semi-bold">Validation Results</span>
+     </h5>
    );
    const sanTitle = (
-      <h5>
-         <span className="fw-semi-bold">Subject Alternative Names</span>
-      </h5>
-   );
+    <h5>
+      <span className="fw-semi-bold">Subject Alternative Names</span>
+    </h5>
+  );
 
-   const attributesTitle = (
-      <h5>
-         Certificate <span className="fw-semi-bold">Attributes</span>
-      </h5>
-   );
+  const attributesTitle = (
+    <h5>
+      Certificate <span className="fw-semi-bold">Attributes</span>
+    </h5>
+  );
 
-   const historyTitle = (
-      <h5>
-         <span className="fw-semi-bold">Certificate Event History</span>
-      </h5>
-   );
-
-
-   const detailHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "property",
-            content: "Property",
-         },
-         {
-            id: "value",
-            content: "Value",
-         },
-      ],
-      []
-
-   );
-
-   const historyHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "time",
-            content: "Time",
-         },
-         {
-            id: "user",
-            content: "User",
-         },
-         {
-            id: "event",
-            content: "Event",
-         },
-         {
-            id: "status",
-            content: "Status",
-         },
-         {
-            id: "message",
-            content: "Message",
-         },
-         {
-            id: "additionalMessage",
-            content: "Additional Message",
-         },
-      ],
-      []
-
-   );
-
-   const historyEntry: TableDataRow[] = useMemo(
-      () => !eventHistory ? [] : eventHistory.map(function (history) {
-         return (
-            {
-               "id": history.uuid,
-               "columns": [dateFormatter(history.created),
-
-               history.createdBy,
-
-               history.event,
-
-               <CertificateEventStatus status={history.status} />,
-
-               <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
-
-               history.additionalInformation ? (
-                  <Button
-                     color="white"
-                     data-for={`addInfo${history.uuid}`}
-                     data-tip
-                     onClick={() => setCurrentInfoId(history.uuid)}
-                  >
-
-                     <i className="fa fa-info-circle" aria-hidden="true"></i>
-
-                     <ToolTip
-                        id={`addInfo${history.uuid}`}
-                        message="View Additional Information"
-                     />
-
-                  </Button>
-               ) : ""
-               ]
-            }
-         )
-      }), [eventHistory]
-   );
+  const historyTitle = (
+    <h5>
+      <span className="fw-semi-bold">Certificate Event History</span>
+    </h5>
+  );
 
 
+  const detailHeaders: TableHeader[] = useMemo(
 
-   const additionalInfoEntry = (): any => {
-      let returnList = [];
-      if (!currentInfoId) return;
-      const currentHistory = eventHistory?.filter(
-         (history) => history.uuid === currentInfoId
+     () => [
+        {
+           id: "property",
+           content: "Property",
+        },
+        {
+           id: "value",
+           content: "Value",
+        },
+     ],
+     []
+
+  );
+
+  const historyHeaders: TableHeader[] = useMemo(
+
+    () => [
+       {
+          id: "time",
+          content: "Time",
+       },
+       {
+          id: "user",
+          content: "User",
+       },
+       {
+        id: "event",
+        content: "Event",
+      },
+      {
+        id: "status",
+        content: "Status",
+      },
+      {
+        id: "message",
+        content: "Message",
+      },
+      {
+        id: "additionalMessage",
+        content: "Additional Message",
+      },
+    ],
+    []
+
+ );
+
+  const historyEntry:TableDataRow[] = useMemo(
+    () => !eventHistory ? [] : eventHistory.map(function (history) {
+      return (
+          {"id": history.uuid,
+          "columns": [dateFormatter(history.created),
+
+                      history.createdBy,
+
+                      history.event,
+
+                      <CertificateEventStatus status={history.status} />,
+
+                      <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
+
+                      history.additionalInformation ? (
+                        <Button
+                          color="white"
+                          data-for={`addInfo${history.uuid}`}
+                          data-tip
+                          onClick={() => setCurrentInfoId(history.uuid)}
+                        >
+
+                          <i className="fa fa-info-circle" aria-hidden="true"></i>
+
+                          <ToolTip
+                            id={`addInfo${history.uuid}`}
+                            message="View Additional Information"
+                          />
+
+                        </Button>
+                      ) : ""
+              ]
+          }
+      )
+    }),[eventHistory]
+  );
+
+
+
+  const additionalInfoEntry = (): any => {
+    let returnList = [];
+    if (!currentInfoId) return;
+    const currentHistory = eventHistory?.filter(
+      (history) => history.uuid === currentInfoId
+    );
+    for (let [key, value] of Object.entries(
+      currentHistory![0]?.additionalInformation
+    )) {
+      returnList.push(
+        <tr>
+          <td>{key}</td>
+          <td>
+            <p
+              style={{
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
+              {value as string}
+            </p>
+          </td>
+        </tr>
       );
-      for (let [key, value] of Object.entries(
-         currentHistory![0]?.additionalInformation
-      )) {
-         returnList.push(
-            <tr key={key}>
-               <td style={{ padding: "0.5rem", paddingRight: "2em", width: 0, whiteSpace: "nowrap", verticalAlign: "top", borderRight: "solid 1px #cccbca" }}>{key}</td>
-               <td style={{ padding: "0.5rem", verticalAlign: "top", wordBreak: "break-all" }}>
-                  {value as string}
-               </td>
-            </tr>
-         );
-      }
-      return <table style={{width: "100%"}}>{returnList}</table>;
-   };
+    }
+    return returnList;
+  };
 
 
 
-   const attributeHeaders: TableHeader[] = useMemo(
+  const attributeHeaders: TableHeader[] = useMemo(
 
-      () => [
-         {
-            id: "attribute",
-            content: "Attribute",
-         },
-         {
-            id: "value",
-            content: "Value",
-         },
-         {
-            id: "action",
-            content: "Action",
-         }
-      ],
-      []
-   );
+    () => [
+       {
+          id: "attribute",
+          content: "Attribute",
+       },
+       {
+          id: "value",
+          content: "Value",
+       },
+       {
+          id: "action",
+          content: "Action",
+       }
+    ],
+    []
+ );
 
 
 
-   const validationHeaders: TableHeader[] = useMemo(
+  const validationHeaders: TableHeader[] = useMemo(
 
-      () => [
-         {
-            id: "validationType",
-            content: "Validation Type",
-         },
-         {
-            id: "status",
-            content: "Status",
-         },
-         {
-            id: "message",
-            content: "Message",
-         }
-      ],
-      []
+     () => [
+        {
+           id: "validationType",
+           content: "Validation Type",
+        },
+        {
+           id: "status",
+           content: "Status",
+        },
+        {
+           id: "message",
+           content: "Message",
+        }
+     ],
+     []
 
-   );
+  );
 
-   const metaData: TableDataRow[] = useMemo(
+  const metaData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : Object.entries(certificate.meta || {}).map(function ([key, value]) {
-         return (
-            {
-               id: key,
-               columns: [key, value?.toString()],
-            }
-         )
-      }
-      ),
-      [certificate]
-   )
+     () => !certificate ? [] : Object.entries(certificate.meta || {}).map(function([key, value]) {
+      return (
+           {
+              id: key,
+              columns: [key, value?.toString()],
+           }
+        )
+     }
+     ),
+     [certificate]
+  )
 
-   const attributeData: TableDataRow[] = useMemo(
+  const attributeData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : [
-         {
-            id: "uuid",
-            columns: ["UUID", certificate.uuid],
-         },
-         {
+    () => !certificate ? [] :[
+          {
+             id: "uuid",
+             columns: ["UUID", certificate.uuid],
+          },
+          {
             id: "owner",
             columns: ["Owner", certificate.owner || "Unassigned",
-               <Button
-                  className="btn btn-link"
-                  size="sm"
-                  color="secondary"
-                  data-for="updateOwner"
-                  data-tip
-                  onClick={() => setUpdateOwner(true)}
-               >
-                  <i className="fa fa-refresh" />
-                  <ToolTip id="updateOwner" message="Update Owner" />
-               </Button>
-            ],
+                              <Button
+                                className="btn btn-link"
+                                size="sm"
+                                color="secondary"
+                                data-for="updateOwner"
+                                data-tip
+                                onClick={() => setUpdateOwner(true)}
+                              >
+                                <i className="fa fa-refresh" />
+                                <ToolTip id="updateOwner" message="Update Owner" />
+                              </Button>
+                              ],
          },
          {
-            id: "group",
-            columns: ["Group", certificate?.group?.name ? (
-               <Link to={`../../groups/detail/${certificate?.group.uuid}`}>
-                  {certificate?.group.name}
-               </Link>
-            ) : "Unassigned",
-               <Button
-                  className="btn btn-link"
-                  size="sm"
-                  color="secondary"
-                  data-for="updateGroup"
-                  data-tip
-                  onClick={() => setUpdateGroup(true)}
-               >
-                  <i className="fa fa-refresh" />
-                  <ToolTip id="updateGroup" message="Update Group" />
-               </Button>
-            ],
-         },
-         {
-            id: "raProfile",
-            columns: ["RA Profile", certificate?.raProfile?.name ? (
-               <Link to={`../../raProfiles/detail/${certificate?.raProfile.uuid}`}>
-                  {certificate?.raProfile.name}
-               </Link>
-            ) : "Unassigned",
-               <Button
-                  className="btn btn-link"
-                  size="sm"
-                  color="secondary"
-                  data-for="updateRaProfile"
-                  data-tip
-                  onClick={() => setUpdateRaProfile(true)}
-               >
-                  <i className="fa fa-refresh" />
-                  <ToolTip id="updateRaProfile" message="Update RA Profile" />
-               </Button>
-            ],
-         },
-         {
-            id: "type",
-            columns: ["Type", certificate.certificateType || ""],
-         },
-      ],
-      [certificate]
-   )
+          id: "group",
+          columns: ["Group", certificate?.group?.name ? (
+                            <Link to={`../../groups/detail/${certificate?.group.uuid}`}>
+                              {certificate?.group.name}
+                            </Link>
+                          ) :"Unassigned",
+                        <Button
+                          className="btn btn-link"
+                          size="sm"
+                          color="secondary"
+                          data-for="updateGroup"
+                          data-tip
+                          onClick={() => setUpdateGroup(true)}
+                        >
+                          <i className="fa fa-refresh" />
+                          <ToolTip id="updateGroup" message="Update Group" />
+                        </Button>
+          ],
+       },
+       {
+        id: "raProfile",
+        columns: ["RA Profile", certificate?.raProfile?.name ? (
+                          <Link to={`../../raProfiles/detail/${certificate?.raProfile.uuid}`}>
+                            {certificate?.raProfile.name}
+                          </Link>
+                        ) : "Unassigned",
+                        <Button
+                          className="btn btn-link"
+                          size="sm"
+                          color="secondary"
+                          data-for="updateRaProfile"
+                          data-tip
+                          onClick={() => setUpdateRaProfile(true)}
+                        >
+                          <i className="fa fa-refresh" />
+                          <ToolTip id="updateRaProfile" message="Update RA Profile" />
+                        </Button>
+        ],
+     },
+     {
+      id: "type",
+      columns: ["Type", certificate.certificateType || ""],
+    },
+   ],
+    [certificate]
+ )
 
-   const sanData: TableDataRow[] = useMemo(
+  const sanData: TableDataRow[] = useMemo(
 
-      () => {
-         let sanList: TableDataRow[] = [];
-         for (let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
-            if (value && value.length > 0) {
-               sanList.push({
-                  id: key,
-                  columns: [key, value.join(", ")],
-               })
-            }
-         }
-         return sanList
-      },
-      [certificate]
-   )
-
-
-   const validationData: TableDataRow[] = useMemo(
-
-      () => !certificate ? [] : Object.entries(certificate.certificateValidationResult || {}).map(function ([key, value]) {
-         return (
-            {
-               id: key,
-               columns: [
-                  key,
-                  <CertificateValidationStatus status={value.status} />,
-                  <div style={{ wordBreak: "break-all" }}>
-                     {value.message.split("\n").map((str: string) => (
-                        <div>
-                           {str}
-                           <br />
-                        </div>
-                     ))}
-                  </div>
-               ],
-            }
-         )
+    () => {
+      let sanList:TableDataRow[] = [];
+      for(let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})){
+        if(value && value.length > 0){
+          sanList.push({
+            id: key,
+            columns: [key, value.join(", ")],
+          })
+        }
       }
-      ),
-      [certificate]
-   )
+      return sanList
+    },
+    [certificate]
+ )
 
 
-   const detailData: TableDataRow[] = useMemo(
+  const validationData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : [
-
+    () => !certificate ? [] : Object.entries(certificate.certificateValidationResult || {}).map(function([key, value]) {
+      return (
          {
-            id: "commonName",
-            columns: ["Common Name", certificate.commonName],
+            id: key,
+            columns: [
+              key,
+              <CertificateValidationStatus status={value.status} />,
+              <div style={{ wordBreak: "break-all" }}>
+                {value.message.split("\n").map((str: string) => (
+                  <div>
+                    {str}
+                    <br />
+                  </div>
+                ))}
+              </div>
+            ],
+         }
+      )
+   }
+   ),
+   [certificate]
+  )
 
-         },
-         {
+
+  const detailData: TableDataRow[] = useMemo(
+
+     () => !certificate ? [] : [
+
+        {
+           id: "commonName",
+           columns: ["Common Name", certificate.commonName],
+
+        },
+        {
             id: "serialNumber",
             columns: ["Serial Number", certificate.serialNumber]
-         },
-         {
-            id: "issuerCommonName",
-            columns: ["Issuer Common Name", certificate.issuerCommonName]
-         },
-         {
+        },
+        {
+          id: "issuerCommonName",
+          columns: ["Issuer Common Name", certificate.issuerCommonName]
+        },
+        {
             id: "issuerDN",
             columns: ["Issuer DN", certificate.issuerDn]
-         },
-         {
-            id: "subjectDN",
-            columns: ["Subject DN", certificate.subjectDn]
-         },
-         {
-            id: "expiresAt",
-            columns: ["Expires At", dateFormatter(certificate.notAfter)]
-         },
-         {
-            id: "validFrom",
-            columns: ["Valid From", dateFormatter(certificate.notBefore)]
-         },
-         {
-            id: "publicKeyAlgorithm",
-            columns: ["Public Key Algorithm", certificate.publicKeyAlgorithm]
-         },
-         {
-            id: "signatureAlgorithm",
-            columns: ["Signature Algorithm", certificate.signatureAlgorithm]
-         },
-         {
-            id: "certStatus",
-            columns: ["Status", <CertificateStatus status={certificate.status} />]
-         },
-         {
-            id: "fingerprint",
-            columns: ["Fingerprint", certificate.fingerprint]
-         },
-         {
-            id: "fingerprintAlgorithm",
-            columns: ["Fingerprint Algorithm", "SHA256"],
-         },
-         {
-            id: "keySize",
-            columns: ["Key Size", certificate.keySize]
-         },
-         {
-            id: "keyUsage",
-            columns: ["Key Usage",
-               certificate?.keyUsage?.map(function (name) {
-                  return (
-                     <div key={name}>
-                        <Badge style={{ backgroundColor: "Metalic Blue" }}>
-                           {name}
-                        </Badge>
-                        &nbsp;
-                     </div>
-                  );
-               })]
-         },
-         {
-            id: "extendedKeyUsage",
-            columns: ["Extended Key Usage",
-               certificate?.extendedKeyUsage?.map(function (name) {
-                  return (
-                     <div key={name}>
-                        <Badge style={{ backgroundColor: "Metalic Blue" }}>
-                           {name}
-                        </Badge>
-                        &nbsp;
-                     </div>
-                  );
-               })]
-         },
-         {
-            id: "basicConstraint",
-            columns: ["Basic Constraint", certificate.basicConstraints]
-         }
-      ],
-      [certificate]
-   );
+        },
+        {
+          id: "subjectDN",
+          columns: ["Subject DN", certificate.subjectDn]
+        },
+        {
+          id: "expiresAt",
+          columns: ["Expires At", dateFormatter(certificate.notAfter)]
+        },
+        {
+          id: "validFrom",
+          columns: ["Valid From", dateFormatter(certificate.notBefore)]
+        },
+        {
+          id: "publicKeyAlgorithm",
+          columns: ["Public Key Algorithm", certificate.publicKeyAlgorithm]
+        },
+        {
+          id: "signatureAlgorithm",
+          columns: ["Signature Algorithm", certificate.signatureAlgorithm]
+        },
+        {
+          id: "certStatus",
+          columns: ["Status", <CertificateStatus status={certificate.status}/>]
+        },
+        {
+          id: "fingerprint",
+          columns: ["Fingerprint", certificate.fingerprint]
+        },
+        {
+           id: "fingerprintAlgorithm",
+           columns: ["Fingerprint Algorithm", "SHA256"],
+        },
+        {
+          id: "keySize",
+          columns: ["Key Size", certificate.keySize]
+        },
+        {
+           id: "keyUsage",
+           columns: ["Key Usage",
+           certificate?.keyUsage?.map(function (name) {
+            return (
+              <div key={name}>
+                <Badge style={{ backgroundColor: "Metalic Blue" }}>
+                  {name}
+                </Badge>
+                &nbsp;
+              </div>
+            );
+          })]
+        },
+        {
+          id: "extendedKeyUsage",
+          columns: ["Extended Key Usage",
+          certificate?.extendedKeyUsage?.map(function (name) {
+           return (
+             <div key={name}>
+               <Badge style={{ backgroundColor: "Metalic Blue" }}>
+                 {name}
+               </Badge>
+               &nbsp;
+             </div>
+           );
+         })]
+       },
+       {
+        id: "basicConstraint",
+        columns: ["Basic Constraint", certificate.basicConstraints]
+      }
+     ],
+     [certificate]
+  );
 
 
-   return (
+  return (
 
-      <Container className="themed-container" fluid>
-         <Row xs="1" sm="1" md="2" lg="2" xl="2">
-            <Col>
-               <Widget title={certificateTitle} busy={isBusy}>
-                  <br />
-                  <CustomTable
-                     hasPagination={false}
-                     headers={detailHeaders}
-                     data={detailData}
-                  />
-               </Widget>
-            </Col>
-            <Col>
-               <Widget title={sanTitle} busy={isBusy}>
-                  <br />
-                  <CustomTable
-                     headers={detailHeaders}
-                     data={sanData}
-                  />
-               </Widget>
-            </Col>
-         </Row>
-
-         <Widget title={validationTitle} busy={isBusy}>
+     <Container className="themed-container" fluid>
+      <Row xs="1" sm="1" md="2" lg="2" xl="2">
+        <Col>
+          <Widget title={certificateTitle} busy={isBusy}>
             <br />
             <CustomTable
-               headers={validationHeaders}
-               data={validationData}
+              hasPagination={false}
+                headers={detailHeaders}
+                data={detailData}
             />
-         </Widget>
-
-         <Row xs="1" sm="1" md="2" lg="2" xl="2">
-            <Col>
-               <Widget title={attributesTitle}>
-                  <br />
-                  <CustomTable
-                     headers={attributeHeaders}
-                     data={attributeData}
-                  />
-               </Widget>
-            </Col>
-            <Col>
-               <Widget title={metaTitle}>
-                  <br />
-                  <CustomTable
-                     headers={detailHeaders}
-                     data={metaData}
-                  />
-               </Widget>
-            </Col>
-         </Row>
-
-         <Widget title={historyTitle} busy={isFetchingHistory}>
+          </Widget>
+        </Col>
+        <Col>
+          <Widget title={sanTitle} busy={isBusy}>
             <br />
             <CustomTable
-               headers={historyHeaders}
-               data={historyEntry}
+                headers={detailHeaders}
+                data={sanData}
             />
-         </Widget>
+          </Widget>
+        </Col>
+      </Row>
+
+      <Widget title={validationTitle} busy={isBusy}>
+        <br />
+        <CustomTable
+            headers={validationHeaders}
+            data={validationData}
+        />
+      </Widget>
+
+      <Row xs="1" sm="1" md="2" lg="2" xl="2">
+        <Col>
+          <Widget title={attributesTitle}>
+              <br />
+              <CustomTable
+                    headers={attributeHeaders}
+                    data={attributeData}
+                 />
+          </Widget>
+        </Col>
+           <Col>
+              <Widget title={metaTitle}>
+                 <br />
+                 <CustomTable
+                    headers={detailHeaders}
+                    data={metaData}
+                 />
+              </Widget>
+           </Col>
+        </Row>
+
+        <Widget title={historyTitle} busy={isFetchingHistory}>
+                 <br />
+                 <CustomTable
+                    headers={historyHeaders}
+                    data={historyEntry}
+                 />
+              </Widget>
 
 
-         <Dialog
-            isOpen={confirmDelete}
-            caption="Delete Certificate"
-            body="You are about to delete a Certificate. Is this what you want to do?"
-            toggle={() => setConfirmDelete(false)}
-            buttons={[
-               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-            ]}
-         />
+        <Dialog
+           isOpen={confirmDelete}
+           caption="Delete Certificate"
+           body="You are about to delete a Certificate. Is this what you want to do?"
+           toggle={() => setConfirmDelete(false)}
+           buttons={[
+              { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+              { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+           ]}
+        />
 
-         <Dialog
+          <Dialog
             isOpen={updateGroup}
             caption={`Update Group`}
             body={updateGroupBody}
             toggle={() => onCancelGroupUpdate()}
             buttons={[
-               { color: "primary", onClick: () => onUpdateGroup(), body: "Update", disabled: true ? group === undefined : false },
+               { color: "primary", onClick: () => onUpdateGroup(), body: "Update", disabled: true ? group === undefined : false},
                { color: "secondary", onClick: () => onCancelGroupUpdate(), body: "Cancel" },
             ]}
          />
@@ -962,8 +966,8 @@ export default function CertificateDetail() {
             body={updateOwnerBody}
             toggle={() => onCancelOwnerUpdate()}
             buttons={[
-               { color: "primary", onClick: onUpdateOwner, body: "Update", disabled: true ? owner === undefined : false },
-               { color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel" },
+               { color: "primary", onClick: onUpdateOwner, body: "Update" ,disabled: true ? owner === undefined : false},
+               { color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel"},
             ]}
          />
 
@@ -981,7 +985,7 @@ export default function CertificateDetail() {
          <Dialog
             isOpen={renew}
             caption={`Renew Certificate`}
-            body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew} />}
+            body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew}/>}
             toggle={() => setRenew(false)}
             buttons={[]}
          />
@@ -1005,8 +1009,8 @@ export default function CertificateDetail() {
             buttons={[]}
             size="lg"
          />
-      </Container>
+     </Container>
 
-   )
+  )
 
 }
