@@ -1,226 +1,248 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import { Container } from "reactstrap";
 
-import Spinner from "components/Spinner";
+import { actions, selectors } from "ducks/clients";
+
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import { actions, selectors } from "ducks/clients";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
-import ToolTip from "components/ToolTip";
-import {
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
-import CustomTable from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 
-function ClientList() {
-  const clients = useSelector(selectors.selectClients);
-  const isFetching = useSelector(selectors.isFetching);
-  const isDeleting = useSelector(selectors.isDeletingClient);
-  const isEditing = useSelector(selectors.isEditing);
-  const confirmDeleteId = useSelector(selectors.selectConfirmDeleteClientId);
+export default function ClientList() {
 
-  const [checkedRows, setCheckedRows] = useState<string[]>([]);
+   const dispatch = useDispatch();
+   const history = useHistory();
 
-  const dispatch = useDispatch();
-  const { path } = useRouteMatch();
+   const { path } = useRouteMatch();
 
-  useEffect(() => {
-    dispatch(actions.requestClientsList());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+   const checkedRows = useSelector(selectors.checkedRows);
+   const clients = useSelector(selectors.clients);
 
-  const onConfirmDelete = useCallback(() => {
-    dispatch(actions.confirmBulkDeleteClient(checkedRows));
-    setCheckedRows([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, confirmDeleteId]);
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+   const isBulkEnabling = useSelector(selectors.isBulkEnabling);
+   const isDisabling = useSelector(selectors.isDisabling);
+   const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-  const onCancelDelete = useCallback(
-    () => dispatch(actions.cancelBulkDeleteClient()),
-    [dispatch]
-  );
+   const isBusy = isFetching || isDeleting || isBulkDeleting || isBulkEnabling || isDisabling || isBulkDisabling;
 
-  const onDelete = () => {
-    dispatch(actions.confirmBulkDeleteClientRequest(checkedRows));
-  };
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const onEnable = () => {
-    dispatch(actions.requestBulkEnableClient(checkedRows));
-    setCheckedRows([]);
-  };
 
-  const onDisable = () => {
-    dispatch(actions.requestBulkDisableClient(checkedRows));
-    setCheckedRows([]);
-  };
+   useEffect(
 
-  const title = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link to={`${path}/add`} className="btn btn-link">
-          <i className="fa fa-plus" />
-        </Link>
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDelete}
-          data-for="delete"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-trash" />
-          ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
-          )}
+      () => {
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         dispatch(actions.listClients());
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnable}
-          data-for="enable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
+      },
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+      [dispatch]
+   );
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisable}
-          data-for="disable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
-      <h5 className="mt-0">
-        List of <span className="fw-semi-bold">Clients</span>
-      </h5>
-    </div>
-  );
+   const onAddClick = useCallback(
 
-  const getClientList = () => {
-    let rows: any = [];
-    for (let client of clients) {
-      let column: any = {};
-      column["name"] = {
-        content: client.name,
-        styledContent: (
-          <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>
-        ),
-        lineBreak: true,
-      };
-      column["serialNumber"] = {
-        content: client.serialNumber,
-        lineBreak: true,
-      };
-      column["clientDn"] = {
-        content: client?.certificate?.subjectDn,
-        lineBreak: true,
-      };
-      column["status"] = {
-        content: client.enabled ? "enabled" : "disabled",
-        styledContent: <StatusBadge enabled={client.enabled} />,
-        lineBreak: true,
-      };
-      rows.push({
-        id: client.uuid,
-        column: column,
-        data: client,
-      });
-    }
-    return rows;
-  };
+      () => {
 
-  const clientRowHeaders = [
-    {
-      styledContent: <MDBColumnName columnName="Name" />,
-      content: "name",
-      sort: false,
-      id: "clientName",
-      width: "10%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Serial Number" />,
-      content: "serialNumber",
-      sort: false,
-      id: "clientSerialNumber",
-      width: "25%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Client DN" />,
-      content: "clientDn",
-      sort: false,
-      id: "clientAdminDn",
-      width: "35%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Status" />,
-      content: "status",
-      sort: false,
-      id: "clientStatus",
-      width: "10%",
-    },
-  ];
+         history.push("/app/clients/add");
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <br />
-        <CustomTable
-          checkedRows={checkedRows}
-          checkedRowsFunction={setCheckedRows}
-          data={clients}
-          headers={clientRowHeaders}
-          rows={getClientList()}
-        />
-      </Widget>
-      <MDBModal
-        overflowScroll={false}
-        isOpen={confirmDeleteId !== ""}
-        toggle={onCancelDelete}
-      >
-        <MDBModalHeader toggle={onCancelDelete}>Delete Client</MDBModalHeader>
-        <MDBModalBody>
-          You are about deleting a client with existing authorizations to RA
-          Profiles. If you continue, these authorizations will be deleted as
-          well. Is this what you want to do?
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onConfirmDelete}>
-            Yes, delete
-          </Button>
-          <Button color="secondary" onClick={onCancelDelete}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
-      <Spinner active={isFetching || isDeleting || isEditing} />
-    </Container>
-  );
+      },
+      [history]
+
+   );
+
+
+   const onEnableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkEnableClients({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDisableClients({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDeleteClick = useCallback(
+
+      () => {
+
+         setConfirmDelete(true);
+
+      },
+      []
+
+   );
+
+
+   const onDeleteConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDeleteClients({ uuids: checkedRows }));
+         setConfirmDelete(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const setCheckedRows = useCallback(
+
+      (rows: (string | number)[]) => {
+
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
+      },
+
+      [dispatch]
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { onDeleteClick() } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onAddClick, onDeleteClick, onEnableClick, onDisableClick]
+   );
+
+
+   const title = useMemo(
+
+      () => (
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">Clients</span>
+            </h5>
+
+         </div>
+      ),
+      [buttons]
+
+   );
+
+
+   const clientTableHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            id: "clientName",
+            width: "10%",
+         },
+         {
+            content: <MDBColumnName columnName="Serial Number" />,
+            sortable: false,
+            id: "clientSerialNumber",
+            width: "25%",
+         },
+         {
+            content: <MDBColumnName columnName="Client DN" />,
+            sortable: false,
+            id: "clientAdminDn",
+         },
+         {
+            content: <MDBColumnName columnName="Status" />,
+            align: "center",
+            sortable: true,
+            id: "clientStatus",
+            width: "7%",
+         },
+      ],
+      []
+
+   );
+
+
+   const clientTableData: TableDataRow[] = useMemo(
+
+      () => clients.map(
+
+         client => ({
+
+            id: client.uuid,
+
+            columns: [
+
+               <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>,
+
+               client.serialNumber,
+
+               client?.certificate?.subjectDn,
+
+               <StatusBadge enabled={client.enabled} />,
+
+            ]
+
+         })
+
+      ),
+      [clients, path]
+
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+            <CustomTable
+               headers={clientTableHeader}
+               data={clientTableData}
+               onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
+               hasCheckboxes={true}
+            />
+         </Widget>
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete ${checkedRows.length > 1 ? "Clients" : "a Client"}`}
+            body={`You are about deleting ${checkedRows.length > 1 ? "Clients" : "a Client"}. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+   );
 }
 
-export default ClientList;

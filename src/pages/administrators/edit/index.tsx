@@ -1,97 +1,30 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Action } from "redux";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import AdminForm from "components/AdminForm";
-import ConfirmEditDialog from "components/ConfirmActionDialog";
-import Spinner from "components/Spinner";
-import Widget from "components/Widget";
-import { actions, selectors } from "ducks/administrators";
+import AdminForm from "components/Forms/AdminForm";
 
-function AdminEdit() {
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const isFetching = useSelector(selectors.isFetching);
-  const isEditing = useSelector(selectors.isEditing);
-  const admin = useSelector(selectors.selectAdministratorDetails);
-  const { params } = useRouteMatch();
-  const uuid = (params as any).id as string;
-  const [showConfirm, toggleConfirmDialog] = useState(false);
-  const [editAction, setEditAction] = useState<Action | null>(null);
+export default function AdminEdit() {
 
-  const defaultValues = {
-    ...(admin || {}),
-  };
+   const title = useMemo(
 
-  const onCancelEdit = useCallback(() => toggleConfirmDialog(false), []);
-  const onConfirmEdit = useCallback(
-    () => dispatch(editAction),
-    [dispatch, editAction]
-  );
+      () => (
 
-  const onCancel = useCallback(() => history.goBack(), [history]);
-  const onSubmit = useCallback(
-    (
-      name: string,
-      surname: string,
-      username: string,
-      certFile: File,
-      description: string,
-      _enabled: boolean,
-      superAdmin: boolean,
-      email: string,
-      certificateUuid: string
-    ) => {
-      setEditAction(
-        actions.requestUpdate(
-          uuid,
-          name,
-          surname,
-          username,
-          email,
-          certFile,
-          description,
-          superAdmin,
-          certificateUuid,
-          history
-        )
-      );
-      toggleConfirmDialog(true);
-    },
-    [history, uuid]
-  );
+         <h5>
+            Edit <span className="fw-semi-bold">Administrator</span>
+         </h5>
 
-  useEffect(() => {
-    dispatch(actions.requestDetail(uuid));
-  }, [dispatch, uuid]);
+      ),
+      []
 
-  const title = (
-    <h5>
-      Edit <span className="fw-semi-bold">Administrator</span>
-    </h5>
-  );
+   );
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <AdminForm
-          isSubmitting={isEditing}
-          defaultValues={defaultValues}
-          onCancel={onCancel}
-          onSubmit={onSubmit}
-          editMode
-        />
-      </Widget>
-      <ConfirmEditDialog
-        isOpen={showConfirm}
-        onCancel={onCancelEdit}
-        onConfirm={onConfirmEdit}
-      />
-      <Spinner active={isFetching} />
-    </Container>
-  );
+   return (
+
+      <Container className="themed-container" fluid>
+         <AdminForm title={title} />
+      </Container>
+
+   );
+
 }
 
-export default AdminEdit;

@@ -1,210 +1,254 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { Link, useRouteMatch } from "react-router-dom";
-import { Container, Table, Row, Col, Button } from "reactstrap";
+import { useRouteMatch } from "react-router-dom";
+import { Container, Row, Col } from "reactstrap";
 
-import Spinner from "components/Spinner";
+import { actions, selectors } from "ducks/administrators";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 import StatusCircle from "components/StatusCircle";
 import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { actions, selectors } from "ducks/administrators";
+
 import CertificateAttributes from "components/CertificateAttributes";
-import ToolTip from "components/ToolTip";
-import {
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
 
-function AdministratorDetail() {
-  const dispatch = useDispatch();
-  const details = useSelector(selectors.selectSelectedAdministrator);
-  const isFetching = useSelector(selectors.isFetching);
-  const { params } = useRouteMatch();
-  const history = useHistory();
-  const uuid = (params as any).id as string;
 
-  const [isDeleteAdmin, setIsDeleteAdmin] = useState<boolean>(false);
+export default function AdministratorDetail() {
 
-  useEffect(() => {
-    dispatch(actions.requestDetail(uuid));
-  }, [uuid, dispatch]);
+   const dispatch = useDispatch();
 
-  const onDelete = () => {
-    dispatch(actions.requestDelete(details?.uuid || "", history));
-    setIsDeleteAdmin(false);
-  };
+   const { params } = useRouteMatch<{ id: string }>();
 
-  const onEnable = () => {
-    dispatch(actions.requestEnable(details?.uuid || ""));
-  };
+   const history = useHistory();
 
-  const onDisable = () => {
-    dispatch(actions.requestDisable(details?.uuid || ""));
-  };
+   const administrator = useSelector(selectors.administrator);
+   const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+   const isDisabling = useSelector(selectors.isDisabling);
+   const isEnabling = useSelector(selectors.isEnabling);
 
-  const attributesTitle = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link
-          to={`../../administrators/edit/${details?.uuid}`}
-          className="btn btn-link"
-          data-for="edit"
-          data-tip
-        >
-          <i className="fa fa-pencil-square-o" />
-          <ToolTip id="edit" message="Edit" />
-        </Link>
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={() => setIsDeleteAdmin(true)}
-          data-for="delete"
-          data-tip
-          disabled={details?.enabled}
-        >
-          {details?.enabled ? (
-            <i className="fa fa-trash" />
-          ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
-          )}
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
+   useEffect(
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnable}
-          data-for="enable"
-          data-tip
-          disabled={details?.enabled}
-        >
-          {details?.enabled ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
+      () => {
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+         if (!params.id) return;
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisable}
-          data-for="disable"
-          data-tip
-          disabled={!details?.enabled}
-        >
-          {!details?.enabled ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
+         dispatch(actions.getAdminDetail({ uuid: params.id }));
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
-      <h5>
-        Administrator <span className="fw-semi-bold">Attributes</span>
-      </h5>
-    </div>
-  );
-  const certificateTitle = (
-    <h5>
-      Administrator Certificate <span className="fw-semi-bold">Attributes</span>
-    </h5>
-  );
+      },
+      [params.id, dispatch]
 
-  return (
-    <Container className="themed-container" fluid>
-      <Row xs="1" sm="1" md="2" lg="2" xl="2">
-        <Col>
-          <Widget title={attributesTitle}>
-            <Table className="table-hover" size="sm">
-              <thead>
-                <tr>
-                  <th>Attribute</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>UUID</td>
-                  <td>{details?.uuid}</td>
-                </tr>
-                <tr>
-                  <td>Administrator Name</td>
-                  <td>{details?.name}</td>
-                </tr>
-                <tr>
-                  <td>Administrator Surname</td>
-                  <td>{details?.surname}</td>
-                </tr>
-                <tr>
-                  <td>Administrator Username</td>
-                  <td>{details?.username}</td>
-                </tr>
-                <tr>
-                  <td>Email</td>
-                  <td>{details?.email}</td>
-                </tr>
-                <tr>
-                  <td>Description</td>
-                  <td>{details?.description}</td>
-                </tr>
-                <tr>
-                  <td>Superadmin</td>
-                  <td>
-                    <StatusCircle status={details?.superAdmin} />
-                  </td>
-                </tr>
-                <tr>
-                  <td>Status</td>
-                  <td>
-                    <StatusBadge enabled={details?.enabled} />
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </Widget>
-        </Col>
+   );
 
-        <Col>
-          <Widget title={certificateTitle}>
-            <CertificateAttributes certificate={details?.certificate} />
-          </Widget>
-        </Col>
-      </Row>
 
-      <MDBModal
-        overflowScroll={false}
-        isOpen={isDeleteAdmin}
-        toggle={() => setIsDeleteAdmin(false)}
-      >
-        <MDBModalHeader toggle={() => setIsDeleteAdmin(false)}>
-          Delete Credential
-        </MDBModalHeader>
-        <MDBModalBody>
-          You are about to delete an Administrator. Is this what you want to do?
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onDelete}>
-            Yes, delete
-          </Button>
-          <Button color="secondary" onClick={() => setIsDeleteAdmin(false)}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
+   const onEditClick = useCallback(
 
-      <Spinner active={isFetching} />
-    </Container>
-  );
+      () => {
+
+         history.push(`../../administrators/edit/${administrator?.uuid}`);
+
+      },
+      [administrator, history]
+
+   );
+
+
+   const onEnableClick = useCallback(
+
+      () => {
+
+         if (!administrator) return;
+
+         dispatch(actions.enableAdmin({ uuid: administrator.uuid }));
+
+      },
+      [administrator, dispatch]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         if (!administrator) return;
+
+         dispatch(actions.disableAdmin({ uuid: administrator.uuid }));
+
+      },
+      [administrator, dispatch]
+
+   );
+
+
+   const onDeleteConfirmed = useCallback(
+
+      () => {
+
+         if (!administrator) return;
+
+         dispatch(actions.deleteAdmin({ uuid: administrator.uuid }));
+         setConfirmDelete(false);
+
+      },
+      [administrator, dispatch]
+
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
+         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: administrator?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: !(administrator?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [administrator, onEditClick, onDisableClick, onEnableClick]
+
+   );
+
+
+   const attributesTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5>
+               Administrator <span className="fw-semi-bold">Details</span>
+            </h5>
+
+         </div>
+
+      ), [buttons]
+
+   );
+
+
+   const certificateTitle = useMemo(
+
+      () => (
+
+         <h5>
+            Administrator Certificate <span className="fw-semi-bold">Details</span>
+         </h5>
+
+      ),
+      []
+
+   );
+
+
+   const detailHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "property",
+            content: "Property",
+         },
+         {
+            id: "value",
+            content: "Value",
+         },
+      ],
+      []
+
+   );
+
+
+   const detailData: TableDataRow[] = useMemo(
+
+      () => !administrator ? [] : [
+
+         {
+            id: "uuid",
+            columns: ["UUID", administrator.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", administrator.name]
+         },
+         {
+            id: "surname",
+            columns: ["Surname", administrator.surname]
+         },
+         {
+            id: "username",
+            columns: ["Username", administrator.username]
+         },
+         {
+            id: "email",
+            columns: ["Email", administrator.email]
+         },
+         {
+            id: "description",
+            columns: ["Description", administrator.description]
+         },
+         {
+            id: "superadmin",
+            columns: ["Superadmin", <StatusCircle status={administrator?.role === "superAdministrator"} />]
+         },
+         {
+            id: "enabled",
+            columns: ["Administrator Enabled", <StatusBadge enabled={administrator.enabled} />]
+         },
+
+      ],
+      [administrator]
+
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Row xs="1" sm="1" md="2" lg="2" xl="2">
+            <Col>
+
+               <Widget title={attributesTitle} busy={isFetchingDetail || isEnabling || isDisabling}>
+
+                  <CustomTable
+                     headers={detailHeaders}
+                     data={detailData}
+                  />
+
+               </Widget>
+
+            </Col>
+
+            <Col>
+               <Widget title={certificateTitle} busy={isFetchingDetail}>
+                  <CertificateAttributes certificate={administrator?.certificate} />
+               </Widget>
+            </Col>
+
+         </Row>
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Administrator"
+            body="You are about to delete an Administrator. Is this what you want to do?"
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+   );
+
+
 }
 
-export default AdministratorDetail;

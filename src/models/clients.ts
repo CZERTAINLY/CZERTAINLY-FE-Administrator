@@ -1,19 +1,19 @@
-import { CertificateDetailResponse } from "models";
+import { CertificateModel } from "models";
 
-export interface Client {
-  uuid: string;
-  name: string;
-  certificate?: CertificateDetailResponse;
-  enabled: boolean;
-  description?: string;
-  serialNumber?: string;
+
+export interface ClientModel {
+   uuid: string;
+   name: string;
+   certificate: CertificateModel;
+   enabled: boolean;
+   description: string;
+   serialNumber: string;
 }
 
-export interface ClientDetails {
-  uuid: string;
-  name?: string;
-  description?: string;
-  certificate?: CertificateDetailResponse;
-  enabled?: boolean;
-  serialNumber: string;
+
+export interface ClientAuthorizedRaProfileModel {
+   uuid: string;
+   name: string;
+   description: string;
+   enabled: boolean;
 }

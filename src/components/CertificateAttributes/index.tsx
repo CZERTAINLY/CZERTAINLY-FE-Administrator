@@ -1,45 +1,65 @@
-import { CertificateDetailResponse } from "models";
-import React from "react";
-import { Table } from "reactstrap";
+import React, { useMemo } from "react";
+import { CertificateModel } from "models";
 import { dateFormatter } from "utils/dateUtil";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 interface Props {
-  certificate?: CertificateDetailResponse;
+   certificate?: CertificateModel;
 }
 
 function CertificateAttributes({ certificate }: Props) {
-  return (
-    <Table className="table-hover" size="sm">
-      <thead>
-        <tr>
-          <th>Attribute</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Subject DN</td>
-          <td>{certificate?.subjectDn}</td>
-        </tr>
-        <tr>
-          <td>Issuer DN</td>
-          <td>{certificate?.issuerDn}</td>
-        </tr>
-        <tr>
-          <td>Valid from</td>
-          <td>{dateFormatter(certificate?.notBefore)}</td>
-        </tr>
-        <tr>
-          <td>Valid to</td>
-          <td>{dateFormatter(certificate?.notAfter)}</td>
-        </tr>
-        <tr>
-          <td>Serial Number</td>
-          <td>{certificate?.serialNumber}</td>
-        </tr>
-      </tbody>
-    </Table>
-  );
+
+   const detailHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "adminName",
+            content: "Attribute",
+         },
+         {
+            id: "adminUsername",
+            content: "Value",
+         },
+      ],
+      []
+   );
+
+
+   const attributes: TableDataRow[] = useMemo(
+
+      () => [
+         {
+            id: "subjectDN",
+            columns: ["Subject DN", certificate?.subjectDn || ""]
+         },
+         {
+            id: "issuerDN",
+            columns: ["Issuer DN", certificate?.issuerDn || ""]
+         },
+         {
+            id: "validFrom",
+            columns: ["Valid From", certificate?.notBefore ? dateFormatter(certificate.notBefore) : ""]
+         },
+         {
+            id: "validTo",
+            columns: ["Valid To", certificate?.notAfter ? dateFormatter(certificate.notAfter) : ""]
+         },
+         {
+            id: "serialNumber",
+            columns: ["Serial Number", certificate?.serialNumber || ""]
+         }
+      ],
+      [certificate]
+
+   );
+
+   return (
+
+      <CustomTable
+         headers={detailHeaders}
+         data={attributes}
+      />
+
+   );
 }
 
 export default CertificateAttributes;

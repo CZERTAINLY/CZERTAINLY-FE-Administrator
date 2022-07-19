@@ -1,72 +1,68 @@
-import { RaAcmeLink } from "models";
-import { AttributeResponse } from "models/attributes";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { Observable } from "rxjs";
 
-export interface RaProfileResponse {
-  uuid: string;
-  name: string;
-  enabled: boolean;
-  authorityInstanceUuid: string;
-  description: string;
-  authorityInstanceName: string;
-  enabledProtocols?: string[];
+
+export interface RaProfileDTO {
+   uuid: string;
+   name: string;
+   enabled: boolean;
+   description?: string;
+   authorityInstanceUuid: string;
+   authorityInstanceName: string;
+   attributes: AttributeDTO[];
+   enabledProtocols?: string[];
 }
 
-export interface RaProfileDetailResponse {
-  uuid: string;
-  name: string;
-  description?: string;
-  authorityInstanceUuid: string;
-  attributes?: AttributeResponse[];
-  enabled: boolean;
-  authorityInstanceName: string;
+
+export interface RaAuthorizedClientDTO {
+   uuid: string;
+   name: string;
+   enabled: boolean;
 }
 
-export interface RaProfileAuthorizationsResponse {
-  uuid: string;
+
+export interface RaAcmeLinkDTO {
+   uuid?: string;
+   name?: string;
+   directoryUrl?: string;
+   issueCertificateAttributes?: AttributeDTO[];
+   revokeCertificateAttributes?: AttributeDTO[];
+   acmeAvailable: boolean;
 }
 
-export interface EntityProfileResponse {
-  id: number;
-  name: string;
-}
 
 export interface ProfilesManagementApi {
-  createRaProfile(
-    authorityInstanceUuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeResponse[]
-  ): Observable<string>;
-  deleteRaProfile(uuid: string | number): Observable<void>;
-  enableRaProfile(uuid: string | number): Observable<void>;
-  disableRaProfile(uuid: string | number): Observable<void>;
-  bulkDeleteRaProfile(uuid: (string | number)[]): Observable<void>;
-  bulkEnableRaProfile(uuid: (string | number)[]): Observable<void>;
-  bulkDisableRaProfile(uuid: (string | number)[]): Observable<void>;
-  getRaProfilesList(): Observable<RaProfileResponse[]>;
-  getAttributes(authorityUuid: string): Observable<AttributeResponse[]>;
-  getRaProfileDetail(uuid: string): Observable<RaProfileDetailResponse>;
-  getAuthorizedClients(
-    uuid: string
-  ): Observable<RaProfileAuthorizationsResponse[]>;
-  updateRaProfile(
-    authorityInstanceUuid: string,
-    uuid: string,
-    name: string,
-    description: string,
-    attributes: AttributeResponse[]
-  ): Observable<RaProfileDetailResponse>;
-  getIssuanceAttributes(raProfileUuid: string): Observable<AttributeResponse[]>;
-  getRevocationAttributes(
-    raProfileUuid: string
-  ): Observable<AttributeResponse[]>;
-  getRaAcmeProfile(uuid: string): Observable<RaAcmeLink>;
-  activateAcme(
-    uuid: string,
-    acmeProfileUuid: string,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[]
-  ): Observable<RaAcmeLink>;
-  deactivateAcme(uuid: string): Observable<void>;
+
+   getRaProfilesList(enabled?: boolean): Observable<RaProfileDTO[]>;
+
+   getRaProfileDetail(uuid: string): Observable<RaProfileDTO>;
+
+   getAuthorizedClients(uuid: string): Observable<RaAuthorizedClientDTO[]>;
+
+   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
+
+   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
+
+   getRaAcmeProfile(uuid: string): Observable<RaAcmeLinkDTO>;
+
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string>;
+
+   updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<RaProfileDTO>;
+
+   deleteRaProfile(uuid: string): Observable<void>;
+
+   bulkDeleteRaProfile(uuids: string[]): Observable<void>;
+
+   enableRaProfile(uuid: string): Observable<void>;
+
+   bulkEnableRaProfile(uuids: string[]): Observable<void>;
+
+   disableRaProfile(uuid: string): Observable<void>;
+
+   bulkDisableRaProfile(uuids: string[]): Observable<void>;
+
+   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<RaAcmeLinkDTO>;
+
+   deactivateAcme(uuid: string): Observable<void>;
+
 }

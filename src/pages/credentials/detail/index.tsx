@@ -1,267 +1,220 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
-import { Button, Container, Table } from "reactstrap";
-import Spinner from "components/Spinner";
+import { useRouteMatch } from "react-router-dom";
+
+import { Container } from "reactstrap";
+
 import Widget from "components/Widget";
+
 import { actions, selectors } from "ducks/credentials";
-import { fieldNameTransform } from "utils/fieldNameTransform";
-import ToolTip from "components/ToolTip";
-import {
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import AttributeViewer from "components/Attributes/AttributeViewer";
+import Dialog from "components/Dialog";
 
 function CredentialDetail() {
-  const dispatch = useDispatch();
-  const credentialDetails = useSelector(selectors.selectCredentialDetails);
-  const isFetchingCredential = useSelector(selectors.isFetching);
-  const confirmDeleteId = useSelector(
-    selectors.selectConfirmDeleteCredentialId
-  );
-  const deleteErrorMessages = useSelector(
-    selectors.selectDeleteCredentialError
-  );
 
-  const { params } = useRouteMatch();
-  const history = useHistory();
+   const dispatch = useDispatch();
 
-  const [deleteErrorModalOpen, setDeleteErrorModalOpen] = useState(false);
-  const uuid = (params as any).id as string;
-  const allowedAttributeTypeForDetail = [
-    "STRING",
-    "NUMBER",
-    "DROPDOWN",
-    "LIST",
-    "CREDENTIAL",
-  ];
+   const { params } = useRouteMatch<{ id: string }>();
+   const history = useHistory();
 
-  useEffect(() => {
-    dispatch(actions.requestCredentialDetail(uuid));
-  }, [uuid, dispatch]);
+   const credential = useSelector(selectors.credential);
 
-  const onConfirmDelete = useCallback(() => {
-    dispatch(
-      actions.confirmDeleteCredential(credentialDetails?.uuid || "", history)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, credentialDetails]);
+   const isFetching = useSelector(selectors.isFetchingDetail);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isForceBulkDeleting = useSelector(selectors.isForceBulkDeleting);
 
-  const onCancelDelete = useCallback(
-    () => dispatch(actions.cancelDeleteCredential()),
-    [dispatch]
-  );
+   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
-  const onForceDeleteCancel = useCallback(() => {
-    dispatch(actions.cancelForceDeleteCredential());
-    setDeleteErrorModalOpen(false);
-  }, [dispatch]);
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const onForceDeleteCredential = (event: any) => {
-    dispatch(
-      actions.requestForceDeleteCredential(
-        credentialDetails?.uuid || "",
-        history
-      )
-    );
-    setDeleteErrorModalOpen(false);
-  };
 
-  const onDeleteConnector = () => {
-    dispatch(
-      actions.confirmDeleteCredentialRequest(
-        credentialDetails?.uuid || "",
-        history
-      )
-    );
-  };
+   useEffect(
 
-  const attributesTitle = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link
-          to={`../../credentials/edit/${credentialDetails?.uuid}`}
-          className="btn btn-link"
-          data-for="edit"
-          data-tip
-        >
-          <i className="fa fa-pencil-square-o" />
-          <ToolTip id="edit" message="Edit Credential" />
-        </Link>
+      () => {
+         dispatch(actions.getCredentialDetail({ uuid: params.id }));
+      },
+      [params.id, dispatch]
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={() => onDeleteConnector()}
-          data-for="delete"
-          data-tip
-        >
-          <i className="fa fa-trash" style={{ color: "red" }} />
+   );
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
-      </div>
-      <h5>
-        Credential <span className="fw-semi-bold">Details</span>
-      </h5>
-    </div>
-  );
 
-  const attributeTitle = (
-    <h5>
-      <span className="fw-semi-bold">Attributes</span>
-    </h5>
-  );
+   const onEditClick = useCallback(
+      () => {
+         if (!credential) return
+         history.push(`../../credentials/edit/${credential.uuid}`);
+      },
+      [history, credential]
+   );
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={attributesTitle}>
-        <Table className="table-hover" size="sm">
-          <thead>
-            <tr>
-              <th>Attribute</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>UUID</td>
-              <td>{credentialDetails?.uuid}</td>
-            </tr>
-            <tr>
-              <td>Name</td>
-              <td>{credentialDetails?.name}</td>
-            </tr>
-            <tr>
-              <td>Kind</td>
-              <td>{credentialDetails?.kind}</td>
-            </tr>
-            <tr>
-              <td>Credential Provider Name</td>
-              <td>
-                {credentialDetails?.connectorUuid ? (
-                  <Link
-                    to={`../../connectors/detail/${credentialDetails?.connectorUuid}`}
-                  >
-                    {credentialDetails?.connectorName}
-                  </Link>
-                ) : (
-                  credentialDetails?.connectorName
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td>Credential Provider UUID</td>
-              <td>
-                {credentialDetails?.connectorUuid || "Connector Not Found"}
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Widget>
 
-      <Widget title={attributeTitle}>
-        <Table className="table-hover" size="sm">
-          <thead>
-            <tr>
-              <th>Attribute</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {credentialDetails?.attributes.map(function (attribute) {
-              return (
-                <tr>
-                  <td>
-                    {attribute.label ||
-                      fieldNameTransform[attribute.name] ||
-                      attribute.name}
-                  </td>
-                  {}
-                  <td>
-                    {allowedAttributeTypeForDetail.includes(attribute.type)
-                      ? attribute.value
-                      : "<" + attribute.type + ">"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Widget>
+   const onDeleteConfirmed = useCallback(
 
-      <MDBModal
-        overflowScroll={false}
-        isOpen={confirmDeleteId !== ""}
-        toggle={onCancelDelete}
-      >
-        <MDBModalHeader toggle={onCancelDelete}>
-          Delete Credential
-        </MDBModalHeader>
-        <MDBModalBody>
-          You are about deleting a credential. If you continue, these connectors
-          with the credentials will fail. Is this what you want to do?
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onConfirmDelete}>
-            Yes, delete
-          </Button>
-          <Button color="secondary" onClick={onCancelDelete}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
+      () => {
+         if (!credential) return;
+         dispatch(actions.deleteCredential({ uuid: credential.uuid }));
+         setConfirmDelete(false);
+      },
+      [dispatch, credential]
 
-      <MDBModal
-        overflowScroll={false}
-        isOpen={deleteErrorModalOpen}
-        toggle={onForceDeleteCancel}
-      >
-        <MDBModalHeader toggle={onForceDeleteCancel}>
-          Delete Credential
-        </MDBModalHeader>
-        <MDBModalBody>
-          Failed to delete some of the credentials. Please find the details
-          below &nbsp;
-          <Table className="table-hover" size="sm">
-            <thead>
-              <tr>
-                <th>
-                  <b>Name</b>
-                </th>
-                <th>
-                  <b>Dependencies</b>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {deleteErrorMessages?.map(function (message) {
-                return (
-                  <tr>
-                    <td>{message.name}</td>
-                    <td>{message.message}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onForceDeleteCredential}>
-            Force
-          </Button>
-          <Button color="secondary" onClick={onForceDeleteCancel}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
+   );
 
-      <Spinner active={isFetchingCredential} />
-    </Container>
-  );
+
+   const onForceDeleteConfirmed = useCallback(
+
+      () => {
+         if (!credential) return;
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.deleteCredential({ uuid: credential.uuid }));
+      },
+      [dispatch, credential]
+
+   );
+
+
+   const widgetButtons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
+         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+      ],
+      [onEditClick, setConfirmDelete]
+   );
+
+   const detailsTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={widgetButtons} />
+            </div>
+
+            <h5>
+               Credential <span className="fw-semi-bold">Details</span>
+            </h5>
+
+         </div>
+
+      ),
+      [widgetButtons]
+
+   );
+
+
+   const detailHeaders: TableHeader[] = useMemo(
+      () => [
+         {
+            id: "property",
+            content: "Property",
+         },
+         {
+            id: "value",
+            content: "Value",
+         },
+      ],
+      []
+   );
+
+
+   const detailData: TableDataRow[] = useMemo(
+
+      () => !credential ? [] : [
+
+         {
+            id: "uuid",
+            columns: ["UUID", credential.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", credential.name]
+         },
+         {
+            id: "kind",
+            columns: ["Kind", credential.kind]
+         },
+         {
+            id: "credentialProviderName",
+            columns: ["Credential Provider Name", credential.connectorName]
+         },
+         {
+            id: "credentialProviderUuid",
+            columns: ["Credential Provider UUID", credential.connectorUuid]
+         }
+
+      ],
+      [credential]
+
+   )
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={detailsTitle} busy={isFetching || isDeleting || isForceBulkDeleting}>
+
+            <br />
+
+            <CustomTable
+               headers={detailHeaders}
+               data={detailData}
+            />
+
+
+         </Widget>
+
+         {
+
+            credential && credential.attributes && credential.attributes.length > 0 && (
+
+               <Widget title="Credential Attributes">
+
+                  <br />
+
+                  <AttributeViewer attributes={credential?.attributes} />
+
+               </Widget>
+            )
+
+         }
+
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption="Delete Credential"
+            body="You are about to delete an Credential. Is this what you want to do?"
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={deleteErrorMessage !== ""}
+            caption="Delete Connector"
+            body={
+               <>
+                  Failed to delete the Credential as the Credential has dependent objects.
+                  Please find the details below:
+                  <br />
+                  <br />
+                  {deleteErrorMessage}
+               </>
+            }
+            toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteConfirmed, body: "Force" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+   );
 }
 
 export default CredentialDetail;

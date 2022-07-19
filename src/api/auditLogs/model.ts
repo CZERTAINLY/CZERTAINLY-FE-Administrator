@@ -1,15 +1,30 @@
 import { Observable } from 'rxjs';
+import { AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from 'types/auditlog';
 
-import { AuditLog, PagedData } from 'models';
+import { PagedDataDTO } from "../_common/pagedDataDTO";
 
-export type AuditLogResponse = PagedData<AuditLog>;
+export interface AuditLogDTO {
+   id: number;
+   author: string;
+   created: Date;
+   operationStatus: AuditLogOperationStatus;
+   origination: AuditLogSourceTarget;
+   affected: AuditLogSourceTarget;
+   objectIdentifier: string;
+   operation: AuditLogOperation;
+   additionalData: any;
+}
+
+export type PagedAuditLog = PagedDataDTO<AuditLogDTO>;
 
 export interface AuditLogsApi {
-  getLogs(page: number, size: number, sort?: string, filters?: { [key: string]: string }): Observable<AuditLogResponse>;
 
-  getObjects(): Observable<string[]>;
+   getLogs(pageNumber: number, pageSize: number, sort?: string, filters?: { [key: string]: string }): Observable<PagedAuditLog>;
 
-  getOperations(): Observable<string[]>;
+   getObjects(): Observable<string[]>;
 
-  getStatuses(): Observable<string[]>;
+   getOperations(): Observable<string[]>;
+
+   getStatuses(): Observable<string[]>;
+
 }

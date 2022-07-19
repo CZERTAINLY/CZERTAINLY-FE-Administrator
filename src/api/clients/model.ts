@@ -1,50 +1,52 @@
-import { CertificateDetailResponse } from "models";
+import { CertificateDTO } from "api/certificates";
 import { Observable } from "rxjs";
 
-export interface ClientInfoResponse {
-  uuid: string;
-  name: string;
-  certificate?: CertificateDetailResponse;
-  enabled: boolean;
+
+export interface ClientDTO {
+   uuid: string;
+   name: string;
+   enabled: boolean;
+   serialNumber: string;
+   certificate: CertificateDTO;
+   description: string;
 }
 
-export interface ClientDetailResponse {
-  uuid: string;
-  enabled: boolean;
-  serialNumber: string;
-  certificate?: CertificateDetailResponse;
-  name?: string;
-  description?: string;
+
+export interface AuthorizedRAProfileDTO {
+   uuid: string;
+   name: string;
+   description?: string;
+   enabled: boolean;
 }
 
-export interface ClientAuthorizationsReponse {
-  uuid: string;
-  name: string;
-}
 
 export interface ClientManagementApi {
-  authorizeProfile(clientId: string, profileId: string): Observable<void>;
-  createNewClient(
-    name: string,
-    clientCertificate: string,
-    description: string,
-    enabled: boolean,
-    certificateUuid: string
-  ): Observable<string>;
-  deleteClient(uuid: string): Observable<void>;
-  enableClient(uuid: string): Observable<void>;
-  disableClient(uuid: string): Observable<void>;
-  bulkDeleteClient(uuid: string[]): Observable<void>;
-  bulkEnableClient(uuid: string[]): Observable<void>;
-  bulkDisableClient(uuid: string[]): Observable<void>;
-  getClientsList(): Observable<ClientInfoResponse[]>;
-  getClientDetail(uuid: string): Observable<ClientDetailResponse>;
-  getClientAuth(uuid: string): Observable<ClientAuthorizationsReponse[]>;
-  unauthorizeProfile(clientId: string, profileId: string): Observable<void>;
-  updateClient(
-    uuid: string,
-    clientCertificate: string | undefined,
-    description: string,
-    certificateUuid: string
-  ): Observable<ClientDetailResponse>;
+
+   unauthorizeClient(clientUuid: string, profileUuid: string): Observable<void>;
+
+   enableClient(uuid: string): Observable<void>;
+
+   disableClient(uuid: string): Observable<void>;
+
+   authorizeClient(clientUuid: string, profileUuid: string): Observable<void>;
+
+   bulkEnableClient(uuids: string[]): Observable<void>;
+
+   bulkDisableClient(uuids: string[]): Observable<void>;
+
+   getClientDetail(uuid: string): Observable<ClientDTO>;
+
+   updateClient(uuid: string, description?: string, certificateUuid?: string, certificate?: CertificateDTO): Observable<ClientDTO>;
+
+   deleteClient(uuid: string): Observable<void>;
+
+   getClientsList(): Observable<ClientDTO[]>;
+
+   createNewClient(name: string, description?: string, enabled?: boolean, certificateUuid?: string, certificate?: CertificateDTO): Observable<string>;
+
+   bulkDeleteClient(uuids: string[]): Observable<void>;
+
+   getAuthorizedProfiles(uuid: string): Observable<AuthorizedRAProfileDTO[]>;
+
+
 }

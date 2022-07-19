@@ -1,41 +1,43 @@
 import { Observable } from "rxjs";
 
-export interface AcmeAccountListResponse {
-  accountId: string;
-  uuid: string;
-  totalOrders: number;
-  status?: string | "";
-  raProfileName: string;
-  acmeProfileName: string;
-  enabled: boolean;
+export type AcmeAccountStatus = "valid" | "deactivated" | "revoked"
+
+export interface AcmeAccountListItemDTO {
+   accountId: string;
+   uuid: string;
+   enabled: boolean;
+   totalOrders: number;
+   status: AcmeAccountStatus;
+   raProfileName: string;
+   acmeProfileName: string;
 }
 
-export interface AcmeAccountDetailResponse {
-  accountId: string;
-  uuid: string;
-  totalOrders: number;
-  successfulOrders: number;
-  failedOrders: number;
-  pendingOrders: number;
-  validOrders: number;
-  processingOrders: number;
-  status: string;
-  contact: string[];
-  termsOfServiceAgreed: boolean;
-  raProfileName: string;
-  raProfileUuid: string;
-  acmeProfileName: string;
-  acmeProfileUuid: string;
-  enabled: boolean;
+export interface AcmeAccountDTO {
+   accountId: string;
+   uuid: string;
+   enabled: boolean;
+   totalOrders: number;
+   successfulOrders: number;
+   failedOrders: number;
+   pendingOrders: number;
+   validOrders: number;
+   processingOrders: number;
+   status: AcmeAccountStatus;
+   contact: string[];
+   termsOfServiceAgreed: boolean;
+   raProfileName: string;
+   raProfileUuid: string;
+   acmeProfileName: string;
+   acmeProfileUuid: string;
 }
 
 export interface AcmeAccountManagementApi {
-  getAcmeAccountList(): Observable<AcmeAccountListResponse[]>;
-  getAcmeDetails(uuid: string | number): Observable<AcmeAccountDetailResponse>;
-  deleteAcmeAccount(uuid: string | number): Observable<void>;
-  enableAcmeAccount(uuid: string | number): Observable<void>;
-  disableAcmeAccount(uuid: string | number): Observable<void>;
-  bulkDeleteAcmeAccount(uuids: (string | number)[]): Observable<void>;
-  bulkEnableAcmeAccount(uuids: (string | number)[]): Observable<void>;
-  bulkDisableAcmeAccount(uuids: (string | number)[]): Observable<void>;
+   enableAcmeAccount(uuid: string): Observable<void>;
+   disableAcmeAccount(uuid: string): Observable<void>;
+   bulkRevokeAcmeAccount(uuids: string[]): Observable<void>;
+   bulkEnableAcmeAccount(uuids: string[]): Observable<void>;
+   bulkDisableAcmeAccount(uuids: string[]): Observable<void>;
+   getAcmeAccountDetails(uuid: string): Observable<AcmeAccountDTO>;
+   revokeAcmeAccount(uuid: string): Observable<void>;
+   getAcmeAccountList(): Observable<AcmeAccountListItemDTO[]>;
 }

@@ -1,12 +1,12 @@
 export enum Role {
-  Admin = "administrator",
-  SuperAdmin = "superAdministrator",
+   Admin = "administrator",
+   SuperAdmin = "superAdministrator",
 }
 
-export interface Profile {
-  name: string;
-  surname: string;
-  username: string;
-  email: string;
-  role: Role;
+export interface UserProfileModel {
+   name: string;
+   surname: string;
+   username: string;
+   email: string;
+   role: Role;
 }

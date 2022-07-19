@@ -1,255 +1,242 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
-import Spinner from "components/Spinner";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+
+import { MDBBadge } from "mdbreact";
+
+import { actions, selectors } from "ducks/ra-profiles";
+
+import { Container } from "reactstrap";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import { actions, selectors } from "ducks/ra-profiles";
 import MDBColumnName from "components/MDBColumnName";
-import {
-  MDBBadge,
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
-import ToolTip from "components/ToolTip";
-import CustomTable from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from "components/Dialog";
 
 function RaProfileList() {
-  const profiles = useSelector(selectors.selectProfiles);
-  const isFetching = useSelector(selectors.isFetching);
-  const isDeleting = useSelector(selectors.isDeleting);
-  const isEditing = useSelector(selectors.isEditing);
-  const confirmDeleteId = useSelector(selectors.selectConfirmDeleteProfileId);
-  const [checkedRows, setCheckedRows] = useState<(string | number)[]>([]);
 
-  const dispatch = useDispatch();
-  const { path } = useRouteMatch();
+   const dispatch = useDispatch();
+   const history = useHistory();
 
-  useEffect(() => {
-    dispatch(actions.requestRaProfilesList());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+   const { path } = useRouteMatch();
 
-  const onConfirmDelete = useCallback(() => {
-    dispatch(actions.confirmBulkDeleteProfile(checkedRows));
-    setCheckedRows([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, confirmDeleteId]);
+   const checkedRows = useSelector(selectors.checkedRows);
+   const raProfiles = useSelector(selectors.raProfiles);
 
-  const onCancelDelete = useCallback(
-    () => dispatch(actions.cancelBulkDeleteProfile()),
-    [dispatch]
-  );
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+   const isUpdating = useSelector(selectors.isUpdating);
+   const isEnabling = useSelector(selectors.isEnabling);
+   const isBulkEnabling = useSelector(selectors.isBulkEnabling);
+   const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-  const onDeleteProfile = () => {
-    dispatch(actions.confirmBulkDeleteProfileRequest(checkedRows));
-  };
+   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isBulkDisabling;
 
-  const onEnableProfile = () => {
-    dispatch(actions.requestBulkEnableProfile(checkedRows));
-    setCheckedRows([]);
-  };
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const onDisableProfile = () => {
-    dispatch(actions.requestBulkDisableProfile(checkedRows));
-    setCheckedRows([]);
-  };
 
-  const getProtocolsForDisplay = (protocols: string[]) => {
-    return protocols.map(function (protocol) {
-      return (
-        <>
-          <MDBBadge color="secondary" searchvalue={protocol}>
-            {protocol}
-          </MDBBadge>
-          &nbsp;
-        </>
-      );
-    });
-  };
+   useEffect(() => {
+      dispatch(actions.setCheckedRows({ checkedRows: [] }));
+      dispatch(actions.listRaProfiles());
+   }, [dispatch]);
 
-  const title = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link to={`${path}/add`} className="btn btn-link">
-          <i className="fa fa-plus" />
-        </Link>
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDeleteProfile}
-          data-for="delete"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-trash" />
-          ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
-          )}
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
+   const onAddClick = useCallback(() => {
+      history.push(`${path}/add`);
+   }, [history, path]);
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnableProfile}
-          data-for="enable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+   const onEnableClick = useCallback(
+      () => {
+         dispatch(actions.bulkEnableRaProfiles({ uuids: checkedRows }));
+      },
+      [checkedRows, dispatch]
+   );
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisableProfile}
-          data-for="disable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
-      <h5 className="mt-0">
-        List of <span className="fw-semi-bold">RA Profiles</span>
-      </h5>
-    </div>
-  );
+   const onDisableClick = useCallback(
+      () => {
+         dispatch(actions.bulkDisableRaProfiles({ uuids: checkedRows }));
+      },
+      [checkedRows, dispatch]
+   );
 
-  const profilesList = () => {
-    let rows: any = [];
-    for (let profile of profiles) {
-      let column: any = {};
-      column["name"] = {
-        content: profile.name,
-        styledContent: (
-          <Link to={`${path}/detail/${profile.uuid}`}>{profile.name}</Link>
-        ),
-        lineBreak: true,
-      };
-      column["authority"] = {
-        content: profile.authorityInstanceName,
-        styledContent: (
-          <MDBBadge color="info">{profile.authorityInstanceName}</MDBBadge>
-        ),
-        lineBreak: true,
-      };
-      column["description"] = {
-        content: profile.description,
-        lineBreak: true,
-      };
-      column["enabledProtocols"] = {
-        content: getProtocolsForDisplay(profile.enabledProtocols || []).join(
-          ""
-        ),
-        styledContent: getProtocolsForDisplay(profile.enabledProtocols || []),
-        lineBreak: true,
-      };
-      column["status"] = {
-        content: profile.enabled ? "enabled" : "disabled",
-        styledContent: <StatusBadge enabled={profile.enabled} />,
-        lineBreak: true,
-      };
-      rows.push({
-        id: profile.uuid,
-        column: column,
-        data: profile,
-      });
-    }
-    return rows;
-  };
 
-  const profileRowHeaders = [
-    {
-      styledContent: <MDBColumnName columnName="Name" />,
-      content: "name",
-      sort: false,
-      id: "raProfileName",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Description" />,
-      content: "description",
-      sort: false,
-      id: "raProfileDescription",
-      width: "20%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Authority" />,
-      content: "authority",
-      sort: false,
-      id: "raProfileAuthority",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Enabled Protocols" />,
-      content: "enabledProtocols",
-      sort: false,
-      id: "enabledProtocols",
-      width: "20%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Status" />,
-      content: "status",
-      sort: false,
-      id: "adminStatus",
-      width: "10%",
-    },
-  ];
+   const onDeleteConfirmed = useCallback(
+      () => {
+         dispatch(actions.bulkDeleteRaProfiles({ uuids: checkedRows }));
+         setConfirmDelete(false);
+      },
+      [checkedRows, dispatch]
+   );
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <br />
-        <CustomTable
-          checkedRows={checkedRows}
-          checkedRowsFunction={setCheckedRows}
-          data={profiles}
-          headers={profileRowHeaders}
-          rows={profilesList()}
-        />
-      </Widget>
-      <MDBModal
-        overflowScroll={false}
-        isOpen={confirmDeleteId !== ""}
-        toggle={onCancelDelete}
-      >
-        <MDBModalHeader toggle={onCancelDelete}>Delete Profile</MDBModalHeader>
-        <MDBModalBody>
-          You are about to delete RA Profiles which may have existing
-          authorizations from clients. If you continue, these authorizations
-          will be deleted as well. Is this what you want to do?
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onConfirmDelete}>
-            Yes, delete
-          </Button>
-          <Button color="secondary" onClick={onCancelDelete}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
-      <Spinner active={isFetching || isDeleting || isEditing} />
-    </Container>
-  );
+
+   const setCheckedRows = useCallback(
+      (rows: (string | number)[]) => {
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+      },
+      [dispatch]
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onAddClick, onEnableClick, onDisableClick]
+   );
+
+
+   const title = useMemo(
+      () => (
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">RA Profiles</span>
+            </h5>
+
+         </div>
+      ),
+      [buttons]
+   );
+
+
+   const raProfilesTableHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "name",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            width: "15%",
+         },
+         {
+            id: "description",
+            content: <MDBColumnName columnName="Description" />,
+            sortable: true,
+         },
+         {
+            id: "authority",
+            styledContent: <MDBColumnName columnName="Authority" />,
+            align: "center",
+            content: "authority",
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "enabledProtocols",
+            content: <MDBColumnName columnName="Enabled Protocols" />,
+            align: "center",
+            sortable: true,
+            width: "20%",
+         },
+         {
+            id: "status",
+            styledContent: <MDBColumnName columnName="Status" />,
+            align: "center",
+            content: "status",
+            sortable: true,
+            width: "7%",
+         },
+      ],
+      []
+
+   );
+
+
+   const getProtocolsForDisplay = useCallback(
+
+      (protocols?: string[]) => !protocols ? <></> : (
+         <>
+            {
+               protocols.map(
+                  protocol => (
+                     <Fragment key={protocol}>
+                        <MDBBadge color="secondary" searchvalue={protocol}>
+                           {protocol}
+                        </MDBBadge>
+                        &nbsp;
+                     </Fragment>
+                  )
+               )
+            }
+         </>
+      ),
+      []
+
+   );
+
+
+   const profilesTableData: TableDataRow[] = useMemo(
+
+      () => raProfiles.map(
+
+         raProfile => ({
+
+            id: raProfile.uuid,
+
+            columns: [
+
+               <Link to={`${path}/detail/${raProfile.uuid}`}>{raProfile.name}</Link>,
+
+               raProfile.description || "",
+
+               <MDBBadge color="info">{raProfile.authorityInstanceName}</MDBBadge>,
+
+               getProtocolsForDisplay(raProfile.enabledProtocols),
+
+               <StatusBadge enabled={raProfile.enabled} />
+
+            ]
+
+         })
+      ),
+      [getProtocolsForDisplay, path, raProfiles]
+
+   )
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+            <CustomTable
+               headers={raProfilesTableHeaders}
+               data={profilesTableData}
+               onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
+               hasCheckboxes={true}
+               hasPagination={true}
+            />
+
+         </Widget>
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete RA ${checkedRows.length > 1 ? "Profiles" : "Profile"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "a RA Profile" : "RA profiles"}. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+   );
 }
 
 export default RaProfileList;

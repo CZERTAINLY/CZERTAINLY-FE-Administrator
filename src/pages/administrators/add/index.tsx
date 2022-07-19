@@ -1,65 +1,29 @@
-import React, { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import AdminForm from "components/AdminForm";
-import Widget from "components/Widget";
-import { actions, selectors } from "ducks/administrators";
+import AdminForm from "components/Forms/AdminForm";
 
-function AdminAdd() {
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const isCreating = useSelector(selectors.isCreating);
+export default function AdminAdd() {
 
-  const title = (
-    <h5>
-      Add new <span className="fw-semi-bold">Administrator</span>
-    </h5>
-  );
+   const title = useMemo(
 
-  const onCancel = useCallback(() => history.goBack(), [history]);
-  const onSubmit = useCallback(
-    (
-      name: string,
-      surname: string,
-      username: string,
-      certFile: File,
-      description: string,
-      enabled: boolean,
-      superAdmin: boolean,
-      email: string,
-      certificateUuid: string
-    ) => {
-      dispatch(
-        actions.requestCreate(
-          name,
-          surname,
-          username,
-          email,
-          certFile as File,
-          description,
-          superAdmin,
-          enabled,
-          certificateUuid,
-          history
-        )
-      );
-    },
-    [dispatch, history]
-  );
+      () => (
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <AdminForm
-          isSubmitting={isCreating}
-          onCancel={onCancel}
-          onSubmit={onSubmit}
-        />
-      </Widget>
-    </Container>
-  );
+         <h5>
+            Add new <span className="fw-semi-bold">Administrator</span>
+         </h5>
+
+      ),
+      []
+
+   );
+
+   return (
+
+      <Container className="themed-container" fluid>
+         <AdminForm title={title} />
+      </Container>
+
+   );
+
 }
-
-export default AdminAdd;

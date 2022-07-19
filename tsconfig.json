@@ -1,4 +1,5 @@
 {
+
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -18,10 +19,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    "noFallthroughCasesInSwitch": true
+    "jsx": "react-jsx",
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true
   },
+
   "include": [
-    "src"
-  ]
+    "src/**/*"
+   ]
+
 }

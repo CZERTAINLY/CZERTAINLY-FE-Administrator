@@ -1,92 +1,30 @@
-import React, { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import Spinner from "components/Spinner";
-import Widget from "components/Widget";
-import { actions, selectors } from "ducks/acme-profiles";
-import { selectors as callbackSelectors } from "ducks/connectors";
-import { AttributeResponse } from "models/attributes";
-import AcmeProfileForm from "components/AcmeProfileForm";
+import AcmeProfileForm from "components/Forms/AcmeProfileForm";
 
-function RaProfileEdit() {
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const isFetching = useSelector(selectors.isFetching);
-  const isEditing = useSelector(selectors.isEditing);
-  const acmeProfile = useSelector(selectors.selectSelectedProfile);
-  const isFetchingCallback = useSelector(callbackSelectors.isFetchingCallback);
-  const { params } = useRouteMatch();
-  const uuid = (params as any).id as string;
+export default function AdminEdit() {
 
-  const onCancel = useCallback(() => history.goBack(), [history]);
-  const onSubmit = useCallback(
-    (
-      name: string,
-      description: string,
-      termsOfServiceUrl: string,
-      dnsResolverIp: string,
-      dnsResolverPort: string,
-      raProfileUuid: string,
-      websiteUrl: string,
-      retryInterval: number,
-      termsOfServiceChangeDisable: boolean,
-      validity: number,
-      issueCertificateAttributes: AttributeResponse[],
-      revokeCertificateAttributes: AttributeResponse[],
-      requireContact,
-      requireTermsOfService,
-      termsOfServiceChangeUrl
-    ) => {
-      dispatch(
-        actions.requestUpdateProfile(
-          uuid,
-          description,
-          termsOfServiceUrl,
-          dnsResolverIp,
-          dnsResolverPort,
-          raProfileUuid,
-          websiteUrl,
-          retryInterval,
-          termsOfServiceChangeDisable,
-          validity,
-          issueCertificateAttributes,
-          revokeCertificateAttributes,
-          requireContact,
-          requireTermsOfService,
-          termsOfServiceChangeUrl,
-          history
-        )
-      );
-    },
-    [dispatch, history, uuid]
-  );
+   const title = useMemo(
 
-  useEffect(() => {
-    dispatch(actions.requestProfileDetail(uuid));
-  }, [dispatch, uuid]);
+      () => (
 
-  const title = (
-    <h5>
-      Edit <span className="fw-semi-bold">RA Profile</span>
-    </h5>
-  );
+         <h5>
+            Edit <span className="fw-semi-bold">ACME Profile</span>
+         </h5>
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <AcmeProfileForm
-          isSubmitting={isEditing}
-          acmeProfile={acmeProfile}
-          onCancel={onCancel}
-          onSubmit={onSubmit}
-          editMode={true}
-        />
-      </Widget>
-      <Spinner active={isFetching || isFetchingCallback} />
-    </Container>
-  );
+      ),
+      []
+
+   );
+
+   return (
+
+      <Container className="themed-container" fluid>
+         <AcmeProfileForm title={title} />
+      </Container>
+
+   );
+
 }
 
-export default RaProfileEdit;

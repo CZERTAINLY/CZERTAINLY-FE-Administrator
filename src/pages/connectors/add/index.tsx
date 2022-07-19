@@ -1,68 +1,22 @@
-import React, { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
-import { actions, selectors } from "ducks/connectors";
-import ConnectorForm from "components/ConnectorForm";
+import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-function ConnectorAdd() {
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const isCreating = useSelector(selectors.isCreatingConnector);
-  const isConnecting = useSelector(selectors.isConnectingConnector);
-  const isConnected = useSelector(selectors.isConnected);
-  const connectionDetails = useSelector(selectors.connectorConnectionDetails);
+import ConnectorForm from "components/Forms/ConnectorForm";
 
-  const onCancel = useCallback(() => history.goBack(), [history]);
-  const onSubmit = useCallback(
-    (
-      uuid: string,
-      name: string,
-      url: string,
-      authType: string,
-      authAttributes: any
-    ) => {
-      dispatch(
-        actions.requestCreateConnector(
-          name,
-          url,
-          authType,
-          authAttributes,
-          history
-        )
-      );
-    },
-    [dispatch, history]
-  );
+export default function Add() {
 
-  const onConnect = useCallback(
-    (
-      uuid: string,
-      name: string,
-      url: string,
-      authType: string,
-      authAttributes: any
-    ) => {
-      dispatch(
-        actions.requestConnectConnector(name, url, authType, authAttributes, "")
-      );
-    },
-    [dispatch]
-  );
+   const title = useMemo(
+      () => (
+         <h5>
+            Add new <span className="fw-semi-bold">Connector</span>
+         </h5>
+      ),
+      []
+   );
 
-  return (
-    <Container className="themed-container" fluid>
-      <ConnectorForm
-        isSubmitting={isCreating}
-        isConnecting={isConnecting}
-        isConnected={isConnected}
-        connectionDetails={connectionDetails}
-        onCancel={onCancel}
-        onSubmit={onSubmit}
-        onConnect={onConnect}
-      ></ConnectorForm>
-    </Container>
-  );
+   return (
+      <Container className="themed-container" fluid>
+         <ConnectorForm title={title} />
+      </Container>
+   );
 }
-
-export default ConnectorAdd;

@@ -1,17 +1,17 @@
-import { Epic } from 'redux-observable';
+import { AppEpic } from "ducks";
 
-import { mergeMap, take } from 'rxjs/operators';
-import { Action as AuthAction, actions as authActions } from './auth';
+import { mergeMap, take } from "rxjs/operators";
+import { actions as authActions } from "./auth";
 
-const startup: Epic<AuthAction, AuthAction> = action$ => action$.pipe(
-  take(1),
-  mergeMap(() => [
-    authActions.requestProfile(),
-  ]),
+const startup: AppEpic = action$ => action$.pipe(
+   take(1),
+   mergeMap(() => [
+      authActions.getProfile(),
+   ]),
 );
 
 const epics = [
-  startup,
+   startup,
 ];
 
 export default epics;

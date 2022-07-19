@@ -19,8 +19,8 @@ jobs:
           node-version: 12.x
       - name: Test build
         run: |
-          yarn install --frozen-lockfile
-          yarn build
+          npm install
+          npm build
   build:
     if: github.event_name != 'pull_request'
     name: Build

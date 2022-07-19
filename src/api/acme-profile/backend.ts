@@ -1,161 +1,188 @@
-import { ErrorDeleteObject } from "models";
-import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+
 import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
-import { attributeSimplifier } from "utils/attributes";
+
+import { AttributeDTO } from "../_common/attributeDTO";
 
 import { createNewResource } from "utils/net";
 import * as model from "./model";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 const baseUrl = "/api/v1/acmeProfiles";
 
-export class AcmeProfilesManagementBackend
-  implements model.AcmeProfilesManagementApi
-{
-  constructor() {
-    this._fetchService = new FetchHttpService();
-  }
+export class AcmeProfilesManagementBackend implements model.AcmeProfilesManagementApi {
 
-  private _fetchService: FetchHttpService;
 
-  createAcmeProfile(
-    name: string,
-    description: string,
-    termsOfServiceUrl: string,
-    dnsResolverIp: string,
-    dnsResolverPort: string,
-    raProfileUuid: string,
-    websiteUrl: string,
-    retryInterval: number,
-    termsOfServiceChangeDisable: boolean,
-    validity: number,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[],
-    requireContact: boolean,
-    requireTermsOfService: boolean,
-    termsOfServiceChangeUrl: string
-  ): Observable<string> {
-    return createNewResource(baseUrl, {
-      name,
-      description,
-      termsOfServiceUrl,
-      dnsResolverIp,
-      dnsResolverPort,
-      raProfileUuid,
-      websiteUrl,
-      retryInterval,
-      termsOfServiceChangeDisable,
-      validity,
-      issueCertificateAttributes: attributeSimplifier(
-        issueCertificateAttributes
-      ),
-      revokeCertificateAttributes: attributeSimplifier(
-        revokeCertificateAttributes
-      ),
-      requireContact,
-      requireTermsOfService,
-      termsOfServiceChangeUrl,
-    }).pipe(
-      map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-    );
-  }
+   private _fetchService: FetchHttpService;
 
-  deleteAcmeProfile(uuid: string | number): Observable<ErrorDeleteObject[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
-    );
-  }
 
-  enableAcmeProfile(uuid: string | number): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
-    );
-  }
+   constructor() {
+      this._fetchService = new FetchHttpService();
+   }
 
-  disableAcmeProfile(uuid: string | number): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
-    );
-  }
 
-  bulkDeleteAcmeProfile(
-    uuid: (string | number)[]
-  ): Observable<ErrorDeleteObject[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/delete`, "DELETE", uuid)
-    );
-  }
+   createAcmeProfile(
+      name: string,
+      issueCertificateAttributes: AttributeDTO[],
+      revokeCertificateAttributes: AttributeDTO[],
+      description?: string,
+      termsOfServiceUrl?: string,
+      websiteUrl?: string,
+      dnsResolverIp?: string,
+      dnsResolverPort?: string,
+      raProfileUuid?: string,
+      retryInterval?: number,
+      validity?: number,
+      requireContact?: boolean,
+      requireTermsOfService?: boolean,
+   ): Observable<string> {
 
-  bulkForceDeleteAcmeProfile(uuid: (string | number)[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/delete/force`, "DELETE", uuid)
-    );
-  }
+      return createNewResource(baseUrl, {
+         name,
+         description,
+         termsOfServiceUrl,
+         dnsResolverIp,
+         dnsResolverPort,
+         raProfileUuid,
+         websiteUrl,
+         retryInterval,
+         validity,
+         issueCertificateAttributes: issueCertificateAttributes,
+         revokeCertificateAttributes: revokeCertificateAttributes,
+         requireContact,
+         requireTermsOfService
+      }).pipe(
+         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+      );
 
-  bulkEnableAcmeProfile(uuid: (string | number)[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuid)
-    );
-  }
+   }
 
-  bulkDisableAcmeProfile(uuid: (string | number)[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuid)
-    );
-  }
 
-  getAcmeProfilesList(): Observable<model.AcmeProfileResponse[]> {
-    return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
-  }
+   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]> {
 
-  getAcmeProfileDetail(
-    uuid: string
-  ): Observable<model.AcmeProfileDetailResponse> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
-    );
-  }
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+      );
 
-  updateAcmeProfile(
-    uuid: string,
-    description: string,
-    termsOfServiceUrl: string,
-    dnsResolverIp: string,
-    dnsResolverPort: string,
-    raProfileUuid: string,
-    websiteUrl: string,
-    retryInterval: number,
-    termsOfServiceChangeDisable: boolean,
-    validity: number,
-    issueCertificateAttributes: AttributeResponse[],
-    revokeCertificateAttributes: AttributeResponse[],
-    requireContact: boolean,
-    requireTermsOfService: boolean,
-    termsOfServiceChangeUrl: string
-  ): Observable<model.AcmeProfileDetailResponse> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
-        description,
-        termsOfServiceUrl,
-        dnsResolverIp,
-        dnsResolverPort,
-        raProfileUuid,
-        websiteUrl,
-        retryInterval,
-        termsOfServiceChangeDisable,
-        validity,
-        issueCertificateAttributes: attributeSimplifier(
-          issueCertificateAttributes
-        ),
-        revokeCertificateAttributes: attributeSimplifier(
-          revokeCertificateAttributes
-        ),
-        requireContact,
-        requireTermsOfService,
-        termsOfServiceChangeUrl,
-      })
-    );
-  }
+   }
+
+
+   enableAcmeProfile(uuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+      );
+
+   }
+
+
+   disableAcmeProfile(uuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+      );
+
+   }
+
+
+   bulkDeleteAcmeProfiles(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/delete`, "DELETE", uuids)
+      );
+
+   }
+
+
+   bulkForceDeleteAcmeProfiles(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/delete/force`, "DELETE", uuids)
+      );
+
+   }
+
+
+   bulkEnableAcmeProfile(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
+      );
+
+   }
+
+   bulkDisableAcmeProfile(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
+      );
+
+   }
+
+
+   getAcmeProfilesList(): Observable<model.AcmeProfileListItemDTO[]> {
+
+      return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
+
+   }
+
+
+   getAcmeProfileDetail(uuid: string): Observable<model.AcmeProfileDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
+      );
+
+   }
+
+
+   updateAcmeProfile(
+      uuid: string,
+      issueCertificateAttributes: AttributeDTO[],
+      revokeCertificateAttributes: AttributeDTO[],
+      description?: string,
+      termsOfServiceUrl?: string,
+      websiteUrl?: string,
+      dnsResolverIp?: string,
+      dnsResolverPort?: string,
+      raProfileUuid?: string,
+      retryInterval?: number,
+      termsOfServiceChangeDisable?: boolean,
+      termsOfServiceChangeUrl?: string,
+      validity?: number,
+      requireContact?: boolean,
+      requireTermsOfService?: boolean,
+   ): Observable<model.AcmeProfileDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
+            description,
+            termsOfServiceUrl,
+            dnsResolverIp,
+            dnsResolverPort,
+            raProfileUuid,
+            websiteUrl,
+            retryInterval,
+            termsOfServiceChangeDisable,
+            validity,
+            issueCertificateAttributes: issueCertificateAttributes,
+            revokeCertificateAttributes: revokeCertificateAttributes,
+            requireContact,
+            requireTermsOfService,
+            termsOfServiceChangeUrl,
+         })
+      );
+
+   }
+
+   updateRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "PUT")
+      );
+
+   }
+
 }

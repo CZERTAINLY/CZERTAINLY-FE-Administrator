@@ -1,115 +1,97 @@
-import {
-  AllAttributeResponse,
-  ConnectorHealth,
-  ErrorDeleteObject,
-} from "models";
-import { AttributeResponse } from "models/attributes";
 import { Observable } from "rxjs";
 
-export interface ConnectorInfoResponse {
-  uuid: string;
-  name: string;
-  functionGroups?: FunctionGroup[];
-  url: string;
-  status?: string;
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { AuthType, FunctionGroupCode, Status } from "types/connectors";
+
+
+export interface EndpointDTO {
+   uuid?: string;
+   name: string;
+   context: string;
+   method: string;
+   required: boolean;
 }
 
-export interface ConnectorDetailResponse {
-  uuid: string;
-  name?: string;
-  functionGroups?: FunctionGroup[];
-  url: string;
-  status?: string;
-  authType: string;
-  authAttributes: AttributeResponse[];
-  // attributes?: ConnectorAttributes[];
+
+export interface FunctionGroupDTO {
+   uuid: string;
+   name: string;
+   functionGroupCode: FunctionGroupCode;
+   kinds: string[];
+   endPoints: EndpointDTO[];
 }
 
-export interface FunctionalityListResponse {
-  id?: string | number;
-  name: string;
-  context: string;
-  method: string;
-  required: boolean;
+
+export interface ConnectionDTO {
+   functionGroup: FunctionGroupDTO
 }
 
-export interface FunctionGroup {
-  functionGroupCode?: string;
-  endPoints?: FunctionalityListResponse[];
-  endpoints?: FunctionalityListResponse[];
-  id?: string | number;
-  name?: string;
-  kinds: string[];
+
+export interface ConnectorDTO {
+   uuid: string;
+   name: string;
+   functionGroups: FunctionGroupDTO[];
+   url: string;
+   status: Status;
+   authType: AuthType;
+   authAttributes?: AttributeDTO[];
 }
 
-export interface ConnectorConnectionResponse {
-  functionGroup?: FunctionGroup;
+
+export interface ConnectorHealthPartDTO {
+   [key: string]: ConnectorHealthDTO;
 }
 
-export interface ConnectorAttributes {
-  uuid: string | number;
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-  readOnly: boolean;
-  editable: boolean;
-  visible: boolean;
-  multiValue: boolean;
-  description?: string;
-  validationRegex?: string;
-  dependsOn?: any;
-  value?: any;
+
+export interface ConnectorHealthDTO {
+   status: "ok" | "nok" | "unknown";
+   description?: string;
+   parts?: ConnectorHealthPartDTO;
 }
+
+
+export interface AttributeCallbackDataDTO {
+   uuid: string,
+   name: string,
+   pathVariables: { [key: string]: any },
+   queryParameters: { [key: string]: any },
+   requestBody: { [key: string]: any }
+}
+
 
 export interface ConnectorManagementApi {
-  createNewConnector(
-    name: string,
-    url: string,
-    authType: string,
-    authAttributes: any
-  ): Observable<string>;
-  connectNewConnector(
-    name: string,
-    url: string,
-    authType: string,
-    authAttributes: any,
-    uuid: string
-  ): Observable<ConnectorConnectionResponse[]>;
-  getConnectorsList(): Observable<ConnectorInfoResponse[]>;
-  getConnectorHealth(uuid: string): Observable<ConnectorHealth>;
-  getConnectorDetail(uuid: string): Observable<ConnectorDetailResponse>;
 
-  deleteConnector(uuid: string | number): Observable<ErrorDeleteObject[]>;
-  forceDeleteConnector(uuid: string | number): Observable<void>;
-  authorizeConnector(uuid: string): Observable<void>;
-  reconnectConnector(uuid: string): Observable<void>;
+   getConnectorsList(functionGroupCode?: FunctionGroupCode, kind?: string): Observable<ConnectorDTO[]>;
 
-  bulkDeleteConnector(
-    uuid: (string | number)[]
-  ): Observable<ErrorDeleteObject[]>;
-  bulkForceDeleteConnector(uuid: (string | number)[]): Observable<void>;
-  bulkAuthorizeConnector(uuid: string[]): Observable<void>;
-  bulkReconnectConnector(uuid: string[]): Observable<void>;
+   getConnectorDetail(uuid: string): Observable<ConnectorDTO>;
 
-  updateConnector(
-    uuid: string,
-    name: string,
-    url: string,
-    authType: string,
-    authAttributes: any
-  ): Observable<string>;
-  getConnectorAttributes(
-    uuid: string,
-    code: string,
-    kinds: string
-  ): Observable<ConnectorAttributes[]>;
-  getConnectorAllAttributes(uuid: string): Observable<AllAttributeResponse>;
-  getCallback(
-    connectorUuid: string,
-    request: any,
-    functionGroup: string,
-    kind: string,
-    authorityUuid: string
-  ): Observable<any>;
+   getConnectorHealth(uuid: string): Observable<ConnectorHealthDTO>;
+
+   getConnectorAttributes(uuid: string, functionGroup: FunctionGroupCode, kind: string): Observable<AttributeDescriptorDTO[]>;
+
+   getConnectorAllAttributes(uuid: string): Observable<AttributeDescriptorCollectionDTO>;
+
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<string>;
+
+   updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<ConnectorDTO>;
+
+   deleteConnector(uuid: string): Observable<void>;
+
+   bulkDeleteConnectors(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
+
+   bulkForceDeleteConnectors(uuids: string[]): Observable<void>;
+
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<ConnectionDTO[]>;
+
+   reconnectConnector(uuid: string): Observable<ConnectionDTO[]>;
+
+   bulkReconnectConnectors(uuids: string[]): Observable<void>;
+
+   authorizeConnector(uuid: string): Observable<void>;
+
+   bulkAuthorizeConnectors(uuids: string[]): Observable<void>;
+
+   callback(url: string, data: AttributeCallbackDataDTO): Observable<any>;
+
 }

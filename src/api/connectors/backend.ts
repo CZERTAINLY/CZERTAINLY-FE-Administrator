@@ -1,219 +1,214 @@
-import {
-  AllAttributeResponse,
-  ConnectorHealth,
-  ErrorDeleteObject,
-} from "models";
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { functionGroupCodeToGroupFilter } from "ducks/transform/connectors";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { HttpRequestOptions } from "ts-rest-client";
+
+import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
-import { attributeSimplifier } from "utils/attributes";
+import { AuthType, FunctionGroupCode } from "types/connectors";
 
 import { createNewResource } from "utils/net";
+
 import * as model from "./model";
 
 const baseUrl = "/api/v1/connectors";
-const baseUrlCallback = "/api/v1";
+const callbackBaseUrl = "/api/v1";
 
-export class ConnectorManagementBackend
-  implements model.ConnectorManagementApi
-{
-  constructor() {
-    this._fetchService = new FetchHttpService();
-  }
+export class ConnectorManagementBackend implements model.ConnectorManagementApi {
 
-  private _fetchService: FetchHttpService;
+   constructor() {
+      this._fetchService = new FetchHttpService();
+   }
 
-  createNewConnector(
-    name: string,
-    url: string,
-    authType: string,
-    authAttributes: any
-  ): Observable<string> {
-    if (authType === "none") {
-      return createNewResource(baseUrl, {
-        name,
-        url,
-        authType,
-      }).pipe(
-        map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
-    } else {
-      return createNewResource(baseUrl, {
-        name,
-        url,
-        authType,
-        authAttributes: attributeSimplifier(authAttributes),
-      }).pipe(
-        map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
-    }
-  }
+   private _fetchService: FetchHttpService;
 
-  connectNewConnector(
-    name: string,
-    url: any,
-    authType: string,
-    authAttributes: any,
-    uuid: string
-  ): Observable<model.ConnectorConnectionResponse[]> {
-    if (authType === "none") {
-      return this._fetchService.request(
-        new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
-          uuid,
-          name,
-          url,
-          authType,
-        })
-      );
-    } else {
-      return this._fetchService.request(
-        new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
-          uuid,
-          name,
-          url,
-          authType,
-          authAttributes,
-        })
-      );
-    }
-  }
 
-  getConnectorsList(): Observable<model.ConnectorInfoResponse[]> {
-    return this._fetchService.request(new HttpRequestOptions(baseUrl, "GET"));
-  }
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<string> {
 
-  getConnectorDetail(uuid: string): Observable<model.ConnectorDetailResponse> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
-    );
-  }
+      return createNewResource(
+         baseUrl,
+         {
+            name,
+            url,
+            authType,
+            authAttributes
+         }
+      ).pipe(
 
-  getConnectorHealth(uuid: string): Observable<ConnectorHealth> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}/health`, "GET")
-    );
-  }
+         map(
+            result => {
+               if (result === null) throw new HttpErrorResponse({ status: 404 });
+               return result
+            }
+         )
 
-  getConnectorAttributes(
-    uuid: string,
-    code: string,
-    kind: string
-  ): Observable<model.ConnectorAttributes[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(
-        `${baseUrl}/${uuid}/${code}/${kind}/attributes`,
-        "GET"
       )
-    );
-  }
 
-  getConnectorAllAttributes(uuid: string): Observable<AllAttributeResponse> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}/attributes-all`, "GET")
-    );
-  }
+   }
 
-  deleteConnector(uuid: string | number): Observable<ErrorDeleteObject[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
-    );
-  }
 
-  forceDeleteConnector(uuid: string | number): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/force`, "DELETE", [uuid])
-    );
-  }
+   connectToConnector(url: string, authType: AuthType, authAttributes?: AttributeDTO[], uuid?: string): Observable<model.ConnectionDTO[]> {
 
-  authorizeConnector(uuid: string): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT")
-    );
-  }
-
-  reconnectConnector(uuid: string): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}/reconnect`, "PUT")
-    );
-  }
-
-  bulkDeleteConnector(
-    uuid: (string | number)[]
-  ): Observable<ErrorDeleteObject[]> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}`, "DELETE", uuid)
-    );
-  }
-
-  bulkForceDeleteConnector(uuid: (string | number)[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/force`, "DELETE", uuid)
-    );
-  }
-
-  bulkAuthorizeConnector(uuid: string[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/approve`, "PUT", uuid)
-    );
-  }
-
-  bulkReconnectConnector(uuid: string[]): Observable<void> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/reconnect`, "PUT", uuid)
-    );
-  }
-
-  updateConnector(
-    uuid: string,
-    name: string,
-    url: string,
-    authType: string,
-    authAttributes: any
-  ): Observable<string> {
-    if (authType === "none") {
       return this._fetchService.request(
-        new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-          name,
-          url,
-          authType,
-        })
-      );
-    } else {
-      return this._fetchService.request(
-        new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-          name,
-          url,
-          authType,
-          authAttributes: attributeSimplifier(authAttributes),
-        })
-      );
-    }
-  }
 
-  getCallback(
-    connectorUuid: string,
-    request: any,
-    functionGroup: string,
-    kind: string,
-    authorityUuid: string
-  ): Observable<any> {
-    if (authorityUuid) {
-      return this._fetchService.request(
-        new HttpRequestOptions(
-          `${baseUrlCallback}/${authorityUuid}/callback`,
-          "POST",
-          request
-        )
+         new HttpRequestOptions(`${baseUrl}/connect`, "PUT", {
+            uuid,
+            url,
+            authType,
+            authAttributes
+         })
+
       );
-    } else {
+
+   }
+
+
+   getConnectorsList(functionGroupCode?: FunctionGroupCode, kind?: string): Observable<model.ConnectorDTO[]> {
+
+      const fgf = functionGroupCode ? `functionGroup=${functionGroupCodeToGroupFilter[functionGroupCode]}` : "";
+      const k = kind ? `kind=${kind}` : "";
+
+      const search = fgf ? `?${fgf}` + (k ? `&kind=${k}` : "") : "";
+
       return this._fetchService.request(
-        new HttpRequestOptions(
-          `${baseUrl}/${connectorUuid}/${functionGroup}/${kind}/callback`,
-          "POST",
-          request
-        )
+         new HttpRequestOptions(`${baseUrl}${search}`, "GET")
       );
-    }
-  }
+
+   }
+
+
+   getConnectorDetail(uuid: string): Observable<model.ConnectorDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
+      );
+
+   }
+
+
+   getConnectorHealth(uuid: string): Observable<model.ConnectorHealthDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/health`, "GET")
+      );
+
+   }
+
+   getConnectorAttributes(uuid: string, functionGroupCode: FunctionGroupCode, kind: string): Observable<AttributeDescriptorDTO[]> {
+
+      //const fg = functionGroupCodeToGroupFilter[functionGroupCode];
+
+      return this._fetchService.request(
+         new HttpRequestOptions(
+            `${baseUrl}/${uuid}/${functionGroupCode}/${kind}/attributes`,
+            "GET"
+         )
+      );
+
+   }
+
+
+   getConnectorAllAttributes(uuid: string): Observable<AttributeDescriptorCollectionDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes-all`, "GET")
+      );
+
+   }
+
+
+   deleteConnector(uuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+      );
+
+   }
+
+
+
+   authorizeConnector(uuid: string): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT")
+      );
+
+   }
+
+
+   reconnectConnector(uuid: string): Observable<model.ConnectionDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/reconnect`, "PUT")
+      );
+
+   }
+
+
+   bulkDeleteConnectors(uuids: string[]): Observable<DeleteObjectErrorDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}`, "DELETE", uuids)
+      );
+
+   }
+
+
+   bulkForceDeleteConnectors(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/force`, "DELETE", uuids)
+      );
+
+   }
+
+
+   bulkAuthorizeConnectors(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/approve`, "PUT", uuids)
+      );
+
+   }
+
+
+   bulkReconnectConnectors(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/reconnect`, "PUT", uuids)
+      );
+
+   }
+
+
+   updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+            uuid,
+            url,
+            authType,
+            authAttributes
+         })
+      );
+
+   }
+
+
+   callback(url: string, data: model.AttributeCallbackDataDTO): Observable<any> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(
+            `${callbackBaseUrl}/${url}`,
+            "POST",
+            data
+         )
+
+      );
+
+
+   }
+
 }

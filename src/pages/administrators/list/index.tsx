@@ -1,247 +1,254 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useRouteMatch } from "react-router-dom";
-import { Button, Container } from "reactstrap";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import { Container } from "reactstrap";
 
-import Spinner from "components/Spinner";
+import { actions, selectors } from "ducks/administrators";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import MDBColumnName from "components/MDBColumnName";
 import StatusBadge from "components/StatusBadge";
 import StatusCircle from "components/StatusCircle";
-import Widget from "components/Widget";
-import { actions, selectors } from "ducks/administrators";
-import MDBColumnName from "components/MDBColumnName";
-import ToolTip from "components/ToolTip";
-import {
-  MDBModal,
-  MDBModalBody,
-  MDBModalFooter,
-  MDBModalHeader,
-} from "mdbreact";
-import CustomTable from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 
-function AdministratorsList() {
-  const administrators = useSelector(selectors.selectAdministrators);
-  const isFetching = useSelector(selectors.isFetchingList);
-  const isDeleting = useSelector(selectors.isDeleting);
-  const isEditing = useSelector(selectors.isEditing);
+export default function AdministratorsList() {
 
-  const [checkedRows, setCheckedRows] = useState<string[]>([]);
-  const [isDeleteAdmin, setIsDeleteAdmin] = useState<boolean>(false);
+   const dispatch = useDispatch();
+   const history = useHistory();
 
-  const dispatch = useDispatch();
-  const { path } = useRouteMatch();
+   const { path } = useRouteMatch();
 
-  useEffect(
-    () => {
-      dispatch(actions.requestAdministratorsList());
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+   const checkedRows = useSelector(selectors.checkedRows);
+   const administrators = useSelector(selectors.administrators);
 
-  const onDelete = () => {
-    dispatch(actions.requestBulkDelete(checkedRows));
-    setCheckedRows([]);
-    setIsDeleteAdmin(false);
-  };
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+   const isUpdating = useSelector(selectors.isUpdating);
+   const isBulkEnabling = useSelector(selectors.isBulkEnabling);
+   const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-  const onEnable = () => {
-    dispatch(actions.requestBulkEnable(checkedRows));
-    setCheckedRows([]);
-  };
+   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
-  const onDisable = () => {
-    dispatch(actions.requestBulkDisable(checkedRows));
-    setCheckedRows([]);
-  };
+   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-  const title = (
-    <div>
-      <div className="pull-right mt-n-xs">
-        <Link to="/app/administrators/add" className="btn btn-link">
-          <i className="fa fa-plus" />
-        </Link>
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={() => setIsDeleteAdmin(true)}
-          data-for="delete"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-trash" />
-          ) : (
-            <i className="fa fa-trash" style={{ color: "red" }} />
-          )}
+   useEffect(
 
-          <ToolTip id="delete" message="Delete" />
-        </Button>
+      () => {
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onEnable}
-          data-for="enable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-check" />
-          ) : (
-            <i className="fa fa-check" style={{ color: "green" }} />
-          )}
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         dispatch(actions.listAdmins());
 
-          <ToolTip id="enable" message="Enable" />
-        </Button>
+      },
+      [dispatch]
 
-        <Button
-          className="btn btn-link"
-          color="white"
-          onClick={onDisable}
-          data-for="disable"
-          data-tip
-          disabled={!(checkedRows.length !== 0)}
-        >
-          {!(checkedRows.length !== 0) ? (
-            <i className="fa fa-times" />
-          ) : (
-            <i className="fa fa-times" style={{ color: "red" }} />
-          )}
+   );
 
-          <ToolTip id="disable" message="Disable" />
-        </Button>
-      </div>
-      <h5 className="mt-0">
-        List of <span className="fw-semi-bold">Administrators</span>
-      </h5>
-    </div>
-  );
 
-  const administratorsList = () => {
-    let rows: any = [];
-    for (let administrator of administrators) {
-      let column: any = {};
-      column["name"] = {
-        content: administrator.name,
-        styledContent: (
-          <Link to={`${path}/detail/${administrator.uuid}`}>
-            {administrator.name}
-          </Link>
-        ),
-        lineBreak: true,
-      };
-      column["username"] = {
-        content: administrator.username,
-        lineBreak: true,
-      };
-      column["serialNumber"] = {
-        content: administrator.serialNumber,
-        lineBreak: true,
-      };
-      column["adminDn"] = {
-        content: administrator.certificate.subjectDn,
-        lineBreak: true,
-      };
-      column["superAdmin"] = {
-        content: administrator.superAdmin ? "Yes" : "No",
-        styledContent: <StatusCircle status={administrator.superAdmin} />,
-        lineBreak: true,
-      };
-      column["status"] = {
-        content: administrator.enabled ? "enabled" : "disabled",
-        styledContent: <StatusBadge enabled={administrator.enabled} />,
-        lineBreak: true,
-      };
-      rows.push({
-        id: administrator.uuid,
-        column: column,
-        data: administrator,
-      });
-    }
-    return rows;
-  };
+   const onAddClick = useCallback(
 
-  const administratorRowHeaders = [
-    {
-      styledContent: <MDBColumnName columnName="Name" />,
-      content: "name",
-      sort: false,
-      id: "adminName",
-      width: "5%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Username" />,
-      content: "username",
-      sort: false,
-      id: "adminUsername",
-      width: "10%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Serial Number" />,
-      content: "serialNumber",
-      sort: false,
-      id: "adminSerialNumber",
-      width: "15%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Admin DN" />,
-      content: "adminDn",
-      sort: false,
-      id: "adminAdminDn",
-      width: "35%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Super Admin" />,
-      content: "superAdmin",
-      sort: false,
-      id: "adminSuperAdmin",
-      width: "5%",
-    },
-    {
-      styledContent: <MDBColumnName columnName="Status" />,
-      content: "status",
-      sort: false,
-      id: "adminStatus",
-      width: "10%",
-    },
-  ];
+      () => {
 
-  return (
-    <Container className="themed-container" fluid>
-      <Widget title={title}>
-        <br />
-        <CustomTable
-          checkedRows={checkedRows}
-          checkedRowsFunction={setCheckedRows}
-          data={administrators}
-          headers={administratorRowHeaders}
-          rows={administratorsList()}
-        />
-      </Widget>
+         history.push(`${path}/add`);
 
-      <MDBModal
-        overflowScroll={false}
-        isOpen={isDeleteAdmin}
-        toggle={() => setIsDeleteAdmin(false)}
-      >
-        <MDBModalHeader toggle={() => setIsDeleteAdmin(false)}>
-          Delete Credential
-        </MDBModalHeader>
-        <MDBModalBody>
-          You are about to delete an Administrator. Is this what you want to do?
-        </MDBModalBody>
-        <MDBModalFooter>
-          <Button color="danger" onClick={onDelete}>
-            Yes, delete
-          </Button>
-          <Button color="secondary" onClick={() => setIsDeleteAdmin(false)}>
-            Cancel
-          </Button>
-        </MDBModalFooter>
-      </MDBModal>
-      <Spinner active={isFetching || isDeleting || isEditing} />
-    </Container>
-  );
+      },
+      [history, path]
+
+   );
+
+
+   const onEnableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkEnableAdmins({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDisableAdmins({ uuids: checkedRows }));
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDeleteConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.bulkDeleteAdmins({ uuids: checkedRows }));
+         setConfirmDelete(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const setCheckedRows = useCallback(
+
+      (rows: (string | number)[]) => {
+
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
+      },
+      [dispatch]
+
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+      ],
+      [checkedRows, onAddClick, onEnableClick, onDisableClick]
+
+   );
+
+
+   const title = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               List of <span className="fw-semi-bold">Administrators</span>
+            </h5>
+
+         </div>
+
+      ),
+      [buttons]
+
+   );
+
+
+   const adminTableHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "adminUsername",
+            content: <MDBColumnName columnName="Username" />,
+            sortable: true,
+            sort: "asc",
+            width: "10%",
+         },
+         {
+            id: "adminName",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            width: "5%",
+         },
+         {
+            id: "adminSerialNumber",
+            content: <MDBColumnName columnName="Serial Number" />,
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "adminAdminDn",
+            content: <MDBColumnName columnName="Admin DN" />,
+            sortable: true,
+         },
+         {
+            id: "adminSuperAdmin",
+            content: <MDBColumnName columnName="Super Admin" />,
+            align: "center",
+            sortable: true,
+            width: "11%",
+         },
+         {
+            id: "adminStatus",
+            content: <MDBColumnName columnName="Status" />,
+            align: "center",
+            sortable: true,
+            width: "7%",
+         },
+      ],
+      []
+
+   );
+
+
+   const adminTableData: TableDataRow[] = useMemo(
+
+      () => administrators.map(
+
+         administrator => ({
+
+            id: administrator.uuid,
+
+            columns: [
+
+               <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.username}</Link>,
+
+               administrator.name,
+
+               administrator.serialNumber,
+
+               administrator.certificate.subjectDn,
+
+               <StatusCircle status={administrator.role === "superAdministrator"} />,
+
+               <StatusBadge enabled={administrator.enabled} />,
+
+            ]
+         })
+      ),
+      [administrators, path]
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+            <CustomTable
+               headers={adminTableHeader}
+               data={adminTableData}
+               onCheckedRowsChanged={setCheckedRows}
+               canSearch={true}
+               hasCheckboxes={true}
+               hasPagination={true}
+            />
+
+         </Widget>
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete ${checkedRows.length > 1 ? "Administrators" : "an Administrator"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Administrators" : "an Administrator"}. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+   );
+
 }
-
-export default AdministratorsList;

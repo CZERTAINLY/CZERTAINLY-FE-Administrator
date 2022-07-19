@@ -1,43 +1,43 @@
-// import { ConnectorAttributes } from "api/connectors";
-import { FunctionGroup } from "api/connectors";
-import { AttributeResponse } from "./attributes";
+import { AuthType, FunctionGroupCode, Status } from "types/connectors";
+import { AttributeModel } from "./attributes/AttributeModel";
 
-export interface Connector {
-  uuid: string;
-  name: string;
-  functionGroups?: FunctionGroup[];
-  url: string;
-  status?: string | "";
+
+export interface EndpointModel {
+   uuid?: string;
+   name: string;
+   context: string;
+   method: string;
+   required: boolean;
 }
 
-export interface ConnectorDetails {
-  uuid: string;
-  name?: string;
-  functionGroups?: FunctionGroup[];
-  url: string;
-  status?: string | "";
-  authType: string;
-  authAttributes: AttributeResponse[];
+
+export interface FunctionGroupModel {
+   uuid: string;
+   name: string;
+   functionGroupCode: FunctionGroupCode;
+   kinds: string[];
+   endPoints: EndpointModel[];
 }
 
-export interface ConnectorFunctionGroup {
-  id?: string | number;
+
+export interface ConnectorModel {
+   uuid: string;
+   name: string;
+   functionGroups: FunctionGroupModel[];
+   url: string;
+   status: Status;
+   authType: AuthType;
+   authAttributes?: AttributeModel[];
 }
 
-export interface AllAttributeResponse {
-  [key: string]: any;
+
+export interface ConnectorHealthPartModel {
+   [key: string]: ConnectorHealthModel;
 }
 
-export interface ConnectorHealth {
-  status: string;
-  parts?: OConnectorHealthPart;
-}
 
-export interface OConnectorHealthPart {
-  [key: string]: ConnectorHealthPart;
-}
-
-export interface ConnectorHealthPart {
-  status: string;
-  description: string;
+export interface ConnectorHealthModel {
+   status: "down" | "failed" | "notOk" | "nok" | "nOk" | "ok" | "nok" | "unknown";
+   description?: string;
+   parts?: ConnectorHealthPartModel;
 }
