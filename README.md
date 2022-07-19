@@ -6,18 +6,22 @@ Administrator User Interface or commonly called as Admin UI consists of the admi
 
 Admin UI contains the following menu items:
 
-| Menu item          | Short Description                                                                                                                                                                                                           |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home           | Contains useful links and description of the platform                                                                                                                                            |
-| RA Profile     | Management of `RA Profiles` including creating a new `RA Profile`, enable/disable operations, authorizing a new `Client`, edit and delete a `RA Profile`                                                                                  |
-| Administrators | Provides list of available `Administrators` including the action on each `Administrator` and other related operations                                                                                                           |
-| Clients        | List of `Clients` who are authorized to use the platform and the access to `RA Profiles` on each `Client` can be controlled from the `Client` pages                                                                                 |
-| Connectors     | Provides an overview of available `Connectors`, their details and status. Operations on the `Connectors` like `Approvals`, reconnection on each or multiple `Connectors` can be performed on this page                              |
-| Credentials    | List of all the `Credentials` added to the platform. These `Credentials` are used only for the `Connector` related operations and do not contain any platform authorization related items                                         |
-| Authorities    | List of Authority instances added and the action on each `Authority`. These `Authorities` can be added based on the `Connectors` available in the platform                                                                    |
-| ACME           | Management of `ACME Profiles` and `ACME Accounts`
-| Audit Logs     | Audit log records all operations on CZERTAINLY to reconstruct any event in case of investigation. It also proves the compliance with the various standards and regulations, such as PCI DSS, ISO 27k, GDPR, Web Trust, etc. |
-| About          | About CZERTAINLY, support contacts and other relevant information                                                                                                                                                            |
+| Menu item      | Short Description                                                                                                                                                                                                                                                                      |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Home           | Contains useful links and description of the platform                                                                                                                                                                                                                                  |
+| Dashboard      | `Dashboard` contains the comprehensive and intuitive charts of `Certificates` based on various factors like expiration, type, `Group` etc... `Dashboard` provides a quick overview about the health of the PKI                                                                         |
+| RA Profile     | Management of `RA Profiles` including creating a new `RA Profile`, enable/disable operations, authorizing a new `Client`, edit and delete a `RA Profile`                                                                                                                               |
+| Administrators | Provides list of available `Administrators` including the action on each `Administrator` and other related operations                                                                                                                                                                  |
+| Clients        | List of `Clients` who are authorized to use the platform and the access to `RA Profiles` on each `Client` can be controlled from the `Client` pages                                                                                                                                    |
+| Connectors     | Provides an overview of available `Connectors`, their details and status. Operations on the `Connectors` like `Approvals`, reconnection on each or multiple `Connectors` can be performed on this page                                                                                 |
+| Credentials    | List of all the `Credentials` added to the platform. These `Credentials` are used only for the `Connector` related operations and do not contain any platform authorization related items                                                                                              |
+| Authorities    | List of Authority instances added and the action on each `Authority`. These `Authorities` can be added based on the `Connectors` available in the platform                                                                                                                             |
+| ACME           | Management of `ACME Profiles` and `ACME Accounts`                                                                                                                                                                                                                                      |    
+| Groups         | `Groups` can mainly be used for logical grouping of `Certificates` by categories or teams or application. `Group` page contains the list of available `Groups` to which the `Certificates` can be tagged                                                                               |
+| Entities       | List of all the `Entities` that defines where the `Certificates` are used. `Entities` can be used to mark down where and on what component the `Certificates` are deployed.                                                                                                            |
+| Discovery      | List of all the `Discoveries` performed through the platform. It also provides the option to create a new `Discovery` and to view the details of an existing `Discovery`. Initiating the `Discovery` is dependent on the list of available `Connectors` that are added to the platform |
+| Audit Logs     | Audit log records all operations on CZERTAINLY to reconstruct any event in case of investigation. It also proves the compliance with the various standards and regulations, such as PCI DSS, ISO 27k, GDPR, Web Trust, etc.                                                            |
+| About          | About CZERTAINLY, support contacts and other relevant information                                                                                                                                                                                                                      |
 
 ### Details of Objects
 
@@ -37,4 +41,8 @@ For more information, refer to the [CZERTAINLY documentation](https://docs.czert
 
 ## Docker container
 
-Admin Web Interface is provided as a Docker container. Use the `3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository.
+Admin Web Interface is provided as a Docker container. Use the `docker pull harbor.3key.company/czertainly/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
+
+| Variable       | Description                                                        | Required | Default value     |
+|----------------|--------------------------------------------------------------------|----------|-------------------|
+| `BASE_URL`     | Base URL for the web                                               | No       | `/administrator`  |
