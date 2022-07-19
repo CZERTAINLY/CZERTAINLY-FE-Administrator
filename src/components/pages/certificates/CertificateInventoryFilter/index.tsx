@@ -45,10 +45,10 @@ export default function CertificateInventoryFilter({
    const dispatch = useDispatch();
 
    const availableFilters = useSelector(selectors.availableCertificateFilters);
+   const filters = useSelector(selectors.currentCertificateFilters);
 
    const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailablFilters);
 
-   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>(empty);
    const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 
    const [confirmClear, setConfirmClear] = useState(false);
@@ -152,7 +152,7 @@ export default function CertificateInventoryFilter({
                value: filterValue ? typeof filterValue === "string" ? filterValue : Array.isArray(filterValue) ? filterValue.map(v => (v as any).value) : (filterValue as any).value : ""
             }]
 
-            setFilters(newFilters);
+            dispatch(actions.setCurrentFilters({ currentFilters: newFilters }));
 
             onFiltersChanged(newFilters);
 
@@ -165,14 +165,14 @@ export default function CertificateInventoryFilter({
             }, ...filters.slice(selectedFilter + 1)]
 
 
-            setFilters(newFilters);
+            dispatch(actions.setCurrentFilters({ currentFilters: newFilters }));
 
             onFiltersChanged(newFilters);
 
          }
 
       },
-      [filterField, filterCondition, filterValue, selectedFilter, filters, onFiltersChanged]
+      [filterField, filterCondition, selectedFilter, filters, filterValue, dispatch, onFiltersChanged]
 
    )
 
@@ -182,10 +182,10 @@ export default function CertificateInventoryFilter({
       (index: number) => {
 
          const newFilters = filters.filter((_, i) => i !== index);
-         setFilters(newFilters);
+         dispatch(actions.setCurrentFilters({ currentFilters: newFilters }));
 
       },
-      [filters]
+      [dispatch, filters]
 
    )
 
@@ -342,7 +342,7 @@ export default function CertificateInventoryFilter({
             body={`You are about to clear Certificate Inventory Filters. Is this what you want to do?`}
             toggle={() => setConfirmClear(false)}
             buttons={[
-               { color: "danger", onClick: () => { setFilters(empty); setConfirmClear(false) }, body: "Yes, clear" },
+               { color: "danger", onClick: () => { dispatch(actions.setCurrentFilters({ currentFilters: empty })); setConfirmClear(false) }, body: "Yes, clear" },
                { color: "secondary", onClick: () => setConfirmClear(false), body: "Cancel" },
             ]}
 
