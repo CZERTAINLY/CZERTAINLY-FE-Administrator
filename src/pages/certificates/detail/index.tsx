@@ -110,7 +110,7 @@ useEffect(
   [dispatch, raProfiles]
 )
 
- 
+
 
  useEffect(
 
@@ -231,22 +231,22 @@ const onUpdateRaProfile = useCallback(
   },
   [certificate, dispatch, raProfile]
 
-  
+
   );
 
   const onRevoke = useCallback(
 
     () => {
-  
+
        if (!certificate) return;
-  
+
        dispatch(actions.revokeCertificate({ uuid: certificate.uuid,  reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "" }));
        setRevoke(false);
-  
+
     },
     [certificate, dispatch, revokeReason, ]
-  
-    
+
+
     );
 
     const onRenew = useCallback(
@@ -316,8 +316,8 @@ const onUpdateRaProfile = useCallback(
 
      () => [
         { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-        { icon: "retweet", disabled: certificate?.raProfile === undefined, tooltip: "Renew", onClick: () => { setRenew(true); } },
-        { icon: "minus-square", disabled: certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
+        { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
+        { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
         { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
      ],
      [certificate, downloadDropDown]
@@ -544,15 +544,15 @@ const revokeBody = useMemo(
   const historyEntry:TableDataRow[] = useMemo(
     () => !eventHistory ? [] : eventHistory.map(function (history) {
       return (
-          {"id": history.uuid, 
-          "columns": [dateFormatter(history.created), 
+          {"id": history.uuid,
+          "columns": [dateFormatter(history.created),
 
-                      history.createdBy, 
+                      history.createdBy,
 
-                      history.event, 
+                      history.event,
 
-                      <CertificateEventStatus status={history.status} />, 
-                      
+                      <CertificateEventStatus status={history.status} />,
+
                       <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
 
                       history.additionalInformation ? (
@@ -761,8 +761,8 @@ const revokeBody = useMemo(
          {
             id: key,
             columns: [
-              key, 
-              <CertificateValidationStatus status={value.status} />, 
+              key,
+              <CertificateValidationStatus status={value.status} />,
               <div style={{ wordBreak: "break-all" }}>
                 {value.message.split("\n").map((str: string) => (
                   <div>
@@ -839,7 +839,7 @@ const revokeBody = useMemo(
         },
         {
            id: "keyUsage",
-           columns: ["Key Usage", 
+           columns: ["Key Usage",
            certificate?.keyUsage?.map(function (name) {
             return (
               <div key={name}>
@@ -853,7 +853,7 @@ const revokeBody = useMemo(
         },
         {
           id: "extendedKeyUsage",
-          columns: ["Extended Key Usage", 
+          columns: ["Extended Key Usage",
           certificate?.extendedKeyUsage?.map(function (name) {
            return (
              <div key={name}>
