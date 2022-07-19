@@ -10,6 +10,7 @@ import { mutators } from "utils/attributeEditorMutators";
 
 import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
 import { actions as raProfileActions, selectors as raProfileSelectors, } from "ducks/ra-profiles";
+import { actions as connectorActions } from "ducks/connectors";
 
 import ProgressButton from "components/ProgressButton";
 
@@ -50,6 +51,7 @@ function CertificateForm({
    useEffect(() => {
 
       dispatch(raProfileActions.listRaProfiles());
+      dispatch(connectorActions.clearCallbackData());
 
    }, [dispatch]);
 

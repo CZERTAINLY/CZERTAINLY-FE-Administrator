@@ -15,7 +15,7 @@ import { ConnectorModel, EndpointModel } from "models/connectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router";
 
-import { actions as conenctorActions, selectors as connectorSelectors } from "ducks/connectors";
+import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
 import { AuthType } from "types/connectors";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { MDBBadge } from "mdbreact";
@@ -90,11 +90,11 @@ function ConnectorForm({ title }: Props) {
       () => {
 
          if (params.id && (!connectorSelector || connectorSelector.uuid !== params.id) && !isFetching) {
-            dispatch(conenctorActions.getConnectorDetail({ uuid: params.id }));
+            dispatch(connectorActions.getConnectorDetail({ uuid: params.id }));
          }
 
          if (params.id && (connectorSelector && connectorSelector.uuid === params.id && !isFetching)) {
-            dispatch(conenctorActions.reconnectConnector({ uuid: params.id }));
+            dispatch(connectorActions.reconnectConnector({ uuid: params.id }));
          }
 
          if (params.id && connectorSelector?.uuid === params.id) {
@@ -103,7 +103,8 @@ function ConnectorForm({ title }: Props) {
 
          } else {
 
-            dispatch(conenctorActions.clearConnectionDetails());
+            dispatch(connectorActions.clearConnectionDetails());
+            dispatch(connectorActions.clearCallbackData());
 
             setConnector({
                uuid: "",
@@ -131,7 +132,7 @@ function ConnectorForm({ title }: Props) {
 
             if (!connector) return;
 
-            dispatch(conenctorActions.updateConnector({
+            dispatch(connectorActions.updateConnector({
                uuid: connector?.uuid,
                url: values.url,
                authType: selectedAuthType.value,
@@ -140,7 +141,7 @@ function ConnectorForm({ title }: Props) {
 
          } else {
 
-            dispatch(conenctorActions.createConnector({
+            dispatch(connectorActions.createConnector({
                name: values.name,
                url: values.url,
                authType: selectedAuthType.value,
@@ -166,9 +167,9 @@ function ConnectorForm({ title }: Props) {
 
    const onConnectClick = (values: FormValues) => {
       if (editMode) {
-         dispatch(conenctorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
+         dispatch(connectorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
       } else {
-         dispatch(conenctorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
+         dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
       }
    };
 

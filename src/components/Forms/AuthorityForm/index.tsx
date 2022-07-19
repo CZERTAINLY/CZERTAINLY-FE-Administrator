@@ -12,6 +12,7 @@ import { AuthorityModel } from "models/authorities";
 
 import { actions as alertActions } from "ducks/alerts";
 import { actions as authorityActions, selectors as authoritySelectors } from "ducks/authorities";
+import { actions as connectorActions } from "ducks/connectors";
 
 import { mutators } from "utils/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes";
@@ -72,6 +73,7 @@ export default function AuthorityForm({
 
          if (init) {
             dispatch(authorityActions.resetState());
+            dispatch(connectorActions.clearCallbackData());
             setInit(false);
          }
 

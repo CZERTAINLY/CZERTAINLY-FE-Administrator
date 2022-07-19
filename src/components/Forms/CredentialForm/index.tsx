@@ -11,6 +11,7 @@ import { CredentialModel } from "models/credentials";
 import { ConnectorModel } from "models/connectors";
 
 import { actions, selectors } from "ducks/credentials";
+import { actions as connectorsActions } from "ducks/connectors";
 
 import { collectFormAttributes } from "utils/attributes";
 import { mutators } from "utils/attributeEditorMutators";
@@ -77,6 +78,7 @@ export default function CredentialForm({
 
          if (init) {
             dispatch(actions.listCredentialProviders());
+            dispatch(connectorsActions.clearCallbackData());
          }
 
          if (editMode && credentialSelector?.uuid === params.id) {

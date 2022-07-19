@@ -13,6 +13,7 @@ import { RaProfileModel } from "models/ra-profiles";
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import { actions as authoritiesActions, selectors as authoritiesSelectors } from "ducks/authorities";
+import { actions as connectorActions } from "ducks/connectors";
 
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
@@ -71,6 +72,7 @@ export default function RaProfileForm({
       () => {
          dispatch(authoritiesActions.listAuthorities());
          dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
+         dispatch(connectorActions.clearCallbackData());
          if (editMode) dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
       },
       [dispatch, editMode, params.id]

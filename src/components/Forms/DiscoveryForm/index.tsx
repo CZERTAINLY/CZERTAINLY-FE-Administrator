@@ -10,6 +10,7 @@ import { validateRequired, composeValidators, validateAlphaNumeric } from "utils
 import { ConnectorModel } from "models/connectors";
 
 import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
+import { actions as connectorActions } from "ducks/connectors";
 
 import { mutators } from "utils/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes";
@@ -63,6 +64,7 @@ export default function DiscoveryForm({
 
          if (init) {
             dispatch(discoveryActions.resetState());
+            dispatch(connectorActions.clearCallbackData());
             setInit(false);
          }
 
