@@ -31,7 +31,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
       const descriptor = descriptors?.find(d => d.name === attributeName);
 
       if (!descriptor) continue;
-      if (attributes[attribute] === undefined) continue;
+      if (attributes[attribute] === undefined || attributes[attribute] === null) continue;
 
       let content: any;
 
