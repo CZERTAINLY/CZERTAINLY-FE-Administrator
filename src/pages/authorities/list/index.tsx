@@ -280,7 +280,7 @@ function AuthorityList() {
 
          <Dialog
             isOpen={confirmForceDelete}
-            caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            caption={`Force Delete ${checkedRows.length > 1 ? "Authorities" : "an Authority"}`}
             body={forceDeleteBody}
             toggle={() => setConfirmForceDelete(false)}
             buttons={[
