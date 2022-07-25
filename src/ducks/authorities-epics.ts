@@ -507,6 +507,25 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
 }
 
 
+const bulkForceDeleteAuthoritySuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkForceDeleteAuthoritySuccess.match
+      ),
+      switchMap(
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
 const bulkForceDeleteAuthorityFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -546,6 +565,7 @@ const epics = [
    bulkDeleteAuthority,
    bulkDeleteAuthorityFailure,
    bulkForceDeleteAuthority,
+   bulkForceDeleteAuthoritySuccess,
    bulkForceDeleteAuthorityFailure,
 ];
 

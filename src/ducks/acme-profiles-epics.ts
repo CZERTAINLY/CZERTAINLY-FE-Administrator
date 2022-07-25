@@ -272,7 +272,7 @@ const deleteAcmeProfile: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.acmeProfiles.deleteAcmeProfile(action.payload.uuid).pipe(
 
             map(
-               errors => slice.actions.deleteAcmeProfileSuccess({ uuid: action.payload.uuid, errors })
+               () => slice.actions.deleteAcmeProfileSuccess({ uuid: action.payload.uuid })
             ),
             catchError(
                err => of(slice.actions.deleteAcmeProfileFailed({ error: extractError(err, "Failed to delete ACME Profile") }))
@@ -467,7 +467,7 @@ const bulkForceDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.acmeProfiles.bulkForceDeleteAcmeProfiles(action.payload.uuids).pipe(
 
             map(
-               () => slice.actions.bulkForceDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids })
+               () => slice.actions.bulkForceDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
             ),
             catchError(
                err => of(slice.actions.bulkForceDeleteAcmeProfilesFailed({ error: extractError(err, "Failed to delete ACME Accounts") }))
@@ -481,6 +481,25 @@ const bulkForceDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
 
 }
 
+
+const bulkForceDeleteAcmeProfilesSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkForceDeleteAcmeProfilesSuccess.match
+      ),
+      switchMap(
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
 
 const bulkForceDeleteAcmeProfilesFailed: AppEpic = (action$, state$, deps) => {
 
@@ -605,6 +624,7 @@ const epics = [
    bulkDeleteAcmeProfiles,
    bulkDeleteAcmeProfilesFailed,
    bulkForceDeleteAcmeProfiles,
+   bulkForceDeleteAcmeProfilesSuccess,
    bulkForceDeleteAcmeProfilesFailed,
    bulkEnableAcmeProfiles,
    bulkEnableAcmeProfilesFailed,
