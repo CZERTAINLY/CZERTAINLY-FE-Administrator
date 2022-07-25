@@ -83,7 +83,7 @@ export default function AuthorityDetail() {
       () => {
 
          if (!authority) return;
-
+         dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid], redirect:`../` }));
 
       },

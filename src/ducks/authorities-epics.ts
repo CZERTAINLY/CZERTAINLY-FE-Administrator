@@ -492,7 +492,7 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.authorities.bulkForceDeleteAuthority(action.payload.uuids).pipe(
 
             map(
-               () => slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids })
+               () => slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
             ),
             catchError(
                err => of(slice.actions.bulkForceDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk force delete Authorities") }))
