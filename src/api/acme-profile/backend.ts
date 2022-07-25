@@ -60,7 +60,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    }
 
 
-   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]> {
+   deleteAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
