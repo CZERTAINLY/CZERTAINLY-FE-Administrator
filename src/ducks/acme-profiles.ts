@@ -225,11 +225,12 @@ export const slice = createSlice({
       deleteAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = true;
+         state.deleteErrorMessage = "";
 
       },
 
 
-      deleteAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string, errors: DeleteObjectErrorModel[] }>) => {
+      deleteAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string}>) => {
 
          state.isDeleting = false;
 
@@ -245,6 +246,7 @@ export const slice = createSlice({
       deleteAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false
+         state.deleteErrorMessage = action.payload.error || "Unknown error";
 
       },
 
@@ -304,6 +306,7 @@ export const slice = createSlice({
 
 
       bulkDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+         state.bulkDeleteErrorMessages = [];
 
          state.isBulkDeleting = true;
 
@@ -313,7 +316,6 @@ export const slice = createSlice({
       bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
          state.isBulkDeleting = false;
-
          if (action.payload.errors.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return
@@ -340,14 +342,14 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkForceDeleteAcmeProfiles: (state, action: PayloadAction<{ uuids: string[], redirect?: string }>) => {
 
          state.isBulkForceDeleting = true;
 
       },
 
 
-      bulkForceDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkForceDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[],redirect?: string }>) => {
 
          state.isBulkForceDeleting = false;
 

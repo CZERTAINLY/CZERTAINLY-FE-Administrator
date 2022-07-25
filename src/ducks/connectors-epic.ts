@@ -726,7 +726,7 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.connectors.bulkForceDeleteConnectors(action.payload.uuids).pipe(
 
             map(
-               () => slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids })
+               () => slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids, successRedirect: action.payload.successRedirect })
             ),
 
             catchError(

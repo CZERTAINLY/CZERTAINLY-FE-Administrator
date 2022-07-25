@@ -83,8 +83,8 @@ export default function AuthorityDetail() {
       () => {
 
          if (!authority) return;
-
-         dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid] }));
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid], redirect:`../` }));
 
       },
       [authority, dispatch]
@@ -215,10 +215,10 @@ export default function AuthorityDetail() {
 
          <Dialog
             isOpen={deleteErrorMessage !== ""}
-            caption="Delete Connector"
+            caption="Delete Authority"
             body={
                <>
-                  Failed to delete the connector as the connector has dependent objects.
+                  Failed to delete the Authority Instance as it has dependent objects.
                   Please find the details below:
                   <br />
                   <br />

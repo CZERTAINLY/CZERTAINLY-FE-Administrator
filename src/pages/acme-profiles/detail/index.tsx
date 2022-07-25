@@ -27,6 +27,8 @@ export default function AdministratorDetail() {
    const isDisabling = useSelector(selectors.isDisabling);
    const isEnabling = useSelector(selectors.isEnabling);
 
+   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
+
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
 
@@ -97,6 +99,19 @@ export default function AdministratorDetail() {
 
          dispatch(actions.deleteAcmeProfile({ uuid: acmeProfile.uuid }));
          setConfirmDelete(false);
+
+      },
+      [acmeProfile, dispatch]
+
+   );
+
+   const onForceDeleteAcmeProfile = useCallback(
+
+      () => {
+
+         if (!acmeProfile) return;
+
+         dispatch(actions.bulkForceDeleteAcmeProfiles({ uuids: [acmeProfile.uuid], redirect: `../`}));
 
       },
       [acmeProfile, dispatch]
@@ -383,13 +398,32 @@ export default function AdministratorDetail() {
 
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete ACME Pro"
+            caption="Delete ACME Profile"
             body="You are about to delete ACME Profile which may have associated ACME
                   Account(s). When deleted the ACME Account(s) will be revoked."
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={deleteErrorMessage.length > 0}
+            caption="Delete ACME Profile"
+            body={
+               <>
+                  Failed to delete the ACME Profile that has dependent objects.
+                  Please find the details below:
+                  <br />
+                  <br />
+                  {deleteErrorMessage}
+               </>
+            }
+            toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteAcmeProfile, body: "Force" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
             ]}
          />
 
