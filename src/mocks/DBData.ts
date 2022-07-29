@@ -14,6 +14,7 @@ import { DbDiscovery } from "./db-discoveries";
 import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
 import { GroupDTO } from "api/groups";
 import { DashboardDTO } from "api/dashboard";
+import { DbComplianceGroup, DbComplianceProfile, DbComplianceProfileList, DbComplianceRule } from "./db-compliance-profiles";
 
 import { DbEntity } from "./db-entities";
 import { DbLocation } from "./db-locations";
@@ -54,5 +55,9 @@ export interface DBData {
 
    dashboard: DashboardDTO;
 
+   complianceProfilesList: DbComplianceProfileList[];
+   complianceProfiles: DbComplianceProfile[];
+   complianceRules: DbComplianceRule[];
+   complianceGroups: DbComplianceGroup[];
 
 }
