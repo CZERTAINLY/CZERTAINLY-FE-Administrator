@@ -19,7 +19,7 @@ export interface ComplianceListItemRuleDTO {
 export interface ComplianceProfileDTO {
    name: string;
    uuid: string;
-   description: string;
+   description?: string;
    rules: ComplianceConnectorAndRulesDTO[];
    groups: ComplianceConnectorAndGroupsDTO[];
    raProfiles: ComplianceRaProfileDto[];
@@ -103,7 +103,7 @@ export interface ComplianceProfileManagementApi {
    
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
    
-   getAssociatedRaProfiles(uuid: string): Observable<RaProfileDTO[]>;
+   getAssociatedRaProfiles(uuid: string): Observable<ComplianceRaProfileDto[]>;
    
    getComplianceProfileRules(connectorUuid?: string, kind?: string, certificateType?: CertificateType): Observable<ComplianceConnectorAndRulesDTO[]>;
    
