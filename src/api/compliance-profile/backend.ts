@@ -149,7 +149,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
       );
    }
 
-   getAssociatedRaProfiles(uuid: string): Observable<RaProfileDTO[]> {
+   getAssociatedRaProfiles(uuid: string): Observable<model.ComplianceRaProfileDto[]> {
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/raprofiles`, "GET")
       );
