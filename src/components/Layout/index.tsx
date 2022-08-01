@@ -29,6 +29,7 @@ import Groups from "pages/group";
 import Discovery from "pages/discoveries";
 import Dashboard from "pages/dashboard";
 import Certificates from "pages/certificates";
+import ComplianceProfiles from "pages/compliance-profiles";
 
 function Layout() {
 
@@ -72,6 +73,7 @@ function Layout() {
                   <Route path="/app/groups" component={Groups} />
                   <Route path="/app/discovery" component={Discovery} />
                   <Route path="/app/certificates" component={Certificates} />
+                  <Route path="/app/complianceprofiles" component={ComplianceProfiles} />
 
                </Switch>
 

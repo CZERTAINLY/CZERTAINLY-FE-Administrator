@@ -56,6 +56,9 @@ import groupEpics from "./groups-epics";
 import { initialState as initialDiscoveryState, slice as discoverySlice } from "./discoveries";
 import discoveryEpics from "./discoveries-epics";
 
+import { initialState as initialComplianceProfileState, slice as complianceProfileSlice } from "./compliance-profiles";
+import complianceProfileEpics from "./compliance-profiles-epics";
+
 
 export interface EpicDependencies {
    apiClients: ApiClients;
@@ -86,6 +89,7 @@ export const initialState = {
    [locationsSlice.name]: initialLocationState,
    [groupSlice.name]: initialGroupState,
    [discoverySlice.name]: initialDiscoveryState,
+   [complianceProfileSlice.name]: initialComplianceProfileState,
 };
 
 
@@ -107,6 +111,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [locationsSlice.name]: locationsSlice.reducer,
    [groupSlice.name]: groupSlice.reducer,
    [discoverySlice.name]: discoverySlice.reducer,
+   [complianceProfileSlice.name]: complianceProfileSlice.reducer,
 });
 
 
@@ -128,4 +133,5 @@ export const epics = combineEpics(
    ...locationsEpics,
    ...groupEpics,
    ...discoveryEpics,
+   ...complianceProfileEpics,
 );
