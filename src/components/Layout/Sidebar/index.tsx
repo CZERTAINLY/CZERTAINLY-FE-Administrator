@@ -43,6 +43,7 @@ function Sidebar() {
             />
             <LinksGroup _key="/app/groups" header="Groups" headerLink="/app/groups" />
             <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
+            <LinksGroup _key="/app/complianceprofiles" header="Compliance Profiles" headerLink="/app/complianceprofiles" />
             <LinksGroup _key="/app/certificates" header="Certificates" headerLink="/app/certificates" />
             <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
 
