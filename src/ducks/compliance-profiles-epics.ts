@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
 import { slice } from "./compliance-profiles";
 import history from "browser-history";
-import { transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel } from "./transform/compliance-profiles";
+import { transformComplianceConnectorGroupDTOToModel, transformComplianceConnectorRuleDTOToModel, transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel, transformComplianceRuleDTOToModel } from "./transform/compliance-profiles";
 
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
@@ -656,6 +656,92 @@ const getAssociatedRaProfilesFailed: AppEpic = (action$, state$, deps) => {
 }
 
 
+const getRules: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listComplianceRules.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.complianceProfile.getComplianceProfileRules()
+            .pipe(
+
+               map(
+                  (rules) => slice.actions.listComplianceRulesSuccess(rules.map(transformComplianceConnectorRuleDTOToModel))
+               ),
+               catchError(
+                  err => of(slice.actions.listComplianceRulesFailed({ error: extractError(err, "Failed to get compliance rules") }))
+               )
+
+            )
+
+      )
+
+   )
+}
+
+
+const getRulesFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listComplianceRulesFailed.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
+const getGroups: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listComplianceGroups.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.complianceProfile.getComplianceProfileGroups()
+            .pipe(
+
+               map(
+                  (groups) => slice.actions.listComplianceGroupsSuccess(groups.map(transformComplianceConnectorGroupDTOToModel))
+               ),
+               catchError(
+                  err => of(slice.actions.listComplianceGroupsFailed({ error: extractError(err, "Failed to get compliance groups") }))
+               )
+
+            )
+
+      )
+
+   )
+}
+
+
+const getGroupsFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listComplianceGroupsFailed.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
+
 const epics = [
    listComplianceProfiles,
    listComplianceProfilesFailed,
@@ -686,6 +772,10 @@ const epics = [
    dissociateRaProfileFailed,
    getAssociatedRaProfiles,
    getAssociatedRaProfilesFailed,
+   getRules,
+   getRulesFailed,
+   getGroups,
+   getGroupsFailed
 
 ];
 

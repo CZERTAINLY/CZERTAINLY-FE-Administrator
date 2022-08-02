@@ -1,7 +1,6 @@
-import React, { useMemo } from "react";
+import ComplianceProfileForm from "components/Forms/ComplianceProfileForm";
+import { useMemo } from "react";
 import { Container } from "reactstrap";
-
-import AcmeProfileForm from "components/Forms/AcmeProfileForm";
 
 export default function AdminEdit() {
 
@@ -10,7 +9,7 @@ export default function AdminEdit() {
       () => (
 
          <h5>
-            Add new <span className="fw-semi-bold">ACME Profile</span>
+            Add new <span className="fw-semi-bold">Compliance Profile</span>
          </h5>
 
       ),
@@ -21,7 +20,7 @@ export default function AdminEdit() {
    return (
 
       <Container className="themed-container" fluid>
-         <AcmeProfileForm title={title} />
+         <ComplianceProfileForm title={title} />
       </Container>
 
    );
