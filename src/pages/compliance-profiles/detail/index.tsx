@@ -1,41 +1,35 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
-import { Container, Row, Col } from "reactstrap";
+import { Container } from "reactstrap";
 
-import { actions, selectors } from "ducks/acme-profiles";
+import { actions, selectors } from "ducks/compliance-profiles";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import AttributeViewer from "components/Attributes/AttributeViewer";
 
 
-export default function AdministratorDetail() {
+export default function ComplianceProfileDetail() {
 
    const dispatch = useDispatch();
 
    const { params } = useRouteMatch<{ id: string }>();
 
-   const history = useHistory();
-
-   const acmeProfile = useSelector(selectors.acmeProfile);
+   const profile = useSelector(selectors.complianceProfile);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-   const isDisabling = useSelector(selectors.isDisabling);
-   const isEnabling = useSelector(selectors.isEnabling);
 
-   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
+   const isFetchingRules = useSelector(selectors.isFetchingRules);
+   const rules = useSelector(selectors.rules);
+
+   const isFetchingGroups = useSelector(selectors.isFetchingGroups);
+   const groups = useSelector(selectors.groups);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-
-   const isBusy = useMemo(
-      () => isFetchingDetail || isDisabling || isEnabling,
-      [isFetchingDetail, isDisabling, isEnabling]
-   );
+   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
 
    useEffect(
@@ -44,49 +38,12 @@ export default function AdministratorDetail() {
 
          if (!params.id) return;
 
-         dispatch(actions.getAcmeProfile({ uuid: params.id }));
+         dispatch(actions.getComplianceProfile({ uuid: params.id }));
+         dispatch(actions.listComplianceRules());
+         dispatch(actions.listComplianceGroups());
 
       },
       [params.id, dispatch]
-   );
-
-
-   const onEditClick = useCallback(
-
-      () => {
-
-         history.push(`../../acmeprofiles/edit/${acmeProfile?.uuid}`);
-
-      },
-      [acmeProfile, history]
-
-   );
-
-
-   const onEnableClick = useCallback(
-
-      () => {
-
-         if (!acmeProfile) return;
-
-         dispatch(actions.enableAcmeProfile({ uuid: acmeProfile.uuid }));
-
-      },
-      [acmeProfile, dispatch]
-
-   );
-
-
-   const onDisableClick = useCallback(
-
-      () => {
-
-         if (!acmeProfile) return;
-
-         dispatch(actions.disableAcmeProfile({ uuid: acmeProfile.uuid }));
-
-      },
-      [acmeProfile, dispatch]
 
    );
 
@@ -95,26 +52,27 @@ export default function AdministratorDetail() {
 
       () => {
 
-         if (!acmeProfile) return;
+         if (!profile) return;
 
-         dispatch(actions.deleteAcmeProfile({ uuid: acmeProfile.uuid }));
+         dispatch(actions.deleteComplianceProfile({ uuid: profile.uuid }));
          setConfirmDelete(false);
 
       },
-      [acmeProfile, dispatch]
+      [profile, dispatch]
 
    );
 
-   const onForceDeleteAcmeProfile = useCallback(
+
+   const onForceDeleteComplianceProfile = useCallback(
 
       () => {
 
-         if (!acmeProfile) return;
+         if (!profile) return;
 
-         dispatch(actions.bulkForceDeleteAcmeProfiles({ uuids: [acmeProfile.uuid], redirect: `../`}));
+         dispatch(actions.bulkForceDeleteComplianceProfiles({ uuids: [profile.uuid], redirect: `../` }));
 
       },
-      [acmeProfile, dispatch]
+      [profile, dispatch]
 
    );
 
@@ -122,15 +80,11 @@ export default function AdministratorDetail() {
    const buttons: WidgetButtonProps[] = useMemo(
 
       () => [
-         { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "check", disabled: acmeProfile?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: !(acmeProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
-      [acmeProfile, onEditClick, onDisableClick, onEnableClick]
+      []
 
    );
-
 
    const detailsTitle = useMemo(
 
@@ -143,18 +97,83 @@ export default function AdministratorDetail() {
             </div>
 
             <h5>
-               ACME Profile <span className="fw-semi-bold">Details</span>
+               Compliance Profile <span className="fw-semi-bold">Details</span>
             </h5>
 
          </div>
 
-      ),
-      [buttons]
+      ), [buttons]
 
    );
 
 
-   const tableHeader: TableHeader[] = useMemo(
+   const rulesTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <h5>
+               <span className="fw-semi-bold">Rules</span>
+            </h5>
+
+         </div>
+
+      ), [buttons]
+
+   );
+
+
+   const groupsTitle = useMemo(
+
+      () => (
+
+         <div>
+            <h5>
+               <span className="fw-semi-bold">Groups</span>
+            </h5>
+
+         </div>
+
+      ), []
+
+   );
+
+
+   const availableRulesTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <h5>
+               <span className="fw-semi-bold">Add Rules</span>
+            </h5>
+
+         </div>
+
+      ), []
+
+   );
+
+
+   const availableGroupsTitle = useMemo(
+
+      () => (
+
+         <div>
+            <h5>
+               <span className="fw-semi-bold">Add Group</span>
+            </h5>
+
+         </div>
+
+      ), [buttons]
+
+   );
+
+
+   const detailHeaders: TableHeader[] = useMemo(
 
       () => [
          {
@@ -171,236 +190,302 @@ export default function AdministratorDetail() {
    );
 
 
-   const acmeProfileDetailData: TableDataRow[] = useMemo(
+   const rulesHeaders: TableHeader[] = useMemo(
 
-      () => !acmeProfile ? [] : [
+      () => [
+         {
+            id: "connectorName",
+            content: "Connector Name",
+         },
+         {
+            id: "ruleName",
+            content: "Rule Name",
+         },
+         {
+            id: "ruleDescription",
+            content: "Rule Description",
+         },
+         {
+            id: "ruleUuid",
+            content: "Rule UUID",
+         },
+      ],
+      []
+
+   );
+
+
+   const availableRulesHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "connectorName",
+            content: "Connector",
+         },
+         {
+            id: "connectorKind",
+            content: "Kind",
+         },
+         {
+            id: "ruleName",
+            content: "Name",
+         },
+         {
+            id: "ruleDescription",
+            content: "Description",
+         },
+         {
+            id: "action",
+            content: "Action",
+         },
+      ],
+      []
+
+   );
+
+
+   const availableGroupsHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "connectorName",
+            content: "Connector",
+         },
+         {
+            id: "connectorKind",
+            content: "Kind",
+         },
+         {
+            id: "groupName",
+            content: "Name",
+         },
+         {
+            id: "groupDescription",
+            content: "Description",
+         },
+         {
+            id: "action",
+            content: "Action",
+         },
+      ],
+      []
+
+   );
+
+
+   const groupHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "connectorName",
+            content: "Connector Name",
+         },
+         {
+            id: "groupName",
+            content: "Group Name",
+         },
+         {
+            id: "groupDescription",
+            content: "Group Description",
+         },
+         {
+            id: "groupUuid",
+            content: "Group UUID",
+         },
+      ],
+      []
+
+   );
+
+
+   const detailData: TableDataRow[] = useMemo(
+
+      () => !profile ? [] : [
 
          {
             id: "uuid",
-            columns: ["UUID", acmeProfile.uuid]
+            columns: ["UUID", profile.uuid]
          },
          {
             id: "name",
-            columns: ["Name", acmeProfile.name]
+            columns: ["Name", profile.name]
          },
          {
             id: "description",
-            columns: ["Description", acmeProfile.description || ""]
-         },
-         {
-            id: "status",
-            columns: ["Username", <StatusBadge enabled={acmeProfile.enabled} />]
-         },
-         {
-            id: "websiteUrl",
-            columns: ["Website URL", acmeProfile.websiteUrl || "N/A"]
-         },
-         {
-            id: "retryInterval",
-            columns: ["Retry Interval", `${acmeProfile.retryInterval || "N/A"} (seconds)`]
-         },
-         {
-            id: "orderValidity",
-            columns: ["Order Validity", `${acmeProfile.validity || "N/A"} (seconds)`]
-         },
-         {
-            id: "directoryUrl",
-            columns: ["Dierectory URL", acmeProfile.directoryUrl || "N/A"]
+            columns: ["Description", profile.description || ""]
          },
 
       ],
-      [acmeProfile]
+      [profile]
 
    );
 
 
-   const raProfileDetailData: TableDataRow[] = useMemo(
+   const rulesData: TableDataRow[] = useMemo(
 
-      () => !acmeProfile || !acmeProfile.raProfile ? [] : [
+      () => {
+         if (!profile) return [];
+         if (!profile.rules) return [];
 
-         {
-            id: "uuid",
-            columns: ["UUID", acmeProfile.raProfile.uuid]
-         },
-         {
-            id: "name",
-            columns: ["Name", acmeProfile.raProfile.name]
-         },
-         {
-            id: "status",
-            columns: ["Status", <StatusBadge enabled={acmeProfile.raProfile.enabled} />]
-         },
-
-      ],
-      [acmeProfile]
-
-   );
-
-
-   const dnsData: TableDataRow[] = useMemo(
-
-      () => !acmeProfile ? [] : [
-
-         {
-            id: "dnsResolverIpAddress",
-            columns: ["DNS Resolver IP Address", acmeProfile.dnsResolverIp || "N/A"]
-         },
-         {
-            id: "dnsResolverPort",
-            columns: ["DNS Resolver Port", acmeProfile.dnsResolverPort || "N/A"]
+         let data: TableDataRow[] = [];
+         for(const connector of profile.rules) {
+            for(const rule of connector.rules) {
+               data.push({
+                  id: `${rule.uuid}-${connector.connectorUuid}`,
+                  columns: [
+                     connector.connectorName,
+                     rule.name,
+                     rule.description || "",
+                     rule.uuid,
+                  ]
+               });
+            }
          }
-
-      ],
-      [acmeProfile]
+         return data;
+      },
+      [profile]
 
    );
 
 
-   const termsOfServiceData: TableDataRow[] = useMemo(
+   const groupsData: TableDataRow[] = useMemo(
 
-      () => !acmeProfile ? [] : [
+      () => {
+         if (!profile) return [];
+         if (!profile.groups) return [];
 
-         {
-            id: "termsOfServiceUrl",
-            columns: ["Terms of Service URL", acmeProfile.termsOfServiceUrl || "N/A"]
-         },
-         {
-            id: "changesToTermsOfServiceUrl",
-            columns: ["Changes of Terms of Service URL", acmeProfile.termsOfServiceChangeUrl || "N/A"]
-         },
-         {
-            id: "disableNewOrderPlacement",
-            columns: ["Disable new Order placement? (due to change in Terms Of Service)", acmeProfile.termsOfServiceChangeDisable !== undefined ? acmeProfile.termsOfServiceChangeDisable ? "Yes" : "No" : "N/A"]
-         },
-         {
-            id: "requireContact",
-            columns: ["Require Contact information for new Accounts?", acmeProfile.requireContact !== undefined ? acmeProfile.requireContact ? "Yes" : "No" : "N/A"]
-         },
-         {
-            id: "requireAgreement",
-            columns: ["Require Agreement for new Accounts?", acmeProfile.requireTermsOfService !== undefined ? acmeProfile.requireTermsOfService ? "Yes" : "No" : "N/A"]
+         let data: TableDataRow[] = [];
+         for(const connector of profile.groups) {
+            for(const group of connector.groups) {
+               data.push({
+                  id: `${group.uuid}-${connector.connectorUuid}`,
+                  columns: [
+                     connector.connectorName,
+                     group.name,
+                     group.description || "",
+                     group.uuid,
+                  ]
+               });
+            }
          }
-
-      ],
-      [acmeProfile]
+         return data;
+      },
+      [profile]
 
    );
 
 
+   const availableRulesData: TableDataRow[] = useMemo(
+
+      () => {
+         if (!profile) return [];
+         if (!profile.rules) return [];
+
+         let data: TableDataRow[] = [];
+         for(const connector of rules) {
+            for(const rule of connector.rules) {
+               data.push({
+                  id: `${rule.uuid}-${connector.connectorUuid}`,
+                  columns: [
+                     connector.connectorName,
+                     connector.kind,
+                     rule.name,
+                     rule.description || ""
+                  ]
+               });
+            }
+         }
+         return data;
+      },
+      [profile]
+
+   );
+
+
+   const availableGroupsData: TableDataRow[] = useMemo(
+
+      () => {
+         if (!profile) return [];
+         if (!profile.groups) return [];
+
+         let data: TableDataRow[] = [];
+         for(const connector of groups) {
+            for(const group of connector.groups) {
+               data.push({
+                  id: `${group.uuid}-${connector.connectorUuid}`,
+                  columns: [
+                     connector.connectorName,
+                     connector.kind,
+                     group.name,
+                     group.description || "",
+                     group.uuid,
+                  ]
+               });
+            }
+         }
+         return data;
+      },
+      [profile]
+
+   );
+
+      console.log(rules)
    return (
 
       <Container className="themed-container" fluid>
 
-         <Row xs="1" sm="1" md="2" lg="2" xl="2">
+         <Widget title={detailsTitle} busy={isFetchingDetail}>
 
-            <Col>
+            <CustomTable
+               headers={detailHeaders}
+               data={detailData}
+            />
 
-               <Widget title={detailsTitle} busy={isBusy}>
+         </Widget>
 
-                  <CustomTable
-                     headers={tableHeader}
-                     data={acmeProfileDetailData}
-                  />
+         <Widget title={rulesTitle} busy={isFetchingDetail}>
 
-               </Widget>
+            <CustomTable
+               headers={rulesHeaders}
+               data={rulesData}
+            />
 
-            </Col>
+         </Widget>
 
-            <Col>
+         <Widget title={groupsTitle} busy={isFetchingDetail}>
 
-               <Widget title="DNS" busy={isBusy}>
-
-                  <CustomTable
-                     headers={tableHeader}
-                     data={dnsData}
-                  />
-
-               </Widget>
-
-               <Widget title="Terms of Service" busy={isBusy}>
-
-                  <CustomTable
-                     headers={tableHeader}
-                     data={termsOfServiceData}
-                  />
-
-               </Widget>
-
-
-            </Col>
-
-         </Row>
-
-
-
-
-         <Widget title={raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"} busy={isBusy}>
-
-            {
-
-               raProfileDetailData.length === 0 ? <></> : (
-
-                  <>
-
-                     <CustomTable
-                        headers={tableHeader}
-                        data={raProfileDetailData}
-                     />
-
-                     <Row xs="1" sm="1" md="2" lg="2" xl="2">
-
-                        <Col>
-
-                           {
-                              (acmeProfile?.issueCertificateAttributes) === undefined || acmeProfile.issueCertificateAttributes.length === 0 ? <></> : (
-
-                                 <Widget title="List of Attributes to Issue Certificate" busy={isBusy}>
-
-                                    <AttributeViewer
-                                       attributes={acmeProfile?.issueCertificateAttributes}
-                                    />
-
-                                 </Widget>
-
-                              )
-                           }
-
-                        </Col>
-
-                        <Col>
-
-                           {
-                              (acmeProfile?.revokeCertificateAttributes) === undefined || acmeProfile.revokeCertificateAttributes.length === 0 ? <></> : (
-
-                                 <Widget title="List of Attributes to Revoke Certificate" busy={isBusy}>
-
-                                    <AttributeViewer
-                                       attributes={acmeProfile?.revokeCertificateAttributes}
-                                    />
-
-                                 </Widget>
-
-                              )
-                           }
-
-                        </Col>
-
-                     </Row>
-
-                  </>
-
-               )
-
-            }
+            <CustomTable
+               headers={groupHeaders}
+               data={groupsData}
+               hasPagination={true}
+            />
 
          </Widget>
 
 
+         <Widget title={availableRulesTitle} busy={isFetchingRules}>
+
+            <CustomTable
+               headers={availableRulesHeaders}
+               data={availableRulesData}
+               hasPagination={true}
+            />
+
+         </Widget>
+
+         <Widget title={availableGroupsTitle} busy={isFetchingGroups}>
+
+            <CustomTable
+               headers={availableGroupsHeaders}
+               data={availableGroupsData}
+            />
+
+         </Widget>
+
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete ACME Profile"
-            body="You are about to delete ACME Profile which may have associated ACME
-                  Account(s). When deleted the ACME Account(s) will be revoked."
+            caption="Delete Compliance Profile"
+            body="You are about to delete a Compliance Profile. Is this what you want to do?"
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
@@ -410,10 +495,10 @@ export default function AdministratorDetail() {
 
          <Dialog
             isOpen={deleteErrorMessage.length > 0}
-            caption="Delete ACME Profile"
+            caption="Delete Compliance Profile"
             body={
                <>
-                  Failed to delete the ACME Profile that has dependent objects.
+                  Failed to delete the Compliance Profile that has dependent objects.
                   Please find the details below:
                   <br />
                   <br />
@@ -422,14 +507,14 @@ export default function AdministratorDetail() {
             }
             toggle={() => dispatch(actions.clearDeleteErrorMessages())}
             buttons={[
-               { color: "danger", onClick: onForceDeleteAcmeProfile, body: "Force" },
+               { color: "danger", onClick: onForceDeleteComplianceProfile, body: "Force" },
                { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
             ]}
          />
 
-
-      </Container >
+      </Container>
    );
 
 
 }
+

@@ -2,7 +2,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
-import { ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel } from "models/compliance-profiles";
+import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel, ComplianceRulesModel } from "models/compliance-profiles";
 import { ComplianceRaProfileDto } from "api/compliance-profile";
 
 
@@ -15,6 +15,9 @@ export type State = {
 
    complianceProfile?: ComplianceProfileModel;
    complianceProfiles: ComplianceProfileListItemModel[];
+
+   rules: ComplianceConnectorAndRulesModel[]
+   groups: ComplianceConnectorAndGroupsModel[]
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -43,6 +46,9 @@ export const initialState: State = {
 
    deleteErrorMessage: "",
    bulkDeleteErrorMessages: [],
+
+   rules: [],
+   groups: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -471,6 +477,38 @@ export const slice = createSlice({
       getAssociatedRaProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingRaProfile = false;
+      },
+
+      listComplianceRules: (state, action: PayloadAction<void>) => {
+
+         state.isFetchingRules = true;
+      },
+
+      listComplianceRulesSuccess: (state, action: PayloadAction<ComplianceConnectorAndRulesModel[]>) => {
+
+         state.isFetchingRules = false;
+         state.rules = action.payload;
+      },
+
+      listComplianceRulesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingRules = false;
+      },
+
+      listComplianceGroups: (state, action: PayloadAction<void>) => {
+
+         state.isFetchingGroups = true;
+      },
+
+      listComplianceGroupsSuccess: (state, action: PayloadAction<ComplianceConnectorAndGroupsModel[]>) => {
+
+         state.isFetchingGroups = false;
+         state.groups = action.payload;
+      },
+
+      listComplianceGroupsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingGroups = false;
       }
    }
 })
@@ -490,6 +528,8 @@ const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
+const isFetchingRules = createSelector(state, (state) => state.isFetchingRules);
+const isFetchingGroups = createSelector(state, (state) => state.isFetchingGroups);
 
 const isAddingRule = createSelector(state, (state) => state.isAddingRule);
 const isDeletingRule = createSelector(state, (state) => state.isDeletingRule);
@@ -500,6 +540,8 @@ const isDissociatingRaProfile = createSelector(state, (state) => state.isDissoci
 const isFetchingRaProfile = createSelector(state, (state) => state.isFetchingRaProfile);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isBulkForceDeleting = createSelector(state, (state) => state.isBulkForceDeleting);
+const rules = createSelector(state, state => state.rules);
+const groups = createSelector(state, state => state.groups);
 
 
 export const selectors = {
@@ -518,6 +560,8 @@ export const selectors = {
    isFetchingDetail,
    isCreating,
    isDeleting,
+   isFetchingRules,
+   isFetchingGroups,
 
    isAddingRule,
    isDeletingRule,
@@ -528,7 +572,10 @@ export const selectors = {
    isFetchingRaProfile,
 
    isBulkDeleting,
-   isBulkForceDeleting
+   isBulkForceDeleting,
+
+   rules,
+   groups
 
 };
 

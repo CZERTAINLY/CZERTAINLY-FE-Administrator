@@ -1,5 +1,5 @@
-import { ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRulesDTO } from "api/compliance-profile";
-import { ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRulesModel } from "models/compliance-profiles";
+import { ComplianceConnectorAndGroupsDTO, ComplianceConnectorAndRulesDTO, ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRulesDTO } from "api/compliance-profile";
+import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRulesModel } from "models/compliance-profiles";
 import { transformAttributeDTOToModel } from "./attributes";
 
 export function transformComplianceProfileListDtoToModel(complianceProfileDto: ComplianceProfileListItemDTO): ComplianceProfileListItemModel {
@@ -47,6 +47,29 @@ export function transformComplianceGroupDTOToModel(complianceGroupDto: Complianc
       uuid: complianceGroupDto.uuid,
       name: complianceGroupDto.name,
       description: complianceGroupDto.description,
+   };
+
+}
+
+export function transformComplianceConnectorRuleDTOToModel(complianceRuleDto: ComplianceConnectorAndRulesDTO): ComplianceConnectorAndRulesModel {
+
+   return {
+      connectorName: complianceRuleDto.connectorName,
+      connectorUuid: complianceRuleDto.connectorUuid,
+      rules: JSON.parse(JSON.stringify(complianceRuleDto.rules)),
+      kind: complianceRuleDto.kind,
+   };
+
+}
+
+
+export function transformComplianceConnectorGroupDTOToModel(complianceGroupDto: ComplianceConnectorAndGroupsDTO): ComplianceConnectorAndGroupsModel {
+
+   return {
+      connectorName: complianceGroupDto.connectorName,
+      connectorUuid: complianceGroupDto.connectorUuid,
+      groups: JSON.parse(JSON.stringify(complianceGroupDto.groups)),
+      kind: complianceGroupDto.kind,
    };
 
 }
