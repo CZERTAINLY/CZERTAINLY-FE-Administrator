@@ -34,6 +34,7 @@ export type State = {
    isFetchingGroups: boolean;
    isAssociatingRaProfile: boolean;
    isDissociatingRaProfile: boolean;
+   isCheckingCompliance: boolean;
 
 };
 
@@ -65,6 +66,7 @@ export const initialState: State = {
    isFetchingGroups: false,
    isAssociatingRaProfile: false,
    isDissociatingRaProfile: false,
+   isCheckingCompliance: false,
 
 };
 
@@ -366,6 +368,7 @@ export const slice = createSlice({
       addGroupSuccess: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, connectorName: string, kind: string, groupUuid: string, groupName: string, description: string }>) => {
 
          state.isAddingGroup = false;
+         let found = false;
          if (!state.complianceProfile) return;
 
          if (state.complianceProfile?.groups === undefined) {
@@ -382,12 +385,25 @@ export const slice = createSlice({
          } else {
             for (let connector of state.complianceProfile.groups || []) {
                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
+                  found = true;
                   connector.groups.push({
                      uuid: action.payload.groupUuid,
                      name: action.payload.groupName,
                      description: action.payload.description
                   });
                }
+            }
+            if (!found) {
+               state.complianceProfile?.groups.push({
+                  connectorUuid: action.payload.connectorUuid,
+                  kind: action.payload.kind,
+                  connectorName: action.payload.connectorName,
+                  groups: [{
+                     uuid: action.payload.groupUuid,
+                     name: action.payload.groupName,
+                     description: action.payload.description
+                  }]
+               });
             }
          }
 
@@ -428,16 +444,21 @@ export const slice = createSlice({
       },
 
 
-      associateRaProfile: (state, action: PayloadAction<{ uuid: string, raProfileUuids: string[] }>) => {
+      associateRaProfile: (state, action: PayloadAction<{ uuid: string, raProfileUuids: ComplianceRaProfileModel[] }>) => {
 
          state.isAssociatingRaProfile = true;
 
       },
 
 
-      associateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuids: string[] }>) => {
+      associateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuids: ComplianceRaProfileModel[] }>) => {
 
          state.isAssociatingRaProfile = false;
+
+         if (!state.complianceProfile) return;
+
+         state.complianceProfile.raProfiles = state.complianceProfile.raProfiles.concat(action.payload.raProfileUuids);
+
       },
 
 
@@ -455,6 +476,17 @@ export const slice = createSlice({
       dissociateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuids: string[] }>) => {
 
          state.isDissociatingRaProfile = false;
+
+         if (!state.complianceProfile) return;
+
+         for (let profile of state.complianceProfile.raProfiles || []) {
+            for (let requestUuid of action.payload.raProfileUuids) {
+               if (profile.uuid === requestUuid) {
+                  const raProfileIndex = state.complianceProfile.raProfiles.findIndex(raProfile => raProfile.uuid === requestUuid);
+                  if (raProfileIndex >= 0) state.complianceProfile.raProfiles.splice(raProfileIndex, 1);
+               }
+            }
+         }
       },
 
       dissociateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -509,6 +541,21 @@ export const slice = createSlice({
       listComplianceGroupsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingGroups = false;
+      },
+
+      checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isCheckingCompliance = true;
+      },
+
+      checkComplianceSuccess: (state, action: PayloadAction<void>) => {
+
+         state.isCheckingCompliance = false;
+      },
+
+      checkComplianceFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isCheckingCompliance = false;
       }
    }
 })

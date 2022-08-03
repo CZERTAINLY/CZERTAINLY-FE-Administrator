@@ -533,7 +533,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.complianceProfile.associateComplianceProfileToRaProfile(
             action.payload.uuid,
-            action.payload.raProfileUuids
+            action.payload.raProfileUuids.map((raProfile) => (raProfile.uuid))
          ).pipe(
 
             map(
@@ -741,6 +741,68 @@ const getGroupsFailed: AppEpic = (action$, state$, deps) => {
 }
 
 
+const checkCompliance: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkCompliance.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.complianceProfile.checkCompliance(
+            action.payload.uuids
+         ).pipe(
+
+            map(
+               () => slice.actions.checkComplianceSuccess()
+            ),
+            catchError(
+               err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
+
+            )
+
+         )
+
+      )
+
+   )
+}
+
+
+const checkComplianceFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkComplianceFailed.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
+const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkComplianceSuccess.match
+      ),
+      map(
+
+         action => alertActions.success("Compliance Check for the certificates initiated")
+      )
+
+   );
+}
+
+
+
 
 const epics = [
    listComplianceProfiles,
@@ -775,7 +837,10 @@ const epics = [
    getRules,
    getRulesFailed,
    getGroups,
-   getGroupsFailed
+   getGroupsFailed,
+   checkCompliance,
+   checkComplianceSuccess,
+   checkComplianceFailed
 
 ];
 

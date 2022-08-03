@@ -103,7 +103,7 @@ export const dbComplianceProfiles: DbComplianceProfiles = {
       "groups": [
          {
             "connectorName": "COMP",
-            "connectorUuid": "6a4bceef-5eb4-4b35-b3c5-b664a6be4d72",
+            "connectorUuid": "6a4bceef-5eb4-4b35-b3c5-b66416be4d72",
             "kind": "x509",
             "groups": [
                {
