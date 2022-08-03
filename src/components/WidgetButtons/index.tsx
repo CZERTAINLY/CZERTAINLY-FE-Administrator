@@ -4,8 +4,10 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square";
-   tooltip?: string;
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info";
+   additionalTooltipId?: string;
+   tooltipScheme?: "dark" | "success" | "warning" | "error" | "info" | "light";
+   tooltip?: any;
    disabled: boolean;
    custom?: React.ReactNode;
    onClick: (event: React.MouseEvent) => void
@@ -31,7 +33,8 @@ const colors = {
    "user": "auto",
    "cubes": "auto",
    "retweet": "auto",
-   "minus-square": "red"
+   "minus-square": "red",
+   "info": "auto"
 };
 
 
@@ -50,6 +53,7 @@ const classNames = {
    "cubes": "fa fa-cubes",
    "retweet": "fa fa-retweet",
    "minus-square": "fa fa-minus-square",
+   "info": "fa fa-info-circle"
 }
 
 
@@ -61,7 +65,7 @@ function WidgetButtons({ buttons }: Props) {
       let style;
 
       let btnProps: ButtonProps = {
-         key: button.icon + button.tooltip,
+         key: button.icon + button.tooltip + button.additionalTooltipId || "",
          className: "btn btn-link",
          color: "white",
          onClick: button.onClick,
@@ -70,12 +74,12 @@ function WidgetButtons({ buttons }: Props) {
 
       if (button.tooltip) {
 
-         const toolTipId = `btn_tooltip_${button.tooltip}`;
+         const toolTipId = `btn_tooltip_${button.tooltip}_${button.additionalTooltipId || ""}`;
 
          btnProps["data-for"] = toolTipId;
          btnProps["data-tip"] = "";
 
-         toolTip = <ToolTip id={toolTipId} message={button.tooltip} />
+         toolTip = <ToolTip id={toolTipId} message={button.tooltip} tooltipType={button.tooltipScheme}/>
 
       }
 
