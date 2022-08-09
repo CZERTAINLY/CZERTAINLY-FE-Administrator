@@ -16,6 +16,7 @@ export function transformDashbaordDTOToModel(dashboardDTO: DashboardDTO): Dashbo
       certificateStatByKeySize: dashboardDTO.certificateStatByKeySize,
       certificateStatByBasicConstraints: dashboardDTO.certificateStatByBasicConstraints,
       certificateStatByStatus: dashboardDTO.certificateStatByStatus,
+      certificateStatByComplianceStatus: dashboardDTO.certificateStatByComplianceStatus,
    };
 
 }
