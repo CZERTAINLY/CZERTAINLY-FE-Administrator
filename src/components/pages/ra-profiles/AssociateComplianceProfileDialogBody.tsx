@@ -11,34 +11,36 @@ import { validateRequired } from 'utils/validators';
 
 import Spinner from "components/Spinner";
 
-import { actions } from "ducks/compliance-profiles";
-import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
+import { actions, selectors } from "ducks/compliance-profiles";
+import { actions as raActions } from "ducks/ra-profiles";
+
+import { RaProfileModel } from 'models';
 
 
 interface Props {
-   complianceProfileUuid?: string;
-   availableRaProfileUuids?: string[];
+   raProfile?: RaProfileModel;
+   availableComplianceProfileUuids?: string[];
    visible: boolean;
    onClose: () => void;
 }
 
 
-export default function AssociateRaProfileDialogBody({
-   complianceProfileUuid,
-   availableRaProfileUuids,
+export default function AssociateComplianceProfileDialogBody({
+   raProfile,
+   availableComplianceProfileUuids,
    visible,
    onClose
 }: Props) {
 
    const dispatch = useDispatch();
 
-   const raProfiles = useSelector(raSelectors.raProfiles);
+   const complianceProfiles = useSelector(selectors.complianceProfiles);
 
-   const isFetchingRaProfiles = useSelector(raSelectors.isFetchingList);
+   const isFetchingComplianceProfiles = useSelector(selectors.isFetchingList);
 
    const isBusy = useMemo(
-      () => isFetchingRaProfiles,
-      [isFetchingRaProfiles]
+      () => isFetchingComplianceProfiles,
+      [isFetchingComplianceProfiles]
    );
 
 
@@ -47,7 +49,7 @@ export default function AssociateRaProfileDialogBody({
       () => {
          if (!visible) return;
 
-         dispatch(raActions.listRaProfiles());
+         dispatch(actions.listComplianceProfiles());
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [visible]
@@ -55,9 +57,9 @@ export default function AssociateRaProfileDialogBody({
    )
 
 
-   const optionsForRaProfiles = useMemo(
+   const optionsForComplianceProfiles = useMemo(
 
-      () => raProfiles.filter(e => !availableRaProfileUuids?.includes(e.uuid)).map(
+      () => complianceProfiles.filter(e => !availableComplianceProfileUuids?.includes(e.uuid)).map(
 
          raProfile => ({
             value: raProfile,
@@ -65,7 +67,7 @@ export default function AssociateRaProfileDialogBody({
          })
 
       ),
-      [raProfiles, availableRaProfileUuids]
+      [complianceProfiles, availableComplianceProfileUuids]
 
    );
 
@@ -74,22 +76,25 @@ export default function AssociateRaProfileDialogBody({
 
       (values: any) => {
 
-         if (!complianceProfileUuid) return;
+         if (!raProfile) return;
 
-         dispatch(actions.associateRaProfile({
-            uuid: complianceProfileUuid,
-            raProfileUuids: [{uuid: values.raProfiles.value.uuid, name: values.raProfiles.value.name, enabled: values.raProfiles.value.enabled}]
+         dispatch(raActions.associateRaProfile({
+            uuid: raProfile.uuid,
+            complianceProfileUuid: values.complianceProfiles.value.uuid,
+            complianceProfileName: values.complianceProfiles.value.name,
+            description: values.complianceProfiles.value.description
+
          }));
 
          onClose();
 
       },
-      [dispatch, onClose, complianceProfileUuid]
+      [dispatch, onClose, raProfile]
 
    )
 
 
-   if (!complianceProfileUuid) return <></>;
+   if (!raProfile) return <></>;
 
    return (
       <>
@@ -99,20 +104,20 @@ export default function AssociateRaProfileDialogBody({
 
                <BootstrapForm onSubmit={handleSubmit}>
 
-                  <Field name="raProfiles" validate={validateRequired()}>
+                  <Field name="complianceProfiles" validate={validateRequired()}>
 
                      {({ input, meta }) =>
 
                         <FormGroup>
 
-                           <Label for="raProfiles">Select RA profile</Label>
+                           <Label for="complianceProfile">Select Compliance profile</Label>
 
                            <Select
                               {...input}
                               maxMenuHeight={140}
                               menuPlacement="auto"
-                              options={optionsForRaProfiles}
-                              placeholder="Select RA profile to be associated"
+                              options={optionsForComplianceProfiles}
+                              placeholder="Select Compliance profile to be associated"
                               styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                            />
 

@@ -1,9 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel, ComplianceRulesModel } from "models/compliance-profiles";
-import { ComplianceRaProfileDto } from "api/compliance-profile";
+import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel } from "models/compliance-profiles";
 
 
 export type State = {

@@ -1,9 +1,8 @@
-import { RaProfileDTO } from "api/profiles";
 import { AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { HttpRequestOptions, NamedValues } from "ts-rest-client";
+import { HttpRequestOptions } from "ts-rest-client";
 import { FetchHttpService } from "ts-rest-client-fetch";
 import { createNewResource } from "utils/net";
 import * as model from "./model";
@@ -82,7 +81,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
       
       return this._fetchService.request(
          
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}/rules`, "POST", {
             connectorUuid,
             kind,
             ruleUuid,
@@ -96,7 +95,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
    deleteRuleFromComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string): Observable<void> {
       return this._fetchService.request(
          
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}/rules`, "DELETE", {
             connectorUuid,
             kind,
             ruleUuid
@@ -108,7 +107,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
    addGroupToComplianceProfile(uuid: string, connectorUuid: string, kind: string, groupUuid: string): Observable<void> {
       return this._fetchService.request(
          
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}/groups`, "POST", {
             connectorUuid,
             kind,
             groupUuid
@@ -120,7 +119,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
    deleteGroupFromComplianceProfile(uuid: string, connectorUuid: string, kind: string, groupUuid: string): Observable<void> {
       return this._fetchService.request(
          
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}/groups`, "DELETE", {
             connectorUuid,
             kind,
             groupUuid

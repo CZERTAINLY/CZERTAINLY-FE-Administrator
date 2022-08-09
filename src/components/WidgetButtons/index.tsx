@@ -4,7 +4,7 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "push" | "sync";
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "push" | "sync" | "minus";
    additionalTooltipId?: string;
    tooltipScheme?: "dark" | "success" | "warning" | "error" | "info" | "light";
    tooltip?: any;
@@ -36,7 +36,9 @@ const colors = {
    "minus-square": "red",
    "push": "auto",
    "sync": "auto",
-   "info": "auto"
+   "info": "auto",
+   "minus": "red",
+   "gavel": "auto",
 };
 
 
@@ -57,7 +59,9 @@ const classNames = {
    "minus-square": "fa fa-minus-square",
    "push": "fa fa-arrow-circle-up",
    "sync": "fa fa-refresh",
-   "info": "fa fa-info-circle"
+   "info": "fa fa-info-circle",
+   "minus": "fa fa-minus",
+   "gavel": "fa fa-gavel",
 }
 
 

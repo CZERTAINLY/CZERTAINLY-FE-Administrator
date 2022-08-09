@@ -1,12 +1,12 @@
 import { ComplianceConnectorAndGroupsDTO, ComplianceConnectorAndRulesDTO, ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRulesDTO } from "api/compliance-profile";
 import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRulesModel } from "models/compliance-profiles";
-import { transformAttributeDTOToModel } from "./attributes";
 
 export function transformComplianceProfileListDtoToModel(complianceProfileDto: ComplianceProfileListItemDTO): ComplianceProfileListItemModel {
-
+   
    return {
       uuid: complianceProfileDto.uuid,
       name: complianceProfileDto.name,
+      description: complianceProfileDto.description,
       rules: JSON.parse(JSON.stringify(complianceProfileDto.rules)),
    };
 

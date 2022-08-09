@@ -35,6 +35,8 @@ export default function AdministratorsList() {
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
+   const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
+
    useEffect(
 
       () => {
@@ -84,6 +86,19 @@ export default function AdministratorsList() {
    );
 
 
+   const onComplianceCheckConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.checkCompliance({ uuids: checkedRows }));
+         setComplianceCheck(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
    const setCheckedRows = useCallback(
 
       (rows: (string | number)[]) => {
@@ -112,6 +127,7 @@ export default function AdministratorsList() {
 
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "gavel", disabled: checkedRows.length === 0, tooltip: "Check Compliance", onClick: () => { setComplianceCheck(true) } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } }
       ],
       [checkedRows, onAddClick]
@@ -121,47 +137,36 @@ export default function AdministratorsList() {
    const getComplianceItems = useCallback(
 
       (complianceItems: ComplianceListItemRuleDTO[], lookingFor: string) => {
-         if (lookingFor === "connector") {
-            return complianceItems.map(
+         if (lookingFor === "groups") {
+            let sum = complianceItems.map(item => item.numberOfGroups || 0).reduce((a, b) => a + b, 0)
+            return (
+               <div>
 
-               item => (
+                  <MDBBadge color="secondary" searchvalue={sum}>
+                     
+                     {sum || 0}
 
-                  <div key={item.connectorName + item.numberOfGroups + item.numberOfRules}>
-                     <MDBBadge color="primary" searchvalue={item.connectorName}>
-                        {item.connectorName}
-                     </MDBBadge>
-                  </div>
+                  </MDBBadge>
 
-               )
-
-            )
-         } else if (lookingFor === "groups") {
-            return complianceItems.map(
-
-               item => (
-
-                  <div key={item.connectorName + item.numberOfGroups + item.numberOfRules}>
-                     <MDBBadge color="secondary" searchvalue={item.numberOfGroups}>
-                        {item.numberOfGroups || 0}
-                     </MDBBadge>
-                  </div>
-
-               )
+               </div>
 
             )
+
          } else {
-            return complianceItems.map(
+            let sum = complianceItems.map(item => item.numberOfRules || 0).reduce((a, b) => a + b, 0)
+            return (
+               <div>
 
-               item => (
+                  <MDBBadge color="secondary" searchvalue={sum}>
+                     
+                     {sum || 0}
 
-                  <div key={item.connectorName + item.numberOfGroups + item.numberOfRules}>
-                     <MDBBadge color="secondary" searchvalue={item.numberOfGroups}>
-                        {item.numberOfGroups || 0}
-                     </MDBBadge>
-                  </div>
+                  </MDBBadge>
 
-               )
+               </div>
+
             )
+
          }
 
 
@@ -249,8 +254,8 @@ export default function AdministratorsList() {
             sort: "asc"
          },
          {
-            id: "connectorName",
-            content: <MDBColumnName columnName="Connector" />,
+            id: "description",
+            content: <MDBColumnName columnName="Description" />,
          },
          {
             id: "totalRules",
@@ -277,13 +282,13 @@ export default function AdministratorsList() {
             columns: [
 
                <Link to={`${path}/detail/${complianceProfile.uuid}`}>{complianceProfile.name}</Link>,
-               <>{getComplianceItems(complianceProfile.rules, "connector")}</>,
+               complianceProfile.description || "",
                <>{getComplianceItems(complianceProfile.rules, "rules")}</>,
                <>{getComplianceItems(complianceProfile.rules, "groups")}</>
             ]
          })
       ),
-      [complianceProfiles, path]
+      [complianceProfiles, path, getComplianceItems]
 
    );
 
@@ -326,6 +331,18 @@ export default function AdministratorsList() {
             buttons={[
                { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
                { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={complianceCheck}
+            caption={`Initiate Compliance Check`}
+            body={"Initiate the compliance check for the selected Compliance Profile(s)?"}
+            toggle={() => setComplianceCheck(false)}
+            buttons={[
+               { color: "primary", onClick: onComplianceCheckConfirmed, body: "Yes" },
+               { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
             ]}
          />
 

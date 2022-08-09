@@ -5,7 +5,6 @@ import { HttpErrorResponse } from "ts-rest-client";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
-import { RaProfileDTO } from "api/profiles";
 import { AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 import { CertificateType } from "types/certificate";
@@ -26,6 +25,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
                   complianceProfile => ({
                      uuid: complianceProfile.uuid,
                      name: complianceProfile.name,
+                     description: complianceProfile.description,
                      rules: complianceProfile.rules,
                   })
 

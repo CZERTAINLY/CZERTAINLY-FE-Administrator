@@ -9,6 +9,8 @@ import Select from "react-select";
 import { actions as clientActions, selectors as clientSelectors } from "ducks/clients";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 
+import { actions as complianceProfilesActions, selectors as complianceProfilesSelectors } from "ducks/compliance-profiles";
+
 import AcmeProtocolActiovationDialogBody from "../../../components/pages/ra-profiles/AcmeProtocolActiovationDialogBody";
 
 import Widget from "components/Widget";
@@ -19,6 +21,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import ProgressButton from "components/ProgressButton";
 import ToolTip from "components/ToolTip";
+import AssociateComplianceProfileDialogBody from "components/pages/ra-profiles/AssociateComplianceProfileDialogBody";
 
 
 export default function RaProfileDetail() {
@@ -60,6 +63,10 @@ export default function RaProfileDetail() {
    const [activateAcmeDialog, setActivateAcmeDialog] = useState(false);
 
    const [confirmDeactivateAcme, setConfirmDeactivateAcme] = useState<boolean>(false);
+
+   const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
+
+   const [associateComplianceProfile, setAssociateComplianceProfile] = useState<boolean>(false);
 
 
    const isBusy = useMemo(
@@ -178,13 +185,40 @@ export default function RaProfileDetail() {
 
    )
 
+   const onComplianceCheck = useCallback(
+
+      () => {
+
+         setComplianceCheck(false)
+
+         if (!raProfile?.uuid) return;
+
+         dispatch(raProfilesActions.checkCompliance({ uuids: [raProfile.uuid] }));
+      },
+      [dispatch, raProfile]
+
+   )
+
+   const onDissociateComplianceProfile = useCallback(
+
+      (uuid: string) => {
+
+         if (!raProfile) return;
+
+         dispatch(raProfilesActions.dissociateRaProfile({ uuid: raProfile.uuid, complianceProfileUuid: uuid, complianceProfileName: "" }));
+      },
+      [raProfile, dispatch]
+
+   )
+
 
    const buttons: WidgetButtonProps[] = useMemo(
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: raProfile?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: !(raProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
+         { icon: "times", disabled: !(raProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } },
+         { icon: "gavel", disabled: false, tooltip: "Check Compliance", onClick: () => { setComplianceCheck(true); } },
       ],
       [raProfile, onEditClick, onDisableClick, onEnableClick]
    );
@@ -206,6 +240,72 @@ export default function RaProfileDetail() {
          </div>
 
       ), [buttons]
+   );
+
+   const complianceProfileButtons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Associate Compliance Profile", onClick: () => { setAssociateComplianceProfile(true); } },
+      ],
+      []
+
+   );
+
+   const complianceProfileHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "complianceProfileName",
+            content: "Name",
+         },
+         {
+            id: "description",
+            content: "Description",
+         },
+         {
+            id: "action",
+            content: "Action",
+         }
+      ],
+      []
+
+   );
+
+   const complianceProfileData: TableDataRow[] = useMemo(
+
+      () => !raProfile ? [] : (raProfile.complianceProfiles || []).map(
+
+         (profile) => ({
+            id: profile.uuid,
+            columns: [
+               profile.name,
+               profile.description || "",
+               <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateComplianceProfile(profile.uuid); }, additionalTooltipId: raProfile.uuid }]} />
+            ]
+         })
+
+      ),
+      [raProfile, onDissociateComplianceProfile]
+
+   );
+
+   const complianceProfileTitle = useMemo(
+
+      () => (
+
+         <div>
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={complianceProfileButtons} />
+            </div>
+
+            <h5>
+               <span className="fw-semi-bold">Compliance Profiles</span>
+            </h5>
+
+         </div>
+
+      ), [complianceProfileButtons]
+
    );
 
 
@@ -531,7 +631,6 @@ export default function RaProfileDetail() {
 
    );
 
-
    return (
 
       <Container className="themed-container" fluid>
@@ -574,44 +673,61 @@ export default function RaProfileDetail() {
 
          </Row>
 
+         <Row xs="1" sm="1" md="2" lg="2" xl="2">
 
-         <Widget title="Authorized Clients" busy={isFetchingAuthorizedClients || isFetchingClients || isAuthorizingClient || isUnauthorizing}>
+            <Col>
 
-            <br />
+               <Widget title={complianceProfileTitle} busy={isFetchingProfile}>
 
-            <CustomTable
-               headers={authorizedClientsHeaders}
-               data={authorizedClientsDataState}
-            />
-
-            <Label>Authorize a client</Label>
-
-            <div style={{ display: "flex" }}>
-
-               <div style={{ flexGrow: 1 }}>
-                  <Select
-                     maxMenuHeight={140}
-                     menuPlacement="auto"
-                     value={clientToAuthorize}
-                     options={availableClients}
-                     placeholder="Select a client to authorize..."
-                     onChange={(e: any) => { setClientToAuthorize(e) }}
+                  <CustomTable
+                     headers={complianceProfileHeaders}
+                     data={complianceProfileData}
                   />
-               </div>
+               </Widget>
 
-               &nbsp;
+            </Col>
+            <Col>
 
-               <ProgressButton
-                  title="Authorize"
-                  inProgressTitle="Authorizing..."
-                  inProgress={isAuthorizingClient}
-                  disabled={clientToAuthorize === null}
-                  onClick={onAuthorizeClientClick}
-               />
 
-            </div>
+               <Widget title="Authorized Clients" busy={isFetchingAuthorizedClients || isFetchingClients || isAuthorizingClient || isUnauthorizing}>
 
-         </Widget>
+                  <br />
+
+                  <CustomTable
+                     headers={authorizedClientsHeaders}
+                     data={authorizedClientsDataState}
+                  />
+
+                  <Label>Authorize a client</Label>
+
+                  <div style={{ display: "flex" }}>
+
+                     <div style={{ flexGrow: 1 }}>
+                        <Select
+                           maxMenuHeight={140}
+                           menuPlacement="auto"
+                           value={clientToAuthorize}
+                           options={availableClients}
+                           placeholder="Select a client to authorize..."
+                           onChange={(e: any) => { setClientToAuthorize(e) }}
+                        />
+                     </div>
+
+                     &nbsp;
+
+                     <ProgressButton
+                        title="Authorize"
+                        inProgressTitle="Authorizing..."
+                        inProgress={isAuthorizingClient}
+                        disabled={clientToAuthorize === null}
+                        onClick={onAuthorizeClientClick}
+                     />
+
+                  </div>
+
+               </Widget>
+            </Col>
+         </Row>
 
 
          <Widget title="Available protocols" busy={isBusy || isWorkingWithProtocol}>
@@ -640,6 +756,14 @@ export default function RaProfileDetail() {
             ]}
          />
 
+         <Dialog
+            isOpen={associateComplianceProfile}
+            caption="Associate Compliance Profile"
+            body={AssociateComplianceProfileDialogBody({ visible: associateComplianceProfile, onClose: () => setAssociateComplianceProfile(false), raProfile: raProfile, availableComplianceProfileUuids: raProfile?.complianceProfiles?.map(e => e.uuid) })}
+            toggle={() => setAssociateComplianceProfile(false)}
+            buttons={[]}
+         />
+
 
          <Dialog
             isOpen={confirmDeactivateAcme}
@@ -659,6 +783,17 @@ export default function RaProfileDetail() {
             body={AcmeProtocolActiovationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid })}
             toggle={() => setActivateAcmeDialog(false)}
             buttons={[]}
+         />
+
+         <Dialog
+            isOpen={complianceCheck}
+            caption={`Initiate Compliance Check`}
+            body={"Initiate the compliance check for the certificates with RA Profile?"}
+            toggle={() => setComplianceCheck(false)}
+            buttons={[
+               { color: "primary", onClick: onComplianceCheck, body: "Yes" },
+               { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
+            ]}
          />
 
 

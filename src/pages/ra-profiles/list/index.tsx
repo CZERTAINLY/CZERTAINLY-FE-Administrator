@@ -36,6 +36,8 @@ function RaProfileList() {
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
+   const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
+
 
    useEffect(() => {
       dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -73,6 +75,19 @@ function RaProfileList() {
    );
 
 
+   const onComplianceCheckConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.checkCompliance({ uuids: checkedRows }));
+         setComplianceCheck(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
@@ -86,7 +101,8 @@ function RaProfileList() {
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } },
+         { icon: "gavel", disabled: checkedRows.length === 0, tooltip: "Check Compliance", onClick: () => { setComplianceCheck(true) } },
       ],
       [checkedRows, onAddClick, onEnableClick, onDisableClick]
    );
@@ -232,6 +248,17 @@ function RaProfileList() {
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={complianceCheck}
+            caption={`Initiate Compliance Check`}
+            body={"Initiate the compliance check for the selected RA Profile(s)?"}
+            toggle={() => setComplianceCheck(false)}
+            buttons={[
+               { color: "primary", onClick: onComplianceCheckConfirmed, body: "Yes" },
+               { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
             ]}
          />
 
