@@ -1,3 +1,4 @@
+import { ComplianceProfileModel } from "models";
 import { AttributeModel } from "./attributes/AttributeModel";
 
 export interface RaProfileModel {
@@ -9,6 +10,13 @@ export interface RaProfileModel {
    authorityInstanceName: string;
    attributes: AttributeModel[];
    enabledProtocols?: string[];
+   complianceProfiles?: raComplianceProfileModel[];
+}
+
+export interface raComplianceProfileModel {
+   uuid: string;
+   name: string;
+   description?: string;
 }
 
 

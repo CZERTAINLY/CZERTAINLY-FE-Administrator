@@ -50,10 +50,11 @@ export default function AddRuleWithAttributesDialogBody({
       (values: any) => {
 
          if (!complianceProfileUuid) return;
+         if (!connectorUuid) return;
 
          const attribs: AttributeModel[] = attributes && attributes.length > 0
             ?
-            collectFormAttributes("attribs", attributes, values) || []
+            collectFormAttributes("attributes", attributes, values) || []
             :
             []
             ;
@@ -106,7 +107,7 @@ export default function AddRuleWithAttributesDialogBody({
                      <ButtonGroup>
 
                         <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
-                           Activate
+                           Add
                         </Button>
 
                         <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
@@ -115,9 +116,6 @@ export default function AddRuleWithAttributesDialogBody({
 
                      </ButtonGroup>
                   </div>
-
-
-
 
                </BootstrapForm>
 

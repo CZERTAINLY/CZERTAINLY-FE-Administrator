@@ -1,4 +1,3 @@
-import { RaProfileDTO } from "api/profiles";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 import { Observable } from "rxjs";
@@ -7,6 +6,7 @@ import { CertificateType } from "types/certificate";
 export interface ComplianceProfileListItemDTO {
    name: string;
    uuid: string;
+   description?: string;
    rules: ComplianceListItemRuleDTO[];
 }
 

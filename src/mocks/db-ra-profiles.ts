@@ -70,6 +70,13 @@ export const dbRaProfiles: DbRaProfileList = {
          },
       ],
       enabled: false,
+      complianceProfiles: [
+          {
+            "uuid": "466b14f5-7c6e-428c-8a64-3b6ba1cb3922",
+            "name": "Profile1",
+            "description": "Hello There!"
+         }
+      ]
    },
 
 

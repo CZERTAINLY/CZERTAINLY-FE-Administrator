@@ -4,6 +4,7 @@ import { AttributeDescriptorModel } from "./attributes/AttributeDescriptorModel"
 export interface ComplianceProfileListItemModel {
    name: string;
    uuid: string;
+   description?: string;
    rules: ComplianceListItemRuleModel[];
 }
 

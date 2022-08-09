@@ -11,7 +11,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
 
    getRaProfilesList(): Observable<model.RaProfileDTO[]> {
-
+      
       return of(
          dbData.raProfiles
       ).pipe(
@@ -431,7 +431,59 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
          )
 
       );
+   }
 
+
+   checkCompliance(uuids: string[]): Observable<void> {
+      return of(uuids).pipe(
+         delay(randomDelay()),
+         map(
+            uuids => {
+               console.log("Compliance Check Completed", uuids);
+            }
+         )
+      )
+   }
+
+   associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
+      return of(
+         null
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            () => {
+
+               const profile = dbData.raProfiles.find(profile => profile.uuid === raProfileUuids[0]);
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "RA profile not found" });
+
+               profile.complianceProfiles?.push({
+                  name: "Test",
+                  uuid: raProfileUuids[0],
+                  description: "Test"
+               }
+               )
+            }
+         ))
+   }
+
+   dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
+      return of(
+         null
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            () => {
+
+               const profile = dbData.raProfiles.find(profile => profile.uuid === uuid);
+               if (!profile) throw new HttpErrorResponse({ status: 404, statusText: "Compliance profile not found" });
+               profile.complianceProfiles = profile.complianceProfiles?.filter(complianceProfile => uuid !== complianceProfile.uuid);
+            }
+         )
+      )
    }
 
 }

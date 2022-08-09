@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
 import { slice } from "./compliance-profiles";
 import history from "browser-history";
-import { transformComplianceConnectorGroupDTOToModel, transformComplianceConnectorRuleDTOToModel, transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel, transformComplianceRuleDTOToModel } from "./transform/compliance-profiles";
+import { transformComplianceConnectorGroupDTOToModel, transformComplianceConnectorRuleDTOToModel, transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel } from "./transform/compliance-profiles";
 
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {

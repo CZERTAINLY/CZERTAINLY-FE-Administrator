@@ -6,6 +6,7 @@ import { Col, Container, Label, Row } from "reactstrap";
 import { actions, selectors } from "ducks/compliance-profiles";
 
 import Widget from "components/Widget";
+import Select from "react-select";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
@@ -13,6 +14,8 @@ import { ComplianceGroupsModel, ComplianceRaProfileModel, ComplianceRulesModel }
 import StatusBadge from "components/StatusBadge";
 import AssociateRaProfileDialogBody from "components/pages/compliance-profiles/AssociateRaProfileDialogBody";
 import AddRuleWithAttributesDialogBody from "components/pages/compliance-profiles/AddRuleWithAttributesDialogBody";
+import ComplianceRuleAttributeViewer from "components/Attributes/AttributeViewer";
+import { MDBBadge } from "mdbreact";
 
 
 export default function ComplianceProfileDetail() {
@@ -32,15 +35,21 @@ export default function ComplianceProfileDetail() {
 
    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
-   const [displayNewRules, setDisplayNewRules] = useState<boolean>(false);
-   const [displayNewGroups, setDisplayNewGroups] = useState<boolean>(false);
-
    const [addRaProfile, setAddRaProfile] = useState<boolean>(false);
    const [addRuleWithAttributes, setAddRuleWithAttributes] = useState<boolean>(false);
    const [addAttributeRuleDetails, setAddAttributeRuleDetails] = useState<any>();
 
    const [alreadyAssociatedRuleUuids, setAlreadyAssociatedRuleUuids] = useState<string[]>([]);
    const [alreadyAssociatedGroupUuids, setAlreadyAssociatedGroupUuids] = useState<string[]>([]);
+
+   const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
+
+   const [groupRuleMapping, setGroupRuleMapping] = useState<any>();
+
+   const [currentGroupUuidForDisplay, setCurrentGroupUuidForDisplay] = useState<string>();
+
+   const [selectionFilter, setSelectionFilter] = useState<string>("Selected");
+   const [objectFilter, setObjectFilter] = useState<string>("Groups & Rules");
 
 
    useEffect(
@@ -58,6 +67,30 @@ export default function ComplianceProfileDetail() {
 
    );
 
+
+   useEffect(
+
+      () => {
+
+         if (!params.id) return;
+
+         let groupRuleMapping: any = {};
+         for (let connector of rules) {
+            for (let rule of connector.rules) {
+               const keyString = (rule.groupUuid || "unknown") + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
+               if (groupRuleMapping[keyString]) {
+                  groupRuleMapping[keyString].push(rule);
+               } else {
+                  groupRuleMapping[keyString] = [rule];
+               }
+            }
+         }
+         setGroupRuleMapping(groupRuleMapping);
+      },
+      [rules, groups, params.id]
+
+   );
+
    useEffect(
 
       () => {
@@ -69,13 +102,13 @@ export default function ComplianceProfileDetail() {
 
          for (let connector of profile?.rules || []) {
             for (let rule of connector.rules) {
-               alreadyAssociatedRuleUuidsLcl.push(rule.uuid+"-"+connector.connectorUuid+"-"+connector.kind);
+               alreadyAssociatedRuleUuidsLcl.push(rule.uuid + "-" + connector.connectorUuid + "-" + connector.kind);
             }
          }
 
          for (let connector of profile?.groups || []) {
             for (let group of connector.groups) {
-               alreadyAssociatedGroupUuidsLcl.push(group.uuid+"-"+connector.connectorUuid+"-"+connector.kind);
+               alreadyAssociatedGroupUuidsLcl.push(group.uuid + "-" + connector.connectorUuid + "-" + connector.kind);
             }
          }
 
@@ -83,9 +116,16 @@ export default function ComplianceProfileDetail() {
          setAlreadyAssociatedGroupUuids(alreadyAssociatedGroupUuidsLcl);
 
       },
-      [profile]
+      [profile, params.id]
 
    );
+
+   const onCloseGroupRuleDetail = useCallback(
+      () => {
+         setCurrentGroupUuidForDisplay(undefined);
+      }, []
+   );
+
 
 
    const onDeleteConfirmed = useCallback(
@@ -124,7 +164,7 @@ export default function ComplianceProfileDetail() {
 
          dispatch(actions.addRule({ uuid: profile.uuid, connectorName: connectorName, connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid, description: rule.description, ruleName: rule.name, groupUuid: rule.groupUuid, attributes: attributes }));
       },
-      [profile]
+      [profile, dispatch]
 
    )
 
@@ -137,7 +177,7 @@ export default function ComplianceProfileDetail() {
 
          dispatch(actions.addGroup({ uuid: profile.uuid, connectorName: connectorName, connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid, groupName: group.name, description: group.description || "" }));
       },
-      [profile]
+      [profile, dispatch]
 
    )
 
@@ -150,7 +190,7 @@ export default function ComplianceProfileDetail() {
 
          dispatch(actions.deleteRule({ uuid: profile.uuid, connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid }));
       },
-      [profile]
+      [profile, dispatch]
 
    )
 
@@ -163,7 +203,7 @@ export default function ComplianceProfileDetail() {
 
          dispatch(actions.deleteGroup({ uuid: profile.uuid, connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid }));
       },
-      [profile,dispatch]
+      [profile, dispatch]
 
    )
 
@@ -184,22 +224,23 @@ export default function ComplianceProfileDetail() {
 
       () => {
 
-         
+         setComplianceCheck(false);
+
          if (!profile?.uuid) return;
 
          dispatch(actions.checkCompliance({ uuids: [profile.uuid] }));
       },
-      [dispatch]
+      [dispatch, profile]
 
    )
 
-   
+
 
 
    const buttons: WidgetButtonProps[] = useMemo(
 
       () => [
-         { icon: "check", disabled: false, tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
+         { icon: "gavel", disabled: false, tooltip: "Check Compliance", onClick: () => { setComplianceCheck(true); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
       ],
       []
@@ -254,23 +295,7 @@ export default function ComplianceProfileDetail() {
          <div>
 
             <h5>
-               <span className="fw-semi-bold">Rules</span>
-            </h5>
-
-         </div>
-
-      ), [buttons]
-
-   );
-
-
-   const groupsTitle = useMemo(
-
-      () => (
-
-         <div>
-            <h5>
-               <span className="fw-semi-bold">Groups</span>
+               <span className="fw-semi-bold">Rules & Groups</span>
             </h5>
 
          </div>
@@ -295,7 +320,28 @@ export default function ComplianceProfileDetail() {
 
          </div>
 
-      ), []
+      ), [raProfileButtons]
+
+   );
+
+
+   const ruleGroupHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "type",
+            content: "Type",
+         },
+         {
+            id: "description",
+            content: "Description",
+         },
+         {
+            id: "action",
+            content: "Action",
+         },
+      ],
+      []
 
    );
 
@@ -311,106 +357,6 @@ export default function ComplianceProfileDetail() {
             id: "value",
             content: "Value",
          },
-      ],
-      []
-
-   );
-
-
-   const rulesHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "connectorName",
-            content: "Connector Name",
-         },
-         {
-            id: "connectorKind",
-            content: "Connector Kind",
-         },
-         {
-            id: "ruleName",
-            content: "Rule Name",
-         },
-         {
-            id: "action",
-            content: "Action",
-         },
-      ],
-      []
-
-   );
-
-
-   const availableRulesHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "connectorName",
-            content: "Connector",
-         },
-         {
-            id: "connectorKind",
-            content: "Kind",
-         },
-         {
-            id: "ruleName",
-            content: "Name",
-         },
-         {
-            id: "action",
-            content: "Action",
-         },
-      ],
-      []
-
-   );
-
-
-   const availableGroupsHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "connectorName",
-            content: "Connector",
-         },
-         {
-            id: "connectorKind",
-            content: "Kind",
-         },
-         {
-            id: "groupName",
-            content: "Name",
-         },
-         {
-            id: "action",
-            content: "Action",
-         },
-      ],
-      []
-
-   );
-
-
-   const groupHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "connectorName",
-            content: "Connector Name",
-         },
-         {
-            id: "connectorKind",
-            content: "Connector Kind",
-         },
-         {
-            id: "groupName",
-            content: "Group Name",
-         },
-         {
-            id: "action",
-            content: "Action",
-         }
       ],
       []
 
@@ -439,6 +385,57 @@ export default function ComplianceProfileDetail() {
 
    );
 
+   const ruleHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "name",
+            content: "Name",
+         },
+         {
+            id: "description",
+            content: "Description",
+         },
+         {
+            id: "action",
+            content: "Action",
+         }
+      ],
+      []
+
+   );
+
+
+   const ruleData: TableDataRow[] = useMemo(
+
+      () => {
+         if (!profile) return [];
+         if (!profile.rules) return [];
+         if (!currentGroupUuidForDisplay) return [];
+
+         let data: TableDataRow[] = [];
+         let dataSplit = currentGroupUuidForDisplay.split("-")
+
+         for (const rule of groupRuleMapping[currentGroupUuidForDisplay || ""] || []) {
+            data.push({
+               id: `${rule.uuid}-${dataSplit[1]}`,
+               columns: [
+                  rule.name,
+                  rule.description || "",
+
+               ],
+               detailColumns: [
+                  <></>,
+                  <CustomTable data={getRuleMoreData(rule, dataSplit[3], dataSplit[2])} headers={detailHeaders} />
+               ]
+
+            });
+         }
+         return data;
+      }
+      , [profile, onDeleteRule, currentGroupUuidForDisplay, groupRuleMapping]
+   );
+
 
    const raProfileHeaders: TableHeader[] = useMemo(
 
@@ -460,7 +457,6 @@ export default function ComplianceProfileDetail() {
 
    );
 
-
    const raProfileData: TableDataRow[] = useMemo(
 
       () => !profile ? [] : profile.raProfiles.map(
@@ -476,172 +472,236 @@ export default function ComplianceProfileDetail() {
          })
 
       ),
-      [profile]
+      [profile, onDissociateRaProfile]
 
    );
 
 
-
-   const rulesData: TableDataRow[] = useMemo(
-
-      () => {
-         if (!profile) return [];
-         if (!profile.rules) return [];
-
-         let data: TableDataRow[] = [];
-         for (const connector of profile.rules) {
-            for (const rule of connector.rules) {
-               const buttons: WidgetButtonProps[] = [
-                  { icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDeleteRule(connector.connectorUuid, connector.kind, rule); }, additionalTooltipId: rule.uuid },
-                  { icon: "info", disabled: false, tooltip: getRuleTooltip(rule, connector.connectorName, connector.kind), tooltipScheme: "info", onClick: () => { }, additionalTooltipId: rule.uuid },
-               ]
-               data.push({
-                  id: `${rule.uuid}-${connector.connectorUuid}`,
-                  columns: [
-                     connector.connectorName,
-                     connector.kind,
-                     rule.name,
-                     <WidgetButtons buttons={buttons} />
-                  ]
-               });
-            }
+   const getRuleMoreData = (rule: ComplianceRulesModel, connectorName: string, kind: string) => {
+      return [
+         {
+            id: "connectorName",
+            columns: ["Connector Name", connectorName]
+         },
+         {
+            id: "connectorKind",
+            columns: ["Kind", kind]
+         },
+         {
+            id: "uuid",
+            columns: ["UUID", rule.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", rule.name]
+         },
+         {
+            id: "description",
+            columns: ["Description", rule.description || ""]
+         },
+         {
+            id: "groupUuid",
+            columns: ["Group UUID", rule.groupUuid || ""]
+         },
+         {
+            id: "certificateType",
+            columns: ["Certificate Type", rule.certificateType || ""]
+         },
+         {
+            id: "attributes",
+            columns: ["Attributes", <ComplianceRuleAttributeViewer attributes={rule.attributes} />]
          }
-         return data;
-      },
-      [profile]
-
-   );
-
-
-   const groupsData: TableDataRow[] = useMemo(
-
-      () => {
-         if (!profile) return [];
-         if (!profile.groups) return [];
-
-         let data: TableDataRow[] = [];
-         for (const connector of profile.groups) {
-            for (const group of connector.groups) {
-               const buttons: WidgetButtonProps[] = [
-                  { icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDeleteGroup(connector.connectorUuid, connector.kind, group); }, additionalTooltipId: group.uuid },
-                  { icon: "info", disabled: false, tooltip: getRuleTooltip(group, connector.connectorName, connector.kind), tooltipScheme: "info", onClick: () => { }, additionalTooltipId: group.uuid },
-               ]
-               data.push({
-                  id: `${group.uuid}-${connector.connectorUuid}`,
-                  columns: [
-                     connector.connectorName,
-                     connector.kind,
-                     group.name,
-                     <WidgetButtons buttons={buttons} />
-                  ]
-               });
-            }
-         }
-         return data;
-      },
-      [profile]
-
-   );
-
-   function getRuleTooltip(rule: ComplianceRulesModel, connectorName: string, connectorKind: string) {
-      return <Widget title={rule.name}>
-         <CustomTable
-            headers={detailHeaders}
-            data={[
-               {
-                  id: "connectorName", columns: ["Connector Name", connectorName]
-               },
-               {
-                  id: "connectorKind", columns: ["Connector Kind", connectorKind]
-               },
-               {
-                  id: "ruleName", columns: ["Rule Name", rule.name]
-               },
-               {
-                  id: "ruleDescription", columns: ["Description", rule.description || ""]
-               },
-               {
-                  id: "groupUuid", columns: ["Group UUID", rule.groupUuid || ""]
-               }
-            ]}
-         />
-      </Widget>
+      ]
    }
 
 
-   const availableRulesData: TableDataRow[] = useMemo(
+   const getGroupMoreData = (rule: ComplianceGroupsModel, connectorName: string, kind: string) => {
+      return [
+         {
+            id: "connectorName",
+            columns: ["Connector Name", connectorName]
+         },
+         {
+            id: "connectorKind",
+            columns: ["Kind", kind]
+         },
+         {
+            id: "uuid",
+            columns: ["UUID", rule.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", rule.name]
+         },
+         {
+            id: "description",
+            columns: ["Description", rule.description || ""]
+         }
+      ]
+   }
+
+
+   const ruleGroupData: TableDataRow[] = useMemo(
 
       () => {
          if (!profile) return [];
          if (!profile.rules) return [];
 
          let data: TableDataRow[] = [];
-         for (const connector of rules) {
-            for (const rule of connector.rules) {
-               if (alreadyAssociatedRuleUuids.includes(rule.uuid+"-"+connector.connectorUuid+"-"+connector.kind)) continue;
-               const buttons: WidgetButtonProps[] = [
-                  {
-                     icon: "plus",
-                     disabled: false,
-                     tooltip: "Add",
-                     onClick: () => {
-                        rule.attributes ?
-                           onAddRuleWithAttributes(connector.connectorUuid, connector.connectorName, connector.kind, rule)
-                           : onAddRule(connector.connectorUuid, connector.connectorName, connector.kind, rule)
-                     },
-                     additionalTooltipId: rule.uuid
-                  },
 
-                  { icon: "info", disabled: false, tooltip: getRuleTooltip(rule, connector.connectorName, connector.kind), tooltipScheme: "info", onClick: () => { }, additionalTooltipId: rule.uuid },
-               ]
-               data.push({
-                  id: `${rule.uuid}-${connector.connectorUuid}`,
-                  columns: [
-                     connector.connectorName,
-                     connector.kind,
-                     rule.name,
-                     <WidgetButtons buttons={buttons} />
+         if (["Selected", "All"].includes(selectionFilter) && ["Groups & Rules", "Groups"].includes(objectFilter)) {
+
+            for (const connector of profile.groups) {
+               for (const group of connector.groups) {
+                  const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
+                  const buttons: WidgetButtonProps[] = [
+                     { icon: "minus", disabled: false, tooltip: "Remove", onClick: () => { onDeleteGroup(connector.connectorUuid, connector.kind, group); }, additionalTooltipId: group.uuid },
+                     { icon: "info", disabled: false, tooltip: "Rules", onClick: () => { setCurrentGroupUuidForDisplay(keyString) }, additionalTooltipId: group.uuid },
                   ]
-               });
+                  data.push({
+                     id: `${group.uuid}-${connector.connectorUuid}`,
+                     columns: [
+                        <MDBBadge color="secondary">Group</MDBBadge>,
+                        group.name,
+                        <WidgetButtons buttons={buttons} />
+                     ],
+                     detailColumns: [
+                        <></>,
+                        <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
+                        <></>
+                     ]
+                  });
+               }
             }
          }
+
+         if (["Selected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
+            for (const connector of profile.rules) {
+               for (const rule of connector.rules) {
+                  const buttons: WidgetButtonProps[] = [
+                     { icon: "minus", disabled: false, tooltip: "Remove", onClick: () => { onDeleteRule(connector.connectorUuid, connector.kind, rule); }, additionalTooltipId: rule.uuid }
+                  ]
+                  data.push({
+                     id: `${rule.uuid}-${connector.connectorUuid}`,
+                     columns: [
+                        <MDBBadge color="secondary">Rule</MDBBadge>,
+                        rule.description || rule.name,
+                        <WidgetButtons buttons={buttons} />
+                     ],
+                     detailColumns: [
+                        <></>,
+                        <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
+                        <></>
+                     ]
+                  });
+               }
+            }
+
+
+            for (const connector of profile.groups) {
+               for (const group of connector.groups) {
+                  const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
+                  for (const rule of groupRuleMapping[keyString] || []) {
+                     const buttons: WidgetButtonProps[] = [
+                        { icon: "minus", disabled: true, tooltip: "Remove", onClick: () => { onDeleteRule(connector.connectorUuid, connector.kind, rule); }, additionalTooltipId: rule.uuid }
+                     ]
+                     data.push({
+                        id: `${rule.uuid}-${connector.connectorUuid}`,
+                        columns: [
+                           <MDBBadge color="secondary">Rule</MDBBadge>,
+                           rule.description || rule.name,
+                           <WidgetButtons buttons={buttons} />
+                        ],
+                        detailColumns: [
+                           <></>,
+                           <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
+                           <></>
+                        ]
+                     });
+                  }
+               }
+            }
+         }
+
+         if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Groups"].includes(objectFilter)) {
+            for (const connector of groups) {
+               for (const group of connector.groups) {
+                  if (alreadyAssociatedGroupUuids.includes(group.uuid + "-" + connector.connectorUuid + "-" + connector.kind)) continue;
+                  const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
+                  const buttons: WidgetButtonProps[] = [
+                     { icon: "plus", disabled: false, tooltip: "Add", onClick: () => { onAddGroup(connector.connectorUuid, connector.connectorName, connector.kind, group); }, additionalTooltipId: group.uuid },
+                     { icon: "info", disabled: false, tooltip: "Rules", onClick: () => { setCurrentGroupUuidForDisplay(keyString) }, additionalTooltipId: group.uuid },
+                  ]
+                  data.push({
+                     id: `${group.uuid}-${connector.connectorUuid}`,
+                     columns: [
+                        <MDBBadge color="secondary">Group</MDBBadge>,
+                        group.name,
+                        <WidgetButtons buttons={buttons} />
+                     ],
+                     detailColumns: [
+                        <></>,
+                        <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
+                        <></>
+                     ]
+                  });
+               }
+            }
+         }
+         if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
+            for (const connector of rules) {
+               for (const rule of connector.rules) {
+                  if (alreadyAssociatedRuleUuids.includes(rule.uuid + "-" + connector.connectorUuid + "-" + connector.kind)) continue;
+                  const buttons: WidgetButtonProps[] = [
+                     {
+                        icon: "plus",
+                        disabled: false,
+                        tooltip: "Add",
+                        onClick: () => {
+                           rule.attributes ?
+                              onAddRuleWithAttributes(connector.connectorUuid, connector.connectorName, connector.kind, rule)
+                              : onAddRule(connector.connectorUuid, connector.connectorName, connector.kind, rule)
+                        },
+                        additionalTooltipId: rule.uuid
+                     }
+                  ]
+                  data.push({
+                     id: `${rule.uuid}-${connector.connectorUuid}`,
+                     columns: [
+                        <MDBBadge color="secondary">Rule</MDBBadge>,
+                        rule.description || rule.name,
+                        <WidgetButtons buttons={buttons} />
+                     ],
+                     detailColumns: [
+                        <></>,
+                        <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
+                        <></>
+                     ]
+                  });
+               }
+            }
+         }
+
+
          return data;
       },
-      [profile, alreadyAssociatedRuleUuids]
+      [profile, selectionFilter, objectFilter, onDeleteRule, onDeleteGroup, alreadyAssociatedGroupUuids, groups, onAddGroup, onAddRule, onAddRuleWithAttributes, alreadyAssociatedRuleUuids, rules]
 
    );
 
+   const selectionFilterData = ['Selected', "All", "Unselected"].map(
 
-   const availableGroupsData: TableDataRow[] = useMemo(
+      input => ({
+         label: input,
+         value: input
+      })
 
-      () => {
-         if (!profile) return [];
-         if (!profile.groups) return [];
+   ) || [];
 
-         let data: TableDataRow[] = [];
-         for (const connector of groups) {
-            for (const group of connector.groups) {
-               if (alreadyAssociatedGroupUuids.includes(group.uuid+"-"+connector.connectorUuid+"-"+connector.kind)) continue;
-               const buttons: WidgetButtonProps[] = [
-                  { icon: "plus", disabled: false, tooltip: "Add", onClick: () => { onAddGroup(connector.connectorUuid, connector.connectorName, connector.kind, group); }, additionalTooltipId: group.uuid },
-                  { icon: "info", disabled: false, tooltip: getRuleTooltip(group, connector.connectorName, connector.kind), tooltipScheme: "info", onClick: () => { }, additionalTooltipId: group.uuid },
-               ]
-               data.push({
-                  id: `${group.uuid}-${connector.connectorUuid}`,
-                  columns: [
-                     connector.connectorName,
-                     connector.kind,
-                     group.name,
-                     <WidgetButtons buttons={buttons} />
-                  ]
-               });
-            }
-         }
-         return data;
-      },
-      [profile, alreadyAssociatedGroupUuids]
 
-   );
+   const optionFilterData = ["Groups & Rules", "Rules", "Groups"].map(
+      input => ({ label: input, value: input })
+   ) || [];
 
 
    return (
@@ -669,87 +729,64 @@ export default function ComplianceProfileDetail() {
                   />
                </Widget>
             </Col>
-
-
          </Row>
 
-         <Row xs="1" sm="1" md="2" lg="2" xl="2">
 
-            <Col>
-
-               <Widget title={rulesTitle} busy={isFetchingDetail}>
-
-                  <CustomTable
-                     headers={rulesHeaders}
-                     data={rulesData}
-                     hasPagination={true}
+         <Widget title={rulesTitle} busy={isFetchingDetail}>
+            <Row xs="1" sm="1" md="2" lg="2" xl="2">
+               <Col>
+                  <Label>
+                     Filter by Selection
+                  </Label>
+                  <Select
+                     maxMenuHeight={140}
+                     options={selectionFilterData}
+                     value={{ label: selectionFilter || "Selected", value: selectionFilter || "Selected" }}
+                     menuPlacement="auto"
+                     onChange={(event) => setSelectionFilter(event?.value || "")}
+                  />
+               </Col>
+               <Col>
+                  <Label>
+                     Filter by Object
+                  </Label>
+                  <Select
+                     maxMenuHeight={140}
+                     options={optionFilterData}
+                     value={{ label: objectFilter || "Groups & Rules", value: objectFilter || "Groups & Rules" }}
+                     menuPlacement="auto"
+                     onChange={(event) => setObjectFilter(event?.value || "")}
                   />
 
-                  <hr />
+               </Col>
 
-                  <div>
+            </Row>
+            <hr />
 
-                     <h5>
-                        <span className="fw-semi-bold">Add Rules</span>
-                     </h5>
+            <CustomTable
+               headers={ruleGroupHeader}
+               data={ruleGroupData}
+               hasPagination={true}
+               hasDetails={true}
+            />
+         </Widget>
 
-                  </div>
-
-                  <Label for="addNewRuleOption">Check to add more rules</Label>&nbsp;&nbsp;
-
-                  <input id="addNewRuleOption" type="checkbox" onClick={(e) => setDisplayNewRules(e.currentTarget.checked)} />
-
-
-                  {displayNewRules ?
-                     <CustomTable
-                        headers={availableRulesHeaders}
-                        data={availableRulesData}
-                        hasPagination={true}
-                        canSearch={true}
-                     />
-                     : null}
-
-               </Widget>
-
-            </Col>
-            <Col>
-
-
-               <Widget title={groupsTitle} busy={isFetchingDetail}>
-
-                  <CustomTable
-                     headers={groupHeaders}
-                     data={groupsData}
-                     hasPagination={true}
-                  />
-
-                  <hr />
-
-                  <div>
-
-                     <h5>
-                        <span className="fw-semi-bold" >Add Groups</span>
-                     </h5>
-
-                  </div>
-
-                  <Label for="addNewGroupOption">Check to add more groups</Label>&nbsp;&nbsp;
-
-                  <input id="addNewGroupOption" type="checkbox" onClick={(e) => setDisplayNewGroups(e.currentTarget.checked)} />
-
-
-                  {displayNewGroups ?
-                     <CustomTable
-                        headers={availableGroupsHeaders}
-                        data={availableGroupsData}
-                        hasPagination={true}
-                        canSearch={true}
-                     />
-                     : null}
-
-               </Widget>
-            </Col>
-         </Row>
+         <Dialog
+            isOpen={currentGroupUuidForDisplay !== undefined}
+            caption="Rules"
+            size="lg"
+            body={
+               <CustomTable
+                  headers={ruleHeader}
+                  data={ruleData}
+                  hasPagination={true}
+               />
+            }
+            toggle={onCloseGroupRuleDetail}
+            buttons={[
+               { color: "secondary", onClick: () => onCloseGroupRuleDetail, body: "Cancel" },
+            ]}
+         />
 
          <Dialog
             isOpen={confirmDelete}
@@ -783,7 +820,7 @@ export default function ComplianceProfileDetail() {
 
          <Dialog
             isOpen={addRaProfile}
-            caption="Associate RA protocol"
+            caption="Associate RA Profile"
             body={AssociateRaProfileDialogBody({ visible: addRaProfile, onClose: () => setAddRaProfile(false), complianceProfileUuid: profile?.uuid, availableRaProfileUuids: profile?.raProfiles.map(e => e.uuid) })}
             toggle={() => setAddRaProfile(false)}
             buttons={[]}
@@ -806,6 +843,17 @@ export default function ComplianceProfileDetail() {
             })}
             toggle={() => setAddRuleWithAttributes(false)}
             buttons={[]}
+         />
+
+         <Dialog
+            isOpen={complianceCheck}
+            caption={`Initiate Compliance Check`}
+            body={"Initiate the compliance check for the Compliance Profile?"}
+            toggle={() => setComplianceCheck(false)}
+            buttons={[
+               { color: "primary", onClick: onComplianceCheck, body: "Yes" },
+               { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
+            ]}
          />
 
       </Container>
