@@ -32,6 +32,8 @@ import Spinner from "components/Spinner";
 import ProgressButton from "components/ProgressButton";
 import { collectFormAttributes } from "utils/attributes";
 import { Form } from "react-final-form";
+import CertificateComplianceStatusIcon from "components/pages/certificates/CertificateComplianceStatusIcon";
+import CertificateComplianceStatus from "components/pages/certificates/CertificateComplianceStatus";
 
 
 export default function CertificateDetail() {
@@ -271,6 +273,18 @@ export default function CertificateDetail() {
       [setUpdateRaProfile, setRaProfile]
    );
 
+   const onComplianceCheck = useCallback(
+
+      () => {
+  
+         if (!certificate?.uuid) return;
+  
+         dispatch(actions.checkCompliance({ uuids: [certificate.uuid] }));
+      },
+      [dispatch, certificate?.uuid]
+  
+   )
+
 
    const onUpdateGroup = useCallback(
 
@@ -333,9 +347,9 @@ export default function CertificateDetail() {
 
    const onRenew = useCallback(
 
-      (data: { fileName: string, contentType: string, fileContent: string }) => {
+    (data: { fileName: string, contentType: string, fileContent: string }) => {
 
-         if (data.fileContent) {
+      if (data.fileContent) {
 
             try {
                dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || "" }));
@@ -343,12 +357,12 @@ export default function CertificateDetail() {
             }
          }
 
-         setRenew(false);
+      setRenew(false);
 
-      },
-      [dispatch, certificate]
+    },
+    [dispatch, certificate]
 
-   );
+  );
 
 
    const onAddCertToLocations = useCallback(
@@ -445,6 +459,7 @@ export default function CertificateDetail() {
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
          { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
+         { icon: "trash", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
          { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
       ],
       [certificate, downloadDropDown]
@@ -628,6 +643,7 @@ export default function CertificateDetail() {
          <span className="fw-semi-bold">Certificate Event History</span>
       </h5>
    );
+   
 
    const locationsTitle = (
 
@@ -644,6 +660,12 @@ export default function CertificateDetail() {
       </div>
 
    );
+
+  const complianceTitle = (
+    <h5>
+      <span className="fw-semi-bold">Non Compliant / Not Applicable Rules</span>
+    </h5>
+  );
 
 
    const detailHeaders: TableHeader[] = useMemo(
@@ -1310,16 +1332,16 @@ export default function CertificateDetail() {
             ]}
          />
 
-         <Dialog
-            isOpen={updateRaProfile}
-            caption={`Update RA Profile`}
-            body={updateRaProfileBody}
-            toggle={() => onCancelRaProfileUpdate()}
-            buttons={[
-               { color: "primary", onClick: onUpdateRaProfile, body: "Update", disabled: true ? raProfile === undefined : false },
-               { color: "secondary", onClick: () => onCancelRaProfileUpdate(), body: "Cancel" },
-            ]}
-         />
+      <Dialog
+        isOpen={updateGroup}
+        caption={`Update Group`}
+        body={updateGroupBody}
+        toggle={() => onCancelGroupUpdate()}
+        buttons={[
+          { color: "primary", onClick: () => onUpdateGroup(), body: "Update", disabled: true ? group === undefined : false },
+          { color: "secondary", onClick: () => onCancelGroupUpdate(), body: "Cancel" },
+        ]}
+      />
 
          <Dialog
             isOpen={renew}
@@ -1329,16 +1351,16 @@ export default function CertificateDetail() {
             buttons={[]}
          />
 
-         <Dialog
-            isOpen={revoke}
-            caption={`revoke Certificate`}
-            body={revokeBody}
-            toggle={() => setRevoke(false)}
-            buttons={[
-               { color: "primary", onClick: onRevoke, body: "Revoke" },
-               { color: "secondary", onClick: () => setRevoke(false), body: "Cancel" },
-            ]}
-         />
+      <Dialog
+        isOpen={updateOwner}
+        caption={`Update Owner`}
+        body={updateOwnerBody}
+        toggle={() => onCancelOwnerUpdate()}
+        buttons={[
+          { color: "primary", onClick: onUpdateOwner, body: "Update", disabled: true ? owner === undefined : false },
+          { color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel" },
+        ]}
+      />
 
          <Dialog
             isOpen={currentInfoId !== ""}

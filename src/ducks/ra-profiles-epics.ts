@@ -818,7 +818,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.checkCompliance(
+         action => deps.apiClients.profiles.checkCompliance(
             action.payload.uuids
          ).pipe(
 

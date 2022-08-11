@@ -55,7 +55,7 @@ export default function ComplianceProfileDetail() {
    useEffect(
 
       () => {
-
+         
          if (!params.id) return;
 
          dispatch(actions.getComplianceProfile({ uuid: params.id }));
@@ -601,6 +601,7 @@ export default function ComplianceProfileDetail() {
             for (const connector of profile.groups) {
                for (const group of connector.groups) {
                   const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
+                  if(!groupRuleMapping) continue;
                   for (const rule of groupRuleMapping[keyString] || []) {
                      const buttons: WidgetButtonProps[] = [
                         { icon: "minus", disabled: true, tooltip: "Remove", onClick: () => { onDeleteRule(connector.connectorUuid, connector.kind, rule); }, additionalTooltipId: rule.uuid }

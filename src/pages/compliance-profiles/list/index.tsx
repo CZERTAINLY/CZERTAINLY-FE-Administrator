@@ -314,8 +314,8 @@ export default function AdministratorsList() {
          <Dialog
             isOpen={confirmDelete}
             caption={`Delete ${checkedRows.length > 1 ? "Compliance Profiles" : "a Compliance Profile"}`}
-            body={`You are about to delete ${checkedRows.length > 1 ? "Compliance Profiles" : "a Compliance Profile"} which may have associated Compliance
-                   Account(s). When deleted the Compliance Account(s) will be revoked. Is this what you want to do?`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Compliance Profiles" : "a Compliance Profile"} which may have associated RA
+                   Profiles(s). Is this what you want to do?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
