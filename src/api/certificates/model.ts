@@ -115,7 +115,15 @@ export interface CertificateDTO {
    group?: GroupDTO;
    owner?: string;
    raProfile?: CertificateRAProfileDTO;
+   complianceStatus?: "na" | "ok" | "nok";
+   nonCompliantRules?: NonCompliantRulesDTO[]
+}
 
+export interface NonCompliantRulesDTO {
+   connectorName: string;
+   ruleName: string;
+   ruleDescription: string;
+   status: "na" | "ok" | "nok";
 }
 
 
@@ -202,6 +210,8 @@ export interface CertificateInventoryApi {
 
 
    getAvailableCertificateFilters(): Observable<AvailableCertificateFilterDTO[]>;
+
+   checkCompliance(uuids: string[]): Observable<void>;
 
 
 }

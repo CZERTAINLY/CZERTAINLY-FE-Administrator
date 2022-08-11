@@ -62,7 +62,10 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
          uuid: certificate.raProfile.uuid,
          name: certificate.raProfile.name,
          enabled: certificate.raProfile.enabled
-      } : undefined
+      } : undefined,
+
+      complianceStatus: certificate.complianceStatus,
+      nonCompliantRules: certificate.nonCompliantRules,
    }
 
 }

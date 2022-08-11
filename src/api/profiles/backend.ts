@@ -193,7 +193,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
       
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
-            complianceProfileUuids: uuids
+            raProfileUuids: uuids
          })
       );
 

@@ -56,6 +56,8 @@ export type State = {
    isFetchingIssuanceAttributes: boolean;
    isFetchingRevocationAttributes: boolean;
 
+   isCheckingCompliance: boolean;
+
 
 };
 
@@ -103,6 +105,8 @@ export const initialState: State = {
 
    isFetchingIssuanceAttributes: false,
    isFetchingRevocationAttributes: false,
+
+   isCheckingCompliance: false,
 
 
 };
@@ -651,7 +655,22 @@ export const slice = createSlice({
 
          state.isFetchingRevocationAttributes = false;
 
-      }
+      },
+
+      checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isCheckingCompliance = true;
+      },
+
+      checkComplianceSuccess: (state, action: PayloadAction<void>) => {
+
+         state.isCheckingCompliance = false;
+      },
+
+      checkComplianceFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isCheckingCompliance = false;
+      },
 
 
    }

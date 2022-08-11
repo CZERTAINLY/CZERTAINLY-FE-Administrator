@@ -80,6 +80,8 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
                   keySize: detail.keySize,
                   basicConstraints: detail.basicConstraints,
                   certificateValidationResult: detail.certificateValidationResult,
+                  complianceStatus: detail.complianceStatus,
+                  nonCompliantRules: detail.nonCompliantRules,
                };
             }
 
@@ -195,6 +197,17 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 
+   }
+
+   checkCompliance(uuids: string[]): Observable<void> {
+      return of(uuids).pipe(
+         delay(randomDelay()),
+         map(
+            uuids => {
+               console.log("Compliance Check Completed", uuids);
+            }
+         )
+      )
    }
 
 

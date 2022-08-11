@@ -68,7 +68,7 @@ export default function CertificateComplianceChart({ data }: Props) {
 
    return (
 
-      <Widget title={<p style={{ fontWeight: 700 }}>Certificate Expiry In Days</p>}>
+      <Widget title={<p style={{ fontWeight: 700 }}>Certificate Compliance</p>}>
 
          <ReactApexChart
             options={getOptions(data || {})}

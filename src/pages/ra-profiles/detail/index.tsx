@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
@@ -8,8 +8,6 @@ import Select from "react-select";
 
 import { actions as clientActions, selectors as clientSelectors } from "ducks/clients";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-
-import { actions as complianceProfilesActions, selectors as complianceProfilesSelectors } from "ducks/compliance-profiles";
 
 import AcmeProtocolActiovationDialogBody from "../../../components/pages/ra-profiles/AcmeProtocolActiovationDialogBody";
 

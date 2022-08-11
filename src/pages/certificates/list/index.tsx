@@ -19,6 +19,7 @@ import CertificateGroupDialog from "components/pages/certificates/CertificateGro
 import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
 import CertificateRAProfileDialog from "components/pages/certificates/CertificateRAProfileDialog";
 import { downloadFileZip } from "utils/download";
+import CertificateComplianceStatusIcon from "components/pages/certificates/CertificateComplianceStatusIcon";
 
 
 export default function CertificateList() {
@@ -249,6 +250,13 @@ export default function CertificateList() {
             width: "5%"
          },
          {
+            content: <MDBColumnName columnName="Compliance" />,
+            //sortable: true,
+            align: "center",
+            id: "status",
+            width: "5%"
+         },
+         {
             content: <MDBColumnName columnName="Common Name" />,
             //sortable: true,
             id: "commonName",
@@ -333,6 +341,8 @@ export default function CertificateList() {
                columns: [
 
                   <CertificateStatusIcon status={certificate.status} id={certificate.fingerprint || certificate.serialNumber} />,
+
+                  <CertificateComplianceStatusIcon status={certificate.complianceStatus || "na"} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
 
                   <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 
