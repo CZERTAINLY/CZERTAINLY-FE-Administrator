@@ -1,4 +1,3 @@
-import { ComplianceProfileDTO } from "api/compliance-profile";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { Observable } from "rxjs";
 

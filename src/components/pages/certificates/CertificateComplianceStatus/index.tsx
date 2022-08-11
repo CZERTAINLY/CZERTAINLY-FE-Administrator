@@ -1,5 +1,4 @@
 import { MDBBadge } from "mdbreact";
-import { Status } from "types/certificate";
 
 interface Props {
    status: "na" | "nok" | "ok";
