@@ -257,7 +257,9 @@ export default function ComplianceProfileDetail() {
 
    );
 
-   const onAddRuleWithAttributes = (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel) => {
+   const onAddRuleWithAttributes = useCallback(
+
+      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel) => {
       setAddAttributeRuleDetails({
          connectorUuid: connectorUuid,
          connectorName: connectorName,
@@ -265,7 +267,7 @@ export default function ComplianceProfileDetail() {
          rule: rule
       });
       setAddRuleWithAttributes(true);
-   }
+   }, [])
 
    const detailsTitle = useMemo(
 
@@ -433,7 +435,7 @@ export default function ComplianceProfileDetail() {
          }
          return data;
       }
-      , [profile, onDeleteRule, currentGroupUuidForDisplay, groupRuleMapping]
+      , [profile, currentGroupUuidForDisplay, groupRuleMapping, detailHeaders]
    );
 
 
@@ -686,7 +688,7 @@ export default function ComplianceProfileDetail() {
 
          return data;
       },
-      [profile, selectionFilter, objectFilter, onDeleteRule, onDeleteGroup, alreadyAssociatedGroupUuids, groups, onAddGroup, onAddRule, onAddRuleWithAttributes, alreadyAssociatedRuleUuids, rules]
+      [profile, selectionFilter, objectFilter, onDeleteRule, onDeleteGroup, alreadyAssociatedGroupUuids, groups, onAddGroup, onAddRule, onAddRuleWithAttributes, alreadyAssociatedRuleUuids, rules, detailHeaders, groupRuleMapping]
 
    );
 

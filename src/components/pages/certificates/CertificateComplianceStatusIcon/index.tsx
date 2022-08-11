@@ -1,5 +1,5 @@
 
-import { MDBBadge, MDBIcon } from "mdbreact"; import ToolTip from "components/ToolTip";
+import ToolTip from "components/ToolTip";
 
 interface Props {
    status: "ok" | "nok" | "na" | undefined;

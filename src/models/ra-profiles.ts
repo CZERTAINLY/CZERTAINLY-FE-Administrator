@@ -1,4 +1,3 @@
-import { ComplianceProfileModel } from "models";
 import { AttributeModel } from "./attributes/AttributeModel";
 
 export interface RaProfileModel {

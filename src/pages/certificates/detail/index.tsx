@@ -21,7 +21,6 @@ import { CertificateRevocationReason } from "types/certificate";
 import CertificateRenewDialog from "components/pages/certificates/CertificateRenewDialog";
 import CertificateEventStatus from "components/pages/certificates/CertificateHistoryStatus";
 import { downloadFile, formatPEM } from "utils/certificate";
-import CertificateComplianceStatusIcon from "components/pages/certificates/CertificateComplianceStatusIcon";
 import CertificateComplianceStatus from "components/pages/certificates/CertificateComplianceStatus";
 
 
@@ -200,7 +199,7 @@ export default function CertificateDetail() {
 
        dispatch(actions.checkCompliance({ uuids: [certificate.uuid] }));
     },
-    [dispatch, raProfile]
+    [dispatch, certificate?.uuid]
 
  )
 
@@ -337,7 +336,7 @@ export default function CertificateDetail() {
       { icon: "gavel", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
       { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
     ],
-    [certificate, downloadDropDown]
+    [certificate, downloadDropDown, onComplianceCheck]
   );
 
 
