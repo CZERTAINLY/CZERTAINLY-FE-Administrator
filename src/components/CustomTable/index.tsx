@@ -258,7 +258,18 @@ function CustomTable({
 
    const onRowToggleSelection = useCallback(
 
-      (e: React.MouseEvent<HTMLTableRowElement>) => {
+      (e: any, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
+
+         if (hasDetails && e.target.localName !== "i" && e.target.localName !== "button") {
+            if (expandedRow === rowId) {
+               setExpandedRow(undefined);
+            } else {
+               setExpandedRow(rowId);
+            }
+            if (!continueAfterDetails) {
+               return;
+            }
+         }
 
          if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") return;
 
@@ -290,7 +301,7 @@ function CustomTable({
          e.stopPropagation();
          e.preventDefault();
       },
-      [multiSelect, tblCheckedRows, onCheckedRowsChanged]
+      [tblCheckedRows, setTblCheckedRows, onCheckedRowsChanged, expandedRow, hasDetails]
 
    );
 
@@ -381,8 +392,8 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
-         if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false, width: "100%" });
+         if (hasCheckboxes  && multiSelect ) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
 
          return columns.map(
 
@@ -463,11 +474,14 @@ function CustomTable({
       ).map(
 
          (row, index) => (
-
             <Fragment key={row.id}>
 
-               <tr {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
+               <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
+                  {!hasDetails ? (<></>) : <td id="show-detail-more-column" key="show-detail-more-column">
+                     {expandedRow === row.id ? <i className="fa fa-caret-up" /> : <i className="fa fa-caret-down" />}
+                  </td>
+                  }
                   {!hasCheckboxes ? (<></>) : (
                      <td>
                         <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
@@ -480,51 +494,44 @@ function CustomTable({
 
                         <td key={index} className={styles.dataCell} style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}>
 
-                           <div>{column ? column : <>&nbsp;</>}</div>
-
-                           {
-                              row.detailColumns && row.detailColumns[index] && expandedRow === row.id ? (
-                                 <div className={styles.detail}>{row.detailColumns[index]}</div>
-                              ) : (
-                                 <></>
-                              )
-                           }
-
+                           <div>{column ? column : <></>}</div>
                         </td>
 
                      )
 
                   )}
 
-                  {!hasDetails ? (<></>) : (
-
-                     <td className="w-25">
-
-                        <div className={styles.showMore} onClick={() => expandedRow === row.id ? setExpandedRow(undefined) : setExpandedRow(row.id)}>
-                           {expandedRow === row.id ? "Show less..." : "Show more..."}
-                        </div>
-
-                        {
-                           row.detailColumns && row.detailColumns[headers.length] && expandedRow === row.id ? (
-                              <div className={styles.detail}>{row.detailColumns[headers.length]}</div>
-                           ) : (
-                              <></>
-                           )
-                        }
-
-                     </td>
-                  )}
-
                </tr>
 
-            </Fragment>
+               {!hasDetails ? (<></>) : (
 
+                  <tr>
+
+                     {
+                        row.detailColumns && expandedRow === row.id ? (
+                           row.detailColumns.map(e => {
+                              return (
+                                 <td>
+                                    <div>
+                                       {e}
+                                    </div>
+                                 </td>
+                              )
+                           })
+                        ) : (
+                           <></>
+                        )
+                     }
+
+                  </tr>
+               )}
+            </Fragment>
 
          )
 
       ),
 
-      [tblData, hasPagination, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
+      [tblData, hasPagination, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, tblHeaders]
 
    );
 

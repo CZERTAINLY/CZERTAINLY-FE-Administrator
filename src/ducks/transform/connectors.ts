@@ -11,6 +11,7 @@ export const functionGroupCodeToGroupFilter: { [code in FunctionGroupCode]: Func
    "discoveryProvider": "DISCOVERY_PROVIDER",
    "entityProvider": "ENTITY_PROVIDER",
    "locationProvider": "LOCATION_PROVIDER",
+   "complianceProvider": "COMPLIANCE_PROVIDER",
 }
 
 
@@ -21,6 +22,7 @@ export const functionGroupFilterToGroupCode: { [filter in FunctionGroupFilter]: 
    "DISCOVERY_PROVIDER": "discoveryProvider",
    "ENTITY_PROVIDER": "entityProvider",
    "LOCATION_PROVIDER": "locationProvider",
+   "COMPLIANCE_PROVIDER": "complianceProvider",
 }
 
 

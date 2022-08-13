@@ -4,7 +4,7 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "push" | "sync" | "minus";
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus";
    additionalTooltipId?: string;
    tooltipScheme?: "dark" | "success" | "warning" | "error" | "info" | "light";
    tooltip?: any;

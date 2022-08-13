@@ -87,7 +87,7 @@ export default function AddRuleWithAttributesDialogBody({
 
                            <FormGroup>
 
-                              <Label for="attributes">Issuance attributes</Label>
+                              <Label for="attributes">Attributes</Label>
 
                               <AttributeEditor
                                  id="attributes"
