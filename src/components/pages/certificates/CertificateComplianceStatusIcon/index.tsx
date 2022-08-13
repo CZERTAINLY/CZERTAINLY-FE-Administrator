@@ -34,15 +34,15 @@ const certificateIcon: CertificateComplianceIcon = {
    nok: {
       color: "red",
       message: "Non Compliant",
-      tooltipType: "warning",
+      tooltipType: "error",
    },
    na: {
-      color: "orange",
+      color: "grey",
       message: "Not Applicable",
       tooltipType: "dark",
    },
    unknown: {
-      color: "grey",
+      color: "#D1D1D1",
       message: "Not Checked",
       tooltipType: "dark",
    },
