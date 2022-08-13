@@ -12,7 +12,7 @@ function CertificateComplianceStatus({ status }: Props) {
       na: { color: "secondary", text: "Not Applicable" },
    };
 
-   const _default = { color: "secondary", text: "Unknown" };
+   const _default = { color: "secondary", text: "Not Checked" };
 
    const { color, text } = status ? statusMap[status] || _default : _default;
 

@@ -342,7 +342,7 @@ export default function CertificateList() {
 
                   <CertificateStatusIcon status={certificate.status} id={certificate.fingerprint || certificate.serialNumber} />,
 
-                  <CertificateComplianceStatusIcon status={certificate.complianceStatus || "na"} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
+                  <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
 
                   <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 

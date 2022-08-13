@@ -37,8 +37,8 @@ const certificateIcon: CertificateComplianceIcon = {
       tooltipType: "warning",
    },
    na: {
-      color: "grey",
-      message: "Not Checked",
+      color: "orange",
+      message: "Not Applicable",
       tooltipType: "dark",
    },
    unknown: {
@@ -51,7 +51,6 @@ const certificateIcon: CertificateComplianceIcon = {
 
 function CertificateComplianceStatusIcon({ status, id }: Props) {
 
-   console.log(status)
    const pattern = certificateIcon[status || "unknown"];
 
    return (

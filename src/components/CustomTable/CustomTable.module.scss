@@ -55,7 +55,8 @@
 }
 
 .dataCell {
-  white-space: nowrap;
+  white-space: pre-wrap;
+  
   text-overflow: ellipsis;
   overflow: hidden;
 }

@@ -276,7 +276,7 @@ export default function RaProfileDetail() {
          (profile) => ({
             id: profile.uuid,
             columns: [
-               profile.name,
+               <Link to={`../../complianceprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
                profile.description || "",
                <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateComplianceProfile(profile.uuid); }, additionalTooltipId: raProfile.uuid }]} />
             ]

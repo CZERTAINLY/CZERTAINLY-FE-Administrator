@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouteMatch } from "react-router-dom";
-import { Col, Container, Label, Row } from "reactstrap";
+import { Link, useRouteMatch } from "react-router-dom";
+import { Button, Col, Container, Label, Row } from "reactstrap";
 
 import { actions, selectors } from "ducks/compliance-profiles";
 
@@ -14,8 +14,9 @@ import { ComplianceGroupsModel, ComplianceRaProfileModel, ComplianceRulesModel }
 import StatusBadge from "components/StatusBadge";
 import AssociateRaProfileDialogBody from "components/pages/compliance-profiles/AssociateRaProfileDialogBody";
 import AddRuleWithAttributesDialogBody from "components/pages/compliance-profiles/AddRuleWithAttributesDialogBody";
-import ComplianceRuleAttributeViewer from "components/Attributes/AttributeViewer";
+import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 import { MDBBadge } from "mdbreact";
+import ToolTip from "components/ToolTip";
 
 
 export default function ComplianceProfileDetail() {
@@ -55,7 +56,7 @@ export default function ComplianceProfileDetail() {
    useEffect(
 
       () => {
-         
+
          if (!params.id) return;
 
          dispatch(actions.getComplianceProfile({ uuid: params.id }));
@@ -77,7 +78,7 @@ export default function ComplianceProfileDetail() {
          let groupRuleMapping: any = {};
          for (let connector of rules) {
             for (let rule of connector.rules) {
-               const keyString = (rule.groupUuid || "unknown") + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
+               const keyString = (rule.groupUuid || "unknown") + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
                if (groupRuleMapping[keyString]) {
                   groupRuleMapping[keyString].push(rule);
                } else {
@@ -102,13 +103,13 @@ export default function ComplianceProfileDetail() {
 
          for (let connector of profile?.rules || []) {
             for (let rule of connector.rules) {
-               alreadyAssociatedRuleUuidsLcl.push(rule.uuid + "-" + connector.connectorUuid + "-" + connector.kind);
+               alreadyAssociatedRuleUuidsLcl.push(rule.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
             }
          }
 
          for (let connector of profile?.groups || []) {
             for (let group of connector.groups) {
-               alreadyAssociatedGroupUuidsLcl.push(group.uuid + "-" + connector.connectorUuid + "-" + connector.kind);
+               alreadyAssociatedGroupUuidsLcl.push(group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
             }
          }
 
@@ -260,14 +261,14 @@ export default function ComplianceProfileDetail() {
    const onAddRuleWithAttributes = useCallback(
 
       (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel) => {
-      setAddAttributeRuleDetails({
-         connectorUuid: connectorUuid,
-         connectorName: connectorName,
-         kind: kind,
-         rule: rule
-      });
-      setAddRuleWithAttributes(true);
-   }, [])
+         setAddAttributeRuleDetails({
+            connectorUuid: connectorUuid,
+            connectorName: connectorName,
+            kind: kind,
+            rule: rule
+         });
+         setAddRuleWithAttributes(true);
+      }, [])
 
    const detailsTitle = useMemo(
 
@@ -333,15 +334,18 @@ export default function ComplianceProfileDetail() {
          {
             id: "type",
             content: "Type",
-         },
-         {
-            id: "description",
-            content: "Description",
+            width: "10%",
          },
          {
             id: "action",
             content: "Action",
+            width: "10%",
          },
+         {
+            id: "description",
+            content: "Description",
+            width: "50%",
+         }
       ],
       []
 
@@ -387,6 +391,43 @@ export default function ComplianceProfileDetail() {
 
    );
 
+   const getRuleMoreData = (rule: ComplianceRulesModel, connectorName: string, kind: string) => {
+      return [
+         {
+            id: "connectorName",
+            columns: ["Connector Name", connectorName]
+         },
+         {
+            id: "connectorKind",
+            columns: ["Kind", kind]
+         },
+         {
+            id: "uuid",
+            columns: ["UUID", rule.uuid]
+         },
+         {
+            id: "name",
+            columns: ["Name", rule.name]
+         },
+         {
+            id: "description",
+            columns: ["Description", rule.description || ""]
+         },
+         {
+            id: "groupUuid",
+            columns: ["Group UUID", rule.groupUuid || ""]
+         },
+         {
+            id: "certificateType",
+            columns: ["Certificate Type", rule.certificateType || ""]
+         },
+         {
+            id: "attributes",
+            columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <></>]
+         }
+      ]
+   }
+
    const ruleHeader: TableHeader[] = useMemo(
 
       () => [
@@ -397,10 +438,6 @@ export default function ComplianceProfileDetail() {
          {
             id: "description",
             content: "Description",
-         },
-         {
-            id: "action",
-            content: "Action",
          }
       ],
       []
@@ -416,7 +453,7 @@ export default function ComplianceProfileDetail() {
          if (!currentGroupUuidForDisplay) return [];
 
          let data: TableDataRow[] = [];
-         let dataSplit = currentGroupUuidForDisplay.split("-")
+         let dataSplit = currentGroupUuidForDisplay.split(":#")
 
          for (const rule of groupRuleMapping[currentGroupUuidForDisplay || ""] || []) {
             data.push({
@@ -424,9 +461,9 @@ export default function ComplianceProfileDetail() {
                columns: [
                   rule.name,
                   rule.description || "",
-
                ],
                detailColumns: [
+                  <></>,
                   <></>,
                   <CustomTable data={getRuleMoreData(rule, dataSplit[3], dataSplit[2])} headers={detailHeaders} />
                ]
@@ -467,7 +504,7 @@ export default function ComplianceProfileDetail() {
 
             id: raProfile.uuid,
             columns: [
-               raProfile.name,
+               <Link to={`../../raprofiles/detail/${raProfile!.uuid}`}>{raProfile!.name}</Link>,
                <StatusBadge enabled={raProfile.enabled} />,
                <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateRaProfile(raProfile.uuid); }, additionalTooltipId: raProfile.uuid }]} />
             ]
@@ -479,7 +516,10 @@ export default function ComplianceProfileDetail() {
    );
 
 
-   const getRuleMoreData = (rule: ComplianceRulesModel, connectorName: string, kind: string) => {
+
+
+
+   const getGroupMoreData = (group: ComplianceGroupsModel, connectorName: string, kind: string) => {
       return [
          {
             id: "connectorName",
@@ -491,53 +531,15 @@ export default function ComplianceProfileDetail() {
          },
          {
             id: "uuid",
-            columns: ["UUID", rule.uuid]
+            columns: ["UUID", group.uuid]
          },
          {
             id: "name",
-            columns: ["Name", rule.name]
+            columns: ["Name", group.name]
          },
          {
             id: "description",
-            columns: ["Description", rule.description || ""]
-         },
-         {
-            id: "groupUuid",
-            columns: ["Group UUID", rule.groupUuid || ""]
-         },
-         {
-            id: "certificateType",
-            columns: ["Certificate Type", rule.certificateType || ""]
-         },
-         {
-            id: "attributes",
-            columns: ["Attributes", <ComplianceRuleAttributeViewer attributes={rule.attributes} />]
-         }
-      ]
-   }
-
-
-   const getGroupMoreData = (rule: ComplianceGroupsModel, connectorName: string, kind: string) => {
-      return [
-         {
-            id: "connectorName",
-            columns: ["Connector Name", connectorName]
-         },
-         {
-            id: "connectorKind",
-            columns: ["Kind", kind]
-         },
-         {
-            id: "uuid",
-            columns: ["UUID", rule.uuid]
-         },
-         {
-            id: "name",
-            columns: ["Name", rule.name]
-         },
-         {
-            id: "description",
-            columns: ["Description", rule.description || ""]
+            columns: ["Description", group.description || ""]
          }
       ]
    }
@@ -555,22 +557,49 @@ export default function ComplianceProfileDetail() {
 
             for (const connector of profile.groups) {
                for (const group of connector.groups) {
-                  const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
-                  const buttons: WidgetButtonProps[] = [
-                     { icon: "minus", disabled: false, tooltip: "Remove", onClick: () => { onDeleteGroup(connector.connectorUuid, connector.kind, group); }, additionalTooltipId: group.uuid },
-                     { icon: "info", disabled: false, tooltip: "Rules", onClick: () => { setCurrentGroupUuidForDisplay(keyString) }, additionalTooltipId: group.uuid },
-                  ]
+                  const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
                   data.push({
                      id: `${group.uuid}-${connector.connectorUuid}`,
                      columns: [
                         <MDBBadge color="secondary">Group</MDBBadge>,
+                        <div>
+                           <Button
+                              className="btn btn-link p-0"
+                              color="white"
+                              data-placement="right"
+                              data-for={group.uuid + "remove"}
+                              data-tip
+                              onClick={() => {
+                                 onDeleteGroup(connector.connectorUuid, connector.kind, group);
+                              }
+                              }
+                           >
+                              <i className="fa fa-times" style={{ color: "red" }} />
+                              <ToolTip message="Remove" id={group.uuid + "remove"} place="top" />
+                           </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                           <Button
+                              className="btn btn-link p-0"
+                              color="white"
+                              data-placement="right"
+                              data-for={group.uuid + "selected-all-group"}
+                              data-tip
+                              onClick={() => {
+                                 setCurrentGroupUuidForDisplay(keyString)
+                              }
+                              }
+                           >
+                              <i className="fa fa-info" style={{ color: "auto" }} />
+                              <ToolTip message="Rules" id={group.uuid + "selected-all-group"} place="top" />
+                           </Button>
+                        </div>,
                         group.name,
-                        <WidgetButtons buttons={buttons} />
+
                      ],
                      detailColumns: [
                         <></>,
+                        <></>,
+                        <></>,
                         <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                        <></>
                      ]
                   });
                }
@@ -580,20 +609,32 @@ export default function ComplianceProfileDetail() {
          if (["Selected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
             for (const connector of profile.rules) {
                for (const rule of connector.rules) {
-                  const buttons: WidgetButtonProps[] = [
-                     { icon: "minus", disabled: false, tooltip: "Remove", onClick: () => { onDeleteRule(connector.connectorUuid, connector.kind, rule); }, additionalTooltipId: rule.uuid }
-                  ]
                   data.push({
                      id: `${rule.uuid}-${connector.connectorUuid}`,
                      columns: [
                         <MDBBadge color="secondary">Rule</MDBBadge>,
+                        <Button
+                           className="btn btn-link p-0"
+                           color="white"
+                           data-placement="right"
+                           data-for={rule.uuid+"-selected-all-group"}
+                           data-tip
+                           onClick={() => {
+                              onDeleteRule(connector.connectorUuid, connector.kind, rule);
+                           }
+                           }
+                        >
+                           <i className="fa fa-times" style={{ color: "red" }} />
+                           <ToolTip message="Remove" id={rule.uuid+"-selected-all-group"} place="top" />
+                        </Button>,
                         rule.description || rule.name,
-                        <WidgetButtons buttons={buttons} />
+
                      ],
                      detailColumns: [
                         <></>,
+                        <></>,
+                        <></>,
                         <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                        <></>
                      ]
                   });
                }
@@ -602,23 +643,32 @@ export default function ComplianceProfileDetail() {
 
             for (const connector of profile.groups) {
                for (const group of connector.groups) {
-                  const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
-                  if(!groupRuleMapping) continue;
+                  const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                  if (!groupRuleMapping) continue;
                   for (const rule of groupRuleMapping[keyString] || []) {
-                     const buttons: WidgetButtonProps[] = [
-                        { icon: "minus", disabled: true, tooltip: "Remove", onClick: () => { onDeleteRule(connector.connectorUuid, connector.kind, rule); }, additionalTooltipId: rule.uuid }
-                     ]
                      data.push({
                         id: `${rule.uuid}-${connector.connectorUuid}`,
                         columns: [
                            <MDBBadge color="secondary">Rule</MDBBadge>,
+                           <Button
+                              className="btn btn-link p-0"
+                              color="white"
+                              data-placement="right"
+                              data-for={rule.uuid+"rule-group"}
+                              data-tip
+                           >
+                              <i className="fa fa-times" style={{ color: "grey" }} />
+                              <ToolTip message={`Rule is part of the group '${group.name}' and cannot be removed separately`} id={rule.uuid+"rule-group"} place="top" />
+                           </Button>,
                            rule.description || rule.name,
-                           <WidgetButtons buttons={buttons} />
+
                         ],
                         detailColumns: [
                            <></>,
+                           <></>,
+                           <></>,
                            <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                           <></>
+
                         ]
                      });
                   }
@@ -629,23 +679,51 @@ export default function ComplianceProfileDetail() {
          if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Groups"].includes(objectFilter)) {
             for (const connector of groups) {
                for (const group of connector.groups) {
-                  if (alreadyAssociatedGroupUuids.includes(group.uuid + "-" + connector.connectorUuid + "-" + connector.kind)) continue;
-                  const keyString = group.uuid + "-" + connector.connectorUuid + "-" + connector.kind + "-" + connector.connectorName;
-                  const buttons: WidgetButtonProps[] = [
-                     { icon: "plus", disabled: false, tooltip: "Add", onClick: () => { onAddGroup(connector.connectorUuid, connector.connectorName, connector.kind, group); }, additionalTooltipId: group.uuid },
-                     { icon: "info", disabled: false, tooltip: "Rules", onClick: () => { setCurrentGroupUuidForDisplay(keyString) }, additionalTooltipId: group.uuid },
-                  ]
+                  if (alreadyAssociatedGroupUuids.includes(group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind)) continue;
+                  const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
                   data.push({
                      id: `${group.uuid}-${connector.connectorUuid}`,
                      columns: [
                         <MDBBadge color="secondary">Group</MDBBadge>,
+                        <div>
+                           <Button
+                              className="btn btn-link p-0"
+                              color="white"
+                              data-placement="right"
+                              data-for={group.uuid +"-unselected-all-group"}
+                              data-tip
+                              onClick={() => {
+                                 onAddGroup(connector.connectorUuid, connector.connectorName, connector.kind, group);
+                              }
+                              }
+                           >
+                              <i className="fa fa-plus" style={{ color: "auto" }} />
+                              <ToolTip message="Add" id={group.uuid +"-unselected-all-group"} place="auto" />
+                           </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                           <Button
+                              className="btn btn-link p-0"
+                              color="white"
+                              data-placement="right"
+                              data-for={group.uuid  +"-unselected-all-group-rule-info"}
+                              data-tip
+                              onClick={() => {
+                                 setCurrentGroupUuidForDisplay(keyString)
+                              }
+                              }
+                           >
+                              <i className="fa fa-info" style={{ color: "auto" }} />
+                              <ToolTip message="Rules" id={group.uuid  +"-unselected-all-group-rule-info"} place="auto" />
+                           </Button>
+                        </div>,
                         group.name,
-                        <WidgetButtons buttons={buttons} />
+
                      ],
                      detailColumns: [
                         <></>,
+                        <></>,
+                        <></>,
                         <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                        <></>
+
                      ]
                   });
                }
@@ -654,31 +732,36 @@ export default function ComplianceProfileDetail() {
          if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
             for (const connector of rules) {
                for (const rule of connector.rules) {
-                  if (alreadyAssociatedRuleUuids.includes(rule.uuid + "-" + connector.connectorUuid + "-" + connector.kind)) continue;
-                  const buttons: WidgetButtonProps[] = [
-                     {
-                        icon: "plus",
-                        disabled: false,
-                        tooltip: "Add",
-                        onClick: () => {
-                           rule.attributes ?
-                              onAddRuleWithAttributes(connector.connectorUuid, connector.connectorName, connector.kind, rule)
-                              : onAddRule(connector.connectorUuid, connector.connectorName, connector.kind, rule)
-                        },
-                        additionalTooltipId: rule.uuid
-                     }
-                  ]
+                  if (alreadyAssociatedRuleUuids.includes(rule.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind)) continue;
                   data.push({
                      id: `${rule.uuid}-${connector.connectorUuid}`,
                      columns: [
                         <MDBBadge color="secondary">Rule</MDBBadge>,
+                        <Button
+                           className="btn btn-link p-0"
+                           color="white"
+                           data-placement="right"
+                           data-for={rule.uuid  +"-unselected-all-rule"}
+                           data-tip
+                           onClick={() => {
+                              rule.attributes ?
+                                 onAddRuleWithAttributes(connector.connectorUuid, connector.connectorName, connector.kind, rule)
+                                 : onAddRule(connector.connectorUuid, connector.connectorName, connector.kind, rule)
+                           }
+                           }
+                        >
+                           <i className="fa fa-plus" style={{ color: "auto" }} />
+                           <ToolTip message="Add" id={rule.uuid  +"-unselected-all-rule"} place="auto" />
+                        </Button>,
                         rule.description || rule.name,
-                        <WidgetButtons buttons={buttons} />
+
                      ],
                      detailColumns: [
                         <></>,
+                        <></>,
+                        <></>,
                         <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                        <></>
+
                      ]
                   });
                }
@@ -771,6 +854,7 @@ export default function ComplianceProfileDetail() {
                data={ruleGroupData}
                hasPagination={true}
                hasDetails={true}
+               canSearch={true}
             />
          </Widget>
 
@@ -783,6 +867,7 @@ export default function ComplianceProfileDetail() {
                   headers={ruleHeader}
                   data={ruleData}
                   hasPagination={true}
+                  hasDetails={true}
                />
             }
             toggle={onCloseGroupRuleDetail}
