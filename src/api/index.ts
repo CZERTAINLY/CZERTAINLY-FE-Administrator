@@ -5,6 +5,7 @@ import { ClientManagementApi, ClientManagementBackend, ClientManagementMock } fr
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
+import { EntityManagementApi, EntityManagementBackend, EntityManagementMock } from "./entity";
 import { ConnectorManagementApi, ConnectorManagementBackend, ConnectorManagementMock } from "./connectors";
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
@@ -24,6 +25,7 @@ export interface ApiClients {
    connectors: ConnectorManagementApi;
    dashboard: DashboardManagementApi;
    authorities: AuthorityManagementApi;
+   entities: EntityManagementApi;
    certificates: CertificateInventoryApi;
    acmeAccounts: AcmeAccountManagementApi;
    acmeProfiles: AcmeProfilesManagementApi;
@@ -41,6 +43,7 @@ export const backendClient: ApiClients = {
    profiles: new ProfilesManagementBackend(),
    credentials: new CredentialManagementBackend(),
    authorities: new AuthorityManagementBackend(),
+   entities: new EntityManagementBackend(),
    connectors: new ConnectorManagementBackend(),
    dashboard: new DashboardManagementBackend(),
    acmeAccounts: new AcmeAccountManagementBackend(),
@@ -59,6 +62,7 @@ export const mockClient: ApiClients = {
    profiles: new ProfilesManagementMock(),
    credentials: new CredentialManagementMock(),
    authorities: new AuthorityManagementMock(),
+   entities: new EntityManagementMock(),
    connectors: new ConnectorManagementMock(),
    dashboard: new DashboardManagementMock(),
    acmeAccounts: new AcmeAccountManagementMock(),
