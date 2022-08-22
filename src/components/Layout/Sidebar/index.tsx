@@ -32,6 +32,7 @@ function Sidebar() {
             <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
             <LinksGroup _key="/app/credentials" header="Credentials" headerLink="/app/credentials" />
             <LinksGroup _key="/app/authorities" header="Authorities" headerLink="/app/authorities" />
+            <LinksGroup _key="/app/entities" header="Entities" headerLink="/app/entities" />
 
             <LinksGroup
                _key="acm1"

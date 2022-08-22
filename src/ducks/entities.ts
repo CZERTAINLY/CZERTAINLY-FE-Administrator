@@ -1,0 +1,288 @@
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
+import { AttributeModel } from "models/attributes/AttributeModel";
+import { ConnectorModel } from "models/connectors";
+import { EntityModel } from "models/entities";
+import { createFeatureSelector } from "utils/ducks";
+
+
+export type State = {
+
+   checkedRows: string[];
+
+   entity?: EntityModel;
+   entities: EntityModel[];
+
+   entityProviders?: ConnectorModel[];
+   entityProviderAttributeDescriptors?: AttributeDescriptorModel[];
+
+   isFetchingEntityProviders: boolean;
+   isFetchingEntityProviderAttributeDescriptors: boolean;
+
+   isFetchingList: boolean;
+   isFetchingDetail: boolean;
+   isCreating: boolean;
+   isUpdating: boolean;
+   isDeleting: boolean;
+
+}
+
+
+export const initialState: State = {
+
+   checkedRows: [],
+
+   entities: [],
+
+   isFetchingEntityProviders: false,
+   isFetchingEntityProviderAttributeDescriptors: false,
+
+   isFetchingList: false,
+   isFetchingDetail: false,
+   isCreating: false,
+   isDeleting: false,
+   isUpdating: false,
+
+};
+
+
+export const slice = createSlice({
+
+   name: "entities",
+
+   initialState,
+
+   reducers: {
+
+      resetState: (state, action: PayloadAction<void>) => {
+
+         state = initialState;
+
+      },
+
+
+      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+
+         state.checkedRows = action.payload.checkedRows;
+
+      },
+
+
+      clearEntityProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.entityProviderAttributeDescriptors = [];
+
+      },
+
+
+      listEntityProviders: (state, action: PayloadAction<void>) => {
+
+         state.isFetchingEntityProviders = true;
+
+      },
+
+
+      listEntityProvidersSuccess: (state, action: PayloadAction<{ providers: ConnectorModel[] }>) => {
+
+         state.isFetchingEntityProviders = false;
+         state.entityProviders = action.payload.providers;
+
+      },
+
+
+      listEntityProvidersFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isFetchingEntityProviders = false;
+
+      },
+
+
+      getEntityProviderAttributesDescriptors: (state, action: PayloadAction<{ uuid: string, kind: string }>) => {
+
+         state.entityProviderAttributeDescriptors = [];
+         state.isFetchingEntityProviderAttributeDescriptors = true;
+
+      },
+
+
+      getEntityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
+
+         state.entityProviderAttributeDescriptors = action.payload.attributeDescriptor;
+         state.isFetchingEntityProviderAttributeDescriptors = false;
+
+      },
+
+
+      getEntityProviderAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingEntityProviderAttributeDescriptors = false;
+
+      },
+
+
+      listEntities: (state, action: PayloadAction<void>) => {
+
+         state.entities = [];
+         state.isFetchingList = true;
+
+      },
+
+
+      listEntitiesSuccess: (state, action: PayloadAction<EntityModel[]>) => {
+
+         state.entities = action.payload;
+         state.isFetchingList = false;
+
+      },
+
+
+      listEntitiesFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isFetchingList = false;
+
+      },
+
+
+      getEntityDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.entity = undefined;
+         state.isFetchingDetail = true;
+
+      },
+
+
+      getEntityDetailSuccess: (state, action: PayloadAction<{ entity: EntityModel }>) => {
+
+         state.entity = action.payload.entity;
+         state.isFetchingDetail = false;
+
+      },
+
+
+      getEntityDetailFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isFetchingDetail = false;
+
+      },
+
+
+      addEntity: (state, action: PayloadAction<{
+         name: string,
+         attributes: AttributeModel[],
+         connectorUuid: string,
+         kind: string
+      }>) => {
+
+         state.isCreating = true;
+
+      },
+
+
+      addEntitySuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isCreating = false;
+
+      },
+
+
+      addEntityFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isCreating = false;
+
+      },
+
+
+      deleteEntity: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDeleting = true;
+
+      },
+
+
+      deleteEntitySuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isDeleting = false;
+
+      },
+
+
+      deleteEntityFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isDeleting = false;
+
+      },
+
+
+      updateEntity: (state, action: PayloadAction<{ uuid: string, attributes: AttributeModel[] }>) => {
+
+         state.isUpdating = true;
+
+      },
+
+
+      updateEntitySuccess: (state, action: PayloadAction<{ entity: EntityModel }>) => {
+
+         state.isUpdating = false;
+
+      },
+
+
+      updateEntityFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isUpdating = false;
+
+      }
+
+   }
+
+});
+
+
+const state = createFeatureSelector<State>(slice.name);
+
+const checkedRows = createSelector(state, (state) => state.checkedRows);
+
+const entityProviders = createSelector(state, state => state.entityProviders);
+const entityProviderAttributeDescriptors = createSelector(state, state => state.entityProviderAttributeDescriptors);
+
+const entity = createSelector(state, state => state.entity);
+const entities = createSelector(state, state => state.entities);
+
+const isFetchingEntityProviders = createSelector(state, state => state.isFetchingEntityProviders);
+const isFetchingEntityProviderAttributeDescriptors = createSelector(state, state => state.isFetchingEntityProviderAttributeDescriptors);
+
+const isFetchingList = createSelector(state, state => state.isFetchingList);
+const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
+const isCreating = createSelector(state, state => state.isCreating);
+const isDeleting = createSelector(state, state => state.isDeleting);
+const isUpdating = createSelector(state, state => state.isUpdating);
+
+
+export const selectors = {
+
+   state,
+
+   checkedRows,
+
+   entityProviders,
+   entityProviderAttributeDescriptors,
+
+   entity,
+   entities,
+
+   isFetchingEntityProviders,
+   isFetchingEntityProviderAttributeDescriptors,
+
+   isFetchingList,
+   isFetchingDetail,
+   isCreating,
+   isDeleting,
+   isUpdating,
+
+};
+
+
+export const actions = slice.actions;
+
+
+export default slice.reducer;

@@ -767,7 +767,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
          {
             uuid: "736b0fd6-5ea0-4e10-abe7-cfed39cc2a1a",
             name: "authorityProvider",
-            functionGroupCode: "authorityProvider",
+            functionGroupCode: "entityProvider",
             kinds: ["ADCS"],
             endPoints: [
                {
@@ -1181,7 +1181,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
          {
             uuid: "736b0fd6-5ea0-4e10-abe7-cfed39cc2a1a",
             name: "authorityProvider",
-            functionGroupCode: "authorityProvider",
+            functionGroupCode: "entityProvider",
             kinds: [
                "EJBCA"
             ],
