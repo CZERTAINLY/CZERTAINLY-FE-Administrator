@@ -5,7 +5,7 @@ import { useHistory } from "react-router";
 
 import { Container, Label } from "reactstrap";
 
-import { actions, selectors } from "ducks/authorities";
+import { actions, selectors } from "ducks/entities";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
@@ -13,19 +13,17 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeViewer from "components/Attributes/AttributeViewer";
 
-export default function AuthorityDetail() {
+export default function EntityDetail() {
 
    const dispatch = useDispatch();
 
    const { params } = useRouteMatch<{ id: string }>();
    const history = useHistory();
 
-   const authority = useSelector(selectors.authority);
+   const entity = useSelector(selectors.entity);
 
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
-
-   const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -41,7 +39,7 @@ export default function AuthorityDetail() {
 
          if (!params.id) return;
 
-         dispatch(actions.getAuthorityDetail({ uuid: params.id }));
+         dispatch(actions.getEntityDetail({ uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -53,12 +51,12 @@ export default function AuthorityDetail() {
 
       () => {
 
-         if (!authority) return;
+         if (!entity) return;
 
-         history.push(`../../authorities/edit/${authority.uuid}`);
+         history.push(`../../entities/edit/${entity.uuid}`);
 
       },
-      [authority, history]
+      [entity, history]
 
    );
 
@@ -67,27 +65,13 @@ export default function AuthorityDetail() {
 
       () => {
 
-         if (!authority) return;
+         if (!entity) return;
 
-         dispatch(actions.deleteAuthority({ uuid: authority.uuid }));
+         dispatch(actions.deleteEntity({ uuid: entity.uuid }));
          setConfirmDelete(false);
 
       },
-      [authority, dispatch]
-
-   );
-
-
-   const onForceDeleteAuthority = useCallback(
-
-      () => {
-
-         if (!authority) return;
-         dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid], redirect:`../` }));
-
-      },
-      [authority, dispatch]
+      [entity, dispatch]
 
    );
 
@@ -103,7 +87,7 @@ export default function AuthorityDetail() {
    );
 
 
-   const authorityTitle = useMemo(
+   const entityTitle = useMemo(
 
       () => (
 
@@ -114,7 +98,7 @@ export default function AuthorityDetail() {
             </div>
 
             <h5>
-               Certification Authority <span className="fw-semi-bold">Details</span>
+               Entity <span className="fw-semi-bold">Details</span>
             </h5>
 
          </div>
@@ -144,32 +128,32 @@ export default function AuthorityDetail() {
 
    const detailData: TableDataRow[] = useMemo(
 
-      () => !authority ? [] : [
+      () => !entity ? [] : [
 
          {
             id: "uuid",
-            columns: ["UUID", authority.uuid],
+            columns: ["UUID", entity.uuid],
 
          },
          {
             id: "name",
-            columns: ["Name", authority.name],
+            columns: ["Name", entity.name],
          },
          {
             id: "kind",
-            columns: ["Kind", authority.kind],
+            columns: ["Kind", entity.kind],
          },
          {
-            id: "authorityProviderUUID",
-            columns: ["Authority Provider UUID", authority.connectorUuid],
+            id: "entityProviderUUID",
+            columns: ["Entity Provider UUID", entity.connectorUuid],
          },
          {
-            id: "authorityProviderName",
-            columns: ["Authority Provider Name", authority.connectorName],
+            id: "entityProviderName",
+            columns: ["Entity Provider Name", entity.connectorName],
          }
 
       ],
-      [authority]
+      [entity]
 
    );
 
@@ -180,7 +164,7 @@ export default function AuthorityDetail() {
 
       <Container className="themed-container" fluid>
 
-         <Widget title={authorityTitle} busy={isBusy}>
+         <Widget title={entityTitle} busy={isBusy}>
 
             <br />
 
@@ -195,43 +179,22 @@ export default function AuthorityDetail() {
 
             <br />
 
-            <Label>Certification Authority Attributes</Label>
-            <AttributeViewer attributes={authority?.attributes} />
+            <Label>Entity Attributes</Label>
+            <AttributeViewer attributes={entity?.attributes} />
 
          </Widget>
 
 
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete Certification Authority"
-            body="You are about to delete Authority. If you continue, connectors
-                  related to the authority will fail. Is this what you want to do?"
+            caption="Delete Entity"
+            body="You are about to delete Entity. Is this what you want to do?"
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
             ]}
          />
-
-         <Dialog
-            isOpen={deleteErrorMessage !== ""}
-            caption="Delete Authority"
-            body={
-               <>
-                  Failed to delete the Authority Instance as it has dependent objects.
-                  Please find the details below:
-                  <br />
-                  <br />
-                  {deleteErrorMessage}
-               </>
-            }
-            toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-            buttons={[
-               { color: "danger", onClick: onForceDeleteAuthority, body: "Force" },
-               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
-            ]}
-         />
-
 
       </Container>
 
