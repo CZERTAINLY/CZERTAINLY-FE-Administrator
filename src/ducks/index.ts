@@ -47,6 +47,9 @@ import authoritiesEpics from "./authorities-epics";
 import { initialState as initialEntitiesState, slice as entitiesSlice } from "./entities";
 import entitiesEpics from "./entities-epics";
 
+import { initialState as initialLocationState, slice as locationsSlice } from "./locations";
+import locationsEpics from "./locations-epics";
+
 import { initialState as initialGroupState, slice as groupSlice } from "./groups";
 import groupEpics from "./groups-epics";
 
@@ -80,6 +83,7 @@ export const initialState = {
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
    [authoritiesSlice.name]: initialAuthoritiesState,
    [entitiesSlice.name]: initialEntitiesState,
+   [locationsSlice.name]: initialLocationState,
    [groupSlice.name]: initialGroupState,
    [discoverySlice.name]: initialDiscoveryState,
 };
@@ -100,6 +104,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
    [authoritiesSlice.name]: authoritiesSlice.reducer,
    [entitiesSlice.name]: entitiesSlice.reducer,
+   [locationsSlice.name]: locationsSlice.reducer,
    [groupSlice.name]: groupSlice.reducer,
    [discoverySlice.name]: discoverySlice.reducer,
 });
@@ -120,6 +125,7 @@ export const epics = combineEpics(
    ...acmeProfilesEpics,
    ...authoritiesEpics,
    ...entitiesEpics,
+   ...locationsEpics,
    ...groupEpics,
    ...discoveryEpics,
 );

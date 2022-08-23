@@ -16,6 +16,7 @@ import { GroupDTO } from "api/groups";
 import { DashboardDTO } from "api/dashboard";
 
 import { DbEntity } from "./db-entities";
+import { DbLocation } from "./db-locations";
 
 
 export interface DBData {
@@ -49,6 +50,7 @@ export interface DBData {
    discoveries: DbDiscovery[];
 
    entities: DbEntity[];
+   locations: DbLocation[];
 
    dashboard: DashboardDTO;
 
