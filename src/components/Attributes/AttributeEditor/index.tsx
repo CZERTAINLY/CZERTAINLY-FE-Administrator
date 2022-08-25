@@ -145,7 +145,8 @@ export default function AttributeEditor({
 
          // only lists are supported now, because of this the 'value' is added to the path as the list selected option is { label: "", value: "" }
          const formMappingPath = mapping.from ? mapping.from.includes(".") ? "value." + mapping.from.split(".").slice(1).join(".") : "value" : "value";
-         const currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
+         let currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
+         if (typeof currentContent === "object" && currentContent.hasOwnProperty("value")) currentContent = currentContent.value;
 
          const depDescriptor = attributeDescriptors.find(d => d.name === mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : "");
          const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
