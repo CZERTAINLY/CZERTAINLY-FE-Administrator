@@ -6,6 +6,8 @@ import { FetchHttpService } from "ts-rest-client-fetch";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 import * as model from "./model";
+import { createNewResource } from "utils/net";
+import { map } from "rxjs/operators";
 
 
 const baseUrl = "/api/v1/entities";
@@ -53,13 +55,18 @@ export class EntityManagementBackend implements model.EntityManagementApi {
 
    addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string> {
 
-      return this._fetchService.request(
-         new HttpRequestOptions(baseUrl, "POST", {
-            name,
-            attributes,
-            connectorUuid,
-            kind
-         })
+      return createNewResource(baseUrl, {
+         name,
+         attributes,
+         connectorUuid,
+         kind
+      }).pipe(
+         map(
+            uuid => {
+               if (!uuid) throw new Error("Unexpected response returned from server");
+               return uuid;
+            }
+         )
       );
 
    }
@@ -82,7 +89,7 @@ export class EntityManagementBackend implements model.EntityManagementApi {
 
    }
 
-   listLocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   listLocationAttributeDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}/location/attributes`, "GET")

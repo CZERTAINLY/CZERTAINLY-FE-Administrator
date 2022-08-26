@@ -145,8 +145,7 @@ export default function AttributeEditor({
 
          // only lists are supported now, because of this the 'value' is added to the path as the list selected option is { label: "", value: "" }
          const formMappingPath = mapping.from ? mapping.from.includes(".") ? "value." + mapping.from.split(".").slice(1).join(".") : "value" : "value";
-         let currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
-         if (typeof currentContent === "object" && currentContent.hasOwnProperty("value")) currentContent = currentContent.value;
+         const currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
 
          const depDescriptor = attributeDescriptors.find(d => d.name === mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : "");
          const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
@@ -184,7 +183,8 @@ export default function AttributeEditor({
 
                mapping.targets.forEach(
                   target => {
-                     const value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
+                     let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
+                     if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
                      if (value === undefined) hasUndefinedMapping = true;
                      data[target][mapping.to] = value;
                   }

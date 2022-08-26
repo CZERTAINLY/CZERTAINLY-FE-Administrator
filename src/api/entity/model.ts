@@ -27,6 +27,6 @@ export interface EntityManagementApi {
 
    removeEntity(uuid: string): Observable<void>;
 
-   listLocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
+   listLocationAttributeDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]>;
 
 }

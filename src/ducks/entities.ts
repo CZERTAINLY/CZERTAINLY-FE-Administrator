@@ -13,6 +13,8 @@ export type State = {
    entity?: EntityModel;
    entities: EntityModel[];
 
+   locationAttributeDescriptors?: AttributeDescriptorModel[];
+
    entityProviders?: ConnectorModel[];
    entityProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
@@ -21,6 +23,7 @@ export type State = {
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
+   isFetchingLocationAttributeDescriptors: boolean;
    isCreating: boolean;
    isUpdating: boolean;
    isDeleting: boolean;
@@ -39,6 +42,7 @@ export const initialState: State = {
 
    isFetchingList: false,
    isFetchingDetail: false,
+   isFetchingLocationAttributeDescriptors: false,
    isCreating: false,
    isDeleting: false,
    isUpdating: false,
@@ -56,7 +60,13 @@ export const slice = createSlice({
 
       resetState: (state, action: PayloadAction<void>) => {
 
-         state = initialState;
+         for (const key in state) {
+            if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+         }
+
+         for (const key in initialState) {
+            (state as any)[key] = (initialState as any)[key];
+         }
 
       },
 
@@ -192,14 +202,20 @@ export const slice = createSlice({
       },
 
 
-      deleteEntity: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteEntity: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteEntitySuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteEntitySuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
+
+         const index = state.checkedRows.findIndex((uuid: string) => uuid === action.payload.uuid);
+         state.checkedRows.splice(index, 1);
+
+         const index1 = state.entities.findIndex((entity: EntityModel) => entity.uuid === action.payload.uuid);
+         state.entities.splice(index1, 1);
 
          state.isDeleting = false;
 
@@ -231,7 +247,30 @@ export const slice = createSlice({
 
          state.isUpdating = false;
 
+      },
+
+
+      listLocationAttributeDescriptors: (state, action: PayloadAction<{ entityUuid: string }>) => {
+
+         state.isFetchingLocationAttributeDescriptors = true;
+
+      },
+
+
+      listLocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
+
+         state.isFetchingLocationAttributeDescriptors = false;
+         state.locationAttributeDescriptors = action.payload.descriptors;
+
+      },
+
+
+      listLocationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isFetchingLocationAttributeDescriptors = false;
+
       }
+
 
    }
 
@@ -240,10 +279,11 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const checkedRows = createSelector(state, (state) => state.checkedRows);
+const checkedRows = createSelector(state, state => state.checkedRows);
 
 const entityProviders = createSelector(state, state => state.entityProviders);
 const entityProviderAttributeDescriptors = createSelector(state, state => state.entityProviderAttributeDescriptors);
+const locationAttributes = createSelector(state, state => state.locationAttributeDescriptors);
 
 const entity = createSelector(state, state => state.entity);
 const entities = createSelector(state, state => state.entities);
@@ -253,6 +293,7 @@ const isFetchingEntityProviderAttributeDescriptors = createSelector(state, state
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
+const isFetchingLocationAttributes = createSelector(state, state => state.isFetchingLocationAttributeDescriptors);
 const isCreating = createSelector(state, state => state.isCreating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isUpdating = createSelector(state, state => state.isUpdating);
@@ -266,12 +307,14 @@ export const selectors = {
 
    entityProviders,
    entityProviderAttributeDescriptors,
+   locationAttributes,
 
    entity,
    entities,
 
    isFetchingEntityProviders,
    isFetchingEntityProviderAttributeDescriptors,
+   isFetchingLocationAttributes,
 
    isFetchingList,
    isFetchingDetail,

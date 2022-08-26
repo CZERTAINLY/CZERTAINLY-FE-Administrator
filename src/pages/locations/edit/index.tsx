@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import EntityForm from "components/Forms/EntityForm";
+import LocationForm from "components/Forms/LocationForm";
 
 export default function Edit() {
 
@@ -9,7 +9,7 @@ export default function Edit() {
 
       () => (
          <h5>
-            Edit <span className="fw-semi-bold">Entity</span>
+            Edit <span className="fw-semi-bold">Location</span>
          </h5>
       ),
       []
@@ -19,7 +19,7 @@ export default function Edit() {
    return (
 
       <Container className="themed-container" fluid>
-         <EntityForm title={title} />
+         <LocationForm title={title} />
       </Container>
 
    );

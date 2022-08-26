@@ -67,7 +67,7 @@ export default function EntityDetail() {
 
          if (!entity) return;
 
-         dispatch(actions.deleteEntity({ uuid: entity.uuid }));
+         dispatch(actions.deleteEntity({ uuid: entity.uuid, redirect: "../" }));
          setConfirmDelete(false);
 
       },

@@ -143,7 +143,7 @@ export class EntityManagementMock implements model.EntityManagementApi {
    }
 
 
-   listLocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   listLocationAttributeDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.entities.find(entity => entity.uuid === uuid)
