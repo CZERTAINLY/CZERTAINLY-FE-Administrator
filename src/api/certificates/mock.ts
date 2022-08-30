@@ -6,6 +6,7 @@ import * as model from "./model";
 
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
+import { LocationDTO } from "api/location";
 
 export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
@@ -86,6 +87,13 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
          )
 
       );
+
+   }
+
+
+   listLocations(uuid: string): Observable<LocationDTO[]> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 
    }
 

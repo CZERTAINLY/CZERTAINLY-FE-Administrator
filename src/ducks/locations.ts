@@ -1,5 +1,4 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDTO } from "api/_common/attributeDTO";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { AttributeModel } from "models/attributes/AttributeModel";
 import { LocationModel } from "models/locations";
@@ -145,7 +144,7 @@ export const slice = createSlice({
          entityUuid: string,
          name: string,
          description: string,
-         attributes: AttributeDTO[],
+         attributes: AttributeModel[],
          enabled: boolean
       }>) => {
 
@@ -173,7 +172,7 @@ export const slice = createSlice({
          uuid: string,
          entityUuid: string,
          description: string,
-         attributes: AttributeDTO[],
+         attributes: AttributeModel[],
          enabled: boolean
       }>) => {
 
@@ -198,14 +197,14 @@ export const slice = createSlice({
       },
 
 
-      deleteLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteLocation: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteLocationSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteLocationSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.uuid);

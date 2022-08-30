@@ -1,5 +1,6 @@
 import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap, mergeMap } from "rxjs/operators";
+
 import history from "browser-history";
 
 import { AppEpic } from "ducks";

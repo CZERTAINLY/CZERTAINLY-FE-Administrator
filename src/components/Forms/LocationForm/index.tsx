@@ -7,12 +7,11 @@ import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, In
 
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
-import { ConnectorModel } from "models/connectors";
 import { LocationModel } from "models/locations";
 
 import { actions as alertActions } from "ducks/alerts";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
-import { actions as entityActions, selectors as entitySelectors } from "ducks/locations";
+import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
 
 import { mutators } from "utils/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes";
@@ -25,8 +24,8 @@ import ProgressButton from "components/ProgressButton";
 
 interface FormValues {
    name: string | undefined;
-   entityProvider: { value: string; label: string } | undefined;
-   storeKind: { value: string; label: string } | undefined;
+   description: string | undefined;
+   entity: { value: string; label: string } | undefined;
 }
 
 export interface Props {
@@ -47,8 +46,13 @@ export default function EntityForm({
       [params.id]
    );
 
-   const locationAttributeDescriptors = useSelector(entitySelectors.)
+   const entities = useSelector(entitySelectors.entities);
+   const locationAttributeDescriptors = useSelector(entitySelectors.locationAttributeDescriptors);
+
    const locationSelector = useSelector(locationSelectors.location);
+
+   const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
+   const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
 
    const isFetchingLocationDetail = useSelector(locationSelectors.isFetchingDetail);
    const isCreating = useSelector(locationSelectors.isCreating);
@@ -63,12 +67,14 @@ export default function EntityForm({
       [isFetchingLocationDetail, isCreating, isUpdating]
    );
 
+
    useEffect(
 
       () => {
 
          if (init) {
             dispatch(locationActions.resetState());
+            dispatch(entityActions.listEntities());
             setInit(false);
          }
 
@@ -86,63 +92,28 @@ export default function EntityForm({
 
    );
 
+
    useEffect(
 
       () => {
 
-         if (!editMode && locationSelector?.uuid === params.id) {
-
-            /*
-            if (!locationSelector.connectorUuid) {
-               dispatch(alertActions.error("Entity provider was probably deleted"));
-               return;
-            }
-            */
-
-            const provider = entityProviders.find(p => p.uuid === locationSelector.connectorUuid);
-
-            if (provider) {
-               setEntityProvider(provider);
-               dispatch(entityActions.getEntityProviderAttributesDescriptors({ uuid: locationSelector.connectorUuid, kind: locationSelector.kind }));
-            } else {
-               dispatch(alertActions.error("Entity provider not found"));
-            }
-
+         if (editMode && location?.uuid === params.id && entities && entities.length > 0) {
+            dispatch(entityActions.listLocationAttributeDescriptors({ entityUuid: location.entityInstanceUuid }));
          }
 
       },
-      [entityProvider, dispatch, editMode, params.id, locationSelector, entityProviders, isFetchingEntityProviders]
+      [dispatch, editMode, location, params.id, entities]
 
    );
 
 
-   const onEntityProviderChange = useCallback(
+   const onEntityChange = useCallback(
 
       (event) => {
-
-         dispatch(entityActions.clearEntityProviderAttributeDescriptors());
-
-         if (!event.value || !entityProviders) return;
-         const provider = entityProviders.find(p => p.uuid === event.value);
-
-         if (!provider) return;
-         setEntityProvider(provider);
-
+         if (!event.value) return;
+         dispatch(entityActions.listLocationAttributeDescriptors({ entityUuid: event.value }));
       },
-      [dispatch, entityProviders]
-
-   );
-
-
-   const onKindChange = useCallback(
-
-      (event) => {
-
-         if (!event.value || !entityProvider) return;
-         dispatch(entityActions.getEntityProviderAttributesDescriptors({ uuid: entityProvider.uuid, kind: event.value }));
-
-      },
-      [dispatch, entityProvider]
+      [dispatch]
 
    );
 
@@ -153,24 +124,29 @@ export default function EntityForm({
 
          if (editMode) {
 
-            dispatch(entityActions.updateEntity({
+            dispatch(locationActions.editLocation({
                uuid: params.id,
-               attributes: collectFormAttributes("entity", entityProviderAttributeDescriptors, values)
+               description: values.description || "",
+               enabled: location!.enabled,
+               entityUuid: values.entity!.value,
+               attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
             }));
 
          } else {
 
-            dispatch(entityActions.addEntity({
+            dispatch(locationActions.addLocation({
                name: values.name!,
-               connectorUuid: values.entityProvider!.value,
-               kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("entity", entityProviderAttributeDescriptors, values)
+               description: values.description || "",
+               enabled: true,
+               entityUuid: values.entity!.value,
+               attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
             }));
 
          }
 
       },
-      [editMode, dispatch, params.id, entityProviderAttributeDescriptors]
+      [dispatch, editMode, location, locationAttributeDescriptors, params.id]
+
    );
 
 
@@ -194,30 +170,15 @@ export default function EntityForm({
    )
 
 
-   const optionsForEntityProviders = useMemo(
+   const optionsForEntities = useMemo(
 
-      () => entityProviders?.map(
-         provider => ({
-            label: provider.name,
-            value: provider.uuid,
+      () => entities?.map(
+         entity => ({
+            label: entity.name,
+            value: entity.uuid,
          })
       ),
-      [entityProviders]
-
-   );
-
-
-   const optionsForKinds = useMemo(
-
-      () => entityProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "entityProvider"
-      )?.kinds.map(
-         kind => ({
-            label: kind,
-            value: kind
-         })
-      ) ?? [],
-      [entityProvider]
+      [entities]
 
    );
 
@@ -225,8 +186,8 @@ export default function EntityForm({
    const defaultValues: FormValues = useMemo(
       () => ({
          name: editMode ? location?.name || undefined : undefined,
-         entityProvider: editMode ? location ? { value: location.connectorUuid, label: location.connectorName } : undefined : undefined,
-         storeKind: editMode ? location ? { value: location?.kind, label: location?.kind } : undefined : undefined,
+         description: editMode ? location?.description || undefined : undefined,
+         entity: editMode ? location ? { value: location.entityInstanceUuid, label: location.entityInstanceName } : undefined : undefined,
       }),
       [editMode, location]
    );
@@ -248,14 +209,14 @@ export default function EntityForm({
 
                         <FormGroup>
 
-                           <Label for="name">Entity Name</Label>
+                           <Label for="name">Location Name</Label>
 
                            <Input
                               {...input}
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
                               type="text"
-                              placeholder="Enter the Entity Name"
+                              placeholder="Enter the Location Name"
                               disabled={editMode}
                            />
 
@@ -266,130 +227,69 @@ export default function EntityForm({
 
                   </Field>
 
-                  {!editMode ? (
 
-                     <Field name="entityProvider" validate={validateRequired()}>
+                  <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
 
-                        {({ input, meta }) => (
+                     {({ input, meta }) => (
 
-                           <FormGroup>
+                        <FormGroup>
 
-                              <Label for="entityProvider">Entity Provider</Label>
+                           <Label for="name">Location Description</Label>
 
-                              <Select
-                                 {...input}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForEntityProviders}
-                                 placeholder="Select Entity Provider"
-                                 onChange={(event) => { onEntityProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
-                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                              />
+                           <Input
+                              {...input}
+                              valid={!meta.error && meta.touched}
+                              invalid={!!meta.error && meta.touched}
+                              type="text"
+                              placeholder="Enter the location description"
+                           />
 
-                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+                           <FormFeedback>{meta.error}</FormFeedback>
 
-                           </FormGroup>
+                        </FormGroup>
+                     )}
 
-                        )}
+                  </Field>
 
-                     </Field>
 
-                  ) : (
+                  <Field name="entity" validate={validateRequired()}>
 
-                     <Field name="entityProvider" format={(value) => value ? value.label : ""} validate={validateRequired()}>
+                     {({ input, meta }) => (
 
-                        {({ input, meta }) => (
+                        <FormGroup>
 
-                           <FormGroup>
+                           <Label for="entity">Entity</Label>
 
-                              <Label for="entityProvider">Entity Provider</Label>
+                           <Select
+                              {...input}
+                              maxMenuHeight={140}
+                              menuPlacement="auto"
+                              options={optionsForEntities}
+                              placeholder="Select Entity"
+                              onChange={(event) => { onEntityChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
+                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                           />
 
-                              <Input
-                                 {...input}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="text"
-                                 placeholder="Entity Provider Name"
-                                 disabled={editMode}
-                              />
+                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
-                           </FormGroup>
+                        </FormGroup>
 
-                        )}
+                     )}
 
-                     </Field>
+                  </Field>
 
-                  )}
 
-                  {!editMode && optionsForKinds?.length ? (
-
-                     <Field name="storeKind" validate={validateRequired()}>
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="storeKind">Kind</Label>
-
-                              <Select
-                                 {...input}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForKinds}
-                                 placeholder="Select Kind"
-                                 onChange={(event) => { onKindChange(event); input.onChange(event); }}
-                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                              />
-
-                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
-
-                           </FormGroup>
-                        )}
-                     </Field>
-
-                  ) : null}
-
-                  {editMode && location?.kind ? (
-
-                     <Field name="storeKind" format={(value) => value ? value.label : ""}>
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="storeKind">Kind</Label>
-
-                              <Input
-                                 {...input}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="text"
-                                 placeholder="Entity Kind"
-                                 disabled={editMode}
-                              />
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                  ) : null}
-
-                  {entityProvider && values.storeKind && entityProviderAttributeDescriptors && entityProviderAttributeDescriptors.length > 0 ? (
+                  {values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
 
                      <>
                         <hr />
-                        <h6>Entity Attributes</h6>
+                        <h6>Location Attributes</h6>
                         <hr />
 
                         <AttributeEditor
-                           id="entity"
-                           attributeDescriptors={entityProviderAttributeDescriptors}
+                           id="location"
+                           attributeDescriptors={locationAttributeDescriptors}
                            attributes={location?.attributes}
-                           connectorUuid={entityProvider.uuid}
-                           functionGroupCode={"entityProvider"}
-                           kind={values.storeKind.value}
                         />
                      </>
 

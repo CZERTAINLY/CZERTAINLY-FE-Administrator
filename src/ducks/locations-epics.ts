@@ -1,6 +1,8 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { EMPTY, of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+
+import history from "browser-history";
 
 import { actions as alertActions } from "./alerts";
 import { extractError } from "utils/net";
@@ -135,6 +137,25 @@ const addLocation: AppEpic = (action$, state, deps) => {
 }
 
 
+const addLocationSuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.addLocationSuccess.match
+      ),
+      switchMap(
+         action => {
+            history.push(`./detail/${action.payload.location.uuid}`);
+            return EMPTY;
+         }
+      )
+
+   );
+
+}
+
+
 const addLocationFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -185,6 +206,25 @@ const editLocation: AppEpic = (action$, state, deps) => {
 }
 
 
+const editLocationSuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.editLocationSuccess.match
+      ),
+      switchMap(
+         action => {
+            history.push(`../detail/${action.payload.location.uuid}`);
+            return EMPTY;
+         }
+      )
+
+   );
+
+}
+
+
 const editLocationFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -208,12 +248,12 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.deleteLocation.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.locations.deleteLocation(action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid })
+               () => slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
             catchError(
                err => of(slice.actions.deleteLocationFailure({ error: extractError(err, "Failed to delete Location") }))
@@ -226,6 +266,29 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
    );
 
 }
+
+
+
+
+const deleteLocationSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteLocationSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+};
 
 
 const deleteLocationFailure: AppEpic = (action$, state, deps) => {
@@ -251,7 +314,7 @@ const enableLocation: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.enableLocation.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.locations.enableLocation(action.payload.uuid).pipe(
 
@@ -294,7 +357,7 @@ const disableLocation: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.disableLocation.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.locations.disableLocation(action.payload.uuid).pipe(
 
@@ -609,10 +672,13 @@ const epics = [
    getLocationDetail,
    getLocationDetailFailure,
    addLocation,
+   addLocationSuccess,
    addLocationFailure,
    editLocation,
+   editLocationSuccess,
    editLocationFailure,
    deleteLocation,
+   deleteLocationSuccess,
    deleteLocationFailure,
    enableLocation,
    enableLocationFailure,

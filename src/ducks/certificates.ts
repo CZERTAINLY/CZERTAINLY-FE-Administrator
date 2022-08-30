@@ -6,6 +6,7 @@ import { CertificateRAProfileModel } from "models/certificate";
 import { GroupModel } from "models/groups";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { CertificateRevocationReason } from "types/certificate";
+import { LocationModel } from "models/locations";
 
 
 export type State = {
@@ -27,6 +28,7 @@ export type State = {
 
    certificateDetail?: CertificateModel;
    certificateHistory?: CertificateEventHistoryModel[];
+   certificateLocations?: LocationModel[];
    issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
    revocationAttributes: AttributeDescriptorModel[];
 
@@ -35,6 +37,7 @@ export type State = {
    isFetchingList: boolean;
    isFetchingDetail: boolean;
    isFetchingHistory: boolean;
+   isFetchingLocations: boolean;
 
    isIssuing: boolean;
    isRevoking: boolean;
@@ -83,6 +86,7 @@ export const initialState: State = {
    isFetchingList: false,
    isFetchingDetail: false,
    isFetchingHistory: false,
+   isFetchingLocations: false,
 
    isIssuing: false,
    isRevoking: false,
@@ -330,7 +334,31 @@ export const slice = createSlice({
 
 
       getCertificateHistoryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
          state.isFetchingHistory = false;
+
+      },
+
+
+      listCertificateLocations: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.certificateLocations = [];
+         state.isFetchingLocations = true;
+
+      },
+
+
+      listCertificateLocationsSuccess: (state, action: PayloadAction<{ certificateLocations: LocationModel[] }>) => {
+
+         state.isFetchingLocations = false;
+         state.certificateLocations = action.payload.certificateLocations;
+
+      },
+
+
+      listCertificateLocationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingLocations = false;
 
       },
 
@@ -676,6 +704,7 @@ const totalPages = createSelector(state, state => state.totalPages);
 
 const certificateDetail = createSelector(state, state => state.certificateDetail);
 const certificateHistory = createSelector(state, state => state.certificateHistory);
+const certificateLocations = createSelector(state, state => state.certificateLocations);
 const issuanceAttributes = createSelector(state, state => state.issuanceAttributes);
 const revocationAttributes = createSelector(state, state => state.revocationAttributes);
 
@@ -684,6 +713,7 @@ const isFetchingAvailablFilters = createSelector(state, state => state.isFetchin
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
 const isFetchingHistory = createSelector(state, state => state.isFetchingHistory);
+const isFetchingLocations = createSelector(state, state => state.isFetchingLocations);
 
 const isIssuing = createSelector(state, state => state.isIssuing);
 const isRevoking = createSelector(state, state => state.isRevoking);
@@ -718,12 +748,14 @@ export const selectors = {
    totalPages,
    certificateDetail,
    certificateHistory,
+   certificateLocations,
    issuanceAttributes,
    revocationAttributes,
    isFetchingAvailablFilters,
    isFetchingList,
    isFetchingDetail,
    isFetchingHistory,
+   isFetchingLocations,
    isIssuing,
    isRevoking,
    isRenewing,

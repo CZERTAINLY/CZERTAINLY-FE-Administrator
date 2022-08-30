@@ -5,13 +5,14 @@ import { useHistory } from "react-router";
 
 import { Container, Label } from "reactstrap";
 
-import { actions, selectors } from "ducks/entities";
+import { actions, selectors } from "ducks/locations";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeViewer from "components/Attributes/AttributeViewer";
+import StatusBadge from "components/StatusBadge";
 
 export default function EntityDetail() {
 
@@ -20,7 +21,7 @@ export default function EntityDetail() {
    const { params } = useRouteMatch<{ id: string }>();
    const history = useHistory();
 
-   const entity = useSelector(selectors.entity);
+   const location = useSelector(selectors.location);
 
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
@@ -39,7 +40,7 @@ export default function EntityDetail() {
 
          if (!params.id) return;
 
-         dispatch(actions.getEntityDetail({ uuid: params.id }));
+         dispatch(actions.getLocationDetail({ uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -51,12 +52,37 @@ export default function EntityDetail() {
 
       () => {
 
-         if (!entity) return;
-
-         history.push(`../../entities/edit/${entity.uuid}`);
+         if (!location) return;
+         history.push(`../../locations/edit/${location.uuid}`);
 
       },
-      [entity, history]
+      [location, history]
+
+   );
+
+
+   const onEnableClick = useCallback(
+
+      () => {
+
+         if (!location) return;
+         dispatch(actions.enableLocation({ uuid: location.uuid }));
+
+      },
+      [dispatch, location]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         if (!location) return;
+         dispatch(actions.disableLocation({ uuid: location.uuid }));
+
+      },
+      [dispatch, location]
 
    );
 
@@ -65,13 +91,13 @@ export default function EntityDetail() {
 
       () => {
 
-         if (!entity) return;
+         if (!location) return;
 
-         dispatch(actions.deleteEntity({ uuid: entity.uuid }));
+         dispatch(actions.deleteLocation({ uuid: location.uuid, redirect: "../" }));
          setConfirmDelete(false);
 
       },
-      [entity, dispatch]
+      [location, dispatch]
 
    );
 
@@ -81,8 +107,10 @@ export default function EntityDetail() {
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: false, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: false, tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
-      [onEditClick]
+      [onDisableClick, onEditClick, onEnableClick]
 
    );
 
@@ -98,7 +126,7 @@ export default function EntityDetail() {
             </div>
 
             <h5>
-               Entity <span className="fw-semi-bold">Details</span>
+               Location <span className="fw-semi-bold">Details</span>
             </h5>
 
          </div>
@@ -128,36 +156,84 @@ export default function EntityDetail() {
 
    const detailData: TableDataRow[] = useMemo(
 
-      () => !entity ? [] : [
+      () => !location ? [] : [
 
          {
             id: "uuid",
-            columns: ["UUID", entity.uuid],
+            columns: ["UUID", location.uuid],
 
          },
          {
             id: "name",
-            columns: ["Name", entity.name],
+            columns: ["Name", location.name],
          },
          {
-            id: "kind",
-            columns: ["Kind", entity.kind],
+            id: "description",
+            columns: ["Description", location.description || ""],
          },
          {
-            id: "entityProviderUUID",
-            columns: ["Entity Provider UUID", entity.connectorUuid],
+            id: "status",
+            columns: ["Status", <StatusBadge enabled={location.enabled} />],
          },
          {
-            id: "entityProviderName",
-            columns: ["Entity Provider Name", entity.connectorName],
+            id: "entityUuid",
+            columns: ["Entity UUID", location.entityInstanceUuid],
+         },
+         {
+            id: "entityName",
+            columns: ["Entity Name", location.entityInstanceName],
          }
 
       ],
-      [entity]
+      [location]
 
    );
 
 
+   const certHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "cn",
+            content: "Common Name",
+         },
+         {
+            id: "sn",
+            content: "Serial Number",
+         },
+         {
+            id: "pk",
+            content: "Private Key",
+         },
+         {
+            id: "csr",
+            content: "CSR attributes",
+         }
+      ],
+      []
+
+   );
+
+
+   const certData: TableDataRow[] = useMemo(
+
+      () => !location ? [] : location.certificates.map(
+         cert => ({
+            id: cert.certificateUuid,
+            columns: [
+               cert.commonName,
+               cert.serialNumber,
+               cert.withKey ? "Yes" : "No",
+               !cert.csrAttributes ? "" : <CustomTable
+                  headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
+                  data={cert.csrAttributes.map(atr => ({ id: atr.name, columns: [ atr.label || atr.name, atr.content ? (atr.content as any).value : "" ] }))}
+               />
+            ],
+         })
+      ),
+      [location]
+
+   );
 
 
    return (
@@ -179,11 +255,22 @@ export default function EntityDetail() {
 
             <br />
 
-            <Label>Entity Attributes</Label>
-            <AttributeViewer attributes={entity?.attributes} />
+            <Label>Location Attributes</Label>
+            <AttributeViewer attributes={location?.attributes} />
 
          </Widget>
 
+         <Widget title="Certificates">
+
+            <br />
+
+            <Label>Location certificates</Label>
+            <CustomTable
+               headers={certHeaders}
+               data={certData}
+            />
+
+         </Widget>
 
          <Dialog
             isOpen={confirmDelete}

@@ -6,6 +6,8 @@ import { FetchHttpService } from "ts-rest-client-fetch";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 import * as model from "./model";
+import { createNewResource } from "utils/net";
+import { map } from "rxjs/operators";
 
 
 const baseUrl = "/api/v1/locations";
@@ -47,18 +49,21 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
    addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
 
-      return this._fetchService.request(
-         new HttpRequestOptions(
-            `${baseUrl}`,
-            "POST", {
+      return createNewResource(baseUrl, {
             entityInstanceUuid: entityUuid,
             name,
             description,
             attributes,
             enabled
          }
+      ).pipe(
+         map(
+            uuid => {
+               if (!uuid) throw new Error("Unexpected response returned from server");
+               return uuid;
+            }
          )
-      )
+      );
 
    }
 
@@ -68,7 +73,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
       return this._fetchService.request(
          new HttpRequestOptions(
             `${baseUrl}/${uuid}`,
-            "POST", {
+            "PATCH", {
             entityInstanceUuid: entityUuid,
             description,
             attributes,

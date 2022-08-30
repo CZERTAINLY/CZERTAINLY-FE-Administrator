@@ -3,14 +3,11 @@ import { delay, map } from "rxjs/operators";
 
 import * as model from "./model";
 
-import { FunctionGroupCode } from "types/connectors";
-
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import { HttpErrorResponse } from "ts-rest-client";
 
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
 
 export class EntityManagementMock implements model.EntityManagementApi {

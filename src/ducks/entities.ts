@@ -283,7 +283,7 @@ const checkedRows = createSelector(state, state => state.checkedRows);
 
 const entityProviders = createSelector(state, state => state.entityProviders);
 const entityProviderAttributeDescriptors = createSelector(state, state => state.entityProviderAttributeDescriptors);
-const locationAttributes = createSelector(state, state => state.locationAttributeDescriptors);
+const locationAttributeDescriptors = createSelector(state, state => state.locationAttributeDescriptors);
 
 const entity = createSelector(state, state => state.entity);
 const entities = createSelector(state, state => state.entities);
@@ -293,7 +293,7 @@ const isFetchingEntityProviderAttributeDescriptors = createSelector(state, state
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
-const isFetchingLocationAttributes = createSelector(state, state => state.isFetchingLocationAttributeDescriptors);
+const isFetchingLocationAttributeDescriptors = createSelector(state, state => state.isFetchingLocationAttributeDescriptors);
 const isCreating = createSelector(state, state => state.isCreating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isUpdating = createSelector(state, state => state.isUpdating);
@@ -307,14 +307,14 @@ export const selectors = {
 
    entityProviders,
    entityProviderAttributeDescriptors,
-   locationAttributes,
+   locationAttributeDescriptors,
 
    entity,
    entities,
 
    isFetchingEntityProviders,
    isFetchingEntityProviderAttributeDescriptors,
-   isFetchingLocationAttributes,
+   isFetchingLocationAttributeDescriptors,
 
    isFetchingList,
    isFetchingDetail,

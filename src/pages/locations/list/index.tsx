@@ -57,6 +57,34 @@ function LocationList() {
    );
 
 
+   const onEnableClick = useCallback(
+
+      () => {
+
+         for (const uuid of checkedRows) {
+            dispatch(actions.enableLocation({ uuid }));
+         }
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
+   const onDisableClick = useCallback(
+
+      () => {
+
+         for (const uuid of checkedRows) {
+            dispatch(actions.disableLocation({ uuid }));
+         }
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
    const setCheckedRows = useCallback(
 
       (rows: (string | number)[]) => {
@@ -88,8 +116,10 @@ function LocationList() {
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
-      [checkedRows, onAddClick]
+      [checkedRows.length, onAddClick, onDisableClick, onEnableClick]
 
    );
 
