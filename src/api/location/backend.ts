@@ -158,13 +158,14 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   pushCertificate(locationUuid: string, certificateUuid: string, pushAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
+   pushCertificate(locationUuid: string, certificateUuid: string, attributes: AttributeDTO[]): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
             `${baseUrl}/${locationUuid}/push/${certificateUuid}`,
-            "POST",
-            pushAttributes
+            "POST", {
+               attributes
+            }
          )
       )
 

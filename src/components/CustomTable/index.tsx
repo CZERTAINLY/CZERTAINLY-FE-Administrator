@@ -30,6 +30,7 @@ interface Props {
    canSearch?: boolean;
    hasHeader?: boolean;
    hasCheckboxes?: boolean;
+   multiSelect?: boolean;
    hasPagination?: boolean;
    hasDetails?: boolean;
    paginationData?: {
@@ -51,6 +52,7 @@ function CustomTable({
    canSearch,
    hasHeader = true,
    hasCheckboxes,
+   multiSelect = true,
    hasPagination,
    hasDetails,
    paginationData,
@@ -289,6 +291,11 @@ function CustomTable({
          const id = e.target.getAttribute("data-id");
          if (!id) return;
 
+         if (!multiSelect) {
+            setTblCheckedRows([id]);
+            return;
+         }
+
          const checked = [...tblCheckedRows];
 
          if (e.target.checked) {
@@ -300,7 +307,7 @@ function CustomTable({
          setTblCheckedRows(checked);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
 
-      }, [tblCheckedRows, onCheckedRowsChanged]
+      }, [multiSelect, tblCheckedRows, onCheckedRowsChanged]
 
    );
 
@@ -361,7 +368,7 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
          if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false, width: "100%" });
 
          return columns.map(
@@ -425,7 +432,7 @@ function CustomTable({
 
          )
       },
-      [hasCheckboxes, hasDetails, tblHeaders, tblCheckedRows, tblData, onColumnSortClick, onCheckAllCheckboxClick]
+      [tblHeaders, hasCheckboxes, multiSelect, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, onCheckAllCheckboxClick]
    );
 
 

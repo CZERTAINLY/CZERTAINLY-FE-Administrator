@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup, Container, Spinner } from 'reactstrap';
+import { Field, Form } from "react-final-form";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 
-import { Container, Label } from "reactstrap";
+import { mutators } from "utils/attributeEditorMutators";
 
-import { actions, selectors } from "ducks/locations";
+import { actions, isRemovingCertificate, selectors } from "ducks/locations";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
@@ -13,6 +17,11 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeViewer from "components/Attributes/AttributeViewer";
 import StatusBadge from "components/StatusBadge";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import CertificateList from "pages/certificates/list";
+import { collectFormAttributes } from "utils/attributes";
+import ProgressButton from "components/ProgressButton";
+
 
 export default function EntityDetail() {
 
@@ -22,15 +31,27 @@ export default function EntityDetail() {
    const history = useHistory();
 
    const location = useSelector(selectors.location);
+   const pushAttributeDescriptors = useSelector(selectors.pushAttributeDescriptors);
 
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
+   const isFetchingPushAttributeDescriptors = useSelector(selectors.isFetchingCSRAttributeDescriptors);
+   const isPushingCertificate = useSelector(selectors.isPushingCertificate);
+   const isRemovingCertificate = useSelector(selectors.isRemovingCertificate);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
+   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState<boolean>(false);
+   const [issueDialog, setIssueDialog] = useState<boolean>(false);
+   const [pushDialog, setPushDialog] = useState<boolean>(false);
+
+   const [certCheckedRows, setCertCheckedRows] = useState<string[]>([]);
+
+   const [selectedCerts, setSelectedCerts] = useState<string[]>([]);
+
    const isBusy = useMemo(
-      () => isFetching || isDeleting,
-      [isFetching, isDeleting]
+      () => isFetching || isDeleting || isPushingCertificate || isRemovingCertificate || isFetchingPushAttributeDescriptors,
+      [isFetching, isDeleting, isPushingCertificate, isRemovingCertificate, isFetchingPushAttributeDescriptors]
    );
 
 
@@ -41,9 +62,23 @@ export default function EntityDetail() {
          if (!params.id) return;
 
          dispatch(actions.getLocationDetail({ uuid: params.id }));
+         dispatch(actions.getPushAttributes({ uuid: params.id }));
 
       },
       [dispatch, params.id]
+
+   )
+
+
+   useEffect(
+
+      () => {
+
+         if (!isPushingCertificate) setPushDialog(false);
+
+      },
+      [isPushingCertificate]
+
 
    )
 
@@ -87,6 +122,62 @@ export default function EntityDetail() {
    );
 
 
+   const onRemoveConfirmed = useCallback(
+
+      () => {
+
+         if (!location || certCheckedRows.length === 0) return;
+
+         certCheckedRows.forEach(
+            certUuid => {
+               dispatch(actions.removeCertificate({ locationUuid: location.uuid, certificateUuid: certUuid }));
+            }
+         );
+
+         setConfirmRemoveDialog(false);
+
+      },
+      [dispatch, location, certCheckedRows]
+
+   );
+
+
+   const onRenewClick = useCallback(
+
+      () => {
+
+         if (!location) return;
+
+         for (const certUuid of certCheckedRows) {
+            dispatch(actions.autoRenewCertificate({ locationUuid: location.uuid, certificateUuid: certUuid }));
+         }
+
+      },
+      [certCheckedRows, dispatch, location]
+
+   )
+
+
+   const onPushSubmit = useCallback(
+
+      (values: any) => {
+
+         if (selectedCerts.length === 0 || !location) return;
+
+         const attrs = collectFormAttributes("pushAttributes", pushAttributeDescriptors, values);
+
+         selectedCerts.forEach(
+            certUuid => {
+               dispatch(actions.pushCertificate({ locationUuid: location.uuid, certificateUuid: certUuid, pushAttributes: attrs }));
+            }
+         )
+
+      },
+      [dispatch, location, pushAttributeDescriptors, selectedCerts]
+
+   )
+
+
    const onDeleteConfirmed = useCallback(
 
       () => {
@@ -108,14 +199,14 @@ export default function EntityDetail() {
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: false, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: false, tooltip: "Disable", onClick: () => { onDisableClick() } }
+         { icon: "times", disabled: false, tooltip: "Disable", onClick: () => { onDisableClick() } },
       ],
       [onDisableClick, onEditClick, onEnableClick]
 
    );
 
 
-   const entityTitle = useMemo(
+   const locationTitle = useMemo(
 
       () => (
 
@@ -133,6 +224,41 @@ export default function EntityDetail() {
 
       ),
       [buttons]
+
+   );
+
+
+   const certButtons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "trash", disabled: certCheckedRows.length === 0, tooltip: "Remove", onClick: () => { setConfirmRemoveDialog(true); } },
+         { icon: "push", disabled: false, tooltip: "Push", onClick: () => { setPushDialog(true) } },
+         { icon: "cubes", disabled: false, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
+         { icon: "retweet", disabled: certCheckedRows.length === 0, tooltip: "Renew", onClick: () => { onRenewClick() } }
+      ],
+      [onRenewClick, certCheckedRows]
+
+   );
+
+
+   const certsTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="pull-right mt-n-xs">
+               <WidgetButtons buttons={certButtons} />
+            </div>
+
+            <h5>
+               Location <span className="fw-semi-bold">Certificates</span>
+            </h5>
+
+         </div>
+
+      ),
+      [certButtons]
 
    );
 
@@ -196,14 +322,16 @@ export default function EntityDetail() {
          {
             id: "cn",
             content: "Common Name",
-         },
-         {
-            id: "sn",
-            content: "Serial Number",
+            sortable: true,
          },
          {
             id: "pk",
             content: "Private Key",
+            sortable: true,
+         },
+         {
+            id: "meta",
+            content: "Meta",
          },
          {
             id: "csr",
@@ -222,11 +350,14 @@ export default function EntityDetail() {
             id: cert.certificateUuid,
             columns: [
                cert.commonName,
-               cert.serialNumber,
                cert.withKey ? "Yes" : "No",
-               !cert.csrAttributes ? "" : <CustomTable
+               !cert.metadata ? "" : Object.keys(cert.metadata).length === 0 ? "" : <CustomTable
                   headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
-                  data={cert.csrAttributes.map(atr => ({ id: atr.name, columns: [ atr.label || atr.name, atr.content ? (atr.content as any).value : "" ] }))}
+                  data={Object.keys(cert.metadata).map(key => ({ id: key, columns: [key, cert.metadata[key].toString()] }))}
+               />,
+               !cert.csrAttributes ? "" : cert.csrAttributes.length === 0 ? "" : <CustomTable
+                  headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
+                  data={cert.csrAttributes.map(atr => ({ id: atr.name, columns: [atr.label || atr.name, atr.content ? (atr.content as any).value : ""] }))}
                />
             ],
          })
@@ -240,7 +371,7 @@ export default function EntityDetail() {
 
       <Container className="themed-container" fluid>
 
-         <Widget title={entityTitle} busy={isBusy}>
+         <Widget title={locationTitle} busy={isBusy}>
 
             <br />
 
@@ -260,28 +391,101 @@ export default function EntityDetail() {
 
          </Widget>
 
-         <Widget title="Certificates">
+         <Widget title={certsTitle}>
 
             <br />
 
             <Label>Location certificates</Label>
+
             <CustomTable
                headers={certHeaders}
                data={certData}
+               hasCheckboxes={true}
+               onCheckedRowsChanged={
+                  (rows) => { setCertCheckedRows(rows as string[]) }
+               }
             />
 
          </Widget>
 
+
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete Entity"
-            body="You are about to delete Entity. Is this what you want to do?"
+            caption="Delete Location"
+            body="You are about to delete Location. Is this what you want to do?"
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
             ]}
          />
+
+
+         <Dialog
+            isOpen={confirmRemoveDialog}
+            caption={`Remove ${ certCheckedRows.length === 1 ? "certificate" : "certificates" } from the location`}
+            body="You are about to remove certificates from the location. Is this what you want to do?"
+            toggle={() => setConfirmRemoveDialog(false)}
+            buttons={[
+               { color: "danger", onClick: onRemoveConfirmed, body: "Yes, remove" },
+               { color: "secondary", onClick: () => setConfirmRemoveDialog(false), body: "Cancel" },
+            ]}
+         />
+
+
+         <Dialog
+            isOpen={pushDialog}
+            caption="Push certificate to the location"
+            toggle={() => setPushDialog(false)}
+            buttons={[]}
+            size="lg"
+            body={(
+
+               <Widget busy={isPushingCertificate}>
+
+                  <CertificateList selectCertsOnly={true} multiSelect={false} onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])} />
+
+                  <Form onSubmit={onPushSubmit} mutators={{ ...mutators() }} >
+
+                     {({ handleSubmit, pristine, submitting, valid }) => (
+
+                        <BootstrapForm onSubmit={handleSubmit}>
+
+                           <AttributeEditor
+                              id="pushAttributes"
+                              attributeDescriptors={pushAttributeDescriptors!}
+                           />
+
+                           <div style={{ textAlign: "right" }}>
+                              <ButtonGroup>
+
+                                 <ProgressButton
+                                    inProgress={isPushingCertificate}
+                                    title="Push"
+                                    type="submit"
+                                    color="primary"
+                                    disabled={pristine || submitting || !valid || selectedCerts.length === 0}
+                                    onClick={handleSubmit}
+                                 />
+
+                                 <Button type="button" color="secondary" disabled={submitting} onClick={() => setPushDialog(false)}>
+                                    Cancel
+                                 </Button>
+
+                              </ButtonGroup>
+                           </div>
+
+                        </BootstrapForm>
+
+                     )}
+
+                  </Form>
+
+               </Widget>
+
+            )}
+         />
+
 
       </Container>
 

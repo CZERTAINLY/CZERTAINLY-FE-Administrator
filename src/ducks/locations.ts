@@ -26,8 +26,8 @@ export type State = {
 
    isSyncing: boolean;
 
-   isGettingPushAttributes: boolean;
-   isGettingCSRAttributes: boolean;
+   isFetchingPushAttributeDescriptors: boolean;
+   isFetchingCSRAttributeDescriptors: boolean;
 
    isPushingCertificate: boolean;
    isIssuingCertificate: boolean;
@@ -55,8 +55,8 @@ export const initialState: State = {
 
    isSyncing: false,
 
-   isGettingPushAttributes: false,
-   isGettingCSRAttributes: false,
+   isFetchingPushAttributeDescriptors: false,
+   isFetchingCSRAttributeDescriptors: false,
 
    isPushingCertificate: false,
    isIssuingCertificate: false,
@@ -290,7 +290,7 @@ export const slice = createSlice({
 
       getPushAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isGettingPushAttributes = true;
+         state.isFetchingPushAttributeDescriptors = true;
 
       },
 
@@ -298,21 +298,21 @@ export const slice = createSlice({
       getPushAttributesSuccess: (state, action: PayloadAction<{ attributes: AttributeDescriptorModel[] }>) => {
 
          state.pushAttributeDescriptors = action.payload.attributes;
-         state.isGettingPushAttributes = false;
+         state.isFetchingPushAttributeDescriptors = false;
 
       },
 
 
       getPushAttributesFailure: (state, action: PayloadAction<{ error: string }>) => {
 
-         state.isGettingPushAttributes = false;
+         state.isFetchingPushAttributeDescriptors = false;
 
       },
 
 
       getCSRAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isGettingCSRAttributes = true;
+         state.isFetchingCSRAttributeDescriptors = true;
 
       },
 
@@ -320,14 +320,14 @@ export const slice = createSlice({
       getCSRAttributesSuccess: (state, action: PayloadAction<{ attributes: AttributeDescriptorModel[] }>) => {
 
          state.csrAttributeDescriptors = action.payload.attributes;
-         state.isGettingCSRAttributes = false;
+         state.isFetchingCSRAttributeDescriptors = false;
 
       },
 
 
       getCSRAttributesFailure: (state, action: PayloadAction<{ error: string }>) => {
 
-         state.isGettingCSRAttributes = false;
+         state.isFetchingCSRAttributeDescriptors = false;
 
       },
 
@@ -348,6 +348,7 @@ export const slice = createSlice({
          state.isPushingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
          if (index > 0) state.locations[index] = action.payload.location;
+         if (state.location?.uuid === action.payload.location.uuid) state.location = action.payload.location;
 
       },
 
@@ -368,7 +369,6 @@ export const slice = createSlice({
 
          state.isIssuingCertificate = true;
 
-
       },
 
 
@@ -377,6 +377,7 @@ export const slice = createSlice({
          state.isIssuingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
          if (index > 0) state.locations[index] = action.payload.location;
+         if (state.location?.uuid === action.payload.location.uuid) state.location = action.payload.location;
 
       },
 
@@ -400,6 +401,8 @@ export const slice = createSlice({
          state.isAutoRenewingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
          if (index > 0) state.locations[index] = action.payload.location;
+         if (state.location?.uuid === action.payload.location.uuid) state.location = action.payload.location;
+
 
       },
 
@@ -423,6 +426,7 @@ export const slice = createSlice({
          state.isRemovingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
          if (index > 0) state.locations[index] = action.payload.location;
+         if (state.location?.uuid === action.payload.location.uuid) state.location = action.payload.location;
 
       },
 
@@ -449,6 +453,9 @@ export const locations = createSelector(state, (state) => state.locations);
 export const pushAttributeDescriptors = createSelector(state, (state) => state.pushAttributeDescriptors);
 export const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttributeDescriptors);
 
+export const isFetchingPushAttributeDescriptors = createSelector(state, (state) => state.isFetchingPushAttributeDescriptors);
+export const isFetchingCSRAttributeDescriptors = createSelector(state, (state) => state.isFetchingCSRAttributeDescriptors);
+
 export const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 export const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 export const isCreating = createSelector(state, (state) => state.isCreating);
@@ -459,9 +466,6 @@ export const isEnabling = createSelector(state, (state) => state.isEnabling);
 export const isDisabling = createSelector(state, (state) => state.isDisabling);
 
 export const isSyncing = createSelector(state, (state) => state.isSyncing);
-
-export const isGettingPushAttributes = createSelector(state, (state) => state.isGettingPushAttributes);
-export const isGettingCSRAttributes = createSelector(state, (state) => state.isGettingCSRAttributes);
 
 export const isPushingCertificate = createSelector(state, (state) => state.isPushingCertificate);
 export const isIssuingCertificate = createSelector(state, (state) => state.isIssuingCertificate);
@@ -482,8 +486,8 @@ export const selectors = {
    pushAttributeDescriptors,
    csrAttributeDescriptors,
 
-   isGettingPushAttributes,
-   isGettingCSRAttributes,
+   isFetchingPushAttributeDescriptors,
+   isFetchingCSRAttributeDescriptors,
 
    isFetchingList,
    isFetchingDetail,

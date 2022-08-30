@@ -486,7 +486,7 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.pushCertificate.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.locations.pushCertificate(
             action.payload.locationUuid,
@@ -581,7 +581,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.autoRenewCertificate.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.locations.autoRenewCertificate(
             action.payload.locationUuid,
@@ -627,7 +627,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.removeCertificate.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.locations.removeCertificate(
             action.payload.locationUuid,
