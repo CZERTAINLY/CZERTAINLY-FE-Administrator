@@ -292,7 +292,9 @@ function CustomTable({
          if (!id) return;
 
          if (!multiSelect) {
-            setTblCheckedRows([id]);
+            const checked = [id];
+            setTblCheckedRows(checked);
+            if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
             return;
          }
 
