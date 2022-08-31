@@ -265,6 +265,18 @@ function CustomTable({
          const id = e.currentTarget.getAttribute("data-id");
          if (!id) return;
 
+         if (!multiSelect) {
+
+            if (tblCheckedRows.includes(id)) {
+               setTblCheckedRows([]);
+            } else {
+               setTblCheckedRows([id]);
+            }
+
+            return;
+
+         }
+
          const checkedRows = [...tblCheckedRows];
 
          if (checkedRows.includes(id)) {
@@ -279,7 +291,7 @@ function CustomTable({
          e.stopPropagation();
          e.preventDefault();
       },
-      [tblCheckedRows, setTblCheckedRows, onCheckedRowsChanged]
+      [multiSelect, tblCheckedRows, onCheckedRowsChanged]
 
    );
 
