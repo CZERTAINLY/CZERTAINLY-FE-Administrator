@@ -158,35 +158,27 @@ const createClient: AppEpic = (action$, state, deps) => {
 
       switchMap(
 
-         action => (action.payload.certificate ? readFileString$(action.payload.certificate) : of("")).pipe(
+         action => deps.apiClients.clients.createNewClient(
+            action.payload.name,
+            action.payload.description,
+            false,
+            action.payload.certificateUuid,
+            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
+         ).pipe(
 
-            switchMap(
-
-               certificateContent => deps.apiClients.clients.createNewClient(
-                  action.payload.name,
-                  action.payload.description,
-                  false,
-                  action.payload.certificateUuid,
-                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
-               ).pipe(
-
-                  map(
-                     uuid => slice.actions.createClientSuccess({ uuid })
-                  ),
-                  catchError(
-                     err => of(slice.actions.createClientFailure({ error: extractError(err, "Failed to create client") }))
-                  )
-
-               )
-
+            map(
+               uuid => slice.actions.createClientSuccess({ uuid })
             ),
             catchError(
                err => of(slice.actions.createClientFailure({ error: extractError(err, "Failed to create client") }))
-            ),
+            )
 
          )
 
-      )
+      ),
+      catchError(
+         err => of(slice.actions.createClientFailure({ error: extractError(err, "Failed to create client") }))
+      ),
 
    )
 
@@ -238,37 +230,27 @@ const updateClient: AppEpic = (action$, state, deps) => {
          slice.actions.updateClient.match
       ),
 
-
       switchMap(
 
-         action => (action.payload.certificate ? readFileString$(action.payload.certificate) : of("")).pipe(
+         action => deps.apiClients.clients.updateClient(
+            action.payload.uuid,
+            action.payload.description,
+            action.payload.certificateUuid,
+            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
+         ).pipe(
 
-
-            switchMap(
-
-               certificateContent => deps.apiClients.clients.updateClient(
-                  action.payload.uuid,
-                  action.payload.description,
-                  action.payload.certificateUuid,
-                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
-               ).pipe(
-
-                  map(
-                     clientDTO => slice.actions.updateClientSuccess({ client: transformClientDTOToModel(clientDTO) })
-                  ),
-                  catchError(
-                     err => of(slice.actions.updateClientFailure({ error: extractError(err, "Failed to update client") }))
-                  )
-
-               )
+            map(
+               clientDTO => slice.actions.updateClientSuccess({ client: transformClientDTOToModel(clientDTO) })
             ),
-
             catchError(
                err => of(slice.actions.updateClientFailure({ error: extractError(err, "Failed to update client") }))
             )
 
          )
+      ),
 
+      catchError(
+         err => of(slice.actions.updateClientFailure({ error: extractError(err, "Failed to update client") }))
       )
 
    )

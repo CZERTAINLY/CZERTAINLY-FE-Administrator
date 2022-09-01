@@ -32,17 +32,12 @@ function getDistinguishedName(dn: DistinguishedName): string {
 
 export function getCertificateInformation(encoded: string): CertificateModel {
 
-   let toDecode = encoded;
+   let toDecode;
 
-   if (encoded.indexOf('-----BEGIN CERTIFICATE-----') > 0) {
+   if (encoded.includes('-----BEGIN CERTIFICATE-----')) {
       toDecode = encoded.substring(encoded.indexOf('-----BEGIN CERTIFICATE-----'));
-   }
-
-   if (!encoded.startsWith('-----BEGIN CERTIFICATE-----') && !encoded.includes("-----BEGIN CERTIFICATE-----")) {
-      toDecode = `-----BEGIN CERTIFICATE-----
-      ${encoded}
-      -----END CERTIFICATE-----
-    `;
+   } else {
+      toDecode = `-----BEGIN CERTIFICATE-----\n${btoa(encoded)}\n-----END CERTIFICATE-----\n`;
    }
 
    try {

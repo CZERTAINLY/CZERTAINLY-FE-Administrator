@@ -16,6 +16,9 @@ import { AdministratorModel, CertificateModel } from "models";
 
 import { emptyCertificate } from "utils/certificate";
 import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
+import CertificateAttributes from "components/CertificateAttributes";
+import Dialog from "components/Dialog";
+import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
 
 interface Props {
    title: JSX.Element;
@@ -80,6 +83,10 @@ function AdminForm({ title }: Props) {
    const [, setInputTypeValue] = useState<{ label: string, value: string }>(editMode ? optionsForInput[1] : optionsForInput[0]);
 
    const [selectedCertificate, setSelectedCertificate] = useState<{ label: string, value: string }>();
+
+   const [certUploadDialog, setCertUploadDialog] = useState(false);
+   const [certToUpload, setCertToUpload] = useState<CertificateModel>();
+
 
    /* Load first page of certificates */
 
@@ -199,7 +206,7 @@ function AdminForm({ title }: Props) {
                   role: values.superAdmin ? "superAdministrator" : "administrator",
                   description: values.description,
                   certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined,
-                  certificate: values.inputType.value === "upload" ? values.certFile : undefined
+                  certificate: values.inputType.value === "upload" ? certToUpload : undefined
                })
             );
 
@@ -213,7 +220,7 @@ function AdminForm({ title }: Props) {
                   email: values.email,
                   role: values.superAdmin ? "superAdministrator" : "administrator",
                   description: values.description,
-                  certificate: values.inputType.value === "upload" ? values.certFile : undefined,
+                  certificate: values.inputType.value === "upload" ? certToUpload : undefined,
                   certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined
                })
             );
@@ -222,7 +229,7 @@ function AdminForm({ title }: Props) {
 
       },
 
-      [administrator, dispatch, editMode]
+      [administrator, certToUpload, dispatch, editMode]
 
    )
 
@@ -286,7 +293,7 @@ function AdminForm({ title }: Props) {
 
          <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
-            {({ handleSubmit, pristine, submitting, values }) => (
+            {({ handleSubmit, pristine, submitting, values, valid }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
 
@@ -408,33 +415,35 @@ function AdminForm({ title }: Props) {
 
                   {values.inputType.value === "upload" ? (
 
-                     <Field name="certFile" validate={editMode ? undefined : validateRequired()}>
+                     <FormGroup>
 
-                        {({ input: { value, onChange, ...inputProps }, meta }) => (
+                        <Label for="certFile">Client Certificate</Label>
 
-                           <FormGroup>
+                        <div>
 
-                              <Label for="certFile">Upload Administrator Certificate</Label>
+                           {
 
-                              <Input
-                                 {...inputProps}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="file"
-                                 onChange={({ target }) => onChange(target.files)}
-                              />
+                              certToUpload ? (
+                                 <CertificateAttributes certificate={certToUpload} />
+                              ) : (
+                                 <>
+                                    Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;
+                                 </>
+                              )
 
-                              <FormFeedback>{meta.error}</FormFeedback>
+                           }
 
-                              <FormText color="muted">
-                                 Upload certificate of administrator based on which will be
-                                 authenticated.
-                              </FormText>
+                           <Button color="secondary" onClick={() => setCertUploadDialog(true)}>Choose File</Button>
 
-                           </FormGroup>
-                        )}
+                        </div>
 
-                     </Field>
+                        <FormText color="muted">
+                           Upload certificate of client based on which will be
+                           authenticated to RA profile.
+                        </FormText>
+
+                     </FormGroup>
+
 
                   ) : (
 
@@ -529,7 +538,7 @@ function AdminForm({ title }: Props) {
                            title={submitTitle}
                            inProgressTitle={inProgressTitle}
                            inProgress={submitting || isCreatingAdmin || isUpdatingAdmin}
-                           disabled={pristine}
+                           disabled={pristine || submitting || isCreatingAdmin || isUpdatingAdmin || !valid || (values.inputType.value === "upload" && certToUpload === undefined)}
                         />
 
                         <Button color="default" onClick={onCancel} disabled={submitting || isCreatingAdmin || isUpdatingAdmin}>
@@ -545,6 +554,22 @@ function AdminForm({ title }: Props) {
 
          </Form>
 
+
+         <Dialog
+            isOpen={certUploadDialog}
+            caption={`Choose Certificate`}
+            body={
+               <CertificateUploadDialog
+                  okButtonTitle="Choose"
+                  onCancel={() => setCertUploadDialog(false)}
+                  onUpload={(data) => {
+                     setCertToUpload(data.certificate);
+                     setCertUploadDialog(false);
+                  }}
+               />}
+            toggle={() => setCertUploadDialog(false)}
+            buttons={[]}
+         />
 
 
       </Widget>
