@@ -226,7 +226,7 @@ export default function EntityDetail() {
          setIssueDialog(false);
 
       },
-      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, selectedCerts.length]
+      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location]
 
    )
 

@@ -9,7 +9,6 @@ import { validateRequired, composeValidators, validateAlphaNumeric } from "utils
 
 import { LocationModel } from "models/locations";
 
-import { actions as alertActions } from "ducks/alerts";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
 
@@ -50,9 +49,6 @@ export default function EntityForm({
    const locationAttributeDescriptors = useSelector(entitySelectors.locationAttributeDescriptors);
 
    const locationSelector = useSelector(locationSelectors.location);
-
-   const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
-   const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
 
    const isFetchingLocationDetail = useSelector(locationSelectors.isFetchingDetail);
    const isCreating = useSelector(locationSelectors.isCreating);
