@@ -20,6 +20,7 @@ export type State = {
 
    statuses: string[]
    isFetchingStatuses: boolean;
+   isPurging: boolean;
 
 };
 
@@ -36,7 +37,8 @@ export const initialState: State = {
    isFetchingOperations: false,
 
    statuses: [],
-   isFetchingStatuses: false
+   isFetchingStatuses: false,
+   isPurging: false
 
 };
 
@@ -153,6 +155,24 @@ export const slice = createSlice({
 
          state.isFetchingStatuses = false;
 
+      },
+
+      purgeLogs: (state, action: PayloadAction<{ queryString: string }>) => {
+
+         state.isPurging = true;
+
+      },
+
+      purgeLogsSuccess: (state, action: PayloadAction<void>) => {
+
+         state.isPurging = false;
+
+      },
+
+      purgeLogsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isPurging = false;
+
       }
    }
 
@@ -175,7 +195,7 @@ const isFetchingPageData = createSelector(state, state => state.isFetchingPageDa
 const isFetchingObjects = createSelector(state, state => state.isFetchingObjects);
 const isFetchingOperations = createSelector(state, state => state.isFetchingOperations);
 const isFetchingStatuses = createSelector(state, state => state.isFetchingStatuses);
-
+const isPurging = createSelector(state, state => state.isPurging);
 
 export const selectors = {
 
@@ -193,7 +213,8 @@ export const selectors = {
    isFetchingPageData,
    isFetchingObjects,
    isFetchingOperations,
-   isFetchingStatuses
+   isFetchingStatuses,
+   isPurging
 
 }
 
