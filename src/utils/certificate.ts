@@ -32,13 +32,12 @@ function getDistinguishedName(dn: DistinguishedName): string {
 
 export function getCertificateInformation(encoded: string): CertificateModel {
 
-   let toDecode = encoded;
+   let toDecode;
 
-   if (!encoded.startsWith('-----BEGIN CERTIFICATE-----')) {
-      toDecode = `-----BEGIN CERTIFICATE-----
-      ${encoded}
-      -----END CERTIFICATE-----
-    `;
+   if (encoded.includes('-----BEGIN CERTIFICATE-----')) {
+      toDecode = encoded.substring(encoded.indexOf('-----BEGIN CERTIFICATE-----'));
+   } else {
+      toDecode = `-----BEGIN CERTIFICATE-----\n${btoa(encoded)}\n-----END CERTIFICATE-----\n`;
    }
 
    try {
@@ -51,7 +50,7 @@ export function getCertificateInformation(encoded: string): CertificateModel {
          uuid: "",
          commonName: cert.subject.commonName,
          issuerCommonName: cert.issuer.commonName,
-         certificateContent: encoded.replace(/\r\n/g, "\n").replace("-----BEGIN CERTIFICATE-----\n", "").replace("\n-----END CERTIFICATE-----", "").replace(/\n/g, ""),
+         certificateContent: toDecode.replace(/\r\n/g, "\n").replace("-----BEGIN CERTIFICATE-----\n", "").replace("\n-----END CERTIFICATE-----", "").replace(/\n/g, ""),
          publicKeyAlgorithm: cert.publicKey.algo,
          signatureAlgorithm: cert.signatureAlgorithm,
          basicConstraints: "",
@@ -163,8 +162,6 @@ export function certificatePEM2CertificateModel(certificate: string): Certificat
    if (!encoded.startsWith('-----BEGIN CERTIFICATE-----')) {
       encoded = `-----BEGIN CERTIFICATE-----\n${encoded}\n-----END CERTIFICATE-----\n`;
    }
-
-
 
    return {
       uuid: "",
