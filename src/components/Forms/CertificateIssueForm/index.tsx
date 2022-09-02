@@ -373,11 +373,10 @@ function CertificateForm({
                         <Button
                            color="default"
                            onClick={onCancel}
-                           disabled={submitting || !valid}
+                           disabled={submitting}
                         >
                            Cancel
                         </Button>
-
 
                      </ButtonGroup>
 
