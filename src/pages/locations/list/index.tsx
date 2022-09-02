@@ -169,12 +169,6 @@ function LocationList() {
             width: "auto",
          },
          {
-            content: <MDBColumnName columnName="No. of certificates" />,
-            sortable: true,
-            id: "locationNoOfCertificates",
-            width: "15%",
-         },
-         {
             content: <MDBColumnName columnName="Status" />,
             sortable: true,
             id: "Status",
@@ -202,8 +196,6 @@ function LocationList() {
                location.description || "",
 
                <MDBBadge color="primary" >{location.entityInstanceName}</MDBBadge>,
-
-               location.certificates.length.toString(),
 
                <StatusBadge enabled={location.enabled} />,
 

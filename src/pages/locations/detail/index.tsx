@@ -211,7 +211,8 @@ export default function EntityDetail() {
 
       (values: any) => {
 
-         if (selectedCerts.length === 0 || !location) return;
+         debugger;
+         if (!location) return;
 
          const issueAttrs = collectFormAttributes("issueAttributes", issuanceAttributeDescriptors, values);
          const csrAttrs = collectFormAttributes("csrAttributes", csrAttributeDescriptors, values);
@@ -221,7 +222,8 @@ export default function EntityDetail() {
             raProfileUuid: values.raProfile.value,
             csrAttributes: csrAttrs,
             issueAttributes: issueAttrs
-         }))
+         }));
+         setIssueDialog(false);
 
       },
       [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, selectedCerts.length]
@@ -558,7 +560,7 @@ export default function EntityDetail() {
 
                         <BootstrapForm onSubmit={handleSubmit}>
 
-                           <Field name="name" validate={validateRequired()}>
+                           <Field name="raProfile" validate={validateRequired()}>
 
                               {({ input, meta }) => (
 
