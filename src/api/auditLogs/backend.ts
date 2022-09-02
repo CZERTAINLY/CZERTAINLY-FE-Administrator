@@ -58,4 +58,10 @@ export class AuditLogsBackend implements model.AuditLogsApi {
       return this._fetchService.request(new HttpRequestOptions(`${baseUrl}/statuses`, 'GET'));
 
    }
+
+   purgeLogs(queryString: string): Observable<void> {
+
+      return this._fetchService.request(new HttpRequestOptions(`${baseUrl}/purge?${queryString}`, 'GET'));
+
+   }
 }

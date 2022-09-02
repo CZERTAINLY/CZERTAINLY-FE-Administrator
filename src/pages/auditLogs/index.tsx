@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, Fragment, useMemo } from "react";
 
-import { Container, Input, Pagination, PaginationItem, PaginationLink, Table } from "reactstrap";
+import {Button, Container, Input, Pagination, PaginationItem, PaginationLink, Table} from "reactstrap";
 import cx from "classnames";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -31,12 +31,13 @@ function AuditLogs() {
    const isFetchingObjects = useSelector(selectors.isFetchingObjects);
    const isFetchingOperations = useSelector(selectors.isFetchingOperations);
    const isFetchingStatuses = useSelector(selectors.isFetchingStatuses);
+   const isPurging = useSelector(selectors.isPurging);
    const logs = useSelector(selectors.pageData);
    const objects = useSelector(selectors.objects);
    const operations = useSelector(selectors.operations);
    const states = useSelector(selectors.statuses);
 
-   const isBusy = isFetchingPageData || isFetchingObjects || isFetchingOperations || isFetchingStatuses;
+   const isBusy = isFetchingPageData || isFetchingObjects || isFetchingOperations || isFetchingStatuses || isPurging;
    const isFilterBusy = isFetchingObjects || isFetchingOperations || isFetchingStatuses;
 
    const [page, setPage] = useState(1);
@@ -188,7 +189,6 @@ function AuditLogs() {
 
    );
 
-
    const queryString = useMemo(
 
       () => (
@@ -201,6 +201,17 @@ function AuditLogs() {
 
    )
 
+    const purgeCallback = useCallback(
+
+        () => {
+
+            dispatch(auditLogActions.purgeLogs({queryString}));
+            setLogData({});
+
+        },
+        [dispatch, queryString]
+
+    );
 
    const auditLogsTitle = useMemo(
 
@@ -212,12 +223,15 @@ function AuditLogs() {
                <span className="fw-semi-bold">Audit Logs</span>
             </h5>
 
-            <a
-               href={`/api/v1/logs/export?${queryString}`}
-               className={styles.exportButton}
-            >
-               Export
-            </a>
+             <div>
+                 <a
+                     href={`/api/v1/logs/export?${queryString}`}
+                     className={styles.exportButton}
+                 >
+                     Export
+                 </a>
+                 <Button className={styles.exportButton} type="submit" color="primary" size="sm" onClick={() => purgeCallback()}>Purge</Button>
+             </div>
 
          </div>
       ),
