@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup, Container, Spinner } from 'reactstrap';
+import { Form as BootstrapForm, Button, Label, ButtonGroup, Container, FormGroup } from 'reactstrap';
 import { Field, Form } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,8 @@ import { useHistory } from "react-router";
 
 import { mutators } from "utils/attributeEditorMutators";
 
-import { actions, isRemovingCertificate, selectors } from "ducks/locations";
+import { actions, selectors } from "ducks/locations";
+import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
@@ -21,7 +22,10 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import CertificateList from "pages/certificates/list";
 import { collectFormAttributes } from "utils/attributes";
 import ProgressButton from "components/ProgressButton";
+import Spinner from "components/Spinner";
+import Select from "react-select";
 
+import { validateRequired } from "utils/validators";
 
 export default function EntityDetail() {
 
@@ -32,12 +36,21 @@ export default function EntityDetail() {
 
    const location = useSelector(selectors.location);
    const pushAttributeDescriptors = useSelector(selectors.pushAttributeDescriptors);
+   const csrAttributeDescriptors = useSelector(selectors.csrAttributeDescriptors);
+   const raProfiles = useSelector(raSelectors.raProfiles);
+   const issuanceAttributeDescriptors = useSelector(raSelectors.issuanceAttributes);
 
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
-   const isFetchingPushAttributeDescriptors = useSelector(selectors.isFetchingCSRAttributeDescriptors);
+   const isFetchingPushAttributeDescriptors = useSelector(selectors.isFetchingPushAttributeDescriptors);
+   const isFetchingCSRAttributeDescriptors = useSelector(selectors.isFetchingCSRAttributeDescriptors);
    const isPushingCertificate = useSelector(selectors.isPushingCertificate);
+   const isIssuingCertificate = useSelector(selectors.isIssuingCertificate);
    const isRemovingCertificate = useSelector(selectors.isRemovingCertificate);
+   const isRenewingCertificate = useSelector(selectors.isAutoRenewingCertificate);
+
+   const isFetchingRaProfiles = useSelector(raSelectors.isFetchingList);
+   const isFetchingIssuanceAttributes = useSelector(raSelectors.isFetchingIssuanceAttributes);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -50,8 +63,8 @@ export default function EntityDetail() {
    const [selectedCerts, setSelectedCerts] = useState<string[]>([]);
 
    const isBusy = useMemo(
-      () => isFetching || isDeleting || isPushingCertificate || isRemovingCertificate || isFetchingPushAttributeDescriptors,
-      [isFetching, isDeleting, isPushingCertificate, isRemovingCertificate, isFetchingPushAttributeDescriptors]
+      () => isFetching || isDeleting || isPushingCertificate || isRemovingCertificate || isFetchingPushAttributeDescriptors || isFetchingCSRAttributeDescriptors,
+      [isFetching, isDeleting, isPushingCertificate, isRemovingCertificate, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors]
    );
 
 
@@ -63,6 +76,7 @@ export default function EntityDetail() {
 
          dispatch(actions.getLocationDetail({ uuid: params.id }));
          dispatch(actions.getPushAttributes({ uuid: params.id }));
+         dispatch(actions.getCSRAttributes({ uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -81,6 +95,21 @@ export default function EntityDetail() {
 
 
    )
+
+
+   useEffect(
+
+      () => {
+
+         if (!issueDialog) return;
+
+         dispatch(raActions.resetState());
+         dispatch(raActions.listRaProfiles());
+
+      },
+      [dispatch, issueDialog]
+
+   );
 
 
    const onEditClick = useCallback(
@@ -174,6 +203,28 @@ export default function EntityDetail() {
 
       },
       [dispatch, location, pushAttributeDescriptors, selectedCerts]
+
+   )
+
+
+   const onIssueSubmit = useCallback(
+
+      (values: any) => {
+
+         if (selectedCerts.length === 0 || !location) return;
+
+         const issueAttrs = collectFormAttributes("issueAttributes", issuanceAttributeDescriptors, values);
+         const csrAttrs = collectFormAttributes("csrAttributes", csrAttributeDescriptors, values);
+
+         dispatch(actions.issueCertificate({
+            locationUuid: location.uuid,
+            raProfileUuid: values.raProfile.value,
+            csrAttributes: csrAttrs,
+            issueAttributes: issueAttrs
+         }))
+
+      },
+      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, selectedCerts.length]
 
    )
 
@@ -391,7 +442,7 @@ export default function EntityDetail() {
 
          </Widget>
 
-         <Widget title={certsTitle}>
+         <Widget title={certsTitle} busy={isRenewingCertificate}>
 
             <br />
 
@@ -423,7 +474,7 @@ export default function EntityDetail() {
 
          <Dialog
             isOpen={confirmRemoveDialog}
-            caption={`Remove ${ certCheckedRows.length === 1 ? "certificate" : "certificates" } from the location`}
+            caption={`Remove ${certCheckedRows.length === 1 ? "certificate" : "certificates"} from the location`}
             body="You are about to remove certificates from the location. Is this what you want to do?"
             toggle={() => setConfirmRemoveDialog(false)}
             buttons={[
@@ -439,9 +490,9 @@ export default function EntityDetail() {
             toggle={() => setPushDialog(false)}
             buttons={[]}
             size="lg"
-            body={(
+            body={
 
-               <Widget busy={isPushingCertificate}>
+               <>
 
                   <CertificateList selectCertsOnly={true} multiSelect={false} onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])} />
 
@@ -457,6 +508,7 @@ export default function EntityDetail() {
                            />
 
                            <div style={{ textAlign: "right" }}>
+
                               <ButtonGroup>
 
                                  <ProgressButton
@@ -473,6 +525,7 @@ export default function EntityDetail() {
                                  </Button>
 
                               </ButtonGroup>
+
                            </div>
 
                         </BootstrapForm>
@@ -481,9 +534,120 @@ export default function EntityDetail() {
 
                   </Form>
 
-               </Widget>
+                  <Spinner active={isPushingCertificate} />
 
-            )}
+               </>
+
+            }
+         />
+
+
+         <Dialog
+            isOpen={issueDialog}
+            caption="Issue certificate for the location"
+            toggle={() => setIssueDialog(false)}
+            buttons={[]}
+            size="lg"
+            body={
+
+               <>
+
+                  <Form onSubmit={onIssueSubmit} mutators={{ ...mutators() }} >
+
+                     {({ handleSubmit, pristine, submitting, valid }) => (
+
+                        <BootstrapForm onSubmit={handleSubmit}>
+
+                           <Field name="name" validate={validateRequired()}>
+
+                              {({ input, meta }) => (
+
+                                 <FormGroup>
+
+                                    <Label for="certificate">RA Profile</Label>
+
+                                    <Select
+                                       {...input}
+                                       maxMenuHeight={140}
+                                       menuPlacement="auto"
+                                       options={raProfiles.map(p => ({ value: p.uuid, label: p.name }))}
+                                       placeholder="Select RA profile"
+                                       styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                                       onChange={(value) => {
+                                          input.onChange(value);
+                                          dispatch(raActions.listIssuanceAttributeDescriptors({ uuid: value.value }));
+                                       }}
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
+                                 </FormGroup>
+
+                              )}
+
+                           </Field>
+
+
+                           <FormGroup>
+
+                              <Label>Certificate Signing Request Attributes</Label>
+
+                              {csrAttributeDescriptors && (
+                                 <AttributeEditor
+                                    id="csrAttributes"
+                                    attributeDescriptors={csrAttributeDescriptors}
+                                 />
+                              )}
+
+                           </FormGroup>
+
+
+                           <FormGroup>
+
+                              <Label>RA Profile Issuance Attributes</Label>
+
+                              {issuanceAttributeDescriptors && (
+                                 <AttributeEditor
+                                    id="issueAttributes"
+                                    attributeDescriptors={issuanceAttributeDescriptors}
+                                 />
+                              )}
+
+                           </FormGroup>
+
+
+                           <div style={{ textAlign: "right" }}>
+
+                              <ButtonGroup>
+
+                                 <ProgressButton
+                                    inProgress={isPushingCertificate}
+                                    title="Issue"
+                                    type="submit"
+                                    color="primary"
+                                    disabled={pristine || submitting || !valid}
+                                    onClick={handleSubmit}
+                                 />
+
+                                 <Button type="button" color="secondary" disabled={submitting} onClick={() => setIssueDialog(false)}>
+                                    Cancel
+                                 </Button>
+
+                              </ButtonGroup>
+
+                           </div>
+
+                        </BootstrapForm>
+
+                     )}
+
+                  </Form>
+
+                  <Spinner active={isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate} />
+
+               </>
+
+            }
          />
 
 

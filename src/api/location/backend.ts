@@ -193,7 +193,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${locationUuid}/push/${certificateUuid}`,
+            `${baseUrl}/${locationUuid}/renew/${certificateUuid}`,
             "PATCH"
          )
       )
