@@ -54,6 +54,10 @@ export default function EntityForm({
    const isCreating = useSelector(locationSelectors.isCreating);
    const isUpdating = useSelector(locationSelectors.isUpdating);
 
+   const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
+   const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
+
+
    const [init, setInit] = useState(true);
 
    const [location, setLocation] = useState<LocationModel>();
