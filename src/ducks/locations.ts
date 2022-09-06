@@ -95,6 +95,13 @@ export const slice = createSlice({
       },
 
 
+      clearPushAttributeDescriptors: (state, action: PayloadAction<void>) => {
+
+         state.pushAttributeDescriptors = undefined;
+
+      },
+
+
       listLocations: (state, action: PayloadAction<void>) => {
 
          state.isFetchingList = true;

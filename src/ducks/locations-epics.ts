@@ -666,6 +666,50 @@ const removeCertificateFailure: AppEpic = (action$, state, deps) => {
 }
 
 
+const syncLocation: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.syncLocation.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.locations.syncLocation(action.payload.uuid).pipe(
+
+            map(
+               location => slice.actions.syncLocationSuccess({ location: transformLocationDtoToModel(location) })
+            ),
+
+            catchError(
+               err => of(slice.actions.syncLocationFailure({ error: extractError(err, "Failed to sync Location") }))
+            )
+
+         )
+
+      )
+
+   );
+
+}
+
+
+const syncLocationFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.syncLocationFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+}
+
+
 const epics = [
    listLocations,
    listLocationsFailure,
@@ -695,7 +739,9 @@ const epics = [
    autoRenewCertificate,
    autoRenewCertificateFailure,
    removeCertificate,
-   removeCertificateFailure
+   removeCertificateFailure,
+   syncLocation,
+   syncLocationFailure
 ];
 
 

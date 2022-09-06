@@ -2,10 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useRouteMatch } from "react-router-dom";
 
-import { Badge, Button, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, Row, UncontrolledButtonDropdown } from "reactstrap";
+import { Form as BootstrapForm, Badge, Button, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, Row, UncontrolledButtonDropdown, ButtonGroup } from "reactstrap";
+
+import { mutators } from "utils/attributeEditorMutators";
 
 import { actions, selectors } from "ducks/certificates";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/groups";
+import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
 import Widget from "components/Widget";
@@ -21,6 +24,14 @@ import { CertificateRevocationReason } from "types/certificate";
 import CertificateRenewDialog from "components/pages/certificates/CertificateRenewDialog";
 import CertificateEventStatus from "components/pages/certificates/CertificateHistoryStatus";
 import { downloadFile, formatPEM } from "utils/certificate";
+import MDBColumnName from "components/MDBColumnName";
+import { MDBBadge } from "mdbreact";
+import StatusBadge from "components/StatusBadge";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import Spinner from "components/Spinner";
+import ProgressButton from "components/ProgressButton";
+import { collectFormAttributes } from "utils/attributes";
+import { Form } from "react-final-form";
 
 
 export default function CertificateDetail() {
@@ -35,7 +46,9 @@ export default function CertificateDetail() {
    const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
    const eventHistory = useSelector(selectors.certificateHistory);
-   const locations = useSelector(selectors.certificateLocations);
+   const certLocations = useSelector(selectors.certificateLocations);
+
+   const locations = useSelector(locationSelectors.locations);
 
    const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
    const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
@@ -64,6 +77,20 @@ export default function CertificateDetail() {
    const [raProfile, setRaProfile] = useState<string>();
    const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
+   const [locationsCheckedRows, setLocationCheckedRows] = useState<string[]>([]);
+   const [selectLocationsCheckedRows, setSelectLocationCheckedRows] = useState<string[]>([]);
+
+   const locationAttributeDescriptors = useSelector(locationSelectors.pushAttributeDescriptors);
+
+   const [addCertToLocation, setAddCertToLocation] = useState<boolean>(false);
+   const [confirmRemove, setConfirmRemove] = useState<boolean>(false);
+
+   const isRemovingCertificate = useSelector(locationSelectors.isRemovingCertificate);
+   const isPushingCertificate = useSelector(locationSelectors.isPushingCertificate);
+
+   const isFetchingLocationPushAttributeDescriptors = useSelector(locationSelectors.isFetchingPushAttributeDescriptors);
+
+
    const isBusy = useMemo(
       () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing,
       [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing]
@@ -78,7 +105,6 @@ export default function CertificateDetail() {
          dispatch(actions.resetState())
          dispatch(actions.getCertificateDetail({ uuid: params.id }));
          dispatch(actions.getCertificateHistory({ uuid: params.id }));
-         dispatch(actions.listCertificateLocations({ uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -91,6 +117,7 @@ export default function CertificateDetail() {
 
          if (!params.id || !updateGroup) return;
          dispatch(groupAction.listGroups());
+
       },
       [dispatch, updateGroup, params.id]
    )
@@ -100,6 +127,7 @@ export default function CertificateDetail() {
       () => {
 
          setGroupOptions(groups.map(group => ({ value: group.uuid, label: group.name })));
+
       },
       [dispatch, groups]
    )
@@ -109,6 +137,7 @@ export default function CertificateDetail() {
       () => {
 
          setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name })));
+
       },
       [dispatch, raProfiles]
    )
@@ -121,6 +150,7 @@ export default function CertificateDetail() {
 
          if (!params.id || !updateGroup) return;
          dispatch(groupAction.listGroups());
+
       },
       [dispatch, updateGroup, params.id]
    )
@@ -132,10 +162,10 @@ export default function CertificateDetail() {
 
          if (!params.id || !revoke) return;
          dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
+
       },
       [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
    )
-
 
 
    useEffect(
@@ -144,8 +174,56 @@ export default function CertificateDetail() {
 
          if (!params.id || !updateRaProfile) return;
          dispatch(raProfileAction.listRaProfiles());
+
       },
       [dispatch, updateRaProfile, params.id]
+
+   )
+
+
+   useEffect(
+
+      () => {
+
+         selectLocationsCheckedRows.length === 0 ?
+
+            dispatch(locationActions.clearPushAttributeDescriptors())
+            :
+            dispatch(locationActions.getPushAttributes({ uuid: selectLocationsCheckedRows[0] }));
+
+      },
+      [dispatch, selectLocationsCheckedRows]
+
+   )
+
+
+   useEffect(
+
+      () => {
+
+         if (!isPushingCertificate) {
+            dispatch(actions.listCertificateLocations({ uuid: params.id }));
+            dispatch(locationActions.listLocations());
+         }
+
+      },
+      [dispatch, isPushingCertificate, params.id]
+
+   )
+
+
+   useEffect(
+
+      () => {
+
+         if (!isRemovingCertificate) {
+            dispatch(actions.listCertificateLocations({ uuid: params.id }));
+            dispatch(locationActions.listLocations());
+         }
+
+      },
+      [dispatch, isRemovingCertificate, params.id]
+
    )
 
 
@@ -252,6 +330,7 @@ export default function CertificateDetail() {
 
    );
 
+
    const onRenew = useCallback(
 
       (data: { fileName: string, contentType: string, fileContent: string }) => {
@@ -270,6 +349,49 @@ export default function CertificateDetail() {
       [dispatch, certificate]
 
    );
+
+
+   const onAddCertToLocations = useCallback(
+
+      (values) => {
+
+         setAddCertToLocation(false);
+
+         if (selectLocationsCheckedRows.length === 0 || !certificate) return;
+
+         dispatch(
+            locationActions.pushCertificate({
+               certificateUuid: certificate.uuid,
+               locationUuid: selectLocationsCheckedRows[0],
+               pushAttributes: collectFormAttributes("locationAttributes", locationAttributeDescriptors, values)
+            })
+         );
+
+      },
+      [selectLocationsCheckedRows, certificate, dispatch, locationAttributeDescriptors]
+
+   );
+
+
+   const onRemove = useCallback(
+
+      () => {
+
+         if (locationsCheckedRows.length === 0 || !certificate) return;
+
+         setConfirmRemove(false);
+
+         locationsCheckedRows.forEach(
+            uuid => {
+               dispatch(locationActions.removeCertificate({ certificateUuid: certificate.uuid, locationUuid: uuid }));
+            }
+         );
+
+      },
+      [dispatch, certificate, locationsCheckedRows]
+
+   );
+
 
    const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
 
@@ -326,6 +448,16 @@ export default function CertificateDetail() {
          { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
       ],
       [certificate, downloadDropDown]
+   );
+
+
+   const buttonsLocations: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Push to location", onClick: () => { setSelectLocationCheckedRows([]); setAddCertToLocation(true); } },
+         { icon: "trash", disabled: locationsCheckedRows.length === 0, tooltip: "Remove", onClick: () => { setConfirmRemove(true); } },
+      ],
+      [locationsCheckedRows.length]
    );
 
 
@@ -498,9 +630,19 @@ export default function CertificateDetail() {
    );
 
    const locationsTitle = (
-      <h5>
-         <span className="fw-semi-bold">Certificate Locations</span>
-      </h5>
+
+      <div>
+
+         <div className="pull-right mt-n-xs">
+            <WidgetButtons buttons={buttonsLocations} />
+         </div>
+
+         <h5>
+            <span className="fw-semi-bold">Certificate Locations</span>
+         </h5>
+
+      </div>
+
    );
 
 
@@ -553,8 +695,11 @@ export default function CertificateDetail() {
    );
 
    const historyEntry: TableDataRow[] = useMemo(
+
       () => !eventHistory ? [] : eventHistory.map(function (history) {
+
          return (
+
             {
                "id": history.uuid,
                "columns": [dateFormatter(history.created),
@@ -586,7 +731,9 @@ export default function CertificateDetail() {
                ) : ""
                ]
             }
+
          )
+
       }), [eventHistory]
    );
 
@@ -891,16 +1038,44 @@ export default function CertificateDetail() {
 
       () => [
          {
-            id: "name",
-            content: "Name",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            id: "locationName",
+            width: "auto",
          },
          {
-            id: "description",
-            content: "Description",
+            content: <MDBColumnName columnName="Description" />,
+            sortable: true,
+            id: "locationDescription",
+            width: "auto",
          },
          {
-            id: "entity",
-            content: "Entity",
+            content: <MDBColumnName columnName="Entity" />,
+            sortable: true,
+            id: "locationEntity",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Multiple Entires" />,
+            align: "center",
+            sortable: true,
+            id: "multiEntries",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Key Management" />,
+            align: "center",
+            sortable: true,
+            id: "keyMgmt",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Status" />,
+            align: "center",
+            sortable: true,
+            id: "Status",
+            width: "15%",
          }
       ],
       []
@@ -910,23 +1085,122 @@ export default function CertificateDetail() {
 
    const locationsData: TableDataRow[] = useMemo(
 
-      () => !locations ? [] : locations.map(
+      () => !certLocations ? [] : certLocations.map(
 
          location => ({
 
             id: location.uuid,
+
             columns: [
+
                <Link to={`../../locations/detail/${location.uuid}`}>{location.name}</Link>,
+
                location.description || "",
-               location.entityInstanceName ]
+
+               <MDBBadge color="primary" >{location.entityInstanceName}</MDBBadge>,
+
+               location.supportMultipleEntries ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+
+               location.supportKeyMannagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+
+               <StatusBadge enabled={location.enabled} />,
+
+            ]
 
          })
 
       ),
-      [locations]
+      [certLocations]
 
    );
 
+
+   const selectLocationsHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            id: "locationName",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Description" />,
+            sortable: true,
+            id: "locationDescription",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Entity" />,
+            sortable: true,
+            id: "locationEntity",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Multiple Entires" />,
+            align: "center",
+            sortable: true,
+            id: "multiEntries",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Key Management" />,
+            align: "center",
+            sortable: true,
+            id: "keyMgmt",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Status" />,
+            align: "center",
+            sortable: true,
+            id: "Status",
+            width: "15%",
+         }
+      ],
+      []
+
+   );
+
+
+   const selectLocationsData: TableDataRow[] = useMemo(
+
+      () => !locations ? [] : locations.map(
+
+         location => {
+
+            if (certLocations?.find(cl => cl.uuid === location.uuid)) return undefined;
+
+            return {
+
+               id: location.uuid,
+
+               columns: [
+
+                  location.name,
+
+                  location.description || "",
+
+                  <MDBBadge color="primary" >{location.entityInstanceName}</MDBBadge>,
+
+                  location.supportMultipleEntries ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+
+                  location.supportKeyMannagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+
+                  <StatusBadge enabled={location.enabled} />,
+
+               ]
+
+            }
+         }
+
+      ).filter(
+         location => location !== undefined
+      ) as TableDataRow[],
+      [certLocations, locations]
+
+   );
 
    return (
 
@@ -991,11 +1265,13 @@ export default function CertificateDetail() {
          </Widget>
 
 
-         <Widget title={locationsTitle} busy={isFetchingLocations}>
+         <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
             <br />
             <CustomTable
                headers={locationsHeaders}
                data={locationsData}
+               hasCheckboxes={true}
+               onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
             />
          </Widget>
 
@@ -1072,6 +1348,112 @@ export default function CertificateDetail() {
             buttons={[]}
             size="lg"
          />
+
+         <Dialog
+            isOpen={addCertToLocation}
+            caption={`Push certificate to the Location`}
+            toggle={() => setAddCertToLocation(false)}
+            buttons={[]}
+            body={(
+               <>
+
+                  <Form onSubmit={(value) => { onAddCertToLocations(value); }} mutators={{ ...mutators() }} >
+
+                     {({ handleSubmit, submitting, valid, }) => (
+
+                        <BootstrapForm onSubmit={handleSubmit}>
+
+                           <Label>Locations</Label>
+
+                           <CustomTable
+                              hasPagination={false}
+                              headers={selectLocationsHeaders}
+                              data={selectLocationsData}
+                              hasCheckboxes={true}
+                              multiSelect={false}
+
+                              onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
+                           />
+
+                           {locationAttributeDescriptors && (
+
+                              <>
+
+                                 <br />
+                                 <Label>Location attributes</Label>
+
+                                 <AttributeEditor
+                                    id="locationAttributes"
+                                    attributeDescriptors={locationAttributeDescriptors}
+                                 />
+
+                              </>
+
+                           )}
+
+
+                           <div className="d-flex justify-content-end">
+
+                              <ButtonGroup>
+
+                                 <ProgressButton
+                                    title="Push"
+                                    inProgressTitle="Pushing..."
+                                    inProgress={submitting}
+                                    disabled={selectLocationsCheckedRows.length === 0 || !valid}
+                                 />
+
+                                 <Button
+                                    color="default"
+                                    onClick={() => setAddCertToLocation(false)}
+                                    disabled={submitting}
+                                 >
+                                    Cancel
+                                 </Button>
+
+                              </ButtonGroup>
+
+                           </div>
+
+
+                        </BootstrapForm>
+
+                     )}
+
+                  </Form>
+
+                  <Spinner active={isPushingCertificate || isFetchingLocationPushAttributeDescriptors} />
+
+               </>
+
+            )}
+         />
+
+         <Dialog
+            isOpen={confirmRemove}
+            caption={`Remove Certificate from Location`}
+            body={(
+               <>
+                  You are about to remove a Certificate from selected locations:<br /><br />
+                  {
+                     locationsCheckedRows.map(
+                        uuid => {
+                           const loc = certLocations?.find(l => l.uuid === uuid);
+                           return loc ? <>{loc.name}<br /></> : <></>
+                        }
+                     )
+                  }
+                  <br />
+                  Is this what you want to do?
+               </>
+            )}
+            toggle={() => setConfirmRemove(false)}
+            buttons={[
+               { color: "primary", onClick: onRemove, body: "Remove" },
+               { color: "secondary", onClick: () => setConfirmRemove(false), body: "Cancel" },
+            ]}
+         />
+
       </Container>
 
    )

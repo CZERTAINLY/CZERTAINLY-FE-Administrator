@@ -27,7 +27,7 @@ import Select from "react-select";
 
 import { validateRequired } from "utils/validators";
 
-export default function EntityDetail() {
+export default function LocationDetail() {
 
    const dispatch = useDispatch();
 
@@ -48,6 +48,7 @@ export default function EntityDetail() {
    const isIssuingCertificate = useSelector(selectors.isIssuingCertificate);
    const isRemovingCertificate = useSelector(selectors.isRemovingCertificate);
    const isRenewingCertificate = useSelector(selectors.isAutoRenewingCertificate);
+   const isSyncing = useSelector(selectors.isSyncing);
 
    const isFetchingRaProfiles = useSelector(raSelectors.isFetchingList);
    const isFetchingIssuanceAttributes = useSelector(raSelectors.isFetchingIssuanceAttributes);
@@ -164,6 +165,7 @@ export default function EntityDetail() {
          );
 
          setConfirmRemoveDialog(false);
+         setCertCheckedRows([]);
 
       },
       [dispatch, location, certCheckedRows]
@@ -185,6 +187,20 @@ export default function EntityDetail() {
       [certCheckedRows, dispatch, location]
 
    )
+
+
+   const onSyncClick = useCallback(
+
+      () => {
+
+         if (!location) return;
+
+         dispatch(actions.syncLocation({ uuid: location.uuid }));
+
+      },
+      [dispatch, location]
+
+   );
 
 
    const onPushSubmit = useCallback(
@@ -283,11 +299,12 @@ export default function EntityDetail() {
 
       () => [
          { icon: "trash", disabled: certCheckedRows.length === 0, tooltip: "Remove", onClick: () => { setConfirmRemoveDialog(true); } },
-         { icon: "push", disabled: false, tooltip: "Push", onClick: () => { setPushDialog(true) } },
-         { icon: "cubes", disabled: false, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
-         { icon: "retweet", disabled: certCheckedRows.length === 0, tooltip: "Renew", onClick: () => { onRenewClick() } }
+         { icon: "push", disabled: (!(location?.supportMultipleEntries)) && (location ? location.certificates.length > 0 : false), tooltip: "Push", onClick: () => { setPushDialog(true) } },
+         { icon: "cubes", disabled: !location?.supportKeyMannagement, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
+         { icon: "retweet", disabled: certCheckedRows.length === 0, tooltip: "Renew", onClick: () => { onRenewClick() } },
+         { icon: "sync", disabled: false, tooltip: "Sync", onClick: () => { onSyncClick() } }
       ],
-      [onRenewClick, certCheckedRows]
+      [certCheckedRows.length, location, onRenewClick, onSyncClick]
 
    );
 
@@ -442,7 +459,7 @@ export default function EntityDetail() {
 
          </Widget>
 
-         <Widget title={certsTitle} busy={isRenewingCertificate}>
+         <Widget title={certsTitle} busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing}>
 
             <br />
 
@@ -475,7 +492,26 @@ export default function EntityDetail() {
          <Dialog
             isOpen={confirmRemoveDialog}
             caption={`Remove ${certCheckedRows.length === 1 ? "certificate" : "certificates"} from the location`}
-            body="You are about to remove certificates from the location. Is this what you want to do?"
+            body={(
+               <>
+                  You are about to remove certificates from the location:<br />
+
+                  {
+
+                     certCheckedRows.map(
+                        uuid => {
+                           const cert = location?.certificates.find(c => c.certificateUuid === uuid);
+                           return cert ? <>{cert.commonName || ("empty")}<br /></> : <></>
+                        }
+                     )
+
+                  }
+
+                  <br />
+                  <br />
+                  Is this what you want to do?
+               </>
+            )}
             toggle={() => setConfirmRemoveDialog(false)}
             buttons={[
                { color: "danger", onClick: onRemoveConfirmed, body: "Yes, remove" },
@@ -534,7 +570,7 @@ export default function EntityDetail() {
 
                   </Form>
 
-                  <Spinner active={isPushingCertificate} />
+                  <Spinner active={isPushingCertificate || isRemovingCertificate} />
 
                </>
 
@@ -643,7 +679,7 @@ export default function EntityDetail() {
 
                   </Form>
 
-                  <Spinner active={isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate} />
+                  <Spinner active={isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate || isRemovingCertificate} />
 
                </>
 

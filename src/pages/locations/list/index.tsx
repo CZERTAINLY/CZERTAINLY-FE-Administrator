@@ -169,13 +169,22 @@ function LocationList() {
             width: "auto",
          },
          {
-            content: <MDBColumnName columnName="No. of certificates" />,
+            content: <MDBColumnName columnName="Multiple Entires" />,
+            align: "center",
             sortable: true,
-            id: "locationNoOfCertificates",
-            width: "15%",
+            id: "multiEntries",
+            width: "auto",
+         },
+         {
+            content: <MDBColumnName columnName="Key Management" />,
+            align: "center",
+            sortable: true,
+            id: "keyMgmt",
+            width: "auto",
          },
          {
             content: <MDBColumnName columnName="Status" />,
+            align: "center",
             sortable: true,
             id: "Status",
             width: "15%",
@@ -203,7 +212,9 @@ function LocationList() {
 
                <MDBBadge color="primary" >{location.entityInstanceName}</MDBBadge>,
 
-               location.certificates.length.toString(),
+               location.supportMultipleEntries ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+
+               location.supportKeyMannagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
                <StatusBadge enabled={location.enabled} />,
 

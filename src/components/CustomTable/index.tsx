@@ -267,11 +267,10 @@ function CustomTable({
 
          if (!multiSelect) {
 
-            if (tblCheckedRows.includes(id)) {
-               setTblCheckedRows([]);
-            } else {
-               setTblCheckedRows([id]);
-            }
+            const checkedRows: string[] = tblCheckedRows.includes(id) ? [] : [id];
+
+            setTblCheckedRows(checkedRows);
+            if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
             return;
 

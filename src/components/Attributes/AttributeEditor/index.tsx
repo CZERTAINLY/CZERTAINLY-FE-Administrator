@@ -255,7 +255,7 @@ export default function AttributeEditor({
 
       () => {
 
-         // run this effect only when attribute descripotors or attributes changed
+         // run this effect only when attribute descriptors or attributes changes
          if (attributeDescriptors === prevDescriptors && attributes === prevAttributes) return;
 
          let newOptions: { [attributeName: string]: { label: string; value: any; }[] } = {};

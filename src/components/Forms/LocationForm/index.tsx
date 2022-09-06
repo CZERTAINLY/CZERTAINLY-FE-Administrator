@@ -9,7 +9,6 @@ import { validateRequired, composeValidators, validateAlphaNumeric } from "utils
 
 import { LocationModel } from "models/locations";
 
-import { actions as alertActions } from "ducks/alerts";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
 
@@ -63,8 +62,8 @@ export default function EntityForm({
    const [location, setLocation] = useState<LocationModel>();
 
    const isBusy = useMemo(
-      () => isFetchingLocationDetail || isCreating || isUpdating,
-      [isFetchingLocationDetail, isCreating, isUpdating]
+      () => isFetchingLocationDetail || isCreating || isUpdating || isFetchingEntities || isFetchingLocationAttributeDescriptors,
+      [isFetchingLocationDetail, isCreating, isUpdating, isFetchingEntities, isFetchingLocationAttributeDescriptors]
    );
 
 
@@ -74,6 +73,7 @@ export default function EntityForm({
 
          if (init) {
             dispatch(locationActions.resetState());
+            dispatch(entityActions.resetState());
             dispatch(entityActions.listEntities());
             setInit(false);
          }
