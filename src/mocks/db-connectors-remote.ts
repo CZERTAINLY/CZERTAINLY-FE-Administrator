@@ -767,7 +767,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
          {
             uuid: "736b0fd6-5ea0-4e10-abe7-cfed39cc2a1a",
             name: "authorityProvider",
-            functionGroupCode: "authorityProvider",
+            functionGroupCode: "entityProvider",
             kinds: ["ADCS"],
             endPoints: [
                {
@@ -1181,7 +1181,7 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
          {
             uuid: "736b0fd6-5ea0-4e10-abe7-cfed39cc2a1a",
             name: "authorityProvider",
-            functionGroupCode: "authorityProvider",
+            functionGroupCode: "entityProvider",
             kinds: [
                "EJBCA"
             ],
@@ -1322,6 +1322,219 @@ export const dbRemoteConnectors: DbRemoteConnectors = {
          }
       ]
 
-   }
+   },
+
+   "http://ms-adcs-connector-service:8080": {
+
+      url: "http://ms-adcs-connector-service:8080",
+      health: {
+         status: "ok",
+         parts: {
+            "database": {
+               status: "ok",
+               description: "Database connection ok"
+            }
+         }
+      },
+
+      authType: "none",
+      authAttributes: [],
+
+      attributes: {
+
+         authorityProvider: {
+
+            EJBCA: [
+               {
+                  uuid: "87e968ca-9404-4128-8b58-3ab5db2ba06e",
+                  name: "url",
+                  label: "EJBCA WS URL",
+                  type: "STRING",
+                  required: true,
+                  readOnly: false,
+                  visible: true,
+                  list: false,
+                  multiSelect: false,
+                  description: "URL of EJBCA web services"
+               },
+               {
+                  uuid: "9379ca2c-aa51-42c8-8afd-2a2d16c99c57",
+                  name: "credential",
+                  label: "Credential",
+                  type: "CREDENTIAL",
+                  required: true,
+                  readOnly: false,
+                  visible: true,
+                  list: false,
+                  multiSelect: false,
+                  description: "SoftKeyStore Credential representing EJBCA administrator for the communication",
+                  attributeCallback: {
+                     callbackContext: "core/getCredentials",
+                     callbackMethod: "GET",
+                     mappings: [
+                        {
+                           to: "credentialKind",
+                           targets: ["pathVariable"],
+                           value: "SoftKeyStore"
+                        }
+                     ]
+                  }
+               }
+            ]
+         },
+
+         "entityProvider": {
+         },
+
+
+      },
+
+      functionGroups: [
+         {
+            uuid: "736b0fd6-5ea0-4e10-abe7-cfed39cc2a1a",
+            name: "authorityProvider",
+            functionGroupCode: "entityProvider",
+            kinds: [
+               "EJBCA"
+            ],
+            endPoints: [
+               {
+                  name: "listEntityProfiles",
+                  context: "/v1/authorityProvider/authorities/{uuid}/endEntityProfiles",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "listAuthorityInstances",
+                  context: "/v1/authorityProvider/authorities",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "listIssueCertificateAttributes",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/issue/attributes",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "getAuthorityInstance",
+                  context: "/v1/authorityProvider/authorities/{uuid}",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "createAuthorityInstance",
+                  context: "/v1/authorityProvider/authorities",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "listCAsInProfile",
+                  context: "/v1/authorityProvider/authorities/{uuid}/endEntityProfiles/{endEntityProfileId}/cas",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "renewCertificate",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/renew",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "listAttributeDefinitions",
+                  context: "/v1/authorityProvider/{kind}/attributes",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "checkHealth",
+                  context: "/v1/health",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "listCertificateProfiles",
+                  context: "/v1/authorityProvider/authorities/{uuid}/endEntityProfiles/{endEntityProfileId}/certificateprofiles",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "issueCertificate",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/issue",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "updateAuthorityInstance",
+                  context: "/v1/authorityProvider/authorities/{uuid}",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "removeAuthorityInstance",
+                  context: "/v1/authorityProvider/authorities/{uuid}",
+                  method: "DELETE",
+                  required: false
+               },
+               {
+                  name: "validateIssueCertificateAttributes",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/issue/attributes/validate",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "validateRAProfileAttributes",
+                  context: "/v1/authorityProvider/authorities/{uuid}/raProfile/attributes/validate",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "listSupportedFunctions",
+                  context: "/v1",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "validateAttributes",
+                  context: "/v1/authorityProvider/{kind}/attributes/validate",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "listRAProfileAttributes",
+                  context: "/v1/authorityProvider/authorities/{uuid}/raProfile/attributes",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "revokeCertificate",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/revoke",
+                  method: "POST",
+                  required: false
+               },
+               {
+                  name: "getConnection",
+                  context: "/v1/authorityProvider/authorities/{uuid}/connect",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "listRevokeCertificateAttributes",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/revoke/attributes",
+                  method: "GET",
+                  required: false
+               },
+               {
+                  name: "validateRevokeCertificateAttributes",
+                  context: "/v2/authorityProvider/authorities/{uuid}/certificates/revoke/attributes/validate",
+                  method: "POST",
+                  required: false
+               }
+            ]
+         }
+      ]
+
+   },
+
 
 }

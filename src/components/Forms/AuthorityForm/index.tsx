@@ -429,6 +429,7 @@ export default function AuthorityForm({
 
                </BootstrapForm>
             )}
+
          </Form>
 
       </Widget>

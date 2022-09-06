@@ -15,6 +15,9 @@ import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
 import { GroupDTO } from "api/groups";
 import { DashboardDTO } from "api/dashboard";
 
+import { DbEntity } from "./db-entities";
+import { DbLocation } from "./db-locations";
+
 
 export interface DBData {
 
@@ -45,6 +48,11 @@ export interface DBData {
    groups: GroupDTO[];
 
    discoveries: DbDiscovery[];
+
+   entities: DbEntity[];
+   locations: DbLocation[];
+
    dashboard: DashboardDTO;
+
 
 }

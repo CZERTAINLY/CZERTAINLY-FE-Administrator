@@ -1,4 +1,5 @@
 import { GroupDTO } from "api/groups";
+import { LocationDTO } from "api/location";
 import { Observable } from "rxjs";
 
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
@@ -75,7 +76,7 @@ export interface CertificateListFilterDTO {
    condition: string;
    value?: any;
 }
- 
+
  export interface ValidationResult {
    status: ValidationStatus;
    message: string;
@@ -137,6 +138,9 @@ export interface CertificateInventoryApi {
 
 
    getCertificateDetail(uuid: string): Observable<CertificateDTO>;
+
+
+   listLocations(uuid: string): Observable<LocationDTO[]>;
 
 
    getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]>;

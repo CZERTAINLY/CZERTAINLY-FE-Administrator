@@ -4,7 +4,7 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square";
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "push" | "sync";
    tooltip?: string;
    disabled: boolean;
    custom?: React.ReactNode;
@@ -31,7 +31,9 @@ const colors = {
    "user": "auto",
    "cubes": "auto",
    "retweet": "auto",
-   "minus-square": "red"
+   "minus-square": "red",
+   "push": "auto",
+   "sync": "auto"
 };
 
 
@@ -50,6 +52,8 @@ const classNames = {
    "cubes": "fa fa-cubes",
    "retweet": "fa fa-retweet",
    "minus-square": "fa fa-minus-square",
+   "push": "fa fa-arrow-circle-up",
+   "sync": "fa fa-refresh"
 }
 
 

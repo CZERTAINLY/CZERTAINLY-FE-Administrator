@@ -20,6 +20,8 @@ import Clients from "pages/clients";
 import RaProfiles from "pages/ra-profiles";
 import Credentials from "pages/credentials";
 import Authorities from "pages/authorities";
+import Entities from "pages/entities";
+import Locations from "pages/locations";
 import AcmeAccounts from "pages/acme-accounts";
 import AcmeProfiles from "pages/acme-profiles";
 import Profile from "pages/profile";
@@ -62,6 +64,8 @@ function Layout() {
                   <Route path="/app/raprofiles" component={RaProfiles} />
                   <Route path="/app/credentials" component={Credentials} />
                   <Route path="/app/authorities" component={Authorities} />
+                  <Route path="/app/entities" component={Entities} />
+                  <Route path="/app/locations" component={Locations} />
                   <Route path="/app/acmeaccounts" component={AcmeAccounts} />
                   <Route path="/app/acmeprofiles" component={AcmeProfiles} />
                   <Route path="/app/profile" component={Profile} />
