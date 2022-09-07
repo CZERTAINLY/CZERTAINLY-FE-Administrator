@@ -4,7 +4,7 @@ import { Form as BootstrapForm, Button, Label, ButtonGroup, Container, FormGroup
 import { Field, Form } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useRouteMatch } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 
 import { mutators } from "utils/attributeEditorMutators";
@@ -26,6 +26,7 @@ import Spinner from "components/Spinner";
 import Select from "react-select";
 
 import { validateRequired } from "utils/validators";
+import certificates from "ducks/certificates";
 
 export default function LocationDetail() {
 
@@ -423,7 +424,7 @@ export default function LocationDetail() {
 
             columns: [
 
-               cert.commonName,
+               <Link to={`../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
 
                cert.withKey ? "Yes" : "No",
 
