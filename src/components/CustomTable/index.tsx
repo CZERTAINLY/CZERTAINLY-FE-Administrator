@@ -261,7 +261,8 @@ function CustomTable({
 
       (e: any, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
 
-         if (hasDetails && /* e.target.localName !== "i" && */ e.target.localName !== "button") {
+         if (hasDetails && /* e.target.localName !== "i" && */ e.target.localName !== "input") {
+
             if (expandedRow === rowId) {
                setExpandedRow(undefined);
             } else {
@@ -270,6 +271,8 @@ function CustomTable({
             if (!continueAfterDetails) {
                return;
             }
+
+            return;
          }
 
          if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") return;

@@ -400,13 +400,14 @@ export default function LocationDetail() {
             sortable: true,
          },
          {
-            id: "meta",
-            content: "Meta",
+            id: "metadata",
+            content: "Metadata",
          },
          {
-            id: "csr",
-            content: "CSR attributes",
-         }
+            id: "CSR Detail",
+            content: "CSR Detail",
+         },
+
       ],
       []
 
@@ -417,19 +418,48 @@ export default function LocationDetail() {
 
       () => !location ? [] : location.certificates.map(
          cert => ({
+
             id: cert.certificateUuid,
+
             columns: [
+
                cert.commonName,
+
                cert.withKey ? "Yes" : "No",
+
+               !cert.metadata ? "" :
+                  Object.keys(cert.metadata).length === 0 ? "" :
+                     <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                        {Object.keys(cert.metadata).map(key => (cert.metadata[key].toString())).join(", ")}
+                     </div>,
+
+               !cert.csrAttributes ? "" :
+                  cert.csrAttributes.length === 0 ? "" :
+                     <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                        {cert.csrAttributes.map(atr => atr.content ? (atr.content as any).value : "").join(", ")}
+                     </div>,
+
+            ],
+
+            detailColumns: [
+
+               <></>,
+               <></>,
+               <></>,
+               <></>,
+
                !cert.metadata ? "" : Object.keys(cert.metadata).length === 0 ? "" : <CustomTable
                   headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
                   data={Object.keys(cert.metadata).map(key => ({ id: key, columns: [key, cert.metadata[key].toString()] }))}
                />,
+
                !cert.csrAttributes ? "" : cert.csrAttributes.length === 0 ? "" : <CustomTable
                   headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
                   data={cert.csrAttributes.map(atr => ({ id: atr.name, columns: [atr.label || atr.name, atr.content ? (atr.content as any).value : ""] }))}
                />
-            ],
+
+            ]
+
          })
       ),
       [location]
@@ -474,6 +504,7 @@ export default function LocationDetail() {
                onCheckedRowsChanged={
                   (rows) => { setCertCheckedRows(rows as string[]) }
                }
+               hasDetails={true}
             />
 
          </Widget>
