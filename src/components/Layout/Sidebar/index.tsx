@@ -22,33 +22,37 @@ function Sidebar() {
             </Link>
          </header>
 
-         <ul className={style.nav}>
+         <div className={style.nav}>
 
-            {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
-            <LinksGroup _key="/app/dashboard" header="Dashboard" headerLink="/app/dashboard" />
-            <LinksGroup _key="/app/raprofiles" header="RA Profiles" headerLink="/app/raprofiles" />
-            {isSuperAdmin ? (<LinksGroup _key="/app/administrators" header="Administrators" headerLink="/app/administrators" />) : null}
-            <LinksGroup _key="/app/clients" header="Clients" headerLink="/app/clients" />
-            <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
-            <LinksGroup _key="/app/credentials" header="Credentials" headerLink="/app/credentials" />
-            <LinksGroup _key="/app/authorities" header="Authorities" headerLink="/app/authorities" />
+            <ul>
 
-            <LinksGroup
-               _key="acm1"
-               header="ACME"
-               childrenLinks={[
-                  { _key: "/app/acmeaccounts", name: "ACME Accounts", link: "/app/acmeaccounts" },
-                  { _key: "/app/acmeprofiles", name: "ACME Profiles", link: "/app/acmeprofiles" },
-               ]}
-            />
-            <LinksGroup _key="/app/groups" header="Groups" headerLink="/app/groups" />
-            <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
-            <LinksGroup _key="/app/certificates" header="Certificates" headerLink="/app/certificates" />
-            <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
+               {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
+               <LinksGroup _key="/app/dashboard" header="Dashboard" headerLink="/app/dashboard" />
+               <LinksGroup _key="/app/raprofiles" header="RA Profiles" headerLink="/app/raprofiles" />
+               {isSuperAdmin ? (<LinksGroup _key="/app/administrators" header="Administrators" headerLink="/app/administrators" />) : null}
+               <LinksGroup _key="/app/clients" header="Clients" headerLink="/app/clients" />
+               <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
+               <LinksGroup _key="/app/credentials" header="Credentials" headerLink="/app/credentials" />
+               <LinksGroup _key="/app/authorities" header="Authorities" headerLink="/app/authorities" />
 
-            {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}
+               <LinksGroup
+                  _key="acm1"
+                  header="ACME"
+                  childrenLinks={[
+                     { _key: "/app/acmeaccounts", name: "ACME Accounts", link: "/app/acmeaccounts" },
+                     { _key: "/app/acmeprofiles", name: "ACME Profiles", link: "/app/acmeprofiles" },
+                  ]}
+               />
+               <LinksGroup _key="/app/groups" header="Groups" headerLink="/app/groups" />
+               <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
+               <LinksGroup _key="/app/certificates" header="Certificates" headerLink="/app/certificates" />
+               <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
 
-         </ul>
+               {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}
+
+            </ul>
+
+         </div>
 
       </nav>
    );
