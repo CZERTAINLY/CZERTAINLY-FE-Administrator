@@ -237,6 +237,7 @@ function CustomTable({
 
    );
 
+
    const onCheckAllCheckboxClick = useCallback(
 
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -260,7 +261,7 @@ function CustomTable({
 
       (e: any, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
 
-         if (hasDetails && e.target.localName !== "i" && e.target.localName !== "button") {
+         if (hasDetails && /* e.target.localName !== "i" && */ e.target.localName !== "button") {
             if (expandedRow === rowId) {
                setExpandedRow(undefined);
             } else {
@@ -300,8 +301,9 @@ function CustomTable({
 
          e.stopPropagation();
          e.preventDefault();
+
       },
-      [tblCheckedRows, setTblCheckedRows, onCheckedRowsChanged, expandedRow, hasDetails]
+      [hasDetails, multiSelect, tblCheckedRows, onCheckedRowsChanged, expandedRow]
 
    );
 
@@ -392,7 +394,7 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes  && multiSelect ) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
          if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
 
          return columns.map(
@@ -457,8 +459,8 @@ function CustomTable({
          )
       },
       [tblHeaders, hasCheckboxes, multiSelect, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, onCheckAllCheckboxClick]
-   );
 
+   );
 
 
    const body = useMemo(
@@ -474,6 +476,7 @@ function CustomTable({
       ).map(
 
          (row, index) => (
+
             <Fragment key={row.id}>
 
                <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
@@ -525,6 +528,7 @@ function CustomTable({
 
                   </tr>
                )}
+
             </Fragment>
 
          )
