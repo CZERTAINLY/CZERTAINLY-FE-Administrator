@@ -264,7 +264,7 @@ export default function CertificateList({
             content: <MDBColumnName columnName="Compliance" />,
             //sortable: true,
             align: "center",
-            id: "status",
+            id: "compliance",
             width: "5%"
          },
          {
@@ -349,6 +349,7 @@ export default function CertificateList({
             return {
 
                id: certificate.uuid,
+
                columns: [
 
                   <CertificateStatusIcon status={certificate.status} id={certificate.fingerprint || certificate.serialNumber} />,
