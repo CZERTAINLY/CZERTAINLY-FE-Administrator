@@ -8,9 +8,6 @@ import { extractError } from "utils/net";
 import * as slice from "./administrators";
 import { actions as alertActions } from "./alerts";
 
-import { readFileString$ } from "utils/readFile";
-import { getCertificateInformation } from "utils/certificate";
-
 import { transformCertModelToDTO } from "./transform/certificates";
 import { transformAdminDtoToModel } from "./transform/administrators";
 
