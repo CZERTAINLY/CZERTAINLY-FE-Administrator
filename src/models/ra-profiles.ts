@@ -9,6 +9,13 @@ export interface RaProfileModel {
    authorityInstanceName: string;
    attributes: AttributeModel[];
    enabledProtocols?: string[];
+   complianceProfiles?: raComplianceProfileModel[];
+}
+
+export interface raComplianceProfileModel {
+   uuid: string;
+   name: string;
+   description?: string;
 }
 
 

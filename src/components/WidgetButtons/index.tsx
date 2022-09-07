@@ -4,8 +4,10 @@ import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "push" | "sync";
-   tooltip?: string;
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus";
+   additionalTooltipId?: string;
+   tooltipScheme?: "dark" | "success" | "warning" | "error" | "info" | "light";
+   tooltip?: any;
    disabled: boolean;
    custom?: React.ReactNode;
    onClick: (event: React.MouseEvent) => void
@@ -33,7 +35,10 @@ const colors = {
    "retweet": "auto",
    "minus-square": "red",
    "push": "auto",
-   "sync": "auto"
+   "sync": "auto",
+   "info": "auto",
+   "minus": "red",
+   "gavel": "auto",
 };
 
 
@@ -53,7 +58,10 @@ const classNames = {
    "retweet": "fa fa-retweet",
    "minus-square": "fa fa-minus-square",
    "push": "fa fa-arrow-circle-up",
-   "sync": "fa fa-refresh"
+   "sync": "fa fa-refresh",
+   "info": "fa fa-info-circle",
+   "minus": "fa fa-minus",
+   "gavel": "fa fa-gavel",
 }
 
 
@@ -65,7 +73,7 @@ function WidgetButtons({ buttons }: Props) {
       let style;
 
       let btnProps: ButtonProps = {
-         key: button.icon + button.tooltip,
+         key: button.icon + button.tooltip + button.additionalTooltipId || "",
          className: "btn btn-link",
          color: "white",
          onClick: button.onClick,
@@ -74,12 +82,12 @@ function WidgetButtons({ buttons }: Props) {
 
       if (button.tooltip) {
 
-         const toolTipId = `btn_tooltip_${button.tooltip}`;
+         const toolTipId = `btn_tooltip_${button.tooltip}_${button.additionalTooltipId || ""}`;
 
          btnProps["data-for"] = toolTipId;
          btnProps["data-tip"] = "";
 
-         toolTip = <ToolTip id={toolTipId} message={button.tooltip} />
+         toolTip = <ToolTip id={toolTipId} message={button.tooltip} tooltipType={button.tooltipScheme}/>
 
       }
 

@@ -42,6 +42,9 @@ export type State = {
    isBulkDisabling: boolean;
    isActivatingAcme: boolean;
    isDeactivatingAcme: boolean;
+   isCheckingCompliance: boolean;
+   isAssociatingComplianceProfile: boolean;
+   isDissociatingComplianceProfile: boolean;
 
 };
 
@@ -71,6 +74,9 @@ export const initialState: State = {
    isBulkDisabling: false,
    isActivatingAcme: false,
    isDeactivatingAcme: false,
+   isCheckingCompliance: false,
+   isAssociatingComplianceProfile: false,
+   isDissociatingComplianceProfile: false,
 
 };
 
@@ -526,7 +532,66 @@ export const slice = createSlice({
 
       listRevocationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
          state.isFetchinRevocationAttributes = false;
-      }
+      },
+
+      checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isCheckingCompliance = true;
+      },
+
+      checkComplianceSuccess: (state, action: PayloadAction<void>) => {
+
+         state.isCheckingCompliance = false;
+      },
+
+      checkComplianceFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isCheckingCompliance = false;
+      },
+
+      associateRaProfile: (state, action: PayloadAction<{ uuid: string, complianceProfileUuid: string, complianceProfileName: string, description?: string }>) => {
+
+         state.isAssociatingComplianceProfile = true;
+
+      },
+
+
+      associateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, complianceProfileUuid: string, complianceProfileName: string, description?: string }>) => {
+
+         state.isAssociatingComplianceProfile = false;
+
+         if (!state.raProfile) return;
+
+         state.raProfile.complianceProfiles = (state.raProfile.complianceProfiles || []).concat([{uuid: action.payload.complianceProfileUuid, name: action.payload.complianceProfileName, description: action.payload.description}]);
+
+      },
+
+
+      associateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isAssociatingComplianceProfile = false;
+      },
+
+
+      dissociateRaProfile: (state, action: PayloadAction<{ uuid: string, complianceProfileUuid: string, complianceProfileName: string, description?: string }>) => {
+
+         state.isDissociatingComplianceProfile = true;
+      },
+
+      dissociateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, complianceProfileUuid: string, complianceProfileName: string, description?: string }>) => {
+
+         state.isDissociatingComplianceProfile = false;
+
+         if (!state.raProfile) return;
+         if (!state.raProfile.complianceProfiles) return;
+         const raProfileIndex = state.raProfile.complianceProfiles.findIndex(profile => profile.uuid === action.payload.complianceProfileUuid);
+         if (raProfileIndex >= 0) state.raProfile.complianceProfiles.splice(raProfileIndex, 1);
+      },
+
+      dissociateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isDissociatingComplianceProfile = false;
+      },
 
    }
 });

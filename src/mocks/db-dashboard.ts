@@ -53,4 +53,10 @@ export const dbDashboard: DashboardDTO = {
    },
 
    certificateStatByStatus: { Unknown: 25, Valid: 100 },
+
+   certificateStatByComplianceStatus: {
+      "Non Compliant": 5,
+      "Not Checked": 2,
+      "Compliant": 10
+   }
 }

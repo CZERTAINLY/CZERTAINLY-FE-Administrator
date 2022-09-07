@@ -75,3 +75,5 @@ export type CertificateFilterField =
 export type ValidationStatus = "success" | "failed" | "warning" | "revoked" | "notChecked" | "invalid" | "expiring" | "expired";
 
 export type Status = "valid" | "revoked" | "expired" | "unknown" | "expiring" | "new" | "invalid"
+
+export type CertificateType = "X509" | "SSH";

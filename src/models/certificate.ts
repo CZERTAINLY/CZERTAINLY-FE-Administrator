@@ -111,7 +111,18 @@ export interface CertificateModel {
    owner?: string;
    raProfile?: CertificateRAProfileModel;
 
+   complianceStatus?: "na" | "ok" | "nok";
+   nonCompliantRules?: NonCompliantRulesModel[]
 }
+
+export interface NonCompliantRulesModel {
+   connectorName: string;
+   ruleName: string;
+   ruleDescription: string;
+   status: "na" | "ok" | "nok";
+}
+
+
 
 
 export interface X509Certificate {
