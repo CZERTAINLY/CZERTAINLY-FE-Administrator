@@ -36,11 +36,10 @@ export class ClientManagementBackend implements model.ClientManagementApi {
 
       return createNewResource(baseUrl, {
          name,
-         certificate,
          description,
          enabled,
-         certificateUuid,
-         clientCertificate: certificate
+         certificateUuid: certificateUuid || "",
+         clientCertificate: certificate?.certificateContent
       }).pipe(
          map(
 

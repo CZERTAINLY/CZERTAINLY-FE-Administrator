@@ -12,6 +12,7 @@ import CertificateExpiryChart from "components/pages/dashboard/DashboardItem/Cer
 import CertificateKeySizeChart from "components/pages/dashboard/DashboardItem/CertificateByKeySize";
 import CertificateConstraintsChart from "components/pages/dashboard/DashboardItem/CertificateByConstraints";
 import CertificateByStatusChart from "components/pages/dashboard/DashboardItem/CertificateByStatus";
+import CertificateComplianceChart from "components/pages/dashboard/DashboardItem/CertificateByComplianceStatus";
 
 function Dashboard() {
    const dashboard = useSelector(selectors.dashboard);
@@ -82,6 +83,10 @@ function Dashboard() {
 
             <Col>
                <CertificateConstraintsChart data={dashboard?.certificateStatByBasicConstraints} />
+            </Col>
+
+            <Col>
+               <CertificateComplianceChart data={dashboard?.certificateStatByComplianceStatus} />
             </Col>
 
          </Row>

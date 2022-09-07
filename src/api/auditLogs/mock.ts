@@ -77,4 +77,9 @@ export class AuditLogsMock implements model.AuditLogsApi {
 
    }
 
+   purgeLogs(queryString: string): Observable<void> {
+
+      return of();
+
+   }
 }

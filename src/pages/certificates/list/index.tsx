@@ -19,9 +19,20 @@ import CertificateGroupDialog from "components/pages/certificates/CertificateGro
 import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
 import CertificateRAProfileDialog from "components/pages/certificates/CertificateRAProfileDialog";
 import { downloadFileZip } from "utils/download";
+import CertificateComplianceStatusIcon from "components/pages/certificates/CertificateComplianceStatusIcon";
 
 
-export default function CertificateList() {
+interface Props {
+   selectCertsOnly?: boolean;
+   multiSelect?: boolean;
+   onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
+}
+
+export default function CertificateList({
+   selectCertsOnly = false,
+   multiSelect = true,
+   onCheckedRowsChanged
+}: Props) {
 
    const dispatch = useDispatch();
    const history = useHistory();
@@ -93,9 +104,10 @@ export default function CertificateList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
+         if (onCheckedRowsChanged) onCheckedRowsChanged(rows);
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
-      [dispatch]
+      [dispatch, onCheckedRowsChanged]
    );
 
 
@@ -202,7 +214,7 @@ export default function CertificateList() {
 
 
    const buttons: WidgetButtonProps[] = useMemo(
-      () => [
+      () => selectCertsOnly ? [] : [
          { icon: "plus", disabled: false, tooltip: "Create Certificate", onClick: () => { onAddClick(); } },
          { icon: "upload", disabled: false, tooltip: "Upload Certificate", onClick: () => { setUpload(true); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete Certificate", onClick: () => { setConfirmDelete(true) } },
@@ -212,7 +224,7 @@ export default function CertificateList() {
          { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Update RA Profile", onClick: () => { setUpdateRaProfile(true) } },
          { icon: "download", disabled: checkedRows.length === 0, tooltip: "Download", custom: downloadDropDown, onClick: () => { } }
       ],
-      [checkedRows.length, downloadDropDown, onAddClick]
+      [checkedRows.length, downloadDropDown, onAddClick, selectCertsOnly]
    );
 
 
@@ -243,6 +255,13 @@ export default function CertificateList() {
       () => [
          {
             content: <MDBColumnName columnName="Status" />,
+            //sortable: true,
+            align: "center",
+            id: "status",
+            width: "5%"
+         },
+         {
+            content: <MDBColumnName columnName="Compliance" />,
             //sortable: true,
             align: "center",
             id: "status",
@@ -334,7 +353,9 @@ export default function CertificateList() {
 
                   <CertificateStatusIcon status={certificate.status} id={certificate.fingerprint || certificate.serialNumber} />,
 
-                  <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
+                  <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
+
+                  selectCertsOnly ? certificate.commonName || "(empty)" : <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 
                   dateFormatter(certificate.notBefore),
 
@@ -375,9 +396,9 @@ export default function CertificateList() {
          totalItems: totalItems,
          pageSize: pageSize,
          totalPages: Math.ceil(totalItems / pageSize),
-         itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+         itemsPerPageOptions: selectCertsOnly ? [10, 20] : [10, 20, 50, 100, 200, 500, 1000],
       }),
-      [pageSize, pageNumber, totalItems]
+      [pageNumber, totalItems, pageSize, selectCertsOnly]
 
    );
 
@@ -397,6 +418,7 @@ export default function CertificateList() {
          <Widget title={title} busy={isBusy}>
 
             <CustomTable
+               multiSelect={multiSelect}
                headers={certificatesRowHeaders}
                data={certificateList}
                onCheckedRowsChanged={setCheckedRows}

@@ -109,35 +109,27 @@ const createAdmin: AppEpic = (action$, state, deps) => {
 
       switchMap(
 
-         action => (action.payload.certificate ? readFileString$(action.payload.certificate) : of("")).pipe(
+         action => deps.apiClients.admins.createAdmin(
+            action.payload.username,
+            action.payload.name,
+            action.payload.surname,
+            action.payload.email,
+            action.payload.description,
+            action.payload.role,
+            false,
+            action.payload.certificateUuid,
+            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
+         ).pipe(
 
-            switchMap(
+            map(uuid => slice.actions.createAdminSuccess({ uuid })),
 
-               certificateContent => deps.apiClients.admins.createAdmin(
-                  action.payload.username,
-                  action.payload.name,
-                  action.payload.surname,
-                  action.payload.email,
-                  action.payload.description,
-                  action.payload.role,
-                  false,
-                  action.payload.certificateUuid,
-                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
-               ).pipe(
-
-                  map(uuid => slice.actions.createAdminSuccess({ uuid })),
-
-                  catchError(err => of(slice.actions.createAdminFailure({ error: extractError(err, "Failed to create administrator") })))
-
-               )
-
-            ),
-
-            catchError(err => of(slice.actions.createAdminFailure({ error: extractError(err, "Failed to create administrator") }))),
+            catchError(err => of(slice.actions.createAdminFailure({ error: extractError(err, "Failed to create administrator") })))
 
          )
 
-      )
+      ),
+
+      catchError(err => of(slice.actions.createAdminFailure({ error: extractError(err, "Failed to create administrator") }))),
 
    )
 
@@ -191,43 +183,36 @@ const updateAdmin: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => (action.payload.certificate ? readFileString$(action.payload.certificate) : of("")).pipe(
+         action => deps.apiClients.admins.updateAdmin(
+            action.payload.uuid,
+            action.payload.username,
+            action.payload.name,
+            action.payload.surname,
+            action.payload.email,
+            action.payload.description,
+            action.payload.role,
+            action.payload.certificateUuid,
+            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
+         ).pipe(
 
-            switchMap(
-
-               certificateContent => deps.apiClients.admins.updateAdmin(
-                  action.payload.uuid,
-                  action.payload.username,
-                  action.payload.name,
-                  action.payload.surname,
-                  action.payload.email,
-                  action.payload.description,
-                  action.payload.role,
-                  action.payload.certificateUuid,
-                  certificateContent ? transformCertModelToDTO(getCertificateInformation(certificateContent as string)) : undefined
-               ).pipe(
-
-                  map(
-                     adminDTO => slice.actions.updateAdminSuccess({ administrator: transformAdminDtoToModel(adminDTO) })
-                  ),
-
-                  catchError(
-                     err => of(slice.actions.updateAdminFailure({ error: extractError(err, "Failed to update administrator") }))
-                  )
-
-               )
-
+            map(
+               adminDTO => slice.actions.updateAdminSuccess({ administrator: transformAdminDtoToModel(adminDTO) })
             ),
 
             catchError(
                err => of(slice.actions.updateAdminFailure({ error: extractError(err, "Failed to update administrator") }))
-            ),
+            )
 
          )
 
-      )
+      ),
+
+      catchError(
+         err => of(slice.actions.updateAdminFailure({ error: extractError(err, "Failed to update administrator") }))
+      ),
 
    )
+
 
 }
 

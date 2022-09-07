@@ -807,6 +807,159 @@ const bulkDeleteProfilesFailure: AppEpic = (action$, state$, deps) => {
 }
 
 
+
+
+const checkCompliance: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkCompliance.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.profiles.checkCompliance(
+            action.payload.uuids
+         ).pipe(
+
+            map(
+               () => slice.actions.checkComplianceSuccess()
+            ),
+            catchError(
+               err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
+
+            )
+
+         )
+
+      )
+
+   )
+}
+
+
+const checkComplianceFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkComplianceFailed.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
+const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkComplianceSuccess.match
+      ),
+      map(
+
+         action => alertActions.success("Compliance Check for the certificates initiated")
+      )
+
+   );
+}
+
+
+const associateRaProfile: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.associateRaProfile.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.complianceProfile.associateComplianceProfileToRaProfile(
+            action.payload.complianceProfileUuid,
+            [action.payload.uuid]
+         ).pipe(
+
+            map(
+               () => slice.actions.associateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
+            ),
+            catchError(
+               err => of(slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }))
+            )
+
+         )
+
+      )
+
+   )
+}
+
+
+const associateRaProfileFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.associateRaProfileFailed.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
+const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.dissociateRaProfile.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.complianceProfile.dissociateComplianceProfileFromRaProfile(
+            action.payload.complianceProfileUuid,
+            [action.payload.uuid]
+         ).pipe(
+
+            map(
+               () => slice.actions.dissociateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
+            ),
+            catchError(
+               err => of(slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }))
+            )
+
+         )
+
+      )
+
+   )
+}
+
+
+const dissociateRaProfileFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.dissociateRaProfileFailed.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
 const epics = [
    listRaProfiles,
    listRaProfilesFailure,
@@ -842,7 +995,14 @@ const epics = [
    bulkDisableProfiles,
    bulkDisableProfilesFailure,
    bulkDeleteProfiles,
-   bulkDeleteProfilesFailure
+   bulkDeleteProfilesFailure,
+   checkCompliance,
+   checkComplianceFailed,
+   checkComplianceSuccess,
+   associateRaProfile,
+   associateRaProfileFailed,
+   dissociateRaProfile,
+   dissociateRaProfileFailed
 ];
 
 

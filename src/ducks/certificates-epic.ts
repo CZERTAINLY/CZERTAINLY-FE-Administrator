@@ -11,6 +11,7 @@ import { actions as alertActions } from "./alerts";
 import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDtoToCertificaeModel } from "./transform/certificates";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformGroupDtoToModel } from "./transform/groups";
+import { transformLocationDtoToModel } from "./transform/locations";
 
 
 const listCertificates: AppEpic = (action$, state, deps) => {
@@ -374,6 +375,51 @@ const getCertificateHistoryFailure: AppEpic = (action$, state, deps) => {
       ),
       map(
 
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const listCertificateLocations: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listCertificateLocations.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.listLocations(action.payload.uuid).pipe(
+
+            map(
+               locations => slice.actions.listCertificateLocationsSuccess({
+                  certificateLocations: locations.map(location => transformLocationDtoToModel(location))
+               })
+            ),
+            catchError(
+               err => of(slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }))
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const listCertificateLocationsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listCertificateLocationsFailure.match
+      ),
+      map(
          action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
@@ -1008,6 +1054,67 @@ const getRevocationAttributesFailure: AppEpic = (action$, state, deps) => {
 }
 
 
+const checkCompliance: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkCompliance.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.checkCompliance(
+            action.payload.uuids
+         ).pipe(
+
+            map(
+               () => slice.actions.checkComplianceSuccess()
+            ),
+            catchError(
+               err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
+
+            )
+
+         )
+
+      )
+
+   )
+}
+
+
+const checkComplianceFailed: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkComplianceFailed.match
+      ),
+      map(
+
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+}
+
+
+const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.checkComplianceSuccess.match
+      ),
+      map(
+
+         action => alertActions.success("Compliance Check for the certificates initiated")
+      )
+
+   );
+}
+
+
 const epics = [
    listCertificates,
    listCertificatesFailure,
@@ -1024,6 +1131,9 @@ const epics = [
    getAvailableCertificateFilters,
    getAvailableCertificateFiltersFailure,
    getCertificateHistory,
+   getCertificateHistoryFailure,
+   listCertificateLocations,
+   listCertificateLocationsFailure,
    deleteCertificate,
    deleteCertificateSuccess,
    deleteCertificateFailure,
@@ -1047,7 +1157,10 @@ const epics = [
    getIssuanceAttributesFailure,
    getRevocationAttributes,
    getRevocationAttributesFailure,
-   getCertificateHistoryFailure
+   getCertificateHistoryFailure,
+   checkCompliance,
+   checkComplianceFailed,
+   checkComplianceSuccess,
 ];
 
 

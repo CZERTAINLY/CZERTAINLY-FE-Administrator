@@ -1,4 +1,4 @@
-import { AdministratorModel, AdministratorRole } from "models";
+import { AdministratorModel, AdministratorRole, CertificateModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
@@ -142,7 +142,7 @@ export const slice = createSlice({
          email: string,
          description: string,
          role: AdministratorRole,
-         certificate: FileList | undefined,
+         certificate: CertificateModel | undefined,
          certificateUuid: string | undefined
       }>) => {
 
@@ -171,7 +171,7 @@ export const slice = createSlice({
          surname: string,
          username: string,
          email: string,
-         certificate: FileList | undefined,
+         certificate: CertificateModel | undefined,
          description: string,
          role: AdministratorRole,
          certificateUuid: string | undefined

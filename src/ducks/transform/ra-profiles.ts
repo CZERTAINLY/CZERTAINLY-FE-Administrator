@@ -3,7 +3,7 @@ import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models
 import { transformAttributeDTOToModel, transformAttributeModelToDTO } from "./attributes";
 
 export function transformRaProfileDtoToModel(raProfileDto: RaProfileDTO): RaProfileModel {
-
+   
    return {
       uuid: raProfileDto.uuid,
       name: raProfileDto.name,
@@ -12,7 +12,8 @@ export function transformRaProfileDtoToModel(raProfileDto: RaProfileDTO): RaProf
       authorityInstanceUuid: raProfileDto.authorityInstanceUuid,
       authorityInstanceName: raProfileDto.authorityInstanceName,
       attributes: raProfileDto.attributes ? raProfileDto.attributes.map(attribute => transformAttributeDTOToModel(attribute)) : [],
-      enabledProtocols: raProfileDto.enabledProtocols
+      enabledProtocols: raProfileDto.enabledProtocols,
+      complianceProfiles: raProfileDto?.complianceProfiles,
    };
 
 }

@@ -1,4 +1,5 @@
 import { GroupDTO } from "api/groups";
+import { LocationDTO } from "api/location";
 import { Observable } from "rxjs";
 
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
@@ -75,7 +76,7 @@ export interface CertificateListFilterDTO {
    condition: string;
    value?: any;
 }
- 
+
  export interface ValidationResult {
    status: ValidationStatus;
    message: string;
@@ -115,7 +116,15 @@ export interface CertificateDTO {
    group?: GroupDTO;
    owner?: string;
    raProfile?: CertificateRAProfileDTO;
+   complianceStatus?: "na" | "ok" | "nok";
+   nonCompliantRules?: NonCompliantRulesDTO[]
+}
 
+export interface NonCompliantRulesDTO {
+   connectorName: string;
+   ruleName: string;
+   ruleDescription: string;
+   status: "na" | "ok" | "nok";
 }
 
 
@@ -137,6 +146,9 @@ export interface CertificateInventoryApi {
 
 
    getCertificateDetail(uuid: string): Observable<CertificateDTO>;
+
+
+   listLocations(uuid: string): Observable<LocationDTO[]>;
 
 
    getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]>;
@@ -202,6 +214,8 @@ export interface CertificateInventoryApi {
 
 
    getAvailableCertificateFilters(): Observable<AvailableCertificateFilterDTO[]>;
+
+   checkCompliance(uuids: string[]): Observable<void>;
 
 
 }

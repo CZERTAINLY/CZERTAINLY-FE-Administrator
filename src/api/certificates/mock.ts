@@ -6,6 +6,7 @@ import * as model from "./model";
 
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
+import { LocationDTO } from "api/location";
 
 export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
@@ -80,12 +81,21 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
                   keySize: detail.keySize,
                   basicConstraints: detail.basicConstraints,
                   certificateValidationResult: detail.certificateValidationResult,
+                  complianceStatus: detail.complianceStatus,
+                  nonCompliantRules: detail.nonCompliantRules,
                };
             }
 
          )
 
       );
+
+   }
+
+
+   listLocations(uuid: string): Observable<LocationDTO[]> {
+
+      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 
    }
 
@@ -195,6 +205,17 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 
+   }
+
+   checkCompliance(uuids: string[]): Observable<void> {
+      return of(uuids).pipe(
+         delay(randomDelay()),
+         map(
+            uuids => {
+               console.log("Compliance Check Completed", uuids);
+            }
+         )
+      )
    }
 
 

@@ -4,6 +4,7 @@ import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RaProfileModel } from "models/ra-profiles";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { CertificateModel } from "models";
 
 
 export type State = {
@@ -174,7 +175,7 @@ export const slice = createSlice({
       createClient: (state, action: PayloadAction<{
          name: string,
          description: string
-         certificate: FileList | undefined,
+         certificate: CertificateModel | undefined,
          certificateUuid: string,
       }>) => {
 
@@ -200,7 +201,7 @@ export const slice = createSlice({
       updateClient: (state, action: PayloadAction<{
          uuid: string,
          description: string
-         certificate: FileList | undefined,
+         certificate: CertificateModel | undefined,
          certificateUuid: string,
       }>) => {
 
