@@ -275,13 +275,13 @@ export default function CertificateDetail() {
    const onComplianceCheck = useCallback(
 
       () => {
-  
+
          if (!certificate?.uuid) return;
-  
+
          dispatch(actions.checkCompliance({ uuids: [certificate.uuid] }));
       },
       [dispatch, certificate?.uuid]
-  
+
    )
 
 
@@ -844,10 +844,10 @@ export default function CertificateDetail() {
       ],
       []
     );
-  
-  
+
+
     const complianceData: TableDataRow[] = useMemo(
-  
+
       () => !certificate ? [] : (certificate.nonCompliantRules || []).map(e => {
         return (
           {
@@ -1155,7 +1155,7 @@ export default function CertificateDetail() {
 
                location.supportMultipleEntries ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
-               location.supportKeyMannagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+               location.supportKeyManagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
                <StatusBadge enabled={location.enabled} />,
 
@@ -1240,7 +1240,7 @@ export default function CertificateDetail() {
 
                   location.supportMultipleEntries ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
-                  location.supportKeyMannagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+                  location.supportKeyManagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
                   <StatusBadge enabled={location.enabled} />,
 
