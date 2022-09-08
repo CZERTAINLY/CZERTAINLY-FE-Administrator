@@ -259,9 +259,11 @@ function CustomTable({
 
    const onRowToggleSelection = useCallback(
 
-      (e: any, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
+      (e: React.MouseEvent, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
 
-         if (hasDetails && /* e.target.localName !== "i" && */ e.target.localName !== "input") {
+         const target = e.target as HTMLElement;
+
+         if (hasDetails && target.localName !== "input" && target.localName !== "button" && (target.localName !== "i" || target.hasAttribute("data-expander") ) ) {
 
             if (expandedRow === rowId) {
                setExpandedRow(undefined);
@@ -485,7 +487,7 @@ function CustomTable({
                <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
                   {!hasDetails ? (<></>) : <td id="show-detail-more-column" key="show-detail-more-column">
-                     {expandedRow === row.id ? <i className="fa fa-caret-up" /> : <i className="fa fa-caret-down" />}
+                     {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
                   </td>
                   }
                   {!hasCheckboxes ? (<></>) : (
