@@ -197,11 +197,11 @@ export default function ClientList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${client.uuid}`}>{client.name}</Link></span>,
 
                client.serialNumber,
 
-               client?.certificate?.subjectDn,
+               <span style={{ whiteSpace: "nowrap" }}>{client?.certificate?.subjectDn || "N/A"}</span>,
 
                <StatusBadge enabled={client.enabled} />,
 
