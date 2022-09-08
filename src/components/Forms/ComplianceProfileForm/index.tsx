@@ -96,7 +96,7 @@ function ComplianceProfileForm({
 
                   </Field>
 
-                  <Field name="description" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                  <Field name="description">
 
                      {({ input, meta }) => (
 
@@ -112,8 +112,6 @@ function ComplianceProfileForm({
                               id="description"
                               placeholder="Compliance Profile Description"
                            />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
 
                         </FormGroup>
 

@@ -32,6 +32,7 @@ import Spinner from "components/Spinner";
 import ProgressButton from "components/ProgressButton";
 import { collectFormAttributes } from "utils/attributes";
 import { Form } from "react-final-form";
+import CertificateComplianceStatus from "components/pages/certificates/CertificateComplianceStatus";
 
 
 export default function CertificateDetail() {
@@ -271,6 +272,18 @@ export default function CertificateDetail() {
       [setUpdateRaProfile, setRaProfile]
    );
 
+   const onComplianceCheck = useCallback(
+
+      () => {
+  
+         if (!certificate?.uuid) return;
+  
+         dispatch(actions.checkCompliance({ uuids: [certificate.uuid] }));
+      },
+      [dispatch, certificate?.uuid]
+  
+   )
+
 
    const onUpdateGroup = useCallback(
 
@@ -445,9 +458,10 @@ export default function CertificateDetail() {
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
          { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
+         { icon: "gavel", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
          { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
       ],
-      [certificate, downloadDropDown]
+      [certificate, downloadDropDown, onComplianceCheck]
    );
 
 
@@ -628,6 +642,12 @@ export default function CertificateDetail() {
          <span className="fw-semi-bold">Certificate Event History</span>
       </h5>
    );
+
+   const complianceTitle = (
+      <h5>
+        <span className="fw-semi-bold">Non Compliant Rules</span>
+      </h5>
+    );
 
    const locationsTitle = (
 
@@ -810,6 +830,36 @@ export default function CertificateDetail() {
 
    );
 
+   const complianceHeaders: TableHeader[] = useMemo(
+
+      () => [
+        {
+          id: "status",
+          content: "Status",
+        },
+        {
+          id: "ruleDescription",
+          content: "Rule Description",
+        }
+      ],
+      []
+    );
+  
+  
+    const complianceData: TableDataRow[] = useMemo(
+  
+      () => !certificate ? [] : (certificate.nonCompliantRules || []).map(e => {
+        return (
+          {
+            id: e.ruleDescription,
+            columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
+          }
+        )
+      }
+      ),
+      [certificate]
+    )
+
    const metaData: TableDataRow[] = useMemo(
 
       () => !certificate ? [] : Object.entries(certificate.meta || {}).map(function ([key, value]) {
@@ -983,6 +1033,10 @@ export default function CertificateDetail() {
          {
             id: "certStatus",
             columns: ["Status", <CertificateStatus status={certificate.status} />]
+         },
+         {
+            id: "complianceStatus",
+            columns: ["Compliance Status", <CertificateComplianceStatus status={certificate.complianceStatus || "na"} />]
          },
          {
             id: "fingerprint",
@@ -1274,6 +1328,14 @@ export default function CertificateDetail() {
                onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
             />
          </Widget>
+
+         {certificate?.nonCompliantRules ? <Widget title={complianceTitle} busy={isFetching}>
+            <br />
+            <CustomTable
+               headers={complianceHeaders}
+               data={complianceData}
+            />
+            </Widget> : null}
 
 
          <Dialog
