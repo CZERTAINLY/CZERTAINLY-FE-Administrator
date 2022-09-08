@@ -872,7 +872,7 @@ export default function ComplianceProfileDetail() {
             }
             toggle={onCloseGroupRuleDetail}
             buttons={[
-               { color: "secondary", onClick: () => onCloseGroupRuleDetail, body: "Cancel" },
+               { color: "secondary", onClick: () => onCloseGroupRuleDetail(), body: "Cancel" },
             ]}
          />
 
