@@ -385,7 +385,7 @@ export default function CertificateList({
          }
 
       ),
-      [certificates, path]
+      [certificates, path, selectCertsOnly]
 
    );
 
