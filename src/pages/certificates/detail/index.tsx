@@ -645,9 +645,9 @@ export default function CertificateDetail() {
 
    const complianceTitle = (
       <h5>
-        <span className="fw-semi-bold">Non Compliant Rules</span>
+         <span className="fw-semi-bold">Non Compliant Rules</span>
       </h5>
-    );
+   );
 
    const locationsTitle = (
 
@@ -722,7 +722,7 @@ export default function CertificateDetail() {
 
             {
                "id": history.uuid,
-               "columns": [dateFormatter(history.created),
+               "columns": [<span style={{ whiteSpace: "nowrap" }}>{dateFormatter(history.created)}</span>,
 
                history.createdBy,
 
@@ -833,32 +833,32 @@ export default function CertificateDetail() {
    const complianceHeaders: TableHeader[] = useMemo(
 
       () => [
-        {
-          id: "status",
-          content: "Status",
-        },
-        {
-          id: "ruleDescription",
-          content: "Rule Description",
-        }
+         {
+            id: "status",
+            content: "Status",
+         },
+         {
+            id: "ruleDescription",
+            content: "Rule Description",
+         }
       ],
       []
-    );
+   );
 
 
-    const complianceData: TableDataRow[] = useMemo(
+   const complianceData: TableDataRow[] = useMemo(
 
       () => !certificate ? [] : (certificate.nonCompliantRules || []).map(e => {
-        return (
-          {
-            id: e.ruleDescription,
-            columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
-          }
-        )
+         return (
+            {
+               id: e.ruleDescription,
+               columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
+            }
+         )
       }
       ),
       [certificate]
-    )
+   )
 
    const metaData: TableDataRow[] = useMemo(
 
@@ -1016,11 +1016,11 @@ export default function CertificateDetail() {
          },
          {
             id: "expiresAt",
-            columns: ["Expires At", dateFormatter(certificate.notAfter)]
+            columns: ["Expires At", <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span>]
          },
          {
             id: "validFrom",
-            columns: ["Valid From", dateFormatter(certificate.notBefore)]
+            columns: ["Valid From", <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span>]
          },
          {
             id: "publicKeyAlgorithm",
@@ -1048,12 +1048,12 @@ export default function CertificateDetail() {
          },
          {
             id: "keySize",
-            columns: ["Key Size", certificate.keySize]
+            columns: ["Key Size", certificate.keySize.toString()]
          },
          {
             id: "keyUsage",
             columns: ["Key Usage",
-               certificate?.keyUsage?.map(function (name) {
+               (certificate?.keyUsage?.map(function (name) {
                   return (
                      <div key={name}>
                         <Badge style={{ backgroundColor: "Metalic Blue" }}>
@@ -1062,12 +1062,13 @@ export default function CertificateDetail() {
                         &nbsp;
                      </div>
                   );
-               })]
+               })) || ""
+            ]
          },
          {
             id: "extendedKeyUsage",
             columns: ["Extended Key Usage",
-               certificate?.extendedKeyUsage?.map(function (name) {
+               (certificate?.extendedKeyUsage?.map(function (name) {
                   return (
                      <div key={name}>
                         <Badge style={{ backgroundColor: "Metalic Blue" }}>
@@ -1076,7 +1077,8 @@ export default function CertificateDetail() {
                         &nbsp;
                      </div>
                   );
-               })]
+               })) || ""
+            ]
          },
          {
             id: "basicConstraint",
@@ -1335,7 +1337,7 @@ export default function CertificateDetail() {
                headers={complianceHeaders}
                data={complianceData}
             />
-            </Widget> : null}
+         </Widget> : null}
 
 
          <Dialog

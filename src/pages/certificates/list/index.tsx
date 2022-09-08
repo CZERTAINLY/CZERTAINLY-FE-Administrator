@@ -358,15 +358,15 @@ export default function CertificateList({
 
                   selectCertsOnly ? certificate.commonName || "(empty)" : <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 
-                  dateFormatter(certificate.notBefore),
+                  <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>,
 
-                  dateFormatter(certificate.notAfter),
+                  <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>,
 
                   certificate.entity?.name || "Unassigned",
 
                   certificate.group?.name || "Unassigned",
 
-                  certificate.raProfile?.name || "Unassigned",
+                  <span style={{ whiteSpace: "nowrap" }}>{certificate.raProfile?.name || "Unassigned"}</span>,
 
                   certificate.owner || "Unassigned",
 
@@ -376,7 +376,7 @@ export default function CertificateList({
 
                   certificate.issuerCommonName,
 
-                  certificate.certificateType,
+                  certificate.certificateType || "Unknown",
 
                ]
 

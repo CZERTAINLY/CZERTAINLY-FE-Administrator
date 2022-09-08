@@ -304,7 +304,7 @@ function AuditLogs() {
                            <tr>
                               <td>{item.id}</td>
                               <td>{lineBreakFormatter(item.author)}</td>
-                              <td className={styles.dateCell}>{dateFormatter(item.created)}</td>
+                              <td className={styles.dateCell} style={{whiteSpace: "nowrap"}}>{dateFormatter(item.created)}</td>
                               <td>{lineBreakFormatter(item.operationStatus)}</td>
                               <td>{lineBreakFormatter(item.origination)}</td>
                               <td>{lineBreakFormatter(item.affected)}</td>

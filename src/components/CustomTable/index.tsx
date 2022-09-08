@@ -19,8 +19,8 @@ export interface TableHeader {
 
 export interface TableDataRow {
    id: number | string;
-   columns: (string | JSX.Element)[];
-   detailColumns?: (string | JSX.Element)[];
+   columns: (string | JSX.Element | JSX.Element[])[];
+   detailColumns?: (string | JSX.Element | JSX.Element[])[];
 }
 
 
