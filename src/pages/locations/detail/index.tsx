@@ -26,7 +26,6 @@ import Spinner from "components/Spinner";
 import Select from "react-select";
 
 import { validateRequired } from "utils/validators";
-import certificates from "ducks/certificates";
 
 export default function LocationDetail() {
 
