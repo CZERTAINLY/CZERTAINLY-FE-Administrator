@@ -302,7 +302,7 @@ export default function LocationDetail() {
       () => [
          { icon: "trash", disabled: certCheckedRows.length === 0, tooltip: "Remove", onClick: () => { setConfirmRemoveDialog(true); } },
          { icon: "push", disabled: (!(location?.supportMultipleEntries)) && (location ? location.certificates.length > 0 : false), tooltip: "Push", onClick: () => { setPushDialog(true) } },
-         { icon: "cubes", disabled: !location?.supportKeyMannagement, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
+         { icon: "cubes", disabled: !location?.supportKeyManagement, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
          { icon: "retweet", disabled: certCheckedRows.length === 0, tooltip: "Renew", onClick: () => { onRenewClick() } },
          { icon: "sync", disabled: false, tooltip: "Sync", onClick: () => { onSyncClick() } }
       ],

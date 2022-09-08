@@ -214,7 +214,7 @@ function LocationList() {
 
                location.supportMultipleEntries ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
-               location.supportKeyMannagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
+               location.supportKeyManagement ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
                <StatusBadge enabled={location.enabled} />,
 

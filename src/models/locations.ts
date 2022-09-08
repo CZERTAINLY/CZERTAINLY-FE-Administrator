@@ -20,7 +20,7 @@ export interface LocationModel {
    attributes: AttributeModel[];
    enabled: boolean;
    supportMultipleEntries: boolean;
-   supportKeyMannagement: boolean;
+   supportKeyManagement: boolean;
    certificates: LocationCertificateModel[];
    metadata?: { [key: string]: any };
 }

@@ -69,7 +69,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
                   certificates: [],
                   entityInstanceName: entity.name,
                   entityInstanceUuid: entity.uuid,
-                  supportKeyMannagement: false,
+                  supportKeyManagement: false,
                   supportMultipleEntries: false
                };
 

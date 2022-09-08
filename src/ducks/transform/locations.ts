@@ -30,7 +30,7 @@ export function transformLocationDtoToModel(location: LocationDTO): LocationMode
       attributes: location.attributes ? location.attributes.map(transformAttributeDTOToModel) : [],
       enabled: location.enabled,
       supportMultipleEntries: location.supportMultipleEntries,
-      supportKeyMannagement: location.supportKeyMannagement,
+      supportKeyManagement: location.supportKeyManagement,
       certificates: location.certificates ? location.certificates.map(transformLocationCertificateDtoToModel) : [],
       metadata: location.metadata
    };
