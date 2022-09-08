@@ -196,7 +196,7 @@ function AcmeAccountList() {
 
                columns: [
 
-                  <Link to={`${path}/detail/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
+                  <Link to={`${path}/detail/${acmeAccount.acmeProfileUuid}/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
 
                   <MDBBadge color="info">{acmeAccount.acmeProfileName}</MDBBadge>,
 

@@ -203,7 +203,7 @@ function RaProfileList() {
 
             columns: [
 
-               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${raProfile.uuid}`}>{raProfile.name}</Link></span>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${raProfile.authorityInstanceUuid}/${raProfile.uuid}`}>{raProfile.name}</Link></span>,
 
                <span style={{ whiteSpace: "nowrap" }}>{raProfile.description || ""}</span>,
 

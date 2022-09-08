@@ -124,7 +124,7 @@ export const slice = createSlice({
       },
 
 
-      getLocationDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+      getLocationDetail: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.location = undefined;
          state.isFetchingDetail = true;
@@ -204,7 +204,7 @@ export const slice = createSlice({
       },
 
 
-      deleteLocation: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
+      deleteLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string, redirect?: string }>) => {
 
          state.isDeleting = true;
 
@@ -227,7 +227,7 @@ export const slice = createSlice({
       },
 
 
-      enableLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      enableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
 
@@ -250,7 +250,7 @@ export const slice = createSlice({
       },
 
 
-      disableLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      disableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isDisabling = true;
 
@@ -272,7 +272,7 @@ export const slice = createSlice({
       },
 
 
-      syncLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      syncLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isSyncing = true;
 
@@ -295,7 +295,7 @@ export const slice = createSlice({
       },
 
 
-      getPushAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
+      getPushAttributes: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isFetchingPushAttributeDescriptors = true;
 
@@ -317,7 +317,7 @@ export const slice = createSlice({
       },
 
 
-      getCSRAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
+      getCSRAttributes: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isFetchingCSRAttributeDescriptors = true;
 
@@ -340,6 +340,7 @@ export const slice = createSlice({
 
 
       pushCertificate: (state, action: PayloadAction<{
+         entityUuid: string, 
          locationUuid: string,
          certificateUuid: string,
          pushAttributes: AttributeModel[]
@@ -368,6 +369,7 @@ export const slice = createSlice({
 
 
       issueCertificate: (state, action: PayloadAction<{
+         entityUuid: string, 
          locationUuid: string,
          raProfileUuid: string,
          csrAttributes: AttributeModel[],
@@ -396,7 +398,7 @@ export const slice = createSlice({
       },
 
 
-      autoRenewCertificate: (state, action: PayloadAction<{ locationUuid: string, certificateUuid: string }>) => {
+      autoRenewCertificate: (state, action: PayloadAction<{ entityUuid: string, locationUuid: string, certificateUuid: string }>) => {
 
          state.isAutoRenewingCertificate = true;
 
@@ -421,7 +423,7 @@ export const slice = createSlice({
       },
 
 
-      removeCertificate: (state, action: PayloadAction<{ locationUuid: string, certificateUuid: string }>) => {
+      removeCertificate: (state, action: PayloadAction<{ entityUuid: string, locationUuid: string, certificateUuid: string }>) => {
 
          state.isRemovingCertificate = true;
 

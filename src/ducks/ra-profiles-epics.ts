@@ -62,7 +62,7 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getRaProfileDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                profileDto => slice.actions.getRaProfileDetailSuccess({
@@ -107,7 +107,7 @@ const listAuthorizedClients: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getAuthorizedClients(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getAuthorizedClients(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                clients => slice.actions.listAuthorizedClientsSuccess({
@@ -296,7 +296,7 @@ const enableRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.enableRaProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.enableRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.enableRaProfileSuccess({ uuid: action.payload.uuid })
@@ -339,7 +339,7 @@ const disableRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.disableRaProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.disableRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.disableRaProfileSuccess({ uuid: action.payload.uuid })
@@ -383,7 +383,7 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.deleteRaProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.deleteRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid })
@@ -449,6 +449,7 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
       switchMap(
 
          action => deps.apiClients.profiles.activateAcme(
+            action.payload.authorityUuid, 
             action.payload.uuid,
             action.payload.acmeProfileUuid,
             action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
@@ -499,7 +500,7 @@ const deactivateAcme: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.deactivateAcme(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.deactivateAcme(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.deactivateAcmeSuccess({ uuid: action.payload.uuid })
@@ -543,7 +544,7 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getRaAcmeProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getRaAcmeProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                acmeDetails => slice.actions.getAcmeDetailsSuccess({
@@ -589,7 +590,7 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getIssueAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getIssueAttributes(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                issuanceAttributes => slice.actions.listIssuanceAttributesDescriptorsSuccess({
@@ -636,7 +637,7 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.getRevocationAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getRevocationAttributes(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                revocationAttributes => slice.actions.listRevocationAttributeDescriptorsSuccess({

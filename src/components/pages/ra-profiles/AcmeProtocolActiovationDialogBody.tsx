@@ -20,6 +20,7 @@ import { AttributeModel } from 'models/attributes/AttributeModel';
 
 interface Props {
    raProfileUuid?: string;
+   authorityInstanceUuid?: string;
    visible: boolean;
    onClose: () => void;
 }
@@ -27,6 +28,7 @@ interface Props {
 
 export default function AcmeProtocolActiovationDialogBody({
    raProfileUuid,
+   authorityInstanceUuid,
    visible,
    onClose
 }: Props) {
@@ -55,8 +57,8 @@ export default function AcmeProtocolActiovationDialogBody({
 
          dispatch(acmeProfilesActions.listAcmeProfiles());
          if (!raProfileUuid) return;
-         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: raProfileUuid }));
-         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ uuid: raProfileUuid }));
+         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityInstanceUuid || "", uuid: raProfileUuid }));
+         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityInstanceUuid || "", uuid: raProfileUuid }));
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [visible]
@@ -99,6 +101,7 @@ export default function AcmeProtocolActiovationDialogBody({
             ;
 
          dispatch(raProfilesActions.activateAcme({
+            authorityUuid: authorityInstanceUuid || "",
             uuid: raProfileUuid,
             acmeProfileUuid: values.acmeProfiles.value,
             issueCertificateAttributes: issuanceAttribs,

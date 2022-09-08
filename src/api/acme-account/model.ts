@@ -10,6 +10,7 @@ export interface AcmeAccountListItemDTO {
    status: AcmeAccountStatus;
    raProfileName: string;
    acmeProfileName: string;
+   acmeProfileUuid: string;
 }
 
 export interface AcmeAccountDTO {
@@ -32,12 +33,12 @@ export interface AcmeAccountDTO {
 }
 
 export interface AcmeAccountManagementApi {
-   enableAcmeAccount(uuid: string): Observable<void>;
-   disableAcmeAccount(uuid: string): Observable<void>;
+   enableAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void>;
+   disableAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void>;
    bulkRevokeAcmeAccount(uuids: string[]): Observable<void>;
    bulkEnableAcmeAccount(uuids: string[]): Observable<void>;
    bulkDisableAcmeAccount(uuids: string[]): Observable<void>;
-   getAcmeAccountDetails(uuid: string): Observable<AcmeAccountDTO>;
-   revokeAcmeAccount(uuid: string): Observable<void>;
+   getAcmeAccountDetails(acmeProfileUuid: string, uuid: string): Observable<AcmeAccountDTO>;
+   revokeAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void>;
    getAcmeAccountList(): Observable<AcmeAccountListItemDTO[]>;
 }

@@ -423,7 +423,7 @@ export const slice = createSlice({
       },
 
 
-      updateRaProfile: (state, action: PayloadAction<{ uuid: string, raProfileUuid: string }>) => {
+      updateRaProfile: (state, action: PayloadAction<{ uuid: string, authorityUuid: string, raProfileUuid: string }>) => {
 
          state.isUpdatingRaProfile = true;
 
@@ -512,7 +512,7 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateRaProfile: (state, action: PayloadAction<{ uuids: string[], raProfileUuid: string, inFilter: any, allSelect: boolean }>) => {
+      bulkUpdateRaProfile: (state, action: PayloadAction<{ uuids: string[], authorityUuid: string, raProfileUuid: string, inFilter: any, allSelect: boolean }>) => {
 
          state.isBulkUpdatingRaProfile = true;
 

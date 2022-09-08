@@ -66,7 +66,7 @@ const getAccountDetail: AppEpic = (action$, state$, deps) => {
 
          action =>
 
-            deps.apiClients.acmeAccounts.getAcmeAccountDetails(action.payload.uuid).pipe(
+            deps.apiClients.acmeAccounts.getAcmeAccountDetails(action.payload.acmeProfileUuid, action.payload.uuid).pipe(
 
                map(
                   detail => slice.actions.getAcmeAccountSuccess({ acmeAccount: transformAcmeAccountDtoToModel(detail) })
@@ -111,10 +111,10 @@ const revokeAcmeAccount: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.acmeAccounts.revokeAcmeAccount(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeAccounts.revokeAcmeAccount(action.payload.acmeProfileUuid, action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.revokeAcmeAccountSuccess({ uuid: action.payload.uuid })
+               () => slice.actions.revokeAcmeAccountSuccess({ acmeProfileUuid: action.payload.acmeProfileUuid, uuid: action.payload.uuid })
             ),
             catchError(
                err => of(slice.actions.revokeAcmeAccountFailed({ error: extractError(err, "Failed to revoke ACME Account") }))
@@ -137,7 +137,7 @@ const revokeAcmeAccountSuccess: AppEpic = (action$, state, deps) => {
          slice.actions.revokeAcmeAccountSuccess.match
       ),
       map(
-         action => slice.actions.getAcmeAccount({ uuid: action.payload.uuid })
+         action => slice.actions.getAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, uuid: action.payload.uuid })
       ),
 
    )
@@ -170,7 +170,7 @@ const enableAcmeAccount: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeAccounts.enableAcmeAccount(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeAccounts.enableAcmeAccount(action.payload.acmeProfileUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.enableAcmeAccountSuccess({ uuid: action.payload.uuid })
@@ -214,7 +214,7 @@ const disableAcmeAccount: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeAccounts.disableAcmeAccount(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeAccounts.disableAcmeAccount(action.payload.acmeProfileUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.disableAcmeAccountSuccess({ uuid: action.payload.uuid })

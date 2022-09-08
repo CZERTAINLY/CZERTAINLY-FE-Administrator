@@ -25,7 +25,7 @@ export class OperationsBackend implements model.OperationsApi {
    ): Observable<{ uuid: string, certificateData: string }> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}${raProfileUuid}/issue`, "POST", {
+         new HttpRequestOptions(`${baseUrl}${raProfileUuid}/certificates`, "POST", {
             raProfileUuid,
             pkcs10,
             attributes,
@@ -44,7 +44,7 @@ export class OperationsBackend implements model.OperationsApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/${uuid}/revoke`,
+            `${baseUrl}${raProfileUuid}/certificates/${uuid}/revoke`,
             "POST",
             {
                reason,
@@ -64,7 +64,7 @@ export class OperationsBackend implements model.OperationsApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/${uuid}/renew`,
+            `${baseUrl}${raProfileUuid}/certificates/${uuid}/renew`,
             "POST",
             {
                pkcs10,
@@ -79,11 +79,10 @@ export class OperationsBackend implements model.OperationsApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/issue/attributes`,
+            `${baseUrl}${raProfileUuid}/attributes/issue`,
             "GET"
          )
       );
-
    }
 
 
@@ -91,7 +90,7 @@ export class OperationsBackend implements model.OperationsApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/revoke/attributes`,
+            `${baseUrl}${raProfileUuid}/attributes/revoke`,
             "GET"
          )
       );

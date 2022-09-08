@@ -52,7 +52,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
             uuid,
             attributes
          })
@@ -109,7 +109,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
    listRAProfileAttributesDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfile/attributes`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes/raProfile`, "GET")
       );
 
    }

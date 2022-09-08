@@ -31,7 +31,7 @@ export default function LocationDetail() {
 
    const dispatch = useDispatch();
 
-   const { params } = useRouteMatch<{ id: string }>();
+   const { params } = useRouteMatch<{ entityUuid: string, id: string }>();
    const history = useHistory();
 
    const location = useSelector(selectors.location);
@@ -75,9 +75,9 @@ export default function LocationDetail() {
 
          if (!params.id) return;
 
-         dispatch(actions.getLocationDetail({ uuid: params.id }));
-         dispatch(actions.getPushAttributes({ uuid: params.id }));
-         dispatch(actions.getCSRAttributes({ uuid: params.id }));
+         dispatch(actions.getLocationDetail({ entityUuid: params.entityUuid, uuid: params.id }));
+         dispatch(actions.getPushAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
+         dispatch(actions.getCSRAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -131,7 +131,7 @@ export default function LocationDetail() {
       () => {
 
          if (!location) return;
-         dispatch(actions.enableLocation({ uuid: location.uuid }));
+         dispatch(actions.enableLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid }));
 
       },
       [dispatch, location]
@@ -144,7 +144,7 @@ export default function LocationDetail() {
       () => {
 
          if (!location) return;
-         dispatch(actions.disableLocation({ uuid: location.uuid }));
+         dispatch(actions.disableLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid }));
 
       },
       [dispatch, location]
@@ -160,7 +160,7 @@ export default function LocationDetail() {
 
          certCheckedRows.forEach(
             certUuid => {
-               dispatch(actions.removeCertificate({ locationUuid: location.uuid, certificateUuid: certUuid }));
+               dispatch(actions.removeCertificate({ entityUuid: location.entityInstanceUuid, locationUuid: location.uuid, certificateUuid: certUuid }));
             }
          );
 
@@ -180,7 +180,7 @@ export default function LocationDetail() {
          if (!location) return;
 
          for (const certUuid of certCheckedRows) {
-            dispatch(actions.autoRenewCertificate({ locationUuid: location.uuid, certificateUuid: certUuid }));
+            dispatch(actions.autoRenewCertificate({ entityUuid: location.entityInstanceUuid, locationUuid: location.uuid, certificateUuid: certUuid }));
          }
 
       },
@@ -195,7 +195,7 @@ export default function LocationDetail() {
 
          if (!location) return;
 
-         dispatch(actions.syncLocation({ uuid: location.uuid }));
+         dispatch(actions.syncLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid }));
 
       },
       [dispatch, location]
@@ -213,7 +213,7 @@ export default function LocationDetail() {
 
          selectedCerts.forEach(
             certUuid => {
-               dispatch(actions.pushCertificate({ locationUuid: location.uuid, certificateUuid: certUuid, pushAttributes: attrs }));
+               dispatch(actions.pushCertificate({ entityUuid: location.entityInstanceUuid, locationUuid: location.uuid, certificateUuid: certUuid, pushAttributes: attrs }));
             }
          )
 
@@ -234,6 +234,7 @@ export default function LocationDetail() {
          const csrAttrs = collectFormAttributes("csrAttributes", csrAttributeDescriptors, values);
 
          dispatch(actions.issueCertificate({
+            entityUuid: location.entityInstanceUuid, 
             locationUuid: location.uuid,
             raProfileUuid: values.raProfile.value,
             csrAttributes: csrAttrs,
@@ -253,7 +254,7 @@ export default function LocationDetail() {
 
          if (!location) return;
 
-         dispatch(actions.deleteLocation({ uuid: location.uuid, redirect: "../" }));
+         dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: "../" }));
          setConfirmDelete(false);
 
       },
@@ -639,12 +640,12 @@ export default function LocationDetail() {
                                        {...input}
                                        maxMenuHeight={140}
                                        menuPlacement="auto"
-                                       options={raProfiles.map(p => ({ value: p.uuid, label: p.name }))}
+                                       options={raProfiles.map(p => ({ value: p.uuid + ":#" + p.authorityInstanceUuid, label: p.name }))}
                                        placeholder="Select RA profile"
                                        styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                                        onChange={(value) => {
                                           input.onChange(value);
-                                          dispatch(raActions.listIssuanceAttributeDescriptors({ uuid: value.value }));
+                                          dispatch(raActions.listIssuanceAttributeDescriptors({ authorityUuid: value.value.split(":#")[1], uuid: value.value.split(":#")[0] }));
                                        }}
                                     />
 

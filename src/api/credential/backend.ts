@@ -91,7 +91,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    updateCredential(uuid: string, attributes: AttributeDTO[]): Observable<model.CredentialDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
             uuid,
             attributes: attributes,
          })
@@ -103,7 +103,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    enableCredential(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PATCH")
       );
 
    }
@@ -112,7 +112,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    disableCredential(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PATCH")
       );
 
    }

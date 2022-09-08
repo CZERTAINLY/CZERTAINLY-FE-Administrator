@@ -8,7 +8,7 @@ import { createNewResource } from "utils/net";
 import * as model from "./model";
 import { CertificateEventHistoryDTO } from "./model";
 
-const baseUrl = "/api/v1/certificate";
+const baseUrl = "/api/v1/certificates";
 
 export class CertificateInventoryBackend implements model.CertificateInventoryApi {
 
@@ -84,35 +84,24 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    }
 
 
+   // All three below operations uses Same API. For the UI sake, it is separated into three different methods.
    updateGroup(uuid: string, groupUuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/group`, "PUT", {
-            groupUuid,
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PATCH", {
+            "groupUuid": groupUuid,
          })
       );
 
    }
 
-
-   /*
-   updateEntity(uuid: string, entityUuid: string): Observable<void> {
-
-      return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/entity`, "PUT", {
-            entityUuid,
-         })
-      );
-
-   }
-   */
 
 
    updateRaProfile(uuid: string, raProfileUuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/ra-profile`, "PUT", {
-            raProfileUuid,
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PATCH", {
+            "raProfileUuid": raProfileUuid,
          })
       );
 
@@ -122,13 +111,14 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    updateOwner(uuid: string, owner: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/owner`, "PUT", {
-            owner,
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PATCH", {
+            "owner": owner,
          })
       );
 
    }
 
+   // All three below operations uses Same API. For the UI sake, it is separated into three different methods.
 
    bulkUpdateGroup(
       certificateIds: string[],
@@ -138,34 +128,14 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    ): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/group`, "PUT", {
-            uuid,
+         new HttpRequestOptions(`${baseUrl}`, "PATCH", {
+            "groupUuid": uuid,
             certificateUuids: certificateIds,
             filters: allSelect ? inFilter : null,
          })
       );
 
    }
-
-
-   /*
-   bulkUpdateEntity(
-      certificateIds: string[],
-      uuid: string,
-      inFilter: any,
-      allSelect: boolean
-   ): Observable<void> {
-
-      return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/entity`, "PUT", {
-            uuid,
-            certificateUuids: certificateIds,
-            filters: allSelect ? inFilter : null,
-         })
-      );
-
-   }
-   */
 
 
    bulkUpdateRaProfile(
@@ -176,8 +146,8 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    ): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/ra-profile`, "PUT", {
-            uuid,
+         new HttpRequestOptions(`${baseUrl}`, "PATCH", {
+            "raProfileUuid": uuid,
             certificateUuids: certificateIds,
             filters: allSelect ? inFilter : null,
          })
@@ -194,8 +164,8 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    ): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/owner`, "PUT", {
-            owner,
+         new HttpRequestOptions(`${baseUrl}`, "PATCH", {
+            "owner": owner,
             certificateUuids: certificateIds,
             filters: allSelect ? inFilter : null,
          })

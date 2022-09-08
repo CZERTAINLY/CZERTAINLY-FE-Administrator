@@ -6,7 +6,7 @@ import { FetchHttpService } from "ts-rest-client-fetch";
 import { createNewResource } from "utils/net";
 import * as model from "./model";
 
-const baseUrl = "/api/v1/groups";
+const baseUrl = "/api/v1/certificateGroups";
 
 export class GroupManagementBackend implements model.GroupManagementApi {
   constructor() {
@@ -52,7 +52,7 @@ export class GroupManagementBackend implements model.GroupManagementApi {
     description: string
   ): Observable<model.GroupDTO> {
     return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+      new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
         name,
         description,
       })

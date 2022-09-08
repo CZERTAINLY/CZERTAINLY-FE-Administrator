@@ -10,7 +10,8 @@ export function transformAcmeAccountListDtoToModel(acmeAccountDto: AcmeAccountLi
       totalOrders: acmeAccountDto.totalOrders,
       status: acmeAccountDto.status,
       raProfileName: acmeAccountDto.raProfileName,
-      acmeProfileName: acmeAccountDto.acmeProfileName
+      acmeProfileName: acmeAccountDto.acmeProfileName,
+      acmeProfileUuid: acmeAccountDto.acmeProfileUuid,
    }
 
 }

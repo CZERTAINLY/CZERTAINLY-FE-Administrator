@@ -26,7 +26,8 @@ export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi
                   totalOrders: account.totalOrders,
                   status: account.status,
                   raProfileName: account.raProfileName,
-                  acmeProfileName: account.acmeProfileName
+                  acmeProfileName: account.acmeProfileName,
+                  acmeProfileUuid: account.acmeProfileUuid,
                })
 
             )
@@ -37,7 +38,7 @@ export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi
    }
 
 
-   getAcmeAccountDetails(uuid: string): Observable<model.AcmeAccountDTO> {
+   getAcmeAccountDetails(acmeProfileUuid: string, uuid: string): Observable<model.AcmeAccountDTO> {
 
       return of(
          dbData.acmeAccounts.find(acmeAccount => acmeAccount.uuid === uuid)
@@ -57,7 +58,7 @@ export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi
 
    }
 
-   revokeAcmeAccount(uuid: string): Observable<void> {
+   revokeAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.acmeAccounts.findIndex(account => account.uuid)
@@ -79,7 +80,7 @@ export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi
    }
 
 
-   enableAcmeAccount(uuid: string): Observable<void> {
+   enableAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.acmeAccounts.find(account => account.uuid === uuid)
@@ -101,7 +102,7 @@ export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi
    }
 
 
-   disableAcmeAccount(uuid: string): Observable<void> {
+   disableAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.acmeAccounts.find(account => account.uuid === uuid)
