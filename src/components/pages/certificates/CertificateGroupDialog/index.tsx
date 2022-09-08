@@ -88,8 +88,6 @@ export default function CertificateGroupDialog({
                   Cancel
                </Button>
 
-
-
             </ButtonGroup>
 
          </div>

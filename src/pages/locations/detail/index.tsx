@@ -4,7 +4,7 @@ import { Form as BootstrapForm, Button, Label, ButtonGroup, Container, FormGroup
 import { Field, Form } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useRouteMatch } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 
 import { mutators } from "utils/attributeEditorMutators";
@@ -302,7 +302,7 @@ export default function LocationDetail() {
       () => [
          { icon: "trash", disabled: certCheckedRows.length === 0, tooltip: "Remove", onClick: () => { setConfirmRemoveDialog(true); } },
          { icon: "push", disabled: (!(location?.supportMultipleEntries)) && (location ? location.certificates.length > 0 : false), tooltip: "Push", onClick: () => { setPushDialog(true) } },
-         { icon: "cubes", disabled: !location?.supportKeyMannagement, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
+         { icon: "cubes", disabled: !location?.supportKeyManagement, tooltip: "Issue", onClick: () => { setIssueDialog(true) } },
          { icon: "retweet", disabled: certCheckedRows.length === 0, tooltip: "Renew", onClick: () => { onRenewClick() } },
          { icon: "sync", disabled: false, tooltip: "Sync", onClick: () => { onSyncClick() } }
       ],
@@ -400,13 +400,14 @@ export default function LocationDetail() {
             sortable: true,
          },
          {
-            id: "meta",
-            content: "Meta",
+            id: "metadata",
+            content: "Metadata",
          },
          {
-            id: "csr",
-            content: "CSR attributes",
-         }
+            id: "CSR Detail",
+            content: "CSR Detail",
+         },
+
       ],
       []
 
@@ -417,19 +418,48 @@ export default function LocationDetail() {
 
       () => !location ? [] : location.certificates.map(
          cert => ({
+
             id: cert.certificateUuid,
+
             columns: [
-               cert.commonName,
+
+               <Link to={`../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
+
                cert.withKey ? "Yes" : "No",
+
+               !cert.metadata ? "" :
+                  Object.keys(cert.metadata).length === 0 ? "" :
+                     <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                        {Object.keys(cert.metadata).map(key => (cert.metadata[key].toString())).join(", ")}
+                     </div>,
+
+               !cert.csrAttributes ? "" :
+                  cert.csrAttributes.length === 0 ? "" :
+                     <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                        {cert.csrAttributes.map(atr => atr.content ? (atr.content as any).value : "").join(", ")}
+                     </div>,
+
+            ],
+
+            detailColumns: [
+
+               <></>,
+               <></>,
+               <></>,
+               <></>,
+
                !cert.metadata ? "" : Object.keys(cert.metadata).length === 0 ? "" : <CustomTable
                   headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
                   data={Object.keys(cert.metadata).map(key => ({ id: key, columns: [key, cert.metadata[key].toString()] }))}
                />,
+
                !cert.csrAttributes ? "" : cert.csrAttributes.length === 0 ? "" : <CustomTable
                   headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
                   data={cert.csrAttributes.map(atr => ({ id: atr.name, columns: [atr.label || atr.name, atr.content ? (atr.content as any).value : ""] }))}
                />
-            ],
+
+            ]
+
          })
       ),
       [location]
@@ -474,6 +504,7 @@ export default function LocationDetail() {
                onCheckedRowsChanged={
                   (rows) => { setCertCheckedRows(rows as string[]) }
                }
+               hasDetails={true}
             />
 
          </Widget>

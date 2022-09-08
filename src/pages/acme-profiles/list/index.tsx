@@ -268,9 +268,9 @@ export default function AdministratorsList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${acmeProfile.uuid}`}>{acmeProfile.name}</Link>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${acmeProfile.uuid}`}>{acmeProfile.name}</Link></span>,
 
-               acmeProfile.description || "",
+               <span style={{ whiteSpace: "nowrap" }}>{acmeProfile.description || ""}</span>,
 
                <MDBBadge color="info">{acmeProfile.raProfileName}</MDBBadge>,
 

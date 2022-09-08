@@ -335,7 +335,6 @@ export default function CertificateInventoryFilter({
 
          </Widget>
 
-
          <Dialog
             isOpen={confirmClear}
             caption="Clear Certificate Inventory Filters"

@@ -200,13 +200,13 @@ export default function AdministratorsList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${administrator.uuid}`}>{administrator.username}</Link>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${administrator.uuid}`}>{administrator.username}</Link></span>,
 
                administrator.name,
 
                administrator.serialNumber,
 
-               administrator.certificate.subjectDn,
+               <span style={{ whiteSpace: "nowrap" }}>{administrator.certificate.subjectDn}</span>,
 
                <StatusCircle status={administrator.role === "superAdministrator"} />,
 

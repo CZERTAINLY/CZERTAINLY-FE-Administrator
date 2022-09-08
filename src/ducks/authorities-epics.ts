@@ -129,6 +129,7 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
    );
 }
 
+
 const listAuthorityProvidersFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -140,7 +141,6 @@ const listAuthorityProvidersFailure: AppEpic = (action$, state, deps) => {
       )
    );
 }
-
 
 
 const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps) => {

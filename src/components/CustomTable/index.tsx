@@ -19,8 +19,8 @@ export interface TableHeader {
 
 export interface TableDataRow {
    id: number | string;
-   columns: (string | JSX.Element)[];
-   detailColumns?: (string | JSX.Element)[];
+   columns: (string | JSX.Element | JSX.Element[])[];
+   detailColumns?: (string | JSX.Element | JSX.Element[])[];
 }
 
 
@@ -237,6 +237,7 @@ function CustomTable({
 
    );
 
+
    const onCheckAllCheckboxClick = useCallback(
 
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -258,9 +259,12 @@ function CustomTable({
 
    const onRowToggleSelection = useCallback(
 
-      (e: any, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
+      (e: React.MouseEvent, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
 
-         if (hasDetails && e.target.localName !== "i" && e.target.localName !== "button") {
+         const target = e.target as HTMLElement;
+
+         if (hasDetails && target.localName !== "input" && target.localName !== "button" && (target.localName !== "i" || target.hasAttribute("data-expander") ) ) {
+
             if (expandedRow === rowId) {
                setExpandedRow(undefined);
             } else {
@@ -269,6 +273,8 @@ function CustomTable({
             if (!continueAfterDetails) {
                return;
             }
+
+            return;
          }
 
          if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") return;
@@ -300,8 +306,9 @@ function CustomTable({
 
          e.stopPropagation();
          e.preventDefault();
+
       },
-      [tblCheckedRows, setTblCheckedRows, onCheckedRowsChanged, expandedRow, hasDetails]
+      [hasDetails, multiSelect, tblCheckedRows, onCheckedRowsChanged, expandedRow]
 
    );
 
@@ -392,7 +399,7 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes  && multiSelect ) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
          if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
 
          return columns.map(
@@ -457,8 +464,8 @@ function CustomTable({
          )
       },
       [tblHeaders, hasCheckboxes, multiSelect, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, onCheckAllCheckboxClick]
-   );
 
+   );
 
 
    const body = useMemo(
@@ -474,12 +481,13 @@ function CustomTable({
       ).map(
 
          (row, index) => (
+
             <Fragment key={row.id}>
 
                <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
                   {!hasDetails ? (<></>) : <td id="show-detail-more-column" key="show-detail-more-column">
-                     {expandedRow === row.id ? <i className="fa fa-caret-up" /> : <i className="fa fa-caret-down" />}
+                     {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
                   </td>
                   }
                   {!hasCheckboxes ? (<></>) : (
@@ -525,6 +533,7 @@ function CustomTable({
 
                   </tr>
                )}
+
             </Fragment>
 
          )

@@ -203,9 +203,9 @@ function RaProfileList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${raProfile.uuid}`}>{raProfile.name}</Link>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${raProfile.uuid}`}>{raProfile.name}</Link></span>,
 
-               raProfile.description || "",
+               <span style={{ whiteSpace: "nowrap" }}>{raProfile.description || ""}</span>,
 
                <MDBBadge color="info">{raProfile.authorityInstanceName}</MDBBadge>,
 

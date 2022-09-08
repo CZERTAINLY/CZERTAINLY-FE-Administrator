@@ -37,11 +37,11 @@ function CertificateAttributes({ certificate }: Props) {
          },
          {
             id: "validFrom",
-            columns: ["Valid From", certificate?.notBefore ? dateFormatter(certificate.notBefore) : ""]
+            columns: ["Valid From", <span style={{whiteSpace: "nowrap"}}>{certificate?.notBefore ? dateFormatter(certificate.notBefore) : ""}</span>]
          },
          {
             id: "validTo",
-            columns: ["Valid To", certificate?.notAfter ? dateFormatter(certificate.notAfter) : ""]
+            columns: ["Valid To", <span style={{whiteSpace: "nowrap"}}>{certificate?.notAfter ? dateFormatter(certificate.notAfter) : ""}</span>]
          },
          {
             id: "serialNumber",

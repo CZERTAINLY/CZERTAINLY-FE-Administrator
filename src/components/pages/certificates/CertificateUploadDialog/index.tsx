@@ -188,8 +188,6 @@ export default function CertificateUploadDialog({
 
             </FormGroup>
 
-
-
             <FormGroup style={{ textAlign: "right" }}>
 
                <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>

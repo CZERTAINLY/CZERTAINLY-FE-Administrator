@@ -145,9 +145,6 @@ export default function AssociateComplianceProfileDialogBody({
                      </ButtonGroup>
                   </div>
 
-
-
-
                </BootstrapForm>
 
             )}

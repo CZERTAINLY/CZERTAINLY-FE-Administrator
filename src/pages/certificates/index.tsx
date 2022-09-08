@@ -8,20 +8,24 @@ import CertificateList from "./list";
 
 function Certificates() {
 
-  const { path } = useRouteMatch();
+   const { path } = useRouteMatch();
 
-  return (
+   return (
 
-    <Switch>
+      <Switch>
 
-      <Route path={path} component={CertificateList} exact />
-      <Route path={`${path}/list`} component={CertificateList} exact />
-      <Route path={`${path}/detail/:id`} component={CertificateDetail} exact />
-      <Route path={`${path}/add`} component={IssueCertificate} exact />
+         <Route path={path} component={CertificateList} exact />
+         <Route path={`${path}/list`} component={CertificateList} exact />
+         <Route path={`${path}/detail/:id`} component={CertificateDetail} exact />
+         <Route path={`${path}/add`} component={IssueCertificate} exact />
 
-    </Switch>
+      </Switch>
 
-  );
+
+   );
+
+
+
 
 }
 

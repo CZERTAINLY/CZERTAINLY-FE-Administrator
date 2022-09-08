@@ -111,8 +111,6 @@ export default function CertificateRenewDialog({
 
             </FormGroup>
 
-
-
             <FormGroup style={{ textAlign: "right" }}>
 
                <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
@@ -149,8 +147,6 @@ export default function CertificateRenewDialog({
                >
                   Cancel
                </Button>
-
-
 
             </ButtonGroup>
 

@@ -12,10 +12,12 @@ import { transformAuditLogDTOToModel } from "./transform/auditlog";
 const listLogs: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
+
       filter(
          slice.actions.listLogs.match
       ),
       switchMap(
+
          action => deps.apiClients.auditLogs.getLogs(
             action.payload.page,
             action.payload.size,
@@ -39,6 +41,7 @@ const listLogs: AppEpic = (action$, state, deps) => {
          )
 
       )
+
    )
 
 }
@@ -158,7 +161,7 @@ const listStatuses: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.getStatuses().pipe(
 
             map(
-               statusList => slice.actions.listStatusesSuccess({ statusList})
+               statusList => slice.actions.listStatusesSuccess({ statusList })
             ),
 
             catchError(
@@ -193,24 +196,24 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
-       filter(
-           slice.actions.purgeLogs.match
-       ),
-       switchMap(
+      filter(
+         slice.actions.purgeLogs.match
+      ),
+      switchMap(
 
-           action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
+         action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
 
-               map(
-                   () => slice.actions.purgeLogsSuccess()
-               ),
+            map(
+               () => slice.actions.purgeLogsSuccess()
+            ),
 
-               catchError(
-                   err => of(slice.actions.purgeLogsFailure({ error: extractError(err, "Failed to purge audit logs") }))
-               )
+            catchError(
+               err => of(slice.actions.purgeLogsFailure({ error: extractError(err, "Failed to purge audit logs") }))
+            )
 
-           )
+         )
 
-       )
+      )
 
    )
 
@@ -220,12 +223,12 @@ const purgeLogsFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
-       filter(
-           slice.actions.purgeLogsFailure.match
-       ),
-       map(
-           action => alertActions.error(action.payload.error || "Unexpected error occured")
-       )
+      filter(
+         slice.actions.purgeLogsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
 
    )
 

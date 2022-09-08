@@ -32,7 +32,7 @@ export const dbLocations: DbLocations = {
             withKey: false,
          }
       ],
-      supportKeyMannagement: false,
+      supportKeyManagement: false,
       supportMultipleEntries: false
    },
 
@@ -57,7 +57,7 @@ export const dbLocations: DbLocations = {
             withKey: true,
          }
       ],
-      supportKeyMannagement: false,
+      supportKeyManagement: false,
       supportMultipleEntries: false
    }
 

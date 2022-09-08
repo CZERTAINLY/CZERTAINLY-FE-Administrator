@@ -22,7 +22,7 @@ export interface LocationDTO {
    attributes: AttributeDTO[];
    enabled: boolean;
    supportMultipleEntries: boolean;
-   supportKeyMannagement: boolean;
+   supportKeyManagement: boolean;
    certificates: LocationCertificateDTO[];
    metadata?: { [key: string]: any };
 }
