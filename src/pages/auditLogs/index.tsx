@@ -235,7 +235,7 @@ function AuditLogs() {
 
          </div>
       ),
-      [queryString]
+      [purgeCallback, queryString]
 
    );
 
@@ -263,7 +263,7 @@ function AuditLogs() {
 
                <SortTableHeader onSortChange={onSortChange}>
 
-                  <SortColumnHeader id="id" text={lineBreakFormatter("UUID")} />
+                  <SortColumnHeader id="id" text={lineBreakFormatter("Id")} />
                   <SortColumnHeader id="author" text={lineBreakFormatter("Author")} />
                   <SortColumnHeader id="created" text={lineBreakFormatter("Created")} />
 
