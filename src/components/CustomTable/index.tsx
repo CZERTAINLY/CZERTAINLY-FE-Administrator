@@ -231,9 +231,11 @@ function CustomTable({
    useEffect(
 
       () => {
-         setTotalPages(Math.ceil(tblData.length / pageSize))
+         const totalPages = Math.ceil(tblData.length / pageSize)
+         setTotalPages(totalPages);
+         if (page > totalPages) setPage(totalPages);
       },
-      [tblData, pageSize]
+      [tblData, pageSize, page]
 
    );
 
