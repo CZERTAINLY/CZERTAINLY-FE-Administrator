@@ -235,7 +235,7 @@ function AuditLogs() {
 
          </div>
       ),
-      [queryString]
+      [purgeCallback, queryString]
 
    );
 
