@@ -597,7 +597,7 @@ export default function ComplianceProfileDetail() {
                               className="btn btn-link p-0"
                               color="white"
                               data-placement="right"
-                              data-for={group.uuid + "remove"}
+                              data-for={group.uuid + "-remove"}
                               data-tip
                               onClick={
                                  () => {
@@ -607,7 +607,7 @@ export default function ComplianceProfileDetail() {
                            >
                               <i className="fa fa-times" style={{ color: "red" }} />
 
-                              <ToolTip message="Remove" id={group.uuid + "remove"} place="top" />
+                              <ToolTip message="Remove" id={group.uuid + "-remove"} place="top" />
 
                            </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -615,7 +615,7 @@ export default function ComplianceProfileDetail() {
                               className="btn btn-link p-0"
                               color="white"
                               data-placement="right"
-                              data-for={group.uuid + "selected-all-group"}
+                              data-for={group.uuid + "-selected-all-group"}
                               data-tip
                               onClick={
                                  () => {
@@ -625,7 +625,7 @@ export default function ComplianceProfileDetail() {
                            >
                               <i className="fa fa-info" style={{ color: "auto" }} />
 
-                              <ToolTip message="Rules" id={group.uuid + "selected-all-group"} place="top" />
+                              <ToolTip message="Rules" id={group.uuid + "-selected-all-group"} place="top" />
 
                            </Button>
                         </div>,
@@ -702,17 +702,23 @@ export default function ComplianceProfileDetail() {
                      data.push({
                         id: `${rule.uuid}-${connector.connectorUuid}`,
                         columns: [
+
                            <MDBBadge color="secondary">Rule</MDBBadge>,
+
                            <Button
                               className="btn btn-link p-0"
                               color="white"
                               data-placement="right"
-                              data-for={rule.uuid + "rule-group"}
+                              data-for={rule.uuid + "-rule-group"}
                               data-tip
                            >
+
                               <i className="fa fa-times" style={{ color: "grey" }} />
-                              <ToolTip message={`Rule is part of the group '${group.name}' and cannot be removed separately`} id={rule.uuid + "rule-group"} place="top" />
+
+                              <ToolTip message={`Rule is part of the group '${group.name}' and cannot be removed separately`} id={rule.uuid + "-rule-group"} place="top" />
+
                            </Button>,
+
                            rule.description || rule.name,
 
                         ],
