@@ -42,7 +42,7 @@ export function jsxInnerText(obj: JSX.Element): string {
 
          } else {
 
-            Object.getOwnPropertyNames(props).forEach(
+            if (props) Object.getOwnPropertyNames(props).forEach(
                propName => {
                   buf += propName;
                   buf += jsxInnerText(props[propName]);
