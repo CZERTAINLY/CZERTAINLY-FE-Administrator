@@ -78,13 +78,13 @@ export interface CertificateListFilterDTO {
    value?: any;
 }
 
- export interface ValidationResult {
+ export interface ValidationResultDTO {
    status: ValidationStatus;
    message: string;
  }
 
 export interface CertificateValidationResultDTO {
-   [key: string]: ValidationResult;
+   [key: string]: ValidationResultDTO;
 }
 
 
@@ -218,7 +218,7 @@ export interface CertificateInventoryApi {
 
    checkCompliance(uuids: string[]): Observable<void>;
 
-   getCertificateValidationResult(uuid: string): Observable<CertificateValidationResultModel>;
+   getCertificateValidationResult(uuid: string): Observable<CertificateValidationResultDTO>;
 
 
 }

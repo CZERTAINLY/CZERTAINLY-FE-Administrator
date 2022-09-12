@@ -1,6 +1,6 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
 import { CertificateValidationResultDTO } from "api/certificates";
-import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status } from "types/certificate";
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
 import { AttributeModel } from "./attributes/AttributeModel";
 import { GroupModel } from "./groups";
 
@@ -82,6 +82,16 @@ export interface CertificateRAProfileModel {
 }
 
 
+export interface ValidationResultModel {
+   status: ValidationStatus;
+   message: string;
+ }
+
+export interface CertificateValidationResultModel {
+   [key: string]: ValidationResultModel;
+}
+
+
 export interface CertificateModel {
 
    uuid: string;
@@ -105,7 +115,7 @@ export interface CertificateModel {
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
    meta?: CertificateMetaModel;
-   certificateValidationResult?: CertificateValidationResultDTO;
+   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityModel;
    group?: GroupModel;
    owner?: string;

@@ -164,7 +164,7 @@ export function transformCertificateHistoryDTOToModel(certificateHistory: Certif
 }
 
 
-export function transformRaProfileDtoToCertificaeModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
+export function transformRaProfileDTOToCertificateModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
 
    return {
       uuid: raProfile.uuid,
