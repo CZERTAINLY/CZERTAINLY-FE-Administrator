@@ -293,6 +293,22 @@ export default function ComplianceProfileDetail() {
 
    );
 
+   const onAddRuleWithAttributes = useCallback(
+
+      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel) => {
+
+         setAddAttributeRuleDetails({
+            connectorUuid: connectorUuid,
+            connectorName: connectorName,
+            kind: kind,
+            rule: rule
+         });
+
+         setAddRuleWithAttributes(true);
+
+      },
+      []
+   )
 
    const detailsTitle = useMemo(
 
@@ -587,7 +603,9 @@ export default function ComplianceProfileDetail() {
                   const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
 
                   data.push({
+
                      id: `${group.uuid}-${connector.connectorUuid}`,
+
                      columns: [
 
                         <MDBBadge color="secondary">Group</MDBBadge>,
@@ -604,6 +622,7 @@ export default function ComplianceProfileDetail() {
                                     onDeleteGroup(connector.connectorUuid, connector.kind, group);
                                  }
                               }
+
                            >
                               <i className="fa fa-times" style={{ color: "red" }} />
 
@@ -656,7 +675,9 @@ export default function ComplianceProfileDetail() {
                for (const rule of connector.rules) {
 
                   data.push({
+
                      id: `${rule.uuid}-${connector.connectorUuid}`,
+
                      columns: [
 
                         <MDBBadge color="secondary">Rule</MDBBadge>,
@@ -681,10 +702,10 @@ export default function ComplianceProfileDetail() {
                            <ToolTip message="Remove" id={rule.uuid + "-selected-all-group"} place="top" />
                         </>
                         ,
-
                         rule.description || rule.name,
 
                      ],
+
                      detailColumns: [
                         <></>,
                         <></>,
@@ -707,7 +728,9 @@ export default function ComplianceProfileDetail() {
                   for (const rule of groupRuleMapping[keyString] || []) {
 
                      data.push({
+
                         id: `${rule.uuid}-${connector.connectorUuid}`,
+
                         columns: [
 
                            <MDBBadge color="secondary">Rule</MDBBadge>,
@@ -733,6 +756,7 @@ export default function ComplianceProfileDetail() {
                            rule.description || rule.name,
 
                         ],
+
                         detailColumns: [
                            <></>,
                            <></>,
@@ -761,7 +785,9 @@ export default function ComplianceProfileDetail() {
                   const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
 
                   data.push({
+
                      id: `${group.uuid}-${connector.connectorUuid}`,
+
                      columns: [
 
                         <MDBBadge color="secondary">Group</MDBBadge>,
@@ -811,6 +837,7 @@ export default function ComplianceProfileDetail() {
                         group.name,
 
                      ],
+
                      detailColumns: [
                         <></>,
                         <></>,
@@ -818,11 +845,12 @@ export default function ComplianceProfileDetail() {
                         <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
 
                      ]
+
                   });
+
                }
             }
          }
-
 
          if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
 
