@@ -770,8 +770,8 @@ export default function CertificateDetail() {
       )) {
          returnList.push(
             <tr>
-               <td>{key}</td>
-               <td>
+               <td style={{padding: "0.25em"}}>{key}</td>
+               <td style={{padding: "0.25em"}}>
                   <p
                      style={{
                         whiteSpace: "pre-wrap",
