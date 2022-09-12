@@ -110,6 +110,49 @@ const getCertificateDetailFailure: AppEpic = (action$, state, deps) => {
 }
 
 
+const getCertificateValidationResult: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateValidationResult.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.getCertificateValidationResult(action.payload.uuid).pipe(
+
+            map(
+               result => slice.actions.getCertificateValidationResultSuccess(result)
+            ),
+            catchError(
+               err => of(slice.actions.getCertificateValidationResultFailure({ error: extractError(err, "Failed to get certificate validation result") }))
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const getCertificateValidationResultFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateValidationResultFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   )
+
+}
+
+
 const issueCertificate: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -1120,6 +1163,8 @@ const epics = [
    listCertificatesFailure,
    getCertificateDetail,
    getCertificateDetailFailure,
+   getCertificateValidationResult,
+   getCertificateValidationResultFailure,
    issueCertificate,
    issueCertificateSuccess,
    issueCertificateFailure,

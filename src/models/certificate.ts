@@ -1,5 +1,4 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
-import { CertificateValidationResultModel } from "api/certificates";
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status } from "types/certificate";
 import { GroupModel } from "./groups";
 
@@ -105,7 +104,6 @@ export interface CertificateModel {
    subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
    meta?: CertificateMetaModel;
 
-   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityModel;
    group?: GroupModel;
    owner?: string;
