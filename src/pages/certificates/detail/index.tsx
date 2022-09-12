@@ -1312,15 +1312,6 @@ export default function CertificateDetail() {
             </Col>
          </Row>
 
-         <Widget title={historyTitle} busy={isFetchingHistory}>
-            <br />
-            <CustomTable
-               headers={historyHeaders}
-               data={historyEntry}
-            />
-         </Widget>
-
-
          <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
             <br />
             <CustomTable
@@ -1339,6 +1330,14 @@ export default function CertificateDetail() {
             />
          </Widget> : null}
 
+         <Widget title={historyTitle} busy={isFetchingHistory}>
+            <br />
+            <CustomTable
+               headers={historyHeaders}
+               data={historyEntry}
+               hasPagination={true}
+            />
+         </Widget>
 
          <Dialog
             isOpen={confirmDelete}
