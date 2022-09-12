@@ -255,24 +255,6 @@ export default function ComplianceProfileDetail() {
    );
 
 
-   const onAddRuleWithAttributes = useCallback(
-
-      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel) => {
-
-         setAddAttributeRuleDetails({
-            connectorUuid: connectorUuid,
-            connectorName: connectorName,
-            kind: kind,
-            rule: rule
-         });
-
-         setAddRuleWithAttributes(true);
-
-      },
-      []
-   );
-
-
    const buttons: WidgetButtonProps[] = useMemo(
 
       () => [
