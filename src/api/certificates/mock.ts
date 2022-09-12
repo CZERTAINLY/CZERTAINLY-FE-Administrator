@@ -10,7 +10,7 @@ import { LocationDTO } from "api/location";
 
 export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
-   getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultModel> {
+   getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultDTO> {
       return of(
          dbData.certificates.find((c) => c.uuid.toString() === uuid.toString())
       ).pipe(

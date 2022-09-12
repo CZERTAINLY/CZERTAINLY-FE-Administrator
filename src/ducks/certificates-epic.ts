@@ -8,7 +8,7 @@ import { extractError } from "utils/net";
 
 import * as slice from "./certificates";
 import { actions as alertActions } from "./alerts";
-import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDtoToCertificaeModel } from "./transform/certificates";
+import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDTOToCertificateModel } from "./transform/certificates";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformGroupDtoToModel } from "./transform/groups";
 import { transformLocationDtoToModel } from "./transform/locations";
@@ -617,7 +617,7 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
                      raProfile => slice.actions.updateRaProfileSuccess({
                         uuid: action.payload.uuid,
                         raProfileUuid: action.payload.raProfileUuid,
-                        raProfile: transformRaProfileDtoToCertificaeModel(raProfile)
+                        raProfile: transformRaProfileDTOToCertificateModel(raProfile)
                      })
                   ),
                   catchError(

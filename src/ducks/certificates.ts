@@ -1,4 +1,4 @@
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryFilterModel, CertificateListQueryModel, CertificateModel } from "models/certificate";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryFilterModel, CertificateListQueryModel, CertificateModel, CertificateValidationResultModel } from "models/certificate";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeModel } from "models/attributes/AttributeModel";
@@ -7,7 +7,6 @@ import { GroupModel } from "models/groups";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { CertificateRevocationReason } from "types/certificate";
 import { LocationModel } from "models/locations";
-import { CertificateValidationResultModel } from "api/certificates";
 
 
 export type State = {
