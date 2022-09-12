@@ -1,6 +1,7 @@
-import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO, NonCompliantRuleDTO } from "api/certificates";
 import { RaProfileDTO } from "api/profiles";
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel } from "models";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel, NonCompliantRuleModel } from "models";
+import { transformAttributeDTOToModel } from "./attributes";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -65,7 +66,7 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
       } : undefined,
 
       complianceStatus: certificate.complianceStatus,
-      nonCompliantRules: certificate.nonCompliantRules,
+      nonCompliantRules: transformNonComplianceRulesToModel(certificate.nonCompliantRules),
    }
 
 }
@@ -176,5 +177,22 @@ export function transformRaProfileDtoToCertificaeModel(raProfile: RaProfileDTO):
       name: raProfile.name,
       enabled: raProfile.enabled,
    }
+
+}
+
+
+export function transformNonComplianceRulesToModel(nonComplianceRules?: NonCompliantRuleDTO[]): NonCompliantRuleModel[] {
+
+   if (!nonComplianceRules) return [];
+
+   return nonComplianceRules.map(
+      rule => ({
+         connectorName: rule.connectorName,
+         ruleName: rule.ruleName,
+         ruleDescription: rule.ruleDescription,
+         status: rule.status,
+         attributes: rule.attributes?.map(attribute => transformAttributeDTOToModel(attribute))
+      })
+   );
 
 }

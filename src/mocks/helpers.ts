@@ -32,6 +32,7 @@ export function getOrCreateCertificate(certificateContent: string | undefined, c
          rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
          uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
          x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
+         nonCompliantRules: mcrt.nonCompliantRules || []
       }
    }
 

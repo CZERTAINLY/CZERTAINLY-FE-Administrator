@@ -70,7 +70,7 @@ export interface AttributeDTO {
    name: string;
    label?: string;
    type?: AttributeType;
-   content?: AttributeContentDTO;
+   content?: AttributeContentDTO | AttributeContentDTO[];
 }
 
 
