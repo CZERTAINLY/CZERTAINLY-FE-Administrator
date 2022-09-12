@@ -235,9 +235,11 @@ function CustomTable({
    useEffect(
 
       () => {
-         setTotalPages(Math.ceil(tblData.length / pageSize))
+         const totalPages = Math.ceil(tblData.length / pageSize)
+         setTotalPages(totalPages);
+         if (page > totalPages) setPage(totalPages - 1 < 1 ? 1 : totalPages - 1);
       },
-      [tblData, pageSize]
+      [tblData, pageSize, page]
 
    );
 
@@ -650,7 +652,7 @@ function CustomTable({
                         </div>
                         :
                         <div>
-                           Showing {(page - 1) * pageSize + 1} to {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of {tblData.length} entries
+                           Showing {((page - 1) * pageSize) + (tblData.length > 0 ? 1 : 0)} to {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of {tblData.length} entries
                         </div>
                   }
 
