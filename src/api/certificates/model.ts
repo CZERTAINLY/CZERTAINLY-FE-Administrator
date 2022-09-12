@@ -111,7 +111,6 @@ export interface CertificateDTO {
    subjectAlternativeNames: CertificateSubjectAlternativeNamesDTO;
    meta?: CertificateMetaDTO;
 
-   certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityDTO;
    group?: GroupDTO;
    owner?: string;
@@ -216,6 +215,8 @@ export interface CertificateInventoryApi {
    getAvailableCertificateFilters(): Observable<AvailableCertificateFilterDTO[]>;
 
    checkCompliance(uuids: string[]): Observable<void>;
+
+   getCertificateValidationResult(uuid: string): Observable<CertificateValidationResultModel>;
 
 
 }

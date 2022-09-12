@@ -238,6 +238,14 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
    }
 
+   getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultModel> {
+      
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/validate`, "GET")
+      );
+
+   }
+
 
 
 }
