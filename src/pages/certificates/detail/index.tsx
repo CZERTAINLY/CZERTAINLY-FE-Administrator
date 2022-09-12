@@ -33,6 +33,8 @@ import ProgressButton from "components/ProgressButton";
 import { collectFormAttributes } from "utils/attributes";
 import { Form } from "react-final-form";
 import CertificateComplianceStatus from "components/pages/certificates/CertificateComplianceStatus";
+import AttributeViewer from "components/Attributes/AttributeViewer";
+import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 
 
 export default function CertificateDetail() {
@@ -848,14 +850,13 @@ export default function CertificateDetail() {
 
    const complianceData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : (certificate.nonCompliantRules || []).map(e => {
-         return (
-            {
-               id: e.ruleDescription,
-               columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
-            }
-         )
-      }
+      () => !certificate ? [] : (certificate.nonCompliantRules || []).map(
+         e => ({
+            id: e.ruleDescription,
+            columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
+            detailColumns: !e.attributes ? undefined : [ <></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false} />]
+
+         })
       ),
       [certificate]
    )
@@ -995,7 +996,7 @@ export default function CertificateDetail() {
 
          {
             id: "commonName",
-            columns: ["Common Name", certificate.commonName],
+            columns: [<span style={{ whiteSpace: "nowrap" }}>Common Name</span>, certificate.commonName],
 
          },
          {
@@ -1327,6 +1328,7 @@ export default function CertificateDetail() {
             <CustomTable
                headers={complianceHeaders}
                data={complianceData}
+               hasDetails={true}
             />
          </Widget> : null}
 
