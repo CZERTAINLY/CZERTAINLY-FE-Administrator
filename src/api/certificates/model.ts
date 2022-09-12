@@ -218,5 +218,7 @@ export interface CertificateInventoryApi {
 
    checkCompliance(uuids: string[]): Observable<void>;
 
+   getCertificateValidationResult(uuid: string): Observable<CertificateValidationResultModel>;
+
 
 }

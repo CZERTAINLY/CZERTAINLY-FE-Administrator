@@ -42,8 +42,6 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
 
       meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
 
-      certificateValidationResult: certificate.certificateValidationResult ? certificate.certificateValidationResult : undefined,
-
       entity: certificate.entity ? {
          uuid: certificate.entity.uuid,
          entityType: certificate.entity.entityType,
@@ -110,10 +108,6 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
       },
 
       meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
-
-      certificateValidationResult: certificate.certificateValidationResult ? {
-         status: certificate.certificateValidationResult.status
-      } : undefined,
 
       entity: certificate.entity ? {
          uuid: certificate.entity.uuid,

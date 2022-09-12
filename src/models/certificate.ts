@@ -105,7 +105,6 @@ export interface CertificateModel {
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
    meta?: CertificateMetaModel;
-
    certificateValidationResult?: CertificateValidationResultDTO;
    entity?: CertificateEntityModel;
    group?: GroupModel;

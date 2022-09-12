@@ -47,8 +47,6 @@ export default function CertificateList({
 
    const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
-   const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
    const isIssuing = useSelector(selectors.isIssuing);
    const isRevoking = useSelector(selectors.isRevoking);
    const isRenewing = useSelector(selectors.isRenewing);

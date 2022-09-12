@@ -51,6 +51,8 @@ export default function CertificateDetail() {
    const eventHistory = useSelector(selectors.certificateHistory);
    const certLocations = useSelector(selectors.certificateLocations);
 
+   const validationResult = useSelector(selectors.validationResult);
+
    const locations = useSelector(locationSelectors.locations);
 
    const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
@@ -65,6 +67,7 @@ export default function CertificateDetail() {
    const isFetchingLocations = useSelector(selectors.isFetchingLocations);
    const isRevoking = useSelector(selectors.isRevoking);
    const isRenewing = useSelector(selectors.isRenewing);
+   const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [renew, setRenew] = useState<boolean>(false);
@@ -108,6 +111,7 @@ export default function CertificateDetail() {
          dispatch(actions.resetState())
          dispatch(actions.getCertificateDetail({ uuid: params.id }));
          dispatch(actions.getCertificateHistory({ uuid: params.id }));
+         dispatch(actions.getCertificateValidationResult({ uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -772,8 +776,8 @@ export default function CertificateDetail() {
       )) {
          returnList.push(
             <tr>
-               <td>{key}</td>
-               <td>
+               <td style={{padding: "0.25em"}}>{key}</td>
+               <td style={{padding: "0.25em"}}>
                   <p
                      style={{
                         whiteSpace: "pre-wrap",
@@ -966,7 +970,7 @@ export default function CertificateDetail() {
 
    const validationData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : Object.entries(certificate.certificateValidationResult || {}).map(function ([key, value]) {
+      () => !certificate ? [] : Object.entries(validationResult || {}).map(function ([key, value]) {
          return (
             {
                id: key,
@@ -986,7 +990,7 @@ export default function CertificateDetail() {
          )
       }
       ),
-      [certificate]
+      [certificate, validationResult]
    )
 
 
@@ -1284,7 +1288,7 @@ export default function CertificateDetail() {
             </Col>
          </Row>
 
-         <Widget title={validationTitle} busy={isBusy}>
+         <Widget title={validationTitle} busy={isFetchingValidationResult}>
             <br />
             <CustomTable
                headers={validationHeaders}
