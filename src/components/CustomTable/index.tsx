@@ -165,7 +165,11 @@ function CustomTable({
             [...data].filter(
                row => {
                   let rowStr = "";
-                  row.columns.forEach(col => rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element));
+                  row.columns.forEach(
+                     col => {
+                        rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element)
+                     }
+                  );
                   return rowStr.toLowerCase().includes(searchKey.toLowerCase());
                }
             )
