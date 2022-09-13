@@ -33,7 +33,6 @@ import ProgressButton from "components/ProgressButton";
 import { collectFormAttributes } from "utils/attributes";
 import { Form } from "react-final-form";
 import CertificateComplianceStatus from "components/pages/certificates/CertificateComplianceStatus";
-import AttributeViewer from "components/Attributes/AttributeViewer";
 import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 
 
@@ -1267,6 +1266,7 @@ export default function CertificateDetail() {
 
       <Container className="themed-container" fluid>
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
+
             <Col>
                <Widget title={certificateTitle} busy={isBusy}>
                   <br />
@@ -1277,6 +1277,7 @@ export default function CertificateDetail() {
                   />
                </Widget>
             </Col>
+
             <Col>
                <Widget title={sanTitle} busy={isBusy}>
                   <br />
@@ -1285,19 +1286,7 @@ export default function CertificateDetail() {
                      data={sanData}
                   />
                </Widget>
-            </Col>
-         </Row>
 
-         <Widget title={validationTitle} busy={isFetchingValidationResult}>
-            <br />
-            <CustomTable
-               headers={validationHeaders}
-               data={validationData}
-            />
-         </Widget>
-
-         <Row xs="1" sm="1" md="2" lg="2" xl="2">
-            <Col>
                <Widget title={attributesTitle}>
                   <br />
                   <CustomTable
@@ -1305,8 +1294,7 @@ export default function CertificateDetail() {
                      data={attributeData}
                   />
                </Widget>
-            </Col>
-            <Col>
+
                <Widget title={metaTitle}>
                   <br />
                   <CustomTable
@@ -1314,6 +1302,7 @@ export default function CertificateDetail() {
                      data={metaData}
                   />
                </Widget>
+
             </Col>
          </Row>
 
@@ -1324,6 +1313,14 @@ export default function CertificateDetail() {
                data={locationsData}
                hasCheckboxes={true}
                onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
+            />
+         </Widget>
+
+         <Widget title={validationTitle} busy={isFetchingValidationResult}>
+            <br />
+            <CustomTable
+               headers={validationHeaders}
+               data={validationData}
             />
          </Widget>
 
