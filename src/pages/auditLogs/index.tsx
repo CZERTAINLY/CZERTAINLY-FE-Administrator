@@ -205,11 +205,10 @@ function AuditLogs() {
 
         () => {
 
-            dispatch(auditLogActions.purgeLogs({queryString}));
-            setLogData({});
+            dispatch(auditLogActions.purgeLogs({queryString, sort, filters}));
 
         },
-        [dispatch, queryString]
+        [dispatch, queryString, sort, filters]
 
     );
 
