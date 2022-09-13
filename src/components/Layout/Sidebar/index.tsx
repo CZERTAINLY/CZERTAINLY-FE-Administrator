@@ -27,15 +27,24 @@ function Sidebar() {
             <ul>
 
                {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
+
                <LinksGroup _key="/app/dashboard" header="Dashboard" headerLink="/app/dashboard" />
-               <LinksGroup _key="/app/raprofiles" header="RA Profiles" headerLink="/app/raprofiles" />
-               {isSuperAdmin ? (<LinksGroup _key="/app/administrators" header="Administrators" headerLink="/app/administrators" />) : null}
-               <LinksGroup _key="/app/clients" header="Clients" headerLink="/app/clients" />
+
+               <LinksGroup
+                  _key="inventory"
+                  header="Inventory"
+                  childrenLinks={[
+                     { _key: "/app/certificates", name: "Certificates", link: "/app/certificates" },
+                     { _key: "/app/authorities", name: "Authorities", link: "/app/authorities" },
+                     { _key: "/app/raprofiles", name: "RA Profiles", link: "/app/raprofiles" },
+                     { _key: "/app/groups", name: "Certificate Groups", link: "/app/groups" },
+                     { _key: "/app/complianceprofiles", name: "Compliance Profiles", link: "/app/complianceprofiles" },
+                  ]}
+               />
+
                <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
                <LinksGroup _key="/app/credentials" header="Credentials" headerLink="/app/credentials" />
-               <LinksGroup _key="/app/authorities" header="Authorities" headerLink="/app/authorities" />
-               <LinksGroup _key="/app/entities" header="Entities" headerLink="/app/entities" />
-               <LinksGroup _key="/app/locations" header="Locations" headerLink="/app/locations" />
+               <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
 
                <LinksGroup
                   _key="acm1"
@@ -45,12 +54,25 @@ function Sidebar() {
                      { _key: "/app/acmeprofiles", name: "ACME Profiles", link: "/app/acmeprofiles" },
                   ]}
                />
-               <LinksGroup _key="/app/groups" header="Groups" headerLink="/app/groups" />
-               <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
-               <LinksGroup _key="/app/complianceprofiles" header="Compliance Profiles" headerLink="/app/complianceprofiles" />
-               <LinksGroup _key="/app/certificates" header="Certificates" headerLink="/app/certificates" />
-               <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
 
+               <LinksGroup
+                  _key="devices"
+                  header="Entity Management"
+                  childrenLinks={[
+                     { _key: "/app/entities", name: "Entities", link: "/app/entities" },
+                     { _key: "/app/locations", name: "Locations", link: "/app/locations" },
+                  ]}
+               />
+
+               <LinksGroup
+                  _key="users"
+                  header="User Management"
+                  childrenLinks={[
+                     { _key: "/app/administrators", name: "Administrators", link: "/app/administrators" },
+                     { _key: "/app/clients", name: "Clients", link: "/app/clients" }
+                  ]}
+               />
+               <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
                {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}
 
             </ul>
