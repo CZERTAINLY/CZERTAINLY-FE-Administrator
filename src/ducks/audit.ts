@@ -157,13 +157,13 @@ export const slice = createSlice({
 
       },
 
-      purgeLogs: (state, action: PayloadAction<{ queryString: string }>) => {
+      purgeLogs: (state, action: PayloadAction<{ queryString: string, sort?: string, filters?: { [key: string]: string }}> ) => {
 
          state.isPurging = true;
 
       },
 
-      purgeLogsSuccess: (state, action: PayloadAction<void>) => {
+      purgeLogsSuccess: (state, action: PayloadAction<{sort?: string, filters?: { [key: string]: string}}>) => {
 
          state.isPurging = false;
 
