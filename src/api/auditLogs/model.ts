@@ -27,4 +27,5 @@ export interface AuditLogsApi {
 
    getStatuses(): Observable<string[]>;
 
+   purgeLogs(queryString: string): Observable<void>;
 }

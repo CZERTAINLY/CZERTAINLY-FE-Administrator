@@ -24,7 +24,6 @@ import { collectFormAttributes } from "utils/attributes";
 import { FormApi } from "final-form";
 
 
-
 interface FormValues {
    name: string;
    description: string;

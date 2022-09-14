@@ -5,13 +5,14 @@ import { Container, Table } from "reactstrap";
 
 import { actions, selectors } from "ducks/authorities";
 
+import { MDBBadge } from "mdbreact";
+
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
-const { MDBBadge } = require("mdbreact");
 
 function AuthorityList() {
 
@@ -280,7 +281,7 @@ function AuthorityList() {
 
          <Dialog
             isOpen={confirmForceDelete}
-            caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            caption={`Force Delete ${checkedRows.length > 1 ? "Authorities" : "an Authority"}`}
             body={forceDeleteBody}
             toggle={() => setConfirmForceDelete(false)}
             buttons={[

@@ -355,14 +355,14 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteAuthority: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkForceDeleteAuthority: (state, action: PayloadAction<{ uuids: string[], redirect?: string }>) => {
 
          state.isBulkForceDeleting = true;
 
       },
 
 
-      bulkForceDeleteAuthoritySuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkForceDeleteAuthoritySuccess: (state, action: PayloadAction<{ uuids: string[], redirect?:string }>) => {
 
          state.isBulkForceDeleting = false;
 

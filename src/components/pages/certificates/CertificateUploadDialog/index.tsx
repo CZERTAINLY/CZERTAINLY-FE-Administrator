@@ -5,13 +5,15 @@ import { Button, ButtonGroup, Col, FormGroup, FormText, Input, Label, Row } from
 import { getCertificateInformation } from "utils/certificate";
 
 interface Props {
-   onCancel: () => void,
-   onUpload: (data: { fileContent: string, fileName: string, contentType: string }) => void
+   onCancel: () => void;
+   onUpload: (data: { fileContent: string, fileName: string, contentType: string, certificate: CertificateModel }) => void;
+   okButtonTitle?: string;
 }
 
 export default function CertificateUploadDialog({
    onCancel,
    onUpload,
+   okButtonTitle = "Upload"
 }: Props) {
 
    const [fileName, setFileName] = useState("");
@@ -39,7 +41,7 @@ export default function CertificateUploadDialog({
 
          try {
             b64decoded = atob(fileContent);
-            setFile(b64decoded.startsWith("-----") ? b64decoded : fileContent);
+            setFile(b64decoded.includes("-----BEGIN CERTIFICATE-----") ? b64decoded : fileContent);
          } catch (e) {
             setError("Failed to decode passed file. Certificate will not be shown.");
             setFile("base64:" + fileContent);
@@ -186,8 +188,6 @@ export default function CertificateUploadDialog({
 
             </FormGroup>
 
-
-
             <FormGroup style={{ textAlign: "right" }}>
 
                <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
@@ -214,10 +214,10 @@ export default function CertificateUploadDialog({
 
                <Button
                   color="primary"
-                  onClick={() => onUpload({ fileContent: file, fileName, contentType })}
+                  onClick={() => onUpload({ fileContent: file, fileName, contentType, certificate: certificate! })}
                   disabled={!file}
                >
-                  Upload
+                  {okButtonTitle}
                </Button>
 
                <Button

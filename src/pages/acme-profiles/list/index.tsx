@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
-import { Container } from "reactstrap";
+import { Container, Table } from "reactstrap";
 
 import { actions, selectors } from "ducks/acme-profiles";
 
@@ -23,16 +23,20 @@ export default function AdministratorsList() {
    const checkedRows = useSelector(selectors.checkedRows);
    const acmeProfiles = useSelector(selectors.acmeProfiles);
 
+   const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
+
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
    const isUpdating = useSelector(selectors.isUpdating);
    const isBulkEnabling = useSelector(selectors.isBulkEnabling);
    const isBulkDisabling = useSelector(selectors.isBulkDisabling);
+   const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
 
-   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
+   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkForceDeleting;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+   const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
    useEffect(
 
@@ -43,6 +47,17 @@ export default function AdministratorsList() {
 
       },
       [dispatch]
+
+   );
+
+   useEffect(
+
+      () => {
+
+         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
+
+      },
+      [bulkDeleteErrorMessages]
 
    );
 
@@ -107,6 +122,18 @@ export default function AdministratorsList() {
 
    );
 
+   const onForceDeleteConfirmed = useCallback(
+
+      () => {
+
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.bulkForceDeleteAcmeProfiles({ uuids: checkedRows }));
+
+      },
+      [dispatch, checkedRows]
+
+   );
+
 
    const buttons: WidgetButtonProps[] = useMemo(
 
@@ -119,6 +146,52 @@ export default function AdministratorsList() {
       [checkedRows, onAddClick, onEnableClick, onDisableClick]
 
    );
+
+   const forceDeleteBody = useMemo(
+
+      () => (
+
+         <div>
+
+            <div>Failed to delete {checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"}. Please find the details below:</div>
+
+            <Table className="table-hover" size="sm">
+
+               <thead>
+
+                  <tr>
+                     <th>
+                        <b>Name</b>
+                     </th>
+                     <th>
+                        <b>Dependencies</b>
+                     </th>
+                  </tr>
+
+               </thead>
+
+               <tbody>
+
+                  {bulkDeleteErrorMessages?.map(
+                     message => (
+                        <tr>
+                           <td>{message.name}</td>
+                           <td>{message.message}</td>
+                        </tr>
+                     )
+                  )}
+
+               </tbody>
+
+            </Table >
+
+         </div>
+
+      ),
+      [bulkDeleteErrorMessages, checkedRows.length]
+
+   );
+
 
 
    const title = useMemo(
@@ -195,9 +268,9 @@ export default function AdministratorsList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${acmeProfile.uuid}`}>{acmeProfile.name}</Link>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${acmeProfile.uuid}`}>{acmeProfile.name}</Link></span>,
 
-               acmeProfile.description || "",
+               <span style={{ whiteSpace: "nowrap" }}>{acmeProfile.description || ""}</span>,
 
                <MDBBadge color="info">{acmeProfile.raProfileName}</MDBBadge>,
 
@@ -240,6 +313,17 @@ export default function AdministratorsList() {
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={confirmForceDelete}
+            caption={`Force Delete ${checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"}`}
+            body={forceDeleteBody}
+            toggle={() => setConfirmForceDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
+               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
             ]}
          />
 

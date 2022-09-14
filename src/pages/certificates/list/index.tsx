@@ -19,9 +19,20 @@ import CertificateGroupDialog from "components/pages/certificates/CertificateGro
 import CertificateOwnerDialog from "components/pages/certificates/CertificateOwnerDialog";
 import CertificateRAProfileDialog from "components/pages/certificates/CertificateRAProfileDialog";
 import { downloadFileZip } from "utils/download";
+import CertificateComplianceStatusIcon from "components/pages/certificates/CertificateComplianceStatusIcon";
 
 
-export default function CertificateList() {
+interface Props {
+   selectCertsOnly?: boolean;
+   multiSelect?: boolean;
+   onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
+}
+
+export default function CertificateList({
+   selectCertsOnly = false,
+   multiSelect = true,
+   onCheckedRowsChanged
+}: Props) {
 
    const dispatch = useDispatch();
    const history = useHistory();
@@ -36,8 +47,6 @@ export default function CertificateList() {
 
    const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
-   const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
    const isIssuing = useSelector(selectors.isIssuing);
    const isRevoking = useSelector(selectors.isRevoking);
    const isRenewing = useSelector(selectors.isRenewing);
@@ -50,8 +59,6 @@ export default function CertificateList() {
    const isBulkUpdatingRaProfile = useSelector(selectors.isBulkUpdatingRaProfile);
    const isBulkUpdatingOwner = useSelector(selectors.isBulkUpdatingOwner);
    const isUploading = useSelector(selectors.isUploading);
-   const isFetchingIssuanceAttributes = useSelector(selectors.isFetchingIssuanceAttributes);
-   const isFetchingRevocationAttributes = useSelector(selectors.isFetchingRevocationAttributes);
 
    const [pageSize, setPageSize] = useState(10);
    const [pageNumber, setPageNumber] = useState(1);
@@ -65,7 +72,7 @@ export default function CertificateList() {
    const [updateEntity, setUpdateEntity] = useState<boolean>(false);
    const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
-   const isBusy = isFetchingAvailablFilters || isFetchingList || isFetchingDetail || isFetchingHistory || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading || isFetchingIssuanceAttributes || isFetchingRevocationAttributes;
+   const isBusy = isFetchingAvailablFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
 
    useEffect(
 
@@ -93,9 +100,10 @@ export default function CertificateList() {
 
    const setCheckedRows = useCallback(
       (rows: (string | number)[]) => {
+         if (onCheckedRowsChanged) onCheckedRowsChanged(rows);
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
-      [dispatch]
+      [dispatch, onCheckedRowsChanged]
    );
 
 
@@ -202,7 +210,7 @@ export default function CertificateList() {
 
 
    const buttons: WidgetButtonProps[] = useMemo(
-      () => [
+      () => selectCertsOnly ? [] : [
          { icon: "plus", disabled: false, tooltip: "Create Certificate", onClick: () => { onAddClick(); } },
          { icon: "upload", disabled: false, tooltip: "Upload Certificate", onClick: () => { setUpload(true); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete Certificate", onClick: () => { setConfirmDelete(true) } },
@@ -212,7 +220,7 @@ export default function CertificateList() {
          { icon: "plug", disabled: checkedRows.length === 0, tooltip: "Update RA Profile", onClick: () => { setUpdateRaProfile(true) } },
          { icon: "download", disabled: checkedRows.length === 0, tooltip: "Download", custom: downloadDropDown, onClick: () => { } }
       ],
-      [checkedRows.length, downloadDropDown, onAddClick]
+      [checkedRows.length, downloadDropDown, onAddClick, selectCertsOnly]
    );
 
 
@@ -246,6 +254,13 @@ export default function CertificateList() {
             //sortable: true,
             align: "center",
             id: "status",
+            width: "5%"
+         },
+         {
+            content: <MDBColumnName columnName="Compliance" />,
+            //sortable: true,
+            align: "center",
+            id: "compliance",
             width: "5%"
          },
          {
@@ -330,21 +345,24 @@ export default function CertificateList() {
             return {
 
                id: certificate.uuid,
+
                columns: [
 
                   <CertificateStatusIcon status={certificate.status} id={certificate.fingerprint || certificate.serialNumber} />,
 
-                  <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
+                  <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
 
-                  dateFormatter(certificate.notBefore),
+                  selectCertsOnly ? certificate.commonName || "(empty)" : <Link to={`${path}/detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 
-                  dateFormatter(certificate.notAfter),
+                  <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>,
+
+                  <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>,
 
                   certificate.entity?.name || "Unassigned",
 
                   certificate.group?.name || "Unassigned",
 
-                  certificate.raProfile?.name || "Unassigned",
+                  <span style={{ whiteSpace: "nowrap" }}>{certificate.raProfile?.name || "Unassigned"}</span>,
 
                   certificate.owner || "Unassigned",
 
@@ -354,7 +372,7 @@ export default function CertificateList() {
 
                   certificate.issuerCommonName,
 
-                  certificate.certificateType,
+                  certificate.certificateType || "Unknown",
 
                ]
 
@@ -363,7 +381,7 @@ export default function CertificateList() {
          }
 
       ),
-      [certificates, path]
+      [certificates, path, selectCertsOnly]
 
    );
 
@@ -375,9 +393,9 @@ export default function CertificateList() {
          totalItems: totalItems,
          pageSize: pageSize,
          totalPages: Math.ceil(totalItems / pageSize),
-         itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+         itemsPerPageOptions: selectCertsOnly ? [10, 20] : [10, 20, 50, 100, 200, 500, 1000],
       }),
-      [pageSize, pageNumber, totalItems]
+      [pageNumber, totalItems, pageSize, selectCertsOnly]
 
    );
 
@@ -397,6 +415,7 @@ export default function CertificateList() {
          <Widget title={title} busy={isBusy}>
 
             <CustomTable
+               multiSelect={multiSelect}
                headers={certificatesRowHeaders}
                data={certificateList}
                onCheckedRowsChanged={setCheckedRows}

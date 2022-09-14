@@ -1,12 +1,12 @@
 import React from "react";
 
 interface Props {
-  columnName: string;
+   columnName: string;
 }
 
 function MDBColumnName({ columnName }: Props) {
 
-  return <strong>{columnName}</strong>;
+   return <strong>{columnName}</strong>;
 
 }
 

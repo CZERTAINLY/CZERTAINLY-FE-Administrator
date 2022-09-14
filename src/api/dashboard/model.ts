@@ -13,6 +13,7 @@ export interface DashboardDTO {
   certificateStatByKeySize: DashboardDict;
   certificateStatByBasicConstraints: DashboardDict;
   certificateStatByStatus: DashboardDict;
+  certificateStatByComplianceStatus: DashboardDict;
 }
 
 export interface DashboardDict {

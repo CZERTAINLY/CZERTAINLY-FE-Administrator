@@ -302,13 +302,13 @@ function ConnectorList() {
                id: connector.uuid,
                columns: [
 
-                  <Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link>,
+                  <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${connector.uuid}`}>{connector.name}</Link></span>,
 
-                  <>{getFunctionGroups(connector.functionGroups)}</>,
+                  <span style={{ whiteSpace: "nowrap" }}>{getFunctionGroups(connector.functionGroups)}</span>,
 
-                  <>{getKinds(connector.functionGroups)}</>,
+                  <span style={{ whiteSpace: "nowrap" }}>{getKinds(connector.functionGroups)}</span>,
 
-                  <>{connector.url}</>,
+                  <span style={{ whiteSpace: "nowrap" }}>{connector.url}</span>,
 
                   <MDBBadge color={connectorStatus[1]}>{connectorStatus[0]}</MDBBadge>
 

@@ -1,3 +1,4 @@
+import { LocationDTO } from "api/location";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpRequestOptions } from "ts-rest-client";
@@ -40,6 +41,16 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
       );
+
+   }
+
+
+   listLocations(uuid: string): Observable<LocationDTO[]> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/locations`, "GET")
+      );
+
 
    }
 
@@ -213,6 +224,24 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/search`, "GET")
+      );
+
+   }
+
+   checkCompliance(uuids: string[]): Observable<void> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
+            certificateUuids: uuids
+         })
+      );
+
+   }
+
+   getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/validate`, "GET")
       );
 
    }

@@ -44,11 +44,20 @@ import acmeProfilesEpics from "./acme-profiles-epics";
 import { initialState as initialAuthoritiesState, slice as authoritiesSlice } from "./authorities";
 import authoritiesEpics from "./authorities-epics";
 
+import { initialState as initialEntitiesState, slice as entitiesSlice } from "./entities";
+import entitiesEpics from "./entities-epics";
+
+import { initialState as initialLocationState, slice as locationsSlice } from "./locations";
+import locationsEpics from "./locations-epics";
+
 import { initialState as initialGroupState, slice as groupSlice } from "./groups";
 import groupEpics from "./groups-epics";
 
 import { initialState as initialDiscoveryState, slice as discoverySlice } from "./discoveries";
 import discoveryEpics from "./discoveries-epics";
+
+import { initialState as initialComplianceProfileState, slice as complianceProfileSlice } from "./compliance-profiles";
+import complianceProfileEpics from "./compliance-profiles-epics";
 
 
 export interface EpicDependencies {
@@ -76,8 +85,11 @@ export const initialState = {
    [acmeAccountsSlice.name]: initialAcmeAccountsState,
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
    [authoritiesSlice.name]: initialAuthoritiesState,
+   [entitiesSlice.name]: initialEntitiesState,
+   [locationsSlice.name]: initialLocationState,
    [groupSlice.name]: initialGroupState,
    [discoverySlice.name]: initialDiscoveryState,
+   [complianceProfileSlice.name]: initialComplianceProfileState,
 };
 
 
@@ -95,8 +107,11 @@ export const reducers = combineReducers<typeof initialState, any>({
    [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
    [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
    [authoritiesSlice.name]: authoritiesSlice.reducer,
+   [entitiesSlice.name]: entitiesSlice.reducer,
+   [locationsSlice.name]: locationsSlice.reducer,
    [groupSlice.name]: groupSlice.reducer,
    [discoverySlice.name]: discoverySlice.reducer,
+   [complianceProfileSlice.name]: complianceProfileSlice.reducer,
 });
 
 
@@ -114,6 +129,9 @@ export const epics = combineEpics(
    ...acmeAccountsEpics,
    ...acmeProfilesEpics,
    ...authoritiesEpics,
+   ...entitiesEpics,
+   ...locationsEpics,
    ...groupEpics,
    ...discoveryEpics,
+   ...complianceProfileEpics,
 );

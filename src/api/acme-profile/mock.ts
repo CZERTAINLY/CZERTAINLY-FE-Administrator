@@ -99,7 +99,7 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
    }
 
 
-   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]> {
+   deleteAcmeProfile(uuid: string): Observable<void> {
 
       return of(
          dbData.acmeProfiles.findIndex(acmeProfile => acmeProfile.uuid === uuid)
@@ -112,8 +112,6 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
 
                if (acmeProfileIndex < 0) throw new HttpErrorResponse({ status: 404 });
                dbData.acmeProfiles.splice(acmeProfileIndex, 1);
-
-               return [];
 
             }
 

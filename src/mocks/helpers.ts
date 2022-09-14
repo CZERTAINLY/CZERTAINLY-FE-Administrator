@@ -21,7 +21,7 @@ export function getOrCreateCertificate(certificateContent: string | undefined, c
    mcrt.uuid = crypto.randomUUID();
 
    const dtoctr: CertificateDTO = {
-      ...mcrt,
+      ...(mcrt as any),
       subjectAlternativeNames: {
          dNSName: mcrt.subjectAlternativeNames?.dNSName || [],
          directoryName: mcrt.subjectAlternativeNames?.directoryName || [],
@@ -32,6 +32,7 @@ export function getOrCreateCertificate(certificateContent: string | undefined, c
          rfc822Name: mcrt.subjectAlternativeNames?.rfc822Name || [],
          uniformResourceIdentifier: mcrt.subjectAlternativeNames?.uniformResourceIdentifier || [],
          x400Address: mcrt.subjectAlternativeNames?.x400Address || [],
+         nonCompliantRules: []
       }
    }
 

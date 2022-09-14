@@ -8,15 +8,21 @@ export const functionGroupCodeToGroupFilter: { [code in FunctionGroupCode]: Func
    "credentialProvider": "CREDENTIAL_PROVIDER",
    "legacyAuthorityProvider": "LEGACY_AUTHORITY_PROVIDER",
    "authorityProvider": "AUTHORITY_PROVIDER",
-   "discoveryProvider": "DISCOVERY_PROVIDER"
+   "discoveryProvider": "DISCOVERY_PROVIDER",
+   "entityProvider": "ENTITY_PROVIDER",
+   "locationProvider": "LOCATION_PROVIDER",
+   "complianceProvider": "COMPLIANCE_PROVIDER",
 }
 
 
 export const functionGroupFilterToGroupCode: { [filter in FunctionGroupFilter]: FunctionGroupCode } = {
    "CREDENTIAL_PROVIDER": "credentialProvider",
-   "AUTHORITY_PROVIDER": "authorityProvider",
+   "AUTHORITY_PROVIDER": "entityProvider",
    "LEGACY_AUTHORITY_PROVIDER": "legacyAuthorityProvider",
-   "DISCOVERY_PROVIDER": "discoveryProvider"
+   "DISCOVERY_PROVIDER": "discoveryProvider",
+   "ENTITY_PROVIDER": "entityProvider",
+   "LOCATION_PROVIDER": "locationProvider",
+   "COMPLIANCE_PROVIDER": "complianceProvider",
 }
 
 

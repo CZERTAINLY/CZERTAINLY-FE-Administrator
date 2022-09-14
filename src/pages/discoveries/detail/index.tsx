@@ -178,8 +178,8 @@ export default function DiscoveryDetail() {
                columns: [
                   r.commonName,
                   r.serialNumber,
-                  dateFormatter(r.notAfter),
-                  dateFormatter(r.notBefore),
+                  <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notAfter)}</span>,
+                  <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notBefore)}</span>,
                   r.issuerCommonName,
                   r.fingerprint,
                ],
@@ -222,11 +222,11 @@ export default function DiscoveryDetail() {
          },
          {
             id: "startTime",
-            columns: ["Discovery Start Time", dateFormatter(discovery.startTime)],
+            columns: ["Discovery Start Time", <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(discovery.startTime)}</span>],
          },
          {
             id: "endTime",
-            columns: ["Discovery End Time", dateFormatter(discovery.endTime)],
+            columns: ["Discovery End Time", <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(discovery.endTime)}</span>],
          },
          {
             id: "totalCertificatesDiscovered",
@@ -234,7 +234,7 @@ export default function DiscoveryDetail() {
          },
          {
             id: "message",
-            columns: ["Message", discovery.message],
+            columns: ["Message", discovery.message || ""],
          },
 
       ],

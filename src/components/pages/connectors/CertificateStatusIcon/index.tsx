@@ -1,5 +1,4 @@
 import React from "react";
-import { MDBBadge, MDBIcon } from "mdbreact";
 import ToolTip from "components/ToolTip";
 
 interface Props {
@@ -12,7 +11,6 @@ interface CertificateIcon {
    [key: string]: {
 
       color: string;
-      icon: string;
       message: string;
       tooltipType:
       | "dark"
@@ -29,32 +27,27 @@ interface CertificateIcon {
 const certificateIcon: CertificateIcon = {
 
    valid: {
-      color: "success",
-      icon: "battery-full",
+      color: "green",
       message: "Valid",
       tooltipType: "success",
    },
    expiring: {
-      color: "info",
-      icon: "battery-half",
+      color: "orange",
       message: "Expiring",
-      tooltipType: "info",
+      tooltipType: "warning",
    },
    revoked: {
-      color: "dark",
-      icon: "battery-empty",
+      color: "silver",
       message: "Revoked",
       tooltipType: "dark",
    },
    expired: {
-      color: "danger",
-      icon: "battery-empty",
+      color: "red",
       message: "Expired",
       tooltipType: "error",
    },
    unknown: {
-      color: "dark",
-      icon: "question-circle",
+      color: "silver",
       message: "Unknown",
       tooltipType: "dark",
    },
@@ -67,9 +60,9 @@ function CertificateStatusIcon({ status, id }: Props) {
 
    return (
 
-      <MDBBadge color={pattern.color} data-tip data-for={id}>
+      <>
 
-         <MDBIcon icon={pattern.icon} />
+         <i className={"fa fa-circle"} style={{ color: pattern.color }} data-tip data-for={id} />
 
          <ToolTip
             id={id}
@@ -77,7 +70,7 @@ function CertificateStatusIcon({ status, id }: Props) {
             tooltipType={pattern.tooltipType}
          />
 
-      </MDBBadge>
+      </>
 
    );
 

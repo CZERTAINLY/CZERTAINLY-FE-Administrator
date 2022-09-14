@@ -43,7 +43,6 @@ export const dbCertificates: DbCertificateList = {
          uniformResourceIdentifier: [],
       },
       certificateType: "X509",
-      certificateValidationResult: undefined,
       entity: {
          uuid: "",
          entityType: "HSM",
@@ -55,7 +54,8 @@ export const dbCertificates: DbCertificateList = {
          name: "test group 1",
          description: "test group 1"
       },
-      owner: "Pradeep"
+      owner: "Pradeep",
+      complianceStatus: "ok"
 
    },
 
@@ -91,7 +91,6 @@ export const dbCertificates: DbCertificateList = {
       },
       certificateType: "X509",
       issuerSerialNumber: "4d94dc3da65485a2befac3ed7199efe407ba6e02",
-      certificateValidationResult: undefined,
       entity: {
          uuid: "",
          entityType: "HSM",
@@ -103,7 +102,8 @@ export const dbCertificates: DbCertificateList = {
          name: "test group 1",
          description: "test group 1"
       },
-      owner: "Pradeep"
+      owner: "Pradeep",
+      complianceStatus: "na"
 
    },
 
@@ -138,7 +138,6 @@ export const dbCertificates: DbCertificateList = {
          uniformResourceIdentifier: [],
       },
       certificateType: "X509",
-      certificateValidationResult: undefined,
       entity: {
          uuid: "",
          entityType: "HSM",
@@ -150,7 +149,8 @@ export const dbCertificates: DbCertificateList = {
          name: "test group 1",
          description: "test group 1"
       },
-      owner: "Pradeep"
+      owner: "Pradeep",
+      complianceStatus: "na"
 
    },
 
@@ -189,7 +189,6 @@ export const dbCertificates: DbCertificateList = {
          uniformResourceIdentifier: [],
       },
       certificateType: "X509",
-      certificateValidationResult: undefined,
       entity: {
          uuid: "",
          entityType: "HSM",
@@ -201,7 +200,8 @@ export const dbCertificates: DbCertificateList = {
          name: "test group 1",
          description: "test group 1"
       },
-      owner: "Pradeep"
+      owner: "Pradeep",
+      complianceStatus: "ok"
 
    },
 
@@ -239,7 +239,6 @@ export const dbCertificates: DbCertificateList = {
          uniformResourceIdentifier: [],
       },
       certificateType: "X509",
-      certificateValidationResult: undefined,
       entity: {
          uuid: "",
          entityType: "HSM",
@@ -251,7 +250,16 @@ export const dbCertificates: DbCertificateList = {
          name: "test group 1",
          description: "test group 1"
       },
-      owner: "Pradeep"
+      owner: "Pradeep",
+      complianceStatus: "nok",
+      "nonCompliantRules": [
+         {
+            "connectorName": "COMP",
+            "ruleName": "e_ca_common_name_missing",
+            "ruleDescription": "CA Certificates common name MUST be included.",
+            "status": "na"
+         }
+      ],
 
    },
 
@@ -264,7 +272,6 @@ export const dbCertificates: DbCertificateList = {
       subjectDn: "CN=*.google.com",
       notBefore: "2021-07-12T01:35:31.000+00:00",
       notAfter: "2021-10-04T01:35:30.000+00:00",
-      certificateValidationResult: undefined,
       publicKeyAlgorithm: "EC",
       signatureAlgorithm: "SHA256withRSA",
       keySize: 256,
@@ -426,9 +433,35 @@ export const dbCertificates: DbCertificateList = {
          name: "test group 1",
          description: "test group 1"
       },
-      owner: "Pradeep"
-},
+      owner: "Pradeep",
+      complianceStatus: "nok",
+      "nonCompliantRules": [
+         {
+            "connectorName": "COMP",
+            "ruleName": "e_ca_common_name_missing",
+            "ruleDescription": "CA Certificates common name MUST be included.",
+            "status": "na"
+         },
+         {
+            "connectorName": "COMP",
+            "ruleName": "e_ca_common_name_missing_1",
+            "ruleDescription": "CA Certificates common name MUST be included.",
+            "status": "na"
+         },
+         {
+            "connectorName": "COMP",
+            "ruleName": "e_ca_common_name_missing_2",
+            "ruleDescription": "CA Certificates common name MUST be included.",
+            "status": "na"
+         },
+         {
+            "connectorName": "COMP",
+            "ruleName": "e_ca_common_name_missing_3",
+            "ruleDescription": "CA Certificates common name MUST be included.",
+            "status": "na"
+         },
 
-
+      ],
+   },
 
 }

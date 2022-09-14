@@ -17,12 +17,14 @@ import { ClientModel } from "models";
 
 import { emptyCertificate } from "utils/certificate";
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
+import CertificateAttributes from "components/CertificateAttributes";
+import Dialog from "components/Dialog";
+import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
 
 interface FormValues {
    name: string;
    description: string;
    enabled: boolean;
-   certFile: FileList | undefined;
    inputType: { value: "upload" | "select" };
    certificate: any;
 }
@@ -65,6 +67,9 @@ function ClientForm({ title }: Props) {
    const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
    const [client, setClient] = useState<ClientModel>();
+
+   const [certUploadDialog, setCertUploadDialog] = useState(false);
+   const [certToUpload, setCertToUpload] = useState<CertificateModel>();
 
    const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
 
@@ -169,7 +174,7 @@ function ClientForm({ title }: Props) {
                   uuid: client!.uuid,
                   description: values.description,
                   certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined,
-                  certificate: values.inputType.value === "upload" ? values.certFile : undefined
+                  certificate: values.inputType.value === "upload" ? certToUpload : undefined
                })
             );
 
@@ -180,14 +185,14 @@ function ClientForm({ title }: Props) {
                   name: values.name,
                   description: values.description,
                   certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined,
-                  certificate: values.inputType.value === "upload" ? values.certFile : undefined
+                  certificate: values.inputType.value === "upload" ? certToUpload : undefined
                })
             );
 
          }
 
       },
-      [client, editMode, dispatch]
+      [editMode, dispatch, client, certToUpload]
 
    );
 
@@ -235,7 +240,7 @@ function ClientForm({ title }: Props) {
 
          <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
-            {({ handleSubmit, pristine, submitting, values }) => (
+            {({ handleSubmit, pristine, submitting, values, valid }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
 
@@ -284,38 +289,38 @@ function ClientForm({ title }: Props) {
 
                   {values.inputType.value === "upload" ? (
 
-                     <Field name="certFile" validate={editMode ? undefined : validateRequired()}>
+                     <FormGroup>
 
-                        {({ input: { value, onChange, ...inputProps }, meta }) => (
+                        <Label for="certFile">Client Certificate</Label>
 
-                           <FormGroup>
+                        <div>
 
-                              <Label for="certFile">Upload Client Certificate</Label>
+                           {
 
-                              <Input
-                                 {...inputProps}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="file"
-                                 onChange={({ target }) => onChange(target.files)}
-                              />
+                              certToUpload ? (
+                                 <CertificateAttributes certificate={certToUpload} />
+                              ) : (
+                                 <>
+                                    Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;
+                                 </>
+                              )
 
-                              <FormFeedback>{meta.error}</FormFeedback>
+                           }
 
-                              <FormText color="muted">
-                                 Upload certificate of client based on which will be
-                                 authenticated to RA profile.
-                              </FormText>
+                           <Button color="secondary" onClick={() => setCertUploadDialog(true)}>Choose File</Button>
 
-                           </FormGroup>
+                        </div>
 
-                        )}
+                        <FormText color="muted">
+                           Upload certificate of client based on which will be
+                           authenticated to RA profile.
+                        </FormText>
 
-                     </Field>
+                     </FormGroup>
 
                   ) :
                      (
-                        <Field name="certificate">
+                        <Field name="certificate" validate={validateRequired()}>
 
                            {({ input, meta }) => (
 
@@ -371,7 +376,7 @@ function ClientForm({ title }: Props) {
                            title={submitTitle}
                            inProgressTitle={inProgressTitle}
                            inProgress={submitting || isCreating || isUpdating}
-                           disabled={pristine}
+                           disabled={pristine || submitting || isCreating || isUpdating || !valid || (values.inputType.value === "upload" && certToUpload === undefined)}
                         />
 
                         <Button color="default" onClick={onCancel} disabled={submitting || isCreating || isUpdating}>
@@ -387,6 +392,23 @@ function ClientForm({ title }: Props) {
             )}
 
          </Form>
+
+
+         <Dialog
+            isOpen={certUploadDialog}
+            caption={`Choose Certificate`}
+            body={
+               <CertificateUploadDialog
+                  okButtonTitle="Choose"
+                  onCancel={() => setCertUploadDialog(false)}
+                  onUpload={(data) => {
+                     setCertToUpload(data.certificate);
+                     setCertUploadDialog(false);
+                  }}
+               />}
+            toggle={() => setCertUploadDialog(false)}
+            buttons={[]}
+         />
 
       </Widget>
 

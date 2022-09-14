@@ -63,7 +63,7 @@ export interface AcmeProfilesManagementApi {
       requireTermsOfService?: boolean,
    ): Observable<AcmeProfileDTO>;
 
-   deleteAcmeProfile(uuid: string): Observable<DeleteObjectErrorDTO[]>;
+   deleteAcmeProfile(uuid: string): Observable<void>;
 
    bulkEnableAcmeProfile(uuids: string[]): Observable<void>;
 

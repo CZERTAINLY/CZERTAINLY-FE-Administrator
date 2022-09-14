@@ -7,7 +7,11 @@ export const validateRequired = () => (value: any) => value ? undefined : "Requi
 
 export const validatePattern = (pattern: RegExp, message?: string) =>
    (value: any) => {
-      return !value || pattern.test(value)
+      let validationInput = value;
+      if (typeof value === "object" && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
+         validationInput = value["value"]["value"];
+      }
+      return !validationInput || pattern.test(validationInput)
          ? undefined
          : message || `Value must conform to ${pattern}`;
    }

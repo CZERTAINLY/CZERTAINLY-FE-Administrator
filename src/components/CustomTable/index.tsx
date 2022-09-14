@@ -19,8 +19,8 @@ export interface TableHeader {
 
 export interface TableDataRow {
    id: number | string;
-   columns: (string | JSX.Element)[];
-   detailColumns?: (string | JSX.Element)[];
+   columns: (string | JSX.Element | JSX.Element[])[];
+   detailColumns?: (string | JSX.Element | JSX.Element[])[];
 }
 
 
@@ -30,6 +30,7 @@ interface Props {
    canSearch?: boolean;
    hasHeader?: boolean;
    hasCheckboxes?: boolean;
+   multiSelect?: boolean;
    hasPagination?: boolean;
    hasDetails?: boolean;
    paginationData?: {
@@ -51,6 +52,7 @@ function CustomTable({
    canSearch,
    hasHeader = true,
    hasCheckboxes,
+   multiSelect = true,
    hasPagination,
    hasDetails,
    paginationData,
@@ -163,7 +165,11 @@ function CustomTable({
             [...data].filter(
                row => {
                   let rowStr = "";
-                  row.columns.forEach(col => rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element));
+                  row.columns.forEach(
+                     col => {
+                        rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element)
+                     }
+                  );
                   return rowStr.toLowerCase().includes(searchKey.toLowerCase());
                }
             )
@@ -229,11 +235,14 @@ function CustomTable({
    useEffect(
 
       () => {
-         setTotalPages(Math.ceil(tblData.length / pageSize))
+         const totalPages = Math.ceil(tblData.length / pageSize)
+         setTotalPages(totalPages);
+         if (page > totalPages) setPage(totalPages - 1 < 1 ? 1 : totalPages - 1);
       },
-      [tblData, pageSize]
+      [tblData, pageSize, page]
 
    );
+
 
    const onCheckAllCheckboxClick = useCallback(
 
@@ -256,12 +265,39 @@ function CustomTable({
 
    const onRowToggleSelection = useCallback(
 
-      (e: React.MouseEvent<HTMLTableRowElement>) => {
+      (e: React.MouseEvent, rowId: string | number | undefined = undefined, continueAfterDetails: boolean = true) => {
+
+         const target = e.target as HTMLElement;
+
+         if (hasDetails && target.localName !== "input" && target.localName !== "button" && (target.localName !== "i" || target.hasAttribute("data-expander") ) ) {
+
+            if (expandedRow === rowId) {
+               setExpandedRow(undefined);
+            } else {
+               setExpandedRow(rowId);
+            }
+            if (!continueAfterDetails) {
+               return;
+            }
+
+            return;
+         }
 
          if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") return;
 
          const id = e.currentTarget.getAttribute("data-id");
          if (!id) return;
+
+         if (!multiSelect) {
+
+            const checkedRows: string[] = tblCheckedRows.includes(id) ? [] : [id];
+
+            setTblCheckedRows(checkedRows);
+            if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
+
+            return;
+
+         }
 
          const checkedRows = [...tblCheckedRows];
 
@@ -276,8 +312,9 @@ function CustomTable({
 
          e.stopPropagation();
          e.preventDefault();
+
       },
-      [tblCheckedRows, setTblCheckedRows, onCheckedRowsChanged]
+      [hasDetails, multiSelect, tblCheckedRows, onCheckedRowsChanged, expandedRow]
 
    );
 
@@ -288,6 +325,13 @@ function CustomTable({
 
          const id = e.target.getAttribute("data-id");
          if (!id) return;
+
+         if (!multiSelect) {
+            const checked = [id];
+            setTblCheckedRows(checked);
+            if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
+            return;
+         }
 
          const checked = [...tblCheckedRows];
 
@@ -300,7 +344,7 @@ function CustomTable({
          setTblCheckedRows(checked);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
 
-      }, [tblCheckedRows, onCheckedRowsChanged]
+      }, [multiSelect, tblCheckedRows, onCheckedRowsChanged]
 
    );
 
@@ -361,8 +405,8 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
-         if (hasDetails) columns.push({ id: "details", content: "Details", sortable: false, width: "100%" });
+         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
 
          return columns.map(
 
@@ -425,9 +469,9 @@ function CustomTable({
 
          )
       },
-      [hasCheckboxes, hasDetails, tblHeaders, tblCheckedRows, tblData, onColumnSortClick, onCheckAllCheckboxClick]
-   );
+      [tblHeaders, hasCheckboxes, multiSelect, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, onCheckAllCheckboxClick]
 
+   );
 
 
    const body = useMemo(
@@ -446,8 +490,12 @@ function CustomTable({
 
             <Fragment key={row.id}>
 
-               <tr {...(hasCheckboxes ? { onClick: onRowToggleSelection } : {})} data-id={row.id} >
+               <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
+                  {!hasDetails ? (<></>) : <td id="show-detail-more-column" key="show-detail-more-column">
+                     {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
+                  </td>
+                  }
                   {!hasCheckboxes ? (<></>) : (
                      <td>
                         <input type="checkbox" checked={tblCheckedRows.includes(row.id)} onChange={onRowCheckboxClick} data-id={row.id} />
@@ -460,51 +508,45 @@ function CustomTable({
 
                         <td key={index} className={styles.dataCell} style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}>
 
-                           <div>{column ? column : <>&nbsp;</>}</div>
-
-                           {
-                              row.detailColumns && row.detailColumns[index] && expandedRow === row.id ? (
-                                 <div className={styles.detail}>{row.detailColumns[index]}</div>
-                              ) : (
-                                 <></>
-                              )
-                           }
-
+                           <div>{column ? column : <></>}</div>
                         </td>
 
                      )
 
                   )}
 
-                  {!hasDetails ? (<></>) : (
-
-                     <td className="w-25">
-
-                        <div className={styles.showMore} onClick={() => expandedRow === row.id ? setExpandedRow(undefined) : setExpandedRow(row.id)}>
-                           {expandedRow === row.id ? "Show less..." : "Show more..."}
-                        </div>
-
-                        {
-                           row.detailColumns && row.detailColumns[headers.length] && expandedRow === row.id ? (
-                              <div className={styles.detail}>{row.detailColumns[headers.length]}</div>
-                           ) : (
-                              <></>
-                           )
-                        }
-
-                     </td>
-                  )}
-
                </tr>
 
-            </Fragment>
+               {!hasDetails ? (<></>) : (
 
+                  <tr>
+
+                     {
+                        row.detailColumns && expandedRow === row.id ? (
+                           row.detailColumns.map(e => {
+                              return (
+                                 <td>
+                                    <div>
+                                       {e}
+                                    </div>
+                                 </td>
+                              )
+                           })
+                        ) : (
+                           <></>
+                        )
+                     }
+
+                  </tr>
+               )}
+
+            </Fragment>
 
          )
 
       ),
 
-      [tblData, hasPagination, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, headers.length, tblHeaders]
+      [tblData, hasPagination, pageSize, paginationData, page, hasCheckboxes, onRowToggleSelection, tblCheckedRows, onRowCheckboxClick, hasDetails, expandedRow, tblHeaders]
 
    );
 
@@ -610,7 +652,7 @@ function CustomTable({
                         </div>
                         :
                         <div>
-                           Showing {(page - 1) * pageSize + 1} to {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of {tblData.length} entries
+                           Showing {((page - 1) * pageSize) + (tblData.length > 0 ? 1 : 0)} to {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of {tblData.length} entries
                         </div>
                   }
 

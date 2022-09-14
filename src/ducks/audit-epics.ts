@@ -12,10 +12,12 @@ import { transformAuditLogDTOToModel } from "./transform/auditlog";
 const listLogs: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
+
       filter(
          slice.actions.listLogs.match
       ),
       switchMap(
+
          action => deps.apiClients.auditLogs.getLogs(
             action.payload.page,
             action.payload.size,
@@ -39,6 +41,7 @@ const listLogs: AppEpic = (action$, state, deps) => {
          )
 
       )
+
    )
 
 }
@@ -158,7 +161,7 @@ const listStatuses: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.getStatuses().pipe(
 
             map(
-               statusList => slice.actions.listStatusesSuccess({ statusList})
+               statusList => slice.actions.listStatusesSuccess({ statusList })
             ),
 
             catchError(
@@ -189,6 +192,64 @@ const listStatusesFailure: AppEpic = (action$, state, deps) => {
 
 }
 
+const purgeLogs: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.purgeLogs.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
+
+            map(
+               () => slice.actions.purgeLogsSuccess({ filters: action.payload.filters, sort: action.payload.sort })
+            ),
+
+            catchError(
+               err => of(slice.actions.purgeLogsFailure({ error: extractError(err, "Failed to purge audit logs") }))
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const purgeLogsSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.purgeLogsSuccess.match
+      ),
+      map(
+         action => slice.actions.listLogs({ page: 0, size: 10, sort: action.payload.sort, filters: action.payload.filters })
+      )
+
+   )
+
+}
+
+const purgeLogsFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.purgeLogsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
 const epics = [
    listLogs,
    listLogsFailure,
@@ -197,7 +258,10 @@ const epics = [
    listOperations,
    listOperationsFailure,
    listStatuses,
-   listStatusesFailure
+   listStatusesFailure,
+   purgeLogs,
+   purgeLogsSuccess,
+   purgeLogsFailure
 ]
 
 export default epics

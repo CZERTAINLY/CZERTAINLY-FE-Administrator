@@ -11,6 +11,13 @@ export interface RaProfileDTO {
    authorityInstanceName: string;
    attributes: AttributeDTO[];
    enabledProtocols?: string[];
+   complianceProfiles?: raComplianceProfileDTO[];
+}
+
+export interface raComplianceProfileDTO {
+   uuid: string;
+   name: string;
+   description?: string;
 }
 
 
@@ -64,5 +71,11 @@ export interface ProfilesManagementApi {
    activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<RaAcmeLinkDTO>;
 
    deactivateAcme(uuid: string): Observable<void>;
+
+   checkCompliance(uuids: string[]): Observable<void>;
+
+   associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
+   
+   dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
 
 }

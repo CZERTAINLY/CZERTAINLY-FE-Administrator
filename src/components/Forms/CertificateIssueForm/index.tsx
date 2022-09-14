@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { Form, Field } from "react-final-form";
-import { Button, ButtonGroup, Col, Form as BootstrapForm, FormGroup, Input, Label, Row, } from "reactstrap";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row, } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -47,6 +47,7 @@ function CertificateForm({
    const raProfiles = useSelector(raProfileSelectors.raProfiles);
    const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
 
+   const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
    useEffect(() => {
 
@@ -201,7 +202,7 @@ function CertificateForm({
 
    return (
 
-      <Widget title={title}>
+      <Widget title={title} busy={issuingCertificate}>
 
          <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }} >
 
@@ -209,7 +210,7 @@ function CertificateForm({
 
                <BootstrapForm onSubmit={handleSubmit}>
 
-                  <Field name="raProfile">
+                  <Field name="raProfile" validate={validateRequired()}>
 
                      {({ input, meta, onChange }) => (
 
@@ -226,6 +227,8 @@ function CertificateForm({
                               placeholder="Select RA Profile"
                               onChange={e => { onRaProfileChange(e); input.onChange(e) }}
                            />
+
+                           <FormFeedback>{meta.error}</FormFeedback>
 
                         </FormGroup>
 
@@ -317,6 +320,8 @@ function CertificateForm({
                                           readOnly={true}
                                        />
 
+                                       <FormFeedback>{meta.error}</FormFeedback>
+
                                     </FormGroup>
 
                                  )}
@@ -352,6 +357,8 @@ function CertificateForm({
 
                   }
 
+                  <br />
+
                   <div className="d-flex justify-content-end">
 
                      <ButtonGroup>
@@ -359,18 +366,17 @@ function CertificateForm({
                         <ProgressButton
                            title="Create"
                            inProgressTitle="Creating"
-                           inProgress={submitting}
+                           inProgress={submitting || issuingCertificate}
                            disabled={!valid}
                         />
 
                         <Button
                            color="default"
                            onClick={onCancel}
-                           disabled={submitting || !valid}
+                           disabled={submitting}
                         >
                            Cancel
                         </Button>
-
 
                      </ButtonGroup>
 

@@ -1,6 +1,7 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
-import { CertificateValidationResultModel } from "api/certificates";
-import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status } from "types/certificate";
+import { CertificateValidationResultDTO } from "api/certificates";
+import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
+import { AttributeModel } from "./attributes/AttributeModel";
 import { GroupModel } from "./groups";
 
 
@@ -81,6 +82,16 @@ export interface CertificateRAProfileModel {
 }
 
 
+export interface ValidationResultModel {
+   status: ValidationStatus;
+   message: string;
+ }
+
+export interface CertificateValidationResultModel {
+   [key: string]: ValidationResultModel;
+}
+
+
 export interface CertificateModel {
 
    uuid: string;
@@ -104,14 +115,25 @@ export interface CertificateModel {
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesModel;
    meta?: CertificateMetaModel;
-
    certificateValidationResult?: CertificateValidationResultModel;
    entity?: CertificateEntityModel;
    group?: GroupModel;
    owner?: string;
    raProfile?: CertificateRAProfileModel;
 
+   complianceStatus?: "na" | "ok" | "nok";
+   nonCompliantRules?: NonCompliantRuleModel[];
 }
+
+export interface NonCompliantRuleModel {
+   connectorName: string;
+   ruleName: string;
+   ruleDescription: string;
+   status: "na" | "ok" | "nok";
+   attributes?: AttributeModel[];
+}
+
+
 
 
 export interface X509Certificate {

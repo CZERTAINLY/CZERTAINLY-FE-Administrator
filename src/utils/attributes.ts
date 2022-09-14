@@ -7,6 +7,7 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
    authorityProvider: "Authority Provider",
    discoveryProvider: "Discovery Provider",
    legacyAuthorityProvider: "Legacy Authority Provider",
+   complianceProvider: "Compliance Provider",
 };
 
 

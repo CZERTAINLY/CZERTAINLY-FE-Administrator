@@ -10,6 +10,7 @@ import { createNewResource } from "utils/net";
 import * as model from "./model";
 
 const baseUrl = "/api/v1/raprofiles";
+const baseUrlCompliance = "/api/v1/complianceProfiles";
 
 export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
@@ -185,6 +186,37 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
          )
       );
 
+   }
+
+
+   checkCompliance(uuids: string[]): Observable<void> {
+      
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
+            raProfileUuids: uuids
+         })
+      );
+
+   }
+
+   associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
+      return this._fetchService.request(
+         
+         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/associate`, "PATCH", {
+            raProfileUuids: raProfileUuids
+         })
+         
+      );
+   }
+
+   dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
+      return this._fetchService.request(
+         
+         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/disassociate`, "PATCH", {
+            raProfileUuids: raProfileUuids
+         })
+         
+      );
    }
 
 }

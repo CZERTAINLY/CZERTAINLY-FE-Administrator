@@ -129,6 +129,7 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
    );
 }
 
+
 const listAuthorityProvidersFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -140,7 +141,6 @@ const listAuthorityProvidersFailure: AppEpic = (action$, state, deps) => {
       )
    );
 }
-
 
 
 const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps) => {
@@ -492,7 +492,7 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.authorities.bulkForceDeleteAuthority(action.payload.uuids).pipe(
 
             map(
-               () => slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids })
+               () => slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
             ),
             catchError(
                err => of(slice.actions.bulkForceDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk force delete Authorities") }))
@@ -506,6 +506,25 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
 
 }
 
+
+const bulkForceDeleteAuthoritySuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkForceDeleteAuthoritySuccess.match
+      ),
+      switchMap(
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
 
 const bulkForceDeleteAuthorityFailure: AppEpic = (action$, state$, deps) => {
 
@@ -546,6 +565,7 @@ const epics = [
    bulkDeleteAuthority,
    bulkDeleteAuthorityFailure,
    bulkForceDeleteAuthority,
+   bulkForceDeleteAuthoritySuccess,
    bulkForceDeleteAuthorityFailure,
 ];
 

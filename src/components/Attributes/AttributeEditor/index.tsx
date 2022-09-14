@@ -183,7 +183,8 @@ export default function AttributeEditor({
 
                mapping.targets.forEach(
                   target => {
-                     const value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
+                     let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
+                     if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
                      if (value === undefined) hasUndefinedMapping = true;
                      data[target][mapping.to] = value;
                   }
@@ -254,7 +255,7 @@ export default function AttributeEditor({
 
       () => {
 
-         // run this effect only when attribute descripotors or attributes changed
+         // run this effect only when attribute descriptors or attributes changes
          if (attributeDescriptors === prevDescriptors && attributes === prevAttributes) return;
 
          let newOptions: { [attributeName: string]: { label: string; value: any; }[] } = {};
