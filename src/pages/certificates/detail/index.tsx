@@ -33,6 +33,7 @@ import ProgressButton from "components/ProgressButton";
 import { collectFormAttributes } from "utils/attributes";
 import { Form } from "react-final-form";
 import CertificateComplianceStatus from "components/pages/certificates/CertificateComplianceStatus";
+import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 
 
 export default function CertificateDetail() {
@@ -49,6 +50,8 @@ export default function CertificateDetail() {
    const eventHistory = useSelector(selectors.certificateHistory);
    const certLocations = useSelector(selectors.certificateLocations);
 
+   const validationResult = useSelector(selectors.validationResult);
+
    const locations = useSelector(locationSelectors.locations);
 
    const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
@@ -63,6 +66,7 @@ export default function CertificateDetail() {
    const isFetchingLocations = useSelector(selectors.isFetchingLocations);
    const isRevoking = useSelector(selectors.isRevoking);
    const isRenewing = useSelector(selectors.isRenewing);
+   const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [renew, setRenew] = useState<boolean>(false);
@@ -106,6 +110,7 @@ export default function CertificateDetail() {
          dispatch(actions.resetState())
          dispatch(actions.getCertificateDetail({ uuid: params.id }));
          dispatch(actions.getCertificateHistory({ uuid: params.id }));
+         dispatch(actions.getCertificateValidationResult({ uuid: params.id }));
 
       },
       [dispatch, params.id]
@@ -770,8 +775,8 @@ export default function CertificateDetail() {
       )) {
          returnList.push(
             <tr>
-               <td>{key}</td>
-               <td>
+               <td style={{padding: "0.25em"}}>{key}</td>
+               <td style={{padding: "0.25em"}}>
                   <p
                      style={{
                         whiteSpace: "pre-wrap",
@@ -848,14 +853,13 @@ export default function CertificateDetail() {
 
    const complianceData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : (certificate.nonCompliantRules || []).map(e => {
-         return (
-            {
-               id: e.ruleDescription,
-               columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
-            }
-         )
-      }
+      () => !certificate ? [] : (certificate.nonCompliantRules || []).map(
+         e => ({
+            id: e.ruleDescription,
+            columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
+            detailColumns: !e.attributes ? undefined : [ <></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false} />]
+
+         })
       ),
       [certificate]
    )
@@ -965,7 +969,7 @@ export default function CertificateDetail() {
 
    const validationData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : Object.entries(certificate.certificateValidationResult || {}).map(function ([key, value]) {
+      () => !certificate ? [] : Object.entries(validationResult || {}).map(function ([key, value]) {
          return (
             {
                id: key,
@@ -985,7 +989,7 @@ export default function CertificateDetail() {
          )
       }
       ),
-      [certificate]
+      [certificate, validationResult]
    )
 
 
@@ -995,7 +999,7 @@ export default function CertificateDetail() {
 
          {
             id: "commonName",
-            columns: ["Common Name", certificate.commonName],
+            columns: [<span style={{ whiteSpace: "nowrap" }}>Common Name</span>, certificate.commonName],
 
          },
          {
@@ -1262,6 +1266,7 @@ export default function CertificateDetail() {
 
       <Container className="themed-container" fluid>
          <Row xs="1" sm="1" md="2" lg="2" xl="2">
+
             <Col>
                <Widget title={certificateTitle} busy={isBusy}>
                   <br />
@@ -1272,6 +1277,7 @@ export default function CertificateDetail() {
                   />
                </Widget>
             </Col>
+
             <Col>
                <Widget title={sanTitle} busy={isBusy}>
                   <br />
@@ -1280,19 +1286,7 @@ export default function CertificateDetail() {
                      data={sanData}
                   />
                </Widget>
-            </Col>
-         </Row>
 
-         <Widget title={validationTitle} busy={isBusy}>
-            <br />
-            <CustomTable
-               headers={validationHeaders}
-               data={validationData}
-            />
-         </Widget>
-
-         <Row xs="1" sm="1" md="2" lg="2" xl="2">
-            <Col>
                <Widget title={attributesTitle}>
                   <br />
                   <CustomTable
@@ -1300,8 +1294,7 @@ export default function CertificateDetail() {
                      data={attributeData}
                   />
                </Widget>
-            </Col>
-            <Col>
+
                <Widget title={metaTitle}>
                   <br />
                   <CustomTable
@@ -1309,17 +1302,9 @@ export default function CertificateDetail() {
                      data={metaData}
                   />
                </Widget>
+
             </Col>
          </Row>
-
-         <Widget title={historyTitle} busy={isFetchingHistory}>
-            <br />
-            <CustomTable
-               headers={historyHeaders}
-               data={historyEntry}
-            />
-         </Widget>
-
 
          <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
             <br />
@@ -1331,14 +1316,31 @@ export default function CertificateDetail() {
             />
          </Widget>
 
+         <Widget title={validationTitle} busy={isFetchingValidationResult}>
+            <br />
+            <CustomTable
+               headers={validationHeaders}
+               data={validationData}
+            />
+         </Widget>
+
          {certificate?.nonCompliantRules ? <Widget title={complianceTitle} busy={isFetching}>
             <br />
             <CustomTable
                headers={complianceHeaders}
                data={complianceData}
+               hasDetails={true}
             />
          </Widget> : null}
 
+         <Widget title={historyTitle} busy={isFetchingHistory}>
+            <br />
+            <CustomTable
+               headers={historyHeaders}
+               data={historyEntry}
+               hasPagination={true}
+            />
+         </Widget>
 
          <Dialog
             isOpen={confirmDelete}

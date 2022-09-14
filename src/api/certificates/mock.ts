@@ -10,6 +10,27 @@ import { LocationDTO } from "api/location";
 
 export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
+   getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultDTO> {
+      return of(
+         dbData.certificates.find((c) => c.uuid.toString() === uuid.toString())
+      ).pipe(
+
+         delay(randomDelay()),
+
+         map(
+
+            (detail) => {
+
+               if (!detail) throw new HttpErrorResponse({ status: 404, });
+
+               return {};
+            }
+
+         )
+
+      );
+   }
+
 
    getCertificatesList(
       itemsPerPage: number = 100,
@@ -75,12 +96,10 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
                   entity: detail.entity,
                   group: detail.group,
                   owner: detail.owner,
-                  //raProfileId: detail.raProfileId,
                   keyUsage: detail.keyUsage,
                   extendedKeyUsage: detail.extendedKeyUsage,
                   keySize: detail.keySize,
                   basicConstraints: detail.basicConstraints,
-                  certificateValidationResult: detail.certificateValidationResult,
                   complianceStatus: detail.complianceStatus,
                   nonCompliantRules: detail.nonCompliantRules,
                };

@@ -26,6 +26,7 @@ import Spinner from "components/Spinner";
 import Select from "react-select";
 
 import { validateRequired } from "utils/validators";
+import { MDBBadge } from "mdbreact";
 
 export default function LocationDetail() {
 
@@ -397,6 +398,7 @@ export default function LocationDetail() {
          },
          {
             id: "pk",
+            align: "center",
             content: "Private Key",
             sortable: true,
          },
@@ -426,7 +428,7 @@ export default function LocationDetail() {
 
                <Link to={`../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
 
-               cert.withKey ? "Yes" : "No",
+               cert.withKey ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 
                !cert.metadata ? "" :
                   Object.keys(cert.metadata).length === 0 ? "" :

@@ -8,7 +8,7 @@ import { extractError } from "utils/net";
 
 import * as slice from "./certificates";
 import { actions as alertActions } from "./alerts";
-import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDtoToCertificaeModel } from "./transform/certificates";
+import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDTOToCertificateModel } from "./transform/certificates";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformGroupDtoToModel } from "./transform/groups";
 import { transformLocationDtoToModel } from "./transform/locations";
@@ -103,6 +103,49 @@ const getCertificateDetailFailure: AppEpic = (action$, state, deps) => {
       ),
       map(
          action => alertActions.error(action.payload.error || "Unexpected error occured")
+      )
+
+   )
+
+}
+
+
+const getCertificateValidationResult: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateValidationResult.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.getCertificateValidationResult(action.payload.uuid).pipe(
+
+            map(
+               result => slice.actions.getCertificateValidationResultSuccess(result)
+            ),
+            catchError(
+               err => of(slice.actions.getCertificateValidationResultFailure({ error: extractError(err, "Failed to get certificate validation result") }))
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const getCertificateValidationResultFailure: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateValidationResultFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    )
@@ -574,7 +617,7 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
                      raProfile => slice.actions.updateRaProfileSuccess({
                         uuid: action.payload.uuid,
                         raProfileUuid: action.payload.raProfileUuid,
-                        raProfile: transformRaProfileDtoToCertificaeModel(raProfile)
+                        raProfile: transformRaProfileDTOToCertificateModel(raProfile)
                      })
                   ),
                   catchError(
@@ -1120,6 +1163,8 @@ const epics = [
    listCertificatesFailure,
    getCertificateDetail,
    getCertificateDetailFailure,
+   getCertificateValidationResult,
+   getCertificateValidationResultFailure,
    issueCertificate,
    issueCertificateSuccess,
    issueCertificateFailure,

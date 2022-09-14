@@ -47,8 +47,6 @@ export default function CertificateList({
 
    const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
-   const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
    const isIssuing = useSelector(selectors.isIssuing);
    const isRevoking = useSelector(selectors.isRevoking);
    const isRenewing = useSelector(selectors.isRenewing);
@@ -61,8 +59,6 @@ export default function CertificateList({
    const isBulkUpdatingRaProfile = useSelector(selectors.isBulkUpdatingRaProfile);
    const isBulkUpdatingOwner = useSelector(selectors.isBulkUpdatingOwner);
    const isUploading = useSelector(selectors.isUploading);
-   const isFetchingIssuanceAttributes = useSelector(selectors.isFetchingIssuanceAttributes);
-   const isFetchingRevocationAttributes = useSelector(selectors.isFetchingRevocationAttributes);
 
    const [pageSize, setPageSize] = useState(10);
    const [pageNumber, setPageNumber] = useState(1);
@@ -76,7 +72,7 @@ export default function CertificateList({
    const [updateEntity, setUpdateEntity] = useState<boolean>(false);
    const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
-   const isBusy = isFetchingAvailablFilters || isFetchingList || isFetchingDetail || isFetchingHistory || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading || isFetchingIssuanceAttributes || isFetchingRevocationAttributes;
+   const isBusy = isFetchingAvailablFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
 
    useEffect(
 

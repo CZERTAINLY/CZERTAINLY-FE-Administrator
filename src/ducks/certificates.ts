@@ -1,4 +1,4 @@
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryFilterModel, CertificateListQueryModel, CertificateModel } from "models/certificate";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryFilterModel, CertificateListQueryModel, CertificateModel, CertificateValidationResultModel } from "models/certificate";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeModel } from "models/attributes/AttributeModel";
@@ -31,8 +31,11 @@ export type State = {
    certificateLocations?: LocationModel[];
    issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
    revocationAttributes: AttributeDescriptorModel[];
+   validationResult: CertificateValidationResultModel;
 
    isFetchingAvailableFilters: boolean;
+
+   isFetchingValidationResult: boolean;
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -82,8 +85,11 @@ export const initialState: State = {
 
    issuanceAttributes: {},
    revocationAttributes: [],
+   validationResult: {},
 
    isFetchingAvailableFilters: false,
+
+   isFetchingValidationResult: false,
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -208,6 +214,29 @@ export const slice = createSlice({
       getCertificateDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false;
+
+      },
+
+
+      getCertificateValidationResult: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.validationResult = {};
+         state.isFetchingValidationResult = true;
+
+      },
+
+
+      getCertificateValidationResultSuccess: (state, action: PayloadAction<CertificateValidationResultModel>) => {
+
+         state.isFetchingValidationResult = false;
+         state.validationResult = action.payload;
+
+      },
+
+
+      getCertificateValidationResultFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingValidationResult = false;
 
       },
 
@@ -754,6 +783,9 @@ const isUploading = createSelector(state, state => state.isUploading);
 const isFetchingIssuanceAttributes = createSelector(state, state => state.isFetchingIssuanceAttributes);
 const isFetchingRevocationAttributes = createSelector(state, state => state.isFetchingRevocationAttributes);
 
+const isFetchingValidationResult = createSelector(state, state => state.isFetchingValidationResult);
+const validationResult = createSelector(state, state => state.validationResult);
+
 
 export const selectors = {
    state,
@@ -788,7 +820,9 @@ export const selectors = {
    isBulkUpdatingOwner,
    isUploading,
    isFetchingIssuanceAttributes,
-   isFetchingRevocationAttributes
+   isFetchingRevocationAttributes,
+   isFetchingValidationResult,
+   validationResult
 };
 
 

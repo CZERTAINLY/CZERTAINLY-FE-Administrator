@@ -1,6 +1,7 @@
-import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO } from "api/certificates";
+import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO, NonCompliantRuleDTO } from "api/certificates";
 import { RaProfileDTO } from "api/profiles";
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel } from "models";
+import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel, NonCompliantRuleModel } from "models";
+import { transformAttributeDTOToModel } from "./attributes";
 
 export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
 
@@ -41,8 +42,6 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
 
       meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
 
-      certificateValidationResult: certificate.certificateValidationResult ? certificate.certificateValidationResult : undefined,
-
       entity: certificate.entity ? {
          uuid: certificate.entity.uuid,
          entityType: certificate.entity.entityType,
@@ -65,7 +64,7 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
       } : undefined,
 
       complianceStatus: certificate.complianceStatus,
-      nonCompliantRules: certificate.nonCompliantRules,
+      nonCompliantRules: transformNonComplianceRulesToModel(certificate.nonCompliantRules),
    }
 
 }
@@ -109,10 +108,6 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
       },
 
       meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
-
-      certificateValidationResult: certificate.certificateValidationResult ? {
-         status: certificate.certificateValidationResult.status
-      } : undefined,
 
       entity: certificate.entity ? {
          uuid: certificate.entity.uuid,
@@ -169,12 +164,29 @@ export function transformCertificateHistoryDTOToModel(certificateHistory: Certif
 }
 
 
-export function transformRaProfileDtoToCertificaeModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
+export function transformRaProfileDTOToCertificateModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
 
    return {
       uuid: raProfile.uuid,
       name: raProfile.name,
       enabled: raProfile.enabled,
    }
+
+}
+
+
+export function transformNonComplianceRulesToModel(nonComplianceRules?: NonCompliantRuleDTO[]): NonCompliantRuleModel[] {
+
+   if (!nonComplianceRules) return [];
+
+   return nonComplianceRules.map(
+      rule => ({
+         connectorName: rule.connectorName,
+         ruleName: rule.ruleName,
+         ruleDescription: rule.ruleDescription,
+         status: rule.status,
+         attributes: rule.attributes?.map(attribute => transformAttributeDTOToModel(attribute))
+      })
+   );
 
 }

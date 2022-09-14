@@ -1,5 +1,6 @@
 import { GroupDTO } from "api/groups";
 import { LocationDTO } from "api/location";
+import { AttributeDTO } from "api/_common/attributeDTO";
 import { Observable } from "rxjs";
 
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
@@ -77,13 +78,13 @@ export interface CertificateListFilterDTO {
    value?: any;
 }
 
- export interface ValidationResult {
+ export interface ValidationResultDTO {
    status: ValidationStatus;
    message: string;
  }
 
-export interface CertificateValidationResultModel {
-   [key: string]: ValidationResult;
+export interface CertificateValidationResultDTO {
+   [key: string]: ValidationResultDTO;
 }
 
 
@@ -110,21 +111,21 @@ export interface CertificateDTO {
    issuerSerialNumber?: string;
    subjectAlternativeNames: CertificateSubjectAlternativeNamesDTO;
    meta?: CertificateMetaDTO;
-
-   certificateValidationResult?: CertificateValidationResultModel;
+   certificateValidationResult?: CertificateValidationResultDTO;
    entity?: CertificateEntityDTO;
    group?: GroupDTO;
    owner?: string;
    raProfile?: CertificateRAProfileDTO;
    complianceStatus?: "na" | "ok" | "nok";
-   nonCompliantRules?: NonCompliantRulesDTO[]
+   nonCompliantRules?: NonCompliantRuleDTO[]
 }
 
-export interface NonCompliantRulesDTO {
+export interface NonCompliantRuleDTO {
    connectorName: string;
    ruleName: string;
    ruleDescription: string;
    status: "na" | "ok" | "nok";
+   attributes?: AttributeDTO[];
 }
 
 
@@ -216,6 +217,8 @@ export interface CertificateInventoryApi {
    getAvailableCertificateFilters(): Observable<AvailableCertificateFilterDTO[]>;
 
    checkCompliance(uuids: string[]): Observable<void>;
+
+   getCertificateValidationResult(uuid: string): Observable<CertificateValidationResultDTO>;
 
 
 }

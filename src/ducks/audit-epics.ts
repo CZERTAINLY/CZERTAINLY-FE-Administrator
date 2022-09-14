@@ -204,7 +204,7 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
 
             map(
-               () => slice.actions.purgeLogsSuccess()
+               () => slice.actions.purgeLogsSuccess({ filters: action.payload.filters, sort: action.payload.sort })
             ),
 
             catchError(
@@ -213,6 +213,22 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
 
          )
 
+      )
+
+   )
+
+}
+
+
+const purgeLogsSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.purgeLogsSuccess.match
+      ),
+      map(
+         action => slice.actions.listLogs({ page: 0, size: 10, sort: action.payload.sort, filters: action.payload.filters })
       )
 
    )
@@ -244,6 +260,7 @@ const epics = [
    listStatuses,
    listStatusesFailure,
    purgeLogs,
+   purgeLogsSuccess,
    purgeLogsFailure
 ]
 

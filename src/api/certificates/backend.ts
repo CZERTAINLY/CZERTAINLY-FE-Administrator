@@ -199,11 +199,19 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    }
 
    checkCompliance(uuids: string[]): Observable<void> {
-      
+
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
             certificateUuids: uuids
          })
+      );
+
+   }
+
+   getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${uuid}/validate`, "GET")
       );
 
    }
