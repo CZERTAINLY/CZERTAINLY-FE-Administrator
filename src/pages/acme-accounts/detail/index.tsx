@@ -39,7 +39,7 @@ export default function AcmeAccountDetail() {
          dispatch(actions.getAcmeAccount({ acmeProfileUuid: params.acmeProfileUuid, uuid: params.id }));
 
       },
-      [params.id, dispatch]
+      [params.id, dispatch, params.acmeProfileUuid]
 
    )
 

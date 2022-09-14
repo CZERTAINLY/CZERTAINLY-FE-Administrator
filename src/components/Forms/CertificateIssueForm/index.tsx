@@ -136,7 +136,9 @@ function CertificateForm({
          dispatch(certificateActions.issueCertificate({
             raProfileUuid: values.raProfile.value.uuid,
             pkcs10: values.file,
-            attributes
+            authorityUuid: values.raProfile.value.authorityInstanceUuid,
+            attributes,
+            
          }));
 
       },
@@ -150,7 +152,7 @@ function CertificateForm({
       (event: SingleValue<{ label: string; value: RaProfileModel }>) => {
 
          if (!event) return;
-         dispatch(certificateActions.getIssuanceAttributes({ raProfileUuid: event.value.uuid }));
+         dispatch(certificateActions.getIssuanceAttributes({ raProfileUuid: event.value.uuid, authorityUuid: event.value.authorityInstanceUuid }));
 
          /*setRaProfUuid(event?.value || "");
          dispatch(actions.requestIssuanceAttributes(event?.value || ""));

@@ -244,7 +244,8 @@ export const slice = createSlice({
       issueCertificate: (state, action: PayloadAction<{
          raProfileUuid: string;
          pkcs10: string;
-         attributes: AttributeModel[]
+         attributes: AttributeModel[],
+         authorityUuid: string
       }>) => {
 
          state.isIssuing = true;
@@ -273,7 +274,8 @@ export const slice = createSlice({
          uuid: string,
          raProfileUuid: string,
          reason: CertificateRevocationReason,
-         attributes: AttributeModel[]
+         attributes: AttributeModel[],
+         authorityUuid: string
        }>) => {
 
          state.isRevoking = true;
@@ -305,6 +307,7 @@ export const slice = createSlice({
          uuid: string;
          raProfileUuid: string;
          pkcs10: string;
+         authorityUuid: string
       }>) => {
 
          state.isRenewing = true;
@@ -671,7 +674,7 @@ export const slice = createSlice({
       },
 
 
-      getIssuanceAttributes: (state, action: PayloadAction<{ raProfileUuid: string }>) => {
+      getIssuanceAttributes: (state, action: PayloadAction<{ raProfileUuid: string, authorityUuid: string }>) => {
 
          state.isFetchingIssuanceAttributes = true;
 
@@ -693,7 +696,7 @@ export const slice = createSlice({
       },
 
 
-      getRevocationAttributes: (state, action: PayloadAction<{ raProfileUuid: string }>) => {
+      getRevocationAttributes: (state, action: PayloadAction<{ raProfileUuid: string, authorityUuid: string }>) => {
 
             state.isFetchingRevocationAttributes = true;
 

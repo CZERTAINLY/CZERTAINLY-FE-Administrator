@@ -40,7 +40,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}`,
             "GET"
          )
       )
@@ -50,7 +50,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
    addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
 
-      return createNewResource(`${extBaseUrl}/entities/${entityUuid}/locations`, {
+      return createNewResource(`${extBaseUrl}/${entityUuid}/locations`, {
             name,
             description,
             attributes,
@@ -72,7 +72,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}`,
             "PUT", {
             description,
             attributes,
@@ -89,7 +89,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}`,
             "DELETE"
          )
       )
@@ -101,7 +101,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}/enable`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/enable`,
             "PATCH"
          )
       )
@@ -113,7 +113,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}/disable`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/disable`,
             "PATCH"
          )
       )
@@ -125,7 +125,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}/sync`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/sync`,
             "PUT"
          )
       )
@@ -137,7 +137,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}/attributes/push`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/attributes/push`,
             "GET"
          )
       )
@@ -149,7 +149,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${uuid}/attributes/issue`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/attributes/issue`,
             "GET"
          )
       )
@@ -161,7 +161,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
             "PUT", {
                attributes
             }
@@ -175,7 +175,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${locationUuid}/certificates`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates`,
             "POST",
             {
                raProfileUuid,
@@ -192,7 +192,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
             "PATCH"
          )
       )
@@ -204,7 +204,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${extBaseUrl}/entities/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
             "DELETE"
          )
       )

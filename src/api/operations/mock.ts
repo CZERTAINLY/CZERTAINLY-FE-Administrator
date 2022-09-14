@@ -12,6 +12,7 @@ export class OperationsMock implements model.OperationsApi {
       raProfileUuid: string,
       pkcs10: string,
       attributes: AttributeDTO[],
+      authorityUuid: string
    ): Observable<{ uuid: string, certificateData: string }> {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
@@ -23,7 +24,8 @@ export class OperationsMock implements model.OperationsApi {
       uuid: string,
       raProfileUuid: string,
       reason: CertificateRevocationReason,
-      attributes: AttributeDTO[]
+      attributes: AttributeDTO[],
+      authorityUuid: string
    ): Observable<void> {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
@@ -35,6 +37,7 @@ export class OperationsMock implements model.OperationsApi {
       uuid: string,
       raProfileUuid: string,
       pkcs10: string,
+      authorityUuid: string
    ): Observable<model.CertificateIssuanceDTO> {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
@@ -42,14 +45,14 @@ export class OperationsMock implements model.OperationsApi {
    }
 
 
-   getIssuanceAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]> {
+   getIssuanceAttributes(raProfileUuid: string, authorityUuid: string): Observable<AttributeDescriptorDTO[]> {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 
    }
 
 
-   getRevocationAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]> {
+   getRevocationAttributes(raProfileUuid: string, authorityUuid: string): Observable<AttributeDescriptorDTO[]> {
 
       throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
 

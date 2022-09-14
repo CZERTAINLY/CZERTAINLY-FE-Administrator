@@ -15,6 +15,7 @@ export interface OperationsApi {
       raProfileUuid: string,
       pkcs10: string,
       attributes: AttributeDTO[],
+      authorityUuid: string
    ): Observable<{ uuid: string, certificateData: string }>;
 
 
@@ -22,7 +23,8 @@ export interface OperationsApi {
       uuid: string,
       raProfileUuid: string,
       reason: CertificateRevocationReason,
-      attributes: AttributeDTO[]
+      attributes: AttributeDTO[],
+      authorityUuid: string
    ): Observable<void>;
 
 
@@ -30,13 +32,14 @@ export interface OperationsApi {
       uuid: string,
       raProfileUuid: string,
       pkcs10: string,
+      authorityUuid: string
    ): Observable<CertificateIssuanceDTO>;
 
 
-   getIssuanceAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]>;
+   getIssuanceAttributes(raProfileUuid: string, authorityUuid: string): Observable<AttributeDescriptorDTO[]>;
 
 
-   getRevocationAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]>;
+   getRevocationAttributes(raProfileUuid: string, authorityUuid: string): Observable<AttributeDescriptorDTO[]>;
 
 
 }

@@ -89,7 +89,7 @@ export default function EntityForm({
          }
 
       },
-      [dispatch, editMode, locationSelector, params.id, init]
+      [dispatch, editMode, locationSelector, params.id, init,  params.entityUuid]
 
    );
 

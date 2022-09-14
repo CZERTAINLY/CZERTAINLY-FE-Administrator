@@ -780,7 +780,7 @@ export default function RaProfileDetail() {
          <Dialog
             isOpen={activateAcmeDialog}
             caption="Activate ACME protocol"
-            body={AcmeProtocolActiovationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid })}
+            body={AcmeProtocolActiovationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid, authorityInstanceUuid: raProfile?.authorityInstanceUuid })}
             toggle={() => setActivateAcmeDialog(false)}
             buttons={[]}
          />

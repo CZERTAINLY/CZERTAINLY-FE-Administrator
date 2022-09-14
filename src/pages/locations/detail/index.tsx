@@ -81,7 +81,7 @@ export default function LocationDetail() {
          dispatch(actions.getCSRAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
 
       },
-      [dispatch, params.id]
+      [dispatch, params.id, params.entityUuid]
 
    )
 

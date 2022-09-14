@@ -75,7 +75,7 @@ export default function RaProfileForm({
          dispatch(connectorActions.clearCallbackData());
          if (editMode) dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: params.authorityUuid, uuid: params.id }));
       },
-      [dispatch, editMode, params.id]
+      [dispatch, editMode, params.id, params.authorityUuid]
 
    )
 

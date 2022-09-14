@@ -214,7 +214,7 @@ export const slice = createSlice({
       },
 
 
-      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string , authorityInstanceUuid: string}>) => {
 
          state.isCreating = false;
 

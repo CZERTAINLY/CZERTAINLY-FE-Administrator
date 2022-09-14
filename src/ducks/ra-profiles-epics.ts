@@ -161,7 +161,7 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createRaProfileSuccess({ uuid })
+               uuid => slice.actions.createRaProfileSuccess({ uuid: uuid, authorityInstanceUuid: action.payload.authorityInstanceUuid })
             ),
 
             catchError(
@@ -186,7 +186,7 @@ const createRaProfileSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`./detail/${action.payload.uuid}`);
+            history.push(`./detail/${action.payload.authorityInstanceUuid}/${action.payload.uuid}`);
             return EMPTY;
          }
 

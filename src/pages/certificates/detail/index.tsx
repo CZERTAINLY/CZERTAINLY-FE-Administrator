@@ -80,10 +80,13 @@ export default function CertificateDetail() {
    const [group, setGroup] = useState<string>();
    const [owner, setOwner] = useState<string>();
    const [raProfile, setRaProfile] = useState<string>();
+   const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
    const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
    const [locationsCheckedRows, setLocationCheckedRows] = useState<string[]>([]);
    const [selectLocationsCheckedRows, setSelectLocationCheckedRows] = useState<string[]>([]);
+
+   const [locationToEntityMap, setLocationToEntityMap] = useState<{ [key: string]: string }>({});
 
    const locationAttributeDescriptors = useSelector(locationSelectors.pushAttributeDescriptors);
 
@@ -121,6 +124,22 @@ export default function CertificateDetail() {
 
       () => {
 
+         if (!certificate || !locations) return;
+         let locationToEntityMapLocal: { [key: string]: string } = {};
+         for(const location of locations) {
+            locationToEntityMapLocal[location.uuid] = location.entityInstanceUuid;
+         }
+         
+         setLocationToEntityMap(locationToEntityMapLocal);
+      },
+      [certificate, locations, locationToEntityMap]
+
+   )
+
+   useEffect(
+
+      () => {
+
          if (!params.id || !updateGroup) return;
          dispatch(groupAction.listGroups());
 
@@ -142,7 +161,7 @@ export default function CertificateDetail() {
 
       () => {
 
-         setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name })));
+         setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name+":#"+group.authorityInstanceUuid })));
 
       },
       [dispatch, raProfiles]
@@ -167,7 +186,7 @@ export default function CertificateDetail() {
       () => {
 
          if (!params.id || !revoke) return;
-         dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "" }));
+         dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
 
       },
       [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
@@ -195,10 +214,10 @@ export default function CertificateDetail() {
 
             dispatch(locationActions.clearPushAttributeDescriptors())
             :
-            dispatch(locationActions.getPushAttributes({ uuid: selectLocationsCheckedRows[0] }));
+            dispatch(locationActions.getPushAttributes({ uuid: selectLocationsCheckedRows[0], entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]]}));
 
       },
-      [dispatch, selectLocationsCheckedRows]
+      [dispatch, selectLocationsCheckedRows, locationToEntityMap]
 
    )
 
@@ -324,11 +343,11 @@ export default function CertificateDetail() {
 
          if (!certificate || !raProfile) return;
 
-         dispatch(actions.updateRaProfile({ uuid: certificate.uuid, raProfileUuid: raProfile }));
+         dispatch(actions.updateRaProfile({ uuid: certificate.uuid, raProfileUuid: raProfile, authorityUuid: raProfileAuthorityUuid || "" }));
          setUpdateRaProfile(false);
 
       },
-      [certificate, dispatch, raProfile]
+      [certificate, dispatch, raProfile, raProfileAuthorityUuid]
 
 
    );
@@ -339,7 +358,7 @@ export default function CertificateDetail() {
 
          if (!certificate) return;
 
-         dispatch(actions.revokeCertificate({ uuid: certificate.uuid, reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "" }));
+         dispatch(actions.revokeCertificate({ uuid: certificate.uuid, reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "", authorityUuid: certificate.raProfile?.authorityInstanceUuid || "" }));
          setRevoke(false);
 
       },
@@ -356,7 +375,7 @@ export default function CertificateDetail() {
          if (data.fileContent) {
 
             try {
-               dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || "" }));
+               dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
             } catch (error) {
             }
          }
@@ -381,12 +400,13 @@ export default function CertificateDetail() {
             locationActions.pushCertificate({
                certificateUuid: certificate.uuid,
                locationUuid: selectLocationsCheckedRows[0],
+               entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]],
                pushAttributes: collectFormAttributes("locationAttributes", locationAttributeDescriptors, values)
             })
          );
 
       },
-      [selectLocationsCheckedRows, certificate, dispatch, locationAttributeDescriptors]
+      [selectLocationsCheckedRows, certificate, dispatch, locationAttributeDescriptors, locationToEntityMap]
 
    );
 
@@ -401,12 +421,12 @@ export default function CertificateDetail() {
 
          locationsCheckedRows.forEach(
             uuid => {
-               dispatch(locationActions.removeCertificate({ certificateUuid: certificate.uuid, locationUuid: uuid }));
+               dispatch(locationActions.removeCertificate({ certificateUuid: certificate.uuid, locationUuid: uuid, entityUuid: locationToEntityMap[uuid]}));
             }
          );
 
       },
-      [dispatch, certificate, locationsCheckedRows]
+      [dispatch, certificate, locationsCheckedRows, locationToEntityMap]
 
    );
 
@@ -516,6 +536,12 @@ export default function CertificateDetail() {
 
    );
 
+   const updateRaAndAuthorityState = useCallback((value: string) => {
+      setRaProfile(value.split(":#")[0])
+      setRaProfileAuthorityUuid(value.split(":#")[1])
+   }, []
+   )
+
 
    const updateRaProfileBody = useMemo(
 
@@ -526,12 +552,12 @@ export default function CertificateDetail() {
                menuPlacement="auto"
                options={raProfileOptions}
                placeholder={`Select RA Profile`}
-               onChange={(event) => setRaProfile(event?.value)}
+               onChange={(event) => updateRaAndAuthorityState(event?.value || "")}
             />
          </div>
          )
       },
-      [setRaProfile, raProfileOptions]
+      [raProfileOptions, updateRaAndAuthorityState]
 
    );
 

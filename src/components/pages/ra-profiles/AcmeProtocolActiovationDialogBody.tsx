@@ -111,7 +111,7 @@ export default function AcmeProtocolActiovationDialogBody({
          onClose();
 
       },
-      [dispatch, issuanceAttributes, onClose, raProfileUuid, revocationAttributes]
+      [dispatch, issuanceAttributes, onClose, raProfileUuid, revocationAttributes, authorityInstanceUuid]
 
    )
 

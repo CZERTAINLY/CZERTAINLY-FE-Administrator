@@ -60,7 +60,8 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
       raProfile: certificate.raProfile ? {
          uuid: certificate.raProfile.uuid,
          name: certificate.raProfile.name,
-         enabled: certificate.raProfile.enabled
+         enabled: certificate.raProfile.enabled,
+         authorityInstanceUuid: certificate.raProfile.authorityInstanceUuid,
       } : undefined,
 
       complianceStatus: certificate.complianceStatus,
@@ -127,7 +128,8 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
       raProfile: certificate.raProfile ? {
          uuid: certificate.raProfile.uuid,
          name: certificate.raProfile.name,
-         enabled: certificate.raProfile.enabled
+         enabled: certificate.raProfile.enabled,
+         authorityInstanceUuid: certificate.raProfile.authorityInstanceUuid,
       } : undefined
    }
 
@@ -170,6 +172,7 @@ export function transformRaProfileDTOToCertificateModel(raProfile: RaProfileDTO)
       uuid: raProfile.uuid,
       name: raProfile.name,
       enabled: raProfile.enabled,
+      authorityInstanceUuid: raProfile.authorityInstanceUuid,
    }
 
 }

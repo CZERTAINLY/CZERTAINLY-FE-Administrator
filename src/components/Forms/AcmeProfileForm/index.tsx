@@ -216,7 +216,7 @@ export default function RaProfileForm({
          }
 
       },
-      [dispatch, raProfiles, acmeProfile]
+      [dispatch, raProfiles, acmeProfile, raProfile?.authorityInstanceUuid]
 
    );
 

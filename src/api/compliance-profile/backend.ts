@@ -131,7 +131,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
    associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
       return this._fetchService.request(
          
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfile/associate`, "PATCH", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfiles/associate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
          
@@ -141,7 +141,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
       return this._fetchService.request(
          
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfile/disassociate`, "PATCH", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfiles/disassociate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
          
@@ -150,7 +150,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
 
    getAssociatedRaProfiles(uuid: string): Observable<model.ComplianceRaProfileDto[]> {
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofiles`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfiles`, "GET")
       );
 
    }
