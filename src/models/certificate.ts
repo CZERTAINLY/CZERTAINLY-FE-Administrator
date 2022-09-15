@@ -88,10 +88,6 @@ export interface ValidationResultModel {
    message: string;
  }
 
-export interface CertificateValidationResultModel {
-   [key: string]: ValidationResultModel;
-}
-
 
 export interface ValidationResultModel {
    status: ValidationStatus;
