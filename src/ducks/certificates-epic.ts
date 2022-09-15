@@ -165,7 +165,8 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.operations.issueCertificate(
             action.payload.raProfileUuid,
             action.payload.pkcs10,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.authorityUuid
          ).pipe(
 
             map(
@@ -235,7 +236,8 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
             action.payload.uuid,
             action.payload.raProfileUuid,
             action.payload.reason,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.authorityUuid
          ).pipe(
 
             map(
@@ -282,7 +284,8 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.operations.renewCertificate(
             action.payload.uuid,
             action.payload.raProfileUuid,
-            action.payload.pkcs10
+            action.payload.pkcs10,
+            action.payload.authorityUuid,
          ).pipe(
 
             map(
@@ -611,7 +614,7 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
 
                   map(
                      raProfile => slice.actions.updateRaProfileSuccess({
@@ -788,7 +791,7 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
 
                   map(
 
@@ -1010,6 +1013,7 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.operations.getIssuanceAttributes(
             action.payload.raProfileUuid,
+            action.payload.authorityUuid,
          ).pipe(
 
             map(
@@ -1059,6 +1063,7 @@ const getRevocationAttributes: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.operations.getRevocationAttributes(
             action.payload.raProfileUuid,
+            action.payload.authorityUuid,
          ).pipe(
 
             map(

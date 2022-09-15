@@ -101,7 +101,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/${functionGroupCode}/${kind}/attributes`,
+            `${baseUrl}/${uuid}/attributes/${functionGroupCode}/${kind}`,
             "GET"
          )
       );
@@ -112,7 +112,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    getConnectorAllAttributes(uuid: string): Observable<AttributeDescriptorCollectionDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes-all`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes`, "GET")
       );
 
    }
@@ -131,7 +131,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    authorizeConnector(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/approve`, "PUT")
       );
 
    }
@@ -185,7 +185,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<model.ConnectorDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
             uuid,
             url,
             authType,

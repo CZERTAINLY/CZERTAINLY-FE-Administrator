@@ -75,7 +75,7 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    updateEntity(uuid: string, attributes: AttributeDTO[]): Observable<model.EntityDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PATCH", attributes)
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", attributes)
       );
 
    }
@@ -92,7 +92,7 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    listLocationAttributeDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/location/attributes`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes/location`, "GET")
       );
 
    }

@@ -26,7 +26,9 @@ export default function RaProfileDetail() {
 
    const dispatch = useDispatch();
 
-   const { params } = useRouteMatch<{ id: string }>();
+   const { params } = useRouteMatch<{ id: string, authorityUuid: string }>();
+
+
    const history = useHistory();
 
    const clients = useSelector(clientSelectors.clients);
@@ -83,12 +85,12 @@ export default function RaProfileDetail() {
 
       () => {
          if (!params.id) return;
-         dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
-         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ uuid: params.id }));
-         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ uuid: params.id }));
-         dispatch(raProfilesActions.getAcmeDetails({ uuid: params.id }));
+         dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: params.authorityUuid, uuid: params.id }));
+         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
+         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
+         dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: params.authorityUuid, uuid: params.id }));
       },
-      [params.id, dispatch]
+      [params.id, dispatch, params.authorityUuid]
 
    )
 
@@ -97,11 +99,11 @@ export default function RaProfileDetail() {
 
       () => {
          if (isAuthorizingClient || isUnauthorizing) return;
-         dispatch(raProfilesActions.listAuthorizedClients({ uuid: params.id }));
+         dispatch(raProfilesActions.listAuthorizedClients({ authorityUuid: params.authorityUuid, uuid: params.id }));
          dispatch(clientActions.listClients());
          setClientToAuthorize(null);
       },
-      [dispatch, isAuthorizingClient, isUnauthorizing, params.id]
+      [dispatch, isAuthorizingClient, isUnauthorizing, params.id, params.authorityUuid]
 
    )
 
@@ -121,7 +123,7 @@ export default function RaProfileDetail() {
       () => {
 
          if (!raProfile) return;
-         dispatch(raProfilesActions.enableRaProfile({ uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.enableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
       },
       [dispatch, raProfile]
 
@@ -132,7 +134,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.disableRaProfile({ uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.disableRaProfile({  authorityUuid: raProfile.authorityInstanceUuid,uuid: raProfile.uuid }));
       },
       [dispatch, raProfile]
 
@@ -154,7 +156,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.deleteRaProfile({ uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.deleteRaProfile({  authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
          setConfirmDelete(false);
       },
       [dispatch, raProfile]
@@ -166,7 +168,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.deactivateAcme({ uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.deactivateAcme({  authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
          setConfirmDeactivateAcme(false);
       },
       [dispatch, raProfile]
@@ -778,7 +780,7 @@ export default function RaProfileDetail() {
          <Dialog
             isOpen={activateAcmeDialog}
             caption="Activate ACME protocol"
-            body={AcmeProtocolActiovationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid })}
+            body={AcmeProtocolActiovationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid, authorityInstanceUuid: raProfile?.authorityInstanceUuid })}
             toggle={() => setActivateAcmeDialog(false)}
             buttons={[]}
          />

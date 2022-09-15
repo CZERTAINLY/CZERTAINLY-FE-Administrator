@@ -156,7 +156,7 @@ export const slice = createSlice({
       },
 
 
-      listAuthorizedClients: (state, action: PayloadAction<{ uuid: string }>) => {
+      listAuthorizedClients: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.authorizedClients = undefined;
          state.isFetchingAuthorizedClients = true;
@@ -179,7 +179,7 @@ export const slice = createSlice({
       },
 
 
-      getRaProfileDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+      getRaProfileDetail: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.raProfile = undefined;
          state.isFetchingDetail = true;
@@ -214,7 +214,7 @@ export const slice = createSlice({
       },
 
 
-      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string , authorityInstanceUuid: string}>) => {
 
          state.isCreating = false;
 
@@ -256,7 +256,7 @@ export const slice = createSlice({
       },
 
 
-      enableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+      enableRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
 
@@ -282,7 +282,7 @@ export const slice = createSlice({
       },
 
 
-      disableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+      disableRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isDisabling = true;
 
@@ -308,7 +308,7 @@ export const slice = createSlice({
       },
 
 
-      deleteRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isDeleting = true;
 
@@ -335,6 +335,7 @@ export const slice = createSlice({
 
 
       activateAcme: (state, action: PayloadAction<{
+         authorityUuid: string, 
          uuid: string,
          acmeProfileUuid: string,
          issueCertificateAttributes: AttributeModel[],
@@ -361,7 +362,7 @@ export const slice = createSlice({
       },
 
 
-      deactivateAcme: (state, action: PayloadAction<{ uuid: string }>) => {
+      deactivateAcme: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isDeactivatingAcme = true;
 
@@ -383,7 +384,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeDetails: (state, action: PayloadAction<{ uuid: string }>) => {
+      getAcmeDetails: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isFetchingAcmeDetails = true;
 
@@ -492,7 +493,7 @@ export const slice = createSlice({
       },
 
 
-      listIssuanceAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
+      listIssuanceAttributeDescriptors: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isFetchingIssuanceAttributes = true;
 
@@ -515,7 +516,7 @@ export const slice = createSlice({
       },
 
 
-      listRevocationAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
+      listRevocationAttributeDescriptors: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isFetchinRevocationAttributes = true;
 

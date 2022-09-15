@@ -79,7 +79,14 @@ export interface CertificateRAProfileModel {
    uuid: string;
    name: string;
    enabled: boolean;
+   authorityInstanceUuid: string;
 }
+
+
+export interface ValidationResultModel {
+   status: ValidationStatus;
+   message: string;
+ }
 
 
 export interface ValidationResultModel {

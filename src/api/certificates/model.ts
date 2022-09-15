@@ -10,6 +10,7 @@ export interface CertificateRAProfileDTO {
    uuid: string;
    name: string;
    enabled: boolean;
+   authorityInstanceUuid: string;
 }
 
 

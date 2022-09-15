@@ -61,7 +61,7 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getLocationDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                location => slice.actions.getLocationDetailSuccess({ location: transformLocationDtoToModel(location) })
@@ -114,7 +114,7 @@ const addLocation: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.locations.getLocationDetail(uuid).pipe(
+               uuid => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, uuid).pipe(
 
                   map(
                      location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location) })
@@ -250,7 +250,7 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.deleteLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.deleteLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
@@ -316,7 +316,7 @@ const enableLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.enableLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.enableLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.enableLocationSuccess({ uuid: action.payload.uuid })
@@ -359,7 +359,7 @@ const disableLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.disableLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.disableLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.disableLocationSuccess({ uuid: action.payload.uuid })
@@ -402,7 +402,7 @@ const getPushAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getPushAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getPushAttributes(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                attributes => slice.actions.getPushAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
@@ -445,7 +445,7 @@ const getCSRAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getCSRAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getCSRAttributes(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                attributes => slice.actions.getCSRAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
@@ -489,6 +489,7 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.pushCertificate(
+            action.payload.entityUuid, 
             action.payload.locationUuid,
             action.payload.certificateUuid,
             action.payload.pushAttributes.map(transformAttributeModelToDTO)
@@ -536,6 +537,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => deps.apiClients.locations.issueCertificate(
+            action.payload.entityUuid, 
             action.payload.locationUuid,
             action.payload.raProfileUuid,
             action.payload.csrAttributes.map(transformAttributeModelToDTO),
@@ -584,6 +586,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.autoRenewCertificate(
+            action.payload.entityUuid, 
             action.payload.locationUuid,
             action.payload.certificateUuid
          ).pipe(
@@ -630,6 +633,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.removeCertificate(
+            action.payload.entityUuid, 
             action.payload.locationUuid,
             action.payload.certificateUuid
          ).pipe(
@@ -675,7 +679,7 @@ const syncLocation: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.syncLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.syncLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                location => slice.actions.syncLocationSuccess({ location: transformLocationDtoToModel(location) })

@@ -4,7 +4,7 @@ import { FetchHttpService } from 'ts-rest-client-fetch';
 
 import * as model from './model';
 
-const baseUrl = '/api/v1/logs';
+const baseUrl = '/api/v1/auditLogs';
 
 
 export class AuditLogsBackend implements model.AuditLogsApi {

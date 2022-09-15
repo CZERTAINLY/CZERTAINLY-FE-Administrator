@@ -117,8 +117,8 @@ export default function RaProfileForm({
       () => {
 
          if (raProfile) {
-            dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: raProfile.uuid }));
-            dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: raProfile.uuid }));
+            dispatch(raProfileActions.listIssuanceAttributeDescriptors({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
+            dispatch(raProfileActions.listRevocationAttributeDescriptors({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
          }
 
       },
@@ -202,8 +202,8 @@ export default function RaProfileForm({
 
          setRaProfile(raProfiles.find(p => p.uuid === value) || undefined);
 
-         dispatch(raProfileActions.listIssuanceAttributeDescriptors({ uuid: value }));
-         dispatch(raProfileActions.listRevocationAttributeDescriptors({ uuid: value }));
+         dispatch(raProfileActions.listIssuanceAttributeDescriptors({ authorityUuid: raProfile?.authorityInstanceUuid || "", uuid: value }));
+         dispatch(raProfileActions.listRevocationAttributeDescriptors({ authorityUuid: raProfile?.authorityInstanceUuid || "", uuid: value }));
 
          if (acmeProfile) {
 
@@ -216,7 +216,7 @@ export default function RaProfileForm({
          }
 
       },
-      [dispatch, raProfiles, acmeProfile]
+      [dispatch, raProfiles, acmeProfile, raProfile?.authorityInstanceUuid]
 
    );
 

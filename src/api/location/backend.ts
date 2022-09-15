@@ -11,6 +11,7 @@ import { map } from "rxjs/operators";
 
 
 const baseUrl = "/api/v1/locations";
+const extBaseUrl = "/api/v1/entities";
 
 
 export class LocationManagementBackend implements model.LocationManagementApi {
@@ -35,11 +36,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   getLocationDetail(uuid: string): Observable<model.LocationDTO> {
+   getLocationDetail(entityUuid: string, uuid: string): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}`,
             "GET"
          )
       )
@@ -49,8 +50,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
    addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
 
-      return createNewResource(baseUrl, {
-            entityInstanceUuid: entityUuid,
+      return createNewResource(`${extBaseUrl}/${entityUuid}/locations`, {
             name,
             description,
             attributes,
@@ -72,9 +72,8 @@ export class LocationManagementBackend implements model.LocationManagementApi {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}`,
-            "PATCH", {
-            entityInstanceUuid: entityUuid,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}`,
+            "PUT", {
             description,
             attributes,
             enabled
@@ -86,11 +85,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   deleteLocation(uuid: string): Observable<void> {
+   deleteLocation(entityUuid: string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}`,
             "DELETE"
          )
       )
@@ -98,11 +97,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   enableLocation(uuid: string): Observable<void> {
+   enableLocation(entityUuid: string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/enable`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/enable`,
             "PATCH"
          )
       )
@@ -110,11 +109,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   disableLocation(uuid: string): Observable<void> {
+   disableLocation(entityUuid: string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/disable`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/disable`,
             "PATCH"
          )
       )
@@ -122,11 +121,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   syncLocation(uuid: string): Observable<model.LocationDTO> {
+   syncLocation(entityUuid: string, uuid: string): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/sync`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/sync`,
             "PUT"
          )
       )
@@ -134,11 +133,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   getPushAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getPushAttributes(entityUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/push/attributes`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/attributes/push`,
             "GET"
          )
       )
@@ -146,11 +145,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   getCSRAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getCSRAttributes(entityUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/issue/attributes`,
+            `${extBaseUrl}/${entityUuid}/locations/${uuid}/attributes/issue`,
             "GET"
          )
       )
@@ -158,12 +157,12 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   pushCertificate(locationUuid: string, certificateUuid: string, attributes: AttributeDTO[]): Observable<model.LocationDTO> {
+   pushCertificate(entityUuid: string, locationUuid: string, certificateUuid: string, attributes: AttributeDTO[]): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${locationUuid}/push/${certificateUuid}`,
-            "POST", {
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
+            "PUT", {
                attributes
             }
          )
@@ -172,11 +171,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   issueCertificate(locationUuid: string, raProfileUuid: string, csrAttributes: AttributeDTO[], issueAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
+   issueCertificate(entityUuid: string, locationUuid: string, raProfileUuid: string, csrAttributes: AttributeDTO[], issueAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${locationUuid}/issue`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates`,
             "POST",
             {
                raProfileUuid,
@@ -189,11 +188,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   autoRenewCertificate(locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
+   autoRenewCertificate(entityUuid: string, locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${locationUuid}/renew/${certificateUuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
             "PATCH"
          )
       )
@@ -201,11 +200,11 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   removeCertificate(locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
+   removeCertificate(entityUuid: string, locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${locationUuid}/remove/${certificateUuid}`,
+            `${extBaseUrl}/${entityUuid}/locations/${locationUuid}/certificates/${certificateUuid}`,
             "DELETE"
          )
       )

@@ -9,8 +9,9 @@ import { createNewResource } from "utils/net";
 
 import * as model from "./model";
 
-const baseUrl = "/api/v1/raprofiles";
+const baseUrl = "/api/v1/raProfiles";
 const baseUrlCompliance = "/api/v1/complianceProfiles";
+const extBaseUrl = "/api/v1/authorities";
 
 export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
@@ -22,21 +23,20 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getRaAcmeProfile(uuid: string): Observable<model.RaAcmeLinkDTO> {
+   getRaAcmeProfile(authorityInstanceUuid: string, uuid: string): Observable<model.RaAcmeLinkDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/acme`, "GET")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme`, "GET")
       );
 
    }
 
 
-   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
+   activateAcme(authorityInstanceUuid: string ,uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrl}/${uuid}/activateAcme`, "POST", {
-            acmeProfileUuid,
+         new HttpRequestOptions(`$${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme/activate/${acmeProfileUuid}`, "PATCH", {
             issueCertificateAttributes: issueCertificateAttributes,
             revokeCertificateAttributes: revokeCertificateAttributes,
          })
@@ -46,10 +46,10 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   deactivateAcme(uuid: string): Observable<void> {
+   deactivateAcme(authorityInstanceUuid: string ,uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/deactivateAcme`, "POST")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme/deactivate`, "PATCH")
       );
 
    }
@@ -58,42 +58,41 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
 
       return createNewResource(
-         baseUrl,
+         `${extBaseUrl}/${authorityInstanceUuid}/raProfiles`,
          {
-            authorityInstanceUuid,
             name: name,
             description,
             attributes: attributes,
          }
       ).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
+         map((location) => location?.substr(location.lastIndexOf(`/${authorityInstanceUuid}`) + 1) || "")
       );
 
    }
 
 
-   deleteRaProfile(uuid: string): Observable<void> {
+   deleteRaProfile(authorityInstanceUuid:string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}`, "DELETE")
       );
 
    }
 
 
-   enableRaProfile(uuid: string): Observable<void> {
+   enableRaProfile(authorityInstanceUuid: string ,uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/enable`, "PATCH")
       );
 
    }
 
 
-   disableRaProfile(uuid: string): Observable<void> {
+   disableRaProfile(authorityInstanceUuid: string ,uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/disable`, "PATCH")
       );
 
    }
@@ -133,10 +132,10 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getRaProfileDetail(uuid: string): Observable<model.RaProfileDTO> {
+   getRaProfileDetail(authorityInstanceUuid: string, uuid: string): Observable<model.RaProfileDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}`, "GET")
       );
 
    }
@@ -145,7 +144,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    getAuthorizedClients(uuid: string): Observable<model.RaAuthorizedClientDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/listclients`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/users`, "GET")
       );
 
    }
@@ -154,8 +153,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<model.RaProfileDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-            authorityInstanceUuid,
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}`, "PUT", {
             description,
             uuid,
             attributes: attributes,
@@ -165,11 +163,11 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getIssueAttributes(authorityInstanceUuid: string ,uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/issue/attributes`,
+            `${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/attributes/issue`,
             "GET"
          )
       );
@@ -177,11 +175,11 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getRevocationAttributes(authorityInstanceUuid: string ,uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/revoke/attributes`,
+            `${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/attributes/revoke`,
             "GET"
          )
       );

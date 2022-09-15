@@ -72,7 +72,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    enableAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PATCH")
       );
 
    }
@@ -81,7 +81,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    disableAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PATCH")
       );
 
    }
@@ -108,7 +108,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    bulkEnableAcmeProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/enable`, "PATCH", uuids)
       );
 
    }
@@ -116,7 +116,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    bulkDisableAcmeProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/disable`, "PATCH", uuids)
       );
 
    }
@@ -180,7 +180,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    updateRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "PATCH")
       );
 
    }
