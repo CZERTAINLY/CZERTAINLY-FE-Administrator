@@ -1,13 +1,12 @@
-import { UserDetailDTO } from 'api/users';
 import { Observable } from 'rxjs';
 import { HttpRequestOptions } from 'ts-rest-client';
 import { FetchHttpService } from 'ts-rest-client-fetch';
 
 import * as model from './model';
 
-const baseUrl = '/api/v1/auth';
+const baseUrl = '/api/v1/roles';
 
-export class AuthBackend implements model.AuthApi {
+export class RolesBackend implements model.RoleApi {
 
    private _fetchService: FetchHttpService;
 
@@ -18,12 +17,12 @@ export class AuthBackend implements model.AuthApi {
    }
 
 
-   profile(): Observable<UserDetailDTO> {
+   listRoles(): Observable<model.RoleDTO[]> {
 
       return this._fetchService.request(
 
          new HttpRequestOptions(
-            `${baseUrl}/profile`,
+            `${baseUrl}`,
             'GET',
          )
 
@@ -31,18 +30,5 @@ export class AuthBackend implements model.AuthApi {
 
    }
 
-
-   getAllResources(): Observable<model.ResourceDetailDTO[]> {
-
-      return this._fetchService.request(
-
-         new HttpRequestOptions(
-            `${baseUrl}/resources`,
-            'GET'
-         )
-
-      );
-
-   }
 
 }

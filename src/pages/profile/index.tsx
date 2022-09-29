@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, Container, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
 import { actions, selectors } from "ducks/auth";
-import { Role } from "models/auth";
 import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
 import { useHistory } from "react-router";
 
@@ -32,7 +31,7 @@ export default function Profile() {
 
          const { name, surname, username, email } = values;
 
-         dispatch(
+         /*dispatch(
             actions.updateProfile({
                userProfile: {
                   username,
@@ -42,7 +41,7 @@ export default function Profile() {
                   role: profile?.role || Role.Admin
                }
             })
-         );
+         );*/
 
       },
       [dispatch, profile?.role]

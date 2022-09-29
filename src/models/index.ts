@@ -1,5 +1,5 @@
 export * from "./audit-log";
-export * from "./auth";
+export * from "./users";
 export * from "./certificate";
 export * from "./administrators";
 export * from "./clients";

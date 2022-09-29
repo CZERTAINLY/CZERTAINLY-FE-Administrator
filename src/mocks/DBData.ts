@@ -1,10 +1,8 @@
 import { DbAuthority } from "./db-authorities";
 import { DbAcmeAccount } from "./db-acme-accounts";
 import { DbAcmeProfile } from "./db-acme-profiles";
-import { DbAdministrator } from "./db-administrators";
 import { DbAuditLog } from "./db-audit-logs";
 import { DbCertificate } from "./db-certificates";
-import { DbClient } from "./db-clients";
 import { DbConnector } from "./db-connectors";
 import { DbRemoteConnector } from "./db-connectors-remote";
 import { DbCredential } from "./db-credentials";
@@ -18,6 +16,9 @@ import { DbComplianceGroup, DbComplianceProfile, DbComplianceProfileList, DbComp
 
 import { DbEntity } from "./db-entities";
 import { DbLocation } from "./db-locations";
+import { DbUser } from "./db-users";
+import { DbResource } from "./db-auth";
+import { DbRole } from "./db-roles";
 
 
 export interface DBData {
@@ -26,7 +27,9 @@ export interface DBData {
 
    acmeProfiles: DbAcmeProfile[];
 
-   administrators: DbAdministrator[];
+   users: DbUser[];
+   roles: DbRole[];
+   resources: DbResource[];
 
    auditLogs: DbAuditLog[];
    auditLogsOperations: AuditLogOperation[],
@@ -37,7 +40,6 @@ export interface DBData {
 
    certificates: DbCertificate[];
 
-   clients: DbClient[];
 
    connectors: DbConnector[];
    connectorsRemote: DbRemoteConnector[];

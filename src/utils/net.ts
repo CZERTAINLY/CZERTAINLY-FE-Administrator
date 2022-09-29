@@ -2,22 +2,22 @@ import { Observable, from } from "rxjs";
 import { HttpErrorResponse, StringMap } from "ts-rest-client";
 
 
-export function createNewResource(
+export function createNewResource<T = any>(
    url: string,
    body: any,
    headers?: any
-): Observable<string | null> {
+): Observable<T extends any ? T : (string | null)> {
 
    return from(doFetch(url, body, headers));
 
 }
 
 
-async function doFetch(
+async function doFetch<T>(
    url: string,
    body: any,
    headers?: any
-): Promise<string> {
+): Promise<T> {
 
    let errorResponse = null;
 
