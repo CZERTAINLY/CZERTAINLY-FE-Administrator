@@ -4,6 +4,7 @@ import { dbCertificates } from "./db-certificates";
 
 
 export interface DbUser extends UserDetailDTO {
+   authorizedProfiles: string[];
 };
 
 
@@ -28,8 +29,8 @@ export const dbUsers: DbUsers = {
       },
       roles: [
          dbRoles[""]
-      ]
-
+      ],
+      authorizedProfiles: []
    },
 
    "User": {
@@ -51,7 +52,8 @@ export const dbUsers: DbUsers = {
             description: dbRoles["user"].description,
             systemRole: dbRoles["user"].systemRole,
          }
-      ]
+      ],
+      authorizedProfiles: []
    },
 
 }

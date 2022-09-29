@@ -2,10 +2,10 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import { useRouteMatch } from 'react-router-dom';
 
-import AdministratorAdd from './add';
-import AdministratorEdit from './edit';
+import UserAdd from './add';
+import UserEdit from './edit';
 import UsersList from './list';
-import AdministratorDetail from './detail';
+import UserDetail from './detail';
 
 function Administrators() {
 
@@ -17,9 +17,9 @@ function Administrators() {
 
          <Route path={path} component={UsersList} exact />
          <Route path={`${path}/list`} component={UsersList} exact />
-         <Route path={`${path}/detail/:id`} component={AdministratorDetail} exact />
-         <Route path={`${path}/edit/:id`} component={AdministratorEdit} exact />
-         <Route path={`${path}/add`} component={AdministratorAdd} exact />
+         <Route path={`${path}/detail/:id`} component={UserDetail} exact />
+         <Route path={`${path}/edit/:id`} component={UserEdit} exact />
+         <Route path={`${path}/add`} component={UserAdd} exact />
 
       </Switch>
 

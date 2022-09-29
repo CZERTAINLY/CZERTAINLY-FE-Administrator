@@ -1,14 +1,30 @@
-import { UserProfileDTO } from "api/auth/model";
-import { Role, UserProfileModel } from "models";
+import { ResourceDetailDTO } from "api/auth/model";
+import { ResourceDetailModel, ResourceModel } from "models/auth";
 
-export function UserProfileDtoToModel(profile: UserProfileDTO): UserProfileModel {
+
+export function transformResourceDTOToModel(resource: ResourceDetailDTO): ResourceModel {
 
    return {
-      username: profile.username,
-      name: profile.name,
-      surname: profile.surname,
-      email: profile.email,
-      role: profile.role === "superAdministrator" ? Role.SuperAdmin : Role.Admin,
-   }
+      uuid: resource.uuid,
+      name: resource.name,
+      displayName: resource.displayName,
+      listingEndPoint: resource.listingEndPoint,
+      objectAccess: resource.objectAccess,
+   };
+
+}
+
+export function transformResourceDetailDTOToModel(resource: ResourceDetailDTO): ResourceDetailModel {
+
+   return {
+      ...transformResourceDTOToModel(resource),
+      actions: resource.actions.map(
+         action => ({
+            uuid: action.uuid,
+            name: action.name,
+            displayName: action.displayName,
+         })
+      ),
+   };
 
 }

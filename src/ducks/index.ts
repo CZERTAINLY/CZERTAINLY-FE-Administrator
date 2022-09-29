@@ -112,10 +112,10 @@ export const reducers = combineReducers<typeof initialState, any>({
 
 export const epics = combineEpics(
    ...statupEpics,
+   ...usersEpics,
    ...authEpics,
    ...auditLogsEpics,
    ...certificatesEpics,
-   ...usersEpics,
    ...connectorsEpics,
    ...dashboardEpics,
    ...raProfilesEpics,

@@ -41,7 +41,7 @@ function Header({ sidebarToggle }: Props) {
 
                      <DropdownToggle nav>
                         <i className={cx('fa fa-user-circle-o fa-2x', style.adminPhoto)} />
-                        <span className="text-body">{profile.name}</span>
+                        <span className="text-body">{profile.username}</span>
                         <i className={cx('fa fa-angle-down ml-sm', style.arrow, { [style.arrowActive]: isOpen })} />
                      </DropdownToggle>
 

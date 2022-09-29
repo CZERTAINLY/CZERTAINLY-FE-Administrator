@@ -39,15 +39,16 @@ export const dbData: DBData = {
       dbAcmeProfiles["ACME CZERTAINLY Profile"]
    ],
 
+   users: [
+      dbUsers["Admin"],
+      dbUsers["User"],
+   ],
+
    roles: [
       dbRoles["admin"],
       dbRoles["user"],
    ],
 
-   users: [
-      dbUsers["Admin"],
-      dbUsers["User"],
-   ],
 
    resources: [
       dbResources["users"],

@@ -10,7 +10,7 @@ interface Props {
 
 function PrivateRoute({ component, ...rest }: Props) {
 
-   const isAuthenticated = useSelector(selectors.isAuthenticated);
+   const isAuthenticated = useSelector(selectors.profile);
 
    if (!isAuthenticated) { return <Redirect to="/login" />; }
 

@@ -7,6 +7,7 @@ import { actions as alertActions } from "./alerts";
 import { extractError } from 'utils/net';
 
 import * as slice from './auth';
+import { transformResourceDetailDTOToModel } from './transform/auth';
 
 
 const getProfile: AppEpic = (action$, state$, deps) => {
@@ -63,7 +64,7 @@ const getResources: AppEpic = (action$, state$, deps) => {
          () => deps.apiClients.auth.getAllResources().pipe(
 
             map(
-               resources => slice.actions.getResourcesSuccess({ resources })
+               resources => slice.actions.getResourcesSuccess({ resources: resources.map(resource => transformResourceDetailDTOToModel(resource)) })
             ),
 
             catchError(

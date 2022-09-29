@@ -1,22 +1,20 @@
-import { UserModel, UserDetailModel, UserCertificateModel } from "models";
+import { UserModel, UserDetailModel, CertificateModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { RoleDTO } from "api/roles";
+import { RoleModel } from "models/roles";
 
 
 export type State = {
 
-   adminListCheckedRows: string[];
-   adminRolesListCheckedRows: string[];
+   usersListCheckedRows: string[];
+   userRolesListCheckedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
 
-   administrator?: UserDetailModel;
-   administratorRoles?: RoleDTO[];
+   user?: UserDetailModel;
+   userRoles?: RoleModel[];
 
-   administrators: UserModel[];
+   users: UserModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -25,8 +23,8 @@ export type State = {
    isUpdating: boolean;
    isEnabling: boolean;
    isDisabling: boolean;
-   isGettingRoles: boolean;
-   isPushingRoles: boolean;
+   isFetchingRoles: boolean;
+   isUpdatingRoles: boolean;
    isAddingRole: boolean;
    isRemovingRole: boolean;
 
@@ -35,13 +33,12 @@ export type State = {
 
 export const initialState: State = {
 
-   adminListCheckedRows: [],
-   adminRolesListCheckedRows: [],
+   usersListCheckedRows: [],
+   userRolesListCheckedRows: [],
 
    deleteErrorMessage: "",
-   bulkDeleteErrorMessages: [],
 
-   administrators: [],
+   users: [],
 
    isFetchingDetail: false,
    isFetchingList: false,
@@ -50,7 +47,8 @@ export const initialState: State = {
    isUpdating: false,
    isEnabling: false,
    isDisabling: false,
-   isGettingRoles: false,
+   isFetchingRoles: false,
+   isUpdatingRoles: false,
    isAddingRole: false,
    isRemovingRole: false,
 
@@ -80,16 +78,16 @@ export const slice = createSlice({
       },
 
 
-      setAdminListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+      setUserListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
-         state.adminListCheckedRows = action.payload.checkedRows;
+         state.usersListCheckedRows = action.payload.checkedRows;
 
       },
 
 
-      setAdminRolesListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+      setUserRolesListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
-         state.adminRolesListCheckedRows = action.payload.checkedRows;
+         state.userRolesListCheckedRows = action.payload.checkedRows;
 
       },
 
@@ -97,23 +95,22 @@ export const slice = createSlice({
       clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
 
          state.deleteErrorMessage = "";
-         state.bulkDeleteErrorMessages = [];
 
       },
 
 
       list: (state, action: PayloadAction<void>) => {
 
-         state.adminListCheckedRows = [];
+         state.usersListCheckedRows = [];
          state.isFetchingList = true;
 
       },
 
 
-      listSucces: (state, action: PayloadAction<{ users: UserModel[] }>) => {
+      listSuccess: (state, action: PayloadAction<{ users: UserModel[] }>) => {
 
          state.isFetchingList = false;
-         state.administrators = action.payload.users;
+         state.users = action.payload.users;
 
       },
 
@@ -126,45 +123,44 @@ export const slice = createSlice({
 
       getDetail: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.administrator = undefined;
-         state.administratorRoles = undefined;
-         state.adminRolesListCheckedRows = [];
+         state.user = undefined;
+         state.userRoles = undefined;
+         state.userRolesListCheckedRows = [];
          state.isFetchingDetail = true;
 
       },
 
 
-      getDetailSuccess: (state, action: PayloadAction<{ user: AdministratorModel }>) => {
+      getDetailSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
 
          state.isFetchingDetail = false;
 
-         state.administrator = action.payload.user;
+         state.user = action.payload.user;
 
-         const administratorIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload.user.uuid);
+         const userIndex = state.users.findIndex(user => user.uuid === action.payload.user.uuid);
 
-         if (administratorIndex >= 0) {
-            state.administrators[administratorIndex] = action.payload.user;
+         if (userIndex >= 0) {
+            state.users[userIndex] = action.payload.user;
          } else {
-            state.administrators.push(action.payload.user);
+            state.users.push(action.payload.user);
          }
 
       },
 
 
-      getAdminDetailFailure: (state, acttion: PayloadAction<{ error: string | undefined }>) => {
+      getDetailFailure: (state, acttion: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false;
 
       },
 
 
-      createAdmin: (state, action: PayloadAction<{
-         name: string,
-         surname: string,
+      create: (state, action: PayloadAction<{
          username: string,
+         firstName: string | undefined,
+         lastName: string | undefined,
          email: string,
-         description: string,
-         role: AdministratorRole,
+         enabled: boolean,
          certificate: CertificateModel | undefined,
          certificateUuid: string | undefined
       }>) => {
@@ -174,29 +170,28 @@ export const slice = createSlice({
       },
 
 
-      createAdminSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      createSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+
+         state.isCreating = false;
+         state.users.push(action.payload.user);
+
+      },
+
+
+      createFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isCreating = false;
 
       },
 
 
-      createAdminFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isCreating = false;
-
-      },
-
-
-      updateAdmin: (state, action: PayloadAction<{
+      update: (state, action: PayloadAction<{
          uuid: string,
-         name: string,
-         surname: string,
-         username: string,
-         email: string,
+         firstName: string | undefined,
+         lastName: string | undefined,
+         email: string | undefined,
+         enabled: boolean,
          certificate: CertificateModel | undefined,
-         description: string,
-         role: AdministratorRole,
          certificateUuid: string | undefined
       }>) => {
 
@@ -205,53 +200,53 @@ export const slice = createSlice({
       },
 
 
-      updateAdminSuccess: (state, action: PayloadAction<{ administrator: AdministratorModel }>) => {
+      updateSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
 
          state.isUpdating = false;
 
-         const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload.administrator.uuid)
+         const userIndex = state.users.findIndex(user => user.uuid === action.payload.user.uuid)
 
-         if (adminIndex >= 0) {
-            state.administrators[adminIndex] = action.payload.administrator;
+         if (userIndex >= 0) {
+            state.users[userIndex] = action.payload.user;
          } else {
-            state.administrators.push(action.payload.administrator);
+            state.users.push(action.payload.user);
          }
 
-         if (state.administrator?.uuid === action.payload.administrator.uuid) state.administrator = action.payload.administrator;
+         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
 
       },
 
 
-      updateAdminFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      updateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false;
 
       },
 
 
-      deleteAdmin: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteUser: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteAdminSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteUserSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDeleting = false;
 
-         state.adminListCheckedRows = [];
+         state.usersListCheckedRows = [];
 
-         const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === action.payload.uuid);
+         const userIndex = state.users.findIndex(user => user.uuid === action.payload.uuid);
 
-         if (adminIndex >= 0) state.administrators.splice(adminIndex, 1);
+         if (userIndex >= 0) state.users.splice(userIndex, 1);
 
-         if (state.administrator?.uuid === action.payload.uuid) state.administrator = undefined;
+         if (state.user?.uuid === action.payload.uuid) state.user = undefined;
 
       },
 
 
-      deleteAdminFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      deleteUserFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.deleteErrorMessage = action.payload.error || "Unknown error";
          state.isDeleting = false;
@@ -259,154 +254,157 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAdmins: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.bulkDeleteErrorMessages = [];
-         state.isBulkDeleting = true;
-
-      },
-
-
-      bulkDeleteAdminsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkDeleting = false;
-         state.adminListCheckedRows = [];
-
-         action.payload.uuids.forEach(
-
-            uuid => {
-               const adminIndex = state.administrators.findIndex(administrator => administrator.uuid === uuid)
-               if (adminIndex >= 0) state.administrators.splice(adminIndex, 1);
-            }
-         )
-
-         if (state.administrator && action.payload.uuids.includes(state.administrator.uuid)) state.administrator = undefined;
-
-      },
-
-
-      bulkDeleteAdminsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isBulkDeleting = false;
-
-      },
-
-
-      enableAdmin: (state, action: PayloadAction<{ uuid: string }>) => {
+      enable: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isEnabling = true;
 
       },
 
 
-      enableAdminSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      enableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isEnabling = false;
 
-         const admin = state.administrators.find(administrator => administrator.uuid === action.payload.uuid)
+         const admin = state.users.find(administrator => administrator.uuid === action.payload.uuid)
          if (admin) admin.enabled = true;
 
-         if (state.administrator?.uuid === action.payload.uuid) state.administrator.enabled = true;
+         if (state.user?.uuid === action.payload.uuid) state.user.enabled = true;
 
       },
 
 
-      enableAdminFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      enableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isEnabling = false;
 
       },
 
 
-      bulkEnableAdmins: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkEnabling = true;
-
-      },
-
-
-      bulkEnableAdminsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkEnabling = false;
-
-         action.payload.uuids.forEach(
-
-            uuid => {
-               const admin = state.administrators.find(administrator => administrator.uuid === uuid)
-               if (admin) admin.enabled = true;
-            }
-
-         )
-
-         if (state.administrator && action.payload.uuids.includes(state.administrator.uuid)) state.administrator.enabled = true;
-
-      },
-
-
-      bulkEnableAdminsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isBulkEnabling = false;
-
-      },
-
-
-      disableAdmin: (state, action: PayloadAction<{ uuid: string }>) => {
+      disable: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDisabling = true;
 
       },
 
 
-      disableAdminSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      disableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isDisabling = false;
 
-         const admin = state.administrators.find(administrator => administrator.uuid === action.payload.uuid)
+         const admin = state.users.find(administrator => administrator.uuid === action.payload.uuid)
 
          if (admin) admin.enabled = false;
 
-         if (state.administrator?.uuid === action.payload.uuid) state.administrator.enabled = false;
+         if (state.user?.uuid === action.payload.uuid) state.user.enabled = false;
 
       },
 
 
-      disableAdminFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      disableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDisabling = false;
 
       },
 
 
-      bulkDisableAdmins: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      getRoles: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.isBulkDisabling = true;
-
-      },
-
-
-      bulkDisableAdminsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkDisabling = false;
-
-         action.payload.uuids.forEach(
-
-            uuid => {
-               const admin = state.administrators.find(administrator => administrator.uuid === uuid)
-               if (admin) admin.enabled = false;
-            }
-
-         )
-
-         if (state.administrator && action.payload.uuids.includes(state.administrator.uuid)) state.administrator.enabled = false;
+         state.isFetchingRoles = true;
 
       },
 
 
-      bulkDisableAdminsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getRolesSuccess: (state, action: PayloadAction<{ uuid: string, roles: RoleModel[] }>) => {
 
-         state.isBulkDisabling = false;
+         state.isFetchingRoles = false;
+
+         state.userRoles = action.payload.roles;
 
       },
+
+
+      getRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingRoles = false;
+
+      },
+
+
+      updateRoles: (state, action: PayloadAction<{ uuid: string, roles: string[] }>) => {
+
+         state.userRoles = undefined;
+         state.isUpdatingRoles = true;
+
+      },
+
+
+      updateRolesSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+
+         state.isUpdatingRoles = false;
+
+         state.userRoles = action.payload.user.roles;
+
+         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+
+      },
+
+
+      updateRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isUpdatingRoles = false;
+
+      },
+
+
+      addRole: (state, action: PayloadAction<{ uuid: string, roleUuid: string }>) => {
+
+         state.isAddingRole = true;
+
+      },
+
+
+      addRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+
+         state.isAddingRole = false;
+
+         state.userRoles = action.payload.user.roles;
+
+         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+
+      },
+
+
+      addRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isAddingRole = false;
+
+      },
+
+
+      removeRole: (state, action: PayloadAction<{ uuid: string, roleUuid: string }>) => {
+
+         state.isRemovingRole = true;
+
+      },
+
+
+      removeRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+
+         state.isRemovingRole = false;
+
+         state.userRoles = action.payload.user.roles;
+
+         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+
+      },
+
+
+      removeRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isRemovingRole = false;
+
+      }
+
    }
 
 })
@@ -414,13 +412,15 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const checkedRows = createSelector(state, state => state.adminListCheckedRows);
+const usersListCheckedRows = createSelector(state, state => state.usersListCheckedRows);
+const userRolesListCheckedRows = createSelector(state, state => state.userRolesListCheckedRows);
 
 const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
-const bulkDeleteErrorMessages = createSelector(state, state => state.bulkDeleteErrorMessages);
 
-const administrators = createSelector(state, state => state.administrators);
-const administrator = createSelector(state, state => state.administrator);
+const user = createSelector(state, state => state.user);
+const userRoles = createSelector(state, state => state.userRoles);
+
+const users = createSelector(state, state => state.users);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
@@ -429,22 +429,25 @@ const isUpdating = createSelector(state, state => state.isUpdating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isEnabling = createSelector(state, state => state.isEnabling);
 const isDisabling = createSelector(state, state => state.isDisabling);
-const isBulkDeleting = createSelector(state, state => state.isBulkDeleting);
-const isBulkEnabling = createSelector(state, state => state.isBulkEnabling);
-const isBulkDisabling = createSelector(state, state => state.isBulkDisabling);
+const isFetchingRoles = createSelector(state, state => state.isFetchingRoles);
+const isUpdatingRoles = createSelector(state, state => state.isUpdatingRoles);
+const isAddingRole = createSelector(state, state => state.isAddingRole);
+const isRemovingRole = createSelector(state, state => state.isRemovingRole);
 
 
 export const selectors = {
 
    state,
 
-   checkedRows,
+   usersListCheckedRows,
+   userRolesListCheckedRows,
 
    deleteErrorMessage,
-   bulkDeleteErrorMessages,
 
-   administrator,
-   administrators,
+   user,
+   userRoles,
+
+   users,
 
    isFetchingList,
    isFetchingDetail,
@@ -453,9 +456,11 @@ export const selectors = {
    isUpdating,
    isEnabling,
    isDisabling,
-   isBulkDeleting,
-   isBulkEnabling,
-   isBulkDisabling
+   isFetchingRoles,
+   isUpdatingRoles,
+   isAddingRole,
+   isRemovingRole
+
 };
 
 

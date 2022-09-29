@@ -8,6 +8,8 @@ interface DbRoles {
    [key: string]: DbRole;
 }
 
+console.log(dbUsers);
+
 export const dbRoles: DbRoles = {
 
    "admin": {

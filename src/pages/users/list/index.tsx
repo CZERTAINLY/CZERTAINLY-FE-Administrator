@@ -20,17 +20,14 @@ export default function UsersList() {
 
    const { path } = useRouteMatch();
 
-   const checkedRows = useSelector(selectors.checkedRows);
-   const administrators = useSelector(selectors.administrators);
+   const checkedRows = useSelector(selectors.usersListCheckedRows);
+   const users = useSelector(selectors.users);
 
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
-   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
    const isUpdating = useSelector(selectors.isUpdating);
-   const isBulkEnabling = useSelector(selectors.isBulkEnabling);
-   const isBulkDisabling = useSelector(selectors.isBulkDisabling);
 
-   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
+   const isBusy = isFetching || isDeleting || isUpdating;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -38,8 +35,8 @@ export default function UsersList() {
 
       () => {
 
-         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-         dispatch(actions.listAdmins());
+         dispatch(actions.setUserListCheckedRows({ checkedRows: [] }));
+         dispatch(actions.list());
 
       },
       [dispatch]
@@ -63,7 +60,9 @@ export default function UsersList() {
 
       () => {
 
-         dispatch(actions.bulkEnableAdmins({ uuids: checkedRows }));
+         checkedRows.forEach(
+            uuid => dispatch(actions.enable({ uuid }))
+         );
 
       },
       [checkedRows, dispatch]
@@ -75,7 +74,9 @@ export default function UsersList() {
 
       () => {
 
-         dispatch(actions.bulkDisableAdmins({ uuids: checkedRows }));
+         checkedRows.forEach(
+            uuid => dispatch(actions.disable({ uuid }))
+         );
 
       },
       [checkedRows, dispatch]
@@ -87,8 +88,11 @@ export default function UsersList() {
 
       () => {
 
-         dispatch(actions.bulkDeleteAdmins({ uuids: checkedRows }));
          setConfirmDelete(false);
+
+         checkedRows.forEach(
+            uuid => dispatch(actions.deleteUser({ uuid }))
+         );
 
       },
       [checkedRows, dispatch]
@@ -100,7 +104,7 @@ export default function UsersList() {
 
       (rows: (string | number)[]) => {
 
-         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+         dispatch(actions.setUserListCheckedRows({ checkedRows: rows as string[] }));
 
       },
       [dispatch]
@@ -147,35 +151,35 @@ export default function UsersList() {
 
       () => [
          {
-            id: "adminUsername",
+            id: "username",
             content: <MDBColumnName columnName="Username" />,
             sortable: true,
             sort: "asc",
             width: "10%",
          },
          {
-            id: "adminName",
-            content: <MDBColumnName columnName="Name" />,
+            id: "firstName",
+            content: <MDBColumnName columnName="First name" />,
             sortable: true,
             width: "5%",
          },
          {
-            id: "adminSerialNumber",
-            content: <MDBColumnName columnName="Serial Number" />,
+            id: "lastName",
+            content: <MDBColumnName columnName="Last name" />,
             sortable: true,
-            width: "15%",
+            width: "5%",
          },
          {
-            id: "adminAdminDn",
-            content: <MDBColumnName columnName="Admin DN" />,
+            id: "email",
+            content: <MDBColumnName columnName="Email" />,
             sortable: true,
          },
          {
-            id: "adminSuperAdmin",
-            content: <MDBColumnName columnName="Super Admin" />,
+            id: "systemUser",
+            content: <MDBColumnName columnName="System user" />,
             align: "center",
             sortable: true,
-            width: "11%",
+            width: "7%",
          },
          {
             id: "adminStatus",
@@ -192,30 +196,30 @@ export default function UsersList() {
 
    const adminTableData: TableDataRow[] = useMemo(
 
-      () => administrators.map(
+      () => users.map(
 
-         administrator => ({
+         user => ({
 
-            id: administrator.uuid,
+            id: user.uuid,
 
             columns: [
 
-               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${administrator.uuid}`}>{administrator.username}</Link></span>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${user.uuid}`}>{user.username}</Link></span>,
 
-               administrator.name,
+               user.firstName || "",
 
-               administrator.serialNumber,
+               user.lastName || "",
 
-               <span style={{ whiteSpace: "nowrap" }}>{administrator.certificate.subjectDn}</span>,
+               user.email || "",
 
-               <StatusCircle status={administrator.role === "superAdministrator"} />,
+               <StatusCircle status={user.systemUser} />,
 
-               <StatusBadge enabled={administrator.enabled} />,
+               <StatusBadge enabled={user.enabled} />,
 
             ]
          })
       ),
-      [administrators, path]
+      [users, path]
    );
 
 

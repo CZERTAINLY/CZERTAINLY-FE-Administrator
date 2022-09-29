@@ -5,6 +5,7 @@ import { useRouteMatch } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 
 import { actions, selectors } from "ducks/users";
+import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
@@ -24,10 +25,12 @@ export default function AdministratorDetail() {
 
    const history = useHistory();
 
-   const administrator = useSelector(selectors.administrator);
+   const user = useSelector(selectors.user);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isDisabling = useSelector(selectors.isDisabling);
    const isEnabling = useSelector(selectors.isEnabling);
+
+   const certificate = useSelector(certSelectors.certificateDetail);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -37,7 +40,7 @@ export default function AdministratorDetail() {
       () => {
 
          if (!params.id) return;
-
+         dispatch(certActions.clearCertificateDetail());
          dispatch(actions.getDetail({ uuid: params.id }));
 
       },
@@ -46,14 +49,27 @@ export default function AdministratorDetail() {
    );
 
 
+   useEffect(
+
+      () => {
+
+         if (!user) return;
+         dispatch(certActions.getCertificateDetail({ uuid: user.certificate.uuid }));
+
+      },
+      [user, dispatch]
+
+   );
+
+
    const onEditClick = useCallback(
 
       () => {
 
-         history.push(`../../administrators/edit/${administrator?.uuid}`);
+         history.push(`../../administrators/edit/${user?.uuid}`);
 
       },
-      [administrator, history]
+      [user, history]
 
    );
 
@@ -62,12 +78,12 @@ export default function AdministratorDetail() {
 
       () => {
 
-         if (!administrator) return;
+         if (!user) return;
 
-         dispatch(actions.enableAdmin({ uuid: administrator.uuid }));
+         dispatch(actions.enable({ uuid: user.uuid }));
 
       },
-      [administrator, dispatch]
+      [user, dispatch]
 
    );
 
@@ -76,12 +92,12 @@ export default function AdministratorDetail() {
 
       () => {
 
-         if (!administrator) return;
+         if (!user) return;
 
-         dispatch(actions.disableAdmin({ uuid: administrator.uuid }));
+         dispatch(actions.disable({ uuid: user.uuid }));
 
       },
-      [administrator, dispatch]
+      [user, dispatch]
 
    );
 
@@ -90,13 +106,13 @@ export default function AdministratorDetail() {
 
       () => {
 
-         if (!administrator) return;
+         if (!user) return;
 
-         dispatch(actions.deleteAdmin({ uuid: administrator.uuid }));
+         dispatch(actions.deleteUser({ uuid: user.uuid }));
          setConfirmDelete(false);
 
       },
-      [administrator, dispatch]
+      [user, dispatch]
 
    );
 
@@ -106,10 +122,10 @@ export default function AdministratorDetail() {
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "check", disabled: administrator?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: !(administrator?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
+         { icon: "check", disabled: user?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: !(user?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
-      [administrator, onEditClick, onDisableClick, onEnableClick]
+      [user, onEditClick, onDisableClick, onEnableClick]
 
    );
 
@@ -168,43 +184,39 @@ export default function AdministratorDetail() {
 
    const detailData: TableDataRow[] = useMemo(
 
-      () => !administrator ? [] : [
+      () => !user ? [] : [
 
          {
             id: "uuid",
-            columns: ["UUID", administrator.uuid]
-         },
-         {
-            id: "name",
-            columns: ["Name", administrator.name]
-         },
-         {
-            id: "surname",
-            columns: ["Surname", administrator.surname]
+            columns: ["UUID", user.uuid]
          },
          {
             id: "username",
-            columns: ["Username", administrator.username]
+            columns: ["Username", user.username]
+         },
+         {
+            id: "firstName",
+            columns: ["First name", user.firstName || ""]
+         },
+         {
+            id: "username",
+            columns: ["Last name", user.lastName || ""]
          },
          {
             id: "email",
-            columns: ["Email", administrator.email]
+            columns: ["Email", user.email || ""]
          },
          {
-            id: "description",
-            columns: ["Description", administrator.description]
-         },
-         {
-            id: "superadmin",
-            columns: ["Superadmin", <StatusCircle status={administrator?.role === "superAdministrator"} />]
+            id: "systemUser",
+            columns: ["syst", <StatusCircle status={user.systemUser} />]
          },
          {
             id: "enabled",
-            columns: ["Administrator Enabled", <StatusBadge enabled={administrator.enabled} />]
-         },
+            columns: ["Administrator Enabled", <StatusBadge enabled={user.enabled} />]
+         }
 
       ],
-      [administrator]
+      [user]
 
    );
 
@@ -229,7 +241,7 @@ export default function AdministratorDetail() {
 
             <Col>
                <Widget title={certificateTitle} busy={isFetchingDetail}>
-                  <CertificateAttributes certificate={administrator?.certificate} />
+                  <CertificateAttributes certificate={certificate} />
                </Widget>
             </Col>
 

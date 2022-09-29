@@ -11,7 +11,7 @@ import { RoleDTO } from "api/roles";
 const baseUrl = "/api/v1/users";
 
 
-export class UsersManagementBackend implements model.UserManagementApi {
+export class UserManagementBackend implements model.UserManagementApi {
 
    private _fetchService: FetchHttpService;
 
@@ -120,7 +120,16 @@ export class UsersManagementBackend implements model.UserManagementApi {
    }
 
 
-   addRole(userUuid: string, roleUuid: string): Observable<void> {
+   updateRoles(userUuid: string, rolesUuids: string[]): Observable<model.UserDetailDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}/${userUuid}/roles`, "PUT", rolesUuids)
+      );
+
+   }
+
+
+   addRole(userUuid: string, roleUuid: string): Observable<model.UserDetailDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${userUuid}/roles/${roleUuid}`, "PUT")
@@ -130,7 +139,7 @@ export class UsersManagementBackend implements model.UserManagementApi {
    }
 
 
-   removeRole(userUuid: string, roleUuid: string): Observable<void> {
+   removeRole(userUuid: string, roleUuid: string): Observable<model.UserDetailDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/${userUuid}/roles/${roleUuid}`, "DELETE")

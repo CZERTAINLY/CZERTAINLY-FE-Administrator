@@ -69,8 +69,8 @@ export interface UserManagementApi {
 
    updateRoles(userUuid: string, rolesUuids: string[]): Observable<UserDetailDTO>;
 
-   addRole(userUuid: string, roleUuid: string): Observable<void>;
+   addRole(userUuid: string, roleUuid: string): Observable<UserDetailDTO>;
 
-   removeRole(userUuid: string, roleUuid: string): Observable<void>;
+   removeRole(userUuid: string, roleUuid: string): Observable<UserDetailDTO>;
 
 }

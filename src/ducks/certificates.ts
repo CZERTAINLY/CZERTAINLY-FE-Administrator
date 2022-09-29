@@ -158,6 +158,13 @@ export const slice = createSlice({
       },
 
 
+      clearCertificateDetail: (state, action: PayloadAction<void>) => {
+
+         state.certificateDetail = undefined;
+
+      },
+
+
       setCurrentFilters: (state, action: PayloadAction<{ currentFilters: CertificateListQueryFilterModel[] }>) => {
 
          state.currentFilters = action.payload.currentFilters;

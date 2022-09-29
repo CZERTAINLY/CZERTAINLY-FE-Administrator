@@ -9,10 +9,10 @@ import Select from "react-select";
 import Widget from "components/Widget";
 import ProgressButton from "components/ProgressButton";
 
-import { actions as adminActions, selectors as adminSelectors } from "ducks/users";
+import { actions as adminActions, selectors as userSelectors } from "ducks/users";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 
-import { UserModel, CertificateModel } from "models";
+import { UserDetailModel, CertificateModel } from "models";
 
 import { emptyCertificate } from "utils/certificate";
 import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
@@ -25,11 +25,12 @@ interface Props {
 }
 
 interface FormValues {
-   name: string;
+   username: string;
    firstName: string;
    lastName: string;
    email: string;
    enabled: boolean;
+   systemUser: boolean;
    inputType: { value: "upload" | "select" };
    certFile: FileList | undefined;
    certificate: any;
@@ -66,15 +67,15 @@ function AdminForm({ title }: Props) {
    const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
    const certificates = useSelector(certSelectors.certificates);
 
-   const isFetchingAdminDetail = useSelector(adminSelectors.isFetchingDetail);
-   const administratorSelector = useSelector(adminSelectors.administrator);
+   const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
+   const userSelector = useSelector(userSelectors.user);
 
-   const isCreatingAdmin = useSelector(adminSelectors.isCreating);
-   const isUpdatingAdmin = useSelector(adminSelectors.isUpdating);
+   const isCreatingAdmin = useSelector(userSelectors.isCreating);
+   const isUpdatingAdmin = useSelector(userSelectors.isUpdating);
 
    const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
-   const [administrator, setAdministrator] = useState<AdministratorModel>();
+   const [user, setUser] = useState<UserDetailModel>();
 
    const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
 
@@ -102,21 +103,23 @@ function AdminForm({ title }: Props) {
 
    }, [dispatch]);
 
-   /* Load administrator or copy it to administrator state, if it was just loaded */
+   /* Load user or copy it to user  state, if it was just loaded */
 
    useEffect(() => {
 
-      if (params.id && (!administratorSelector || administratorSelector.uuid !== params.id)) dispatch(adminActions.getDetail({ uuid: params.id }));
+      if (params.id && (!userSelector || userSelector.uuid !== params.id)) dispatch(adminActions.getDetail({ uuid: params.id }));
 
-      if (params.id && administratorSelector?.uuid === params.id) {
+      if (params.id && userSelector?.uuid === params.id) {
 
-         setAdministrator(administratorSelector);
+         setUser(userSelector);
 
          if (editMode) {
 
-            if (administrator && administrator.certificate && administrator.certificate.uuid && !loadedCerts.find(cert => cert.uuid === administrator.certificate.uuid)) {
+            if (user && user.certificate && user.certificate.uuid && !loadedCerts.find(cert => cert.uuid === user.certificate.uuid)) {
 
-               const certs = [administrator.certificate, ...loadedCerts];
+               const cert = certificates.find(cert => cert.uuid === user.certificate.uuid);
+
+               const certs = cert ? [cert, ...loadedCerts] : [...loadedCerts];
 
                setLoadedCerts(certs);
 
@@ -127,33 +130,36 @@ function AdminForm({ title }: Props) {
 
             }
 
-            setSelectedCertificate({
-               label: administratorSelector.certificate.commonName || `( empty ) ( ${administratorSelector.certificate.serialNumber} )`,
-               value: administratorSelector.certificate.uuid,
-            });
+            const cert = certificates.find(cert => cert.uuid === userSelector.certificate.uuid);
+
+            if (cert) {
+               setSelectedCertificate({
+                  label: cert.commonName || `( empty ) ( ${cert.fingerprint} )`,
+                  value: cert.uuid,
+               });
+            }
 
          }
 
       } else {
 
-         if (!administrator) setAdministrator({
+         if (!user) setUser({
             uuid: "",
-            serialNumber: "",
             username: "",
-            name: "",
-            surname: "",
-            description: "",
+            firstName: "",
+            lastName: "",
             email: "",
-            role: "administrator",
             enabled: false,
-            certificate: emptyCertificate
+            certificate: emptyCertificate,
+            roles: [],
+            systemUser: false
          });
 
       }
 
       // loadedCerts dependedncy not needed and would cause loop
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [editMode, params.id, administrator, administratorSelector, dispatch]);
+   }, [editMode, params.id, user, userSelector, dispatch]);
 
 
    /* Process fetched certs and store them to loaded certs */
@@ -195,14 +201,12 @@ function AdminForm({ title }: Props) {
          if (editMode) {
 
             dispatch(
-               adminActions.updateAdmin({
-                  uuid: administrator!.uuid,
-                  username: values.lastName,
-                  name: values.name,
-                  surname: values.firstName,
+               adminActions.update({
+                  uuid: user!.uuid,
+                  firstName: values.firstName,
+                  lastName: values.lastName,
                   email: values.email,
-                  role: values.superAdmin ? "superAdministrator" : "administrator",
-                  description: values.description,
+                  enabled: values.enabled,
                   certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined
                })
@@ -211,13 +215,12 @@ function AdminForm({ title }: Props) {
          } else {
 
             dispatch(
-               adminActions.createAdmin({
-                  username: values.lastName,
-                  name: values.name,
-                  surname: values.firstName,
+               adminActions.create({
+                  username: values.username,
+                  firstName: values.firstName,
+                  lastName: values.firstName,
                   email: values.email,
-                  role: values.superAdmin ? "superAdministrator" : "administrator",
-                  description: values.description,
+                  enabled: values.enabled,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined,
                   certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined
                })
@@ -227,7 +230,7 @@ function AdminForm({ title }: Props) {
 
       },
 
-      [administrator, certToUpload, dispatch, editMode]
+      [user, certToUpload, dispatch, editMode]
 
    )
 
@@ -273,21 +276,21 @@ function AdminForm({ title }: Props) {
 
    const defaultValues = useMemo(
       () => ({
-         name: editMode ? administrator?.name || "" : "",
-         surname: editMode ? administrator?.surname : "",
-         username: editMode ? administrator?.username : "",
-         email: editMode ? administrator?.email : "",
-         superAdmin: editMode ? administrator?.role === "superAdministrator" || false : false,
+         username: editMode ? user?.username : "",
+         firstName: editMode ? user?.firstName || "" : "",
+         lastName: editMode ? user?.lastName : "",
+         email: editMode ? user?.email : "",
+         enabled: editMode ? user?.enabled : false,
+         systemUser: editMode ? user?.systemUser : false,
          inputType: optionsForInput[1],
          certificate: selectedCertificate,
-         description: editMode ? administrator?.description || "" : "",
       }),
-      [administrator, editMode, selectedCertificate, optionsForInput]
+      [user, editMode, selectedCertificate, optionsForInput]
    );
 
    return (
 
-      <Widget title={title} busy={isFetchingAdminDetail || isFetchingCertsList}>
+      <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList}>
 
          <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
@@ -301,7 +304,7 @@ function AdminForm({ title }: Props) {
 
                         <FormGroup>
 
-                           <Label for="username">User Name</Label>
+                           <Label for="username">Username</Label>
 
                            <Input
                               {...input}
@@ -309,7 +312,7 @@ function AdminForm({ title }: Props) {
                               invalid={!!meta.error && meta.touched}
                               disabled={editMode}
                               type="text"
-                              placeholder="Administrator User Name"
+                              placeholder="Username"
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -319,20 +322,20 @@ function AdminForm({ title }: Props) {
 
                   </Field>
 
-                  <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                  <Field name="firstName" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
 
                      {({ input, meta }) => (
 
                         <FormGroup>
 
-                           <Label for="name">First Name</Label>
+                           <Label for="firstName">First Name</Label>
 
                            <Input
                               {...input}
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
                               type="text"
-                              placeholder="Administrator Name"
+                              placeholder="First Name"
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -343,20 +346,20 @@ function AdminForm({ title }: Props) {
 
                   </Field>
 
-                  <Field name="surname" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                  <Field name="lastName" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
 
                      {({ input, meta }) => (
 
                         <FormGroup>
 
-                           <Label for="surname">Last Name</Label>
+                           <Label for="lastName">Last Name</Label>
 
                            <Input
                               {...input}
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
                               type="text"
-                              placeholder="Administrator Surname"
+                              placeholder="Last name"
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -370,14 +373,14 @@ function AdminForm({ title }: Props) {
 
                         <FormGroup>
 
-                           <Label for="email">Administrator Email</Label>
+                           <Label for="email">Email</Label>
 
                            <Input
                               {...input}
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
                               type="text"
-                              placeholder="Administrator Email"
+                              placeholder="Email address"
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -474,21 +477,22 @@ function AdminForm({ title }: Props) {
 
                   )}
 
-                  <Field name="description">
+                  <Field name="enabled" type="checkbox">
 
-                     {({ input, meta }) => (
+                     {({ input }) => (
 
-                        <FormGroup>
+                        <FormGroup check>
 
-                           <Label for="description">Description</Label>
+                           <Label check>
 
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              type="textarea"
-                              placeholder="Description / Comment"
-                           />
+                              <Input
+                                 {...input}
+                                 type="checkbox"
+                              />
+
+                              &nbsp;Enabled
+
+                           </Label>
 
                         </FormGroup>
 
@@ -496,21 +500,7 @@ function AdminForm({ title }: Props) {
 
                   </Field>
 
-                  {/*<Field name="enabled" type="checkbox">*/}
-                  {/*  {({ input }) => (*/}
-                  {/*    <FormGroup check>*/}
-                  {/*      <Label check>*/}
-                  {/*        <Input*/}
-                  {/*          {...input}*/}
-                  {/*          type="checkbox"*/}
-                  {/*        />*/}
-                  {/*        &nbsp;Enabled*/}
-                  {/*      </Label>*/}
-                  {/*    </FormGroup>*/}
-                  {/*  )}*/}
-                  {/*</Field>*/}
-
-                  <Field name="superAdmin" type="checkbox">
+                  <Field name="systemUser" type="checkbox">
 
                      {({ input }) => (
 
@@ -520,7 +510,7 @@ function AdminForm({ title }: Props) {
                                  {...input}
                                  type="checkbox"
                               />
-                              &nbsp;Superadmin
+                              &nbsp;System user
                            </Label>
 
                         </FormGroup>
@@ -536,7 +526,7 @@ function AdminForm({ title }: Props) {
                            title={submitTitle}
                            inProgressTitle={inProgressTitle}
                            inProgress={submitting || isCreatingAdmin || isUpdatingAdmin}
-                           disabled={pristine || submitting || isCreatingAdmin || isUpdatingAdmin || !valid || (values.inputType.value === "upload" && certToUpload === undefined)}
+                           disabled={pristine || submitting || isCreatingAdmin || isUpdatingAdmin || !valid || values.systemUser || (values.inputType.value === "upload" && certToUpload === undefined)}
                         />
 
                         <Button color="default" onClick={onCancel} disabled={submitting || isCreatingAdmin || isUpdatingAdmin}>

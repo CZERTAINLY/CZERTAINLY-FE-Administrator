@@ -94,7 +94,8 @@ export class UserManagementMock implements model.UserManagementApi {
                      fingerprint: cert.fingerprint,
                   },
                   roles: [],
-                  systemUser: false
+                  systemUser: false,
+                  authorizedProfiles: [],
                }
 
                dbData.users.push(user);
@@ -273,7 +274,7 @@ export class UserManagementMock implements model.UserManagementApi {
    }
 
 
-   addRole(userUuid: string, roleUuid: string): Observable<void> {
+   addRole(userUuid: string, roleUuid: string): Observable<model.UserDetailDTO> {
 
       return of(
          dbData.users.find(user => user.uuid === userUuid)
@@ -291,6 +292,8 @@ export class UserManagementMock implements model.UserManagementApi {
 
                if (!user.roles.find(r => r.uuid === role.uuid)) user.roles.push(role);
 
+               return user
+
             }
 
          )
@@ -300,7 +303,7 @@ export class UserManagementMock implements model.UserManagementApi {
 
    }
 
-   removeRole(userUuid: string, roleUuid: string): Observable<void> {
+   removeRole(userUuid: string, roleUuid: string): Observable<model.UserDetailDTO> {
 
       return of(
          dbData.users.find(user => user.uuid === userUuid)
@@ -317,6 +320,8 @@ export class UserManagementMock implements model.UserManagementApi {
                if (index < 0) throw new HttpErrorResponse({ status: 404, statusText: "User role not found" });
 
                user.roles.splice(index, 1);
+
+               return user;
 
             }
 

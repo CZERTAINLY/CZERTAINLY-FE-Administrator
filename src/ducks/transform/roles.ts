@@ -1,7 +1,7 @@
 import { RoleDTO } from "api/roles";
 import { RoleModel } from "models/roles";
 
-export function transformRoleDTOtoModel(role: RoleDTO): RoleModel {
+export function transformRoleDTOToModel(role: RoleDTO): RoleModel {
 
    return {
       uuid: role.uuid,

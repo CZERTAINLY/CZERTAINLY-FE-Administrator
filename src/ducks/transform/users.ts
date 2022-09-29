@@ -1,6 +1,6 @@
-import { UserCertificateDTO, UserDetailDTO } from "api/users";
-import { UserCertificateModel, UserDetailModel } from "models";
-import { transformRoleDTOtoModel } from "./roles";
+import { UserCertificateDTO, UserDetailDTO, UserDTO } from "api/users";
+import { UserCertificateModel, UserDetailModel, UserModel } from "models";
+import { transformRoleDTOToModel } from "./roles";
 
 
 export function transformUserCertificateDTOToModel(certificate: UserCertificateDTO): UserCertificateModel {
@@ -13,7 +13,7 @@ export function transformUserCertificateDTOToModel(certificate: UserCertificateD
 }
 
 
-export function transformUserDetailDTO(user: UserDetailDTO): UserDetailModel {
+export function transformUserDetailDTOToModel(user: UserDetailDTO): UserDetailModel {
 
    return {
       uuid: user.uuid,
@@ -24,7 +24,22 @@ export function transformUserDetailDTO(user: UserDetailDTO): UserDetailModel {
       enabled: user.enabled,
       systemUser: user.systemUser,
       certificate: transformUserCertificateDTOToModel(user.certificate),
-      roles: user.roles.map(role => transformRoleDTOtoModel(role))
+      roles: user.roles.map(role => transformRoleDTOToModel(role))
+   }
+
+}
+
+
+export function transformUserDTOToModel(user: UserDTO): UserModel {
+
+   return {
+      uuid: user.uuid,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      enabled: user.enabled,
+      systemUser: user.systemUser,
    }
 
 }

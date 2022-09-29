@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
 
-import { UserDetailDTO } from 'api/users';
-import { ResourceDetailDTO } from 'api/auth';
+import { UserDetailModel } from 'models';
+import { ResourceDetailModel } from 'models/auth';
 
 
 export type State = {
 
-   profile?: UserDetailDTO;
-   resources?: ResourceDetailDTO[];
+   profile?: UserDetailModel;
+   resources?: ResourceDetailModel[];
 
    isFetchingProfile: boolean;
    isFetchingResources: boolean;
@@ -40,7 +40,7 @@ export const slice = createSlice({
       },
 
 
-      getProfileSuccess(state, action: PayloadAction<{ profile: UserDetailDTO }>) {
+      getProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel }>) {
 
          state.isFetchingProfile = false;
          state.profile = action.payload.profile;
@@ -62,7 +62,7 @@ export const slice = createSlice({
       },
 
 
-      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceDetailDTO[] }>) {
+      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceDetailModel[] }>) {
 
          state.isFetchingResources = false;
          state.resources = action.payload.resources;
