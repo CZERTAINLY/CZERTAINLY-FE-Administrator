@@ -45,8 +45,8 @@ export const dbData: DBData = {
    ],
 
    roles: [
-      dbRoles["admin"],
-      dbRoles["user"],
+      { ...dbRoles["admin"], users: [dbUsers["Admin"]] }  ,
+      { ...dbRoles["user"], users: [dbUsers["User"]] }  ,
    ],
 
 

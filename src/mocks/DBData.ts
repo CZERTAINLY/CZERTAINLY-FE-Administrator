@@ -1,3 +1,5 @@
+import { DbUser } from "./db-users";
+import { DbRole } from "./db-roles";
 import { DbAuthority } from "./db-authorities";
 import { DbAcmeAccount } from "./db-acme-accounts";
 import { DbAcmeProfile } from "./db-acme-profiles";
@@ -16,9 +18,7 @@ import { DbComplianceGroup, DbComplianceProfile, DbComplianceProfileList, DbComp
 
 import { DbEntity } from "./db-entities";
 import { DbLocation } from "./db-locations";
-import { DbUser } from "./db-users";
 import { DbResource } from "./db-auth";
-import { DbRole } from "./db-roles";
 
 
 export interface DBData {

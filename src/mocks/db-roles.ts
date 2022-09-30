@@ -1,5 +1,4 @@
 import { RoleDetailDTO } from "api/roles";
-import { dbUsers } from "./db-users";
 
 export interface DbRole extends RoleDetailDTO {
 }
@@ -8,8 +7,6 @@ interface DbRoles {
    [key: string]: DbRole;
 }
 
-console.log(dbUsers);
-
 export const dbRoles: DbRoles = {
 
    "admin": {
@@ -17,9 +14,7 @@ export const dbRoles: DbRoles = {
       name: "admin",
       description: "Admin role",
       systemRole: true,
-      users: [
-         dbUsers["Admin"],
-      ]
+      users: []
    },
 
    "user": {
@@ -27,9 +22,7 @@ export const dbRoles: DbRoles = {
       name: "user",
       description: "User role",
       systemRole: false,
-      users: [
-         dbUsers["User"],
-      ]
+      users: []
    }
 
 }

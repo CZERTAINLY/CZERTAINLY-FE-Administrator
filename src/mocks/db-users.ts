@@ -12,7 +12,6 @@ interface DbUsers {
    [key: string]: DbUser;
 }
 
-
 export const dbUsers: DbUsers = {
 
    "Admin": {
@@ -24,11 +23,16 @@ export const dbUsers: DbUsers = {
       enabled: true,
       systemUser: true,
       certificate: {
-         uuid: dbCertificates["Admin"].uuid,
-         fingerprint: dbCertificates["Admin"].fingerprint,
+         uuid: dbCertificates["CLIENT1"].uuid,
+         fingerprint: dbCertificates["CLIENT1"].fingerprint,
       },
       roles: [
-         dbRoles[""]
+         {
+            uuid: dbRoles["admin"].uuid,
+            name: dbRoles["admin"].name,
+            description: dbRoles["admin"].description,
+            systemRole: dbRoles["admin"].systemRole,
+         }
       ],
       authorizedProfiles: []
    },
