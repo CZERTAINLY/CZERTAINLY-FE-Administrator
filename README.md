@@ -48,4 +48,8 @@ Admin Web Interface is provided as a Docker container. Use the `docker pull harb
 | Variable       | Description                                                        | Required | Default value     |
 |----------------|--------------------------------------------------------------------|----------|-------------------|
 | `BASE_URL`     | URL Path of the frontend application                               | No       | `/administrator`  |
-| `API_URL`      | URL Path of the Czertainly API for the web application             | No       | `/api`            |
+| `API_URL`      | URL Path of the CZERTAINLY API for the web application             | No       | `/api`            |
+| `LOGIN_URL`    | URL Path of the login page                                         | No       | `/login`          |
+| `LOGOUT_URL`   | URL Path of the logout page                                        | No       | `/logout`         |
+
+* Default variable values are defined in the Dockerfile
