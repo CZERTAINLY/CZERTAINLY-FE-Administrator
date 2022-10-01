@@ -15,6 +15,7 @@ mv $tmpNginxFile $nginxFile
 indexFile=/usr/share/nginx/html/index.html
 tmpIndexFile=/usr/share/nginx/html/index.html.tmp
 sed 's/"\/administrator/"\'"$BASE_URL"'/g' $indexFile > $tmpIndexFile
+sed 's/"\/api/"\'"$API_URL"'/g' $tmpIndexFile > $tmpIndexFile
 mv $tmpIndexFile $indexFile
 
 nginx -g 'daemon off;'

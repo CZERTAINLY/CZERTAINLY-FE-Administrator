@@ -1,27 +1,28 @@
 import { Observable } from "rxjs";
-
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-
-import * as model from "./model";
-import { createNewResource } from "utils/net";
 import { map } from "rxjs/operators";
 
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
-const baseUrl = "/api/v1/locations";
-const extBaseUrl = "/api/v1/entities";
+import * as model from "./model";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+
+
+const baseUrl = "/v1/locations";
+const extBaseUrl = "/v1/entities";
 
 
 export class LocationManagementBackend implements model.LocationManagementApi {
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
-   }
-
    private _fetchService: FetchHttpService;
+
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
+   }
 
 
    listLocations(enabled?: boolean): Observable<model.LocationDTO[]> {

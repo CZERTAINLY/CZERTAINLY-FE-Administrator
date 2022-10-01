@@ -1,27 +1,28 @@
-import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
-import { functionGroupCodeToGroupFilter } from "ducks/transform/connectors";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
-import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-import { AuthType, FunctionGroupCode } from "types/connectors";
-
+import { FetchHttpService, HttpErrorResponse, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
+import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { AuthType, FunctionGroupCode } from "types/connectors";
+import { functionGroupCodeToGroupFilter } from "ducks/transform/connectors";
 
-const baseUrl = "/api/v1/connectors";
-const callbackBaseUrl = "/api/v1";
+const baseUrl = "/v1/connectors";
+const callbackBaseUrl = "/v1";
 
 export class ConnectorManagementBackend implements model.ConnectorManagementApi {
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
-   }
-
    private _fetchService: FetchHttpService;
+
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
+   }
 
 
    createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<string> {

@@ -1,22 +1,26 @@
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+
+import { FetchHttpService, HttpErrorResponse, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
 import * as model from "./model";
-import { createNewResource } from "utils/net";
 import { AdministratorRole } from "./model";
 import { CertificateDTO } from "api/certificates";
 
-const baseUrl = "/api/v1/admins";
+const baseUrl = "/v1/admins";
 
 export class AdministratorsManagementBackend implements model.AdministratorManagementApi {
 
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
+
 
    createAdmin(
       username: string,

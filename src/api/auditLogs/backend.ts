@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
-import { HttpRequestOptions, NamedValues } from 'ts-rest-client';
-import { FetchHttpService } from 'ts-rest-client-fetch';
+
+import { FetchHttpService, HttpRequestOptions, NamedValues } from "utils/FetchHttpService";
 
 import * as model from './model';
 
-const baseUrl = '/api/v1/auditLogs';
+const baseUrl = '/v1/auditLogs';
 
 
 export class AuditLogsBackend implements model.AuditLogsApi {
@@ -12,9 +12,9 @@ export class AuditLogsBackend implements model.AuditLogsApi {
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
+   constructor(fetchService: FetchHttpService) {
 
-      this._fetchService = new FetchHttpService();
+      this._fetchService = fetchService;
 
    }
 
