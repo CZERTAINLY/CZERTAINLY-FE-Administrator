@@ -53,7 +53,7 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
                const headers: { [key: string]: string } = {};
                if (response.headers) response.headers.forEach((value, key) => headers[key] = value);
 
-               if (response.status === 401) window.location.href = (window as any).__ENV__.LOGIN_URL;
+               if (response.status === 401) window.location.href = `${(window as any).__ENV__.LOGIN_URL}?redirect=${encodeURIComponent(window.location.href)}`;
 
                throw new HttpErrorResponse({
                   error,
