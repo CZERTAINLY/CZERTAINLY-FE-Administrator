@@ -1,18 +1,19 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+
 import * as model from "./model";
 
-const baseUrl = "/api/v1/acmeAccounts";
-const extBaseUrl = "/api/v1/acmeProfiles";
+const baseUrl = "/v1/acmeAccounts";
+const extBaseUrl = "/v1/acmeProfiles";
 
 export class AcmeAccountManagementBackend implements model.AcmeAccountManagementApi {
 
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+      this._fetchService = fetchService;
    }
 
 

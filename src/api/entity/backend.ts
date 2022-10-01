@@ -1,25 +1,27 @@
 import { Observable } from "rxjs";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
 import * as model from "./model";
-import { createNewResource } from "utils/net";
 import { map } from "rxjs/operators";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 
-const baseUrl = "/api/v1/entities";
+const baseUrl = "/v1/entities";
 
 
 export class EntityManagementBackend implements model.EntityManagementApi {
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
-   }
 
    private _fetchService: FetchHttpService;
+
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
+   }
 
 
    validateLocationAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {

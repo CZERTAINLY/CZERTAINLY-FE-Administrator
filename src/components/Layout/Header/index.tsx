@@ -21,6 +21,8 @@ function Header({ sidebarToggle }: Props) {
       [isOpen],
    );
 
+   console.log((window as any).__ENV__.LOGOUT_URL);
+
    return (
 
       <Navbar className={style.root}>
@@ -51,8 +53,8 @@ function Header({ sidebarToggle }: Props) {
                            <NavLink to="/app/profile">Profile</NavLink>
                         </DropdownItem>
 
-                        <DropdownItem disabled>
-                           Log out
+                        <DropdownItem>
+                           <NavLink to="#" onClick={() => { window.location.href = (window as any).__ENV__.LOGOUT_URL }}>Log out</NavLink>
                         </DropdownItem>
 
                      </DropdownMenu>

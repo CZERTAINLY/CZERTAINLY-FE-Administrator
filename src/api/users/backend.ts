@@ -1,9 +1,9 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
 import * as model from "./model";
-import { createNewResource } from "utils/net";
 import { CertificateDTO } from "api/certificates";
 import { RoleDTO } from "api/roles";
 
@@ -15,8 +15,11 @@ export class UserManagementBackend implements model.UserManagementApi {
 
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
 
 

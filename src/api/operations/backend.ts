@@ -1,22 +1,26 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
 
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-import { CertificateRevocationReason } from "types/certificate";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 
 import * as model from "./model";
 import { CertificateIssuanceDTO } from "./model";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { CertificateRevocationReason } from "types/certificate";
 
-const baseUrl = "/api/v2/operations";
+const baseUrl = "/v2/operations";
 
 export class OperationsBackend implements model.OperationsApi {
 
+
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
+
 
    issueCertificate(
       raProfileUuid: string,

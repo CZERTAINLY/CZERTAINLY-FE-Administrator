@@ -1,21 +1,24 @@
 import { LocationDTO } from "api/location";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
 import { CertificateEventHistoryDTO } from "./model";
 
-const baseUrl = "/api/v1/certificates";
+const baseUrl = "/v1/certificates";
 
 export class CertificateInventoryBackend implements model.CertificateInventoryApi {
 
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
 
 

@@ -16,7 +16,7 @@ Admin UI contains the following menu items:
 | Connectors     | Provides an overview of available `Connectors`, their details and status. Operations on the `Connectors` like `Approvals`, reconnection on each or multiple `Connectors` can be performed on this page                                                                                 |
 | Credentials    | List of all the `Credentials` added to the platform. These `Credentials` are used only for the `Connector` related operations and do not contain any platform authorization related items                                                                                              |
 | Authorities    | List of Authority instances added and the action on each `Authority`. These `Authorities` can be added based on the `Connectors` available in the platform                                                                                                                             |
-| ACME           | Management of `ACME Profiles` and `ACME Accounts`                                                                                                                                                                                                                                      |    
+| ACME           | Management of `ACME Profiles` and `ACME Accounts`                                                                                                                                                                                                                                      |
 | Groups         | `Groups` can mainly be used for logical grouping of `Certificates` by categories or teams or application. `Group` page contains the list of available `Groups` to which the `Certificates` can be tagged                                                                               |
 | Entities       | The `entity` that is managed by the `Entity Provider`. Entities are comprised of multiple locations                                                                                                            |
 | Location | The `location` of the `entity` that is managed by the `Entity Provider`. Location is the object that contains the details of the certificates and information about where they are currently deployed. A Single location can have more than one certificates |
@@ -47,4 +47,9 @@ Admin Web Interface is provided as a Docker container. Use the `docker pull harb
 
 | Variable       | Description                                                        | Required | Default value     |
 |----------------|--------------------------------------------------------------------|----------|-------------------|
-| `BASE_URL`     | Base URL for the web                                               | No       | `/administrator`  |
+| `BASE_URL`     | URL Path of the frontend application                               | No       | `/administrator`  |
+| `API_URL`      | URL Path of the CZERTAINLY API for the web application             | No       | `/api`            |
+| `LOGIN_URL`    | URL Path of the login page                                         | No       | `/login`          |
+| `LOGOUT_URL`   | URL Path of the logout page                                        | No       | `/logout`         |
+
+* Default variable values are defined in the Dockerfile

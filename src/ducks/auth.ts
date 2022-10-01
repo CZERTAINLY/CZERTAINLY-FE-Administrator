@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { UserDetailModel } from 'models/users';
 import { createFeatureSelector } from 'utils/ducks';
-
-import { UserDetailModel } from 'models';
-import { ResourceDetailModel } from 'models/auth';
 
 
 export type State = {
@@ -58,6 +56,8 @@ export const slice = createSlice({
       getResources(state, action: PayloadAction<void>) {
 
          state.isFetchingResources = true;
+         state.profile = undefined;
+         state.isFetchingProfile = false;
 
       },
 
