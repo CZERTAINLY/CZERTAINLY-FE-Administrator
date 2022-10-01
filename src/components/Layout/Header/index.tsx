@@ -51,7 +51,7 @@ function Header({ sidebarToggle }: Props) {
                            <NavLink to="/app/profile">Profile</NavLink>
                         </DropdownItem>
 
-                        <DropdownItem disabled>
+                        <DropdownItem>
                            <NavLink to={(window as any).__ENV__.LOGOUT_URL}>Log out</NavLink>
                         </DropdownItem>
 
