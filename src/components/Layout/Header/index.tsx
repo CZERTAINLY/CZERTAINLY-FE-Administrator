@@ -52,7 +52,7 @@ function Header({ sidebarToggle }: Props) {
                         </DropdownItem>
 
                         <DropdownItem disabled>
-                           Log out
+                           <NavLink to={(window as any).__ENV__.LOGOUT_URL}>Log out</NavLink>
                         </DropdownItem>
 
                      </DropdownMenu>
