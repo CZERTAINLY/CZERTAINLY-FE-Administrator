@@ -84,7 +84,7 @@ export const slice = createSlice({
       getProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.userProfile = undefined;
-         state.isFetchingProfile = true;
+         state.isFetchingProfile = false;
 
       },
 

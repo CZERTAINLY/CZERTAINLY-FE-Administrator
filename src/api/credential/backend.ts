@@ -1,24 +1,25 @@
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
+
+import * as model from "./model";
 import { AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-// import { attributeSimplifier } from "utils/attributes";
-
-import { createNewResource } from "utils/net";
-import * as model from "./model";
-
-const baseUrl = "/api/v1/credentials";
+const baseUrl = "/v1/credentials";
 
 
 export class CredentialManagementBackend implements model.CredentialManagementApi {
 
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
 
 

@@ -1,16 +1,15 @@
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
 import { AttributeDTO } from "../_common/attributeDTO";
 
-import { createNewResource } from "utils/net";
 import * as model from "./model";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
-const baseUrl = "/api/v1/acmeProfiles";
+const baseUrl = "/v1/acmeProfiles";
 
 export class AcmeProfilesManagementBackend implements model.AcmeProfilesManagementApi {
 
@@ -18,8 +17,8 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+      this._fetchService = fetchService;
    }
 
 

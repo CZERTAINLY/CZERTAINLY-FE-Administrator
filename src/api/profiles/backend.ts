@@ -1,25 +1,28 @@
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
-const baseUrl = "/api/v1/raProfiles";
-const baseUrlCompliance = "/api/v1/complianceProfiles";
-const extBaseUrl = "/api/v1/authorities";
+
+const baseUrl = "/v1/raProfiles";
+const baseUrlCompliance = "/v1/complianceProfiles";
+const extBaseUrl = "/v1/authorities";
+
 
 export class ProfilesManagementBackend implements model.ProfilesManagementApi {
+
 
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
 
 
@@ -188,7 +191,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
 
    checkCompliance(uuids: string[]): Observable<void> {
-      
+
       return this._fetchService.request(
          new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
             raProfileUuids: uuids
@@ -199,21 +202,21 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
    associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
       return this._fetchService.request(
-         
+
          new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/associate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
-         
+
       );
    }
 
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
       return this._fetchService.request(
-         
+
          new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/disassociate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
-         
+
       );
    }
 

@@ -24,6 +24,9 @@ RUN chmod +x /usr/bin/start-nginx.sh
 WORKDIR /usr/share/nginx/html
 
 ENV BASE_URL=/administrator
+ENV API_URL=/api
+ENV LOGIN_URL=/login
+ENV LOGOUT_URL=/logout
 
 COPY ./default.conf /etc/nginx/conf.d/default.conf
 
