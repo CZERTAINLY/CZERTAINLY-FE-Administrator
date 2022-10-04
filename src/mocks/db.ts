@@ -5,6 +5,7 @@ import { dbAcmeAccounts } from "./db-acme-accounts";
 import { dbUsers } from "./db-users";
 import { dbRoles } from "./db-roles";
 import { dbAuditLogs, dbAuditLogsOperationStatuses, dbAuditLogsOperations, dbAuditLogsOrigins } from "./db-audit-logs";
+import { dbCertificateFilters } from "./db-certificate-filters";
 import { dbCertificates } from "./db-certificates";
 import { dbAuthorities } from "./db-authorities";
 import { dbConnectors } from "./db-connectors";
@@ -86,6 +87,32 @@ export const dbData: DBData = {
 
    authorities: [
       dbAuthorities["ejbca-ca-instance1"]
+   ],
+
+   certificateFilters: [
+      dbCertificateFilters["commonName"],
+      dbCertificateFilters["serialNumber"],
+      dbCertificateFilters["raProfile"],
+      dbCertificateFilters["status"],
+      dbCertificateFilters["group"],
+      dbCertificateFilters["owner"],
+      dbCertificateFilters["issuerCommonName"],
+      dbCertificateFilters["signatureAlgorithm"],
+      dbCertificateFilters["fingerprint"],
+      dbCertificateFilters["notAfter"],
+      dbCertificateFilters["notBefore"],
+      dbCertificateFilters["publicKeyAlgorithm"],
+      dbCertificateFilters["keySize"],
+      dbCertificateFilters["keyUsage"],
+      dbCertificateFilters["meta"],
+      dbCertificateFilters["subjectAlternativeNames"],
+      dbCertificateFilters["subjectDn"],
+      dbCertificateFilters["issuerDn"],
+      dbCertificateFilters["issuerSerialNumber"],
+      dbCertificateFilters["ocspValidation"],
+      dbCertificateFilters["crlValidation"],
+      dbCertificateFilters["signatureValidation"],
+      dbCertificateFilters["complianceStatus"]
    ],
 
    certificates: [

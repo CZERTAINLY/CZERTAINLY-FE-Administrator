@@ -19,6 +19,7 @@ import { DbComplianceGroup, DbComplianceProfile, DbComplianceProfileList, DbComp
 import { DbEntity } from "./db-entities";
 import { DbLocation } from "./db-locations";
 import { DbResource } from "./db-auth";
+import { DbCertificateFilter } from "./db-certificate-filters";
 
 
 export interface DBData {
@@ -38,8 +39,8 @@ export interface DBData {
 
    authorities: DbAuthority[];
 
+   certificateFilters: DbCertificateFilter[];
    certificates: DbCertificate[];
-
 
    connectors: DbConnector[];
    connectorsRemote: DbRemoteConnector[];

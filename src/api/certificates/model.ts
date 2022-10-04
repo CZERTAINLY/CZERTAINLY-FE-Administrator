@@ -46,7 +46,7 @@ export interface AvailableCertificateFilterDTO {
    label: string;
    type: "string" | "number" | "list" | "date";
    conditions: CertificateFilterCondition[];
-   value?: string;
+   value?: string | number | string[] | number[];
    multiValue?: boolean;
 }
 

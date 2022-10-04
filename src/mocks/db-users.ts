@@ -15,17 +15,17 @@ interface DbUsers {
 export const dbUsers: DbUsers = {
 
    "Admin": {
-      uuid: "1825af93-cf31-402e-84c6-4988d96096c4",
+      uuid: "b241586e-609a-404e-affe-0e1d3b04aba6",
       username: "Admin",
       firstName: "Admin",
       lastName: "admin",
       email: "admin@3key.company",
       enabled: true,
       systemUser: true,
-      certificate: {
-         uuid: dbCertificates["CLIENT1"].uuid,
+      certificate: ({
+         uuid: undefined, //dbCertificates["CLIENT1"].uuid,
          fingerprint: dbCertificates["CLIENT1"].fingerprint,
-      },
+      } as any),
       roles: [
          {
             uuid: dbRoles["admin"].uuid,
@@ -38,7 +38,7 @@ export const dbUsers: DbUsers = {
    },
 
    "User": {
-      uuid: "1825af93-cf31-402e-84c6-4988d96096c4",
+      uuid: "652d4186-1a65-4745-a1fd-f486f8df4d95",
       username: "lkopenec",
       firstName: "Lukas",
       lastName: "Kopenec",

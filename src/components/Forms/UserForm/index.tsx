@@ -9,8 +9,9 @@ import Select from "react-select";
 import Widget from "components/Widget";
 import ProgressButton from "components/ProgressButton";
 
-import { actions as adminActions, selectors as userSelectors } from "ducks/users";
+import { actions as userActions, selectors as userSelectors } from "ducks/users";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
+//import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 
 import { UserDetailModel, CertificateModel } from "models";
 
@@ -37,7 +38,7 @@ interface FormValues {
 }
 
 
-function AdminForm({ title }: Props) {
+function UserForm({ title }: Props) {
 
    const dispatch = useDispatch();
    const history = useHistory();
@@ -66,16 +67,20 @@ function AdminForm({ title }: Props) {
 
    const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
    const certificates = useSelector(certSelectors.certificates);
+   const isFetchingCertDetail = useSelector(certSelectors.isFetchingDetail);
+   const certificateDetail = useSelector(certSelectors.certificateDetail);
 
    const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
    const userSelector = useSelector(userSelectors.user);
+   const rolesSelector = useSelector(userSelectors.userRoles);
 
-   const isCreatingAdmin = useSelector(userSelectors.isCreating);
-   const isUpdatingAdmin = useSelector(userSelectors.isUpdating);
+   const isCreatingUser = useSelector(userSelectors.isCreating);
+   const isUpdatingUser = useSelector(userSelectors.isUpdating);
 
    const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
    const [user, setUser] = useState<UserDetailModel>();
+   const [roles, setRoles] = useState<string[]>([]);
 
    const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
 
@@ -87,111 +92,136 @@ function AdminForm({ title }: Props) {
    const [certToUpload, setCertToUpload] = useState<CertificateModel>();
 
 
-   /* Load first page of certificates */
+   /* Load first page of certificates & all roles available */
 
-   useEffect(() => {
+   useEffect(
 
-      dispatch(
-         certActions.listCertificates({
-            query: {
-               itemsPerPage: 100,
-               pageNumber: 1,
-               filters: [],
-            }
-         })
-      );
+      () => {
 
-   }, [dispatch]);
+         dispatch(
+            certActions.listCertificates({
+               query: {
+                  itemsPerPage: 100,
+                  pageNumber: 1,
+                  filters: [],
+               }
+            })
+         );
 
-   /* Load user or copy it to user  state, if it was just loaded */
+         // dispatch(rolesActions.getRoles({} ));
 
-   useEffect(() => {
 
-      if (params.id && (!userSelector || userSelector.uuid !== params.id)) dispatch(adminActions.getDetail({ uuid: params.id }));
+      },
+      [dispatch]
 
-      if (params.id && userSelector?.uuid === params.id) {
+   );
 
-         setUser(userSelector);
+   /* Load user */
 
-         if (editMode) {
+   useEffect(
 
-            if (user && user.certificate && user.certificate.uuid && !loadedCerts.find(cert => cert.uuid === user.certificate.uuid)) {
+      () => {
 
-               const cert = certificates.find(cert => cert.uuid === user.certificate.uuid);
+         if (params.id && (!userSelector || userSelector.uuid !== params.id)) dispatch(userActions.getDetail({ uuid: params.id }));
 
-               const certs = cert ? [cert, ...loadedCerts] : [...loadedCerts];
+      },
+      [dispatch, params.id, userSelector]
 
-               setLoadedCerts(certs);
+   );
 
-               setOptionsForCertificte(certs.map(loadedCert => ({
-                  label: loadedCert.commonName || `( empty ) ( ${loadedCert.serialNumber} )`,
-                  value: loadedCert.uuid,
-               })))
+   /* Copy loaded user to the state */
 
-            }
+   useEffect(
 
-            const cert = certificates.find(cert => cert.uuid === userSelector.certificate.uuid);
+      () => {
+         if (params.id && userSelector?.uuid === params.id) {
 
-            if (cert) {
-               setSelectedCertificate({
-                  label: cert.commonName || `( empty ) ( ${cert.fingerprint} )`,
-                  value: cert.uuid,
-               });
-            }
+            setUser(userSelector);
+
+         } else {
+
+            if (!user) setUser({
+               uuid: "",
+               username: "",
+               firstName: "",
+               lastName: "",
+               email: "",
+               enabled: false,
+               certificate: emptyCertificate,
+               roles: [],
+               systemUser: false
+            });
+
+         }
+      },
+      [params.id, user, userSelector]
+
+   );
+
+
+   /* Process cert detail loaded for user */
+
+   useEffect(
+
+      () => {
+
+         if (user && user.certificate && user.certificate.uuid && certificateDetail && certificateDetail.uuid === user.certificate.uuid) {
+
+            const certs = [...loadedCerts];
+
+            const idx = certs.findIndex(c => c.uuid === certificateDetail.uuid);
+            if (idx >= 0) certs.splice(idx, 1, certificateDetail);
+
+            setLoadedCerts([certificateDetail, ...loadedCerts]);
+
+            setSelectedCertificate({
+               label: certificateDetail.commonName || `( empty ) ( ${certificateDetail.fingerprint} )`,
+               value: certificateDetail.uuid,
+            });
 
          }
 
-      } else {
+      },
+      [certificateDetail, loadedCerts, user]
 
-         if (!user) setUser({
-            uuid: "",
-            username: "",
-            firstName: "",
-            lastName: "",
-            email: "",
-            enabled: false,
-            certificate: emptyCertificate,
-            roles: [],
-            systemUser: false
-         });
-
-      }
-
-      // loadedCerts dependedncy not needed and would cause loop
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [editMode, params.id, user, userSelector, dispatch]);
+   );
 
 
    /* Process fetched certs and store them to loaded certs */
 
-   useEffect(() => {
+   useEffect(
 
-      const fpc = certificates.filter(
-         pagedCert => !["expired", "revoked", "invalid"].includes(pagedCert.status)
-      ).filter(
-         pagedCert => loadedCerts.find(loadedCert => loadedCert.uuid === pagedCert.uuid) === undefined
-      )
+      () => {
 
-      const certs = [...loadedCerts, ...fpc];
-
-      setLoadedCerts(certs);
-
-      setOptionsForCertificte(
-
-         certs.map(
-            loadedCert => ({
-               label: loadedCert.commonName || `( empty ) ( ${loadedCert.serialNumber} )`,
-               value: loadedCert.uuid,
-            })
+         const fpc = certificates.filter(
+            pagedCert => !["expired", "revoked", "invalid"].includes(pagedCert.status)
+         ).filter(
+            pagedCert => loadedCerts.find(loadedCert => loadedCert.uuid === pagedCert.uuid) === undefined
          )
 
-      );
+         if (fpc.length === 0) return;
 
-      setCurrentPage(currentPage + 1);
+         const certs = [...loadedCerts, ...fpc];
 
-      // loadedCert dependedncy not needed and would cause loop
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [certificates]);
+         setLoadedCerts(certs);
+
+         setOptionsForCertificte(
+
+            certs.map(
+               loadedCert => ({
+                  label: loadedCert.commonName || `( empty ) ( ${loadedCert.serialNumber} )`,
+                  value: loadedCert.uuid,
+               })
+            )
+
+         );
+
+         setCurrentPage(currentPage + 1);
+
+      },
+      [certificates, currentPage, loadedCerts]
+
+   );
 
 
    const onSubmit = useCallback(
@@ -201,13 +231,13 @@ function AdminForm({ title }: Props) {
          if (editMode) {
 
             dispatch(
-               adminActions.update({
+               userActions.update({
                   uuid: user!.uuid,
-                  firstName: values.firstName,
-                  lastName: values.lastName,
-                  email: values.email,
+                  firstName: values.firstName || undefined,
+                  lastName: values.lastName || undefined,
+                  email: values.email || undefined,
                   enabled: values.enabled,
-                  certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined,
+                  certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined
                })
             );
@@ -215,14 +245,14 @@ function AdminForm({ title }: Props) {
          } else {
 
             dispatch(
-               adminActions.create({
+               userActions.create({
                   username: values.username,
-                  firstName: values.firstName,
-                  lastName: values.firstName,
-                  email: values.email,
+                  firstName: values.firstName || undefined,
+                  lastName: values.firstName || undefined,
+                  email: values.email || undefined,
                   enabled: values.enabled,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined,
-                  certificateUuid: values.inputType.value === "select" ? values.certificate.value : undefined
+                  certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
                })
             );
 
@@ -245,21 +275,26 @@ function AdminForm({ title }: Props) {
    );
 
 
-   const loadNextCertificates = () => {
+   const loadNextCertificates = useCallback(
 
-      if (loadedCerts.length === 0) return;
+      () => {
 
-      dispatch(
-         certActions.listCertificates({
-            query: {
-               itemsPerPage: 100,
-               pageNumber: currentPage,
-               filters: [],
-            }
-         })
-      );
+         if (loadedCerts.length === 0) return;
 
-   };
+         dispatch(
+            certActions.listCertificates({
+               query: {
+                  itemsPerPage: 100,
+                  pageNumber: currentPage,
+                  filters: [],
+               }
+            })
+         );
+
+      },
+      [dispatch, currentPage, loadedCerts]
+
+   )
 
 
    const submitTitle = useMemo(
@@ -290,7 +325,7 @@ function AdminForm({ title }: Props) {
 
    return (
 
-      <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList}>
+      <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail}>
 
          <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
@@ -310,7 +345,7 @@ function AdminForm({ title }: Props) {
                               {...input}
                               valid={!meta.error && meta.touched}
                               invalid={!!meta.error && meta.touched}
-                              disabled={editMode}
+                              disabled={editMode || user?.systemUser}
                               type="text"
                               placeholder="Username"
                            />
@@ -322,7 +357,7 @@ function AdminForm({ title }: Props) {
 
                   </Field>
 
-                  <Field name="firstName" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                  <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
 
                      {({ input, meta }) => (
 
@@ -336,6 +371,7 @@ function AdminForm({ title }: Props) {
                               invalid={!!meta.error && meta.touched}
                               type="text"
                               placeholder="First Name"
+                              disabled={user?.systemUser}
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -346,7 +382,7 @@ function AdminForm({ title }: Props) {
 
                   </Field>
 
-                  <Field name="lastName" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                  <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
 
                      {({ input, meta }) => (
 
@@ -360,6 +396,7 @@ function AdminForm({ title }: Props) {
                               invalid={!!meta.error && meta.touched}
                               type="text"
                               placeholder="Last name"
+                              disabled={user?.systemUser}
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -367,7 +404,7 @@ function AdminForm({ title }: Props) {
                      )}
                   </Field>
 
-                  <Field name="email" validate={composeValidators(validateRequired(), validateEmail())}>
+                  <Field name="email" validate={composeValidators(validateEmail())}>
 
                      {({ input, meta }) => (
 
@@ -381,6 +418,7 @@ function AdminForm({ title }: Props) {
                               invalid={!!meta.error && meta.touched}
                               type="text"
                               placeholder="Email address"
+                              disabled={user?.systemUser}
                            />
 
                            <FormFeedback>{meta.error}</FormFeedback>
@@ -406,6 +444,7 @@ function AdminForm({ title }: Props) {
                               options={optionsForInput}
                               placeholder="Select Input Type"
                               onChange={(e) => { setInputTypeValue(e); input.onChange(e) }}
+                              isDisabled={user?.systemUser}
                            />
 
                         </FormGroup>
@@ -448,7 +487,7 @@ function AdminForm({ title }: Props) {
 
                   ) : (
 
-                     <Field name="certificate" validate={validateRequired()}>
+                     <Field name="certificate">
 
                         {({ input, meta }) => (
 
@@ -464,6 +503,7 @@ function AdminForm({ title }: Props) {
                                  options={optionsForCertificate}
                                  placeholder="Select Certificate"
                                  onMenuScrollToBottom={loadNextCertificates}
+                                 isDisabled={user?.systemUser}
                                  styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                               />
 
@@ -476,6 +516,8 @@ function AdminForm({ title }: Props) {
                      </Field>
 
                   )}
+
+                  <br />
 
                   <Field name="enabled" type="checkbox">
 
@@ -490,7 +532,7 @@ function AdminForm({ title }: Props) {
                                  type="checkbox"
                               />
 
-                              &nbsp;Enabled
+                              &nbsp;&nbsp;&nbsp;Enabled
 
                            </Label>
 
@@ -499,6 +541,8 @@ function AdminForm({ title }: Props) {
                      )}
 
                   </Field>
+
+                  <br />
 
                   <Field name="systemUser" type="checkbox">
 
@@ -509,8 +553,9 @@ function AdminForm({ title }: Props) {
                               <Input
                                  {...input}
                                  type="checkbox"
+                                 disabled={true}
                               />
-                              &nbsp;System user
+                              &nbsp;&nbsp;&nbsp;System user
                            </Label>
 
                         </FormGroup>
@@ -525,11 +570,11 @@ function AdminForm({ title }: Props) {
                         <ProgressButton
                            title={submitTitle}
                            inProgressTitle={inProgressTitle}
-                           inProgress={submitting || isCreatingAdmin || isUpdatingAdmin}
-                           disabled={pristine || submitting || isCreatingAdmin || isUpdatingAdmin || !valid || values.systemUser || (values.inputType.value === "upload" && certToUpload === undefined)}
+                           inProgress={submitting || isCreatingUser || isUpdatingUser}
+                           disabled={pristine || submitting || isCreatingUser || isUpdatingUser || !valid || values.systemUser}
                         />
 
-                        <Button color="default" onClick={onCancel} disabled={submitting || isCreatingAdmin || isUpdatingAdmin}>
+                        <Button color="default" onClick={onCancel} disabled={submitting || isCreatingUser || isUpdatingUser}>
                            Cancel
                         </Button>
 
@@ -565,4 +610,4 @@ function AdminForm({ title }: Props) {
 
 }
 
-export default AdminForm;
+export default UserForm;

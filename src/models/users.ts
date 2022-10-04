@@ -24,7 +24,7 @@ export interface UserCertificateModel {
 
 export interface UserDetailModel extends UserModel {
 
-   certificate: UserCertificateModel;
+   certificate: UserCertificateModel | undefined;
    roles: RoleModel[];
 
 }

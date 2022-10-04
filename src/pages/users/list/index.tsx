@@ -9,9 +9,9 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import MDBColumnName from "components/MDBColumnName";
 import StatusBadge from "components/StatusBadge";
-import StatusCircle from "components/StatusCircle";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import { MDBBadge } from "mdbreact";
 
 export default function UsersList() {
 
@@ -26,8 +26,10 @@ export default function UsersList() {
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
    const isUpdating = useSelector(selectors.isUpdating);
+   const isEnabling = useSelector(selectors.isEnabling);
+   const isDisabling = useSelector(selectors.isDisabling);
 
-   const isBusy = isFetching || isDeleting || isUpdating;
+   const isBusy = isFetching || isDeleting || isUpdating || isEnabling || isDisabling;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -112,15 +114,59 @@ export default function UsersList() {
    );
 
 
+   const isSystemUserSelected = useMemo(
+
+      () => {
+
+         return checkedRows.some(uuid => {
+            const user = users.find(user => user.uuid === uuid);
+            return user && user.systemUser;
+         });
+
+      },
+      [checkedRows, users]
+
+   )
+
+
+   const canEnable: boolean = useMemo(
+
+      () => {
+
+         if (checkedRows.length === 0) return false;
+         if (checkedRows.length > 1) return true;
+         const user = users.find(user => user.uuid === checkedRows[0]);
+         if (user && !user.enabled) return true;
+         return false;
+      },
+      [checkedRows, users]
+
+   );
+
+
+   const canDisable: boolean = useMemo(
+
+      () => {
+
+         if (checkedRows.length > 1) return true;
+         const user = users.find(user => user.uuid === checkedRows[0]);
+         return (user && user.enabled) || false;
+
+      },
+      [checkedRows, users]
+
+   );
+
+
    const buttons: WidgetButtonProps[] = useMemo(
 
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
-         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } }
+         { icon: "trash", disabled: checkedRows.length === 0 || isSystemUserSelected, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: isSystemUserSelected || !canEnable, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: isSystemUserSelected || !canDisable, tooltip: "Disable", onClick: () => { onDisableClick() } }
       ],
-      [checkedRows, onAddClick, onEnableClick, onDisableClick]
+      [checkedRows.length, isSystemUserSelected, canEnable, canDisable, onAddClick, onEnableClick, onDisableClick]
 
    );
 
@@ -136,7 +182,7 @@ export default function UsersList() {
             </div>
 
             <h5 className="mt-0">
-               List of <span className="fw-semi-bold">Administrators</span>
+               List of <span className="fw-semi-bold">Users</span>
             </h5>
 
          </div>
@@ -147,7 +193,7 @@ export default function UsersList() {
    );
 
 
-   const adminTableHeader: TableHeader[] = useMemo(
+   const userTableHeader: TableHeader[] = useMemo(
 
       () => [
          {
@@ -182,7 +228,7 @@ export default function UsersList() {
             width: "7%",
          },
          {
-            id: "adminStatus",
+            id: "userStatus",
             content: <MDBColumnName columnName="Status" />,
             align: "center",
             sortable: true,
@@ -194,7 +240,7 @@ export default function UsersList() {
    );
 
 
-   const adminTableData: TableDataRow[] = useMemo(
+   const userTableData: TableDataRow[] = useMemo(
 
       () => users.map(
 
@@ -212,7 +258,7 @@ export default function UsersList() {
 
                user.email || "",
 
-               <StatusCircle status={user.systemUser} />,
+               <MDBBadge color={!user.systemUser ? "success" : "danger"}>{user.systemUser ? "Yes" : "No"}</MDBBadge>,
 
                <StatusBadge enabled={user.enabled} />,
 
@@ -231,8 +277,8 @@ export default function UsersList() {
 
             <br />
             <CustomTable
-               headers={adminTableHeader}
-               data={adminTableData}
+               headers={userTableHeader}
+               data={userTableData}
                onCheckedRowsChanged={setCheckedRows}
                canSearch={true}
                hasCheckboxes={true}
@@ -243,8 +289,8 @@ export default function UsersList() {
 
          <Dialog
             isOpen={confirmDelete}
-            caption={`Delete ${checkedRows.length > 1 ? "Administrators" : "an Administrator"}`}
-            body={`You are about to delete ${checkedRows.length > 1 ? "Administrators" : "an Administrator"}. Is this what you want to do?`}
+            caption={`Delete ${checkedRows.length > 1 ? "Users" : "an User"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Users" : "an User"}. Is this what you want to do?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },

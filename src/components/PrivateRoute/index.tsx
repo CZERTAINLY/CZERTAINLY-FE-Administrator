@@ -10,9 +10,9 @@ interface Props {
 
 function PrivateRoute({ component, ...rest }: Props) {
 
-   const isAuthenticated = useSelector(selectors.profile);
+   // const isAuthenticated = useSelector(selectors.profile);
 
-   if (!isAuthenticated) { return <Redirect to="/login" />; }
+   // if (!isAuthenticated) { return <Redirect to="/login" />; }
 
    return <Route {...rest} render={props => React.createElement(component, props)} />;
 

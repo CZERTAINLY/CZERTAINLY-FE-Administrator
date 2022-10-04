@@ -3,12 +3,12 @@ import { UserCertificateModel, UserDetailModel, UserModel } from "models";
 import { transformRoleDTOToModel } from "./roles";
 
 
-export function transformUserCertificateDTOToModel(certificate: UserCertificateDTO): UserCertificateModel {
+export function transformUserCertificateDTOToModel(certificate: UserCertificateDTO): UserCertificateModel | undefined {
 
-   return {
+   return certificate ? {
       uuid: certificate.uuid,
       fingerprint: certificate.fingerprint,
-   };
+   } : undefined;
 
 }
 

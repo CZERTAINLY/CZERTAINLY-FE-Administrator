@@ -5,7 +5,7 @@ export interface RoleModel {
    systemRole: boolean;
 }
 
-export interface UserCertificateModel {
-   uuid: string;
-   fingerprint: string;
+
+export interface RoleDetailModel extends RoleModel {
+   users: UserModel[];
 }

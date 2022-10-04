@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
-import { UserDetailModel } from 'models/users';
 import { createFeatureSelector } from 'utils/ducks';
 
+import { ResourceDetailModel } from 'models';
+import { UserDetailModel } from 'models/users';
 
 export type State = {
 

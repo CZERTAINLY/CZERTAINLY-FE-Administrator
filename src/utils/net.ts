@@ -8,7 +8,9 @@ export function createNewResource<T = any>(
    headers?: any
 ): Observable<T extends any ? T : (string | null)> {
 
-   return from(doFetch(url, body, headers));
+   const apiUrl = (window as any).__ENV__.API_URL + url;
+
+   return from(doFetch(apiUrl, body, headers));
 
 }
 

@@ -124,15 +124,18 @@ export default function CertificateDetail() {
 
       () => {
 
-         if (!certificate || !locations) return;
+         if (!certificate || !locations || locations.length === 0) return;
+
          let locationToEntityMapLocal: { [key: string]: string } = {};
+
          for(const location of locations) {
             locationToEntityMapLocal[location.uuid] = location.entityInstanceUuid;
          }
-         
+
          setLocationToEntityMap(locationToEntityMapLocal);
+
       },
-      [certificate, locations, locationToEntityMap]
+      [certificate, locations]
 
    )
 
@@ -189,7 +192,7 @@ export default function CertificateDetail() {
          dispatch(actions.getRevocationAttributes({ raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
 
       },
-      [dispatch, revoke, params.id, certificate?.raProfile?.uuid]
+      [dispatch, revoke, params.id, certificate?.raProfile?.uuid, certificate?.raProfile?.authorityInstanceUuid]
    )
 
 
@@ -217,7 +220,7 @@ export default function CertificateDetail() {
             dispatch(locationActions.getPushAttributes({ uuid: selectLocationsCheckedRows[0], entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]]}));
 
       },
-      [dispatch, selectLocationsCheckedRows, locationToEntityMap]
+      [dispatch, locationToEntityMap, selectLocationsCheckedRows]
 
    )
 

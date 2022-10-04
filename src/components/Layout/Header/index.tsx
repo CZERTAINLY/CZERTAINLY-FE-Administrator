@@ -21,8 +21,6 @@ function Header({ sidebarToggle }: Props) {
       [isOpen],
    );
 
-   console.log((window as any).__ENV__.LOGOUT_URL);
-
    return (
 
       <Navbar className={style.root}>

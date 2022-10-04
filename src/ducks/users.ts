@@ -159,7 +159,7 @@ export const slice = createSlice({
          username: string,
          firstName: string | undefined,
          lastName: string | undefined,
-         email: string,
+         email: string | undefined,
          enabled: boolean,
          certificate: CertificateModel | undefined,
          certificateUuid: string | undefined

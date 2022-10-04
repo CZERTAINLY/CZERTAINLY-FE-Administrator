@@ -68,7 +68,8 @@ export type CertificateFilterField =
    "issuerSerialNumber" |
    "ocspValidation" |
    "crlValidation" |
-   "signatureValidation"
+   "signatureValidation" |
+   "complianceStatus"
    ;
 
 

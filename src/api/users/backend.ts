@@ -8,7 +8,7 @@ import { CertificateDTO } from "api/certificates";
 import { RoleDTO } from "api/roles";
 
 
-const baseUrl = "/api/v1/users";
+const baseUrl = "/v1/users";
 
 
 export class UserManagementBackend implements model.UserManagementApi {

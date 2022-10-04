@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Container } from "reactstrap";
 
-import AdminForm from "components/Forms/UserForm";
+import UserForm from "components/Forms/UserForm";
 
 export default function AdminEdit() {
 
@@ -21,7 +21,7 @@ export default function AdminEdit() {
    return (
 
       <Container className="themed-container" fluid>
-         <AdminForm title={title} />
+         <UserForm title={title} />
       </Container>
 
    );

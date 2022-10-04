@@ -44,10 +44,9 @@ export interface ApiClients {
 
 export const backendClient: ApiClients = {
    auth: new AuthBackend(fetchService),
-   admins: new AdministratorsManagementBackend(fetchService),
+   users: new UserManagementBackend(fetchService),
    certificates: new CertificateInventoryBackend(fetchService),
    auditLogs: new AuditLogsBackend(fetchService),
-   clients: new ClientManagementBackend(fetchService),
    profiles: new ProfilesManagementBackend(fetchService),
    credentials: new CredentialManagementBackend(fetchService),
    authorities: new AuthorityManagementBackend(fetchService),
