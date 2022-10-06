@@ -62,14 +62,7 @@ export class EntityManagementBackend implements model.EntityManagementApi {
          attributes,
          connectorUuid,
          kind
-      }).pipe(
-         map(
-            uuid => {
-               if (!uuid) throw new Error("Unexpected response returned from server");
-               return uuid;
-            }
-         )
-      );
+      });
 
    }
 

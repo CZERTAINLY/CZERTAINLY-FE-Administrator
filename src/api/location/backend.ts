@@ -57,13 +57,6 @@ export class LocationManagementBackend implements model.LocationManagementApi {
             attributes,
             enabled
          }
-      ).pipe(
-         map(
-            uuid => {
-               if (!uuid) throw new Error("Unexpected response returned from server");
-               return uuid;
-            }
-         )
       );
 
    }

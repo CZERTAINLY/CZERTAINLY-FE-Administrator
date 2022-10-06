@@ -30,9 +30,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
          kind,
          connectorUuid,
          attributes: attributes,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

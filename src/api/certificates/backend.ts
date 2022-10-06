@@ -71,9 +71,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
 
       return createNewResource(`${baseUrl}/upload`, {
          certificate,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

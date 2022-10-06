@@ -35,16 +35,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
             authType,
             authAttributes
          }
-      ).pipe(
-
-         map(
-            result => {
-               if (result === null) throw new HttpErrorResponse({ status: 404 });
-               return result
-            }
-         )
-
-      )
+      );
 
    }
 

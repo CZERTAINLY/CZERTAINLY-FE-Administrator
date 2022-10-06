@@ -25,9 +25,7 @@ export class GroupManagementBackend implements model.GroupManagementApi {
       return createNewResource(baseUrl, {
          name,
          description,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

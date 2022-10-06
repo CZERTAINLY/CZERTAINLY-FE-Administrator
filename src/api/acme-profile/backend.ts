@@ -52,9 +52,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
          revokeCertificateAttributes: revokeCertificateAttributes,
          requireContact,
          requireTermsOfService
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

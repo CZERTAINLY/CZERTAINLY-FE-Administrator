@@ -93,9 +93,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
          connectorUuid,
          attributes,
          kind,
-      }).pipe(
-         map(response => response ? response : "")
-      )
+      })
 
    }
 

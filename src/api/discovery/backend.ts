@@ -36,9 +36,7 @@ export class DiscoveryManagementBackend implements model.DiscoveryManagementApi 
          kind,
          connectorUuid,
          attributes: attributes,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

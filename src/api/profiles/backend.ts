@@ -67,8 +67,6 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
             description,
             attributes: attributes,
          }
-      ).pipe(
-         map((location) => location?.substr(location.lastIndexOf(`/${authorityInstanceUuid}`) + 1) || "")
       );
 
    }
