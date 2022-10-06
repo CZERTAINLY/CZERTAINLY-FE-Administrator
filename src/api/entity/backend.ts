@@ -55,7 +55,7 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    }
 
 
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string> {
+   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,

@@ -127,7 +127,7 @@ const createAcmeProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createAcmeProfileSuccess({ uuid }),
+               obj => slice.actions.createAcmeProfileSuccess({ uuid: obj.uuid }),
             ),
             catchError(
                err => of(slice.actions.createAcmeProfileFailed({ error: extractError(err, "Failed to create ACME Profile") }))

@@ -86,7 +86,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
       attributes: AttributeDTO[],
       connectorUuid: string,
       kind: string
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,

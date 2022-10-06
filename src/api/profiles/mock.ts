@@ -217,7 +217,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}> {
 
       return of(
          dbData.authorities.find(authority => authority.uuid === authorityInstanceUuid)
@@ -241,7 +241,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
                   authorityInstanceName: name,
                })
 
-               return uuid;
+               return { uuid };
 
             }
          )

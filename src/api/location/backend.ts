@@ -49,7 +49,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
+   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<{ uuid: string}> {
 
       return createNewResource(`${extBaseUrl}/${entityUuid}/locations`, {
             name,

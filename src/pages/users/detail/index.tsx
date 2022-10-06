@@ -111,7 +111,7 @@ export default function UserDetail() {
 
          if (!user) return;
 
-         dispatch(actions.deleteUser({ uuid: user.uuid }));
+         dispatch(actions.deleteUser({ uuid: user.uuid, redirect: `../` }));
          setConfirmDelete(false);
 
       },

@@ -1,8 +1,5 @@
 import React from 'react';
-import { Redirect, Route } from 'react-router';
-import { useSelector } from 'react-redux';
-
-import { selectors } from 'ducks/auth';
+import { Route } from 'react-router';
 
 interface Props {
    component: React.FunctionComponent<any> | React.ComponentClass;

@@ -33,7 +33,7 @@ export interface DiscoveryManagementApi {
     kind: string,
     connectorUuid: string,
     attributes: AttributeDTO[]
-  ): Observable<string>;
+  ): Observable<{ uuid: string}>;
   getDiscoveryList(): Observable<DiscoveryDTO[]>;
   getDiscoveryDetail(uuid: string): Observable<DiscoveryDTO>;
   getDiscoveryProviderList(): Observable<ConnectorDTO[]>;

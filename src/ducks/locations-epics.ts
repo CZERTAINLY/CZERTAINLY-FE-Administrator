@@ -114,7 +114,7 @@ const addLocation: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, uuid).pipe(
+               obj => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, obj.uuid).pipe(
 
                   map(
                      location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location) })
@@ -489,7 +489,7 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.pushCertificate(
-            action.payload.entityUuid, 
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.certificateUuid,
             action.payload.pushAttributes.map(transformAttributeModelToDTO)
@@ -537,7 +537,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => deps.apiClients.locations.issueCertificate(
-            action.payload.entityUuid, 
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.raProfileUuid,
             action.payload.csrAttributes.map(transformAttributeModelToDTO),
@@ -586,7 +586,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.autoRenewCertificate(
-            action.payload.entityUuid, 
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.certificateUuid
          ).pipe(
@@ -633,7 +633,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.removeCertificate(
-            action.payload.entityUuid, 
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.certificateUuid
          ).pipe(

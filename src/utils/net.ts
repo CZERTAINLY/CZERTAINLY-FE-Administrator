@@ -41,8 +41,7 @@ async function doFetch<T>(
 
 
       if (response.ok) {
-         const data = await getResponseBody(response);
-         return data.uuid;
+         return await getResponseBody(response);
       }
 
       const responseHeaders = {} as StringMap;

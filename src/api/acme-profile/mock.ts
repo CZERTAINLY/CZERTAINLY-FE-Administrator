@@ -54,7 +54,7 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
       validity?: number,
       requireContact?: boolean,
       requireTermsOfService?: boolean,
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return of(
          null
@@ -88,7 +88,7 @@ export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementA
                   enabled: true
                })
 
-               return uuid;
+               return { uuid };
 
             }
 

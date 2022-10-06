@@ -11,7 +11,7 @@ import ProgressButton from "components/ProgressButton";
 
 import { actions as userActions, selectors as userSelectors } from "ducks/users";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
-//import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
+import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 
 import { UserDetailModel, CertificateModel } from "models";
 
@@ -20,6 +20,8 @@ import { validateRequired, composeValidators, validateAlphaNumeric, validateEmai
 import CertificateAttributes from "components/CertificateAttributes";
 import Dialog from "components/Dialog";
 import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
+import MDBColumnName from "components/MDBColumnName";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 interface Props {
    title: JSX.Element;
@@ -65,14 +67,16 @@ function UserForm({ title }: Props) {
    );
 
 
-   const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
+   const userSelector = useSelector(userSelectors.user);
    const certificates = useSelector(certSelectors.certificates);
-   const isFetchingCertDetail = useSelector(certSelectors.isFetchingDetail);
-   const certificateDetail = useSelector(certSelectors.certificateDetail);
+   const rolesSelector = useSelector(rolesSelectors.roles);
 
    const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
-   const userSelector = useSelector(userSelectors.user);
-   const rolesSelector = useSelector(userSelectors.userRoles);
+   const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
+
+   const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
+   const isFetchingCertDetail = useSelector(certSelectors.isFetchingDetail);
+   const certificateDetail = useSelector(certSelectors.certificateDetail);
 
    const isCreatingUser = useSelector(userSelectors.isCreating);
    const isUpdatingUser = useSelector(userSelectors.isUpdating);
@@ -81,6 +85,8 @@ function UserForm({ title }: Props) {
    const [currentPage, setCurrentPage] = useState(1);
    const [user, setUser] = useState<UserDetailModel>();
    const [roles, setRoles] = useState<string[]>([]);
+
+   const [userRoles, setUserRoles] = useState<string[]>([]);
 
    const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
 
@@ -108,8 +114,7 @@ function UserForm({ title }: Props) {
             })
          );
 
-         // dispatch(rolesActions.getRoles({} ));
-
+         dispatch(rolesActions.list());
 
       },
       [dispatch]
@@ -137,6 +142,7 @@ function UserForm({ title }: Props) {
          if (params.id && userSelector?.uuid === params.id) {
 
             setUser(userSelector);
+            setUserRoles(userSelector.roles.map(role => role.uuid));
 
          } else {
 
@@ -152,9 +158,24 @@ function UserForm({ title }: Props) {
                systemUser: false
             });
 
+            setUserRoles([]);
+
          }
       },
       [params.id, user, userSelector]
+
+   );
+
+   /* Copy loaded roles to the state */
+
+   useEffect(
+
+      () => {
+
+         if (rolesSelector) setRoles(rolesSelector.map(role => role.name));
+
+      },
+      [rolesSelector]
 
    );
 
@@ -238,7 +259,8 @@ function UserForm({ title }: Props) {
                   email: values.email || undefined,
                   enabled: values.enabled,
                   certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
-                  certificate: values.inputType.value === "upload" ? certToUpload : undefined
+                  certificate: values.inputType.value === "upload" ? certToUpload : undefined,
+                  roles: userRoles
                })
             );
 
@@ -253,6 +275,7 @@ function UserForm({ title }: Props) {
                   enabled: values.enabled,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined,
                   certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
+                  roles: userRoles
                })
             );
 
@@ -260,7 +283,7 @@ function UserForm({ title }: Props) {
 
       },
 
-      [user, certToUpload, dispatch, editMode]
+      [user, certToUpload, dispatch, editMode, userRoles]
 
    )
 
@@ -323,191 +346,116 @@ function UserForm({ title }: Props) {
       [user, editMode, selectedCertificate, optionsForInput]
    );
 
+
+   const rolesTableHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "roleName",
+            content: <MDBColumnName columnName="Name" />,
+            sortable: true,
+            sort: "asc",
+            width: "auto",
+         }
+      ],
+      []
+
+   );
+
+
+   const rolesTableData: TableDataRow[] = useMemo(
+
+      () => rolesSelector.map(
+
+         role => ({
+
+            id: role.uuid,
+
+            columns: [
+
+               role.name
+
+            ]
+
+         })
+
+      ),
+
+      [rolesSelector]
+
+   );
+
+
+   const hasRolesChanged: boolean = useMemo(
+
+      () => {
+         if (!user) return false;
+
+         const usrRoleUuids = user.roles.map(role => role.uuid);
+
+         if (userRoles.length === usrRoleUuids.length && userRoles.length === 0) return true;
+
+         return userRoles.length !== usrRoleUuids.length || userRoles.some(roleUuid => !usrRoleUuids.includes(roleUuid));
+      },
+      [user, userRoles]
+
+   );
+
+
    return (
 
-      <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail}>
+      <>
 
-         <Form onSubmit={onSubmit} initialValues={defaultValues}>
+         <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles}>
 
-            {({ handleSubmit, pristine, submitting, values, valid }) => (
+            <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
-               <BootstrapForm onSubmit={handleSubmit}>
+               {({ handleSubmit, pristine, submitting, values, valid }) => (
 
-                  <Field name="username" validate={validateRequired()}>
+                  <BootstrapForm onSubmit={handleSubmit}>
 
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="username">Username</Label>
-
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              disabled={editMode || user?.systemUser}
-                              type="text"
-                              placeholder="Username"
-                           />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
-
-                        </FormGroup>
-                     )}
-
-                  </Field>
-
-                  <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
-
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="firstName">First Name</Label>
-
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              type="text"
-                              placeholder="First Name"
-                              disabled={user?.systemUser}
-                           />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
-
-                        </FormGroup>
-
-                     )}
-
-                  </Field>
-
-                  <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
-
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="lastName">Last Name</Label>
-
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              type="text"
-                              placeholder="Last name"
-                              disabled={user?.systemUser}
-                           />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
-                        </FormGroup>
-                     )}
-                  </Field>
-
-                  <Field name="email" validate={composeValidators(validateEmail())}>
-
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="email">Email</Label>
-
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              type="text"
-                              placeholder="Email address"
-                              disabled={user?.systemUser}
-                           />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
-
-                        </FormGroup>
-
-                     )}
-
-                  </Field>
-
-                  <Field name="inputType">
-
-                     {({ input }) => (
-
-                        <FormGroup>
-
-                           <Label for="inputType">Input Type</Label>
-
-                           <Select
-                              {...input}
-                              maxMenuHeight={140}
-                              menuPlacement="auto"
-                              options={optionsForInput}
-                              placeholder="Select Input Type"
-                              onChange={(e) => { setInputTypeValue(e); input.onChange(e) }}
-                              isDisabled={user?.systemUser}
-                           />
-
-                        </FormGroup>
-
-                     )}
-
-                  </Field>
-
-                  {values.inputType.value === "upload" ? (
-
-                     <FormGroup>
-
-                        <Label for="certFile">Client Certificate</Label>
-
-                        <div>
-
-                           {
-
-                              certToUpload ? (
-                                 <CertificateAttributes certificate={certToUpload} />
-                              ) : (
-                                 <>
-                                    Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;
-                                 </>
-                              )
-
-                           }
-
-                           <Button color="secondary" onClick={() => setCertUploadDialog(true)}>Choose File</Button>
-
-                        </div>
-
-                        <FormText color="muted">
-                           Upload certificate of client based on which will be
-                           authenticated to RA profile.
-                        </FormText>
-
-                     </FormGroup>
-
-
-                  ) : (
-
-                     <Field name="certificate">
+                     <Field name="username" validate={validateRequired()}>
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="certificate">Certificate</Label>
+                              <Label for="username">Username</Label>
 
-                              <Select
+                              <Input
                                  {...input}
-                                 //ref={certSelectRef}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForCertificate}
-                                 placeholder="Select Certificate"
-                                 onMenuScrollToBottom={loadNextCertificates}
-                                 isDisabled={user?.systemUser}
-                                 styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 disabled={editMode || user?.systemUser}
+                                 type="text"
+                                 placeholder="Username"
                               />
 
-                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+                              <FormFeedback>{meta.error}</FormFeedback>
+
+                           </FormGroup>
+                        )}
+
+                     </Field>
+
+                     <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="firstName">First Name</Label>
+
+                              <Input
+                                 {...input}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type="text"
+                                 placeholder="First Name"
+                                 disabled={user?.systemUser}
+                              />
+
+                              <FormFeedback>{meta.error}</FormFeedback>
 
                            </FormGroup>
 
@@ -515,77 +463,224 @@ function UserForm({ title }: Props) {
 
                      </Field>
 
-                  )}
+                     <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
 
-                  <br />
+                        {({ input, meta }) => (
 
-                  <Field name="enabled" type="checkbox">
+                           <FormGroup>
 
-                     {({ input }) => (
-
-                        <FormGroup check>
-
-                           <Label check>
+                              <Label for="lastName">Last Name</Label>
 
                               <Input
                                  {...input}
-                                 type="checkbox"
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type="text"
+                                 placeholder="Last name"
+                                 disabled={user?.systemUser}
                               />
 
-                              &nbsp;&nbsp;&nbsp;Enabled
+                              <FormFeedback>{meta.error}</FormFeedback>
+                           </FormGroup>
+                        )}
+                     </Field>
 
-                           </Label>
+                     <Field name="email" validate={composeValidators(validateEmail())}>
 
-                        </FormGroup>
+                        {({ input, meta }) => (
 
-                     )}
+                           <FormGroup>
 
-                  </Field>
+                              <Label for="email">Email</Label>
 
-                  <br />
-
-                  <Field name="systemUser" type="checkbox">
-
-                     {({ input }) => (
-
-                        <FormGroup check>
-                           <Label check>
                               <Input
                                  {...input}
-                                 type="checkbox"
-                                 disabled={true}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type="text"
+                                 placeholder="Email address"
+                                 disabled={user?.systemUser}
                               />
-                              &nbsp;&nbsp;&nbsp;System user
-                           </Label>
+
+                              <FormFeedback>{meta.error}</FormFeedback>
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                     <Field name="inputType">
+
+                        {({ input }) => (
+
+                           <FormGroup>
+
+                              <Label for="inputType">Input Type</Label>
+
+                              <Select
+                                 {...input}
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={optionsForInput}
+                                 placeholder="Select Input Type"
+                                 onChange={(e) => { setInputTypeValue(e); input.onChange(e) }}
+                                 isDisabled={user?.systemUser}
+                              />
+
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                     {values.inputType.value === "upload" ? (
+
+                        <FormGroup>
+
+                           <Label for="certFile">Client Certificate</Label>
+
+                           <div>
+
+                              {
+
+                                 certToUpload ? (
+                                    <CertificateAttributes certificate={certToUpload} />
+                                 ) : (
+                                    <>
+                                       Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;
+                                    </>
+                                 )
+
+                              }
+
+                              <Button color="secondary" onClick={() => setCertUploadDialog(true)}>Choose File</Button>
+
+                           </div>
+
+                           <FormText color="muted">
+                              Upload certificate of client based on which will be
+                              authenticated to RA profile.
+                           </FormText>
 
                         </FormGroup>
+
+
+                     ) : (
+
+                        <Field name="certificate">
+
+                           {({ input, meta }) => (
+
+                              <FormGroup>
+
+                                 <Label for="certificate">Certificate</Label>
+
+                                 <Select
+                                    {...input}
+                                    //ref={certSelectRef}
+                                    maxMenuHeight={140}
+                                    menuPlacement="auto"
+                                    options={optionsForCertificate}
+                                    placeholder="Select Certificate"
+                                    onMenuScrollToBottom={loadNextCertificates}
+                                    isDisabled={user?.systemUser}
+                                    styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                                 />
+
+                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
+                              </FormGroup>
+
+                           )}
+
+                        </Field>
+
                      )}
 
-                  </Field>
+                     <br />
 
-                  <div className="d-flex justify-content-end">
+                     <Field name="enabled" type="checkbox">
 
-                     <ButtonGroup>
+                        {({ input }) => (
 
-                        <ProgressButton
-                           title={submitTitle}
-                           inProgressTitle={inProgressTitle}
-                           inProgress={submitting || isCreatingUser || isUpdatingUser}
-                           disabled={pristine || submitting || isCreatingUser || isUpdatingUser || !valid || values.systemUser}
-                        />
+                           <FormGroup check>
 
-                        <Button color="default" onClick={onCancel} disabled={submitting || isCreatingUser || isUpdatingUser}>
-                           Cancel
-                        </Button>
+                              <Label check>
 
-                     </ButtonGroup>
+                                 <Input
+                                    {...input}
+                                    type="checkbox"
+                                 />
 
-                  </div>
+                                 &nbsp;&nbsp;&nbsp;Enabled
 
-               </BootstrapForm>
-            )}
+                              </Label>
 
-         </Form>
+                           </FormGroup>
+
+                        )}
+
+                     </Field>
+
+                     <br />
+
+                     <Field name="systemUser" type="checkbox">
+
+                        {({ input }) => (
+
+                           <FormGroup check>
+                              <Label check>
+                                 <Input
+                                    {...input}
+                                    type="checkbox"
+                                    disabled={true}
+                                 />
+                                 &nbsp;&nbsp;&nbsp;System user
+                              </Label>
+
+                           </FormGroup>
+                        )}
+
+                     </Field>
+
+                     <br />
+                     <CustomTable
+                        headers={rolesTableHeader}
+                        data={rolesTableData}
+                        checkedRows={userRoles}
+                        hasCheckboxes={true}
+                        hasAllCheckBox={false}
+                        onCheckedRowsChanged={(roles) => {
+                           setUserRoles(roles as string[])
+                        }}
+                     />
+
+                     <div className="d-flex justify-content-end">
+
+                        <ButtonGroup>
+
+                           <ProgressButton
+                              title={submitTitle}
+                              inProgressTitle={inProgressTitle}
+                              inProgress={submitting || isCreatingUser || isUpdatingUser}
+                              disabled={(pristine && !hasRolesChanged) || submitting || isCreatingUser || isUpdatingUser || !valid || values.systemUser}
+                           />
+
+                           <Button color="default" onClick={onCancel} disabled={submitting || isCreatingUser || isUpdatingUser}>
+                              Cancel
+                           </Button>
+
+                        </ButtonGroup>
+
+                     </div>
+
+                  </BootstrapForm>
+               )}
+
+            </Form>
+
+         </Widget>
 
 
          <Dialog
@@ -605,7 +700,8 @@ function UserForm({ title }: Props) {
          />
 
 
-      </Widget>
+      </>
+
    )
 
 }

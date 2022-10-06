@@ -14,7 +14,7 @@ import { AuthType, FunctionGroupCode } from "types/connectors";
 
 export class ConnectorManagementMock implements model.ConnectorManagementApi {
 
-   createNewConnector(name: string, url: string, authType: AuthType, authAttributes: AttributeDTO[]): Observable<string> {
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes: AttributeDTO[]): Observable<{ uuid: string}> {
 
       return of(
          dbData.connectorsRemote.find(connector => connector.url === url)
@@ -39,7 +39,7 @@ export class ConnectorManagementMock implements model.ConnectorManagementApi {
                   status: "registered"
                });
 
-               return uuid;
+               return { uuid };
 
             }
 

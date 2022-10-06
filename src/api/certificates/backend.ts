@@ -67,7 +67,7 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    }
 
 
-   uploadCertificate(certificate: string): Observable<string> {
+   uploadCertificate(certificate: string): Observable<{ uuid: string}> {
 
       return createNewResource(`${baseUrl}/upload`, {
          certificate,

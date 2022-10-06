@@ -58,7 +58,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}> {
 
       return createNewResource(
          `${extBaseUrl}/${authorityInstanceUuid}/raProfiles`,

@@ -36,7 +36,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
       validity?: number,
       requireContact?: boolean,
       requireTermsOfService?: boolean,
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,

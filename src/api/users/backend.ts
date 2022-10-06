@@ -74,7 +74,7 @@ export class UserManagementBackend implements model.UserManagementApi {
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
             firstName,
             lastName,
             email,
@@ -126,7 +126,7 @@ export class UserManagementBackend implements model.UserManagementApi {
    updateRoles(userUuid: string, rolesUuids: string[]): Observable<model.UserDetailDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${userUuid}/roles`, "PUT", rolesUuids)
+         new HttpRequestOptions(`${baseUrl}/${userUuid}/roles`, "PATCH", rolesUuids)
       );
 
    }

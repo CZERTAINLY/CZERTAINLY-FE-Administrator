@@ -1,6 +1,7 @@
 import { AuthApi, AuthBackend, AuthMock } from "./auth";
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
 import { UserManagementApi, UserManagementBackend, UserManagementMock } from "./users";
+import { RolesManagementApi, RolesManagementBackend, RolesManagementMock } from "./roles";
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
@@ -24,6 +25,7 @@ const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
 export interface ApiClients {
    auth: AuthApi;
    users: UserManagementApi;
+   roles: RolesManagementApi;
    auditLogs: AuditLogsApi;
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
@@ -45,6 +47,7 @@ export interface ApiClients {
 export const backendClient: ApiClients = {
    auth: new AuthBackend(fetchService),
    users: new UserManagementBackend(fetchService),
+   roles: new RolesManagementBackend(fetchService),
    certificates: new CertificateInventoryBackend(fetchService),
    auditLogs: new AuditLogsBackend(fetchService),
    profiles: new ProfilesManagementBackend(fetchService),
@@ -66,6 +69,7 @@ export const backendClient: ApiClients = {
 export const mockClient: ApiClients = {
    auth: new AuthMock(),
    users: new UserManagementMock(),
+   roles: new RolesManagementMock(),
    certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
    profiles: new ProfilesManagementMock(),

@@ -7,7 +7,7 @@ import * as model from "./model";
 import { HttpErrorResponse } from "ts-rest-client";
 
 export class GroupManagementMock implements model.GroupManagementApi {
-  createNewGroup(name: string, description: string): Observable<string> {
+  createNewGroup(name: string, description: string): Observable<{ uuid: string}> {
     return of(null).pipe(
       delay(randomDelay()),
          map(
@@ -18,7 +18,7 @@ export class GroupManagementMock implements model.GroupManagementApi {
                 name,
                 description
               });
-              return uuid;
+              return { uuid };
           }
         )
       );

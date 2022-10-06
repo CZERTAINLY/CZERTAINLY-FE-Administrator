@@ -1,5 +1,5 @@
 import { DbUser } from "./db-users";
-import { DbRole } from "./db-roles";
+import { DbRole, DbRolePermissions } from "./db-roles";
 import { DbAuthority } from "./db-authorities";
 import { DbAcmeAccount } from "./db-acme-accounts";
 import { DbAcmeProfile } from "./db-acme-profiles";
@@ -30,6 +30,7 @@ export interface DBData {
 
    users: DbUser[];
    roles: DbRole[];
+   permissions: DbRolePermissions[];
    resources: DbResource[];
 
    auditLogs: DbAuditLog[];

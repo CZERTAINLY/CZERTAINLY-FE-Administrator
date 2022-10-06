@@ -6,12 +6,12 @@ import { dbData } from 'mocks/db';
 import { randomDelay } from 'utils/mock';
 import * as model from './model';
 
-export class RoleMock implements model.RoleApi {
+export class RolesManagementMock implements model.RolesManagementApi {
 
-   listRoles(): Observable<model.RoleDTO[]> {
+   list(): Observable<model.RoleDTO[]> {
 
       return of(
-         []
+         dbData.roles
       ).pipe(
 
          delay(randomDelay())
@@ -20,4 +20,190 @@ export class RoleMock implements model.RoleApi {
 
    }
 
+
+   getDetail(uuid: string): Observable<model.RoleDetailDTO> {
+
+      return of(
+         dbData.roles.find(role => role.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            role => {
+
+               if (!role) throw new HttpErrorResponse({ status: 404 });
+               return role;
+
+            }
+
+         )
+
+      );
+
+   }
+
+
+   create(
+      name: string,
+      description?: string,
+   ): Observable<model.RoleDetailDTO> {
+
+      return of(
+         dbData.roles.find(role => role.name === name)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            role => {
+
+               if (role) throw new HttpErrorResponse({ status: 409 });
+
+               const newRole = {
+                  uuid: crypto.randomUUID(),
+                  name,
+                  description,
+                  systemRole: false,
+                  users: []
+               };
+
+               dbData.roles.push(newRole);
+
+               return newRole;
+
+            }
+
+         )
+
+      );
+
+   }
+
+
+   update(
+      uuid: string,
+      name: string,
+      description?: string,
+   ): Observable<model.RoleDetailDTO> {
+
+      return of(
+         dbData.roles.find(role => role.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            role => {
+
+               if (!role) throw new HttpErrorResponse({ status: 404 });
+
+               role.name = name;
+               role.description = description || role.description;
+
+               return role;
+
+            }
+
+         )
+
+      );
+
+   }
+
+
+   delete(uuid: string): Observable<void> {
+
+      return of(
+         dbData.roles.find(role => role.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            role => {
+
+               if (!role) throw new HttpErrorResponse({ status: 404 });
+
+               dbData.roles = dbData.roles.filter(r => r.uuid !== uuid);
+
+            }
+
+         )
+
+      );
+
+
+   }
+
+
+   getPermissions(uuid: string): Observable<model.SubjectPermissionsDTO[]> {
+
+      return of(
+         dbData.roles.find(role => role.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            role => {
+
+               if (!role) throw new HttpErrorResponse({ status: 404, statusText: 'Role not found' });
+
+               const dbPerms = dbData.permissions.find(p => p.uuid === uuid);
+               if (!dbPerms) return [];
+
+               return dbPerms.permissions;
+
+            }
+
+         )
+
+      );
+
+   }
+
+
+   updatePermissions(uuid: string, permissions: model.SubjectPermissionsDTO[]): Observable<model.SubjectPermissionsDTO[]> {
+
+      return of(
+         dbData.roles.find(role => role.uuid === uuid)
+      ).pipe(
+
+         delay(randomDelay()),
+         map(
+
+            role => {
+
+               if (!role) throw new HttpErrorResponse({ status: 404, statusText: 'Role not found' });
+
+               let dbPerms = dbData.permissions.find(p => p.uuid === uuid);
+
+               if (!dbPerms) {
+
+                  dbPerms = {
+                     uuid,
+                     permissions: []
+                  };
+
+                  dbData.permissions.push(dbPerms);
+
+               }
+
+               dbPerms.permissions = permissions;
+
+               return dbPerms.permissions;
+
+            }
+
+         )
+
+      );
+
+
+   }
+
+
 }
+
+

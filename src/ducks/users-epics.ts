@@ -1,5 +1,5 @@
 import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import history from "browser-history";
 
 import { AppEpic } from "ducks";
@@ -32,7 +32,6 @@ const list: AppEpic = (action$, state, deps) => {
       )
 
    )
-
 }
 
 
@@ -188,8 +187,20 @@ const update: AppEpic = (action$, state, deps) => {
             action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
          ).pipe(
 
-            map(
-               userDetailDTO => slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
+            switchMap(
+
+               userDetailDTO => action.payload.roles && action.payload.roles.length > 0 ?
+
+                  deps.apiClients.users.updateRoles(userDetailDTO.uuid, action.payload.roles).pipe(
+
+                     map(
+                        () => slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
+                     )
+
+                  )
+                  :
+                  of(slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) }))
+
             ),
 
             catchError(
@@ -254,12 +265,12 @@ const deletUser: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.deleteUser.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.users.delete(action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.deleteUserSuccess({ uuid: action.payload.uuid })
+               () => slice.actions.deleteUserSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
             catchError(
                err => of(slice.actions.deleteUserFailure({ error: extractError(err, "Failed to delete user") }))
@@ -282,8 +293,8 @@ const deleteUserSuccess: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => {
-            history.push(`../`);
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
             return EMPTY;
          }
 
@@ -316,7 +327,7 @@ const enable: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.enable.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.users.enable(action.payload.uuid).pipe(
 
@@ -360,7 +371,7 @@ const disable: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.disable.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.users.disable(action.payload.uuid).pipe(
 

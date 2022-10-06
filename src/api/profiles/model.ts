@@ -52,7 +52,7 @@ export interface ProfilesManagementApi {
 
    getRaAcmeProfile(authorityInstanceUuid: string, uuid: string): Observable<RaAcmeLinkDTO>;
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string>;
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}>;
 
    updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<RaProfileDTO>;
 
@@ -75,7 +75,7 @@ export interface ProfilesManagementApi {
    checkCompliance(uuids: string[]): Observable<void>;
 
    associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
-   
+
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
 
 }

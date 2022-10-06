@@ -3,7 +3,7 @@ import { DBData } from "./DBData";
 import { dbAcmeProfiles } from "./db-acme-profiles";
 import { dbAcmeAccounts } from "./db-acme-accounts";
 import { dbUsers } from "./db-users";
-import { dbRoles } from "./db-roles";
+import { dbRolePermissions, dbRoles } from "./db-roles";
 import { dbAuditLogs, dbAuditLogsOperationStatuses, dbAuditLogsOperations, dbAuditLogsOrigins } from "./db-audit-logs";
 import { dbCertificateFilters } from "./db-certificate-filters";
 import { dbCertificates } from "./db-certificates";
@@ -27,27 +27,21 @@ import { dbResources } from "./db-auth";
  */
 export const dbData: DBData = {
 
-   acmeAccounts: [
-      dbAcmeAccounts["BeWgvKI160E"],
-      dbAcmeAccounts["ZnaucX7UOFs"],
-      dbAcmeAccounts["PrLHcY5PnnA"],
-      dbAcmeAccounts["FQxkmEYae9g"],
-      dbAcmeAccounts["ZeQgvUI12pE"]
-   ],
-
-   acmeProfiles: [
-      dbAcmeProfiles["cm"],
-      dbAcmeProfiles["ACME CZERTAINLY Profile"]
-   ],
-
    users: [
       dbUsers["Admin"],
       dbUsers["User"],
    ],
 
+
    roles: [
       { ...dbRoles["admin"], users: [dbUsers["Admin"]] }  ,
       { ...dbRoles["user"], users: [dbUsers["User"]] }  ,
+   ],
+
+
+   permissions: [
+      dbRolePermissions["bbbbbbbb-cf31-402e-84c6-4988d96096c4"],
+      dbRolePermissions["aaaaaaaa-cf31-402e-84c6-4988d96096c4"],
    ],
 
 
@@ -79,15 +73,35 @@ export const dbData: DBData = {
       dbAuditLogs[20]
    ],
 
+
    auditLogsOperations: dbAuditLogsOperations,
+
 
    auditLogsStatuses: dbAuditLogsOperationStatuses,
 
+
    auditLogsOrigins: dbAuditLogsOrigins,
+
+
+   acmeAccounts: [
+      dbAcmeAccounts["BeWgvKI160E"],
+      dbAcmeAccounts["ZnaucX7UOFs"],
+      dbAcmeAccounts["PrLHcY5PnnA"],
+      dbAcmeAccounts["FQxkmEYae9g"],
+      dbAcmeAccounts["ZeQgvUI12pE"]
+   ],
+
+
+   acmeProfiles: [
+      dbAcmeProfiles["cm"],
+      dbAcmeProfiles["ACME CZERTAINLY Profile"]
+   ],
+
 
    authorities: [
       dbAuthorities["ejbca-ca-instance1"]
    ],
+
 
    certificateFilters: [
       dbCertificateFilters["commonName"],
@@ -115,6 +129,7 @@ export const dbData: DBData = {
       dbCertificateFilters["complianceStatus"]
    ],
 
+
    certificates: [
       dbCertificates["Lukas Kopenec"],
       dbCertificates["CLIENT1"],
@@ -124,6 +139,7 @@ export const dbData: DBData = {
       dbCertificates["*.google.com"],
    ],
 
+
    connectors: [
       dbConnectors["Common-Credential-Provider"],
       dbConnectors["Network-Discovery-Provider"],
@@ -132,6 +148,7 @@ export const dbData: DBData = {
       dbConnectors["EJBCA-Legacy-Connector"],
       dbConnectors["EJBCA-NG-Connector"],
    ],
+
 
    connectorsRemote: [
       dbRemoteConnectors["http://localhost:1"],
@@ -143,6 +160,7 @@ export const dbData: DBData = {
       dbRemoteConnectors["http://localhost:10005"],
    ],
 
+
    credentials: [
       dbCredentials["ejbca-client-cert"],
       dbCredentials["Cryptosense-API"],
@@ -150,11 +168,13 @@ export const dbData: DBData = {
       dbCredentials["ejbca-admin"]
    ],
 
+
    raProfiles: [
       dbRaProfiles["localhostProfile"],
       dbRaProfiles["DEMO-PROFILE"],
       dbRaProfiles["DEMO-RA-PROFILE2"]
    ],
+
 
    groups: [
       dbGroups["Group1"],
@@ -162,22 +182,27 @@ export const dbData: DBData = {
       dbGroups["Group3"],
    ],
 
+
    discoveries: [
       dbDiscoveries["Discovery1"],
       dbDiscoveries["Discovery2"],
       dbDiscoveries["Discovery3"],
    ],
 
+
    entities: [
       dbEntities["entity1"]
    ],
+
 
    locations: [
       dbLocations["location1"],
       dbLocations["location2"]
    ],
 
+
    dashboard: dbDashboard,
+
 
    complianceProfilesList: [
       dbComplianceProfilesListItem["Profile1"],
@@ -186,6 +211,7 @@ export const dbData: DBData = {
       dbComplianceProfilesListItem["Profile4"],
    ],
 
+
    complianceProfiles: [
       dbComplianceProfiles["Profile1"],
       dbComplianceProfiles["Profile2"],
@@ -193,8 +219,11 @@ export const dbData: DBData = {
       dbComplianceProfiles["Profile4"],
    ],
 
+
    complianceRules: dbComplianceRules,
 
+
    complianceGroups: dbComplianceGroups,
+
 };
 

@@ -156,7 +156,7 @@ export interface CertificateInventoryApi {
    getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]>;
 
 
-   uploadCertificate(certificate: string): Observable<string>;
+   uploadCertificate(certificate: string): Observable<{ uuid: string}>;
 
 
    deleteCertificate(uuid: string): Observable<void>;

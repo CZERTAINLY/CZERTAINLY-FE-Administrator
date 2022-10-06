@@ -29,7 +29,7 @@ export class DiscoveryManagementBackend implements model.DiscoveryManagementApi 
       kind: string,
       connectorUuid: string,
       attributes: AttributeDTO[]
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,

@@ -4,7 +4,6 @@ import { Link, useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 
 import { Container, Label, Row, Col } from "reactstrap";
-import Select from "react-select";
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 
@@ -40,9 +39,6 @@ export default function RaProfileDetail() {
    const isDisabling = useSelector(raProfilesSelectors.isDisabling);
    const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
    const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
-
-
-   const [clientToAuthorize, setClientToAuthorize] = useState<{ value: string; label: string; } | null>(null);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -322,41 +318,6 @@ export default function RaProfileDetail() {
       [raProfile]
 
    )
-
-
-   const authorizedClientsHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "name",
-            content: "Client Name",
-            sortable: true,
-            sort: "asc",
-            width: "auto"
-         },
-         {
-            id: "dn",
-            content: "Client DN",
-            sortable: true,
-            width: "auto"
-         },
-         {
-            id: "status",
-            content: "Status",
-            sortable: true,
-            align: "center",
-            width: "0"
-         },
-         {
-            id: "actions",
-            content: "Actions",
-            align: "center",
-            width: "0"
-         },
-      ],
-      []
-
-   );
 
 
    const acmeProfileHeaders: TableHeader[] = useMemo(

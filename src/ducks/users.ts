@@ -162,7 +162,8 @@ export const slice = createSlice({
          email: string | undefined,
          enabled: boolean,
          certificate: CertificateModel | undefined,
-         certificateUuid: string | undefined
+         certificateUuid: string | undefined,
+         roles?: string[]
       }>) => {
 
          state.isCreating = true;
@@ -192,7 +193,8 @@ export const slice = createSlice({
          email: string | undefined,
          enabled: boolean,
          certificate: CertificateModel | undefined,
-         certificateUuid: string | undefined
+         certificateUuid: string | undefined,
+         roles?: string[]
       }>) => {
 
          state.isUpdating = true;
@@ -224,14 +226,14 @@ export const slice = createSlice({
       },
 
 
-      deleteUser: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteUser: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteUserSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteUserSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = false;
 

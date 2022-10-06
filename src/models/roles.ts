@@ -1,3 +1,5 @@
+import { UserModel } from "./users";
+
 export interface RoleModel {
    uuid: string;
    name: string;
@@ -9,3 +11,25 @@ export interface RoleModel {
 export interface RoleDetailModel extends RoleModel {
    users: UserModel[];
 }
+
+
+export interface ObjectPermissionsModel {
+   uuid: string;
+   allow: string[];
+   deny: string[];
+}
+
+
+export interface ResourcePermissionsModel {
+   name: string;
+   allowAllActions: boolean;
+   actions: string[];
+   objects: ObjectPermissionsModel[];
+}
+
+
+export interface SubjectPermissionsModel {
+   allowAllResources: boolean;
+   resources: ResourcePermissionsModel[];
+}
+

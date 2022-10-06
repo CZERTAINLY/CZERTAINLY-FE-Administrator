@@ -143,7 +143,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
    }
 
 
-   uploadCertificate(certificate: string): Observable<string> {
+   uploadCertificate(certificate: string): Observable<{ uuid: string}> {
 
       return of(
          null

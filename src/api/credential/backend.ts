@@ -23,7 +23,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    }
 
 
-   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<string> {
+   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,

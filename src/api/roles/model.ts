@@ -10,15 +10,17 @@ export interface RoleDTO {
 }
 
 
+export interface RoleDetailDTO extends RoleDTO {
+   users: UserDTO[];
+}
+
+
 export interface ObjectPermissionsDTO {
    uuid: string;
    allow: string[];
    deny: string[];
 }
 
-export interface RoleDetailDTO extends RoleDTO {
-   users: UserDTO[];
-}
 
 export interface ResourcePermissionsDTO {
    name: string;
@@ -34,28 +36,28 @@ export interface SubjectPermissionsDTO {
 }
 
 
-export interface RoleApi {
+export interface RolesManagementApi {
 
-   listRoles(): Observable<RoleDTO[]>;
+   list(): Observable<RoleDTO[]>;
 
-   getRole(name: string): Observable<RoleDetailDTO>;
+   getDetail(name: string): Observable<RoleDetailDTO>;
 
-   addRole(
+   create(
       name: string,
       description?: string,
    ): Observable<RoleDetailDTO>;
 
-   updateRole(
+   update(
       uuid: string,
       name: string,
       description?: string,
    ): Observable<RoleDetailDTO>;
 
-   deleteRole(uuid: string): Observable<void>;
+   delete(uuid: string): Observable<void>;
 
-   getRolePermissions(uuid: string): Observable<SubjectPermissionsDTO[]>;
+   getPermissions(uuid: string): Observable<SubjectPermissionsDTO[]>;
 
-   saveRolePermissions(uuid: string, getRolePermissions: ResourcePermissionsDTO[]): Observable<SubjectPermissionsDTO[]>;
+   updatePermissions(uuid: string, permissions: SubjectPermissionsDTO[]): Observable<SubjectPermissionsDTO[]>;
 
    /*
       ResourcePermissionsDto getRoleResourcePermissions(
