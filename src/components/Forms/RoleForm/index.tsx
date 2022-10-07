@@ -9,17 +9,12 @@ import Select from "react-select";
 import Widget from "components/Widget";
 import ProgressButton from "components/ProgressButton";
 
-import { actions as userActions, selectors as userSelectors } from "ducks/users";
-import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
+import users, { actions as userActions, selectors as usersSelectors } from "ducks/users";
 
-import { UserDetailModel, CertificateModel } from "models";
-
-import { emptyCertificate } from "utils/certificate";
 import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
-import CertificateAttributes from "components/CertificateAttributes";
+
 import Dialog from "components/Dialog";
-import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
@@ -28,19 +23,13 @@ interface Props {
 }
 
 interface FormValues {
-   username: string;
-   firstName: string;
-   lastName: string;
-   email: string;
-   enabled: boolean;
-   systemUser: boolean;
-   inputType: { value: "upload" | "select" };
-   certFile: FileList | undefined;
-   certificate: any;
+   name: string;
+   description: string;
+   systemRole: boolean;
 }
 
 
-function UserForm({ title }: Props) {
+function RoleForm({ title }: Props) {
 
    const dispatch = useDispatch();
    const history = useHistory();
@@ -52,238 +41,53 @@ function UserForm({ title }: Props) {
       [params.id]
    );
 
-   const optionsForInput = useMemo(
-      () => [
-         {
-            label: "Upload a new Certificate",
-            value: "upload",
-         },
-         {
-            label: "Choose Existing Certificate",
-            value: "select",
-         },
-      ],
-      []
-   );
+   const rolesSelector = useSelector(rolesSelectors.role);
+   const usersSelector = useSelector(usersSelectors.users);
 
+   const isFetchingRoleDetail = useSelector(rolesSelectors.isFetchingDetail);
+   const isFetchingUsers = useSelector(usersSelectors.isFetchingList);
 
-   const userSelector = useSelector(userSelectors.user);
-   const certificates = useSelector(certSelectors.certificates);
-   const rolesSelector = useSelector(rolesSelectors.roles);
+   const isCreatingRole = useSelector(rolesSelectors.isCreating);
+   const isUpdatingRole = useSelector(rolesSelectors.isUpdating);
+   const isFetchingPermissions = useSelector(rolesSelectors.isFetchingPermissions);
+   const isUpdatingPermissions = useSelector(rolesSelectors.isUpdatingPermissions);
 
-   const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
-   const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
-
-   const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
-   const isFetchingCertDetail = useSelector(certSelectors.isFetchingDetail);
-   const certificateDetail = useSelector(certSelectors.certificateDetail);
-
-   const isCreatingUser = useSelector(userSelectors.isCreating);
-   const isUpdatingUser = useSelector(userSelectors.isUpdating);
-
-   const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
-   const [currentPage, setCurrentPage] = useState(1);
-   const [user, setUser] = useState<UserDetailModel>();
-   const [roles, setRoles] = useState<string[]>([]);
-
-   const [userRoles, setUserRoles] = useState<string[]>([]);
-
-   const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
-
-   const [, setInputTypeValue] = useState<{ label: string, value: string }>(editMode ? optionsForInput[1] : optionsForInput[0]);
-
-   const [selectedCertificate, setSelectedCertificate] = useState<{ label: string, value: string }>();
-
-   const [certUploadDialog, setCertUploadDialog] = useState(false);
-   const [certToUpload, setCertToUpload] = useState<CertificateModel>();
-
-
-   /* Load first page of certificates & all roles available */
+   /* Load all users, resources and objects */
 
    useEffect(
 
       () => {
 
-         dispatch(
-            certActions.listCertificates({
-               query: {
-                  itemsPerPage: 100,
-                  pageNumber: 1,
-                  filters: [],
-               }
-            })
-         );
-
-         dispatch(rolesActions.list());
+         dispatch(userActions.list());
 
       },
       [dispatch]
 
    );
 
-   /* Load user */
+   /* Load role */
 
    useEffect(
 
       () => {
 
-         if (params.id && (!userSelector || userSelector.uuid !== params.id)) dispatch(userActions.getDetail({ uuid: params.id }));
+         if (params.id && (!rolesSelector || rolesSelector.uuid !== params.id)) dispatch(rolesActions.getDetail({ uuid: params.id }));
 
       },
-      [dispatch, params.id, userSelector]
+      [dispatch, params.id, rolesSelector]
 
    );
-
-   /* Copy loaded user to the state */
-
-   useEffect(
-
-      () => {
-         if (params.id && userSelector?.uuid === params.id) {
-
-            setUser(userSelector);
-            setUserRoles(userSelector.roles.map(role => role.uuid));
-
-         } else {
-
-            if (!user) setUser({
-               uuid: "",
-               username: "",
-               firstName: "",
-               lastName: "",
-               email: "",
-               enabled: false,
-               certificate: emptyCertificate,
-               roles: [],
-               systemUser: false
-            });
-
-            setUserRoles([]);
-
-         }
-      },
-      [params.id, user, userSelector]
-
-   );
-
-   /* Copy loaded roles to the state */
-
-   useEffect(
-
-      () => {
-
-         if (rolesSelector) setRoles(rolesSelector.map(role => role.name));
-
-      },
-      [rolesSelector]
-
-   );
-
-
-   /* Process cert detail loaded for user */
-
-   useEffect(
-
-      () => {
-
-         if (user && user.certificate && user.certificate.uuid && certificateDetail && certificateDetail.uuid === user.certificate.uuid) {
-
-            const certs = [...loadedCerts];
-
-            const idx = certs.findIndex(c => c.uuid === certificateDetail.uuid);
-            if (idx >= 0) certs.splice(idx, 1, certificateDetail);
-
-            setLoadedCerts([certificateDetail, ...loadedCerts]);
-
-            setSelectedCertificate({
-               label: certificateDetail.commonName || `( empty ) ( ${certificateDetail.fingerprint} )`,
-               value: certificateDetail.uuid,
-            });
-
-         }
-
-      },
-      [certificateDetail, loadedCerts, user]
-
-   );
-
-
-   /* Process fetched certs and store them to loaded certs */
-
-   useEffect(
-
-      () => {
-
-         const fpc = certificates.filter(
-            pagedCert => !["expired", "revoked", "invalid"].includes(pagedCert.status)
-         ).filter(
-            pagedCert => loadedCerts.find(loadedCert => loadedCert.uuid === pagedCert.uuid) === undefined
-         )
-
-         if (fpc.length === 0) return;
-
-         const certs = [...loadedCerts, ...fpc];
-
-         setLoadedCerts(certs);
-
-         setOptionsForCertificte(
-
-            certs.map(
-               loadedCert => ({
-                  label: loadedCert.commonName || `( empty ) ( ${loadedCert.serialNumber} )`,
-                  value: loadedCert.uuid,
-               })
-            )
-
-         );
-
-         setCurrentPage(currentPage + 1);
-
-      },
-      [certificates, currentPage, loadedCerts]
-
-   );
-
 
    const onSubmit = useCallback(
 
       (values: FormValues) => {
 
          if (editMode) {
-
-            dispatch(
-               userActions.update({
-                  uuid: user!.uuid,
-                  firstName: values.firstName || undefined,
-                  lastName: values.lastName || undefined,
-                  email: values.email || undefined,
-                  enabled: values.enabled,
-                  certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
-                  certificate: values.inputType.value === "upload" ? certToUpload : undefined,
-                  roles: userRoles
-               })
-            );
-
-         } else {
-
-            dispatch(
-               userActions.create({
-                  username: values.username,
-                  firstName: values.firstName || undefined,
-                  lastName: values.firstName || undefined,
-                  email: values.email || undefined,
-                  enabled: values.enabled,
-                  certificate: values.inputType.value === "upload" ? certToUpload : undefined,
-                  certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
-                  roles: userRoles
-               })
-            );
-
          }
 
       },
 
-      [user, certToUpload, dispatch, editMode, userRoles]
+      [editMode]
 
    )
 
@@ -298,28 +102,6 @@ function UserForm({ title }: Props) {
    );
 
 
-   const loadNextCertificates = useCallback(
-
-      () => {
-
-         if (loadedCerts.length === 0) return;
-
-         dispatch(
-            certActions.listCertificates({
-               query: {
-                  itemsPerPage: 100,
-                  pageNumber: currentPage,
-                  filters: [],
-               }
-            })
-         );
-
-      },
-      [dispatch, currentPage, loadedCerts]
-
-   )
-
-
    const submitTitle = useMemo(
       () => editMode ? "Save" : "Create",
       [editMode]
@@ -332,30 +114,40 @@ function UserForm({ title }: Props) {
    )
 
 
-   const defaultValues = useMemo(
+   const defaultValues: FormValues = useMemo(
       () => ({
-         username: editMode ? user?.username : "",
-         firstName: editMode ? user?.firstName || "" : "",
-         lastName: editMode ? user?.lastName : "",
-         email: editMode ? user?.email : "",
-         enabled: editMode ? user?.enabled : false,
-         systemUser: editMode ? user?.systemUser : false,
-         inputType: optionsForInput[1],
-         certificate: selectedCertificate,
+         name: editMode ? rolesSelector?.name || "" : "",
+         description: editMode ? rolesSelector?.description || "" : "",
+         systemRole: editMode ? rolesSelector?.systemRole || false : false
       }),
-      [user, editMode, selectedCertificate, optionsForInput]
+      [editMode, rolesSelector?.name, rolesSelector?.description, rolesSelector?.systemRole]
    );
 
 
-   const rolesTableHeader: TableHeader[] = useMemo(
+   const usersTableHeader: TableHeader[] = useMemo(
 
       () => [
          {
-            id: "roleName",
-            content: <MDBColumnName columnName="Name" />,
+            id: "userName",
+            content: <MDBColumnName columnName="Username" />,
             sortable: true,
             sort: "asc",
             width: "auto",
+         },
+         {
+            id: "firstName",
+            content: <MDBColumnName columnName="First Name" />,
+            sortable: true,
+         },
+         {
+            id: "lastName",
+            content: <MDBColumnName columnName="Last Name" />,
+            sortable: true,
+         },
+         {
+            id: "email",
+            content: <MDBColumnName columnName="Email" />,
+            sortable: true,
          }
       ],
       []
@@ -363,17 +155,23 @@ function UserForm({ title }: Props) {
    );
 
 
-   const rolesTableData: TableDataRow[] = useMemo(
+   const usersTableData: TableDataRow[] = useMemo(
 
-      () => rolesSelector.map(
+      () => usersSelector.map(
 
-         role => ({
+         user => ({
 
-            id: role.uuid,
+            id: user.uuid,
 
             columns: [
 
-               role.name
+               user.username,
+
+               user.firstName || "",
+
+               user.lastName || "",
+
+               user.email || ""
 
             ]
 
@@ -381,10 +179,11 @@ function UserForm({ title }: Props) {
 
       ),
 
-      [rolesSelector]
+      [usersSelector]
 
    );
 
+   /*
 
    const hasRolesChanged: boolean = useMemo(
 
@@ -401,12 +200,14 @@ function UserForm({ title }: Props) {
 
    );
 
+   */
+
 
    return (
 
       <>
 
-         <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles}>
+         <Widget title={title} busy={isFetchingRoleDetail || isFetchingUsers}>
 
             <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
@@ -414,21 +215,21 @@ function UserForm({ title }: Props) {
 
                   <BootstrapForm onSubmit={handleSubmit}>
 
-                     <Field name="username" validate={validateRequired()}>
+                     <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="username">Username</Label>
+                              <Label for="name">Role Name</Label>
 
                               <Input
                                  {...input}
                                  valid={!meta.error && meta.touched}
                                  invalid={!!meta.error && meta.touched}
-                                 disabled={editMode || user?.systemUser}
+                                 disabled={editMode || rolesSelector?.systemRole}
                                  type="text"
-                                 placeholder="Username"
+                                 placeholder="Enter name of the role"
                               />
 
                               <FormFeedback>{meta.error}</FormFeedback>
@@ -438,13 +239,13 @@ function UserForm({ title }: Props) {
 
                      </Field>
 
-                     <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
+                     <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
 
                         {({ input, meta }) => (
 
                            <FormGroup>
 
-                              <Label for="firstName">First Name</Label>
+                              <Label for="description">Description</Label>
 
                               <Input
                                  {...input}
@@ -452,170 +253,10 @@ function UserForm({ title }: Props) {
                                  invalid={!!meta.error && meta.touched}
                                  type="text"
                                  placeholder="First Name"
-                                 disabled={user?.systemUser}
+                                 disabled={rolesSelector?.systemRole}
                               />
 
                               <FormFeedback>{meta.error}</FormFeedback>
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                     <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="lastName">Last Name</Label>
-
-                              <Input
-                                 {...input}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="text"
-                                 placeholder="Last name"
-                                 disabled={user?.systemUser}
-                              />
-
-                              <FormFeedback>{meta.error}</FormFeedback>
-                           </FormGroup>
-                        )}
-                     </Field>
-
-                     <Field name="email" validate={composeValidators(validateEmail())}>
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="email">Email</Label>
-
-                              <Input
-                                 {...input}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="text"
-                                 placeholder="Email address"
-                                 disabled={user?.systemUser}
-                              />
-
-                              <FormFeedback>{meta.error}</FormFeedback>
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                     <Field name="inputType">
-
-                        {({ input }) => (
-
-                           <FormGroup>
-
-                              <Label for="inputType">Input Type</Label>
-
-                              <Select
-                                 {...input}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForInput}
-                                 placeholder="Select Input Type"
-                                 onChange={(e) => { setInputTypeValue(e); input.onChange(e) }}
-                                 isDisabled={user?.systemUser}
-                              />
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                     {values.inputType.value === "upload" ? (
-
-                        <FormGroup>
-
-                           <Label for="certFile">Client Certificate</Label>
-
-                           <div>
-
-                              {
-
-                                 certToUpload ? (
-                                    <CertificateAttributes certificate={certToUpload} />
-                                 ) : (
-                                    <>
-                                       Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;
-                                    </>
-                                 )
-
-                              }
-
-                              <Button color="secondary" onClick={() => setCertUploadDialog(true)}>Choose File</Button>
-
-                           </div>
-
-                           <FormText color="muted">
-                              Upload certificate of client based on which will be
-                              authenticated to RA profile.
-                           </FormText>
-
-                        </FormGroup>
-
-
-                     ) : (
-
-                        <Field name="certificate">
-
-                           {({ input, meta }) => (
-
-                              <FormGroup>
-
-                                 <Label for="certificate">Certificate</Label>
-
-                                 <Select
-                                    {...input}
-                                    //ref={certSelectRef}
-                                    maxMenuHeight={140}
-                                    menuPlacement="auto"
-                                    options={optionsForCertificate}
-                                    placeholder="Select Certificate"
-                                    onMenuScrollToBottom={loadNextCertificates}
-                                    isDisabled={user?.systemUser}
-                                    styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                                 />
-
-                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
-
-                              </FormGroup>
-
-                           )}
-
-                        </Field>
-
-                     )}
-
-                     <br />
-
-                     <Field name="enabled" type="checkbox">
-
-                        {({ input }) => (
-
-                           <FormGroup check>
-
-                              <Label check>
-
-                                 <Input
-                                    {...input}
-                                    type="checkbox"
-                                 />
-
-                                 &nbsp;&nbsp;&nbsp;Enabled
-
-                              </Label>
 
                            </FormGroup>
 
@@ -625,7 +266,7 @@ function UserForm({ title }: Props) {
 
                      <br />
 
-                     <Field name="systemUser" type="checkbox">
+                     <Field name="systemRole" type="checkbox">
 
                         {({ input }) => (
 
@@ -636,7 +277,7 @@ function UserForm({ title }: Props) {
                                     type="checkbox"
                                     disabled={true}
                                  />
-                                 &nbsp;&nbsp;&nbsp;System user
+                                 &nbsp;&nbsp;&nbsp;System role
                               </Label>
 
                            </FormGroup>
@@ -645,15 +286,18 @@ function UserForm({ title }: Props) {
                      </Field>
 
                      <br />
+
+                     <p>Assigned Users</p>
+
                      <CustomTable
-                        headers={rolesTableHeader}
-                        data={rolesTableData}
-                        checkedRows={userRoles}
+                        headers={usersTableHeader}
+                        data={usersTableData}
+                        /*checkedRows={userRoles}*/
                         hasCheckboxes={true}
                         hasAllCheckBox={false}
-                        onCheckedRowsChanged={(roles) => {
+                        /*onCheckedRowsChanged={(roles) => {
                            setUserRoles(roles as string[])
-                        }}
+                        }}*/
                      />
 
                      <div className="d-flex justify-content-end">
@@ -663,11 +307,11 @@ function UserForm({ title }: Props) {
                            <ProgressButton
                               title={submitTitle}
                               inProgressTitle={inProgressTitle}
-                              inProgress={submitting || isCreatingUser || isUpdatingUser}
-                              disabled={(pristine && !hasRolesChanged) || submitting || isCreatingUser || isUpdatingUser || !valid || values.systemUser}
+                              inProgress={submitting || isCreatingRole || isUpdatingRole}
+                              disabled={(pristine) || submitting || isCreatingRole || isUpdatingRole || !valid || values.systemRole}
                            />
 
-                           <Button color="default" onClick={onCancel} disabled={submitting || isCreatingUser || isUpdatingUser}>
+                           <Button color="default" onClick={onCancel} disabled={submitting || isCreatingRole || isUpdatingRole}>
                               Cancel
                            </Button>
 
@@ -682,28 +326,10 @@ function UserForm({ title }: Props) {
 
          </Widget>
 
-
-         <Dialog
-            isOpen={certUploadDialog}
-            caption={`Choose Certificate`}
-            body={
-               <CertificateUploadDialog
-                  okButtonTitle="Choose"
-                  onCancel={() => setCertUploadDialog(false)}
-                  onUpload={(data) => {
-                     setCertToUpload(data.certificate);
-                     setCertUploadDialog(false);
-                  }}
-               />}
-            toggle={() => setCertUploadDialog(false)}
-            buttons={[]}
-         />
-
-
       </>
 
    )
 
 }
 
-export default UserForm;
+export default RoleForm;
