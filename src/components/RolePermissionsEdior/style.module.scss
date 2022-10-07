@@ -71,3 +71,15 @@
 .objectPermissions > div {
    padding: 0.25em;
 }
+
+.objectPermissions > div:first-child > * {
+   background-color: $success;
+}
+
+.objectPermissions > div:nth-child(2) > * {
+   background-color: $danger;
+}
+
+.objectPermissions > div:last-child > * {
+   background-color: $warning;
+}
