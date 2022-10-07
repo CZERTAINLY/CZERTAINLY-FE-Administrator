@@ -37,6 +37,7 @@ export default function UsersList() {
 
       () => {
 
+         dispatch(actions.resetState());
          dispatch(actions.setUserListCheckedRows({ checkedRows: [] }));
          dispatch(actions.list());
 

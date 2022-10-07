@@ -8,7 +8,7 @@ export function transformResourceDTOToModel(resource: ResourceDetailDTO): Resour
       uuid: resource.uuid,
       name: resource.name,
       displayName: resource.displayName,
-      listingEndPoint: resource.listingEndPoint,
+      listObjectsEndpoint: resource.listObjectsEndpoint,
       objectAccess: resource.objectAccess,
    };
 

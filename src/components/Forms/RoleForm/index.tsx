@@ -2,21 +2,22 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { Form, Field } from "react-final-form";
-import Select from "react-select";
 
 import Widget from "components/Widget";
 import ProgressButton from "components/ProgressButton";
 
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import users, { actions as userActions, selectors as usersSelectors } from "ducks/users";
+import { actions as userActions, selectors as usersSelectors } from "ducks/users";
+import { actions as authActions, selectors as authSelectors } from "ducks/auth";
 
-import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
+import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
-import Dialog from "components/Dialog";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import RolePermissionsEditor from "components/RolePermissionsEdior";
+import { SubjectPermissionsModel } from "models";
 
 interface Props {
    title: JSX.Element;
@@ -26,6 +27,7 @@ interface FormValues {
    name: string;
    description: string;
    systemRole: boolean;
+   allResources: boolean;
 }
 
 
@@ -42,15 +44,21 @@ function RoleForm({ title }: Props) {
    );
 
    const rolesSelector = useSelector(rolesSelectors.role);
+   const rolePermissionsSelector = useSelector(rolesSelectors.permissions);
    const usersSelector = useSelector(usersSelectors.users);
+   const resourcesSelector = useSelector(authSelectors.resources);
 
    const isFetchingRoleDetail = useSelector(rolesSelectors.isFetchingDetail);
+   const isFetchingPermissions = useSelector(rolesSelectors.isFetchingPermissions);
    const isFetchingUsers = useSelector(usersSelectors.isFetchingList);
+   const isFetchingResources = useSelector(authSelectors.isFetchingResources);
 
    const isCreatingRole = useSelector(rolesSelectors.isCreating);
    const isUpdatingRole = useSelector(rolesSelectors.isUpdating);
-   const isFetchingPermissions = useSelector(rolesSelectors.isFetchingPermissions);
    const isUpdatingPermissions = useSelector(rolesSelectors.isUpdatingPermissions);
+
+   const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
+   const [permissions, setPermissions] = useState<SubjectPermissionsModel>();
 
    /* Load all users, resources and objects */
 
@@ -58,25 +66,62 @@ function RoleForm({ title }: Props) {
 
       () => {
 
+         dispatch(userActions.resetState());
+         dispatch(authActions.resetState());
+         dispatch(rolesActions.resetState());
+
          dispatch(userActions.list());
+         dispatch(authActions.getResources());
 
       },
       [dispatch]
 
    );
 
-   /* Load role */
+   /* Load role && role permissions */
 
    useEffect(
 
       () => {
 
-         if (params.id && (!rolesSelector || rolesSelector.uuid !== params.id)) dispatch(rolesActions.getDetail({ uuid: params.id }));
+         if (!params.id || (rolesSelector && rolesSelector.uuid === params.id)) return;
+
+         dispatch(rolesActions.getDetail({ uuid: params.id }));
+         dispatch(rolesActions.getPermissions({ uuid: params.id }));
 
       },
       [dispatch, params.id, rolesSelector]
 
    );
+
+   /* Set assigned users */
+
+   useEffect(
+
+      () => {
+
+         if (!rolesSelector || rolesSelector.uuid !== params.id) return;
+         setAssignedUsers(rolesSelector.users.map(user => user.uuid));
+
+      },
+      [params.id, rolesSelector]
+
+   );
+
+   /* Set role permissions */
+
+   useEffect(
+
+      () => {
+
+         if (!rolePermissionsSelector || rolePermissionsSelector.uuid !== params.id) return;
+         setPermissions(rolePermissionsSelector.permissions);
+
+      },
+      [params.id, rolePermissionsSelector]
+
+   );
+
 
    const onSubmit = useCallback(
 
@@ -118,9 +163,10 @@ function RoleForm({ title }: Props) {
       () => ({
          name: editMode ? rolesSelector?.name || "" : "",
          description: editMode ? rolesSelector?.description || "" : "",
-         systemRole: editMode ? rolesSelector?.systemRole || false : false
+         systemRole: editMode ? rolesSelector?.systemRole || false : false,
+         allResources: editMode ? rolePermissionsSelector?.permissions.allowAllResources || false : false,
       }),
-      [editMode, rolesSelector?.name, rolesSelector?.description, rolesSelector?.systemRole]
+      [editMode, rolesSelector?.name, rolesSelector?.description, rolesSelector?.systemRole, rolePermissionsSelector?.permissions.allowAllResources]
    );
 
 
@@ -287,18 +333,33 @@ function RoleForm({ title }: Props) {
 
                      <br />
 
-                     <p>Assigned Users</p>
+                     <Widget title="Permissions" busy={isFetchingPermissions || isFetchingResources}>
 
-                     <CustomTable
-                        headers={usersTableHeader}
-                        data={usersTableData}
-                        /*checkedRows={userRoles}*/
-                        hasCheckboxes={true}
-                        hasAllCheckBox={false}
-                        /*onCheckedRowsChanged={(roles) => {
-                           setUserRoles(roles as string[])
-                        }}*/
-                     />
+                        <RolePermissionsEditor
+                           resources={resourcesSelector}
+                           permissions={permissions}
+                           disabled={rolesSelector?.systemRole}
+                           onPermissionsChanged={(perms) => { setPermissions(perms); }}
+                        />
+
+                     </Widget>
+
+                     <br />
+
+                     <Widget title="Users" busy={isFetchingUsers}>
+
+                        <br />
+
+                        <CustomTable
+                           headers={usersTableHeader}
+                           data={usersTableData}
+                           checkedRows={assignedUsers}
+                           hasCheckboxes={true}
+                           hasAllCheckBox={false}
+                           onCheckedRowsChanged={(rows) => setAssignedUsers(rows as string[])}
+                        />
+
+                     </Widget>
 
                      <div className="d-flex justify-content-end">
 

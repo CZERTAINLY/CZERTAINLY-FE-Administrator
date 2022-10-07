@@ -9,7 +9,7 @@ export interface ResourceModel {
    uuid: string;
    name: string;
    displayName: string;
-   listingEndPoint: string;
+   listObjectsEndpoint: string;
    objectAccess: boolean;
 }
 

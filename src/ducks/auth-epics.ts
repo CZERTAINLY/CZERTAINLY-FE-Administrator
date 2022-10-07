@@ -95,11 +95,57 @@ const getResourcesFailure: AppEpic = (action$, state$, deps) => {
 };
 
 
+const listObjects: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listObjects.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.auth.listObjects(action.payload.endpoint).pipe(
+
+            map(
+               objects => slice.actions.listObjectsSuccess({ objects })
+            ),
+
+            catchError(
+               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") }))
+            )
+
+         )
+
+      )
+
+   );
+
+};
+
+
+const listObjectsFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listObjectsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+};
+
+
 export const epics = [
    getProfile,
    getProfileFailure,
    getResources,
-   getResourcesFailure
+   getResourcesFailure,
+   listObjects,
+   listObjectsFailure
 ];
 
 

@@ -39,4 +39,16 @@ export class AuthMock implements model.AuthApi {
       );
    }
 
+
+   listObjects(endpoint: string): Observable<{ uuid: string; name: string; }[]> {
+
+         return of(
+            []
+         ).pipe(
+
+            delay(randomDelay())
+         );
+
+   }
+
 }

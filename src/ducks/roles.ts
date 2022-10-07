@@ -279,7 +279,7 @@ const permissionsListCheckedRows = createSelector(state, state => state.permissi
 const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
 
 const role = createSelector(state, state => state.role);
-const rolePermissions = createSelector(state, state => state.rolePermissions);
+const permissions = createSelector(state, state => state.rolePermissions);
 const roles = createSelector(state, state => state.roles);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
@@ -300,7 +300,7 @@ export const selectors = {
    deleteErrorMessage,
 
    role,
-   permissions: rolePermissions,
+   permissions,
    roles,
 
    isFetchingList,

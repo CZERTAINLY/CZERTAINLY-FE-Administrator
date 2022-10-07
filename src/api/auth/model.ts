@@ -13,7 +13,7 @@ export interface ResourceDTO {
    uuid: string;
    name: string;
    displayName: string;
-   listingEndPoint: string;
+   listObjectsEndpoint: string;
    objectAccess: boolean;
 }
 
@@ -49,6 +49,8 @@ export interface AuthApi {
    profile(): Observable<UserDetailDTO>;
 
    getAllResources(): Observable<ResourceDetailDTO[]>;
+
+   listObjects(endpoint: string): Observable<{ uuid: string, name: string }[]>;
 
 }
 

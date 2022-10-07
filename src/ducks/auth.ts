@@ -8,9 +8,11 @@ export type State = {
 
    profile?: UserDetailModel;
    resources?: ResourceDetailModel[];
+   objects?: { uuid: string; name: string; }[];
 
    isFetchingProfile: boolean;
    isFetchingResources: boolean;
+   isFetchingObjects: boolean;
 
 };
 
@@ -19,6 +21,7 @@ export const initialState: State = {
 
    isFetchingProfile: false,
    isFetchingResources: false,
+   isFetchingObjects: false,
 
 };
 
@@ -31,6 +34,20 @@ export const slice = createSlice({
 
    reducers: {
 
+
+      resetState: (state, action: PayloadAction<void>) => {
+
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
+
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
+
+         state = initialState;
+
+      },
 
       getProfile(state, action: PayloadAction<void>) {
 
@@ -75,6 +92,29 @@ export const slice = createSlice({
 
          state.isFetchingResources = false;
 
+      },
+
+
+      listObjects(state, action: PayloadAction<{ endpoint: string }>) {
+
+         state.objects = undefined;
+         state.isFetchingObjects = true;
+
+      },
+
+
+      listObjectsSuccess(state, action: PayloadAction<{ objects: { uuid: string; name: string; }[] }>) {
+
+         state.isFetchingObjects = false;
+         state.objects = action.payload.objects;
+
+      },
+
+
+      listObjectsFailure(state, action: PayloadAction<{ error: string }>) {
+
+         state.isFetchingObjects = false;
+
       }
 
 
@@ -87,17 +127,21 @@ const selectState = createFeatureSelector<State>(slice.name);
 
 const profile = createSelector(selectState, state => state.profile);
 const resources = createSelector(selectState, state => state.resources);
+const objects = createSelector(selectState, state => state.objects);
 
 const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
 const isFetchingResources = createSelector(selectState, state => state.isFetchingResources);
+const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
 
 
 export const selectors = {
    selectState,
    profile,
    resources,
+   objects,
    isFetchingProfile,
-   isFetchingResources
+   isFetchingResources,
+   isFetchingObjects
 };
 
 

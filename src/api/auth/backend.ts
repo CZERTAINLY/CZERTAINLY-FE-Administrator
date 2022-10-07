@@ -46,4 +46,18 @@ export class AuthBackend implements model.AuthApi {
 
    }
 
+
+   listObjects(endpoint: string): Observable<{ uuid: string; name: string; }[]> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(
+            `${endpoint}`,
+            'GET'
+         )
+
+      );
+
+   }
+
 }

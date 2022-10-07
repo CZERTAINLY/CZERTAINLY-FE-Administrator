@@ -32,14 +32,21 @@ export default function UserDetail() {
 
 
    useEffect(
+      () => {
+         dispatch(actions.resetState());
+      },
+      [dispatch]
+   );
+
+   useEffect(
 
       () => {
 
-         if (!params.id) return;
+         if (!params.id || role?.uuid === params.id) return;
          dispatch(actions.getDetail({ uuid: params.id }));
 
       },
-      [params.id, dispatch]
+      [params.id, dispatch, role?.uuid]
 
    );
 
@@ -47,11 +54,11 @@ export default function UserDetail() {
 
       () => {
 
-         if (!role || role.uuid !== params.id) return;
+         if (!role || role.uuid !== params.id || permissions?.uuid === params.id || isFetchingPermissions) return;
          dispatch(actions.getPermissions({ uuid: params.id }));
 
       },
-      [role, params.id, dispatch]
+      [role, params.id, dispatch, permissions?.uuid, isFetchingPermissions]
 
    );
 

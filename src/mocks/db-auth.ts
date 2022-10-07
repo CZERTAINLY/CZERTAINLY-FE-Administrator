@@ -14,7 +14,7 @@ export const dbResources: DbResources = {
       name: "users",
       displayName: "Users Management",
       objectAccess: false,
-      listingEndPoint: "/users",
+      listObjectsEndpoint: "/users",
       actions: []
    },
 
@@ -23,7 +23,7 @@ export const dbResources: DbResources = {
       name: "locations",
       displayName: "Locations Management",
       objectAccess: false,
-      listingEndPoint: "/locations",
+      listObjectsEndpoint: "/locations",
       actions: []
    }
 

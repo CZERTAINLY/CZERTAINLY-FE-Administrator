@@ -1,0 +1,54 @@
+@import "styles/app";
+
+.accordeon {
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+   border-bottom: solid 2px transparent;
+}
+
+.accordeonLabel {
+   display: block;
+   padding: 10px;
+   background-color: #eee;
+}
+
+
+.accordeonContent {
+   padding: 0em;
+   max-height: 0;
+   overflow: hidden;
+}
+
+
+.accordeonContent[data-selected="true"] {
+   max-height: 9999px;
+   padding: 0.5em;
+}
+
+
+.accordeonContent label {
+   margin: 0;
+   padding: 0;
+}
+
+.accordeonLabel[data-selected="true"] {
+   background-color: $sidebar-bg-color;
+   color: white;
+}
+
+.objectLevelTable {
+   width: 100%;
+   border-collapse: collapse;
+}
+
+.objectLevelTable th {
+   text-align: left;
+   padding: 0.5em;
+   border-bottom: solid 1px #ddd;
+}
+
+.objectLevelTable td {
+   padding: 0.5em;
+   border-bottom: solid 1px #ddd;
+}
