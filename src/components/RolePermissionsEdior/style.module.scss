@@ -1,0 +1,91 @@
+@import "styles/app";
+
+.accordeon {
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+   border-bottom: solid 2px transparent;
+}
+
+.accordeonLabel {
+   display: block;
+   padding: 10px;
+   background-color: #eee;
+}
+
+
+.accordeonContent {
+   padding: 0em;
+   max-height: 0;
+   overflow: hidden;
+}
+
+
+.accordeonContent[data-selected="true"] {
+   max-height: 9999px;
+   padding: 0.5em;
+}
+
+
+.accordeonContent label {
+   margin: 0;
+   padding: 0;
+}
+
+.accordeonLabel[data-selected="true"] {
+   background-color: $sidebar-bg-color;
+   color: white;
+}
+
+.objectLevelPermissionsContainer {
+   overflow: auto;
+   max-height: 80vh;
+}
+
+.objectLevelTable {
+   width: 100%;
+   border-collapse: collapse;
+}
+
+.objectLevelTable th {
+   text-align: left;
+   padding: 0.5em;
+   border-bottom: solid 2px #ddd;
+   font-weight: bold;
+}
+
+.objectLevelTable th:not(:first-child) {
+   text-align: center;
+}
+
+.objectLevelTable td {
+   padding: 0.5em;
+   border-bottom: solid 2px #ddd;
+}
+
+.objectLevelTable td:not(:first-child) {
+   text-align: center;
+   border: solid 2px #ddd;
+   margin: 0 auto;
+}
+
+.objectPermissions {
+   display: inline-flex;
+}
+
+.objectPermissions > div {
+   padding: 0.25em;
+   width: 1.5em
+}
+
+.objectPermissions > div:first-child > * {
+   background-color: rgba($success, 0.5);
+}
+
+.objectPermissions > div:nth-child(2) > * {
+   background-color: rgba($danger, 0.5);
+}
+
+.objectPermissions > div:last-child > * {
+   background-color:  rgba($warning, 0.5);
+}

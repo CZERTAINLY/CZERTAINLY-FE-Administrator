@@ -257,7 +257,7 @@ const createConnector: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.connectors.getConnectorDetail(uuid).pipe(
+               obj => deps.apiClients.connectors.getConnectorDetail(obj.uuid).pipe(
 
                   map(
                      connector => slice.actions.createConnectorSuccess({

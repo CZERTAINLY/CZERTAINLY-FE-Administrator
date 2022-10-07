@@ -56,7 +56,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
 
       )
    }
-   createComplianceProfile(name: string, description?: string | undefined): Observable<string> {
+   createComplianceProfile(name: string, description?: string | undefined): Observable<{ uuid: string}> {
       return of(
          null
       ).pipe(
@@ -78,7 +78,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
 
                })
 
-               return uuid;
+               return { uuid };
 
             }
 
@@ -324,14 +324,14 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
    }
 
    getComplianceProfileRules(connectorUuid?: string | undefined, kind?: string | undefined, certificateType?: CertificateType | undefined): Observable<model.ComplianceConnectorAndRulesDTO[]> {
-      
+
       return of(dbData.complianceRules);
-   
+
    }
 
    getComplianceProfileGroups(connectorUuid?: string | undefined, kind?: string | undefined): Observable<model.ComplianceConnectorAndGroupsDTO[]> {
-      
+
       return of(dbData.complianceGroups);
-   
+
    }
 }

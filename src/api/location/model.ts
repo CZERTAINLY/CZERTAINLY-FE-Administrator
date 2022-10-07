@@ -33,7 +33,7 @@ export interface LocationManagementApi {
    listLocations(enabled?: boolean): Observable<LocationDTO[]>;
 
    getLocationDetail(entityUuid: string, uuid: string): Observable<LocationDTO>;
-   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string>;
+   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<{ uuid: string}>;
    editLocation(uuid: string, entityUuid: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<LocationDTO>;
    deleteLocation(entityUuid: string, uuid: string): Observable<void>;
 

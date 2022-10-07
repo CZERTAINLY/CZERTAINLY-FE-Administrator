@@ -85,7 +85,7 @@ export interface AcmeProfilesManagementApi {
       validity?: number,
       requireContact?: boolean,
       requireTermsOfService?: boolean,
-   ): Observable<string>;
+   ): Observable<{ uuid: string}>;
 
 
    bulkDeleteAcmeProfiles(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;

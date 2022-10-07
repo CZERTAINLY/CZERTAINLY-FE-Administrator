@@ -1,19 +1,56 @@
+import { UserDetailDTO } from 'api/users';
 import { Observable } from 'rxjs';
 
 
-export interface UserProfileDTO {
+export interface ActionDTO {
+   uuid: string;
    name: string;
-   surname: string;
-   username: string;
-   email: string;
-   role: string;
+   displayName: string;
+}
+
+
+export interface ResourceDTO {
+   uuid: string;
+   name: string;
+   displayName: string;
+   listObjectsEndpoint: string;
+   objectAccess: boolean;
+}
+
+export interface ResourceDetailDTO extends ResourceDTO {
+
+   actions: ActionDTO[];
+
+}
+
+
+export interface ObjectPermissionsDTO {
+   uuid: string;
+   isAllowed?: string[];
+   isDenied?: string[];
+}
+
+
+export interface ResourcePermissionDTO {
+   uuid: string;
+   name: string;
+   allowAllActions: boolean;
+   actions: string[];
+}
+
+
+export interface ResourceDetailDTO extends ResourceDTO {
+
 }
 
 
 export interface AuthApi {
 
-   getProfile(): Observable<UserProfileDTO>;
+   profile(): Observable<UserDetailDTO>;
 
-   updateProfile(name?: string, surname?: string, username?: string, email?: string): Observable<void>;
+   getAllResources(): Observable<ResourceDetailDTO[]>;
+
+   listObjects(endpoint: string): Observable<{ uuid: string, name: string }[]>;
 
 }
+

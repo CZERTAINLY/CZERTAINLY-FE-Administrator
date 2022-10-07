@@ -14,7 +14,7 @@ interface DbDiscoveries {
 export const dbDiscoveries: DbDiscoveries = {
 
    "Discovery1": {
-      uuid: "26c86d68-635f-4a23-aad0-d52f2e7c398b",
+      uuid: "817bf9e8-b855-4043-be66-e2a71913f441",
       name: "CZERTAINLY",
       kind: "IP-Hostname",
       status: "completed",
@@ -46,7 +46,7 @@ export const dbDiscoveries: DbDiscoveries = {
    },
 
    "Discovery2": {
-      uuid: "26c86d68-635f-4a23-aad0-d52f2e7c398b",
+      uuid: "fba8b7a8-11af-4e35-b6d5-0e294427bb83",
       name: "CZERTAINLY2",
       kind: "IP-Hostname",
       status: "completed",
@@ -78,7 +78,7 @@ export const dbDiscoveries: DbDiscoveries = {
    },
 
    "Discovery3": {
-      uuid: "26c86d68-635f-4a23-aad0-d52f2e7c398b",
+      uuid: "2f8fd761c-5d48-4994-9cc8-a74632e24778",
       name: "CZERTAINLY3",
       kind: "IP-Hostname",
       status: "completed",

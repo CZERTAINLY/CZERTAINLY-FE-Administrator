@@ -55,21 +55,14 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    }
 
 
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string> {
+   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          attributes,
          connectorUuid,
          kind
-      }).pipe(
-         map(
-            uuid => {
-               if (!uuid) throw new Error("Unexpected response returned from server");
-               return uuid;
-            }
-         )
-      );
+      });
 
    }
 

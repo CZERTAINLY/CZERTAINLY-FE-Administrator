@@ -67,13 +67,11 @@ export class CertificateInventoryBackend implements model.CertificateInventoryAp
    }
 
 
-   uploadCertificate(certificate: string): Observable<string> {
+   uploadCertificate(certificate: string): Observable<{ uuid: string}> {
 
       return createNewResource(`${baseUrl}/upload`, {
          certificate,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

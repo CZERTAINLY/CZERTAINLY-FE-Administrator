@@ -64,7 +64,7 @@ export class EntityManagementMock implements model.EntityManagementApi {
    }
 
 
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string> {
+   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}> {
 
       return of(
          dbData
@@ -91,7 +91,7 @@ export class EntityManagementMock implements model.EntityManagementApi {
 
                db.entities.push();
 
-               return entity.uuid
+               return { uuid: entity.uuid }
             }
          )
       )

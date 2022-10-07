@@ -38,14 +38,12 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
       );
    }
 
-   createComplianceProfile(name: string, description?: string | undefined): Observable<string> {
+   createComplianceProfile(name: string, description?: string | undefined): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          description
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 
