@@ -69,15 +69,15 @@ function UserForm({ title }: Props) {
 
 
    const userSelector = useSelector(userSelectors.user);
-   const certificates = useSelector(certSelectors.certificates);
    const rolesSelector = useSelector(rolesSelectors.roles);
+   const certificates = useSelector(certSelectors.certificates);
+   const certificateDetail = useSelector(certSelectors.certificateDetail);
 
    const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
    const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
    const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
    const isFetchingCertDetail = useSelector(certSelectors.isFetchingDetail);
-   const certificateDetail = useSelector(certSelectors.certificateDetail);
 
    const isCreatingUser = useSelector(userSelectors.isCreating);
    const isUpdatingUser = useSelector(userSelectors.isUpdating);
@@ -140,6 +140,7 @@ function UserForm({ title }: Props) {
    useEffect(
 
       () => {
+
          if (params.id && userSelector?.uuid === params.id) {
 
             setUser(userSelector);
@@ -191,15 +192,15 @@ function UserForm({ title }: Props) {
 
             const certs = [...loadedCerts];
 
-            const idx = certs.findIndex(c => c.uuid === certificateDetail.uuid);
-            if (idx >= 0) certs.splice(idx, 1, certificateDetail);
-
-            setLoadedCerts([certificateDetail, ...loadedCerts]);
-
             setSelectedCertificate({
-               label: certificateDetail.commonName || `( empty ) ( ${certificateDetail.fingerprint} )`,
+               label: `${certificateDetail.commonName} (${certificateDetail.fingerprint})` || `( empty ) ( ${certificateDetail.fingerprint} )`,
                value: certificateDetail.uuid,
             });
+
+            const idx = certs.findIndex(c => c.uuid === certificateDetail.uuid);
+            if (idx >= 0) certs.splice(idx, 1, certificateDetail); else return;
+
+            setLoadedCerts([certificateDetail, ...loadedCerts]);
 
          }
 
@@ -231,7 +232,7 @@ function UserForm({ title }: Props) {
 
             certs.map(
                loadedCert => ({
-                  label: loadedCert.commonName || `( empty ) ( ${loadedCert.serialNumber} )`,
+                  label: `${loadedCert.commonName} (${loadedCert.fingerprint})` || `( empty ) ( ${loadedCert.serialNumber} )`,
                   value: loadedCert.uuid,
                })
             )
