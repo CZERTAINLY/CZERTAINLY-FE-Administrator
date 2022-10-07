@@ -7,7 +7,7 @@ import UserEdit from './edit';
 import UsersList from './list';
 import UserDetail from './detail';
 
-function Administrators() {
+function Users() {
 
    const { path } = useRouteMatch();
 
@@ -27,4 +27,4 @@ function Administrators() {
 
 }
 
-export default Administrators;
+export default Users;

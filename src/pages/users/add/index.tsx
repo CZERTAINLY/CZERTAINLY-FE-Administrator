@@ -10,7 +10,7 @@ export default function AdminAdd() {
       () => (
 
          <h5>
-            Add new <span className="fw-semi-bold">Administrator</span>
+            Add new <span className="fw-semi-bold">User</span>
          </h5>
 
       ),

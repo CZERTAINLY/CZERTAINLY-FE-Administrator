@@ -10,7 +10,7 @@ export default function AdminEdit() {
       () => (
 
          <h5>
-            Edit <span className="fw-semi-bold">Administrator</span>
+            Edit <span className="fw-semi-bold">User</span>
          </h5>
 
       ),

@@ -22,6 +22,7 @@ import Dialog from "components/Dialog";
 import CertificateUploadDialog from "components/pages/certificates/CertificateUploadDialog";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { MDBBadge } from "mdbreact";
 
 interface Props {
    title: JSX.Element;
@@ -356,6 +357,20 @@ function UserForm({ title }: Props) {
             sortable: true,
             sort: "asc",
             width: "auto",
+         },
+         {
+            id: "roleDescription",
+            content: <MDBColumnName columnName="Role description" />,
+            sortable: true,
+            sort: "asc",
+            width: "auto",
+         },
+         {
+            id: "systemRole",
+            content: <MDBColumnName columnName="System role" />,
+            sortable: true,
+            sort: "asc",
+            width: "auto",
          }
       ],
       []
@@ -373,7 +388,11 @@ function UserForm({ title }: Props) {
 
             columns: [
 
-               role.name
+               role.name,
+
+               role.description || "",
+
+               <MDBBadge color={!role.systemRole ? "success" : "danger"}>{role.systemRole ? "Yes" : "No"}</MDBBadge>,
 
             ]
 
@@ -644,7 +663,11 @@ function UserForm({ title }: Props) {
 
                      </Field>
 
+
                      <br />
+
+                     <p>Assigned User Roles</p>
+
                      <CustomTable
                         headers={rolesTableHeader}
                         data={rolesTableData}
