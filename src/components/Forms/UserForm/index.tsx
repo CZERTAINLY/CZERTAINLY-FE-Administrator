@@ -85,7 +85,6 @@ function UserForm({ title }: Props) {
    const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
    const [user, setUser] = useState<UserDetailModel>();
-   const [roles, setRoles] = useState<string[]>([]);
 
    const [userRoles, setUserRoles] = useState<string[]>([]);
 
@@ -167,20 +166,6 @@ function UserForm({ title }: Props) {
       [params.id, user, userSelector]
 
    );
-
-   /* Copy loaded roles to the state */
-
-   useEffect(
-
-      () => {
-
-         if (rolesSelector) setRoles(rolesSelector.map(role => role.name));
-
-      },
-      [rolesSelector]
-
-   );
-
 
    /* Process cert detail loaded for user */
 
