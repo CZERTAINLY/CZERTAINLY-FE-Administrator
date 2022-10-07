@@ -171,8 +171,16 @@ function RolePermissionsEditor({
 
                   <tr>
                      <th>Object Name</th>
-                     <th>Allow</th>
-                     <th>Deny</th>
+
+                     {
+                        currentResource?.actions.map(
+                           action => (
+                              <th key={action.uuid}>{action.displayName}</th>
+                           )
+                        )
+
+                     }
+
                   </tr>
 
                </thead>
@@ -190,15 +198,42 @@ function RolePermissionsEditor({
 
                               <tr key={object.uuid}>
 
+
                                  <td>{object.name || object.uuid}</td>
 
-                                 <td>
-                                    <input type="radio" checked={objectPermissions?.allow.includes("read")} name={object.uuid} />
-                                 </td>
+                                 {
 
-                                 <td>
-                                    <input type="radio" checked={objectPermissions?.deny.includes("read") || !objectPermissions?.allow.includes("read")} name={object.uuid} />
-                                 </td>
+                                    currentResource?.actions.map(
+
+                                       action => (
+
+                                          <td>
+
+                                             <div className={style.objectPermissions}>
+
+                                                <div>
+                                                   <div title="Allow">A</div>
+                                                   <input type="radio" checked={objectPermissions?.allow.includes("read")} name={object.uuid + " " + action.uuid} />
+                                                </div>
+
+                                                <div>
+                                                   <div title="Deny">D</div>
+                                                   <input type="radio" checked={objectPermissions?.deny.includes("read")} name={object.uuid + " " + action.uuid} />
+                                                </div>
+
+                                                <div>
+                                                   <div title="Inherit">I</div>
+                                                   <input type="radio" checked={!objectPermissions?.deny.includes("read") || !objectPermissions?.allow.includes("read")} name={object.uuid + " " + action.uuid} />
+                                                </div>
+
+                                             </div>
+
+                                          </td>
+
+                                       )
+
+                                    )
+                                 }
 
                               </tr>
 
@@ -328,6 +363,7 @@ function RolePermissionsEditor({
             caption="Edit Object Level Permissions"
             body={objectLevelPermissions}
             toggle={() => setShowObjectLevel(false)}
+            size="lg"
             buttons={[
                { color: "danger", onClick: onObjectLevelPermissionsChanged, body: "OK" },
                { color: "secondary", onClick: () => setShowObjectLevel(false), body: "Cancel" },

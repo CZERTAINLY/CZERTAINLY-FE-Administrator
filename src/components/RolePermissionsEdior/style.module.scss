@@ -46,9 +46,28 @@
    text-align: left;
    padding: 0.5em;
    border-bottom: solid 1px #ddd;
+   font-weight: bold;
+}
+
+.objectLevelTable th:not(:first-child) {
+   text-align: center;
 }
 
 .objectLevelTable td {
    padding: 0.5em;
    border-bottom: solid 1px #ddd;
+}
+
+.objectLevelTable td:not(:first-child) {
+   text-align: center;
+   border: solid 1px #ddd;
+   margin: 0 auto;
+}
+
+.objectPermissions {
+   display: inline-flex;
+}
+
+.objectPermissions > div {
+   padding: 0.25em;
 }
