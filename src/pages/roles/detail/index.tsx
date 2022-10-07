@@ -282,10 +282,10 @@ export default function UserDetail() {
             ],
             detailColumns: resource.objects.length === 0 ? undefined : [
                <></>,
-               resource.objects.map(object => <div>{object.uuid}</div>),
+               resource.objects.map(object => <div key={object.uuid}>{object.uuid}</div>),
                <></>,
-               resource.objects.map(object => <div>{object.allow.join(",")}</div>),
-               resource.objects.map(object => <div>{object.deny.join(",")}</div>),
+               resource.objects.map(object => <div key={object.uuid}>{object.allow.join(",")}</div>),
+               resource.objects.map(object => <div key={object.uuid}>{object.deny.join(",")}</div>),
                <></>
             ]
          })
