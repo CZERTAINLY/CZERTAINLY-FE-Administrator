@@ -25,40 +25,34 @@ export function transformRoleDetailDTOToModel(role: RoleDetailDTO): RoleDetailMo
 }
 
 
-export function transformSubjectPermissionsDTOToModel(permissions: SubjectPermissionsDTO[]): SubjectPermissionsModel[] {
+export function transformSubjectPermissionsDTOToModel(permissions: SubjectPermissionsDTO): SubjectPermissionsModel {
 
-   return permissions.map(
+   return {
 
-      permission => ({
+      allowAllResources: permissions.allowAllResources,
 
-         allowAllResources: permission.allowAllResources,
+      resources: permissions.resources.map(
 
-         resources: permission.resources.map(
+         resource => ({
 
-            resource => ({
+            name: resource.name,
+            allowAllActions: resource.allowAllActions,
+            actions: [ ...resource.actions ],
 
-               name: resource.name,
-               allowAllActions: resource.allowAllActions,
-               actions: resource.actions,
+            objects: resource.objects.map(
 
-               objects: resource.objects.map(
+               object => ({
+                  uuid: object.uuid,
+                  allow: [ ...object.allow ],
+                  deny: [ ...object.deny ],
+               })
 
-                  object => ({
+            )
 
-                     uuid: object.uuid,
-                     allow: object.allow,
-                     deny: object.deny,
+         })
 
-                  })
+      )
 
-               )
-
-            })
-
-         )
-
-      })
-
-   );
+   }
 
 }

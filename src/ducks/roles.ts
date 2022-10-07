@@ -14,7 +14,7 @@ export type State = {
 
    rolePermissions?: {
       uuid: string;
-      permissions: SubjectPermissionsModel[];
+      permissions: SubjectPermissionsModel;
    };
 
    roles: RoleModel[];
@@ -226,7 +226,7 @@ export const slice = createSlice({
       },
 
 
-      getPermissionsSuccess: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel[] }>) => {
+      getPermissionsSuccess: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel }>) => {
 
          state.rolePermissions = {
             uuid: action.payload.uuid,
@@ -245,14 +245,14 @@ export const slice = createSlice({
       },
 
 
-      updatePermissions: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel[] }>) => {
+      updatePermissions: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel }>) => {
 
          state.isUpdatingPermissions = true;
 
       },
 
 
-      updatePermissionsSuccess: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel[] }>) => {
+      updatePermissionsSuccess: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel }>) => {
 
          if (state.rolePermissions && state.rolePermissions.uuid === action.payload.uuid) state.rolePermissions.permissions = action.payload.permissions;
          state.isUpdatingPermissions = false;
@@ -300,7 +300,7 @@ export const selectors = {
    deleteErrorMessage,
 
    role,
-   rolePermissions,
+   permissions: rolePermissions,
    roles,
 
    isFetchingList,

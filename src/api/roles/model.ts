@@ -55,9 +55,9 @@ export interface RolesManagementApi {
 
    delete(uuid: string): Observable<void>;
 
-   getPermissions(uuid: string): Observable<SubjectPermissionsDTO[]>;
+   getPermissions(uuid: string): Observable<SubjectPermissionsDTO>;
 
-   updatePermissions(uuid: string, permissions: SubjectPermissionsDTO[]): Observable<SubjectPermissionsDTO[]>;
+   updatePermissions(uuid: string, permissions: SubjectPermissionsDTO): Observable<SubjectPermissionsDTO>;
 
    /*
       ResourcePermissionsDto getRoleResourcePermissions(

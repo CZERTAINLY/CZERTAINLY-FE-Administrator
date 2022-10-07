@@ -224,10 +224,12 @@ const getPermissions: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.roles.getPermissions(action.payload.uuid).pipe(
 
-            map(permissions => slice.actions.getPermissionsSuccess({
-               uuid: action.payload.uuid,
-               permissions: transformSubjectPermissionsDTOToModel(permissions)
-            })),
+            map(
+               permissions => slice.actions.getPermissionsSuccess({
+                  uuid: action.payload.uuid,
+                  permissions: transformSubjectPermissionsDTOToModel(permissions)
+               })
+            ),
 
             catchError(err => of(slice.actions.getPermissionsFailure({ error: extractError(err, "Failed to get role permissions") })))
 

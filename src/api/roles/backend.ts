@@ -104,7 +104,7 @@ export class RolesManagementBackend implements model.RolesManagementApi {
    }
 
 
-   getPermissions(uuid: string): Observable<model.SubjectPermissionsDTO[]> {
+   getPermissions(uuid: string): Observable<model.SubjectPermissionsDTO> {
 
       return this._fetchService.request(
 
@@ -118,7 +118,7 @@ export class RolesManagementBackend implements model.RolesManagementApi {
    }
 
 
-   updatePermissions(uuid: string, permissions: model.SubjectPermissionsDTO[]): Observable<model.SubjectPermissionsDTO[]> {
+   updatePermissions(uuid: string, permissions: model.SubjectPermissionsDTO): Observable<model.SubjectPermissionsDTO> {
 
          return this._fetchService.request(
 

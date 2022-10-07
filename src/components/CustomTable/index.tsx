@@ -509,7 +509,7 @@ function CustomTable({
 
                <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
-                  {!hasDetails ? (<></>) : <td id="show-detail-more-column" key="show-detail-more-column">
+                  {!hasDetails ? (<></>) :  !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
                      {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
                   </td>
                   }
@@ -540,15 +540,27 @@ function CustomTable({
 
                      {
                         row.detailColumns && expandedRow === row.id ? (
-                           row.detailColumns.map(e => {
-                              return (
-                                 <td>
-                                    <div>
-                                       {e}
-                                    </div>
-                                 </td>
-                              )
-                           })
+
+                           row.detailColumns.length === 1 ? (
+
+                              <td colSpan={row.columns.length + (hasCheckboxes ? 1 : 0) + (hasDetails ? 1 : 0)} className={styles.detailCell}>
+                                 {row.detailColumns[0]}
+                              </td>
+
+                           ) : (
+
+                              row.detailColumns.map(e => {
+                                 return (
+                                    <td>
+                                       <div>
+                                          {e}
+                                       </div>
+                                    </td>
+                                 )
+                              })
+
+                           )
+
                         ) : (
                            <></>
                         )

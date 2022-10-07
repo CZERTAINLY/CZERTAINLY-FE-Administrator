@@ -137,7 +137,7 @@ export class RolesManagementMock implements model.RolesManagementApi {
    }
 
 
-   getPermissions(uuid: string): Observable<model.SubjectPermissionsDTO[]> {
+   getPermissions(uuid: string): Observable<model.SubjectPermissionsDTO> {
 
       return of(
          dbData.roles.find(role => role.uuid === uuid)
@@ -151,7 +151,7 @@ export class RolesManagementMock implements model.RolesManagementApi {
                if (!role) throw new HttpErrorResponse({ status: 404, statusText: 'Role not found' });
 
                const dbPerms = dbData.permissions.find(p => p.uuid === uuid);
-               if (!dbPerms) return [];
+               if (!dbPerms) throw new HttpErrorResponse({ status: 404, statusText: 'Role permissions found' });
 
                return dbPerms.permissions;
 
@@ -164,7 +164,7 @@ export class RolesManagementMock implements model.RolesManagementApi {
    }
 
 
-   updatePermissions(uuid: string, permissions: model.SubjectPermissionsDTO[]): Observable<model.SubjectPermissionsDTO[]> {
+   updatePermissions(uuid: string, permissions: model.SubjectPermissionsDTO): Observable<model.SubjectPermissionsDTO> {
 
       return of(
          dbData.roles.find(role => role.uuid === uuid)
@@ -183,10 +183,12 @@ export class RolesManagementMock implements model.RolesManagementApi {
 
                   dbPerms = {
                      uuid,
-                     permissions: []
+                     permissions
                   };
 
                   dbData.permissions.push(dbPerms);
+
+                  return permissions;
 
                }
 

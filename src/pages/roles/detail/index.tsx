@@ -10,9 +10,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
 
-import CertificateAttributes from "components/CertificateAttributes";
 import { MDBBadge } from "mdbreact";
 
 
@@ -25,7 +23,10 @@ export default function UserDetail() {
    const history = useHistory();
 
    const role = useSelector(selectors.role);
+   const permissions = useSelector(selectors.permissions);
+
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+   const isFetchingPermissions = useSelector(selectors.isFetchingPermissions);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -39,6 +40,18 @@ export default function UserDetail() {
 
       },
       [params.id, dispatch]
+
+   );
+
+   useEffect(
+
+      () => {
+
+         if (!role || role.uuid !== params.id) return;
+         dispatch(actions.getPermissions({ uuid: params.id }));
+
+      },
+      [role, params.id, dispatch]
 
    );
 
@@ -217,6 +230,69 @@ export default function UserDetail() {
    );
 
 
+   const permsHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "resourceName",
+            content: "Resource",
+            width: "auto"
+         },
+         {
+            id: "allActionsAllowed",
+            content: "All Actions",
+            width: "1%",
+            align: "center"
+         },
+         {
+            id: "actions",
+            content: "Allowed Actions",
+            width: "5%"
+         },
+         {
+            id: "denyActions",
+            content: "Denied Actions",
+            width: "5%"
+         },
+         {
+            id: "noAllowedObjects",
+            content: "No. Objects",
+            width: "1%",
+            align: "center"
+         }
+
+      ],
+
+      []
+
+   );
+
+
+   const permsData: TableDataRow[] = useMemo(
+
+      () => !permissions ? [] : permissions.permissions.resources.map(
+         resource => ({
+            id: resource.name,
+            columns: [
+               resource.name,
+               <MDBBadge color={!resource.allowAllActions ? "danger" : "success"}>{resource.allowAllActions ? "Yes" : "No"}</MDBBadge>,
+               <span style={{whiteSpace: "nowrap"}}>{resource.actions.join(", ")}</span>,
+               <></>,
+               resource.objects.length.toString()
+            ],
+            detailColumns: resource.objects.length === 0 ? undefined : [
+               <></>,
+               resource.objects.map(object => <div>{object.uuid}</div>),
+               <></>,
+               resource.objects.map(object => <div>{object.allow.join(",")}</div>),
+               resource.objects.map(object => <div>{object.deny.join(",")}</div>),
+               <></>
+            ]
+         })
+      ),
+      [permissions]
+
+   );
 
    return (
 
@@ -224,6 +300,7 @@ export default function UserDetail() {
 
          <Widget title={attributesTitle} busy={isFetchingDetail}>
 
+            <br />
             <CustomTable
                headers={detailHeaders}
                data={detailData}
@@ -233,10 +310,47 @@ export default function UserDetail() {
 
 
          <Widget title={usersTitle} busy={isFetchingDetail}>
+
+            <br />
             <CustomTable
                headers={usersHeaders}
                data={usersData}
             />
+
+         </Widget>
+
+
+         <Widget title={permissionsTitle} busy={isFetchingDetail || isFetchingPermissions}>
+
+            <br />
+            {
+
+               !permissions ? <></> : (
+
+                  <>
+                     <p><input type="checkbox" checked={permissions.permissions.allowAllResources} disabled />&nbsp;&nbsp;&nbsp;All resources allowed</p>
+
+                     {
+                        permissions.permissions.resources.length === 0 || permissions.permissions.allowAllResources ? <></> : (
+
+                           <>
+                              <p>List of allowed resources</p>
+                              <CustomTable
+                                 headers={permsHeaders}
+                                 data={permsData}
+                                 hasDetails={true}
+                              />
+                           </>
+                        )
+                     }
+
+                  </>
+
+               )
+
+            }
+
+
          </Widget>
 
 
