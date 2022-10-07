@@ -37,6 +37,11 @@
    color: white;
 }
 
+.objectLevelPermissionsContainer {
+   overflow: auto;
+   max-height: 80vh;
+}
+
 .objectLevelTable {
    width: 100%;
    border-collapse: collapse;
@@ -45,7 +50,7 @@
 .objectLevelTable th {
    text-align: left;
    padding: 0.5em;
-   border-bottom: solid 1px #ddd;
+   border-bottom: solid 2px #ddd;
    font-weight: bold;
 }
 
@@ -55,12 +60,12 @@
 
 .objectLevelTable td {
    padding: 0.5em;
-   border-bottom: solid 1px #ddd;
+   border-bottom: solid 2px #ddd;
 }
 
 .objectLevelTable td:not(:first-child) {
    text-align: center;
-   border: solid 1px #ddd;
+   border: solid 2px #ddd;
    margin: 0 auto;
 }
 
@@ -70,16 +75,17 @@
 
 .objectPermissions > div {
    padding: 0.25em;
+   width: 1.5em
 }
 
 .objectPermissions > div:first-child > * {
-   background-color: $success;
+   background-color: rgba($success, 0.5);
 }
 
 .objectPermissions > div:nth-child(2) > * {
-   background-color: $danger;
+   background-color: rgba($danger, 0.5);
 }
 
 .objectPermissions > div:last-child > * {
-   background-color: $warning;
+   background-color:  rgba($warning, 0.5);
 }

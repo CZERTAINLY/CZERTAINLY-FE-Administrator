@@ -149,6 +149,75 @@ function RolePermissionsEditor({
    );
 
 
+   const setOLP = useCallback(
+
+      (resourceUuid: string, objectUuid: string, action: string, permissions: "allow" | "deny" | "inherit") => {
+
+         const resource = resources?.find(r => r.uuid === resourceUuid);
+         if (!resource) return;
+
+         const newPermissions: SubjectPermissionsModel = clonePerms();
+
+         const resourcePermissions = newPermissions.resources.find(r => r.name === resource.name);
+
+         if (resourcePermissions) {
+
+            const objectPermissions = resourcePermissions.objects.find(o => o.uuid === objectUuid);
+
+            if (objectPermissions) {
+
+               if (permissions === "allow") {
+
+                  if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
+
+               } else if (permissions === "deny") {
+
+                  if (!objectPermissions.deny.includes(action)) objectPermissions.deny.push(action);
+
+               } else {
+
+                  objectPermissions.allow = objectPermissions.allow.filter(a => a !== action);
+                  objectPermissions.deny = objectPermissions.deny.filter(a => a !== action);
+
+               }
+
+            } else {
+
+               resourcePermissions.objects.push({
+
+                  uuid: objectUuid,
+                  allow: permissions === "allow" ? [action] : [],
+                  deny: permissions === "deny" ? [action] : []
+
+               });
+
+            }
+
+         } else {
+
+            newPermissions.resources.push({
+
+               name: resource.name,
+               allowAllActions: false,
+               actions: [],
+               objects: [{
+                  uuid: objectUuid,
+                  allow: permissions === "allow" ? [action] : [],
+                  deny: permissions === "deny" ? [action] : []
+               }]
+
+            });
+
+         }
+
+         onPermissionsChanged?.(newPermissions);
+
+      },
+      [clonePerms, onPermissionsChanged, resources]
+
+   );
+
+
    const onObjectLevelPermissionsChanged = useCallback(
 
       () => {
@@ -163,7 +232,7 @@ function RolePermissionsEditor({
 
       () => (
 
-         <>
+         <div className={style.objectLevelPermissionsContainer}>
 
             <table className={style.objectLevelTable}>
 
@@ -198,39 +267,48 @@ function RolePermissionsEditor({
 
                               <tr key={object.uuid}>
 
-
                                  <td>{object.name || object.uuid}</td>
 
                                  {
 
                                     currentResource?.actions.map(
 
-                                       action => (
+                                       action => {
 
-                                          <td>
+                                          return (
 
-                                             <div className={style.objectPermissions}>
+                                             <td key={action.uuid}>
 
-                                                <div>
-                                                   <div title="Allow">A</div>
-                                                   <input type="radio" checked={objectPermissions?.allow.includes("read")} name={object.uuid + " " + action.uuid} />
+                                                <div className={style.objectPermissions}>
+
+                                                   <div>
+                                                      <div title="Allow">A</div>
+                                                      <input type="radio" checked={objectPermissions?.allow.includes(action.name) || false} name={object.uuid + " " + action.uuid}
+                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, action.name, "allow") }}
+                                                      />
+                                                   </div>
+
+                                                   <div>
+                                                      <div title="Deny">D</div>
+                                                      <input type="radio" checked={objectPermissions?.deny.includes(action.name) || false} name={object.uuid + " " + action.uuid}
+                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, action.name, "deny") }}
+                                                      />
+                                                   </div>
+
+                                                   <div>
+                                                      <div title="Inherit">I</div>
+                                                      <input type="radio" checked={!objectPermissions?.deny.includes(action.name) && !objectPermissions?.allow.includes(action.name)} name={object.uuid + " " + action.uuid}
+                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, action.name, "inherit") }}
+                                                      />
+                                                   </div>
+
                                                 </div>
 
-                                                <div>
-                                                   <div title="Deny">D</div>
-                                                   <input type="radio" checked={objectPermissions?.deny.includes("read")} name={object.uuid + " " + action.uuid} />
-                                                </div>
+                                             </td>
 
-                                                <div>
-                                                   <div title="Inherit">I</div>
-                                                   <input type="radio" checked={!objectPermissions?.deny.includes("read") || !objectPermissions?.allow.includes("read")} name={object.uuid + " " + action.uuid} />
-                                                </div>
+                                          )
 
-                                             </div>
-
-                                          </td>
-
-                                       )
+                                       }
 
                                     )
                                  }
@@ -251,10 +329,10 @@ function RolePermissionsEditor({
 
             <Spinner active={isFetchingObjects} />
 
-         </>
+         </div>
 
       ),
-      [currentResource?.name, isFetchingObjects, objects, permissions.resources]
+      [currentResource, isFetchingObjects, objects, permissions.resources, setOLP]
 
    );
 
@@ -365,8 +443,7 @@ function RolePermissionsEditor({
             toggle={() => setShowObjectLevel(false)}
             size="lg"
             buttons={[
-               { color: "danger", onClick: onObjectLevelPermissionsChanged, body: "OK" },
-               { color: "secondary", onClick: () => setShowObjectLevel(false), body: "Cancel" },
+               { color: "secondary", onClick: () => setShowObjectLevel(false), body: "Close" },
             ]}
          />
 
