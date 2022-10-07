@@ -12,6 +12,7 @@ import Home from "pages/home";
 import About from "pages/about";
 import AuditLogs from "pages/auditLogs";
 import Users from "pages/users";
+import Roles from "pages/roles";
 import Connectors from "pages/connectors";
 import RaProfiles from "pages/ra-profiles";
 import Credentials from "pages/credentials";
@@ -50,6 +51,7 @@ function Layout() {
                <Switch>
                   <Route path="/app/home" component={Home} />
                   <Route path="/app/users" component={Users} />
+                  <Route path="/app/roles" component={Roles} />
                   <Route path="/app/audit" component={AuditLogs} />
                   <Route path="/app/about" component={About} />
                   <Route path="/app/connectors" component={Connectors} />

@@ -73,16 +73,16 @@ export const slice = createSlice({
       },
 
 
-      setRolesListCheckedRows: (state, action: PayloadAction<string[]>) => {
+      setRolesListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
-         state.rolesListCheckedRows = action.payload;
+         state.rolesListCheckedRows = action.payload.checkedRows;
 
       },
 
 
-      setPermissionsListCheckedRows: (state, action: PayloadAction<string[]>) => {
+      setPermissionsListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
-         state.permissionsListCheckedRows = action.payload;
+         state.permissionsListCheckedRows = action.payload.checkedRows;
 
       },
 
@@ -191,14 +191,14 @@ export const slice = createSlice({
       },
 
 
-      delete: (state, action: PayloadAction<{ uuid: string }>) => {
+      delete: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.roles = state.roles.filter(role => role.uuid !== action.payload.uuid);
 
