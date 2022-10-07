@@ -402,7 +402,7 @@ function RoleForm({ title }: Props) {
                               title={submitTitle}
                               inProgressTitle={inProgressTitle}
                               inProgress={submitting || isCreatingRole || isUpdatingRole}
-                              disabled={(pristine) || submitting || isCreatingRole || isUpdatingRole || !valid || values.systemRole}
+                              disabled={/*pristine ||*/ submitting || isCreatingRole || isUpdatingRole || !valid || values.systemRole}
                            />
 
                            <Button color="default" onClick={onCancel} disabled={submitting || isCreatingRole || isUpdatingRole}>
