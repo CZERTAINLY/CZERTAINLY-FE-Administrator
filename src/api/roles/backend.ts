@@ -124,7 +124,7 @@ export class RolesManagementBackend implements model.RolesManagementApi {
 
             new HttpRequestOptions(
                `${baseUrl}/${uuid}/permissions`,
-               'PUT',
+               'POST',
                permissions
             )
 

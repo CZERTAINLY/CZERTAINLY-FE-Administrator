@@ -1,5 +1,6 @@
-import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { EMPTY, of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import history from "browser-history";
 
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
@@ -99,9 +100,17 @@ const create: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.roles.create(action.payload.name, action.payload.description).pipe(
 
-            map(role => slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) })),
+            switchMap(
 
-            catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role") })))
+               role => deps.apiClients.roles.updatePermissions(role.uuid, transformSubjectPermissionsDTOToModel(action.payload.permissions)).pipe(
+
+                  map(() => slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) })),
+
+                  catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role") })))
+
+               )
+
+            )
 
          )
 
@@ -110,6 +119,29 @@ const create: AppEpic = (action$, state, deps) => {
    )
 
 }
+
+
+const createSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.createSuccess.match
+      ),
+
+      switchMap(
+
+         action => {
+            history.push(`./detail/${action.payload.role.uuid}`);
+            return EMPTY;
+         }
+
+      )
+
+   )
+
+}
+
 
 
 const createFailure: AppEpic = (action$, state, deps) => {
@@ -143,11 +175,40 @@ const update: AppEpic = (action$, state, deps) => {
             action.payload.description
          ).pipe(
 
-            map(role => slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) })),
+            switchMap(
 
-            catchError(err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update role") })))
+               role => deps.apiClients.roles.updatePermissions(role.uuid, transformSubjectPermissionsDTOToModel(action.payload.permissions)).pipe(
+
+                  map(() => slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) })),
+
+                  catchError(err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update role") })))
+
+               )
+
+            )
 
          )
+
+      )
+
+   )
+
+}
+
+
+const updateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            history.push(`../detail/${action.payload.role.uuid}`);
+            return EMPTY;
+         }
 
       )
 
@@ -180,7 +241,7 @@ const deleteRole: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.delete.match
       ),
-      switchMap(
+      mergeMap(
 
          action => deps.apiClients.roles.delete(action.payload.uuid).pipe(
 
@@ -294,8 +355,10 @@ const epics = [
    getDetail,
    getDetailFailure,
    create,
+   createSuccess,
    createFailure,
    update,
+   updateSuccess,
    updateFailure,
    deleteRole,
    deleteFailure,

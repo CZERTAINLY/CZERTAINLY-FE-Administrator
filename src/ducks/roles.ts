@@ -140,7 +140,7 @@ export const slice = createSlice({
       },
 
 
-      create: (state, action: PayloadAction<{ name: string, description?: string }>) => {
+      create: (state, action: PayloadAction<{ name: string, users: string[], permissions: SubjectPermissionsModel, description?: string }>) => {
 
          state.isCreating = true;
 
@@ -162,7 +162,7 @@ export const slice = createSlice({
       },
 
 
-      update: (state, action: PayloadAction<{ uuid: string, name: string, description?: string }>) => {
+      update: (state, action: PayloadAction<{ uuid: string, name: string, users: string[], permissions: SubjectPermissionsModel, description?: string }>) => {
 
          state.isUpdating = true;
 

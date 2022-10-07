@@ -27,7 +27,6 @@ interface FormValues {
    name: string;
    description: string;
    systemRole: boolean;
-   allResources: boolean;
 }
 
 
@@ -55,7 +54,6 @@ function RoleForm({ title }: Props) {
 
    const isCreatingRole = useSelector(rolesSelectors.isCreating);
    const isUpdatingRole = useSelector(rolesSelectors.isUpdating);
-   const isUpdatingPermissions = useSelector(rolesSelectors.isUpdatingPermissions);
 
    const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
    const [permissions, setPermissions] = useState<SubjectPermissionsModel>();
@@ -128,11 +126,38 @@ function RoleForm({ title }: Props) {
       (values: FormValues) => {
 
          if (editMode) {
+
+            dispatch(
+
+               rolesActions.update({
+                  uuid: params.id,
+                  name: values.name,
+                  description: values.description,
+                  users: assignedUsers,
+                  permissions: permissions || { allowAllResources: false, resources: [] }
+               })
+
+            );
+
+
+         } else {
+
+            dispatch(
+
+               rolesActions.create({
+                  name: values.name,
+                  description: values.description,
+                  users: assignedUsers,
+                  permissions: permissions || { allowAllResources: false, resources: [] }
+               })
+
+            )
+
          }
 
       },
 
-      [editMode]
+      [assignedUsers, dispatch, editMode, params.id, permissions]
 
    )
 
@@ -164,9 +189,8 @@ function RoleForm({ title }: Props) {
          name: editMode ? rolesSelector?.name || "" : "",
          description: editMode ? rolesSelector?.description || "" : "",
          systemRole: editMode ? rolesSelector?.systemRole || false : false,
-         allResources: editMode ? rolePermissionsSelector?.permissions.allowAllResources || false : false,
       }),
-      [editMode, rolesSelector?.name, rolesSelector?.description, rolesSelector?.systemRole, rolePermissionsSelector?.permissions.allowAllResources]
+      [editMode, rolesSelector?.name, rolesSelector?.description, rolesSelector?.systemRole]
    );
 
 
@@ -298,7 +322,7 @@ function RoleForm({ title }: Props) {
                                  valid={!meta.error && meta.touched}
                                  invalid={!!meta.error && meta.touched}
                                  type="text"
-                                 placeholder="First Name"
+                                 placeholder="Enter description of the role"
                                  disabled={rolesSelector?.systemRole}
                               />
 
@@ -339,11 +363,14 @@ function RoleForm({ title }: Props) {
                            resources={resourcesSelector}
                            permissions={permissions}
                            disabled={rolesSelector?.systemRole}
-                           onPermissionsChanged={(perms) => { setPermissions(perms); }}
+                           onPermissionsChanged={(perms) => {
+                              setPermissions(perms);
+                           }}
                         />
 
                      </Widget>
 
+                     {/*
                      <br />
 
                      <Widget title="Users" busy={isFetchingUsers}>
@@ -356,10 +383,16 @@ function RoleForm({ title }: Props) {
                            checkedRows={assignedUsers}
                            hasCheckboxes={true}
                            hasAllCheckBox={false}
-                           onCheckedRowsChanged={(rows) => setAssignedUsers(rows as string[])}
+                           onCheckedRowsChanged={
+                              (rows) => {
+                                 setAssignedUsers(rows as string[])
+                              }
+                           }
                         />
 
                      </Widget>
+
+                     */}
 
                      <div className="d-flex justify-content-end">
 
