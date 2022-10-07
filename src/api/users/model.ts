@@ -54,7 +54,6 @@ export interface UserManagementApi {
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
-      enabled: boolean,
       certificateUuid?: string,
       certificate?: CertificateDTO,
    ): Observable<UserDetailDTO>;

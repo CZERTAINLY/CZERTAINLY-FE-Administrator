@@ -259,7 +259,6 @@ function UserForm({ title }: Props) {
                   firstName: values.firstName || undefined,
                   lastName: values.lastName || undefined,
                   email: values.email || undefined,
-                  enabled: values.enabled,
                   certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined,
                   roles: userRoles
@@ -631,6 +630,7 @@ function UserForm({ title }: Props) {
                                  <Input
                                     {...input}
                                     type="checkbox"
+                                    disabled={editMode || user?.systemUser}
                                  />
 
                                  &nbsp;&nbsp;&nbsp;Enabled

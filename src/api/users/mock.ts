@@ -116,7 +116,6 @@ export class UserManagementMock implements model.UserManagementApi {
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
-      enabled: boolean,
       certificateUuid?: string,
       certificate?: CertificateDTO,
    ): Observable<model.UserDetailDTO> {
@@ -138,7 +137,6 @@ export class UserManagementMock implements model.UserManagementApi {
                user.firstName = firstName;
                user.lastName = lastName;
                user.email = email;
-               user.enabled = enabled;
                user.certificate = cert || user.certificate;
 
                return user;

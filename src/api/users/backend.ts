@@ -67,7 +67,6 @@ export class UserManagementBackend implements model.UserManagementApi {
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
-      enabled: boolean,
       certificateUuid?: string,
       certificate?: CertificateDTO,
    ): Observable<model.UserDetailDTO> {
@@ -78,7 +77,6 @@ export class UserManagementBackend implements model.UserManagementApi {
             firstName,
             lastName,
             email,
-            enabled,
             certificateUuid,
             certificateData: certificate?.certificateContent
          })

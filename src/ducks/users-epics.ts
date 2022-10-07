@@ -182,7 +182,6 @@ const update: AppEpic = (action$, state, deps) => {
             action.payload.firstName,
             action.payload.lastName,
             action.payload.email,
-            action.payload.enabled,
             action.payload.certificateUuid,
             action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
          ).pipe(
