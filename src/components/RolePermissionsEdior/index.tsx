@@ -1,7 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { useDispatch, useSelector } from "react-redux";
-
 
 import style from "./style.module.scss";
 import { Button } from "reactstrap";
@@ -137,14 +135,12 @@ function RolePermissionsEditor({
 
       (resource: ResourceDetailModel) => {
 
-         const objects = permissions.resources.find(r => r.name === resource.name)?.objects || [];
-
          dispatch(authActions.listObjects({ endpoint: resource.listObjectsEndpoint }));
          setCurrentResource(resource);
          setShowObjectLevel(true);
 
       },
-      [dispatch, permissions.resources]
+      [dispatch]
 
    );
 
@@ -214,16 +210,6 @@ function RolePermissionsEditor({
 
       },
       [clonePerms, onPermissionsChanged, resources]
-
-   );
-
-
-   const onObjectLevelPermissionsChanged = useCallback(
-
-      () => {
-         setShowObjectLevel(false);
-      },
-      []
 
    );
 
