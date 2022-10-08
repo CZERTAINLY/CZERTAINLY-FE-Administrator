@@ -106,6 +106,18 @@ export function extractError(err: HttpErrorResponse, headline: string): string {
       return `${headline}. ${err.error.join(", ")}`;
    }
 
-   return err.error.message ? `${headline}: ${err.error.message}` : headline;
+   if (err.error.message) return `${headline}: ${err.error.message}`;
+
+   if (typeof err.error === "string") {
+
+      try {
+         const json = JSON.parse(err.error);
+         if (json.message) return `${headline}: ${json.message}`;
+      } catch (e) {}
+
+      return `${headline}: ${err.error}`;
+   }
+
+   return headline;
 
 }

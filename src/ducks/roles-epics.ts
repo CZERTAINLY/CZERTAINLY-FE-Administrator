@@ -106,11 +106,13 @@ const create: AppEpic = (action$, state, deps) => {
 
                   map(() => slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) })),
 
-                  catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role") })))
+                  catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role permissions") })))
 
                )
 
-            )
+            ),
+
+            catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role") })))
 
          )
 
