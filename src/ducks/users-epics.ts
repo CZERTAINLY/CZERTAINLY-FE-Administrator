@@ -115,7 +115,19 @@ const createUser: AppEpic = (action$, state, deps) => {
             action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
          ).pipe(
 
-            map(userDetailDTO => slice.actions.createSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })),
+            switchMap(
+
+               user => deps.apiClients.users.updateRoles(
+                  user.uuid,
+                  action.payload.roles || []
+               ).pipe(
+
+                  map(userDetailDTO => slice.actions.createSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })),
+
+                  catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to update user roles") })))
+
+               )
+            ),
 
             catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create user") })))
 
