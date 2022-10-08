@@ -245,11 +245,32 @@ const deleteRole: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.roles.delete(action.payload.uuid).pipe(
 
-            map(() => slice.actions.deleteSuccess({ uuid: action.payload.uuid })),
+            map(() => slice.actions.deleteSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })),
 
             catchError(err => of(slice.actions.deleteFailure({ error: extractError(err, "Failed to delete role") })))
 
          )
+
+      )
+
+   )
+
+}
+
+
+const deleteSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.deleteSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
+            return EMPTY;
+         }
 
       )
 
@@ -361,6 +382,7 @@ const epics = [
    updateSuccess,
    updateFailure,
    deleteRole,
+   deleteSuccess,
    deleteFailure,
    getPermissions,
    getPermissionsFailure,

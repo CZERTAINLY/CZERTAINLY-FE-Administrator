@@ -42,11 +42,11 @@ export default function UserDetail() {
 
       () => {
 
-         if (!params.id || role?.uuid === params.id) return;
+         if (!role || !role.uuid || !params.id || role?.uuid === params.id) return;
          dispatch(actions.getDetail({ uuid: params.id }));
 
       },
-      [params.id, dispatch, role?.uuid]
+      [params.id, dispatch, role]
 
    );
 
