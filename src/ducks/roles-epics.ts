@@ -179,13 +179,17 @@ const update: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               role => deps.apiClients.roles.updatePermissions(role.uuid, transformSubjectPermissionsDTOToModel(action.payload.permissions)).pipe(
+               role => {
 
-                  map(() => slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) })),
+                  return deps.apiClients.roles.updatePermissions(role.uuid, action.payload.permissions).pipe(
 
-                  catchError(err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update role") })))
+                     map(() => slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) })),
 
-               )
+                     catchError(err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update role") })))
+
+                  )
+
+               }
 
             )
 

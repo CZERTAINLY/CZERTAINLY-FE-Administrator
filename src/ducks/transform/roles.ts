@@ -39,7 +39,7 @@ export function transformSubjectPermissionsDTOToModel(permissions: SubjectPermis
             allowAllActions: resource.allowAllActions,
             actions: [ ...resource.actions ],
 
-            objects: resource.objects.map(
+            objects: resource.objects?.map(
 
                object => ({
                   uuid: object.uuid,

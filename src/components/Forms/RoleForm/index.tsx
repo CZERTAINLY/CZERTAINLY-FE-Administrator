@@ -124,6 +124,37 @@ function RoleForm({ title }: Props) {
    );
 
 
+   const patchPermissions = useCallback(
+
+      (outPerms: SubjectPermissionsModel) => {
+
+         const inPerms: SubjectPermissionsModel = rolePermissionsSelector?.permissions || {
+            allowAllResources: false,
+            resources: []
+         };
+
+         for (let i = 0; i < outPerms.resources.length; i++) {
+
+            const outRes = outPerms.resources[i];
+            const inRes = inPerms.resources.find(res => res.name === outRes.name);
+
+            if (!outRes.objects) continue;
+
+            if (outRes.objects?.length === 0 && (!inRes || (inRes.objects && inRes.objects.length === 0))) {
+               delete outRes.objects;
+               continue;
+            }
+
+         }
+
+         return outPerms;
+
+      },
+      [rolePermissionsSelector]
+
+   );
+
+
    const onSubmit = useCallback(
 
       (values: FormValues) => {
@@ -137,7 +168,7 @@ function RoleForm({ title }: Props) {
                   name: values.name,
                   description: values.description,
                   users: assignedUsers,
-                  permissions: permissions || { allowAllResources: false, resources: [] }
+                  permissions: patchPermissions(JSON.parse(JSON.stringify(permissions || { allowAllResources: false, resources: [] })))
                })
 
             );
@@ -151,7 +182,7 @@ function RoleForm({ title }: Props) {
                   name: values.name,
                   description: values.description,
                   users: assignedUsers,
-                  permissions: permissions || { allowAllResources: false, resources: [] }
+                  permissions: patchPermissions(permissions || { allowAllResources: false, resources: [] })
                })
 
             )
@@ -160,7 +191,7 @@ function RoleForm({ title }: Props) {
 
       },
 
-      [assignedUsers, dispatch, editMode, params.id, permissions]
+      [assignedUsers, dispatch, editMode, params.id, patchPermissions, permissions]
 
    )
 

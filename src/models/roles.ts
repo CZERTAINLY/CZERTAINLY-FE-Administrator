@@ -24,7 +24,7 @@ export interface ResourcePermissionsModel {
    name: string;
    allowAllActions: boolean;
    actions: string[];
-   objects: ObjectPermissionsModel[];
+   objects?: ObjectPermissionsModel[];
 }
 
 

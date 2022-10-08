@@ -54,7 +54,7 @@ function RolePermissionsEditor({
                   allowAllActions: resource.allowAllActions,
                   actions: [...resource.actions],
                   name: resource.name,
-                  objects: resource.objects.map(
+                  objects: resource.objects?.map(
                      object => ({
                         uuid: object.uuid,
                         allow: [...object.allow],
@@ -158,7 +158,7 @@ function RolePermissionsEditor({
 
          if (resourcePermissions) {
 
-            const objectPermissions = resourcePermissions.objects.find(o => o.uuid === objectUuid);
+            const objectPermissions = resourcePermissions.objects?.find(o => o.uuid === objectUuid);
 
             if (objectPermissions) {
 
@@ -178,6 +178,8 @@ function RolePermissionsEditor({
                }
 
             } else {
+
+               if (!resourcePermissions.objects) resourcePermissions.objects = [];
 
                resourcePermissions.objects.push({
 
@@ -247,7 +249,7 @@ function RolePermissionsEditor({
                      objects?.map(
                         object => {
 
-                           const objectPermissions = permissions.resources.find(r => r.name === currentResource?.name)?.objects.find(o => o.uuid === object.uuid);
+                           const objectPermissions = permissions.resources.find(r => r.name === currentResource?.name)?.objects?.find(o => o.uuid === object.uuid);
 
                            return (
 

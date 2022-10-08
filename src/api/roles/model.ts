@@ -26,7 +26,7 @@ export interface ResourcePermissionsDTO {
    name: string;
    allowAllActions: boolean;
    actions: string[];
-   objects: ObjectPermissionsDTO[];
+   objects?: ObjectPermissionsDTO[];
 }
 
 

@@ -285,9 +285,9 @@ export default function UserDetail() {
                <MDBBadge color={!resource.allowAllActions ? "danger" : "success"}>{resource.allowAllActions ? "Yes" : "No"}</MDBBadge>,
                <span style={{whiteSpace: "nowrap"}}>{resource.actions.join(", ")}</span>,
                <></>,
-               resource.objects.length.toString()
+               resource.objects?.length.toString() || "0"
             ],
-            detailColumns: resource.objects.length === 0 ? undefined : [
+            detailColumns: !resource.objects || resource.objects.length === 0 ? undefined : [
                <></>,
                resource.objects.map(object => <div key={object.uuid}>{object.uuid}</div>),
                <></>,
