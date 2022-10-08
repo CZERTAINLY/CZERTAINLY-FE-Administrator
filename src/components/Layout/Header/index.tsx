@@ -50,7 +50,7 @@ function Header({ sidebarToggle }: Props) {
                      <DropdownMenu style={{ width: '100%' }}>
 
                         <DropdownItem>
-                           <NavLink to="/app/profile">Profile</NavLink>
+                           <NavLink to={`/app/users/edit/${profile.uuid}`}>Profile</NavLink>
                         </DropdownItem>
 
                         <DropdownItem>
