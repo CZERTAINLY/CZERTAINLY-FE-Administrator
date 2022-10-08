@@ -359,6 +359,12 @@ function RolePermissionsEditor({
 
                            <li style={{ float: "right" }}>
 
+                              {
+                                 !resource.objectAccess ? <></> : (
+                                    <Button color="link" title="Edit Object Level Permissions" onClick={() => onEditObjectLevelPermissionsClick(resource)}>Edit OLP</Button>
+                                 )
+                              }
+
                               <label>
 
                                  <input
@@ -374,16 +380,12 @@ function RolePermissionsEditor({
 
                            </li>
 
+
+
                         </div>
 
 
                         <div className={style.accordeonContent} data-selected={expandedRow === resource.uuid && !(permissions?.resources.find(r => r.name === resource.name)?.allowAllActions) ? "true" : "false"} >
-
-                           {
-                              !resource.objectAccess ? <></> : (
-                                 <Button style={{ float: "right" }} onClick={() => onEditObjectLevelPermissionsClick(resource)}>Edit Object Level Permissions</Button>
-                              )
-                           }
 
                            {
                               resource.actions.map(

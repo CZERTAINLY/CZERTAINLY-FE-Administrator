@@ -8,9 +8,29 @@
 }
 
 .accordeonLabel {
-   display: block;
-   padding: 10px;
+   padding: 0.25em;
    background-color: #eee;
+}
+
+.accordeonLabel[data-selected="true"] {
+   background-color: $sidebar-bg-color;
+   color: white;
+}
+
+.accordeonLabel button {
+   padding: 0;
+   margin: 0;
+   border: none;
+   margin-right: 1em;
+   text-decoration: underline;
+   background-color: transparent;
+   color: black;
+}
+
+.accordeonLabel[data-selected="true"] button {
+   background-color: $sidebar-bg-color;
+   color: white;
+   background-color: transparent;
 }
 
 
@@ -32,10 +52,6 @@
    padding: 0;
 }
 
-.accordeonLabel[data-selected="true"] {
-   background-color: $sidebar-bg-color;
-   color: white;
-}
 
 .objectLevelPermissionsContainer {
    overflow: auto;
