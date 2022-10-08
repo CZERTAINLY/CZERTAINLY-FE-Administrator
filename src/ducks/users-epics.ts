@@ -257,7 +257,7 @@ const updateFailure: AppEpic = (action$, state, deps) => {
 }
 
 
-const deletUser: AppEpic = (action$, state, deps) => {
+const deleteUser: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
@@ -283,6 +283,7 @@ const deletUser: AppEpic = (action$, state, deps) => {
 
 }
 
+
 const deleteUserSuccess: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -302,6 +303,7 @@ const deleteUserSuccess: AppEpic = (action$, state, deps) => {
    )
 
 }
+
 
 const deleteUserFailure: AppEpic = (action$, state, deps) => {
 
@@ -595,7 +597,7 @@ const epics = [
    update,
    updateSuccess,
    updateFailure,
-   deletUser,
+   deleteUser,
    deleteUserSuccess,
    deleteUserFailure,
    enable,
