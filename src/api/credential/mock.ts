@@ -143,7 +143,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
    }
 
 
-   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<string> {
+   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<{ uuid: string}> {
 
       return of(
          null
@@ -167,7 +167,7 @@ export class CredentialManagementMock implements model.CredentialManagementApi {
                   enabled: true
                })
 
-               return uuid;
+               return { uuid };
 
             }
          )

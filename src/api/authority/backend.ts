@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
@@ -86,16 +85,14 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
       attributes: AttributeDTO[],
       connectorUuid: string,
       kind: string
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          connectorUuid,
          attributes,
          kind,
-      }).pipe(
-         map(response => response ? response : "")
-      )
+      })
 
    }
 

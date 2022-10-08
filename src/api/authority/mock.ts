@@ -141,7 +141,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
       attributes: AttributeDTO[],
       connectorUuid: string,
       kind: string
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return of(
          null
@@ -170,7 +170,7 @@ export class AuthorityManagementMock implements model.AuthorityManagementApi {
                   revokeAttributes: [],
                })
 
-               return uuid;
+               return { uuid };
             }
 
          )

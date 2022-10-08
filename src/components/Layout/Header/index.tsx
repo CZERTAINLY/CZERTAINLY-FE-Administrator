@@ -13,6 +13,7 @@ interface Props {
 }
 
 function Header({ sidebarToggle }: Props) {
+
    const [isOpen, setIsOpen] = useState(false);
    const profile = useSelector(selectors.profile);
 
@@ -21,7 +22,6 @@ function Header({ sidebarToggle }: Props) {
       [isOpen],
    );
 
-   console.log((window as any).__ENV__.LOGOUT_URL);
 
    return (
 
@@ -43,14 +43,14 @@ function Header({ sidebarToggle }: Props) {
 
                      <DropdownToggle nav>
                         <i className={cx('fa fa-user-circle-o fa-2x', style.adminPhoto)} />
-                        <span className="text-body">{profile.name}</span>
+                        <span className="text-body">{profile.username}</span>
                         <i className={cx('fa fa-angle-down ml-sm', style.arrow, { [style.arrowActive]: isOpen })} />
                      </DropdownToggle>
 
                      <DropdownMenu style={{ width: '100%' }}>
 
                         <DropdownItem>
-                           <NavLink to="/app/profile">Profile</NavLink>
+                           <NavLink to={`/app/users/edit/${profile.uuid}`}>Profile</NavLink>
                         </DropdownItem>
 
                         <DropdownItem>

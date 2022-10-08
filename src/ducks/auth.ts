@@ -1,24 +1,28 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
-import { UserProfileModel, Role } from 'models';
 
+import { ResourceDetailModel } from 'models';
+import { UserDetailModel } from 'models/users';
 
 export type State = {
-   token: string;
-   isLoggingIn: boolean;
+
+   profile?: UserDetailModel;
+   resources?: ResourceDetailModel[];
+   objects?: { uuid: string; name: string; }[];
+
    isFetchingProfile: boolean;
-   isAuthenticated: boolean;
-   isUpdatingProfile: boolean;
-   userProfile?: UserProfileModel;
+   isFetchingResources: boolean;
+   isFetchingObjects: boolean;
+
 };
 
 
 export const initialState: State = {
-   token: "",
-   isLoggingIn: false,
+
    isFetchingProfile: false,
-   isAuthenticated: true,
-   isUpdatingProfile: false,
+   isFetchingResources: false,
+   isFetchingObjects: false,
+
 };
 
 
@@ -30,81 +34,86 @@ export const slice = createSlice({
 
    reducers: {
 
-      login: (state, action: PayloadAction<{ credentials: any }>) => {
 
-         state.token = "";
-         state.isAuthenticated = false;
-         state.isLoggingIn = true;
+      resetState: (state, action: PayloadAction<void>) => {
 
-      },
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
 
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
 
-      loginSuccess: (state, action: PayloadAction<{ token: string }>) => {
-
-         state.token = action.payload.token;
-         state.isAuthenticated = true;
-         state.isLoggingIn = false;
+         state = initialState;
 
       },
 
+      getProfile(state, action: PayloadAction<void>) {
 
-      loginFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.token = "";
-         state.isAuthenticated = false;
-         state.isLoggingIn = false;
-
-      },
-
-
-      logout: (state, action: PayloadAction<void>) => {
-
-         state.token = "";
-         state.isAuthenticated = false;
-
-      },
-
-
-      getProfile: (state, action: PayloadAction<void>) => {
-
-         state.userProfile = undefined;
          state.isFetchingProfile = true;
 
       },
 
 
-      getProfileSuccess: (state, action: PayloadAction<{ userProfile: UserProfileModel }>) => {
+      getProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel }>) {
 
-         state.userProfile = action.payload.userProfile;
+         state.isFetchingProfile = false;
+         state.profile = action.payload.profile;
+
+      },
+
+
+      getProfileFailure(state, action: PayloadAction<{ error: string }>) {
+
          state.isFetchingProfile = false;
 
       },
 
 
-      getProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getResources(state, action: PayloadAction<void>) {
 
-         state.userProfile = undefined;
+         state.isFetchingResources = true;
+         state.profile = undefined;
          state.isFetchingProfile = false;
 
       },
 
 
-      updateProfile: (state, action: PayloadAction<{ userProfile: UserProfileModel }>) => {
+      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceDetailModel[] }>) {
 
-         state.isUpdatingProfile = true;
-
-      },
-
-      updateProfileSuccess: (state, action: PayloadAction<{ userProfile: UserProfileModel }>) => {
-
-         state.userProfile = action.payload.userProfile;
-         state.isUpdatingProfile = false;
+         state.isFetchingResources = false;
+         state.resources = action.payload.resources;
 
       },
 
-      updateProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isUpdatingProfile = false;
+      getResourcesFailure(state, action: PayloadAction<{ error: string }>) {
+
+         state.isFetchingResources = false;
+
+      },
+
+
+      listObjects(state, action: PayloadAction<{ endpoint: string }>) {
+
+         state.objects = undefined;
+         state.isFetchingObjects = true;
+
+      },
+
+
+      listObjectsSuccess(state, action: PayloadAction<{ objects: { uuid: string; name: string; }[] }>) {
+
+         state.isFetchingObjects = false;
+         state.objects = action.payload.objects;
+
+      },
+
+
+      listObjectsFailure(state, action: PayloadAction<{ error: string }>) {
+
+         state.isFetchingObjects = false;
 
       }
 
@@ -116,27 +125,23 @@ export const slice = createSlice({
 
 const selectState = createFeatureSelector<State>(slice.name);
 
-const userProfile = createSelector(selectState, state => state.userProfile);
-
-const isAuthenticated = createSelector(selectState, state => state.isAuthenticated);
-
-const isLoggingIn = createSelector(selectState, state => state.isLoggingIn);
+const profile = createSelector(selectState, state => state.profile);
+const resources = createSelector(selectState, state => state.resources);
+const objects = createSelector(selectState, state => state.objects);
 
 const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
-
-const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
-
-const isSuperAdmin = createSelector(userProfile, profile => profile?.role === Role.SuperAdmin );
+const isFetchingResources = createSelector(selectState, state => state.isFetchingResources);
+const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
 
 
 export const selectors = {
    selectState,
-   profile: userProfile,
-   isAuthenticated,
-   isLoggingIn,
+   profile,
+   resources,
+   objects,
    isFetchingProfile,
-   isUpdatingProfile,
-   isSuperAdmin
+   isFetchingResources,
+   isFetchingObjects
 };
 
 

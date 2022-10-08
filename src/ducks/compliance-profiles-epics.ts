@@ -115,7 +115,7 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createComplianceProfileSuccess({ uuid }),
+               obj => slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
             ),
             catchError(
                err => of(slice.actions.createComplianceProfileFailed({ error: extractError(err, "Failed to create Compliance Profile") }))

@@ -207,7 +207,7 @@ const createCredential: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createCredentialSuccess({ uuid })
+               obj => slice.actions.createCredentialSuccess({ uuid: obj.uuid })
             ),
 
             catchError(

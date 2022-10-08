@@ -210,7 +210,7 @@ const addEntity: AppEpic = (action$, state$, deps) => {
 
             map(
 
-               uuid => slice.actions.addEntitySuccess({ uuid })
+               obj => slice.actions.addEntitySuccess({ uuid: obj.uuid })
 
             ),
             catchError(

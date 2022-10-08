@@ -41,7 +41,7 @@ export interface CredentialManagementApi {
 
    getCredentialsList(): Observable<CredentialDTO[]>;
 
-   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<string>;
+   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<{ uuid: string}>;
 
    forceDeleteCredential(uuid: string | number): Observable<void>;
 

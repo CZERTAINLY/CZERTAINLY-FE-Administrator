@@ -14,7 +14,7 @@ export class DiscoveryManagementMock implements model.DiscoveryManagementApi {
     kind: string,
     connectorUuid: number | string,
     attributes: any
-  ): Observable<string> {
+  ): Observable<{ uuid: string}> {
     return of(null).pipe(
       delay(randomDelay()),
       map(() => {
@@ -47,7 +47,7 @@ export class DiscoveryManagementMock implements model.DiscoveryManagementApi {
             "failedUrls": 0
         }
       })
-      return uuid;
+      return { uuid };
     }),
     );
   }

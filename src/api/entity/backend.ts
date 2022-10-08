@@ -4,7 +4,6 @@ import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
-import { map } from "rxjs/operators";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 
@@ -55,21 +54,14 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    }
 
 
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string> {
+   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          attributes,
          connectorUuid,
          kind
-      }).pipe(
-         map(
-            uuid => {
-               if (!uuid) throw new Error("Unexpected response returned from server");
-               return uuid;
-            }
-         )
-      );
+      });
 
    }
 

@@ -958,12 +958,12 @@ const uploadCertificate: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.certificates.getCertificateDetail(uuid).pipe(
+               obj => deps.apiClients.certificates.getCertificateDetail(obj.uuid).pipe(
 
                   map(
 
                      certificate => slice.actions.uploadCertificateSuccess({
-                        uuid,
+                        uuid: obj.uuid,
                         certificate,
                      })
 

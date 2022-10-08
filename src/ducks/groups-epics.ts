@@ -112,7 +112,7 @@ const createGroup: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createGroupSuccess({ uuid })
+               obj => slice.actions.createGroupSuccess({ uuid: obj.uuid })
             ),
 
             catchError(

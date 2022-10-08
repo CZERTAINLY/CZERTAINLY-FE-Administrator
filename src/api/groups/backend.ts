@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
@@ -20,14 +19,12 @@ export class GroupManagementBackend implements model.GroupManagementApi {
    }
 
 
-   createNewGroup(name: string, description: string): Observable<string> {
+   createNewGroup(name: string, description: string): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          description,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

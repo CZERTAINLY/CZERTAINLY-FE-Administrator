@@ -31,11 +31,11 @@ function Sidebar() {
                <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
 
                <LinksGroup
-                  _key="users"
-                  header="Users"
+                  _key="accessControl"
+                  header="Access Control"
                   childrenLinks={[
-                     { _key: "/app/administrators", name: "Administrators", link: "/app/administrators" },
-                     { _key: "/app/clients", name: "Clients", link: "/app/clients" }
+                     { _key: "/app/users", name: "Users", link: "/app/users" },
+                     { _key: "/app/roles", name: "Roles", link: "/app/roles" }
                   ]}
                />
 

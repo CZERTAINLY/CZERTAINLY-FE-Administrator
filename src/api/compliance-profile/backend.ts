@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
@@ -38,14 +37,12 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
       );
    }
 
-   createComplianceProfile(name: string, description?: string | undefined): Observable<string> {
+   createComplianceProfile(name: string, description?: string | undefined): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          description
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 

@@ -1,8 +1,5 @@
 import React from 'react';
-import { Redirect, Route } from 'react-router';
-import { useSelector } from 'react-redux';
-
-import { selectors } from 'ducks/auth';
+import { Route } from 'react-router';
 
 interface Props {
    component: React.FunctionComponent<any> | React.ComponentClass;
@@ -10,9 +7,9 @@ interface Props {
 
 function PrivateRoute({ component, ...rest }: Props) {
 
-   const isAuthenticated = useSelector(selectors.isAuthenticated);
+   // const isAuthenticated = useSelector(selectors.profile);
 
-   if (!isAuthenticated) { return <Redirect to="/login" />; }
+   // if (!isAuthenticated) { return <Redirect to="/login" />; }
 
    return <Route {...rest} render={props => React.createElement(component, props)} />;
 

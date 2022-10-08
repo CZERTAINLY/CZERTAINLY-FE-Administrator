@@ -161,7 +161,7 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createRaProfileSuccess({ uuid: uuid, authorityInstanceUuid: action.payload.authorityInstanceUuid })
+               obj => slice.actions.createRaProfileSuccess({ uuid: obj.uuid, authorityInstanceUuid: action.payload.authorityInstanceUuid })
             ),
 
             catchError(
@@ -449,7 +449,7 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
       switchMap(
 
          action => deps.apiClients.profiles.activateAcme(
-            action.payload.authorityUuid, 
+            action.payload.authorityUuid,
             action.payload.uuid,
             action.payload.acmeProfileUuid,
             action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),

@@ -206,7 +206,7 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
             action.payload.attributes.map(transformAttributeModelToDTO),
          ).pipe(
             map(
-               uuid => slice.actions.createDiscoverySuccess({ uuid })
+               obj => slice.actions.createDiscoverySuccess({ uuid: obj.uuid })
             ),
             catchError(
                err => of(slice.actions.createDiscoveryFailure({ error: extractError(err, "Failed to create discovery") }))

@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
@@ -49,7 +48,7 @@ export class LocationManagementBackend implements model.LocationManagementApi {
    }
 
 
-   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
+   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<{ uuid: string}> {
 
       return createNewResource(`${extBaseUrl}/${entityUuid}/locations`, {
             name,
@@ -57,13 +56,6 @@ export class LocationManagementBackend implements model.LocationManagementApi {
             attributes,
             enabled
          }
-      ).pipe(
-         map(
-            uuid => {
-               if (!uuid) throw new Error("Unexpected response returned from server");
-               return uuid;
-            }
-         )
       );
 
    }

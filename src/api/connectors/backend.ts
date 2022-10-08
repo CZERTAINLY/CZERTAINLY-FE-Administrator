@@ -1,7 +1,6 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { FetchHttpService, HttpErrorResponse, HttpRequestOptions } from "utils/FetchHttpService";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
@@ -25,7 +24,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
    }
 
 
-   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<string> {
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<{ uuid: string}> {
 
       return createNewResource(
          baseUrl,
@@ -35,16 +34,7 @@ export class ConnectorManagementBackend implements model.ConnectorManagementApi 
             authType,
             authAttributes
          }
-      ).pipe(
-
-         map(
-            result => {
-               if (result === null) throw new HttpErrorResponse({ status: 404 });
-               return result
-            }
-         )
-
-      )
+      );
 
    }
 

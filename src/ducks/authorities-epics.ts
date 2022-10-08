@@ -252,7 +252,7 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createAuthoritySuccess({ uuid })
+               obj => slice.actions.createAuthoritySuccess({ uuid: obj.uuid })
             ),
             catchError(
                err => of(slice.actions.createAuthorityFailure({ error: extractError(err, "Failed to create Authority") }))

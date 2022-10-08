@@ -1,3 +1,4 @@
+import { UserDetailDTO } from 'api/users';
 import { Observable } from 'rxjs';
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
@@ -18,7 +19,7 @@ export class AuthBackend implements model.AuthApi {
    }
 
 
-   getProfile(): Observable<model.UserProfileDTO> {
+   profile(): Observable<UserDetailDTO> {
 
       return this._fetchService.request(
 
@@ -32,14 +33,27 @@ export class AuthBackend implements model.AuthApi {
    }
 
 
-   updateProfile(name?: string, surname?: string, username?: string, email?: string): Observable<void> {
+   getAllResources(): Observable<model.ResourceDetailDTO[]> {
 
       return this._fetchService.request(
 
          new HttpRequestOptions(
-            `${baseUrl}/profile`,
-            'PUT',
-            { name, surname, username, email },
+            `${baseUrl}/resources`,
+            'GET'
+         )
+
+      );
+
+   }
+
+
+   listObjects(endpoint: string): Observable<{ uuid: string; name: string; }[]> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(
+            `${endpoint}`,
+            'GET'
          )
 
       );

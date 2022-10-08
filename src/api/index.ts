@@ -1,7 +1,7 @@
 import { AuthApi, AuthBackend, AuthMock } from "./auth";
-import { AdministratorManagementApi, AdministratorsManagementBackend, AdministatorManagementMock, } from "./administrators";
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
-import { ClientManagementApi, ClientManagementBackend, ClientManagementMock } from "./clients";
+import { UserManagementApi, UserManagementBackend, UserManagementMock } from "./users";
+import { RolesManagementApi, RolesManagementBackend, RolesManagementMock } from "./roles";
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
@@ -24,9 +24,9 @@ const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
 
 export interface ApiClients {
    auth: AuthApi;
-   admins: AdministratorManagementApi;
+   users: UserManagementApi;
+   roles: RolesManagementApi;
    auditLogs: AuditLogsApi;
-   clients: ClientManagementApi;
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
@@ -46,10 +46,10 @@ export interface ApiClients {
 
 export const backendClient: ApiClients = {
    auth: new AuthBackend(fetchService),
-   admins: new AdministratorsManagementBackend(fetchService),
+   users: new UserManagementBackend(fetchService),
+   roles: new RolesManagementBackend(fetchService),
    certificates: new CertificateInventoryBackend(fetchService),
    auditLogs: new AuditLogsBackend(fetchService),
-   clients: new ClientManagementBackend(fetchService),
    profiles: new ProfilesManagementBackend(fetchService),
    credentials: new CredentialManagementBackend(fetchService),
    authorities: new AuthorityManagementBackend(fetchService),
@@ -68,10 +68,10 @@ export const backendClient: ApiClients = {
 
 export const mockClient: ApiClients = {
    auth: new AuthMock(),
-   admins: new AdministatorManagementMock(),
+   users: new UserManagementMock(),
+   roles: new RolesManagementMock(),
    certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
-   clients: new ClientManagementMock(),
    profiles: new ProfilesManagementMock(),
    credentials: new CredentialManagementMock(),
    authorities: new AuthorityManagementMock(),

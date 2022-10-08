@@ -11,7 +11,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
 
    getRaProfilesList(): Observable<model.RaProfileDTO[]> {
-      
+
       return of(
          dbData.raProfiles
       ).pipe(
@@ -55,16 +55,16 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
                if (!profile) throw new HttpErrorResponse({ status: 404 });
 
-               const clients = dbData.clients.filter(
-                  client => client.authorizedProfiles.includes(uuid)
+               const users = dbData.users.filter(
+                  user => user.authorizedProfiles.includes(uuid)
                );
 
-               return clients.map(
+               return users.map(
 
-                  client => ({
-                     uuid: client.uuid,
-                     name: client.name,
-                     enabled: client.enabled
+                  user => ({
+                     uuid: user.uuid,
+                     name: user.username,
+                     enabled: user.enabled
                   })
 
                );
@@ -217,7 +217,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}> {
 
       return of(
          dbData.authorities.find(authority => authority.uuid === authorityInstanceUuid)
@@ -241,7 +241,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
                   authorityInstanceName: name,
                })
 
-               return uuid;
+               return { uuid };
 
             }
          )

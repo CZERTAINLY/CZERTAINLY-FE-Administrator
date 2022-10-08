@@ -3,95 +3,149 @@ import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 
-import { UserProfileDtoToModel } from './transform/auth';
+import { actions as alertActions } from "./alerts";
 import { extractError } from 'utils/net';
 
 import * as slice from './auth';
+import { transformResourceDetailDTOToModel } from './transform/auth';
 
 
-const login: AppEpic = action$ => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.login.match
-      ),
-      map(
-         () => slice.actions.loginSuccess({ token: "token" })
-      )
-
-   );
-
-}
-
-
-const getProfile: AppEpic = (action$, state, deps) => {
+const getProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
          slice.actions.getProfile.match
       ),
-
       switchMap(
-
-         () => deps.apiClients.auth.getProfile().pipe(
+         () => deps.apiClients.auth.profile().pipe(
 
             map(
-               profile => slice.actions.getProfileSuccess({ userProfile: UserProfileDtoToModel(profile) })
+               profile => slice.actions.getProfileSuccess({ profile })
             ),
 
             catchError(
-               err => of(slice.actions.getProfileFailed({ error: extractError(err, "Failed to get user profile") }))
+               err => of(slice.actions.getProfileFailure({ error: extractError(err, "Failed to get user profile") }))
             )
 
          )
 
       )
 
-   )
+   );
 
-}
+};
 
 
-const updateProfile: AppEpic = (action$, state, deps) => {
+const getProfileFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.updateProfile.match
+         slice.actions.getProfileFailure.match
       ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
 
+   );
+
+};
+
+
+const getResources: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getResources.match
+      ),
       switchMap(
-
-         action => deps.apiClients.auth.updateProfile(
-            action.payload.userProfile.name,
-            action.payload.userProfile.surname,
-            action.payload.userProfile.username,
-            action.payload.userProfile.email
-         ).pipe(
+         () => deps.apiClients.auth.getAllResources().pipe(
 
             map(
-               () => slice.actions.updateProfileSuccess({ userProfile: action.payload.userProfile })
+               resources => slice.actions.getResourcesSuccess({ resources: resources.map(resource => transformResourceDetailDTOToModel(resource)) })
             ),
 
             catchError(
-               err => of(slice.actions.updateProfileFailed({ error: extractError(err, "Failed to update profile") }))
+               err => of(slice.actions.getResourcesFailure({ error: extractError(err, "Failed to get user resources") }))
+            )
+
+         )
+      )
+
+   );
+
+};
+
+
+const getResourcesFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getResourcesFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+};
+
+
+const listObjects: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listObjects.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.auth.listObjects(action.payload.endpoint).pipe(
+
+            map(
+               objects => slice.actions.listObjectsSuccess({ objects })
+            ),
+
+            catchError(
+               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") }))
             )
 
          )
 
       )
 
-   )
+   );
 
-}
+};
+
+
+const listObjectsFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listObjectsFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+};
 
 
 export const epics = [
-   login,
    getProfile,
-   updateProfile
+   getProfileFailure,
+   getResources,
+   getResourcesFailure,
+   listObjects,
+   listObjectsFailure
 ];
 
 

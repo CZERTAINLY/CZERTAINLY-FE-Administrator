@@ -45,7 +45,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
+   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<{ uuid: string}> {
 
       return of(
          dbData
@@ -75,7 +75,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
 
                db.locations.push(location);
 
-               return location.uuid;
+               return { uuid: location.uuid };
 
             }
 

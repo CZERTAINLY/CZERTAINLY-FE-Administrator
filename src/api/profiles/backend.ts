@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
@@ -58,7 +57,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}> {
 
       return createNewResource(
          `${extBaseUrl}/${authorityInstanceUuid}/raProfiles`,
@@ -67,8 +66,6 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
             description,
             attributes: attributes,
          }
-      ).pipe(
-         map((location) => location?.substr(location.lastIndexOf(`/${authorityInstanceUuid}`) + 1) || "")
       );
 
    }
