@@ -97,7 +97,7 @@ export class UserManagementBackend implements model.UserManagementApi {
    disable(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PATCH")
       );
 
    }
@@ -106,7 +106,7 @@ export class UserManagementBackend implements model.UserManagementApi {
    enable(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PATCH")
       );
 
    }
