@@ -4,7 +4,6 @@ import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
-import { map } from "rxjs/operators";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 

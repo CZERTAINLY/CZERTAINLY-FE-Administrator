@@ -14,8 +14,11 @@ import { actions as authActions, selectors as authSelectors } from "ducks/auth";
 
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
+/*
 import MDBColumnName from "components/MDBColumnName";
-import /* CustomTable, */ { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+*/
+
 import RolePermissionsEditor from "components/RolePermissionsEdior";
 import { SubjectPermissionsModel } from "models";
 
@@ -44,7 +47,7 @@ function RoleForm({ title }: Props) {
 
    const rolesSelector = useSelector(rolesSelectors.role);
    const rolePermissionsSelector = useSelector(rolesSelectors.permissions);
-   const usersSelector = useSelector(usersSelectors.users);
+   //const usersSelector = useSelector(usersSelectors.users);
    const resourcesSelector = useSelector(authSelectors.resources);
 
    const isFetchingRoleDetail = useSelector(rolesSelectors.isFetchingDetail);

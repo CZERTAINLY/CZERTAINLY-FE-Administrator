@@ -13,6 +13,7 @@ interface Props {
 }
 
 function Header({ sidebarToggle }: Props) {
+
    const [isOpen, setIsOpen] = useState(false);
    const profile = useSelector(selectors.profile);
 
@@ -21,7 +22,6 @@ function Header({ sidebarToggle }: Props) {
       [isOpen],
    );
 
-   console.log((window as any).__ENV__.LOGOUT_URL);
 
    return (
 
