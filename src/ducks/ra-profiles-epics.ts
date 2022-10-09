@@ -232,7 +232,10 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               raProfileDTO => slice.actions.updateRaProfileSuccess({ raProfile: transformRaProfileDtoToModel(raProfileDTO) })
+               raProfileDTO => slice.actions.updateRaProfileSuccess({
+                  raProfile: transformRaProfileDtoToModel(raProfileDTO),
+                  redirect: action.payload.redirect
+               })
             ),
 
             catchError(
@@ -259,7 +262,7 @@ const updateRaProfileSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`../detail/${action.payload.raProfile.uuid}`);
+            if (action.payload.redirect) history.push(action.payload.redirect);
             return EMPTY;
          }
 
@@ -386,7 +389,7 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.profiles.deleteRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid })
+               () => slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
 
             catchError(
@@ -411,8 +414,8 @@ const deleteRaProfileSuccess: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => {
-            history.push(`../`);
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
             return EMPTY;
          }
 
