@@ -17,7 +17,7 @@ function RaProfiles() {
 
          <Route path={path} component={ProfilesList} exact />
          <Route path={`${path}/detail/:authorityUuid/:id`} component={ProfileDetail} exact />
-         <Route path={`${path}/edit/:id`} component={ProfileEdit} exact />
+         <Route path={`${path}/edit/:authorityUuid/:id`} component={ProfileEdit} exact />
          <Route path={`${path}/add`} component={ProfileAdd} exact />
 
       </Switch>
