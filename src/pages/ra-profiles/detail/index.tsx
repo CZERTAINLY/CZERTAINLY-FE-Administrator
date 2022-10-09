@@ -81,7 +81,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         history.push(`../../raprofiles/edit/${raProfile?.uuid}`);
+         history.push(`../../../raprofiles/edit/${raProfile?.uuid}`);
       },
       [history, raProfile]
 
