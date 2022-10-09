@@ -118,7 +118,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    bulkEnableRaProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/enable`, "PATCH", uuids)
       );
 
    }
@@ -127,7 +127,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    bulkDisableRaProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/disable`, "PATCH", uuids)
       );
 
    }
