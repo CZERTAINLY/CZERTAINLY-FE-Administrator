@@ -235,7 +235,7 @@ export default function LocationDetail() {
          const csrAttrs = collectFormAttributes("csrAttributes", csrAttributeDescriptors, values);
 
          dispatch(actions.issueCertificate({
-            entityUuid: location.entityInstanceUuid, 
+            entityUuid: location.entityInstanceUuid,
             locationUuid: location.uuid,
             raProfileUuid: values.raProfile.value,
             csrAttributes: csrAttrs,
@@ -426,7 +426,7 @@ export default function LocationDetail() {
 
             columns: [
 
-               <Link to={`../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
+               <Link to={`../../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
 
                cert.withKey ? <MDBBadge color="success">Yes</MDBBadge> : <MDBBadge color="danger">No</MDBBadge>,
 

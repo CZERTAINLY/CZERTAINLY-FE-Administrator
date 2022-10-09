@@ -233,7 +233,8 @@ export const slice = createSlice({
          authorityInstanceUuid: string,
          description: string,
          enabled: boolean,
-         attributes: AttributeModel[]
+         attributes: AttributeModel[],
+         redirect?: string
       }>) => {
 
          state.isUpdating = true;
@@ -241,7 +242,7 @@ export const slice = createSlice({
       },
 
 
-      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
+      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel, redirect?: string }>) => {
 
          state.isUpdating = false;
          state.raProfile = action.payload.raProfile;
@@ -308,14 +309,14 @@ export const slice = createSlice({
       },
 
 
-      deleteRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
+      deleteRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string, redirect?:string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = false;
 
@@ -335,7 +336,7 @@ export const slice = createSlice({
 
 
       activateAcme: (state, action: PayloadAction<{
-         authorityUuid: string, 
+         authorityUuid: string,
          uuid: string,
          acmeProfileUuid: string,
          issueCertificateAttributes: AttributeModel[],

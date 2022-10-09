@@ -133,7 +133,8 @@ export default function RaProfileForm({
                   authorityInstanceUuid: values.authority!.value,
                   enabled: raProfile!.enabled,
                   description: values.description,
-                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values),
+                  redirect: `../../detail/${values.authority!.value}/${params.id}`
                })
             );
 

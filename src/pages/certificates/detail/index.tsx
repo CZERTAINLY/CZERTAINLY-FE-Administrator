@@ -953,7 +953,7 @@ export default function CertificateDetail() {
          {
             id: "raProfile",
             columns: ["RA Profile", certificate?.raProfile?.name ? (
-               <Link to={`../../raProfiles/detail/${certificate?.raProfile.uuid}`}>
+               <Link to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}>
                   {certificate?.raProfile.name}
                </Link>
             ) : "Unassigned",

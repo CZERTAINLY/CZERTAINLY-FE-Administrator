@@ -68,6 +68,8 @@ export default function RaProfileDetail() {
       () => {
          if (!params.id) return;
          dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: params.authorityUuid, uuid: params.id }));
+
+         if (!params.authorityUuid || params.authorityUuid === "unknown") return;
          dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
          dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
          dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: params.authorityUuid, uuid: params.id }));
@@ -81,7 +83,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         history.push(`../../raprofiles/edit/${raProfile?.uuid}`);
+         history.push(`../../../raprofiles/edit/${raProfile.authorityInstanceUuid}/${raProfile?.uuid}`);
       },
       [history, raProfile]
 
@@ -103,7 +105,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.disableRaProfile({  authorityUuid: raProfile.authorityInstanceUuid,uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.disableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
       },
       [dispatch, raProfile]
 
@@ -114,7 +116,11 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.deleteRaProfile({  authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.deleteRaProfile({
+            authorityUuid: raProfile.authorityInstanceUuid || "unknown",
+            uuid: raProfile.uuid,
+            redirect: "../../"
+         }));
          setConfirmDelete(false);
       },
       [dispatch, raProfile]
@@ -126,7 +132,7 @@ export default function RaProfileDetail() {
 
       () => {
          if (!raProfile) return;
-         dispatch(raProfilesActions.deactivateAcme({  authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
+         dispatch(raProfilesActions.deactivateAcme({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
          setConfirmDeactivateAcme(false);
       },
       [dispatch, raProfile]
@@ -174,9 +180,9 @@ export default function RaProfileDetail() {
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "check", disabled: raProfile?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: !(raProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } },
-         { icon: "gavel", disabled: false, tooltip: "Check Compliance", onClick: () => { setComplianceCheck(true); } },
+         { icon: "check", disabled: !raProfile?.authorityInstanceUuid || raProfile?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
+         { icon: "times", disabled: !raProfile?.authorityInstanceUuid || !(raProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } },
+         { icon: "gavel", disabled: !raProfile?.authorityInstanceUuid || false, tooltip: "Check Compliance", onClick: () => { setComplianceCheck(true); } },
       ],
       [raProfile, onEditClick, onDisableClick, onEnableClick]
    );
@@ -478,6 +484,16 @@ export default function RaProfileDetail() {
 
                </Widget>
 
+               <Widget title={complianceProfileTitle} busy={isFetchingProfile}>
+
+                  <CustomTable
+                     headers={complianceProfileHeaders}
+                     data={complianceProfileData}
+                  />
+
+               </Widget>
+
+
             </Col>
 
             <Col>
@@ -505,13 +521,6 @@ export default function RaProfileDetail() {
 
             <Col>
 
-               <Widget title={complianceProfileTitle} busy={isFetchingProfile}>
-
-                  <CustomTable
-                     headers={complianceProfileHeaders}
-                     data={complianceProfileData}
-                  />
-               </Widget>
 
             </Col>
 
