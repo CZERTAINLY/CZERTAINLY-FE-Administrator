@@ -30,11 +30,10 @@ interface Props {
 
 interface FormValues {
    username: string;
+   description: string;
    firstName: string;
    lastName: string;
    email: string;
-   enabled: boolean;
-   systemUser: boolean;
    inputType: { value: "upload" | "select" };
    certFile: FileList | undefined;
    certificate: any;
@@ -104,6 +103,10 @@ function UserForm({ title }: Props) {
 
       () => {
 
+         dispatch(certActions.resetState());
+         dispatch(rolesActions.resetState());
+         dispatch(userActions.resetState());
+
          dispatch(
             certActions.listCertificates({
                query: {
@@ -149,6 +152,7 @@ function UserForm({ title }: Props) {
 
             if (!user) setUser({
                uuid: "",
+               description: "",
                username: "",
                firstName: "",
                lastName: "",
@@ -241,6 +245,7 @@ function UserForm({ title }: Props) {
             dispatch(
                userActions.update({
                   uuid: user!.uuid,
+                  description: values.description,
                   firstName: values.firstName || undefined,
                   lastName: values.lastName || undefined,
                   email: values.email || undefined,
@@ -255,10 +260,11 @@ function UserForm({ title }: Props) {
             dispatch(
                userActions.create({
                   username: values.username,
+                  description: values.description,
                   firstName: values.firstName || undefined,
                   lastName: values.firstName || undefined,
                   email: values.email || undefined,
-                  enabled: values.enabled,
+                  enabled: false,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined,
                   certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
                   roles: userRoles
@@ -321,6 +327,7 @@ function UserForm({ title }: Props) {
    const defaultValues = useMemo(
       () => ({
          username: editMode ? user?.username : "",
+         description: editMode ? user?.description : "",
          firstName: editMode ? user?.firstName || "" : "",
          lastName: editMode ? user?.lastName : "",
          email: editMode ? user?.email : "",
@@ -438,6 +445,31 @@ function UserForm({ title }: Props) {
                               <FormFeedback>{meta.error}</FormFeedback>
 
                            </FormGroup>
+                        )}
+
+                     </Field>
+
+                     <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+
+                        {({ input, meta }) => (
+
+                           <FormGroup>
+
+                              <Label for="description">Description</Label>
+
+                              <Input
+                                 {...input}
+                                 valid={!meta.error && meta.touched}
+                                 invalid={!!meta.error && meta.touched}
+                                 type="text"
+                                 placeholder="Description"
+                                 disabled={user?.systemUser}
+                              />
+
+                              <FormFeedback>{meta.error}</FormFeedback>
+
+                           </FormGroup>
+
                         )}
 
                      </Field>
@@ -590,6 +622,7 @@ function UserForm({ title }: Props) {
                                     onMenuScrollToBottom={loadNextCertificates}
                                     isDisabled={user?.systemUser}
                                     styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                                    isClearable={true}
                                  />
 
                                  <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
@@ -601,54 +634,6 @@ function UserForm({ title }: Props) {
                         </Field>
 
                      )}
-
-                     <br />
-
-                     <Field name="enabled" type="checkbox">
-
-                        {({ input }) => (
-
-                           <FormGroup check>
-
-                              <Label check>
-
-                                 <Input
-                                    {...input}
-                                    type="checkbox"
-                                    disabled={editMode || user?.systemUser}
-                                 />
-
-                                 &nbsp;&nbsp;&nbsp;Enabled
-
-                              </Label>
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                     <br />
-
-                     <Field name="systemUser" type="checkbox">
-
-                        {({ input }) => (
-
-                           <FormGroup check>
-                              <Label check>
-                                 <Input
-                                    {...input}
-                                    type="checkbox"
-                                    disabled={true}
-                                 />
-                                 &nbsp;&nbsp;&nbsp;System user
-                              </Label>
-
-                           </FormGroup>
-                        )}
-
-                     </Field>
-
 
                      <br />
 
@@ -673,7 +658,7 @@ function UserForm({ title }: Props) {
                               title={submitTitle}
                               inProgressTitle={inProgressTitle}
                               inProgress={submitting || isCreatingUser || isUpdatingUser}
-                              disabled={(pristine && !hasRolesChanged) || submitting || isCreatingUser || isUpdatingUser || !valid || values.systemUser}
+                              disabled={(pristine && !hasRolesChanged) || submitting || isCreatingUser || isUpdatingUser || !valid || userSelector?.systemUser}
                            />
 
                            <Button color="default" onClick={onCancel} disabled={submitting || isCreatingUser || isUpdatingUser}>

@@ -20,6 +20,7 @@ export class UserManagementMock implements model.UserManagementApi {
          dbData.users.map(
             user => ({
                uuid: user.uuid,
+               description: user.description,
                username: user.username,
                firstName: user.firstName,
                lastName: user.lastName,
@@ -60,6 +61,7 @@ export class UserManagementMock implements model.UserManagementApi {
 
    create(
       username: string,
+      description: string | undefined,
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
@@ -85,6 +87,7 @@ export class UserManagementMock implements model.UserManagementApi {
                const user: DbUser = {
                   uuid,
                   username,
+                  description,
                   firstName,
                   lastName,
                   email,
@@ -113,6 +116,7 @@ export class UserManagementMock implements model.UserManagementApi {
 
    update(
       uuid: string,
+      description: string | undefined,
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
@@ -134,6 +138,7 @@ export class UserManagementMock implements model.UserManagementApi {
                const cert = getOrCreateCertificate(certificate?.certificateContent, certificateUuid);
                if (!cert) throw new HttpErrorResponse({ status: 404, statusText: "Missing certificate or certificate does not exist." });
 
+               user.description = description;
                user.firstName = firstName;
                user.lastName = lastName;
                user.email = email;

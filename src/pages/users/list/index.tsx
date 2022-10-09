@@ -205,6 +205,12 @@ export default function UsersList() {
             width: "10%",
          },
          {
+            id: "description",
+            content: <MDBColumnName columnName="Description" />,
+            sortable: true,
+            width: "5%",
+         },
+         {
             id: "firstName",
             content: <MDBColumnName columnName="First name" />,
             sortable: true,
@@ -252,6 +258,8 @@ export default function UsersList() {
             columns: [
 
                <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${user.uuid}`}>{user.username}</Link></span>,
+
+               user.description || "",
 
                user.firstName || "",
 

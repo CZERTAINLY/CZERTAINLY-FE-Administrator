@@ -73,8 +73,6 @@ export const slice = createSlice({
             key => (state as any)[key] = (initialState as any)[key]
          );
 
-         state = initialState;
-
       },
 
 
@@ -157,6 +155,7 @@ export const slice = createSlice({
 
       create: (state, action: PayloadAction<{
          username: string,
+         description?: string | undefined,
          firstName: string | undefined,
          lastName: string | undefined,
          email: string | undefined,
@@ -188,6 +187,7 @@ export const slice = createSlice({
 
       update: (state, action: PayloadAction<{
          uuid: string,
+         description?: string | undefined,
          firstName: string | undefined,
          lastName: string | undefined,
          email: string | undefined,

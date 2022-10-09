@@ -60,13 +60,14 @@ export const slice = createSlice({
 
       resetState: (state, action: PayloadAction<void>) => {
 
-         for (const key in state) {
-            if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
-         }
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
 
-         for (const key in initialState) {
-            (state as any)[key] = (initialState as any)[key];
-         }
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
+
 
       },
 

@@ -18,6 +18,7 @@ export function transformUserDetailDTOToModel(user: UserDetailDTO): UserDetailMo
    return {
       uuid: user.uuid,
       username: user.username,
+      description: user.description,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -35,6 +36,7 @@ export function transformUserDTOToModel(user: UserDTO): UserModel {
    return {
       uuid: user.uuid,
       username: user.username,
+      description: user.description,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,

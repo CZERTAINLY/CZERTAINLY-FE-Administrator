@@ -5,6 +5,7 @@ export interface UserModel {
 
    uuid: string;
    username: string;
+   description?: string;
    firstName?: string;
    lastName?: string;
    email?: string;

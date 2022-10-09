@@ -38,7 +38,13 @@ export const slice = createSlice({
    reducers: {
       resetState: (state, action: PayloadAction<void>) => {
 
-         state = initialState;
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
+
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
 
       },
 

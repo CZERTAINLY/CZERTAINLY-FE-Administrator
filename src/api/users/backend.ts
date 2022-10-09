@@ -41,6 +41,7 @@ export class UserManagementBackend implements model.UserManagementApi {
 
    create(
       username: string,
+      description: string | undefined,
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
@@ -51,6 +52,7 @@ export class UserManagementBackend implements model.UserManagementApi {
 
       return createNewResource<model.UserDetailDTO>(baseUrl, {
          username,
+         description,
          firstName,
          lastName,
          email,
@@ -64,6 +66,7 @@ export class UserManagementBackend implements model.UserManagementApi {
 
    update(
       uuid: string,
+      description: string | undefined,
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
@@ -74,6 +77,7 @@ export class UserManagementBackend implements model.UserManagementApi {
       return this._fetchService.request(
 
          new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
+            description,
             firstName,
             lastName,
             email,
