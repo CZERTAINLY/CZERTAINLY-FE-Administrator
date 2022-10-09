@@ -282,8 +282,18 @@ export const slice = createSlice({
       syncLocationSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
 
          state.isSyncing = false;
+
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
-         if (index > 0) state.locations[index] = action.payload.location;
+
+         if (index > 0) {
+            state.locations[index] = action.payload.location;
+         } else {
+            state.locations.push(action.payload.location);
+         }
+
+         if (state.location?.uuid === action.payload.location.uuid) {
+            state.location = action.payload.location;
+         }
 
       },
 
@@ -340,7 +350,7 @@ export const slice = createSlice({
 
 
       pushCertificate: (state, action: PayloadAction<{
-         entityUuid: string, 
+         entityUuid: string,
          locationUuid: string,
          certificateUuid: string,
          pushAttributes: AttributeModel[]
@@ -369,7 +379,7 @@ export const slice = createSlice({
 
 
       issueCertificate: (state, action: PayloadAction<{
-         entityUuid: string, 
+         entityUuid: string,
          locationUuid: string,
          raProfileUuid: string,
          csrAttributes: AttributeModel[],

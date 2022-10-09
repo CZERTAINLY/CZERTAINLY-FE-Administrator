@@ -169,7 +169,7 @@ function LocationList() {
             width: "auto",
          },
          {
-            content: <MDBColumnName columnName="Multiple Entires" />,
+            content: <MDBColumnName columnName="Multiple Entries" />,
             align: "center",
             sortable: true,
             id: "multiEntries",
