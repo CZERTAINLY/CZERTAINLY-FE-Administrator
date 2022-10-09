@@ -143,9 +143,8 @@ function RaProfileList() {
          },
          {
             id: "authority",
-            styledContent: <MDBColumnName columnName="Authority" />,
             align: "center",
-            content: "authority",
+            content: <MDBColumnName columnName="Authority" />,
             sortable: true,
             width: "15%",
          },
@@ -158,9 +157,8 @@ function RaProfileList() {
          },
          {
             id: "status",
-            styledContent: <MDBColumnName columnName="Status" />,
             align: "center",
-            content: "status",
+            content: <MDBColumnName columnName="Status" />,
             sortable: true,
             width: "7%",
          },
