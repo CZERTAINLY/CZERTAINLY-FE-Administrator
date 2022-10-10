@@ -65,8 +65,8 @@ function RoleForm({ title }: Props) {
       () => {
 
          dispatch(userActions.resetState());
-         dispatch(authActions.resetState());
          dispatch(rolesActions.resetState());
+         dispatch(authActions.clearResources());
 
          dispatch(userActions.list());
          dispatch(authActions.getResources());

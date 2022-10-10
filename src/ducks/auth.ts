@@ -35,10 +35,10 @@ export const slice = createSlice({
    reducers: {
 
 
-      resetState: (state, action: PayloadAction<void>) => {
+      /*resetState: (state, action: PayloadAction<void>) => {
 
          Object.keys(state).forEach(
-            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+            key => { if (!initialState.hasOwnProperty(key) && key !== "profile") (state as any)[key] = undefined; }
          );
 
          Object.keys(initialState).forEach(
@@ -47,7 +47,14 @@ export const slice = createSlice({
 
          state = initialState;
 
+      },*/
+
+      clearResources: (state, action: PayloadAction<void>) => {
+
+         state.resources = undefined;
+
       },
+
 
       getProfile(state, action: PayloadAction<void>) {
 
