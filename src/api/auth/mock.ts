@@ -6,7 +6,9 @@ import { randomDelay } from 'utils/mock';
 import * as model from './model';
 import { UserDetailDTO } from 'api/users';
 
+
 export class AuthMock implements model.AuthApi {
+
 
    profile(): Observable<UserDetailDTO> {
 
@@ -18,6 +20,19 @@ export class AuthMock implements model.AuthApi {
          map(
             user => user
          ),
+      );
+
+   }
+
+
+   updateProfile(user: model.ProfileDetailDTO): Observable<UserDetailDTO> {
+
+      return of(
+         dbData.users[0]
+      ).pipe(
+
+         delay(randomDelay()),
+
       );
 
    }
@@ -50,5 +65,6 @@ export class AuthMock implements model.AuthApi {
          );
 
    }
+
 
 }

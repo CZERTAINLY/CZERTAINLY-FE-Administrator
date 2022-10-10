@@ -3,6 +3,7 @@ import { createFeatureSelector } from 'utils/ducks';
 
 import { ResourceDetailModel } from 'models';
 import { UserDetailModel } from 'models/users';
+import { ProfileDetailModel } from 'models/user-profile';
 
 export type State = {
 
@@ -11,6 +12,7 @@ export type State = {
    objects?: { uuid: string; name: string; }[];
 
    isFetchingProfile: boolean;
+   isUpdatingProfile: boolean;
    isFetchingResources: boolean;
    isFetchingObjects: boolean;
 
@@ -20,6 +22,7 @@ export type State = {
 export const initialState: State = {
 
    isFetchingProfile: false,
+   isUpdatingProfile: false,
    isFetchingResources: false,
    isFetchingObjects: false,
 
@@ -74,6 +77,28 @@ export const slice = createSlice({
       getProfileFailure(state, action: PayloadAction<{ error: string }>) {
 
          state.isFetchingProfile = false;
+
+      },
+
+
+      updateProfile(state, action: PayloadAction<{ profile: ProfileDetailModel, redirect?: string }>) {
+
+         state.isUpdatingProfile = true;
+
+      },
+
+
+      updateProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel, redirect?: string }>) {
+
+         state.isUpdatingProfile = false;
+         state.profile = action.payload.profile;
+
+      },
+
+
+      updateProfileFailure(state, action: PayloadAction<{ error: string }>) {
+
+         state.isUpdatingProfile = false;
 
       },
 
@@ -137,6 +162,7 @@ const resources = createSelector(selectState, state => state.resources);
 const objects = createSelector(selectState, state => state.objects);
 
 const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
+const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
 const isFetchingResources = createSelector(selectState, state => state.isFetchingResources);
 const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
 
@@ -147,6 +173,7 @@ export const selectors = {
    resources,
    objects,
    isFetchingProfile,
+   isUpdatingProfile,
    isFetchingResources,
    isFetchingObjects
 };
