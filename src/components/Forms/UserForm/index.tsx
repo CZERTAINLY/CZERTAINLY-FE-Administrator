@@ -137,7 +137,7 @@ function UserForm({ title }: Props) {
 
    );
 
-   /* Copy loaded user to the state */
+   /* Copy loaded user to the state && possibly load the certificate */
 
    useEffect(
 
@@ -147,6 +147,7 @@ function UserForm({ title }: Props) {
 
             setUser(userSelector);
             setUserRoles(userSelector.roles.map(role => role.uuid));
+            if (userSelector.certificate) dispatch(certActions.getCertificateDetail({ uuid: userSelector.certificate.uuid }));
 
          } else {
 
@@ -167,7 +168,7 @@ function UserForm({ title }: Props) {
 
          }
       },
-      [params.id, user, userSelector]
+      [dispatch, params.id, user, userSelector]
 
    );
 
@@ -187,9 +188,9 @@ function UserForm({ title }: Props) {
             });
 
             const idx = certs.findIndex(c => c.uuid === certificateDetail.uuid);
-            if (idx >= 0) certs.splice(idx, 1, certificateDetail); else return;
+            if (idx > 0) certs.splice(idx, 1); else return;
 
-            setLoadedCerts([certificateDetail, ...loadedCerts]);
+            setLoadedCerts([certificateDetail, ...certs]);
 
          }
 
@@ -216,10 +217,22 @@ function UserForm({ title }: Props) {
          const certs = [...loadedCerts, ...fpc];
 
          setLoadedCerts(certs);
+         setCurrentPage(currentPage + 1);
+
+      },
+      [certificates, currentPage, loadedCerts]
+
+   );
+
+   /* Update cert list */
+
+   useEffect(
+
+      () => {
 
          setOptionsForCertificte(
 
-            certs.map(
+            loadedCerts.map(
                loadedCert => ({
                   label: `${loadedCert.commonName} (${loadedCert.fingerprint})` || `( empty ) ( ${loadedCert.serialNumber} )`,
                   value: loadedCert.uuid,
@@ -228,10 +241,8 @@ function UserForm({ title }: Props) {
 
          );
 
-         setCurrentPage(currentPage + 1);
-
       },
-      [certificates, currentPage, loadedCerts]
+      [loadedCerts]
 
    );
 
