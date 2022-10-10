@@ -39,14 +39,23 @@ export interface ResourcePermissionDTO {
 }
 
 
-export interface ResourceDetailDTO extends ResourceDTO {
+export interface ProfileDetailDTO {
+   description?: string;
+   firstName?: string
+   lastName?: string;
+   email?: string;
+}
 
+
+export interface ResourceDetailDTO extends ResourceDTO {
 }
 
 
 export interface AuthApi {
 
    profile(): Observable<UserDetailDTO>;
+
+   updateProfile(user: ProfileDetailDTO): Observable<UserDetailDTO>;
 
    getAllResources(): Observable<ResourceDetailDTO[]>;
 

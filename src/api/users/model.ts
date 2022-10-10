@@ -6,6 +6,7 @@ import { Observable } from "rxjs";
 export interface UserDTO {
    uuid: string;
    username: string;
+   description?: string;
    firstName?: string;
    lastName?: string;
    email?: string;
@@ -23,6 +24,7 @@ export interface UserCertificateDTO {
 export interface UserDetailDTO {
    uuid: string;
    username: string;
+   description?: string;
    firstName?: string;
    lastName?: string;
    email?: string;
@@ -41,6 +43,7 @@ export interface UserManagementApi {
 
    create(
       username: string,
+      description: string | undefined,
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,
@@ -51,6 +54,7 @@ export interface UserManagementApi {
 
    update(
       uuid: string,
+      description: string | undefined,
       firstName: string | undefined,
       lastName: string | undefined,
       email: string | undefined,

@@ -193,6 +193,10 @@ export default function UserDetail() {
             columns: ["Username", user.username]
          },
          {
+            id: "description",
+            columns: ["Description", user.description || ""]
+         },
+         {
             id: "firstName",
             columns: ["First name", user.firstName || ""]
          },

@@ -107,6 +107,7 @@ const createUser: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.users.create(
             action.payload.username,
+            action.payload.description,
             action.payload.firstName,
             action.payload.lastName,
             action.payload.email,
@@ -191,6 +192,7 @@ const update: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.users.update(
             action.payload.uuid,
+            action.payload.description,
             action.payload.firstName,
             action.payload.lastName,
             action.payload.email,

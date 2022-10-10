@@ -33,6 +33,21 @@ export class AuthBackend implements model.AuthApi {
    }
 
 
+   updateProfile(user: model.ProfileDetailDTO): Observable<UserDetailDTO> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(
+            `${baseUrl}/profile`,
+            'PUT',
+            user
+         )
+
+      );
+
+   }
+
+
    getAllResources(): Observable<model.ResourceDetailDTO[]> {
 
       return this._fetchService.request(

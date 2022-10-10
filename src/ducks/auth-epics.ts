@@ -1,5 +1,6 @@
-import { of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import history from "browser-history";
 
 import { AppEpic } from 'ducks';
 
@@ -46,6 +47,79 @@ const getProfileFailure: AppEpic = (action$, state$, deps) => {
       ),
       map(
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+};
+
+
+const updateProfile: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateProfile.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.auth.updateProfile(action.payload.profile).pipe(
+
+            map(
+
+               profile => slice.actions.updateProfileSuccess({ profile, redirect: action.payload.redirect })
+
+            ),
+
+            catchError(
+
+               err => of(slice.actions.updateProfileFailure({ error: extractError(err, "Failed to update user profile") }))
+
+            )
+
+         )
+
+      )
+
+   );
+
+};
+
+
+const updateProfileFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateProfileFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+};
+
+
+const updateProfileSuccess: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateProfileSuccess.match
+      ),
+      switchMap(
+
+         action => {
+            if (action.payload.redirect) {
+               history.push(action.payload.redirect);
+            } else {
+               history.goBack();
+            }
+            return EMPTY;
+         }
+
       )
 
    );
@@ -143,6 +217,9 @@ export const epics = [
    getProfile,
    getProfileFailure,
    getResources,
+   updateProfile,
+   updateProfileSuccess,
+   updateProfileFailure,
    getResourcesFailure,
    listObjects,
    listObjectsFailure

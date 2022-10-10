@@ -14,10 +14,8 @@ import { actions as authActions, selectors as authSelectors } from "ducks/auth";
 
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
-/*
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-*/
 
 import RolePermissionsEditor from "components/RolePermissionsEdior";
 import { SubjectPermissionsModel } from "models";
@@ -29,7 +27,6 @@ interface Props {
 interface FormValues {
    name: string;
    description: string;
-   systemRole: boolean;
 }
 
 
@@ -47,7 +44,7 @@ function RoleForm({ title }: Props) {
 
    const rolesSelector = useSelector(rolesSelectors.role);
    const rolePermissionsSelector = useSelector(rolesSelectors.permissions);
-   //const usersSelector = useSelector(usersSelectors.users);
+   const usersSelector = useSelector(usersSelectors.users);
    const resourcesSelector = useSelector(authSelectors.resources);
 
    const isFetchingRoleDetail = useSelector(rolesSelectors.isFetchingDetail);
@@ -68,8 +65,8 @@ function RoleForm({ title }: Props) {
       () => {
 
          dispatch(userActions.resetState());
-         dispatch(authActions.resetState());
          dispatch(rolesActions.resetState());
+         dispatch(authActions.clearResources());
 
          dispatch(userActions.list());
          dispatch(authActions.getResources());
@@ -222,12 +219,11 @@ function RoleForm({ title }: Props) {
       () => ({
          name: editMode ? rolesSelector?.name || "" : "",
          description: editMode ? rolesSelector?.description || "" : "",
-         systemRole: editMode ? rolesSelector?.systemRole || false : false,
       }),
-      [editMode, rolesSelector?.name, rolesSelector?.description, rolesSelector?.systemRole]
+      [editMode, rolesSelector?.name, rolesSelector?.description]
    );
 
-/*
+
    const usersTableHeader: TableHeader[] = useMemo(
 
       () => [
@@ -258,7 +254,7 @@ function RoleForm({ title }: Props) {
 
    );
 
-/*
+
    const usersTableData: TableDataRow[] = useMemo(
 
       () => usersSelector.map(
@@ -286,7 +282,7 @@ function RoleForm({ title }: Props) {
       [usersSelector]
 
    );
-   */
+
 
    /*
 
@@ -371,27 +367,6 @@ function RoleForm({ title }: Props) {
 
                      <br />
 
-                     <Field name="systemRole" type="checkbox">
-
-                        {({ input }) => (
-
-                           <FormGroup check>
-                              <Label check>
-                                 <Input
-                                    {...input}
-                                    type="checkbox"
-                                    disabled={true}
-                                 />
-                                 &nbsp;&nbsp;&nbsp;System role
-                              </Label>
-
-                           </FormGroup>
-                        )}
-
-                     </Field>
-
-                     <br />
-
                      <Widget title="Permissions" busy={isFetchingPermissions || isFetchingResources}>
 
                         <RolePermissionsEditor
@@ -405,7 +380,6 @@ function RoleForm({ title }: Props) {
 
                      </Widget>
 
-                     {/*
                      <br />
 
                      <Widget title="Users" busy={isFetchingUsers}>
@@ -427,8 +401,6 @@ function RoleForm({ title }: Props) {
 
                      </Widget>
 
-                     */}
-
                      <div className="d-flex justify-content-end">
 
                         <ButtonGroup>
@@ -437,7 +409,7 @@ function RoleForm({ title }: Props) {
                               title={submitTitle}
                               inProgressTitle={inProgressTitle}
                               inProgress={submitting || isCreatingRole || isUpdatingRole}
-                              disabled={/*pristine ||*/ submitting || isCreatingRole || isUpdatingRole || !valid || values.systemRole}
+                              disabled={/*pristine ||*/ submitting || isCreatingRole || isUpdatingRole || !valid || rolesSelector?.systemRole}
                            />
 
                            <Button color="default" onClick={onCancel} disabled={submitting || isCreatingRole || isUpdatingRole}>

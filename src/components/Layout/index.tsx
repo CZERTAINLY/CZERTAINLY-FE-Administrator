@@ -26,6 +26,7 @@ import Discovery from "pages/discoveries";
 import Dashboard from "pages/dashboard";
 import Certificates from "pages/certificates";
 import ComplianceProfiles from "pages/compliance-profiles";
+import UserProfile from "pages/user-profile";
 
 function Layout() {
 
@@ -67,6 +68,7 @@ function Layout() {
                   <Route path="/app/discovery" component={Discovery} />
                   <Route path="/app/certificates" component={Certificates} />
                   <Route path="/app/complianceprofiles" component={ComplianceProfiles} />
+                  <Route path="/app/userprofile" component={UserProfile} />
 
                </Switch>
 
