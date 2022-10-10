@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, Router } from "react-router";
+import { Switch, Route, Router, Redirect } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { useSelector } from "react-redux";
 import history from "browser-history";
@@ -31,6 +31,8 @@ function App() {
 
    const profile = useSelector(selectors.profile);
 
+   const homePage = () => <Redirect to="/app/home" />;
+
    return (
 
 
@@ -54,6 +56,8 @@ function App() {
 
                   <Switch>
 
+                     <Route path="/" exact component={homePage} />
+                     <Route path="/app" exact component={homePage} />
                      <Route path="/app/login" component={Login} exact />
                      <PrivateRoute component={Layout} />
 
