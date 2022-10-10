@@ -1,7 +1,7 @@
 import React from "react";
-import { Switch, Route, Redirect, Router } from "react-router";
+import { Switch, Route, Router } from "react-router";
 import { BrowserRouter } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 import history from "browser-history";
 
 import "styles/theme.scss";
@@ -11,37 +11,62 @@ import PrivateRoute from "components/PrivateRoute";
 
 import Login from "pages/login";
 
-import { inIFrame } from "utils/inIFrame";
+import { selectors } from "ducks/auth";
+import Spinner from "components/Spinner";
+
+let onLocationChanged: () => void = () => {};
+
+history.listen((location, action) => {
+   onLocationChanged();
+});
+
 
 function App() {
 
-   const isInFrame = inIFrame();
-   const redirect = () => !isInFrame ? <Redirect to="/app/home" /> : <Redirect to="/app/raprofiles" />
+   const [, setForceRender] = React.useState(Math.random());
+
+   onLocationChanged = () => {
+      if (history.location.pathname === "/app/login") setForceRender(Math.random());
+   };
+
+   const profile = useSelector(selectors.profile);
 
    return (
-      <div>
 
-         <ToastContainer autoClose={5000} hideProgressBar />
 
-         <BrowserRouter basename={(window as any).__ENV__.BASE_URL}>
+      <BrowserRouter basename={(window as any).__ENV__.BASE_URL}>
 
-            <Router history={history} >
+         <Router history={history} >
 
-               <Switch>
+            {
 
-                  <Route path="/" render={redirect} exact />
-                  <Route path={(window as any).__ENV__.BASE_URL} render={redirect} exact />
-                  <Route path="/app" render={redirect} exact />
-                  <Route path="/login" component={Login} exact />
-                  <PrivateRoute component={Layout} />
+               profile === undefined && (history.location.pathname !== ("/app/login") || !history.location) ? (
 
-               </Switch>
+                  <>
 
-            </Router>
+                     <div style={{ width: "100wv", height: "100wv" }}>
+                        <Spinner active={true} />
+                     </div>
 
-         </BrowserRouter>
+                  </>
 
-      </div>
+               ) : (
+
+                  <Switch>
+
+                     <Route path="/app/login" component={Login} exact />
+                     <PrivateRoute component={Layout} />
+
+                  </Switch>
+
+               )
+
+            }
+
+         </Router>
+
+      </BrowserRouter>
+
    );
 
 }

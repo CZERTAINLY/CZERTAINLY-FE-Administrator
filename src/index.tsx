@@ -13,6 +13,7 @@ ReactDOM.render(
    <StoreProvider store={store}>
 
       <React.StrictMode>
+
          <App />
 
       </React.StrictMode>

@@ -5,7 +5,7 @@ import { FetchHttpService as IFetchHttpService } from "./FetchHttpService";
 import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
 import { switchMap } from "rxjs/operators";
 
-
+import history from "browser-history";
 
 export class FetchHttpServiceImpl implements IFetchHttpService {
 
@@ -21,6 +21,8 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
 
 
    public request(options: HttpRequestOptions): Observable<any> {
+
+      // workaround for
 
       // --- This should be rewritten instead of using the ts-rest-client library ---
 
@@ -53,7 +55,9 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
                const headers: { [key: string]: string } = {};
                if (response.headers) response.headers.forEach((value, key) => headers[key] = value);
 
-               if (response.status === 401) window.location.href = `${(window as any).__ENV__.LOGIN_URL}?redirect=${encodeURIComponent(window.location.href)}`;
+               if (response.status === 401) {
+                  history.push(`/app/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+               }
 
                throw new HttpErrorResponse({
                   error,
