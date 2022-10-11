@@ -15,6 +15,7 @@ export interface RoleDetailModel extends RoleModel {
 
 export interface ObjectPermissionsModel {
    uuid: string;
+   name: string;
    allow: string[];
    deny: string[];
 }

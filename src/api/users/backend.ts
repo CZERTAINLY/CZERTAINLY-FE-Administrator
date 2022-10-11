@@ -58,7 +58,7 @@ export class UserManagementBackend implements model.UserManagementApi {
          email,
          enabled,
          certificateUuid,
-         certificate: certificate?.certificateContent
+         certificateData: certificate?.certificateContent
       });
 
    }

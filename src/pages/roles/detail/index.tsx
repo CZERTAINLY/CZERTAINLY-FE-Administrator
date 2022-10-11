@@ -200,6 +200,10 @@ export default function UserDetail() {
             content: "Username",
          },
          {
+            id: "descrtiption",
+            content: "Description",
+         },
+         {
             id: "firstName",
             content: "First name",
          },
@@ -224,10 +228,11 @@ export default function UserDetail() {
          user => ({
             id: user.uuid,
             columns: [
-               user.username,
-               user.firstName || "",
-               user.lastName || "",
-               user.email || ""
+               <span style={{whiteSpace: "nowrap"}}>{user.username || ""}</span>,
+               <span style={{whiteSpace: "nowrap"}}>{user.description || ""}</span>,
+               <span style={{whiteSpace: "nowrap"}}>{user.firstName || ""}</span>,
+               <span style={{whiteSpace: "nowrap"}}>{user.lastName || ""}</span>,
+               <span style={{whiteSpace: "nowrap"}}>{user.email || ""}</span>,
             ]
          })
 
@@ -289,7 +294,7 @@ export default function UserDetail() {
             ],
             detailColumns: !resource.objects || resource.objects.length === 0 ? undefined : [
                <></>,
-               resource.objects.map(object => <div key={object.uuid}>{object.uuid}</div>),
+               resource.objects.map(object => <div key={object.name}>{object.name}</div>),
                <></>,
                resource.objects.map(object => <div key={object.uuid}>{object.allow.join(",")}</div>),
                resource.objects.map(object => <div key={object.uuid}>{object.deny.join(",")}</div>),

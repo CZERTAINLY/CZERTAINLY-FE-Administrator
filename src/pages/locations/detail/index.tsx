@@ -228,7 +228,6 @@ export default function LocationDetail() {
 
       (values: any) => {
 
-         debugger;
          if (!location) return;
 
          const issueAttrs = collectFormAttributes("issueAttributes", issuanceAttributeDescriptors, values);
@@ -237,7 +236,7 @@ export default function LocationDetail() {
          dispatch(actions.issueCertificate({
             entityUuid: location.entityInstanceUuid,
             locationUuid: location.uuid,
-            raProfileUuid: values.raProfile.value,
+            raProfileUuid: values.raProfile.value.split(":#")[0],
             csrAttributes: csrAttrs,
             issueAttributes: issueAttrs
          }));
