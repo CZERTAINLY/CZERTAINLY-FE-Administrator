@@ -164,7 +164,7 @@ export default function CertificateDetail() {
 
       () => {
 
-         setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid, label: group.name+":#"+group.authorityInstanceUuid })));
+         setRaProfileOptions(raProfiles.map(group => ({ value: group.uuid+":#"+group.authorityInstanceUuid, label: group.name })));
 
       },
       [dispatch, raProfiles]
