@@ -992,7 +992,7 @@ export default function CertificateDetail() {
                   <CertificateValidationStatus status={value.status} />,
                   <div style={{ wordBreak: "break-all" }}>
                      {value.message.split("\n").map((str: string) => (
-                        <div>
+                        <div key={str}>
                            {str}
                            <br />
                         </div>

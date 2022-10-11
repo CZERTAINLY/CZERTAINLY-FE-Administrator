@@ -56,7 +56,7 @@ export default function ComplianceRuleAttributeViewer({
 
          attribute => {
             return ({
-               id: attribute.uuid || "",
+               id: attribute.uuid || attribute.name,
                columns: [
                   attribute.name || "",
                   getAttributeContent(attribute)
