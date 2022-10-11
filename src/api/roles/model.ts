@@ -17,6 +17,7 @@ export interface RoleDetailDTO extends RoleDTO {
 
 export interface ObjectPermissionsDTO {
    uuid: string;
+   name: string;
    allow: string[];
    deny: string[];
 }

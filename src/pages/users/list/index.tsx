@@ -259,13 +259,13 @@ export default function UsersList() {
 
                <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${user.uuid}`}>{user.username}</Link></span>,
 
-               user.description || "",
+               <span style={{ whiteSpace: "nowrap" }}>{user.description || ""}</span>,
 
-               user.firstName || "",
+               <span style={{ whiteSpace: "nowrap" }}>{user.firstName || ""}</span>,
 
-               user.lastName || "",
+               <span style={{ whiteSpace: "nowrap" }}>{user.lastName || ""}</span>,
 
-               user.email || "",
+               <span style={{ whiteSpace: "nowrap" }}>{user.email || ""}</span>,
 
                <MDBBadge color={!user.systemUser ? "success" : "danger"}>{user.systemUser ? "Yes" : "No"}</MDBBadge>,
 

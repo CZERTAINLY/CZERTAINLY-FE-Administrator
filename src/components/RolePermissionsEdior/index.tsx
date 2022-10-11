@@ -45,26 +45,7 @@ function RolePermissionsEditor({
 
    const clonePerms = useCallback(
 
-      () => {
-
-         return ({
-            allowAllResources: permissions.allowAllResources,
-            resources: permissions.resources.map(
-               resource => ({
-                  allowAllActions: resource.allowAllActions,
-                  actions: [...resource.actions],
-                  name: resource.name,
-                  objects: resource.objects?.map(
-                     object => ({
-                        uuid: object.uuid,
-                        allow: [...object.allow],
-                        deny: [...object.deny]
-                     })
-                  )
-               })
-            )
-         })
-      },
+      () => JSON.parse(JSON.stringify(permissions)),
       [permissions]
 
    );
@@ -147,7 +128,7 @@ function RolePermissionsEditor({
 
    const setOLP = useCallback(
 
-      (resourceUuid: string, objectUuid: string, action: string, permissions: "allow" | "deny" | "inherit") => {
+      (resourceUuid: string, objectUuid: string, objectName: string, action: string, permissions: "allow" | "deny" | "inherit") => {
 
          const resource = resources?.find(r => r.uuid === resourceUuid);
          if (!resource) return;
@@ -184,6 +165,7 @@ function RolePermissionsEditor({
                resourcePermissions.objects.push({
 
                   uuid: objectUuid,
+                  name: objectName,
                   allow: permissions === "allow" ? [action] : [],
                   deny: permissions === "deny" ? [action] : []
 
@@ -200,6 +182,7 @@ function RolePermissionsEditor({
                actions: [],
                objects: [{
                   uuid: objectUuid,
+                  name: objectName,
                   allow: permissions === "allow" ? [action] : [],
                   deny: permissions === "deny" ? [action] : []
                }]
@@ -272,21 +255,21 @@ function RolePermissionsEditor({
                                                    <div>
                                                       <div title="Allow">A</div>
                                                       <input type="radio" checked={objectPermissions?.allow.includes(action.name) || false} name={object.uuid + " " + action.uuid}
-                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, action.name, "allow") }}
+                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, object.name, action.name, "allow") }}
                                                       />
                                                    </div>
 
                                                    <div>
                                                       <div title="Deny">D</div>
                                                       <input type="radio" checked={objectPermissions?.deny.includes(action.name) || false} name={object.uuid + " " + action.uuid}
-                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, action.name, "deny") }}
+                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, object.name, action.name, "deny") }}
                                                       />
                                                    </div>
 
                                                    <div>
                                                       <div title="Inherit">I</div>
                                                       <input type="radio" checked={!objectPermissions?.deny.includes(action.name) && !objectPermissions?.allow.includes(action.name)} name={object.uuid + " " + action.uuid}
-                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, action.name, "inherit") }}
+                                                         onChange={(e) => { if (e.target.checked) setOLP(currentResource.uuid, object.uuid, object.name, action.name, "inherit") }}
                                                       />
                                                    </div>
 
