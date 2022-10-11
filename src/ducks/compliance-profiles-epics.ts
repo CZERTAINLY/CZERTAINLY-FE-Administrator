@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
 import { slice } from "./compliance-profiles";
 import history from "browser-history";
-import { transformComplianceConnectorGroupDTOToModel, transformComplianceConnectorRuleDTOToModel, transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel } from "./transform/compliance-profiles";
+import { transformComplianceConnectorGroupDTOToModel, transformComplianceConnectorRuleDTOToModel, transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel, transformComplianceRuleDTOToModel } from "./transform/compliance-profiles";
 
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
@@ -354,7 +354,12 @@ const addRule: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               () => slice.actions.addRuleSuccess({ uuid: action.payload.uuid, connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, ruleUuid: action.payload.ruleUuid, connectorName: action.payload.connectorName, ruleName: action.payload.ruleName })
+               rule => slice.actions.addRuleSuccess({
+                  connectorUuid: action.payload.connectorUuid,
+                  connectorName: action.payload.connectorName,
+                  kind: action.payload.kind,
+                  rule: transformComplianceRuleDTOToModel(rule)
+               })
             ),
             catchError(
                err => of(slice.actions.addRuleFailed({ error: extractError(err, "Failed to add rule to Compliance Profile") }))

@@ -1,7 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel } from "models/compliance-profiles";
+import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel, ComplianceRuleModel } from "models/compliance-profiles";
 
 
 export type State = {
@@ -279,48 +279,59 @@ export const slice = createSlice({
       },
 
 
-      addRuleSuccess: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, connectorName: string, kind: string, ruleUuid: string, ruleName: string, description?: string, groupUuid?: string, }>) => {
+      addRuleSuccess: (state, action: PayloadAction<{ connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRuleModel }>) => {
 
          state.isAddingRule = false;
          let found = false;
          if (!state.complianceProfile) return;
 
          if (state.complianceProfile?.rules === undefined) {
+
             state.complianceProfile.rules = [{
                connectorUuid: action.payload.connectorUuid,
                kind: action.payload.kind,
                connectorName: action.payload.connectorName,
                rules: [{
-                  uuid: action.payload.ruleUuid,
-                  name: action.payload.ruleName,
-                  description: action.payload.description,
-                  groupUuid: action.payload.groupUuid
+                  uuid: action.payload.rule.uuid,
+                  name: action.payload.rule.name,
+                  description: action.payload.rule.description,
+                  groupUuid: action.payload.rule.groupUuid,
+                  attributes: action.payload.rule.attributes
                }]
             }]
+
          } else {
+
             for (let connector of state.complianceProfile.rules || []) {
+
                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
                   found = true;
                   connector.rules.push({
-                     uuid: action.payload.ruleUuid,
-                     name: action.payload.ruleName,
-                     description: action.payload.description,
-                     groupUuid: action.payload.groupUuid
+                     uuid: action.payload.rule.uuid,
+                     name: action.payload.rule.name,
+                     description: action.payload.rule.description,
+                     groupUuid: action.payload.rule.groupUuid,
+                     attributes: action.payload.rule.attributes
                   });
                }
+
             }
+
             if (!found) {
+
                state.complianceProfile?.rules.push({
                   connectorUuid: action.payload.connectorUuid,
                   kind: action.payload.kind,
                   connectorName: action.payload.connectorName,
                   rules: [{
-                     uuid: action.payload.ruleUuid,
-                     name: action.payload.ruleName,
-                     description: action.payload.description,
-                     groupUuid: action.payload.groupUuid
+                     uuid: action.payload.rule.uuid,
+                     name: action.payload.rule.name,
+                     description: action.payload.rule.description,
+                     groupUuid: action.payload.rule.groupUuid,
+                     attributes: action.payload.rule.attributes
                   }]
                });
+
             }
          }
 

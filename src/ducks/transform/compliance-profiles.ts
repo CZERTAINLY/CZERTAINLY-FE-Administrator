@@ -1,8 +1,8 @@
-import { ComplianceConnectorAndGroupsDTO, ComplianceConnectorAndRulesDTO, ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRulesDTO } from "api/compliance-profile";
-import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRulesModel } from "models/compliance-profiles";
+import { ComplianceConnectorAndGroupsDTO, ComplianceConnectorAndRulesDTO, ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRuleDTO } from "api/compliance-profile";
+import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRuleModel } from "models/compliance-profiles";
 
 export function transformComplianceProfileListDtoToModel(complianceProfileDto: ComplianceProfileListItemDTO): ComplianceProfileListItemModel {
-   
+
    return {
       uuid: complianceProfileDto.uuid,
       name: complianceProfileDto.name,
@@ -27,7 +27,7 @@ export function transformComplianceProfileDtoToModel(complianceProfileDto: Compl
 }
 
 
-export function transformComplianceRuleDTOToModel(complianceRuleDto: ComplianceRulesDTO): ComplianceRulesModel {
+export function transformComplianceRuleDTOToModel(complianceRuleDto: ComplianceRuleDTO): ComplianceRuleModel {
 
    return {
       uuid: complianceRuleDto.uuid,
