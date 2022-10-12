@@ -58,7 +58,7 @@ export interface RolesManagementApi {
 
    getUsers(uuid: string): Observable<UserDTO[]>;
 
-   updateUsers(uuid: string, users: UserDTO[]): Observable<RoleDetailDTO>;
+   updateUsers(uuid: string, userUuids: string[]): Observable<RoleDetailDTO>;
 
    getPermissions(uuid: string): Observable<SubjectPermissionsDTO>;
 

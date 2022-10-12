@@ -55,6 +55,32 @@ export default function RolesList() {
    );
 
 
+   const onEditRoleUsersClick = useCallback(
+
+      () => {
+
+         if (checkedRows.length !== 1) return;
+         history.push(`./roles/users/${checkedRows[0]}`);
+
+      },
+      [checkedRows, history]
+
+   );
+
+
+   const onEditRolePermissionsClick = useCallback(
+
+      () => {
+
+         if (checkedRows.length !== 1) return;
+         history.push(`./roles/permissions/${checkedRows[0]}`);
+
+      },
+      [checkedRows, history]
+
+   );
+
+
    const onDeleteConfirmed = useCallback(
 
       () => {
@@ -103,10 +129,10 @@ export default function RolesList() {
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0 || isSystemRoleSelected, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         /*{ icon: "check", disabled: isSystemRoleSelected || !canEnable, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: isSystemRoleSelected || !canDisable, tooltip: "Disable", onClick: () => { onDisableClick() } }*/
+         { icon: "user", disabled: checkedRows.length !== 1 || isSystemRoleSelected, tooltip: "Edit role users", onClick: () => { onEditRoleUsersClick() } },
+         { icon: "lock", disabled: checkedRows.length !== 1 || isSystemRoleSelected, tooltip: "Edit role permissions", onClick: () => { onEditRolePermissionsClick() } }
       ],
-      [checkedRows.length, isSystemRoleSelected, onAddClick]
+      [checkedRows.length, isSystemRoleSelected, onAddClick, onEditRolePermissionsClick, onEditRoleUsersClick]
 
    );
 

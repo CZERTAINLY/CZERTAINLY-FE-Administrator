@@ -162,7 +162,7 @@ export class RolesManagementMock implements model.RolesManagementApi {
    }
 
 
-   updateUsers(uuid: string, users: UserDTO[]): Observable<model.RoleDetailDTO> {
+   updateUsers(uuid: string, userUuids: string[]): Observable<model.RoleDetailDTO> {
 
       return of(
          dbData.roles.find(role => role.uuid === uuid)
@@ -175,7 +175,13 @@ export class RolesManagementMock implements model.RolesManagementApi {
 
                if (!role) throw new HttpErrorResponse({ status: 404, statusText: 'Role not found' });
 
-               role.users = users;
+               role.users = userUuids.map(
+                  uuid => {
+                     const user = dbData.users.find(user => user.uuid === uuid);
+                     if (!user) throw new HttpErrorResponse({ status: 404, statusText: 'User not found' });
+                     return user;
+                  }
+               );
 
                return role;
 

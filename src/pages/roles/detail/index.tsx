@@ -75,6 +75,26 @@ export default function UserDetail() {
    );
 
 
+   const onEditRoleUsersClick = useCallback(
+
+      () => {
+         history.push(`../../roles/users/${role?.uuid}`);
+      },
+      [history, role?.uuid]
+
+   );
+
+
+   const onEditRolePermissionsClick = useCallback(
+
+      () => {
+         history.push(`../../roles/permissions/${role?.uuid}`);
+      },
+      [history, role?.uuid]
+
+   );
+
+
    const onDeleteConfirmed = useCallback(
 
       () => {
@@ -95,12 +115,10 @@ export default function UserDetail() {
       () => [
          { icon: "pencil", disabled: role?.systemRole || false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: role?.systemRole || false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         /*
-         { icon: "check", disabled: role?.enabled || role?.systemUser || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
-         { icon: "times", disabled: !(role?.enabled || false) || role?.systemUser || false, tooltip: "Disable", onClick: () => { onDisableClick() } }
-         */
+         { icon: "user", disabled: role?.systemRole || false, tooltip: "Edit role users", onClick: () => { onEditRoleUsersClick() } },
+         { icon: "lock", disabled: role?.systemRole || false, tooltip: "Edit role permissions", onClick: () => { onEditRolePermissionsClick() } }
       ],
-      [role, onEditClick]
+      [role?.systemRole, onEditClick, onEditRoleUsersClick, onEditRolePermissionsClick]
 
    );
 

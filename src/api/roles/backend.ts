@@ -119,14 +119,14 @@ export class RolesManagementBackend implements model.RolesManagementApi {
    }
 
 
-   updateUsers(uuid: string, users: UserDTO[]): Observable<model.RoleDetailDTO> {
+   updateUsers(uuid: string, userUuids: string[]): Observable<model.RoleDetailDTO> {
 
          return this._fetchService.request(
 
             new HttpRequestOptions(
                `${baseUrl}/${uuid}/users`,
-               'POST',
-               users
+               'PATCH',
+               userUuids
             )
 
          );
