@@ -56,43 +56,22 @@ export interface RolesManagementApi {
 
    delete(uuid: string): Observable<void>;
 
+   getUsers(uuid: string): Observable<UserDTO[]>;
+
+   updateUsers(uuid: string, users: UserDTO[]): Observable<RoleDetailDTO>;
+
    getPermissions(uuid: string): Observable<SubjectPermissionsDTO>;
 
    updatePermissions(uuid: string, permissions: SubjectPermissionsDTO): Observable<SubjectPermissionsDTO>;
 
-   /*
-      ResourcePermissionsDto getRoleResourcePermissions(
-         @Parameter(description = "Role UUID") @PathVariable String roleUuid,
-         @Parameter(description = "Resource UUID") @PathVariable String resourceUuid
-      ) throws NotFoundException;
+   getResourcePermissions(uuid: string, resourceName: string): Observable<ResourcePermissionsDTO>;
 
+   getResourceObjectsPermissions(uuid: string, resourceName: string): Observable<ObjectPermissionsDTO[]>;
 
-      List<ObjectPermissionsDto> getResourcePermissionObjects(
-         @Parameter(description = "Role UUID") @PathVariable String roleUuid,
-         @Parameter(description = "Resource UUID")
-         @PathVariable String resourceUuid
-      ) throws NotFoundException;
+   addResourceObjectsPermissions(uuid: string, resourceName: string, objectUuid: string, permissions: ObjectPermissionsDTO[]): Observable<void>;
 
+   updateResourceObjectsPermissions(uuid: string, resourceName: string, objectUuid: string, permissions: ObjectPermissionsDTO): Observable<void>;
 
-      void addResourcePermissionObjects(
-         @Parameter(description = "Role UUID") @PathVariable String roleUuid,
-         @Parameter(description = "Resource UUID") @PathVariable String resourceUuid,
-         @RequestBody List<ObjectPermissionsRequestDto> request
-      ) throws NotFoundException;
-
-      void updateResourcePermissionObjects(
-         @Parameter(description = "Role UUID") @PathVariable String roleUuid,
-         @Parameter(description = "Resource UUID") @PathVariable String resourceUuid,
-         @Parameter(description = "Object UUID") @PathVariable String objectUuid,
-         @RequestBody ObjectPermissionsRequestDto request
-      ) throws NotFoundException;
-
-      void removeResourcePermissionObjects(
-         @Parameter(description = "Role UUID") @PathVariable String roleUuid,
-         @Parameter(description = "Resource UUID") @PathVariable String resourceUuid,
-         @Parameter(description = "Object UUID") @PathVariable String objectUuid
-      ) throws NotFoundException;
-
-   */
+   removeResourceObjectsPermissions(uuid: string, resourceName: string, objectUuid: string): Observable<void>;
 
 }

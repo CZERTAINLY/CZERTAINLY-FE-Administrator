@@ -1,3 +1,4 @@
+import { UserDTO } from 'api/users';
 import { Observable } from 'rxjs';
 
 import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
@@ -104,6 +105,35 @@ export class RolesManagementBackend implements model.RolesManagementApi {
    }
 
 
+   getUsers(uuid: string): Observable<UserDTO[]> {
+
+            return this._fetchService.request(
+
+               new HttpRequestOptions(
+                  `${baseUrl}/${uuid}/users`,
+                  'GET',
+               )
+
+            );
+
+   }
+
+
+   updateUsers(uuid: string, users: UserDTO[]): Observable<model.RoleDetailDTO> {
+
+         return this._fetchService.request(
+
+            new HttpRequestOptions(
+               `${baseUrl}/${uuid}/users`,
+               'POST',
+               users
+            )
+
+         );
+
+   }
+
+
    getPermissions(uuid: string): Observable<model.SubjectPermissionsDTO> {
 
       return this._fetchService.request(
@@ -126,6 +156,78 @@ export class RolesManagementBackend implements model.RolesManagementApi {
                `${baseUrl}/${uuid}/permissions`,
                'POST',
                permissions
+            )
+
+         );
+
+   }
+
+
+   getResourcePermissions(uuid: string, resourceName: string): Observable<model.ResourcePermissionsDTO> {
+
+         return this._fetchService.request(
+
+            new HttpRequestOptions(
+               `${baseUrl}/${uuid}/permissions/${resourceName}`,
+               'GET',
+            )
+
+         );
+
+   }
+
+
+   getResourceObjectsPermissions(uuid: string, resourceName: string): Observable<model.ObjectPermissionsDTO[]> {
+
+         return this._fetchService.request(
+
+            new HttpRequestOptions(
+               `${baseUrl}/${uuid}/permissions/${resourceName}/objects`,
+               'GET',
+            )
+
+         );
+
+   }
+
+
+   addResourceObjectsPermissions(uuid: string, resourceName: string, objectUuid: string, permissions: model.ObjectPermissionsDTO[]): Observable<void> {
+
+         return this._fetchService.request(
+
+            new HttpRequestOptions(
+               `${baseUrl}/${uuid}/permissions/${resourceName}/objects/${objectUuid}`,
+               'POST',
+               permissions
+            )
+
+         );
+
+   }
+
+
+   updateResourceObjectsPermissions(uuid: string, resourceName: string, objectUuid: string, permissions: model.ObjectPermissionsDTO): Observable<void> {
+
+         return this._fetchService.request(
+
+            new HttpRequestOptions(
+               `${baseUrl}/${uuid}/permissions/${resourceName}/objects/${objectUuid}`,
+               'PUT',
+               permissions
+            )
+
+         );
+
+   }
+
+
+   removeResourceObjectsPermissions(uuid: string, resourceName: string, objectUuid: string): Observable<void> {
+
+         return this._fetchService.request(
+
+            new HttpRequestOptions(
+               `${baseUrl}/${uuid}/permissions/${resourceName}/objects/${objectUuid}`,
+               'DELETE',
             )
 
          );
