@@ -6,6 +6,7 @@ import { createNewResource } from "utils/net";
 import * as model from "./model";
 import { AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { ComplianceRuleDTO } from "./model";
 
 const baseUrl = "/v1/complianceProfiles";
 
@@ -80,7 +81,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
 
    }
 
-   addRuleToComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string, attributes: AttributeDTO[]): Observable<void> {
+   addRuleToComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string, attributes: AttributeDTO[]): Observable<ComplianceRuleDTO> {
 
       return this._fetchService.request(
 

@@ -8,6 +8,7 @@ import * as model from "./model";
 import { AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 import { CertificateType } from "types/certificate";
+import { ComplianceRuleDTO } from "./model";
 
 export class ComplianceProfileManagementMock implements model.ComplianceProfileManagementApi {
    getComplianceProfileList(): Observable<model.ComplianceProfileListItemDTO[]> {
@@ -56,7 +57,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
 
       )
    }
-   createComplianceProfile(name: string, description?: string | undefined): Observable<{ uuid: string}> {
+   createComplianceProfile(name: string, description?: string | undefined): Observable<{ uuid: string }> {
       return of(
          null
       ).pipe(
@@ -172,7 +173,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
       )
    }
 
-   addRuleToComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string, attributes: AttributeDTO[]): Observable<void> {
+   addRuleToComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string, attributes: AttributeDTO[]): Observable<ComplianceRuleDTO> {
       return of(
          null
       ).pipe(
@@ -185,7 +186,9 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
                const complianceProfile = dbData.complianceProfiles.find(complianceProfile => complianceProfile.uuid === uuid);
                if (!complianceProfile) throw new HttpErrorResponse({ status: 404, statusText: "Compliance profile not found" });
 
-               complianceProfile.rules.push({
+               const rule = {
+                  uuid,
+                  name: "",
                   connectorName: "Test",
                   connectorUuid,
                   kind,
@@ -194,8 +197,12 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
                      name: "Test",
                   }],
                }
-               )
+
+               complianceProfile.rules.push(rule);
+
+               return rule;
             }
+
          ))
    }
 

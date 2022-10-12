@@ -509,7 +509,7 @@ function CustomTable({
 
                <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
-                  {!hasDetails ? (<></>) :  !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
+                  {!hasDetails ? (<></>) : !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
                      {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
                   </td>
                   }
@@ -549,15 +549,21 @@ function CustomTable({
 
                            ) : (
 
-                              row.detailColumns.map(e => {
-                                 return (
-                                    <td>
-                                       <div>
-                                          {e}
-                                       </div>
-                                    </td>
-                                 )
-                              })
+                              row.detailColumns.map(
+
+                                 (e, index) => {
+
+                                    return (
+                                       <td key={index}>
+                                          <div>
+                                             {e}
+                                          </div>
+                                       </td>
+                                    )
+
+                                 }
+
+                              )
 
                            )
 

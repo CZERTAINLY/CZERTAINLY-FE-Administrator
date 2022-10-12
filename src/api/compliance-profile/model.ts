@@ -29,14 +29,14 @@ export interface ComplianceConnectorAndRulesDTO {
    connectorName: string;
    connectorUuid: string;
    kind: string;
-   rules: ComplianceRulesDTO[];
+   rules: ComplianceRuleDTO[];
 }
 
 export interface ComplianceRulesListItemDTO {
    connectorName: string;
    connectorUuid: string;
    kind: string;
-   rules: ComplianceRulesDTO[];
+   rules: ComplianceRuleDTO[];
 }
 
 export interface ComplianceGroupsListItemDTO {
@@ -46,7 +46,7 @@ export interface ComplianceGroupsListItemDTO {
    groups: ComplianceGroupsDTO[];
 }
 
-export interface ComplianceRulesDTO {
+export interface ComplianceRuleDTO {
    name: string;
    uuid: string;
    description?: string;
@@ -91,7 +91,7 @@ export interface ComplianceProfileManagementApi {
 
    checkCompliance(uuids: string[]): Observable<void>;
 
-   addRuleToComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string, attributes: AttributeDTO[]): Observable<void>;
+   addRuleToComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string, attributes: AttributeDTO[]): Observable<ComplianceRuleDTO>;
 
    deleteRuleFromComplianceProfile(uuid: string, connectorUuid: string, kind: string, ruleUuid: string): Observable<void>;
 

@@ -229,28 +229,13 @@ export default function CertificateDetail() {
 
       () => {
 
-         if (!isPushingCertificate) {
+         if (!isPushingCertificate && !isRemovingCertificate) {
             dispatch(actions.listCertificateLocations({ uuid: params.id }));
             dispatch(locationActions.listLocations());
          }
 
       },
-      [dispatch, isPushingCertificate, params.id]
-
-   )
-
-
-   useEffect(
-
-      () => {
-
-         if (!isRemovingCertificate) {
-            dispatch(actions.listCertificateLocations({ uuid: params.id }));
-            dispatch(locationActions.listLocations());
-         }
-
-      },
-      [dispatch, isRemovingCertificate, params.id]
+      [dispatch, isPushingCertificate, isRemovingCertificate, params.id]
 
    )
 
@@ -1007,7 +992,7 @@ export default function CertificateDetail() {
                   <CertificateValidationStatus status={value.status} />,
                   <div style={{ wordBreak: "break-all" }}>
                      {value.message.split("\n").map((str: string) => (
-                        <div>
+                        <div key={str}>
                            {str}
                            <br />
                         </div>
