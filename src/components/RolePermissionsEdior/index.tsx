@@ -482,13 +482,24 @@ function RolePermissionsEditor({
       () => {
 
          const newPermissions = clonePerms();
+         let perms = newPermissions.resources.find(r => r.name === currentResource?.name);
+
+         if (!perms) {
+
+            perms = {
+               name: currentResource?.name || "",
+               allowAllActions: false,
+               actions: [],
+            };
+
+            newPermissions.resources.push(perms);
+         }
 
          objectsToAdd.forEach(
 
             uuid => {
 
                const object = objects?.find(o => o.uuid === uuid);
-               const perms = newPermissions.resources.find(r => r.name === currentResource?.name);
 
                if (!object || !perms || !currentResource) {
                   console.error("Unexpected error!")
