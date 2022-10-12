@@ -106,8 +106,7 @@ export const slice = createSlice({
       getResources(state, action: PayloadAction<void>) {
 
          state.isFetchingResources = true;
-         state.profile = undefined;
-         state.isFetchingProfile = false;
+         state.resources = undefined;
 
       },
 

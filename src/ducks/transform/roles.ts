@@ -43,6 +43,7 @@ export function transformSubjectPermissionsDTOToModel(permissions: SubjectPermis
 
                object => ({
                   uuid: object.uuid,
+                  name: object.name,
                   allow: [ ...object.allow ],
                   deny: [ ...object.deny ],
                })

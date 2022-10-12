@@ -37,6 +37,7 @@ interface FormValues {
    inputType: { value: "upload" | "select" };
    certFile: FileList | undefined;
    certificate: any;
+   enabled: boolean;
 }
 
 
@@ -273,9 +274,9 @@ function UserForm({ title }: Props) {
                   username: values.username,
                   description: values.description,
                   firstName: values.firstName || undefined,
-                  lastName: values.firstName || undefined,
+                  lastName: values.lastName || undefined,
                   email: values.email || undefined,
-                  enabled: false,
+                  enabled: values.enabled,
                   certificate: values.inputType.value === "upload" ? certToUpload : undefined,
                   certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
                   roles: userRoles
@@ -342,7 +343,7 @@ function UserForm({ title }: Props) {
          firstName: editMode ? user?.firstName || "" : "",
          lastName: editMode ? user?.lastName : "",
          email: editMode ? user?.email : "",
-         enabled: editMode ? user?.enabled : false,
+         enabled: editMode ? user?.enabled : true,
          systemUser: editMode ? user?.systemUser : false,
          inputType: optionsForInput[1],
          certificate: selectedCertificate,
@@ -428,13 +429,57 @@ function UserForm({ title }: Props) {
 
       <>
 
-         <Widget title={title} busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles}>
+         <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
-            <Form onSubmit={onSubmit} initialValues={defaultValues}>
+            {({ handleSubmit, pristine, submitting, values, valid }) => (
 
-               {({ handleSubmit, pristine, submitting, values, valid }) => (
+               <BootstrapForm onSubmit={handleSubmit}>
 
-                  <BootstrapForm onSubmit={handleSubmit}>
+                  <Widget
+
+                     title={
+
+                        <>
+
+                           {
+                              editMode ? <></> :
+
+                                 <div style={{ float: "right", color: "black" }}>
+
+                                    <Field name="enabled">
+
+                                       {({ input, meta }) => (
+
+                                          <Label for="enabled">
+
+                                             <Input
+                                                {...input}
+                                                id="enabled"
+                                                type="checkbox"
+                                                label="Enabled"
+                                                checked={input.value}
+                                             />
+
+                                             &nbsp;&nbsp;Enabled
+
+                                          </Label>
+
+                                       )}
+
+
+                                    </Field>
+
+                                 </div>
+                           }
+
+
+                           {title}
+
+                        </>
+                     }
+                     busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles}
+                  >
+
 
                      <Field name="username" validate={validateRequired()}>
 
@@ -680,12 +725,14 @@ function UserForm({ title }: Props) {
 
                      </div>
 
-                  </BootstrapForm>
-               )}
 
-            </Form>
+                  </Widget>
 
-         </Widget>
+               </BootstrapForm>
+            )
+            }
+
+         </Form >
 
 
          <Dialog
