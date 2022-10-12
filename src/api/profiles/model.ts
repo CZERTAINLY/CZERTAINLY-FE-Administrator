@@ -78,4 +78,6 @@ export interface ProfilesManagementApi {
 
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
 
+   getComplianceProfilesForRaProfile(authorityInstanceUuid: string, uuid: string): Observable<raComplianceProfileDTO[]>;
+
 }

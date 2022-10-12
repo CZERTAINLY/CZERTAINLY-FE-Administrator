@@ -239,4 +239,12 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
    }
 
+   getComplianceProfilesForRaProfile(authorityInstanceUuid: string, uuid: string): Observable<model.raComplianceProfileDTO[]> {
+
+         return this._fetchService.request(
+            new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/complianceProfiles`, "GET")
+         );
+
+   }
+
 }

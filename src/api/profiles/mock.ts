@@ -486,4 +486,15 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
       )
    }
 
+   getComplianceProfilesForRaProfile(authorityInstanceUuid: string, uuid: string): Observable<model.raComplianceProfileDTO[]> {
+
+      return of(
+         dbData.complianceProfiles
+      ).pipe(
+
+         delay(randomDelay())
+
+         );
+   }
+
 }

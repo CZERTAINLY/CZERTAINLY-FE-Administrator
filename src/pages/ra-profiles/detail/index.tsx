@@ -30,6 +30,7 @@ export default function RaProfileDetail() {
 
    const raProfile = useSelector(raProfilesSelectors.raProfile);
    const acmeDetails = useSelector(raProfilesSelectors.acmeDetails);
+   const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
 
    const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
    const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
@@ -39,6 +40,7 @@ export default function RaProfileDetail() {
    const isDisabling = useSelector(raProfilesSelectors.isDisabling);
    const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
    const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
+   const isFetchingAssociatedComplianceProfiles = useSelector(raProfilesSelectors.isFetchingAssociatedComplianceProfiles);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -68,7 +70,8 @@ export default function RaProfileDetail() {
       () => {
          if (!params.id) return;
          dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: params.authorityUuid, uuid: params.id }));
-
+         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: params.authorityUuid, uuid: params.id }));
+         
          if (!params.authorityUuid || params.authorityUuid === "unknown") return;
          dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
          dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
@@ -237,19 +240,19 @@ export default function RaProfileDetail() {
 
    const complianceProfileData: TableDataRow[] = useMemo(
 
-      () => !raProfile ? [] : (raProfile.complianceProfiles || []).map(
+      () => !associatedComplianceProfiles ? [] : (associatedComplianceProfiles || []).map(
 
          (profile) => ({
             id: profile.uuid,
             columns: [
-               <Link to={`../../complianceprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
+               <Link to={`../../../complianceprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
                profile.description || "",
-               <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateComplianceProfile(profile.uuid); }, additionalTooltipId: raProfile.uuid }]} />
+               <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateComplianceProfile(profile.uuid); }, additionalTooltipId: "ra" + profile.uuid }]} />
             ]
          })
 
       ),
-      [raProfile, onDissociateComplianceProfile]
+      [associatedComplianceProfiles, onDissociateComplianceProfile]
 
    );
 
@@ -484,7 +487,7 @@ export default function RaProfileDetail() {
 
                </Widget>
 
-               <Widget title={complianceProfileTitle} busy={isFetchingProfile}>
+               <Widget title={complianceProfileTitle} busy={isFetchingAssociatedComplianceProfiles}>
 
                   <CustomTable
                      headers={complianceProfileHeaders}

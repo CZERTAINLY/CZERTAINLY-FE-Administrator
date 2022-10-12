@@ -1,4 +1,6 @@
 import { ComplianceConnectorAndGroupsDTO, ComplianceConnectorAndRulesDTO, ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRuleDTO } from "api/compliance-profile";
+import { raComplianceProfileDTO } from "api/profiles";
+import { raComplianceProfileModel } from "models";
 import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRuleModel } from "models/compliance-profiles";
 
 export function transformComplianceProfileListDtoToModel(complianceProfileDto: ComplianceProfileListItemDTO): ComplianceProfileListItemModel {
@@ -22,6 +24,16 @@ export function transformComplianceProfileDtoToModel(complianceProfileDto: Compl
       rules: JSON.parse(JSON.stringify(complianceProfileDto.rules)),
       groups: JSON.parse(JSON.stringify(complianceProfileDto.groups)),
       raProfiles: JSON.parse(JSON.stringify(complianceProfileDto.raProfiles)),
+   };
+
+}
+
+export function transformRaComplianceProfileDtoToModel(complianceProfileDto: raComplianceProfileDTO): raComplianceProfileModel {
+
+   return {
+      uuid: complianceProfileDto.uuid,
+      name: complianceProfileDto.name,
+      description: complianceProfileDto?.description,
    };
 
 }

@@ -9,6 +9,7 @@ import history from "browser-history";
 import { transformRaAcmeLinkDtoToModel, transformRaAuthorizedClientDtoToModel, transformRaProfileDtoToModel } from "./transform/ra-profiles";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transfromRaAcmeLinkDtoToModel } from "./transform/acme-profiles";
+import { transformRaComplianceProfileDtoToModel } from "./transform/compliance-profiles";
 
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
@@ -964,6 +965,51 @@ const dissociateRaProfileFailed: AppEpic = (action$, state$, deps) => {
 }
 
 
+const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getComplianceProfilesForRaProfile.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.profiles.getComplianceProfilesForRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+
+            map(
+               profileDto => slice.actions.getComplianceProfilesForRaProfileSuccess({
+                  complianceProfiles: profileDto.map(transformRaComplianceProfileDtoToModel)
+               })
+            ),
+
+            catchError(
+               err => of(slice.actions.getComplianceProfilesForRaProfileFailure({ error: extractError(err, "Failed to get associated Compliance Profiles") }))
+            )
+
+         )
+      )
+
+   );
+
+}
+
+
+const getComplianceProfilesForRaProfileFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getComplianceProfilesForRaProfileFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
+}
+
+
 const epics = [
    listRaProfiles,
    listRaProfilesFailure,
@@ -1006,7 +1052,9 @@ const epics = [
    associateRaProfile,
    associateRaProfileFailed,
    dissociateRaProfile,
-   dissociateRaProfileFailed
+   dissociateRaProfileFailed,
+   getComplianceProfilesForRaProfile,
+   getComplianceProfilesForRaProfileFailure
 ];
 
 

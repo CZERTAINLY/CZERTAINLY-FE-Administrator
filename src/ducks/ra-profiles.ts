@@ -4,6 +4,7 @@ import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { raComplianceProfileDTO } from "api/profiles";
 
 export type State = {
 
@@ -32,6 +33,8 @@ export type State = {
 
    isFetchingAcmeDetails: boolean;
 
+   isFetchingAssociatedComplianceProfiles: boolean;
+
    isCreating: boolean;
    isDeleting: boolean;
    isBulkDeleting: boolean;
@@ -45,6 +48,8 @@ export type State = {
    isCheckingCompliance: boolean;
    isAssociatingComplianceProfile: boolean;
    isDissociatingComplianceProfile: boolean;
+
+   associatedComplianceProfiles: raComplianceProfileDTO[];
 
 };
 
@@ -64,6 +69,7 @@ export const initialState: State = {
    isFetchingIssuanceAttributes: false,
    isFetchinRevocationAttributes: false,
    isFetchingAcmeDetails: false,
+   isFetchingAssociatedComplianceProfiles: false,
    isCreating: false,
    isDeleting: false,
    isBulkDeleting: false,
@@ -77,6 +83,7 @@ export const initialState: State = {
    isCheckingCompliance: false,
    isAssociatingComplianceProfile: false,
    isDissociatingComplianceProfile: false,
+   associatedComplianceProfiles: [],
 
 };
 
@@ -593,6 +600,29 @@ export const slice = createSlice({
          state.isDissociatingComplianceProfile = false;
       },
 
+      getComplianceProfilesForRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
+
+         state.associatedComplianceProfiles = [];
+         state.isFetchingAssociatedComplianceProfiles = true;
+
+      },
+
+
+      getComplianceProfilesForRaProfileSuccess: (state, action: PayloadAction<{ complianceProfiles: raComplianceProfileDTO[] }>) => {
+
+         state.isFetchingAssociatedComplianceProfiles = false;
+         state.associatedComplianceProfiles = action.payload.complianceProfiles;
+
+      },
+
+
+      getComplianceProfilesForRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingAssociatedComplianceProfiles = false;
+
+      },
+
+
    }
 });
 
@@ -627,6 +657,8 @@ const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
 const isActivatingAcme = createSelector(state, (state: State) => state.isActivatingAcme);
 const isDeactivatingAcme = createSelector(state, (state: State) => state.isDeactivatingAcme);
+const isFetchingAssociatedComplianceProfiles = createSelector(state, (state: State) => state.isFetchingAssociatedComplianceProfiles);
+const associatedComplianceProfiles = createSelector(state, (state: State) => state.associatedComplianceProfiles);
 
 
 export const selectors = {
@@ -660,7 +692,9 @@ export const selectors = {
    isDisabling,
    isBulkDisabling,
    isActivatingAcme,
-   isDeactivatingAcme
+   isDeactivatingAcme,
+   isFetchingAssociatedComplianceProfiles,
+   associatedComplianceProfiles,
 
 };
 
