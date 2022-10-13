@@ -267,11 +267,21 @@ function CustomTable({
             return;
          }
 
-         const checkedRows = tblData.map(row => row.id);
+         const checkedRows = tblData.filter(
+
+            (row, index) => {
+               if (!hasPagination) return true;
+               if (pageSize === 0) return true;
+               return paginationData ? true : index >= (page - 1) * pageSize && index < page * pageSize;
+            }
+
+         ).map(row => row.id);
+
+
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, [tblData, onCheckedRowsChanged]
+      }, [tblData, onCheckedRowsChanged, hasPagination, pageSize, paginationData, page]
 
    );
 
