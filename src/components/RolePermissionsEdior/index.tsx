@@ -339,7 +339,7 @@ function RolePermissionsEditor({
             id: object.uuid,
             columns: [
 
-               <span style={{ whiteSpace: "nowrap" }}>{objects && !objects.find(o => o.uuid === object.uuid) ? "! DELETED ! " : ""}{object.name}</span>,
+               <span style={{ whiteSpace: "nowrap" }}>{object.name}</span>,
 
                ...currentResource?.actions.map(
 
@@ -493,23 +493,23 @@ function RolePermissionsEditor({
             newPermissions.resources.push(perms);
          }
 
+         perms.objects = perms.objects || [];
+
          objectsToAdd.forEach(
 
             uuid => {
 
                const object = objects?.find(o => o.uuid === uuid);
 
-               if (!object || !perms || !currentResource) {
+               if (!object || !perms) {
                   console.error("Unexpected error!")
                   return;
                }
 
-               perms.objects = perms.objects || [];
-
                perms.objects!.push({
                   uuid: object.uuid,
                   name: object.name,
-                  allow: perms.actions,
+                  allow: perms.allowAllActions ? currentResource?.actions.map(a => a.name) || [] : perms.actions,
                   deny: []
                })
 
