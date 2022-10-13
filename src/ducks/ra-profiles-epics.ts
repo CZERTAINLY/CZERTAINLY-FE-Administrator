@@ -830,6 +830,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.checkComplianceSuccess()
             ),
+
             catchError(
                err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
 
@@ -892,6 +893,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.associateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
             ),
+
             catchError(
                err => of(slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }))
             )
@@ -912,7 +914,6 @@ const associateRaProfileFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.associateRaProfileFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
@@ -937,6 +938,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.dissociateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
             ),
+
             catchError(
                err => of(slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }))
             )
@@ -957,7 +959,6 @@ const dissociateRaProfileFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.dissociateRaProfileFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 

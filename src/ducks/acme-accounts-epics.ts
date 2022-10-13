@@ -116,6 +116,7 @@ const revokeAcmeAccount: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.revokeAcmeAccountSuccess({ acmeProfileUuid: action.payload.acmeProfileUuid, uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.revokeAcmeAccountFailed({ error: extractError(err, "Failed to revoke ACME Account") }))
             )
@@ -219,8 +220,8 @@ const disableAcmeAccount: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.disableAcmeAccountSuccess({ uuid: action.payload.uuid })
             ),
-            catchError(
 
+            catchError(
                err => of(slice.actions.disableAcmeAccountFailed({ error: extractError(err, "Failed to disable ACME Account") }))
             )
 
@@ -260,6 +261,7 @@ const bulkRevokeAcmeAccounts: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkRevokeAcmeAccountsSuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkRevokeAcmeAccountsFailed({ error: extractError(err, "Failed to revoke ACME Accounts") }))
             )
@@ -269,9 +271,6 @@ const bulkRevokeAcmeAccounts: AppEpic = (action$, state$, deps) => {
       )
 
    );
-
-
-
 
 }
 
@@ -306,6 +305,7 @@ const bulkEnableAcmeAccounts: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkEnableAcmeAccountsSuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkEnableAcmeAccountsFailed({ error: extractError(err, "Failed to enable ACME Accounts") }))
             )
@@ -349,6 +349,7 @@ const bulkDisableAcmeAccounts: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkDisableAcmeAccountsSuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkDisableAcmeAccountsFailed({ error: extractError(err, "Failed to disable ACME Accounts") }))
             )

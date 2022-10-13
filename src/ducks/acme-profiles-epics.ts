@@ -24,11 +24,11 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
             map(
                acmeProfiles => slice.actions.listAcmeProfilesSuccess(
                   { acmeProfileList: acmeProfiles.map(transformAcmeProfileListDtoToModel) }
-               ),
-               catchError(
-                  err => of(slice.actions.listAcmeProfilesFailed({ error: extractError(err, "Failed to get ACME Profiles list") }))
-
                )
+            ),
+
+            catchError(
+               err => of(slice.actions.listAcmeProfilesFailed({ error: extractError(err, "Failed to get ACME Profiles list") }))
             )
 
          )
@@ -71,6 +71,7 @@ const getAcmeProfileDetail: AppEpic = (action$, state$, deps) => {
             map(
                detail => slice.actions.getAcmeProfileSuccess({ acmeProfile: transformAcmeProfileDtoToModel(detail) })
             ),
+
             catchError(
                err => of(slice.actions.getAcmeProfileFailed({ error: extractError(err, "Failed to get ACME Profile details") }))
             )
@@ -129,6 +130,7 @@ const createAcmeProfile: AppEpic = (action$, state$, deps) => {
             map(
                obj => slice.actions.createAcmeProfileSuccess({ uuid: obj.uuid }),
             ),
+
             catchError(
                err => of(slice.actions.createAcmeProfileFailed({ error: extractError(err, "Failed to create ACME Profile") }))
             )
@@ -210,6 +212,7 @@ const updateAcmeProfile: AppEpic = (action$, state$, deps) => {
             map(
                acmeProfile => slice.actions.updateAcmeProfileSuccess({ acmeProfile: transformAcmeProfileDtoToModel(acmeProfile) })
             ),
+
             catchError(
                err => of(slice.actions.updateAcmeProfileFailed({ error: extractError(err, "Failed to update ACME Profile") }))
             )
@@ -274,6 +277,7 @@ const deleteAcmeProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.deleteAcmeProfileSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.deleteAcmeProfileFailed({ error: extractError(err, "Failed to delete ACME Profile") }))
             )
@@ -337,6 +341,7 @@ const enableAcmeProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.enableAcmeProfileSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.enableAcmeProfileFailed({ error: extractError(err, "Failed to enable ACME Profile") }))
             )
@@ -379,10 +384,9 @@ const disableAcmeProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.disableAcmeProfileSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
-
                err => of(slice.actions.disableAcmeProfileFailed({ error: extractError(err, "Failed to disable ACME Profile") }))
-
             )
 
          )
@@ -425,6 +429,7 @@ const bulkDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
             map(
                errors => slice.actions.bulkDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, errors })
             ),
+
             catchError(
                err => of(slice.actions.bulkDeleteAcmeProfilesFailed({ error: extractError(err, "Failed to delete ACME Accounts") }))
             )
@@ -469,6 +474,7 @@ const bulkForceDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkForceDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
             ),
+
             catchError(
                err => of(slice.actions.bulkForceDeleteAcmeProfilesFailed({ error: extractError(err, "Failed to delete ACME Accounts") }))
             )
@@ -531,6 +537,7 @@ const bulkEnableAcmeProfiles: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkEnableAcmeProfilesSuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkEnableAcmeProfilesFailed({ error: extractError(err, "Failed to enable ACME Accounts") }))
             )
@@ -574,6 +581,7 @@ const bulkDisableAcmeProfiles: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkDisableAcmeProfilesSuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkDisableAcmeProfilesFailed({ error: extractError(err, "Failed to disable ACME Accounts") }))
             )
