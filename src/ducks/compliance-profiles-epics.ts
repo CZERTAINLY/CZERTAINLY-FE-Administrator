@@ -23,11 +23,12 @@ const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
             map(
                complianceProfiles => slice.actions.listComplianceProfilesSuccess(
                   { complianceProfileList: complianceProfiles.map(transformComplianceProfileListDtoToModel) }
-               ),
-               catchError(
-                  err => of(slice.actions.listComplianceProfilesFailed({ error: extractError(err, "Failed to get Compliance Profiles list") }))
-
                )
+            ),
+
+            catchError(
+               err => of(slice.actions.listComplianceProfilesFailed({ error: extractError(err, "Failed to get Compliance Profiles list") }))
+
             )
 
          )
@@ -70,6 +71,7 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
             map(
                detail => slice.actions.getComplianceProfileSuccess({ complianceProfile: transformComplianceProfileDtoToModel(detail) })
             ),
+
             catchError(
                err => of(slice.actions.getComplianceProfileFailed({ error: extractError(err, "Failed to get Compliance Profile details") }))
             )
@@ -117,6 +119,7 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
             map(
                obj => slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
             ),
+
             catchError(
                err => of(slice.actions.createComplianceProfileFailed({ error: extractError(err, "Failed to create Compliance Profile") }))
             )
@@ -180,6 +183,7 @@ const deleteComplianceProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.deleteComplianceProfileSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.deleteComplianceProfileFailed({ error: extractError(err, "Failed to delete Compliance Profile") }))
             )
@@ -244,6 +248,7 @@ const bulkDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
             map(
                errors => slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors })
             ),
+
             catchError(
                err => of(slice.actions.bulkDeleteComplianceProfilesFailed({ error: extractError(err, "Failed to delete Compliance Accounts") }))
             )
@@ -288,6 +293,7 @@ const bulkForceDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkForceDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
             ),
+
             catchError(
                err => of(slice.actions.bulkForceDeleteComplianceProfilesFailed({ error: extractError(err, "Failed to delete Compliance Accounts") }))
             )
@@ -361,6 +367,7 @@ const addRule: AppEpic = (action$, state$, deps) => {
                   rule: transformComplianceRuleDTOToModel(rule)
                })
             ),
+
             catchError(
                err => of(slice.actions.addRuleFailed({ error: extractError(err, "Failed to add rule to Compliance Profile") }))
             )
@@ -405,8 +412,17 @@ const addGroup: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               () => slice.actions.addGroupSuccess({ uuid: action.payload.uuid, connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, groupUuid: action.payload.groupUuid, connectorName: action.payload.connectorName, groupName: action.payload.groupName, description: action.payload.description })
+               () => slice.actions.addGroupSuccess({
+                  uuid: action.payload.uuid,
+                  connectorUuid: action.payload.connectorUuid,
+                  kind: action.payload.kind,
+                  groupUuid: action.payload.groupUuid,
+                  connectorName: action.payload.connectorName,
+                  groupName: action.payload.groupName,
+                  description: action.payload.description
+               })
             ),
+
             catchError(
                err => of(slice.actions.addGroupFailed({ error: extractError(err, "Failed to add group to Compliance Profile") }))
             )
@@ -472,7 +488,6 @@ const deleteRuleFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.deleteRuleFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
@@ -499,6 +514,7 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.deleteGroupSuccess({ connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, groupUuid: action.payload.groupUuid })
             ),
+
             catchError(
                err => of(slice.actions.deleteGroupFailed({ error: extractError(err, "Failed to delete group from Compliance Profile") }))
             )
@@ -519,7 +535,6 @@ const deleteGroupFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.deleteGroupFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
@@ -544,6 +559,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.associateRaProfileSuccess({ uuid: action.payload.uuid, raProfileUuids: action.payload.raProfileUuids })
             ),
+
             catchError(
                err => of(slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }))
             )
@@ -589,6 +605,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.dissociateRaProfileSuccess({ uuid: action.payload.uuid, raProfileUuids: action.payload.raProfileUuids })
             ),
+
             catchError(
                err => of(slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }))
             )
@@ -633,6 +650,7 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
             map(
                (raProfiles) => slice.actions.getAssociatedRaProfilesSuccess({ raProfiles: raProfiles })
             ),
+
             catchError(
                err => of(slice.actions.getAssociatedRaProfilesFailed({ error: extractError(err, "Failed to get associated RA Profiles") }))
             )
@@ -676,6 +694,7 @@ const getRules: AppEpic = (action$, state$, deps) => {
                map(
                   (rules) => slice.actions.listComplianceRulesSuccess(rules.map(transformComplianceConnectorRuleDTOToModel))
                ),
+
                catchError(
                   err => of(slice.actions.listComplianceRulesFailed({ error: extractError(err, "Failed to get compliance rules") }))
                )
@@ -719,6 +738,7 @@ const getGroups: AppEpic = (action$, state$, deps) => {
                map(
                   (groups) => slice.actions.listComplianceGroupsSuccess(groups.map(transformComplianceConnectorGroupDTOToModel))
                ),
+
                catchError(
                   err => of(slice.actions.listComplianceGroupsFailed({ error: extractError(err, "Failed to get compliance groups") }))
                )
@@ -762,6 +782,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.checkComplianceSuccess()
             ),
+
             catchError(
                err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
 
@@ -783,7 +804,6 @@ const checkComplianceFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.checkComplianceFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
@@ -799,14 +819,11 @@ const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
          slice.actions.checkComplianceSuccess.match
       ),
       map(
-
          action => alertActions.success("Compliance Check for the certificates initiated")
       )
 
    );
 }
-
-
 
 
 const epics = [

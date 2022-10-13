@@ -27,6 +27,7 @@ const listLocations: AppEpic = (action$, state, deps) => {
                   locations: locations.map(transformLocationDtoToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.listLocationsFailure({ error: extractError(err, "Failed to get Location list") }))
             )
@@ -66,6 +67,7 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.getLocationDetailSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.getLocationDetailFailure({ error: extractError(err, "Failed to get Location detail") }))
             )
@@ -255,6 +257,7 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
             map(
                () => slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
+
             catchError(
                err => of(slice.actions.deleteLocationFailure({ error: extractError(err, "Failed to delete Location") }))
             )
@@ -321,6 +324,7 @@ const enableLocation: AppEpic = (action$, state, deps) => {
             map(
                () => slice.actions.enableLocationSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.enableLocationFailure({ error: extractError(err, "Failed to enable Location") }))
             )
@@ -364,6 +368,7 @@ const disableLocation: AppEpic = (action$, state, deps) => {
             map(
                () => slice.actions.disableLocationSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.disableLocationFailure({ error: extractError(err, "Failed to disable Location") }))
             )
@@ -407,6 +412,7 @@ const getPushAttributes: AppEpic = (action$, state, deps) => {
             map(
                attributes => slice.actions.getPushAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
             ),
+
             catchError(
                err => of(slice.actions.getPushAttributesFailure({ error: extractError(err, "Failed to get Push Attributes") }))
             )
@@ -450,6 +456,7 @@ const getCSRAttributes: AppEpic = (action$, state, deps) => {
             map(
                attributes => slice.actions.getCSRAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
             ),
+
             catchError(
                err => of(slice.actions.getCSRAttributesFailure({ error: extractError(err, "Failed to get CSR Attributes") }))
             )
@@ -498,6 +505,7 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.pushCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.pushCertificateFailure({ error: extractError(err, "Failed to push Certificate") }))
             )
@@ -547,6 +555,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.issueCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.issueCertificateFailure({ error: extractError(err, "Failed to issue Certificate") }))
             )
@@ -594,6 +603,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.autoRenewCertificateFailure({ error: extractError(err, "Failed to auto-renew Certificate") }))
             )
@@ -641,6 +651,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.removeCertificateFailure({ error: extractError(err, "Failed to remove Certificate") }))
             )

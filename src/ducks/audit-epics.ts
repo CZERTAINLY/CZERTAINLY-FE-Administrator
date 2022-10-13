@@ -78,7 +78,9 @@ const listObjects: AppEpic = (action$, state, deps) => {
                objectList => slice.actions.listObjectsSuccess({ objectList })
             ),
 
-            catchError(err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") })))
+            catchError(
+               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") }))
+            )
 
          )
 

@@ -24,9 +24,13 @@ const list: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.users.list().pipe(
 
-            map(list => slice.actions.listSuccess({ users: list.map(transformUserDTOToModel) })),
+            map(
+               list => slice.actions.listSuccess({ users: list.map(transformUserDTOToModel) })
+            ),
 
-            catchError(err => of(slice.actions.listFailure({ error: extractError(err, "Failed to get user list") })))
+            catchError(
+               err => of(slice.actions.listFailure({ error: extractError(err, "Failed to get user list") }))
+            )
 
          )
       )
@@ -123,20 +127,24 @@ const createUser: AppEpic = (action$, state, deps) => {
                   action.payload.roles || []
                ).pipe(
 
-                  map(userDetailDTO => slice.actions.createSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })),
+                  map(
+                     userDetailDTO => slice.actions.createSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
+                  ),
 
-                  catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to update user roles") })))
+                  catchError(
+                     err => of(slice.actions.createFailure({ error: extractError(err, "Failed to update user roles") }))
+                  )
 
                )
             ),
 
-            catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create user") })))
+            catchError(
+               err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create user") }))
+            )
 
          )
 
-      ),
-
-      catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create user") }))),
+      )
 
    )
 
@@ -280,6 +288,7 @@ const deleteUser: AppEpic = (action$, state, deps) => {
             map(
                () => slice.actions.deleteUserSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
+
             catchError(
                err => of(slice.actions.deleteUserFailure({ error: extractError(err, "Failed to delete user") }))
             )

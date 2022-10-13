@@ -22,11 +22,16 @@ const list: AppEpic = (action$, state, deps) => {
 
          () => deps.apiClients.roles.list().pipe(
 
-            map(list => slice.actions.listSuccess({ roles: list.map(role => transformRoleDTOToModel(role)) })),
+            map(
+               list => slice.actions.listSuccess({ roles: list.map(role => transformRoleDTOToModel(role)) })
+            ),
 
-            catchError(err => of(slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") })))
+            catchError(
+               err => of(slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") }))
+            )
 
          )
+
       )
 
    )
@@ -61,9 +66,13 @@ const getDetail: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.roles.getDetail(action.payload.uuid).pipe(
 
-            map(role => slice.actions.getDetailSuccess({ role: transformRoleDetailDTOToModel(role) })),
+            map(
+               role => slice.actions.getDetailSuccess({ role: transformRoleDetailDTOToModel(role) })
+            ),
 
-            catchError(err => of(slice.actions.getDetailFailure({ error: extractError(err, "Failed to get role detail") })))
+            catchError(
+               err => of(slice.actions.getDetailFailure({ error: extractError(err, "Failed to get role detail") }))
+            )
 
          )
 
@@ -101,9 +110,13 @@ const create: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.roles.create(action.payload.name, action.payload.description).pipe(
 
-            map(role => slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) })),
+            map(
+               role => slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) })
+            ),
 
-            catchError(err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role") })))
+            catchError(
+               err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create role") }))
+            )
 
          )
 
@@ -168,9 +181,13 @@ const update: AppEpic = (action$, state, deps) => {
             action.payload.description
          ).pipe(
 
-            map(role => slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) })),
+            map(
+               role => slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) })
+            ),
 
-            catchError(err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update role") })))
+            catchError(
+               err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update role") }))
+            )
 
          )
 
@@ -230,9 +247,13 @@ const deleteRole: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.roles.delete(action.payload.uuid).pipe(
 
-            map(() => slice.actions.deleteSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })),
+            map(
+               () => slice.actions.deleteSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+            ),
 
-            catchError(err => of(slice.actions.deleteFailure({ error: extractError(err, "Failed to delete role") })))
+            catchError(
+               err => of(slice.actions.deleteFailure({ error: extractError(err, "Failed to delete role") }))
+            )
 
          )
 
@@ -298,7 +319,9 @@ const getUsers: AppEpic = (action$, state, deps) => {
                })
             ),
 
-            catchError(err => of(slice.actions.getUsersFailure({ error: extractError(err, "Failed to get role users") })))
+            catchError(
+               err => of(slice.actions.getUsersFailure({ error: extractError(err, "Failed to get role users") }))
+            )
 
          )
 
@@ -339,7 +362,10 @@ const updateUsers: AppEpic = (action$, state, deps) => {
             map(
                role => slice.actions.updateUsersSuccess({ role: transformRoleDetailDTOToModel(role) })
             ),
-            catchError(err => of(slice.actions.updateUsersFailure({ error: extractError(err, "Failed to update role users") })))
+
+            catchError(
+               err => of(slice.actions.updateUsersFailure({ error: extractError(err, "Failed to update role users") }))
+            )
 
          )
 
@@ -406,7 +432,9 @@ const getPermissions: AppEpic = (action$, state, deps) => {
                })
             ),
 
-            catchError(err => of(slice.actions.getPermissionsFailure({ error: extractError(err, "Failed to get role permissions") })))
+            catchError(
+               err => of(slice.actions.getPermissionsFailure({ error: extractError(err, "Failed to get role permissions") }))
+            )
 
          )
 
@@ -447,12 +475,16 @@ const updatePermissions: AppEpic = (action$, state, deps) => {
             action.payload.permissions
          ).pipe(
 
-            map(permissions => slice.actions.updatePermissionsSuccess({
-               uuid: action.payload.uuid,
-               permissions: transformSubjectPermissionsDTOToModel(permissions)
-            })),
+            map(
+               permissions => slice.actions.updatePermissionsSuccess({
+                  uuid: action.payload.uuid,
+                  permissions: transformSubjectPermissionsDTOToModel(permissions)
+               })
+            ),
 
-            catchError(err => of(slice.actions.updatePermissionsFailure({ error: extractError(err, "Failed to update role permissions") })))
+            catchError(
+               err => of(slice.actions.updatePermissionsFailure({ error: extractError(err, "Failed to update role permissions") }))
+            )
 
          )
 
