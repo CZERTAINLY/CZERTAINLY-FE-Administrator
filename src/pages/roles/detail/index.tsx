@@ -314,8 +314,8 @@ export default function UserDetail() {
                <></>,
                resource.objects.map(object => <div key={object.name}>{object.name}</div>),
                <></>,
-               resource.objects.map(object => <div key={object.uuid}>{object.allow.join(",")}</div>),
-               resource.objects.map(object => <div key={object.uuid}>{object.deny.join(",")}</div>),
+               resource.objects.map(object => <div key={object.uuid}>{object.allow.join(",") || <span>&nbsp;</span>}</div>),
+               resource.objects.map(object => <div key={object.uuid}>{object.deny.join(",") || <span>&nbsp;</span>}</div>),
                <></>
             ]
          })
