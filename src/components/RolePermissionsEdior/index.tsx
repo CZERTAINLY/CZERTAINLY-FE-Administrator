@@ -352,7 +352,7 @@ function RolePermissionsEditor({
                            id={`${object.uuid}_${action.name}`}
                            type="switch"
                            checked={object.allow.includes(action.name)}
-                           disabled={disabled || permissions?.allowAllResources || permissions?.resources.find(r => r.name === currentResource?.name)?.allowAllActions}
+                           disabled={disabled}
                            onChange={
                               (e) => setOLP(currentResource.uuid, object.uuid, object.name, action.name, e.target.checked ? "allow" : "deny")
                            }
@@ -369,7 +369,7 @@ function RolePermissionsEditor({
 
       ) || [],
 
-      [currentResource?.actions, currentResource?.name, currentResource?.uuid, disabled, permissions?.allowAllResources, permissions.resources, setOLP]
+      [currentResource?.actions, currentResource?.name, currentResource?.uuid, disabled, permissions.resources, setOLP]
 
    );
 
@@ -530,16 +530,14 @@ function RolePermissionsEditor({
 
       () => {
 
-         const disabled = permissions?.allowAllResources || permissions?.resources.find(r => r.name === currentResource?.name)?.allowAllActions || false;
-
          return [
-            { icon: "plus", disabled: disabled, tooltip: "Add object", onClick: () => { onAddClick(); } },
-            { icon: "trash", disabled: disabled || selectedObjects.length === 0, tooltip: "Remove objects", onClick: () => { onRemoveClick(); } },
-            { icon: "check", disabled: disabled || selectedObjects.length === 0, tooltip: "Allow all actions", onClick: () => { onAllowAllClick() } },
-            { icon: "times", disabled: disabled || selectedObjects.length === 0, tooltip: "Deny all actions", onClick: () => { onDenyAllClick() } }
+            { icon: "plus", disabled: false, tooltip: "Add object", onClick: () => { onAddClick(); } },
+            { icon: "trash", disabled: selectedObjects.length === 0, tooltip: "Remove objects", onClick: () => { onRemoveClick(); } },
+            { icon: "check", disabled: selectedObjects.length === 0, tooltip: "Allow all actions", onClick: () => { onAllowAllClick() } },
+            { icon: "times", disabled: selectedObjects.length === 0, tooltip: "Deny all actions", onClick: () => { onDenyAllClick() } }
          ]
       },
-      [currentResource?.name, onAddClick, onAllowAllClick, onDenyAllClick, onRemoveClick, permissions?.allowAllResources, permissions?.resources, selectedObjects.length]
+      [onAddClick, onAllowAllClick, onDenyAllClick, onRemoveClick, selectedObjects.length]
 
    );
 
