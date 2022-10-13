@@ -1,6 +1,7 @@
 import { RoleModel, RoleDetailModel, SubjectPermissionsModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { UserDTO } from "api/users";
 
 
 export type State = {
@@ -21,11 +22,13 @@ export type State = {
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
+   isFetchingUsers: boolean;
    isFetchingPermissions: boolean;
    isCreating: boolean;
    isDeleting: boolean;
    isUpdating: boolean;
    isUpdatingPermissions: boolean;
+   isUpdatingUsers: boolean;
 
 };
 
@@ -41,11 +44,13 @@ export const initialState: State = {
 
    isFetchingList: false,
    isFetchingDetail: false,
+   isFetchingUsers: false,
    isFetchingPermissions: false,
    isCreating: false,
    isDeleting: false,
    isUpdating: false,
    isUpdatingPermissions: false,
+   isUpdatingUsers: false,
 
 };
 
@@ -138,7 +143,7 @@ export const slice = createSlice({
       },
 
 
-      create: (state, action: PayloadAction<{ name: string, users: string[], permissions: SubjectPermissionsModel, description?: string }>) => {
+      create: (state, action: PayloadAction<{ name: string, description?: string }>) => {
 
          state.isCreating = true;
 
@@ -160,7 +165,7 @@ export const slice = createSlice({
       },
 
 
-      update: (state, action: PayloadAction<{ uuid: string, name: string, users: string[], permissions: SubjectPermissionsModel, description?: string }>) => {
+      update: (state, action: PayloadAction<{ uuid: string, name: string, description?: string }>) => {
 
          state.isUpdating = true;
 
@@ -212,6 +217,56 @@ export const slice = createSlice({
       deleteFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false;
+
+      },
+
+
+      getUsers: (state, action: PayloadAction<{ uuid: string }>) => {
+
+         state.isFetchingUsers = true;
+
+      },
+
+
+      getUsersSuccess: (state, action: PayloadAction<{ uuid: string, users: UserDTO[] }>) => {
+
+         if (state.role && state.role.uuid === action.payload.uuid) {
+            state.role.users = action.payload.users;
+         }
+
+         state.isFetchingUsers = false;
+
+      },
+
+
+      getUsersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingUsers = false;
+
+      },
+
+
+      updateUsers: (state, action: PayloadAction<{ uuid: string, users: string[] }>) => {
+
+         state.isUpdatingUsers = true;
+
+      },
+
+
+      updateUsersSuccess: (state, action: PayloadAction<{ role: RoleDetailModel }>) => {
+
+         if (state.role && state.role.uuid === action.payload.role.uuid) {
+            state.role.users = action.payload.role.users;
+         }
+
+         state.isUpdatingUsers = false;
+
+      },
+
+
+      updateUsersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isUpdatingUsers = false;
 
       },
 
@@ -283,11 +338,14 @@ const roles = createSelector(state, state => state.roles);
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
 const isFetchingPermissions = createSelector(state, state => state.isFetchingPermissions);
+const isFetchingUsers = createSelector(state, state => state.isFetchingUsers);
 
 const isCreating = createSelector(state, state => state.isCreating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isUpdating = createSelector(state, state => state.isUpdating);
+const isUpdatingUsers = createSelector(state, state => state.isUpdatingUsers);
 const isUpdatingPermissions = createSelector(state, state => state.isUpdatingPermissions);
+
 
 
 export const selectors = {
@@ -304,10 +362,12 @@ export const selectors = {
    isFetchingList,
    isFetchingDetail,
    isFetchingPermissions,
+   isFetchingUsers,
 
    isCreating,
    isDeleting,
    isUpdating,
+   isUpdatingUsers,
    isUpdatingPermissions
 
 };

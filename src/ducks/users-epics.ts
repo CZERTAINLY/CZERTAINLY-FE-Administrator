@@ -202,17 +202,17 @@ const update: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               userDetailDTO => action.payload.roles && action.payload.roles.length > 0 ?
+               userDetailDTO => deps.apiClients.users.updateRoles(userDetailDTO.uuid, action.payload.roles || []).pipe(
 
-                  deps.apiClients.users.updateRoles(userDetailDTO.uuid, action.payload.roles).pipe(
+                  map(
+                     () => slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
+                  ),
 
-                     map(
-                        () => slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
-                     )
-
+                  catchError(
+                     err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update user roles") }))
                   )
-                  :
-                  of(slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) }))
+
+               )
 
             ),
 
@@ -222,14 +222,9 @@ const update: AppEpic = (action$, state, deps) => {
 
          )
 
-      ),
-
-      catchError(
-         err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update user") }))
-      ),
+      )
 
    )
-
 
 }
 
