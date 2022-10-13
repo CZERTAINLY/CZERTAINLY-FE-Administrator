@@ -569,7 +569,7 @@ export const slice = createSlice({
 
          if (!state.raProfile) return;
 
-         state.raProfile.complianceProfiles = (state.raProfile.complianceProfiles || []).concat([{uuid: action.payload.complianceProfileUuid, name: action.payload.complianceProfileName, description: action.payload.description}]);
+         state.associatedComplianceProfiles = (state.associatedComplianceProfiles || []).concat([{uuid: action.payload.complianceProfileUuid, name: action.payload.complianceProfileName, description: action.payload.description}]);
 
       },
 
@@ -590,9 +590,9 @@ export const slice = createSlice({
          state.isDissociatingComplianceProfile = false;
 
          if (!state.raProfile) return;
-         if (!state.raProfile.complianceProfiles) return;
-         const raProfileIndex = state.raProfile.complianceProfiles.findIndex(profile => profile.uuid === action.payload.complianceProfileUuid);
-         if (raProfileIndex >= 0) state.raProfile.complianceProfiles.splice(raProfileIndex, 1);
+         if (!state.associatedComplianceProfiles) return;
+         const raProfileIndex = state.associatedComplianceProfiles.findIndex(profile => profile.uuid === action.payload.complianceProfileUuid);
+         if (raProfileIndex >= 0) state.associatedComplianceProfiles.splice(raProfileIndex, 1);
       },
 
       dissociateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {

@@ -38,7 +38,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`$${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme/activate/${acmeProfileUuid}`, "PATCH", {
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme/activate/${acmeProfileUuid}`, "PATCH", {
             issueCertificateAttributes: issueCertificateAttributes,
             revokeCertificateAttributes: revokeCertificateAttributes,
          })
@@ -219,7 +219,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/associate`, "PATCH", {
+         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raProfiles/associate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
 
@@ -231,7 +231,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/disassociate`, "PATCH", {
+         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raProfiles/disassociate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
 
