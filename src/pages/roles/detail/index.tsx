@@ -361,7 +361,7 @@ export default function UserDetail() {
                      <p><input type="checkbox" checked={permissions.permissions.allowAllResources} disabled />&nbsp;&nbsp;&nbsp;All resources allowed</p>
 
                      {
-                        permissions.permissions.resources.length === 0 || permissions.permissions.allowAllResources ? <></> : (
+                        permissions.permissions.resources.length === 0 ? <></> : (
 
                            <>
                               <p>List of allowed resources</p>
