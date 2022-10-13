@@ -84,26 +84,28 @@ function RoleForm() {
 
       (outPerms: SubjectPermissionsModel) => {
 
+         const perms = JSON.parse(JSON.stringify(outPerms));
+
          const inPerms: SubjectPermissionsModel = rolePermissionsSelector?.permissions || {
             allowAllResources: false,
             resources: []
          };
 
-         for (let i = 0; i < outPerms.resources.length; i++) {
+         for (let i = 0; i < perms.resources.length; i++) {
 
-            const outRes = outPerms.resources[i];
+            const outRes = perms.resources[i];
             const inRes = inPerms.resources.find(res => res.name === outRes.name);
 
             if (!outRes.objects) continue;
 
             if (outRes.objects?.length === 0 && (!inRes || (inRes.objects && inRes.objects.length === 0))) {
-               delete outRes.objects;
+               delete perms.objects;
                continue;
             }
 
          }
 
-         return outPerms;
+         return perms;
 
       },
       [rolePermissionsSelector]
