@@ -47,7 +47,7 @@ export const validateCustom = (pattern: string, value: string) => {
 
 export const validateCustomUrl = (value: string) => {
    return !value || new RegExp(
-      /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/g
+      /^((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?\/?$/g
    ).test(value) ? undefined : "Value must be a valid url";
 };
 
