@@ -369,7 +369,7 @@ function RolePermissionsEditor({
 
       ) || [],
 
-      [currentResource?.actions, currentResource?.name, currentResource?.uuid, disabled, objects, permissions?.allowAllResources, permissions.resources, setOLP]
+      [currentResource?.actions, currentResource?.name, currentResource?.uuid, disabled, permissions?.allowAllResources, permissions.resources, setOLP]
 
    );
 
