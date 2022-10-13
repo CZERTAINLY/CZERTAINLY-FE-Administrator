@@ -2,15 +2,13 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import style from "./style.module.scss";
-import { Button, ButtonGroup, ButtonToggle, CustomInput, Input } from "reactstrap";
+import { CustomInput } from "reactstrap";
 
 import { ResourceDetailModel, SubjectPermissionsModel } from "models";
 import { actions as authActions, selectors as authSelectors } from "ducks/auth";
 import Dialog from "components/Dialog";
-import Spinner from "components/Spinner";
 import MDBColumnName from "components/MDBColumnName";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { current } from "@reduxjs/toolkit";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
