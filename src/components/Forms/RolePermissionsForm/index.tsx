@@ -34,8 +34,6 @@ function RoleForm() {
 
    const [permissions, setPermissions] = useState<SubjectPermissionsModel>();
 
-   const [isSubmitting, setIsSubmitting] = useState(false);
-
    /* Load all users, resources and objects */
 
    useEffect(
@@ -160,12 +158,12 @@ function RoleForm() {
                   <ProgressButton
                      title="Save"
                      inProgressTitle="Svaing..."
-                     inProgress={isSubmitting || isCreatingRole || isUpdatingRole}
-                     disabled={isSubmitting || isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
+                     inProgress={isCreatingRole || isUpdatingRole}
+                     disabled={isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
                      onClick={onSubmit}
                   />
 
-                  <Button color="default" onClick={onCancel} disabled={isSubmitting || isCreatingRole || isUpdatingRole}>
+                  <Button color="default" onClick={onCancel} disabled={isCreatingRole || isUpdatingRole}>
                      Cancel
                   </Button>
 
