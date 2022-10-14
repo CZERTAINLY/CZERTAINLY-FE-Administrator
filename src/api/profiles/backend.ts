@@ -73,7 +73,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
    deleteRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
-      if (authorityInstanceUuid === "unknown") {
+      if (authorityInstanceUuid === "unknown" || authorityInstanceUuid === "undefined") {
 
          return this._fetchService.request(
             new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
@@ -142,7 +142,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
    getRaProfileDetail(authorityInstanceUuid: string, uuid: string): Observable<model.RaProfileDTO> {
 
-      if (authorityInstanceUuid === "unknown") {
+      if (authorityInstanceUuid === "unknown"  || authorityInstanceUuid === "undefined") {
 
          return this._fetchService.request(
             new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")

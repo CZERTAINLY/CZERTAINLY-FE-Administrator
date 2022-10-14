@@ -65,8 +65,8 @@ export default function LocationDetail() {
    const [selectedCerts, setSelectedCerts] = useState<string[]>([]);
 
    const isBusy = useMemo(
-      () => isFetching || isDeleting || isPushingCertificate || isRemovingCertificate || isFetchingPushAttributeDescriptors || isFetchingCSRAttributeDescriptors,
-      [isFetching, isDeleting, isPushingCertificate, isRemovingCertificate, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors]
+      () => isFetching || isDeleting || isFetchingPushAttributeDescriptors || isFetchingCSRAttributeDescriptors,
+      [isFetching, isDeleting, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors]
    );
 
 

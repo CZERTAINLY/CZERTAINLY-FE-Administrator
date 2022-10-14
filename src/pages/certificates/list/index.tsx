@@ -46,6 +46,7 @@ export default function CertificateList({
    const totalItems = useSelector(selectors.totalItems);
 
    const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
+   const currentFilters = useSelector(selectors.currentCertificateFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
    const isIssuing = useSelector(selectors.isIssuing);
    const isRevoking = useSelector(selectors.isRevoking);
@@ -79,9 +80,20 @@ export default function CertificateList({
       () => {
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         setFilters(currentFilters);
       },
       [dispatch]
 
+   );
+
+
+   useEffect(
+
+      () => {
+         if (!filters) return;
+         dispatch(actions.setCurrentFilters({currentFilters: filters}));
+      },
+      [filters]
    );
 
 
@@ -113,6 +125,9 @@ export default function CertificateList({
       [filters]
 
    );
+
+
+
 
 
    const onPageSizeChanged = useCallback(

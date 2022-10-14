@@ -526,7 +526,7 @@ export default function ComplianceProfileDetail() {
 
             id: raProfile.uuid,
             columns: [
-               <Link to={`../../raprofiles/detail/${raProfile!.uuid}`}>{raProfile!.name}</Link>,
+               <Link to={`../../raprofiles/detail/${raProfile.authorityInstanceUuid}/${raProfile!.uuid}`}>{raProfile!.name}</Link>,
                <StatusBadge enabled={raProfile.enabled} />,
                <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateRaProfile(raProfile.uuid); }, additionalTooltipId: raProfile.uuid }]} />
             ]

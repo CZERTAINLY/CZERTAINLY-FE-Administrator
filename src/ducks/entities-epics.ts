@@ -300,12 +300,12 @@ const updateEntitySuccess: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.addEntitySuccess.match
+         slice.actions.updateEntitySuccess.match
       ),
       switchMap(
 
          action => {
-            history.push(`./detail/${action.payload.uuid}`);
+            history.push(`../detail/${action.payload.entity.uuid}`);
             return EMPTY;
          }
 

@@ -288,7 +288,8 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
                complianceProfile.raProfiles.push({
                   name: "Test",
                   uuid: raProfileUuids[0],
-                  enabled: true
+                  enabled: true,
+                  authorityInstanceUuid: "ransom-uuid"
                }
                )
             }
