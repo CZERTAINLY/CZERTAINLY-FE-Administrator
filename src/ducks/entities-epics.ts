@@ -237,7 +237,7 @@ const addEntitySuccess: AppEpic = (action$, state$, deps) => {
       switchMap(
 
          action => {
-            history.push(`./${action.payload.uuid}`);
+            history.push(`./detail/${action.payload.uuid}`);
             return EMPTY;
          }
 
