@@ -135,7 +135,7 @@ export default function LocationDetail() {
       () => {
 
          if (!location) return;
-         history.push(`../../locations/edit/${location.uuid}`);
+         history.push(`../../edit/${location.entityInstanceUuid}/${location.uuid}`);
 
       },
       [location, history]
