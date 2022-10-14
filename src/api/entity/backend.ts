@@ -69,7 +69,9 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    updateEntity(uuid: string, attributes: AttributeDTO[]): Observable<model.EntityDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", attributes)
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
+            attributes: attributes
+         })
       );
 
    }

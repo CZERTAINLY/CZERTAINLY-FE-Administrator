@@ -132,7 +132,7 @@ export const slice = createSlice({
    reducers: {
 
       resetState: (state, action: PayloadAction<void>) => {
-
+         let currentFilterRef = state.currentFilters;
          Object.keys(state).forEach(
             key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
          );
@@ -140,6 +140,7 @@ export const slice = createSlice({
          Object.keys(initialState).forEach(
             key => (state as any)[key] = (initialState as any)[key]
          );
+         state.currentFilters = currentFilterRef;
 
       },
 
@@ -173,7 +174,6 @@ export const slice = createSlice({
 
 
       setCurrentFilters: (state, action: PayloadAction<{ currentFilters: CertificateListQueryFilterModel[] }>) => {
-
          state.currentFilters = action.payload.currentFilters;
 
       },

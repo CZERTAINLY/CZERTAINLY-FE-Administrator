@@ -70,4 +70,5 @@ export interface ComplianceRaProfileModel {
    name: string;
    uuid: string;
    enabled: boolean;
+   authorityInstanceUuid: string
 }

@@ -217,7 +217,7 @@ const editLocationSuccess: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
          action => {
-            history.push(`../detail/${action.payload.location.uuid}`);
+            history.push(`../../detail/${action.payload.location.entityInstanceUuid}/${action.payload.location.uuid}`);
             return EMPTY;
          }
       )

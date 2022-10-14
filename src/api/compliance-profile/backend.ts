@@ -74,9 +74,7 @@ export class ComplianceProfileManagementBackend implements model.ComplianceProfi
    checkCompliance(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
-            complianceProfileUuids: uuids
-         })
+         new HttpRequestOptions(`${baseUrl}/compliance`, "POST", uuids)
       );
 
    }

@@ -70,9 +70,8 @@ export default function RaProfileDetail() {
       () => {
          if (!params.id) return;
          dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: params.authorityUuid, uuid: params.id }));
+         if (!params.authorityUuid || params.authorityUuid === "unknown" || params.authorityUuid === "undefined") return;
          dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: params.authorityUuid, uuid: params.id }));
-         
-         if (!params.authorityUuid || params.authorityUuid === "unknown") return;
          dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
          dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: params.authorityUuid, uuid: params.id }));
          dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: params.authorityUuid, uuid: params.id }));

@@ -1167,7 +1167,7 @@ export default function CertificateDetail() {
 
             columns: [
 
-               <Link to={`../../locations/detail/${location.uuid}`}>{location.name}</Link>,
+               <Link to={`../../locations/detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
 
                location.description || "",
 
