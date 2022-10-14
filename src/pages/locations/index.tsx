@@ -18,7 +18,7 @@ function Entities() {
          <Route path={path} component={LocationList} exact />
          <Route path={`${path}/list`} component={LocationList} exact />
          <Route path={`${path}/detail/:entityUuid/:id`} component={LocationDetail} exact />
-         <Route path={`${path}/edit/:id`} component={LocationEdit} exact />
+         <Route path={`${path}/edit/:entityUuid/:id`} component={LocationEdit} exact />
          <Route path={`${path}/add`} component={LocationAdd} exact />
 
       </Switch>
