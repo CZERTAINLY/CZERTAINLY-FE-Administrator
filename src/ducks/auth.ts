@@ -48,9 +48,8 @@ export const slice = createSlice({
             key => (state as any)[key] = (initialState as any)[key]
          );
 
-         state = initialState;
-
       },*/
+
 
       clearResources: (state, action: PayloadAction<void>) => {
 
