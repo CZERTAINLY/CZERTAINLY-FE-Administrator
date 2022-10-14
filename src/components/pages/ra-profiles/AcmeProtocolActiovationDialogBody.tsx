@@ -208,7 +208,7 @@ export default function AcmeProtocolActiovationDialogBody({
                            Activate
                         </Button>
 
-                        <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
+                        <Button type="button" color="secondary" onClick={onClose}>
                            Cancel
                         </Button>
 

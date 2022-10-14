@@ -932,10 +932,11 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
 
             map(
 
-               () => slice.actions.bulkDeleteSuccess({
+               (result) => slice.actions.bulkDeleteSuccess({
                   uuids: action.payload.uuids,
                   inFilter: action.payload.inFilter,
                   allSelect: action.payload.allSelect,
+                  response: result,
                }),
 
             ),
@@ -952,6 +953,21 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
 
 }
 
+
+const bulkDeleteSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteSuccess.match
+      ),
+      map(
+         action => alertActions.success(action.payload.response.message)
+      )
+
+   )
+
+}
 
 const bulkDeleteFailure: AppEpic = (action$, state, deps) => {
 
@@ -1235,6 +1251,7 @@ const epics = [
    bulkUpdateOwner,
    bulkUpdateOwnerFailure,
    bulkDelete,
+   bulkDeleteSuccess,
    bulkDeleteFailure,
    uploadCertificate,
    uploadCertificateFailure,

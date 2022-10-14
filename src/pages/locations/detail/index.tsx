@@ -77,14 +77,30 @@ export default function LocationDetail() {
          if (!params.id) return;
 
          dispatch(actions.getLocationDetail({ entityUuid: params.entityUuid, uuid: params.id }));
-         dispatch(actions.getPushAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
-         dispatch(actions.getCSRAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
 
       },
       [dispatch, params.id, params.entityUuid]
 
    )
 
+   useEffect(
+
+      () => {
+
+         if (!params.id) return;
+         if (!location) return;
+         if(!location?.uuid) return;
+
+         if(location.enabled) {
+
+            dispatch(actions.getPushAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
+            dispatch(actions.getCSRAttributes({ entityUuid: params.entityUuid, uuid: params.id }));
+
+         }
+      },
+      [dispatch, params.id, params.entityUuid, location]
+
+   )
 
    useEffect(
 
@@ -493,7 +509,7 @@ export default function LocationDetail() {
 
          </Widget>
 
-         <Widget title={certsTitle} busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing}>
+         <Widget title={certsTitle} busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}>
 
             <br />
 

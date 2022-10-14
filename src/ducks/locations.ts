@@ -160,7 +160,7 @@ export const slice = createSlice({
       },
 
 
-      addLocationSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      addLocationSuccess: (state, action: PayloadAction<{ location: LocationModel, entityUuid: string }>) => {
 
          state.isCreating = false;
          state.locations.push(action.payload.location);
@@ -230,7 +230,7 @@ export const slice = createSlice({
       enableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
-
+         
       },
 
 
@@ -239,6 +239,7 @@ export const slice = createSlice({
          state.isEnabling = false;
          const location = state.locations.find(l => l.uuid === action.payload.uuid);
          if (location) location.enabled = true;
+         if (state.location?.uuid === action.payload.uuid) state.location.enabled = true;
 
       },
 
@@ -262,6 +263,7 @@ export const slice = createSlice({
          state.isDisabling = false;
          const location = state.locations.find(l => l.uuid === action.payload.uuid);
          if (location) location.enabled = false;
+         if (state.location?.uuid === action.payload.uuid) state.location.enabled = false;
       },
 
 
