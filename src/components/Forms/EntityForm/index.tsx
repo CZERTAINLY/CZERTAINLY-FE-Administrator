@@ -74,11 +74,10 @@ export default function EntityForm({
          if (init) {
             dispatch(entityActions.resetState());
             dispatch(connectorActions.clearCallbackData());
+            if (editMode && (!entitySelector || entitySelector.uuid !== params.id)) {
+               dispatch(entityActions.getEntityDetail({ uuid: params.id }));
+            }
             setInit(false);
-         }
-
-         if (editMode && (!entitySelector || entitySelector.uuid !== params.id)) {
-            dispatch(entityActions.getEntityDetail({ uuid: params.id }));
          }
 
          if (init) {
