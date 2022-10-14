@@ -7,6 +7,7 @@ import { GroupModel } from "models/groups";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { CertificateRevocationReason } from "types/certificate";
 import { LocationModel } from "models/locations";
+import { CertificateBulkDeleteResultDTO } from "api/certificates";
 
 
 export type State = {
@@ -635,23 +636,9 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteSuccess: (state, action: PayloadAction<{ uuids: string[], inFilter: any, allSelect: boolean  }>) => {
+      bulkDeleteSuccess: (state, action: PayloadAction<{ uuids: string[], inFilter: any, allSelect: boolean, response: CertificateBulkDeleteResultDTO  }>) => {
 
          state.isBulkDeleting = false;
-
-         action.payload.uuids.forEach(
-
-            uuid => {
-
-               const certificateIndex = state.certificates.findIndex(certificate => certificate.uuid === uuid);
-
-               if (certificateIndex >= 0) state.certificates.splice(certificateIndex, 1);
-
-               if (state.certificateDetail?.uuid === uuid) state.certificateDetail = undefined;
-
-            }
-
-         )
 
       },
 

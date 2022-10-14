@@ -119,7 +119,7 @@ const addLocation: AppEpic = (action$, state, deps) => {
                obj => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, obj.uuid).pipe(
 
                   map(
-                     location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location) })
+                     location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location), entityUuid: action.payload.entityUuid })
                   )
 
                )
@@ -148,7 +148,7 @@ const addLocationSuccess: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
          action => {
-            history.push(`./detail/${action.payload.location.uuid}`);
+            history.push(`./detail/${action.payload.entityUuid}/${action.payload.location.uuid}`);
             return EMPTY;
          }
       )
