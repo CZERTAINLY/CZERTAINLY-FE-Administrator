@@ -17,7 +17,7 @@ function Footer({ className }: Props) {
 
             <span>© 2018-{new Date().getFullYear()} &nbsp;3Key Company s.r.o. </span>
             <span className={style.spacer}>·</span>
-            <a href="https://www.czertainly.com" target="_blank" rel="noopener noreferrer">Documentation</a>
+            <a href="https://docs.czertainly.com/docs" target="_blank" rel="noopener noreferrer">Documentation</a>
             <span className={style.spacer}>·</span>
             <a href="https://czertainly.atlassian.net/servicedesk/customer/portal/1" target="_blank" rel="noopener noreferrer">Support</a>
             <span className={style.spacer}>·</span>
