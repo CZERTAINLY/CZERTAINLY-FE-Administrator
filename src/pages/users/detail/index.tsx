@@ -214,7 +214,7 @@ export default function UserDetail() {
          },
          {
             id: "enabled",
-            columns: ["Administrator Enabled", <StatusBadge enabled={user.enabled} />]
+            columns: ["Status", <StatusBadge enabled={user.enabled} />]
          },
          {
             id: "roles",
