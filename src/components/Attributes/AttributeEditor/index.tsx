@@ -68,6 +68,7 @@ export default function AttributeEditor({
    const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any; }>({});
 
    // workaround to be possible to set options from multiple places;
+   // multiple effects can modify opts during single render call
    let opts: { [attributeName: string]: { label: string, value: any }[] } = {};
 
    useEffect(
@@ -389,6 +390,8 @@ export default function AttributeEditor({
 
          )
 
+         // multiple effects can modify opts during single render call
+         // eslint-disable-next-line react-hooks/exhaustive-deps
          opts = { ...opts, ...newOptions };
          setOptions({ ...options, ...opts });
 
@@ -527,8 +530,10 @@ export default function AttributeEditor({
             // Update options
 
             if (Array.isArray(callbackData[callbackId])) {
-               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value }))  };
-               setOptions({ ...options, ...opts});
+               // multiple effects can modify opts during single render call
+               // eslint-disable-next-line react-hooks/exhaustive-deps
+               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) };
+               setOptions({ ...options, ...opts });
                continue;
             }
 

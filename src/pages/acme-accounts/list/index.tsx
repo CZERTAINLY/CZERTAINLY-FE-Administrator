@@ -239,8 +239,8 @@ function AcmeAccountList() {
 
          <Dialog
             isOpen={confirmRevoke}
-            caption={`Revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}`}
-            body={`You are about to revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}. Is this what you want to do?`}
+            caption={`Revoke ${checkedRows.length > 1 ? "ACME Accounts" : "an ACME Account"}`}
+            body={`You are about to revoke ${checkedRows.length > 1 ? "ACME Accounts" : "an ACME Account"}. Is this what you want to do?`}
             toggle={() => setConfirmRevoke(false)}
             buttons={[
                { color: "danger", onClick: onRevokeConfirmed, body: "Yes, revoke" },
