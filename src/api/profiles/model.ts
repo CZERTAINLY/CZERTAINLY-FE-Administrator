@@ -42,40 +42,42 @@ export interface ProfilesManagementApi {
 
    getRaProfilesList(enabled?: boolean): Observable<RaProfileDTO[]>;
 
-   getRaProfileDetail(uuid: string): Observable<RaProfileDTO>;
+   getRaProfileDetail(authorityInstanceUuid: string, uuid: string): Observable<RaProfileDTO>;
 
-   getAuthorizedClients(uuid: string): Observable<RaAuthorizedClientDTO[]>;
+   getAuthorizedClients(authorityInstanceUuid: string, uuid: string): Observable<RaAuthorizedClientDTO[]>;
 
-   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
+   getIssueAttributes(authorityInstanceUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]>;
 
-   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]>;
+   getRevocationAttributes(authorityInstanceUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]>;
 
-   getRaAcmeProfile(uuid: string): Observable<RaAcmeLinkDTO>;
+   getRaAcmeProfile(authorityInstanceUuid: string, uuid: string): Observable<RaAcmeLinkDTO>;
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string>;
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}>;
 
    updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<RaProfileDTO>;
 
-   deleteRaProfile(uuid: string): Observable<void>;
+   deleteRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void>;
 
    bulkDeleteRaProfile(uuids: string[]): Observable<void>;
 
-   enableRaProfile(uuid: string): Observable<void>;
+   enableRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void>;
 
    bulkEnableRaProfile(uuids: string[]): Observable<void>;
 
-   disableRaProfile(uuid: string): Observable<void>;
+   disableRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void>;
 
    bulkDisableRaProfile(uuids: string[]): Observable<void>;
 
-   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<RaAcmeLinkDTO>;
+   activateAcme(authorityInstanceUuid: string, uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<RaAcmeLinkDTO>;
 
-   deactivateAcme(uuid: string): Observable<void>;
+   deactivateAcme(authorityInstanceUuid: string, uuid: string): Observable<void>;
 
    checkCompliance(uuids: string[]): Observable<void>;
 
    associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
-   
+
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void>;
+
+   getComplianceProfilesForRaProfile(authorityInstanceUuid: string, uuid: string): Observable<raComplianceProfileDTO[]>;
 
 }

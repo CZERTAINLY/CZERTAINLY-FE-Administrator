@@ -8,6 +8,7 @@ export interface AcmeAccountListModel {
    status: AcmeAccountStatus;
    raProfileName: string;
    acmeProfileName: string;
+   acmeProfileUuid: string;
 }
 
 export interface AcmeAccountModel {

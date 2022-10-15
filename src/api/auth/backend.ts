@@ -1,23 +1,25 @@
+import { UserDetailDTO } from 'api/users';
 import { Observable } from 'rxjs';
-import { HttpRequestOptions } from 'ts-rest-client';
-import { FetchHttpService } from 'ts-rest-client-fetch';
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 
 import * as model from './model';
 
-const baseUrl = '/api/v1/auth';
+const baseUrl = '/v1/auth';
 
 export class AuthBackend implements model.AuthApi {
 
    private _fetchService: FetchHttpService;
 
-   constructor() {
 
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
 
    }
 
 
-   getProfile(): Observable<model.UserProfileDTO> {
+   profile(): Observable<UserDetailDTO> {
 
       return this._fetchService.request(
 
@@ -31,14 +33,42 @@ export class AuthBackend implements model.AuthApi {
    }
 
 
-   updateProfile(name?: string, surname?: string, username?: string, email?: string): Observable<void> {
+   updateProfile(user: model.ProfileDetailDTO): Observable<UserDetailDTO> {
 
       return this._fetchService.request(
 
          new HttpRequestOptions(
             `${baseUrl}/profile`,
             'PUT',
-            { name, surname, username, email },
+            user
+         )
+
+      );
+
+   }
+
+
+   getAllResources(): Observable<model.ResourceDetailDTO[]> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(
+            `${baseUrl}/resources`,
+            'GET'
+         )
+
+      );
+
+   }
+
+
+   listObjects(endpoint: string): Observable<{ uuid: string; name: string; }[]> {
+
+      return this._fetchService.request(
+
+         new HttpRequestOptions(
+            `${endpoint}`,
+            'GET'
          )
 
       );

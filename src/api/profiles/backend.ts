@@ -1,42 +1,44 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
 
 import * as model from "./model";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
-const baseUrl = "/api/v1/raprofiles";
-const baseUrlCompliance = "/api/v1/complianceProfiles";
+
+const baseUrl = "/v1/raProfiles";
+const baseUrlCompliance = "/v1/complianceProfiles";
+const extBaseUrl = "/v1/authorities";
+
 
 export class ProfilesManagementBackend implements model.ProfilesManagementApi {
+
 
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
 
 
-   getRaAcmeProfile(uuid: string): Observable<model.RaAcmeLinkDTO> {
+   getRaAcmeProfile(authorityInstanceUuid: string, uuid: string): Observable<model.RaAcmeLinkDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/acme`, "GET")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme`, "GET")
       );
 
    }
 
 
-   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
+   activateAcme(authorityInstanceUuid: string, uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrl}/${uuid}/activateAcme`, "POST", {
-            acmeProfileUuid,
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme/activate/${acmeProfileUuid}`, "PATCH", {
             issueCertificateAttributes: issueCertificateAttributes,
             revokeCertificateAttributes: revokeCertificateAttributes,
          })
@@ -46,54 +48,59 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   deactivateAcme(uuid: string): Observable<void> {
+   deactivateAcme(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/deactivateAcme`, "POST")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/acme/deactivate`, "PATCH")
       );
 
    }
 
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string }> {
 
       return createNewResource(
-         baseUrl,
+         `${extBaseUrl}/${authorityInstanceUuid}/raProfiles`,
          {
-            authorityInstanceUuid,
             name: name,
             description,
             attributes: attributes,
          }
-      ).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
       );
 
    }
 
 
-   deleteRaProfile(uuid: string): Observable<void> {
+   deleteRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void> {
+
+      if (authorityInstanceUuid === "unknown" || authorityInstanceUuid === "undefined") {
+
+         return this._fetchService.request(
+            new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+         );
+
+      } else {
+         return this._fetchService.request(
+            new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}`, "DELETE")
+         );
+      }
+
+   }
+
+
+   enableRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/enable`, "PATCH")
       );
 
    }
 
 
-   enableRaProfile(uuid: string): Observable<void> {
+   disableRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
-      );
-
-   }
-
-
-   disableRaProfile(uuid: string): Observable<void> {
-
-      return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/disable`, "PATCH")
       );
 
    }
@@ -111,7 +118,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    bulkEnableRaProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/enable`, "PATCH", uuids)
       );
 
    }
@@ -120,7 +127,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    bulkDisableRaProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/disable`, "PATCH", uuids)
       );
 
    }
@@ -133,11 +140,21 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getRaProfileDetail(uuid: string): Observable<model.RaProfileDTO> {
+   getRaProfileDetail(authorityInstanceUuid: string, uuid: string): Observable<model.RaProfileDTO> {
 
-      return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
-      );
+      if (authorityInstanceUuid === "unknown"  || authorityInstanceUuid === "undefined") {
+
+         return this._fetchService.request(
+            new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
+         );
+
+      } else {
+
+         return this._fetchService.request(
+            new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}`, "GET")
+         );
+
+      }
 
    }
 
@@ -145,7 +162,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    getAuthorizedClients(uuid: string): Observable<model.RaAuthorizedClientDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/listclients`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/users`, "GET")
       );
 
    }
@@ -154,8 +171,7 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    updateRaProfile(uuid: string, authorityInstanceUuid: string, attributes: AttributeDTO[], enabled?: boolean, description?: string): Observable<model.RaProfileDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
-            authorityInstanceUuid,
+         new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}`, "PUT", {
             description,
             uuid,
             attributes: attributes,
@@ -165,11 +181,11 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getIssueAttributes(authorityInstanceUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/issue/attributes`,
+            `${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/attributes/issue`,
             "GET"
          )
       );
@@ -177,11 +193,11 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
    }
 
 
-   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getRevocationAttributes(authorityInstanceUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}/${uuid}/revoke/attributes`,
+            `${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/attributes/revoke`,
             "GET"
          )
       );
@@ -190,33 +206,45 @@ export class ProfilesManagementBackend implements model.ProfilesManagementApi {
 
 
    checkCompliance(uuids: string[]): Observable<void> {
-      
+
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/compliance`, "POST", {
-            raProfileUuids: uuids
-         })
+         new HttpRequestOptions(`${baseUrl}/compliance`, "POST",
+            uuids
+         )
       );
 
    }
 
    associateComplianceProfileToRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
+
       return this._fetchService.request(
-         
-         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/associate`, "PATCH", {
+
+         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raProfiles/associate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
-         
+
       );
+
    }
 
    dissociateComplianceProfileFromRaProfile(uuid: string, raProfileUuids: string[]): Observable<void> {
+
       return this._fetchService.request(
-         
-         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raprofile/disassociate`, "PATCH", {
+
+         new HttpRequestOptions(`${baseUrlCompliance}/${uuid}/raProfiles/disassociate`, "PATCH", {
             raProfileUuids: raProfileUuids
          })
-         
+
       );
+
+   }
+
+   getComplianceProfilesForRaProfile(authorityInstanceUuid: string, uuid: string): Observable<model.raComplianceProfileDTO[]> {
+
+         return this._fetchService.request(
+            new HttpRequestOptions(`${extBaseUrl}/${authorityInstanceUuid}/raProfiles/${uuid}/complianceProfiles`, "GET")
+         );
+
    }
 
 }

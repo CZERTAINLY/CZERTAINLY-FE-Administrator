@@ -1,25 +1,26 @@
 import { Observable } from "rxjs";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
 import * as model from "./model";
-import { createNewResource } from "utils/net";
-import { map } from "rxjs/operators";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 
-const baseUrl = "/api/v1/entities";
+const baseUrl = "/v1/entities";
 
 
 export class EntityManagementBackend implements model.EntityManagementApi {
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
-   }
 
    private _fetchService: FetchHttpService;
+
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
+   }
 
 
    validateLocationAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {
@@ -53,21 +54,14 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    }
 
 
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string> {
+   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          attributes,
          connectorUuid,
          kind
-      }).pipe(
-         map(
-            uuid => {
-               if (!uuid) throw new Error("Unexpected response returned from server");
-               return uuid;
-            }
-         )
-      );
+      });
 
    }
 
@@ -75,7 +69,9 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    updateEntity(uuid: string, attributes: AttributeDTO[]): Observable<model.EntityDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PATCH", attributes)
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
+            attributes: attributes
+         })
       );
 
    }
@@ -92,7 +88,7 @@ export class EntityManagementBackend implements model.EntityManagementApi {
    listLocationAttributeDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/location/attributes`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes/location`, "GET")
       );
 
    }

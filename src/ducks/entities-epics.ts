@@ -28,6 +28,7 @@ const listEntityProviders: AppEpic = (action$, state, deps) => {
                   providers: providers.map(transformConnectorDTOToModel)
                })
             ),
+
             catchError((err) =>
                of(
                   slice.actions.listEntityProvidersFailure({ error: extractError(err, "Failed to get Entity Provider list") })
@@ -72,6 +73,7 @@ const getEntityProviderAttributesDescriptors: AppEpic = (action$, state, deps) =
                   attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.getEntityProviderAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Entity Provider Attribute Descriptor list") }))
             )
@@ -111,12 +113,11 @@ const listEntities: AppEpic = (action$, state$, deps) => {
          () => deps.apiClients.entities.listEntities().pipe(
 
             map(
-
                entities => slice.actions.listEntitiesSuccess(
                   entities.map(transformEntityDtoToModel)
                )
-
             ),
+
             catchError(
                err => of(slice.actions.listEntitiesFailure({ error: extractError(err, "Failed to get list of Entities") }))
             )
@@ -159,10 +160,9 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.entities.getEntityDetail(action.payload.uuid).pipe(
 
             map(
-
                entity => slice.actions.getEntityDetailSuccess({ entity: transformEntityDtoToModel(entity) })
-
             ),
+
             catchError(
                err => of(slice.actions.getEntityDetailFailure({ error: extractError(err, "Failed to get Entity detail") }))
             )
@@ -209,10 +209,9 @@ const addEntity: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-
-               uuid => slice.actions.addEntitySuccess({ uuid })
-
+               obj => slice.actions.addEntitySuccess({ uuid: obj.uuid })
             ),
+
             catchError(
 
                err => of(slice.actions.addEntityFailure({ error: extractError(err, "Failed to add Entity") }))
@@ -236,10 +235,12 @@ const addEntitySuccess: AppEpic = (action$, state$, deps) => {
          slice.actions.addEntitySuccess.match
       ),
       switchMap(
+
          action => {
-            history.push(`./${action.payload.uuid}`);
+            history.push(`./detail/${action.payload.uuid}`);
             return EMPTY;
          }
+
       )
 
    );
@@ -278,14 +279,11 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-
                entity => slice.actions.updateEntitySuccess({ entity: transformEntityDtoToModel(entity) })
-
             ),
+
             catchError(
-
                err => of(slice.actions.updateEntityFailure({ error: extractError(err, "Failed to update Entity") }))
-
             )
 
          )
@@ -302,13 +300,15 @@ const updateEntitySuccess: AppEpic = (action$, state$, deps) => {
    return action$.pipe(
 
       filter(
-         slice.actions.addEntitySuccess.match
+         slice.actions.updateEntitySuccess.match
       ),
       switchMap(
+
          action => {
-            history.push(`./detail/${action.payload.uuid}`);
+            history.push(`../detail/${action.payload.entity.uuid}`);
             return EMPTY;
          }
+
       )
 
    );
@@ -345,15 +345,13 @@ const deleteEntity: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.entities.removeEntity(action.payload.uuid).pipe(
 
             map(
-
                () => slice.actions.deleteEntitySuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
-
             ),
-
 
             catchError(
                err => of(slice.actions.deleteEntityFailure({ error: extractError(err, "Failed to delete Entity") }))
             )
+
          )
 
       )
@@ -412,14 +410,11 @@ const listLocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.entities.listLocationAttributeDescriptors(action.payload.entityUuid).pipe(
 
             map(
-
                descriptors => slice.actions.listLocationAttributeDescriptorsSuccess({ descriptors: descriptors.map(transformAttributeDescriptorDTOToModel) })
-
             ),
+
             catchError(
-
                err => of(slice.actions.listLocationAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Location Attribute Descriptors") }))
-
             )
 
          )

@@ -9,6 +9,7 @@ import history from "browser-history";
 import { transformRaAcmeLinkDtoToModel, transformRaAuthorizedClientDtoToModel, transformRaProfileDtoToModel } from "./transform/ra-profiles";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transfromRaAcmeLinkDtoToModel } from "./transform/acme-profiles";
+import { transformRaComplianceProfileDtoToModel } from "./transform/compliance-profiles";
 
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
@@ -62,7 +63,7 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getRaProfileDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                profileDto => slice.actions.getRaProfileDetailSuccess({
@@ -107,7 +108,7 @@ const listAuthorizedClients: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getAuthorizedClients(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getAuthorizedClients(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                clients => slice.actions.listAuthorizedClientsSuccess({
@@ -161,7 +162,7 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createRaProfileSuccess({ uuid })
+               obj => slice.actions.createRaProfileSuccess({ uuid: obj.uuid, authorityInstanceUuid: action.payload.authorityInstanceUuid })
             ),
 
             catchError(
@@ -186,7 +187,7 @@ const createRaProfileSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`./detail/${action.payload.uuid}`);
+            history.push(`./detail/${action.payload.authorityInstanceUuid}/${action.payload.uuid}`);
             return EMPTY;
          }
 
@@ -232,7 +233,10 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               raProfileDTO => slice.actions.updateRaProfileSuccess({ raProfile: transformRaProfileDtoToModel(raProfileDTO) })
+               raProfileDTO => slice.actions.updateRaProfileSuccess({
+                  raProfile: transformRaProfileDtoToModel(raProfileDTO),
+                  redirect: action.payload.redirect
+               })
             ),
 
             catchError(
@@ -259,7 +263,7 @@ const updateRaProfileSuccess: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => {
-            history.push(`../detail/${action.payload.raProfile.uuid}`);
+            if (action.payload.redirect) history.push(action.payload.redirect);
             return EMPTY;
          }
 
@@ -296,7 +300,7 @@ const enableRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.enableRaProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.enableRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.enableRaProfileSuccess({ uuid: action.payload.uuid })
@@ -339,7 +343,7 @@ const disableRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.disableRaProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.disableRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.disableRaProfileSuccess({ uuid: action.payload.uuid })
@@ -383,10 +387,10 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.deleteRaProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.deleteRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid })
+               () => slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
 
             catchError(
@@ -411,8 +415,8 @@ const deleteRaProfileSuccess: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => {
-            history.push(`../`);
+         action => {
+            if (action.payload.redirect) history.push(action.payload.redirect);
             return EMPTY;
          }
 
@@ -449,6 +453,7 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
       switchMap(
 
          action => deps.apiClients.profiles.activateAcme(
+            action.payload.authorityUuid,
             action.payload.uuid,
             action.payload.acmeProfileUuid,
             action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
@@ -499,7 +504,7 @@ const deactivateAcme: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.deactivateAcme(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.deactivateAcme(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.deactivateAcmeSuccess({ uuid: action.payload.uuid })
@@ -543,7 +548,7 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getRaAcmeProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getRaAcmeProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                acmeDetails => slice.actions.getAcmeDetailsSuccess({
@@ -589,7 +594,7 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getIssueAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getIssueAttributes(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                issuanceAttributes => slice.actions.listIssuanceAttributesDescriptorsSuccess({
@@ -636,7 +641,7 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.getRevocationAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.profiles.getRevocationAttributes(action.payload.authorityUuid, action.payload.uuid).pipe(
 
             map(
                revocationAttributes => slice.actions.listRevocationAttributeDescriptorsSuccess({
@@ -825,6 +830,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.checkComplianceSuccess()
             ),
+
             catchError(
                err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
 
@@ -887,6 +893,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.associateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
             ),
+
             catchError(
                err => of(slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }))
             )
@@ -907,7 +914,6 @@ const associateRaProfileFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.associateRaProfileFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
@@ -932,6 +938,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.dissociateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
             ),
+
             catchError(
                err => of(slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }))
             )
@@ -952,11 +959,55 @@ const dissociateRaProfileFailed: AppEpic = (action$, state$, deps) => {
          slice.actions.dissociateRaProfileFailed.match
       ),
       map(
-
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
+}
+
+
+const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getComplianceProfilesForRaProfile.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.profiles.getComplianceProfilesForRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+
+            map(
+               profileDto => slice.actions.getComplianceProfilesForRaProfileSuccess({
+                  complianceProfiles: profileDto.map(transformRaComplianceProfileDtoToModel)
+               })
+            ),
+
+            catchError(
+               err => of(slice.actions.getComplianceProfilesForRaProfileFailure({ error: extractError(err, "Failed to get associated Compliance Profiles") }))
+            )
+
+         )
+      )
+
+   );
+
+}
+
+
+const getComplianceProfilesForRaProfileFailure: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getComplianceProfilesForRaProfileFailure.match
+      ),
+      map(
+         action => alertActions.error(action.payload.error || "Unexpected error occurred")
+      )
+
+   );
+
 }
 
 
@@ -1002,7 +1053,9 @@ const epics = [
    associateRaProfile,
    associateRaProfileFailed,
    dissociateRaProfile,
-   dissociateRaProfileFailed
+   dissociateRaProfileFailed,
+   getComplianceProfilesForRaProfile,
+   getComplianceProfilesForRaProfileFailure
 ];
 
 

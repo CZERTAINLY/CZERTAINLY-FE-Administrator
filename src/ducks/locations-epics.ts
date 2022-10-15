@@ -27,6 +27,7 @@ const listLocations: AppEpic = (action$, state, deps) => {
                   locations: locations.map(transformLocationDtoToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.listLocationsFailure({ error: extractError(err, "Failed to get Location list") }))
             )
@@ -61,11 +62,12 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getLocationDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                location => slice.actions.getLocationDetailSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.getLocationDetailFailure({ error: extractError(err, "Failed to get Location detail") }))
             )
@@ -114,10 +116,10 @@ const addLocation: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.locations.getLocationDetail(uuid).pipe(
+               obj => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, obj.uuid).pipe(
 
                   map(
-                     location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location) })
+                     location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location), entityUuid: action.payload.entityUuid })
                   )
 
                )
@@ -146,7 +148,7 @@ const addLocationSuccess: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
          action => {
-            history.push(`./detail/${action.payload.location.uuid}`);
+            history.push(`./detail/${action.payload.entityUuid}/${action.payload.location.uuid}`);
             return EMPTY;
          }
       )
@@ -215,7 +217,7 @@ const editLocationSuccess: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
          action => {
-            history.push(`../detail/${action.payload.location.uuid}`);
+            history.push(`../../detail/${action.payload.location.entityInstanceUuid}/${action.payload.location.uuid}`);
             return EMPTY;
          }
       )
@@ -250,11 +252,12 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.deleteLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.deleteLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
             ),
+
             catchError(
                err => of(slice.actions.deleteLocationFailure({ error: extractError(err, "Failed to delete Location") }))
             )
@@ -316,11 +319,12 @@ const enableLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.enableLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.enableLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.enableLocationSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.enableLocationFailure({ error: extractError(err, "Failed to enable Location") }))
             )
@@ -359,11 +363,12 @@ const disableLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.disableLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.disableLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                () => slice.actions.disableLocationSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.disableLocationFailure({ error: extractError(err, "Failed to disable Location") }))
             )
@@ -402,11 +407,12 @@ const getPushAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getPushAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getPushAttributes(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                attributes => slice.actions.getPushAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
             ),
+
             catchError(
                err => of(slice.actions.getPushAttributesFailure({ error: extractError(err, "Failed to get Push Attributes") }))
             )
@@ -445,11 +451,12 @@ const getCSRAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getCSRAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getCSRAttributes(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                attributes => slice.actions.getCSRAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
             ),
+
             catchError(
                err => of(slice.actions.getCSRAttributesFailure({ error: extractError(err, "Failed to get CSR Attributes") }))
             )
@@ -489,6 +496,7 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.pushCertificate(
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.certificateUuid,
             action.payload.pushAttributes.map(transformAttributeModelToDTO)
@@ -497,6 +505,7 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.pushCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.pushCertificateFailure({ error: extractError(err, "Failed to push Certificate") }))
             )
@@ -536,6 +545,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       switchMap(
 
          action => deps.apiClients.locations.issueCertificate(
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.raProfileUuid,
             action.payload.csrAttributes.map(transformAttributeModelToDTO),
@@ -545,6 +555,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.issueCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.issueCertificateFailure({ error: extractError(err, "Failed to issue Certificate") }))
             )
@@ -584,6 +595,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.autoRenewCertificate(
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.certificateUuid
          ).pipe(
@@ -591,6 +603,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.autoRenewCertificateFailure({ error: extractError(err, "Failed to auto-renew Certificate") }))
             )
@@ -630,6 +643,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
       mergeMap(
 
          action => deps.apiClients.locations.removeCertificate(
+            action.payload.entityUuid,
             action.payload.locationUuid,
             action.payload.certificateUuid
          ).pipe(
@@ -637,6 +651,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
             map(
                location => slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location) })
             ),
+
             catchError(
                err => of(slice.actions.removeCertificateFailure({ error: extractError(err, "Failed to remove Certificate") }))
             )
@@ -675,7 +690,7 @@ const syncLocation: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.syncLocation(action.payload.uuid).pipe(
+         action => deps.apiClients.locations.syncLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
             map(
                location => slice.actions.syncLocationSuccess({ location: transformLocationDtoToModel(location) })

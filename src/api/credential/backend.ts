@@ -1,37 +1,35 @@
+import { Observable } from "rxjs";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
+
+import * as model from "./model";
 import { AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-// import { attributeSimplifier } from "utils/attributes";
-
-import { createNewResource } from "utils/net";
-import * as model from "./model";
-
-const baseUrl = "/api/v1/credentials";
+const baseUrl = "/v1/credentials";
 
 
 export class CredentialManagementBackend implements model.CredentialManagementApi {
 
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
 
 
-   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<string> {
+   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          kind,
          connectorUuid,
          attributes: attributes,
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 
@@ -91,7 +89,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    updateCredential(uuid: string, attributes: AttributeDTO[]): Observable<model.CredentialDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
             uuid,
             attributes: attributes,
          })
@@ -103,7 +101,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    enableCredential(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PATCH")
       );
 
    }
@@ -112,7 +110,7 @@ export class CredentialManagementBackend implements model.CredentialManagementAp
    disableCredential(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PATCH")
       );
 
    }

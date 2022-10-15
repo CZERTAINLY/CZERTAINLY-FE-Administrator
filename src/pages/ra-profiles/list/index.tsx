@@ -143,9 +143,8 @@ function RaProfileList() {
          },
          {
             id: "authority",
-            styledContent: <MDBColumnName columnName="Authority" />,
             align: "center",
-            content: "authority",
+            content: <MDBColumnName columnName="Authority" />,
             sortable: true,
             width: "15%",
          },
@@ -158,9 +157,8 @@ function RaProfileList() {
          },
          {
             id: "status",
-            styledContent: <MDBColumnName columnName="Status" />,
             align: "center",
-            content: "status",
+            content: <MDBColumnName columnName="Status" />,
             sortable: true,
             width: "7%",
          },
@@ -203,7 +201,7 @@ function RaProfileList() {
 
             columns: [
 
-               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${raProfile.uuid}`}>{raProfile.name}</Link></span>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`${path}/detail/${raProfile.authorityInstanceUuid || "unknown"}/${raProfile.uuid}`}>{raProfile.name}</Link></span>,
 
                <span style={{ whiteSpace: "nowrap" }}>{raProfile.description || ""}</span>,
 

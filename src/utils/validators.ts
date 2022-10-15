@@ -23,8 +23,8 @@ export const validateFloat = () => validatePattern(/^[+-]?(\d*[.])?\d+$/, "Value
 export const validateAlphaNumeric = () => {
 
    return validatePattern(
-      /^([a-zA-Z0-9À-ž]+([ '-/][a-zA-Z0-9À-ž]+)*)+$/,
-      "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe or slash"
+      /^([a-zA-Z0-9À-ž]+([ '-/_][a-zA-Z0-9À-ž]+)*)+$/,
+      "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe or slash and underscore"
    );
 
 }
@@ -47,7 +47,7 @@ export const validateCustom = (pattern: string, value: string) => {
 
 export const validateCustomUrl = (value: string) => {
    return !value || new RegExp(
-      /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/g
+      /^((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?\/?$/g
    ).test(value) ? undefined : "Value must be a valid url";
 };
 

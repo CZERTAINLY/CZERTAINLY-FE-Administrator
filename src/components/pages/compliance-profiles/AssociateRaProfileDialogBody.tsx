@@ -78,7 +78,7 @@ export default function AssociateRaProfileDialogBody({
 
          dispatch(actions.associateRaProfile({
             uuid: complianceProfileUuid,
-            raProfileUuids: [{uuid: values.raProfiles.value.uuid, name: values.raProfiles.value.name, enabled: values.raProfiles.value.enabled}]
+            raProfileUuids: [{uuid: values.raProfiles.value.uuid, name: values.raProfiles.value.name, enabled: values.raProfiles.value.enabled, authorityInstanceUuid: values.raProfiles.value.authorityInstanceUuid}]
          }));
 
          onClose();

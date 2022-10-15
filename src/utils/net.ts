@@ -2,22 +2,24 @@ import { Observable, from } from "rxjs";
 import { HttpErrorResponse, StringMap } from "ts-rest-client";
 
 
-export function createNewResource(
+export function createNewResource<T = any>(
    url: string,
    body: any,
    headers?: any
-): Observable<string | null> {
+): Observable<T extends any ? T : (string | null)> {
 
-   return from(doFetch(url, body, headers));
+   const apiUrl = (window as any).__ENV__.API_URL + url;
+
+   return from(doFetch(apiUrl, body, headers));
 
 }
 
 
-async function doFetch(
+async function doFetch<T>(
    url: string,
    body: any,
    headers?: any
-): Promise<string> {
+): Promise<T> {
 
    let errorResponse = null;
 
@@ -39,8 +41,7 @@ async function doFetch(
 
 
       if (response.ok) {
-         const data = await getResponseBody(response);
-         return data.uuid;
+         return await getResponseBody(response);
       }
 
       const responseHeaders = {} as StringMap;
@@ -105,6 +106,18 @@ export function extractError(err: HttpErrorResponse, headline: string): string {
       return `${headline}. ${err.error.join(", ")}`;
    }
 
-   return err.error.message ? `${headline}: ${err.error.message}` : headline;
+   if (err.error.message) return `${headline}: ${err.error.message}`;
+
+   if (typeof err.error === "string") {
+
+      try {
+         const json = JSON.parse(err.error);
+         if (json.message) return `${headline}: ${json.message}`;
+      } catch (e) {}
+
+      return `${headline}: ${err.error}`;
+   }
+
+   return headline;
 
 }

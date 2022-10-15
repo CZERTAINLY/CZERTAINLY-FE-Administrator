@@ -1,6 +1,6 @@
 # CZERTAINLY Administrator User Interface
 
-> This repository is part of the commercial open-source project CZERTAINLY, but the UI is available under subscription. You can find more information about the project at [CZERTAINLY](https://github.com/3KeyCompany/CZERTAINLY) repository, including the contribution guide.
+> This repository is part of the commercial open-source project CZERTAINLY. You can find more information about the project at [CZERTAINLY](https://github.com/3KeyCompany/CZERTAINLY) repository, including the contribution guide.
 
 Administrator User Interface or commonly called as Admin UI consists of the administrative web interface where various administrative tasks can be performed on top of the platform by the administrators.
 
@@ -16,7 +16,7 @@ Admin UI contains the following menu items:
 | Connectors     | Provides an overview of available `Connectors`, their details and status. Operations on the `Connectors` like `Approvals`, reconnection on each or multiple `Connectors` can be performed on this page                                                                                 |
 | Credentials    | List of all the `Credentials` added to the platform. These `Credentials` are used only for the `Connector` related operations and do not contain any platform authorization related items                                                                                              |
 | Authorities    | List of Authority instances added and the action on each `Authority`. These `Authorities` can be added based on the `Connectors` available in the platform                                                                                                                             |
-| ACME           | Management of `ACME Profiles` and `ACME Accounts`                                                                                                                                                                                                                                      |    
+| ACME           | Management of `ACME Profiles` and `ACME Accounts`                                                                                                                                                                                                                                      |
 | Groups         | `Groups` can mainly be used for logical grouping of `Certificates` by categories or teams or application. `Group` page contains the list of available `Groups` to which the `Certificates` can be tagged                                                                               |
 | Entities       | The `entity` that is managed by the `Entity Provider`. Entities are comprised of multiple locations                                                                                                            |
 | Location | The `location` of the `entity` that is managed by the `Entity Provider`. Location is the object that contains the details of the certificates and information about where they are currently deployed. A Single location can have more than one certificates |
@@ -43,8 +43,11 @@ For more information, refer to the [CZERTAINLY documentation](https://docs.czert
 
 ## Docker container
 
-Admin Web Interface is provided as a Docker container. Use the `docker pull harbor.3key.company/czertainly/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
+Admin Web Interface is provided as a Docker container. Use the `docker pull 3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
 
-| Variable       | Description                                                        | Required | Default value     |
-|----------------|--------------------------------------------------------------------|----------|-------------------|
-| `BASE_URL`     | Base URL for the web                                               | No       | `/administrator`  |
+| Variable     | Description                                            | Required                                        | Default value    |
+|--------------|--------------------------------------------------------|-------------------------------------------------|------------------|
+| `BASE_URL`   | URL Path of the frontend application                   | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/administrator` |
+| `API_URL`    | URL Path of the CZERTAINLY API for the web application | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/api`           |
+| `LOGIN_URL`  | URL Path of the login page                             | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/login`         |
+| `LOGOUT_URL` | URL Path of the logout page                            | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/logout`        |

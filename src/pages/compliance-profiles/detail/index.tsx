@@ -10,7 +10,7 @@ import Select from "react-select";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import { ComplianceGroupsModel, ComplianceRaProfileModel, ComplianceRulesModel } from "models";
+import { ComplianceGroupsModel, ComplianceRaProfileModel, ComplianceRuleModel } from "models";
 import StatusBadge from "components/StatusBadge";
 import AssociateRaProfileDialogBody from "components/pages/compliance-profiles/AssociateRaProfileDialogBody";
 import AddRuleWithAttributesDialogBody from "components/pages/compliance-profiles/AddRuleWithAttributesDialogBody";
@@ -175,7 +175,7 @@ export default function ComplianceProfileDetail() {
 
    const onAddRule = useCallback(
 
-      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel, attributes?: any) => {
+      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRuleModel, attributes?: any) => {
 
          if (!profile) return;
 
@@ -203,7 +203,7 @@ export default function ComplianceProfileDetail() {
 
    const onDeleteRule = useCallback(
 
-      (connectorUuid: string, kind: string, rule: ComplianceRulesModel, attributes?: any) => {
+      (connectorUuid: string, kind: string, rule: ComplianceRuleModel, attributes?: any) => {
 
          if (!profile) return;
 
@@ -277,7 +277,7 @@ export default function ComplianceProfileDetail() {
 
    const onAddRuleWithAttributes = useCallback(
 
-      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRulesModel) => {
+      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRuleModel) => {
 
          setAddAttributeRuleDetails({
             connectorUuid: connectorUuid,
@@ -413,7 +413,7 @@ export default function ComplianceProfileDetail() {
 
    );
 
-   const getRuleMoreData = (rule: ComplianceRulesModel, connectorName: string, kind: string) => {
+   const getRuleMoreData = (rule: ComplianceRuleModel, connectorName: string, kind: string) => {
       return [
          {
             id: "connectorName",
@@ -526,7 +526,7 @@ export default function ComplianceProfileDetail() {
 
             id: raProfile.uuid,
             columns: [
-               <Link to={`../../raprofiles/detail/${raProfile!.uuid}`}>{raProfile!.name}</Link>,
+               <Link to={`../../raprofiles/detail/${raProfile.authorityInstanceUuid}/${raProfile!.uuid}`}>{raProfile!.name}</Link>,
                <StatusBadge enabled={raProfile.enabled} />,
                <WidgetButtons buttons={[{ icon: "minus-square", disabled: false, tooltip: "Remove", onClick: () => { onDissociateRaProfile(raProfile.uuid); }, additionalTooltipId: raProfile.uuid }]} />
             ]

@@ -26,7 +26,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   getLocationDetail(uuid: string): Observable<model.LocationDTO> {
+   getLocationDetail(entityUuid: string, uuid: string): Observable<model.LocationDTO> {
 
       return of(
          dbData.locations.find(location => location.uuid === uuid)
@@ -45,7 +45,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<string> {
+   addLocation(entityUuid: string, name: string, description: string, attributes: AttributeDTO[], enabled: boolean): Observable<{ uuid: string}> {
 
       return of(
          dbData
@@ -75,7 +75,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
 
                db.locations.push(location);
 
-               return location.uuid;
+               return { uuid: location.uuid };
 
             }
 
@@ -107,7 +107,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   deleteLocation(uuid: string): Observable<void> {
+   deleteLocation(entityUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.locations.findIndex(location => location.uuid === uuid)
@@ -127,7 +127,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   enableLocation(uuid: string): Observable<void> {
+   enableLocation(entityUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.locations.find(location => location.uuid === uuid)
@@ -146,7 +146,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   disableLocation(uuid: string): Observable<void> {
+   disableLocation(entityUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.locations.find(location => location.uuid === uuid)
@@ -166,7 +166,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   syncLocation(uuid: string): Observable<model.LocationDTO> {
+   syncLocation(entityUuid: string, uuid: string): Observable<model.LocationDTO> {
 
       return of(
          dbData.locations.find(location => location.uuid === uuid)
@@ -184,7 +184,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   getPushAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getPushAttributes(entityUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.locations.find(location => location.uuid === uuid)
@@ -203,7 +203,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   getCSRAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getCSRAttributes(entityUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.locations.find(location => location.uuid === uuid)
@@ -222,7 +222,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   pushCertificate(locationUuid: string, certificateUuid: string, pushAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
+   pushCertificate(entityUuid: string, locationUuid: string, certificateUuid: string, pushAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
 
       return of(
          dbData.locations.find(location => location.uuid === locationUuid)
@@ -254,7 +254,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   issueCertificate(locationUuid: string, raProfileUuid: string, csrAttributes: AttributeDTO[], issueAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
+   issueCertificate(entityUuid: string, locationUuid: string, raProfileUuid: string, csrAttributes: AttributeDTO[], issueAttributes: AttributeDTO[]): Observable<model.LocationDTO> {
 
 
       return of(
@@ -288,7 +288,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   autoRenewCertificate(locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
+   autoRenewCertificate(entityUuid: string, locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
 
       return of(
          dbData.locations.find(location => location.uuid === locationUuid)
@@ -314,7 +314,7 @@ export class LocationManagementMock implements model.LocationManagementApi {
    }
 
 
-   removeCertificate(locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
+   removeCertificate(entityUuid: string, locationUuid: string, certificateUuid: string): Observable<model.LocationDTO> {
 
       return of(
          dbData.locations.find(location => location.uuid === locationUuid)

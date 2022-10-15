@@ -196,7 +196,7 @@ function AcmeAccountList() {
 
                columns: [
 
-                  <Link to={`${path}/detail/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
+                  <Link to={`${path}/detail/${acmeAccount.acmeProfileUuid}/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
 
                   <MDBBadge color="info">{acmeAccount.acmeProfileName}</MDBBadge>,
 
@@ -239,8 +239,8 @@ function AcmeAccountList() {
 
          <Dialog
             isOpen={confirmRevoke}
-            caption={`Revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}`}
-            body={`You are about to revoke ${checkedRows.length > 1 ? "an ACME Account" : "an ACME Account"}. Is this what you want to do?`}
+            caption={`Revoke ${checkedRows.length > 1 ? "ACME Accounts" : "an ACME Account"}`}
+            body={`You are about to revoke ${checkedRows.length > 1 ? "ACME Accounts" : "an ACME Account"}. Is this what you want to do?`}
             toggle={() => setConfirmRevoke(false)}
             buttons={[
                { color: "danger", onClick: onRevokeConfirmed, body: "Yes, revoke" },

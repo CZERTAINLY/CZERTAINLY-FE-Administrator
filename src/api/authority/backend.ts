@@ -1,26 +1,28 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
-
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 import { createNewResource } from "utils/net";
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 import * as model from "./model";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
-const baseUrl = "/api/v1/authorities";
-const baseUrlAuthorityProvider = "/api/v1/connectors";
+
+const baseUrl = "/v1/authorities";
+const baseUrlAuthorityProvider = "/v1/connectors";
 
 
 export class AuthorityManagementBackend implements model.AuthorityManagementApi {
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
-   }
 
    private _fetchService: FetchHttpService;
+
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
+   }
 
 
    validateRAProfileAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {
@@ -52,7 +54,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
 
       return this._fetchService.request(
 
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/${uuid}`, "PUT", {
             uuid,
             attributes
          })
@@ -83,16 +85,14 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
       attributes: AttributeDTO[],
       connectorUuid: string,
       kind: string
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
          connectorUuid,
          attributes,
          kind,
-      }).pipe(
-         map(response => response ? response : "")
-      )
+      })
 
    }
 
@@ -109,7 +109,7 @@ export class AuthorityManagementBackend implements model.AuthorityManagementApi 
    listRAProfileAttributesDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raProfile/attributes`, "GET")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/attributes/raProfile`, "GET")
       );
 
    }

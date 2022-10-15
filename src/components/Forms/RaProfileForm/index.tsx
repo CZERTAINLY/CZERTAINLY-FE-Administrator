@@ -40,7 +40,7 @@ export default function RaProfileForm({
    const dispatch = useDispatch();
    const history = useHistory();
 
-   const { params } = useRouteMatch<{ id: string }>();
+   const { params } = useRouteMatch<{ id: string, authorityUuid: string }>();
 
    const editMode = useMemo(
       () => params.id !== undefined,
@@ -73,9 +73,9 @@ export default function RaProfileForm({
          dispatch(authoritiesActions.listAuthorities());
          dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
          dispatch(connectorActions.clearCallbackData());
-         if (editMode) dispatch(raProfilesActions.getRaProfileDetail({ uuid: params.id }));
+         if (editMode) dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: params.authorityUuid, uuid: params.id }));
       },
-      [dispatch, editMode, params.id]
+      [dispatch, editMode, params.id, params.authorityUuid]
 
    )
 
@@ -133,7 +133,8 @@ export default function RaProfileForm({
                   authorityInstanceUuid: values.authority!.value,
                   enabled: raProfile!.enabled,
                   description: values.description,
-                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values),
+                  redirect: `../../detail/${values.authority!.value}/${params.id}`
                })
             );
 

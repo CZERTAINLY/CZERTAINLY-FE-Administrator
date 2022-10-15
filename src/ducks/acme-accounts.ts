@@ -51,7 +51,13 @@ export const slice = createSlice({
 
       resetSate: (state, action: PayloadAction<void>) => {
 
-         state = initialState;
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
+
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
 
       },
 
@@ -87,7 +93,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeAccount: (state, action: PayloadAction<{ uuid: string }>) => {
+      getAcmeAccount: (state, action: PayloadAction<{ acmeProfileUuid: string, uuid: string }>) => {
 
          state.isFetchingDetail = true;
 
@@ -109,14 +115,14 @@ export const slice = createSlice({
       },
 
 
-      revokeAcmeAccount: (state, action: PayloadAction<{ uuid: string }>) => {
+      revokeAcmeAccount: (state, action: PayloadAction<{ acmeProfileUuid: string, uuid: string }>) => {
 
          state.isRevoking = true
 
       },
 
 
-      revokeAcmeAccountSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      revokeAcmeAccountSuccess: (state, action: PayloadAction<{ acmeProfileUuid: string, uuid: string }>) => {
 
          state.isRevoking = false;
 
@@ -141,7 +147,7 @@ export const slice = createSlice({
       },
 
 
-      enableAcmeAccount: (state, action: PayloadAction<{ uuid: string }>) => {
+      enableAcmeAccount: (state, action: PayloadAction<{ acmeProfileUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
 
@@ -167,7 +173,7 @@ export const slice = createSlice({
       },
 
 
-      disableAcmeAccount: (state, action: PayloadAction<{ uuid: string }>) => {
+      disableAcmeAccount: (state, action: PayloadAction<{ acmeProfileUuid: string, uuid: string }>) => {
 
          state.isDisabling = true;
 

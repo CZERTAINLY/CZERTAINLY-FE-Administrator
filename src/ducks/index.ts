@@ -14,14 +14,14 @@ import authEpics from "./auth-epics";
 import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./audit";
 import auditLogsEpics from "./audit-epics";
 
-import { initialState as initialAdministratorsState, slice as administratorsSlice } from "./administrators";
-import administratorsEpics from "./administrators-epics";
+import { initialState as initialUsersState, slice as usersSlice } from "./users";
+import usersEpics from "./users-epics";
+
+import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
+import rolesEpics from "./roles-epics";
 
 import { initialState as initialCertificatesState, slice as certificatesSlice } from "./certificates";
 import certificatesEpics from "./certificates-epic";
-
-import { initialState as initialClientsState, slice as clientsSlice } from "./clients";
-import clientsEpics from "./clients-epics";
 
 import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
 import connectorsEpics from "./connectors-epic";
@@ -75,9 +75,9 @@ export const initialState = {
    [alertsSlice.name]: initialAlertsState,
    [auditLogsSlice.name]: initialAuditLogsState,
    [authSlice.name]: initialAuthState,
-   [administratorsSlice.name]: initialAdministratorsState,
+   [usersSlice.name]: initialUsersState,
+   [rolesSlice.name]: initialRolesState,
    [certificatesSlice.name]: initialCertificatesState,
-   [clientsSlice.name]: initialClientsState,
    [connectorsSlice.name]: initialConnectorsState,
    [dashboardSlice.name]: initialDashboardState,
    [raProfilesSlice.name]: initialRaProfilesState,
@@ -98,8 +98,8 @@ export const reducers = combineReducers<typeof initialState, any>({
    [auditLogsSlice.name]: auditLogsSlice.reducer,
    [authSlice.name]: authSlice.reducer,
    [certificatesSlice.name]: certificatesSlice.reducer,
-   [administratorsSlice.name]: administratorsSlice.reducer,
-   [clientsSlice.name]: clientsSlice.reducer,
+   [usersSlice.name]: usersSlice.reducer,
+   [rolesSlice.name]: rolesSlice.reducer,
    [connectorsSlice.name]: connectorsSlice.reducer,
    [dashboardSlice.name]: dashboardSlice.reducer,
    [raProfilesSlice.name]: raProfilesSlice.reducer,
@@ -117,11 +117,11 @@ export const reducers = combineReducers<typeof initialState, any>({
 
 export const epics = combineEpics(
    ...statupEpics,
+   ...usersEpics,
+   ...rolesEpics,
    ...authEpics,
    ...auditLogsEpics,
    ...certificatesEpics,
-   ...administratorsEpics,
-   ...clientsEpics,
    ...connectorsEpics,
    ...dashboardEpics,
    ...raProfilesEpics,

@@ -1,22 +1,29 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+
 import * as model from "./model";
 
-const baseUrl = "/api/v1/statistics";
+const baseUrl = "/v1/statistics";
 
-export class DashboardManagementBackend
-  implements model.DashboardManagementApi
-{
-  constructor() {
-    this._fetchService = new FetchHttpService();
-  }
+export class DashboardManagementBackend implements model.DashboardManagementApi {
 
-  private _fetchService: FetchHttpService;
+   private _fetchService: FetchHttpService;
 
-  getDashboardData(): Observable<model.DashboardDTO> {
-    return this._fetchService.request(
-      new HttpRequestOptions(`${baseUrl}`, "GET")
-    );
-  }
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
+   }
+
+
+   getDashboardData(): Observable<model.DashboardDTO> {
+
+      return this._fetchService.request(
+         new HttpRequestOptions(`${baseUrl}`, "GET")
+      );
+
+   }
+
 }

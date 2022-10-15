@@ -11,7 +11,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
 
    getRaProfilesList(): Observable<model.RaProfileDTO[]> {
-      
+
       return of(
          dbData.raProfiles
       ).pipe(
@@ -21,7 +21,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   getRaProfileDetail(uuid: string): Observable<model.RaProfileDTO> {
+   getRaProfileDetail(authorityInstanceUuid: string, uuid: string): Observable<model.RaProfileDTO> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -42,7 +42,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
    }
 
-   getAuthorizedClients(uuid: string): Observable<model.RaAuthorizedClientDTO[]> {
+   getAuthorizedClients(authorityInstanceUuid: string, uuid: string): Observable<model.RaAuthorizedClientDTO[]> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -55,16 +55,16 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
                if (!profile) throw new HttpErrorResponse({ status: 404 });
 
-               const clients = dbData.clients.filter(
-                  client => client.authorizedProfiles.includes(uuid)
+               const users = dbData.users.filter(
+                  user => user.authorizedProfiles.includes(uuid)
                );
 
-               return clients.map(
+               return users.map(
 
-                  client => ({
-                     uuid: client.uuid,
-                     name: client.name,
-                     enabled: client.enabled
+                  user => ({
+                     uuid: user.uuid,
+                     name: user.username,
+                     enabled: user.enabled
                   })
 
                );
@@ -77,7 +77,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
 
    }
 
-   getIssueAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getIssueAttributes(authorityInstanceUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -105,7 +105,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   getRevocationAttributes(uuid: string): Observable<AttributeDescriptorDTO[]> {
+   getRevocationAttributes(authorityInstanceUuid: string, uuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -133,7 +133,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   getRaAcmeProfile(uuid: string): Observable<model.RaAcmeLinkDTO> {
+   getRaAcmeProfile(authorityInstanceUuid: string, uuid: string): Observable<model.RaAcmeLinkDTO> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -159,7 +159,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   activateAcme(uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
+   activateAcme(authorityInstanceUuid: string, uuid: string, acmeProfileUuid: string, issueCertificateAttributes: AttributeDTO[], revokeCertificateAttributes: AttributeDTO[]): Observable<model.RaAcmeLinkDTO> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -195,7 +195,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   deactivateAcme(uuid: string): Observable<void> {
+   deactivateAcme(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.raProfiles.find(profile => profile.uuid === uuid)
@@ -217,7 +217,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<string> {
+   createRaProfile(authorityInstanceUuid: string, name: string, attributes: AttributeDTO[], description?: string, enabled?: boolean): Observable<{ uuid: string}> {
 
       return of(
          dbData.authorities.find(authority => authority.uuid === authorityInstanceUuid)
@@ -241,7 +241,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
                   authorityInstanceName: name,
                })
 
-               return uuid;
+               return { uuid };
 
             }
          )
@@ -250,7 +250,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   deleteRaProfile(uuid: string): Observable<void> {
+   deleteRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.raProfiles.findIndex(raProfile => raProfile.uuid === uuid)
@@ -270,7 +270,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   enableRaProfile(uuid: string): Observable<void> {
+   enableRaProfile(authorityInstanceUuid: string, uuid: string): Observable<void> {
 
       return of(
          dbData.raProfiles.find(raProfile => raProfile.uuid === uuid)
@@ -290,7 +290,7 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
    }
 
 
-   disableRaProfile(uuid: string | number): Observable<void> {
+   disableRaProfile(authorityInstanceUuid: string, uuid: string | number): Observable<void> {
 
       return of(
          dbData.raProfiles.find(raProfile => raProfile.uuid === uuid)
@@ -484,6 +484,17 @@ export class ProfilesManagementMock implements model.ProfilesManagementApi {
             }
          )
       )
+   }
+
+   getComplianceProfilesForRaProfile(authorityInstanceUuid: string, uuid: string): Observable<model.raComplianceProfileDTO[]> {
+
+      return of(
+         dbData.complianceProfiles
+      ).pipe(
+
+         delay(randomDelay())
+
+         );
    }
 
 }

@@ -19,7 +19,7 @@ export default function AcmeAccountDetail() {
 
    const dispatch = useDispatch();
 
-   const { params } = useRouteMatch<{ id: string }>();
+   const { params } = useRouteMatch<{ acmeProfileUuid: string, id: string }>();
 
    const acmeAccount = useSelector(selectors.account);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
@@ -36,10 +36,10 @@ export default function AcmeAccountDetail() {
 
          if (!params.id) return;
 
-         dispatch(actions.getAcmeAccount({ uuid: params.id }));
+         dispatch(actions.getAcmeAccount({ acmeProfileUuid: params.acmeProfileUuid, uuid: params.id }));
 
       },
-      [params.id, dispatch]
+      [params.id, dispatch, params.acmeProfileUuid]
 
    )
 
@@ -50,7 +50,7 @@ export default function AcmeAccountDetail() {
 
          if (!acmeAccount) return;
 
-         dispatch(actions.enableAcmeAccount({ uuid: acmeAccount.uuid }));
+         dispatch(actions.enableAcmeAccount({ acmeProfileUuid: acmeAccount.acmeProfileUuid, uuid: acmeAccount.uuid }));
 
       },
       [acmeAccount, dispatch]
@@ -64,7 +64,7 @@ export default function AcmeAccountDetail() {
 
          if (!acmeAccount) return;
 
-         dispatch(actions.disableAcmeAccount({ uuid: acmeAccount.uuid }));
+         dispatch(actions.disableAcmeAccount({ acmeProfileUuid: acmeAccount.acmeProfileUuid, uuid: acmeAccount.uuid }));
 
       },
       [acmeAccount, dispatch]
@@ -76,7 +76,7 @@ export default function AcmeAccountDetail() {
 
       () => {
          if (!acmeAccount) return;
-         dispatch(actions.revokeAcmeAccount({ uuid: acmeAccount.uuid }));
+         dispatch(actions.revokeAcmeAccount({ acmeProfileUuid: acmeAccount.acmeProfileUuid, uuid: acmeAccount.uuid }));
          setConfirmRevoke(false);
       },
       [acmeAccount, dispatch]

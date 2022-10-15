@@ -21,7 +21,7 @@ export interface EntityManagementApi {
 
    getEntityDetail(uuid: string): Observable<EntityDTO>;
 
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string>;
+   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}>;
 
    updateEntity(uuid: string, attributes: AttributeDTO[]): Observable<EntityDTO>;
 

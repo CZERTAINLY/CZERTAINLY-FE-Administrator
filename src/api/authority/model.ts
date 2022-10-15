@@ -28,7 +28,7 @@ export interface AuthorityManagementApi {
 
    getAuthoritiesList(): Observable<AuthorityDTO[]>;
 
-   createNewAuthority(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<string>;
+   createNewAuthority(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}>;
 
    bulkDeleteAuthority(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
 

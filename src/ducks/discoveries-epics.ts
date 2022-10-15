@@ -74,6 +74,7 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
             map(
                discoveryDto => slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryDTOToModel(discoveryDto) })
             ),
+
             catchError(
                err => of(slice.actions.getDiscoveryDetailFailure({ error: extractError(err, "Failed to get Discovery detail") }))
             )
@@ -119,14 +120,17 @@ const listDiscoveryProviders: AppEpic = (action$, state, deps) => {
                   connectors: providers.map(transformConnectorDTOToModel)
                })
             ),
-            catchError((err) =>
-               of(
-                  slice.actions.listDiscoveryProvidersFailure({ error: extractError(err, "Failed to get Discovery Provider list") })
-               )
+
+            catchError(
+               err => of(slice.actions.listDiscoveryProvidersFailure({ error: extractError(err, "Failed to get Discovery Provider list") }))
             )
+
          )
+
       )
+
    );
+
 }
 
 const listDiscoveryProvidersFailure: AppEpic = (action$, state, deps) => {
@@ -163,6 +167,7 @@ const getDiscoveryProviderAttributesDescriptors: AppEpic = (action$, state, deps
                   attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.getDiscoveryProviderAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Discovery Provider Attribute list") }))
             )
@@ -205,9 +210,11 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
             action.payload.connectorUuid,
             action.payload.attributes.map(transformAttributeModelToDTO),
          ).pipe(
+
             map(
-               uuid => slice.actions.createDiscoverySuccess({ uuid })
+               obj => slice.actions.createDiscoverySuccess({ uuid: obj.uuid })
             ),
+
             catchError(
                err => of(slice.actions.createDiscoveryFailure({ error: extractError(err, "Failed to create discovery") }))
             )
@@ -272,6 +279,7 @@ const deleteDiscovery: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.deleteDiscoverySuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.deleteDiscoveryFailure({ error: extractError(err, "Failed to delete discovery") }))
             )
@@ -336,6 +344,7 @@ const bulkDeleteDiscovery: AppEpic = (action$, state$, deps) => {
             map(
                ()=> slice.actions.bulkDeleteDiscoverySuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkDeleteDiscoveryFailure({ error: extractError(err, "Failed to bulk delete Discoveries") }))
             )

@@ -16,5 +16,11 @@ indexFile=/usr/share/nginx/html/index.html
 tmpIndexFile=/usr/share/nginx/html/index.html.tmp
 sed 's/"\/administrator/"\'"$BASE_URL"'/g' $indexFile > $tmpIndexFile
 mv $tmpIndexFile $indexFile
+sed 's/"\/api/"\'"$API_URL"'/g' $indexFile > $tmpIndexFile
+mv $tmpIndexFile $indexFile
+sed 's/"\/login/"\'"$LOGIN_URL"'/g' $indexFile > $tmpIndexFile
+mv $tmpIndexFile $indexFile
+sed 's/"\/logout/"\'"$LOGOUT_URL"'/g' $indexFile > $tmpIndexFile
+mv $tmpIndexFile $indexFile
 
 nginx -g 'daemon off;'

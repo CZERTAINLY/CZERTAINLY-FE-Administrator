@@ -74,6 +74,7 @@ const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
             map(
                authorityDto => slice.actions.getAuthorityDetailSuccess({ authority: transformAuthorityDtoToModel(authorityDto) })
             ),
+
             catchError(
                err => of(slice.actions.getAuthorityDetailFailure({ error: extractError(err, "Failed to get Authority detail") }))
             )
@@ -119,11 +120,11 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
                   connectors: providers.map(transformConnectorDTOToModel)
                })
             ),
-            catchError((err) =>
-               of(
-                  slice.actions.listAuthorityProvidersFailure({ error: extractError(err, "Failed to get Authority Provider list") })
-               )
+
+            catchError(
+               (err) =>of(slice.actions.listAuthorityProvidersFailure({ error: extractError(err, "Failed to get Authority Provider list") }))
             )
+
          )
       )
    );
@@ -163,6 +164,7 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
                   attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.getAuthorityProviderAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Authority Provider Attribute Descriptor list") }))
             )
@@ -199,6 +201,7 @@ const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
          slice.actions.getRAProfilesAttributesDescriptors.match
       ),
       switchMap(
+
          action => deps.apiClients.authorities.listRAProfileAttributesDescriptors(action.payload.authorityUuid).pipe(
 
             map(
@@ -207,6 +210,7 @@ const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
                   attributesDescriptors: descriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.getRAProfilesAttributesDescriptorsFailure({ error: extractError(err, "Failed to get RA Profile Attribute Descriptor list") }))
             )
@@ -252,8 +256,9 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createAuthoritySuccess({ uuid })
+               obj => slice.actions.createAuthoritySuccess({ uuid: obj.uuid })
             ),
+
             catchError(
                err => of(slice.actions.createAuthorityFailure({ error: extractError(err, "Failed to create Authority") }))
             )
@@ -322,6 +327,7 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
             map(
                authorityDto => slice.actions.updateAuthoritySuccess({ authority: transformAuthorityDtoToModel(authorityDto) })
             ),
+
             catchError(
                err => of(slice.actions.updateAuthorityFailure({ error: extractError(err, "Failed to update Authority") }))
             )
@@ -386,6 +392,7 @@ const deleteAuthority: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.deleteAuthoritySuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.deleteAuthorityFailure({ error: extractError(err, "Failed to delete Authority") }))
             )
@@ -450,6 +457,7 @@ const bulkDeleteAuthority: AppEpic = (action$, state$, deps) => {
             map(
                errors => slice.actions.bulkDeleteAuthoritySuccess({ uuids: action.payload.uuids, errors })
             ),
+
             catchError(
                err => of(slice.actions.bulkDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk delete Authorities") }))
             )
@@ -494,6 +502,7 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
             ),
+
             catchError(
                err => of(slice.actions.bulkForceDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk force delete Authorities") }))
             )

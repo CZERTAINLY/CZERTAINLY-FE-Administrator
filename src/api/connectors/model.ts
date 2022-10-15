@@ -72,7 +72,7 @@ export interface ConnectorManagementApi {
 
    getConnectorAllAttributes(uuid: string): Observable<AttributeDescriptorCollectionDTO>;
 
-   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<string>;
+   createNewConnector(name: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<{ uuid: string}>;
 
    updateConnector(uuid: string, url: string, authType: AuthType, authAttributes?: AttributeDTO[]): Observable<ConnectorDTO>;
 

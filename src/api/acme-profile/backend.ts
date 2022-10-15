@@ -1,16 +1,14 @@
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+import { createNewResource } from "utils/net";
 
 import { AttributeDTO } from "../_common/attributeDTO";
 
-import { createNewResource } from "utils/net";
 import * as model from "./model";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
-const baseUrl = "/api/v1/acmeProfiles";
+const baseUrl = "/v1/acmeProfiles";
 
 export class AcmeProfilesManagementBackend implements model.AcmeProfilesManagementApi {
 
@@ -18,8 +16,8 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+      this._fetchService = fetchService;
    }
 
 
@@ -37,7 +35,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
       validity?: number,
       requireContact?: boolean,
       requireTermsOfService?: boolean,
-   ): Observable<string> {
+   ): Observable<{ uuid: string}> {
 
       return createNewResource(baseUrl, {
          name,
@@ -53,9 +51,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
          revokeCertificateAttributes: revokeCertificateAttributes,
          requireContact,
          requireTermsOfService
-      }).pipe(
-         map((location) => location?.substr(location.lastIndexOf("/") + 1) || "")
-      );
+      });
 
    }
 
@@ -72,7 +68,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    enableAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PATCH")
       );
 
    }
@@ -81,7 +77,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    disableAcmeProfile(uuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PATCH")
       );
 
    }
@@ -108,7 +104,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    bulkEnableAcmeProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/enable`, "PATCH", uuids)
       );
 
    }
@@ -116,7 +112,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    bulkDisableAcmeProfile(uuids: string[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/disable`, "PATCH", uuids)
       );
 
    }
@@ -180,7 +176,7 @@ export class AcmeProfilesManagementBackend implements model.AcmeProfilesManageme
    updateRAProfileForAcmeProfile(uuid: string, raProfileUuid: string): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "PUT")
+         new HttpRequestOptions(`${baseUrl}/${uuid}/raprofile/${raProfileUuid}`, "PATCH")
       );
 
    }

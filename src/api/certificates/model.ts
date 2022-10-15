@@ -10,6 +10,7 @@ export interface CertificateRAProfileDTO {
    uuid: string;
    name: string;
    enabled: boolean;
+   authorityInstanceUuid: string;
 }
 
 
@@ -45,7 +46,7 @@ export interface AvailableCertificateFilterDTO {
    label: string;
    type: "string" | "number" | "list" | "date";
    conditions: CertificateFilterCondition[];
-   value?: string;
+   value?: string | number | string[] | number[];
    multiValue?: boolean;
 }
 
@@ -155,7 +156,7 @@ export interface CertificateInventoryApi {
    getCertificateHistory(uuid: string): Observable<CertificateEventHistoryDTO[]>;
 
 
-   uploadCertificate(certificate: string): Observable<string>;
+   uploadCertificate(certificate: string): Observable<{ uuid: string}>;
 
 
    deleteCertificate(uuid: string): Observable<void>;

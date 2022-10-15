@@ -27,14 +27,14 @@ export interface ComplianceConnectorAndRulesModel {
    connectorName: string;
    connectorUuid: string;
    kind: string;
-   rules: ComplianceRulesModel[];
+   rules: ComplianceRuleModel[];
 }
 
 export interface ComplianceRulesListItemModel {
    connectorName: string;
    connectorUuid: string;
    kind: string;
-   rules: ComplianceRulesModel[];
+   rules: ComplianceRuleModel[];
 }
 
 export interface ComplianceGroupsListItemModel {
@@ -44,7 +44,7 @@ export interface ComplianceGroupsListItemModel {
    groups: ComplianceGroupsModel[];
 }
 
-export interface ComplianceRulesModel {
+export interface ComplianceRuleModel {
    name: string;
    uuid: string;
    description?: string;
@@ -70,4 +70,5 @@ export interface ComplianceRaProfileModel {
    name: string;
    uuid: string;
    enabled: boolean;
+   authorityInstanceUuid: string
 }

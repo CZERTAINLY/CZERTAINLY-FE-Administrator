@@ -30,4 +30,6 @@ yarn-error.log*
 #Proxy Files
 src/gateway_client_key.pem
 src/gateway_client_cert.pem
+src/gateway_client_key_fis.pem
+src/gateway_client_cert_fis.pem
 src/setupProxy.js

@@ -1,7 +1,7 @@
 import { AuthApi, AuthBackend, AuthMock } from "./auth";
-import { AdministratorManagementApi, AdministratorsManagementBackend, AdministatorManagementMock, } from "./administrators";
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
-import { ClientManagementApi, ClientManagementBackend, ClientManagementMock } from "./clients";
+import { UserManagementApi, UserManagementBackend, UserManagementMock } from "./users";
+import { RolesManagementApi, RolesManagementBackend, RolesManagementMock } from "./roles";
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
@@ -16,12 +16,17 @@ import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesM
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
 import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
 import { ComplianceProfileManagementApi, ComplianceProfileManagementBackend, ComplianceProfileManagementMock } from "./compliance-profile";
+import { FetchHttpServiceImpl } from "utils/FetchHttpService";
+
+
+const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
+
 
 export interface ApiClients {
    auth: AuthApi;
-   admins: AdministratorManagementApi;
+   users: UserManagementApi;
+   roles: RolesManagementApi;
    auditLogs: AuditLogsApi;
-   clients: ClientManagementApi;
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
@@ -38,33 +43,35 @@ export interface ApiClients {
    complianceProfile: ComplianceProfileManagementApi;
 }
 
+
 export const backendClient: ApiClients = {
-   auth: new AuthBackend(),
-   admins: new AdministratorsManagementBackend(),
-   certificates: new CertificateInventoryBackend(),
-   auditLogs: new AuditLogsBackend(),
-   clients: new ClientManagementBackend(),
-   profiles: new ProfilesManagementBackend(),
-   credentials: new CredentialManagementBackend(),
-   authorities: new AuthorityManagementBackend(),
-   entities: new EntityManagementBackend(),
-   locations: new LocationManagementBackend(),
-   connectors: new ConnectorManagementBackend(),
-   dashboard: new DashboardManagementBackend(),
-   acmeAccounts: new AcmeAccountManagementBackend(),
-   acmeProfiles: new AcmeProfilesManagementBackend(),
-   groups: new GroupManagementBackend(),
-   operations: new OperationsBackend(),
-   discoveries: new DiscoveryManagementBackend(),
-   complianceProfile: new ComplianceProfileManagementBackend(),
+   auth: new AuthBackend(fetchService),
+   users: new UserManagementBackend(fetchService),
+   roles: new RolesManagementBackend(fetchService),
+   certificates: new CertificateInventoryBackend(fetchService),
+   auditLogs: new AuditLogsBackend(fetchService),
+   profiles: new ProfilesManagementBackend(fetchService),
+   credentials: new CredentialManagementBackend(fetchService),
+   authorities: new AuthorityManagementBackend(fetchService),
+   entities: new EntityManagementBackend(fetchService),
+   locations: new LocationManagementBackend(fetchService),
+   connectors: new ConnectorManagementBackend(fetchService),
+   dashboard: new DashboardManagementBackend(fetchService),
+   acmeAccounts: new AcmeAccountManagementBackend(fetchService),
+   acmeProfiles: new AcmeProfilesManagementBackend(fetchService),
+   groups: new GroupManagementBackend(fetchService),
+   operations: new OperationsBackend(fetchService),
+   discoveries: new DiscoveryManagementBackend(fetchService),
+   complianceProfile: new ComplianceProfileManagementBackend(fetchService),
 };
+
 
 export const mockClient: ApiClients = {
    auth: new AuthMock(),
-   admins: new AdministatorManagementMock(),
+   users: new UserManagementMock(),
+   roles: new RolesManagementMock(),
    certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
-   clients: new ClientManagementMock(),
    profiles: new ProfilesManagementMock(),
    credentials: new CredentialManagementMock(),
    authorities: new AuthorityManagementMock(),

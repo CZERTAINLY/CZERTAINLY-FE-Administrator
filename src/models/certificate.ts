@@ -1,5 +1,4 @@
 import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
-import { CertificateValidationResultDTO } from "api/certificates";
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
 import { AttributeModel } from "./attributes/AttributeModel";
 import { GroupModel } from "./groups";
@@ -25,7 +24,7 @@ export interface AvailableCertificateFilterModel {
    label: string;
    type: "string" | "number" | "list" | "date";
    conditions: CertificateFilterCondition[];
-   value?: string | string[];
+   value?: string | number | string[] | number[];
    multiValue?: boolean;
 
 }
@@ -79,7 +78,14 @@ export interface CertificateRAProfileModel {
    uuid: string;
    name: string;
    enabled: boolean;
+   authorityInstanceUuid: string;
 }
+
+
+export interface ValidationResultModel {
+   status: ValidationStatus;
+   message: string;
+ }
 
 
 export interface ValidationResultModel {

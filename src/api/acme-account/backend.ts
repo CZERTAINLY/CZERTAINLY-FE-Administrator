@@ -1,17 +1,19 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
+
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
+
 import * as model from "./model";
 
-const baseUrl = "/api/v1/acmeAccounts";
+const baseUrl = "/v1/acmeAccounts";
+const extBaseUrl = "/v1/acmeProfiles";
 
 export class AcmeAccountManagementBackend implements model.AcmeAccountManagementApi {
 
    private _fetchService: FetchHttpService;
 
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+   constructor(fetchService: FetchHttpService) {
+      this._fetchService = fetchService;
    }
 
 
@@ -24,37 +26,37 @@ export class AcmeAccountManagementBackend implements model.AcmeAccountManagement
    }
 
 
-   getAcmeAccountDetails(uuid: string | number): Observable<model.AcmeAccountDTO> {
+   getAcmeAccountDetails(acmeProfileUuid: string, uuid: string | number): Observable<model.AcmeAccountDTO> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "GET")
+         new HttpRequestOptions(`${extBaseUrl}/${acmeProfileUuid}/acmeAccounts/${uuid}`, "GET")
       );
 
    }
 
 
-   revokeAcmeAccount(uuid: string | number): Observable<void> {
+   revokeAcmeAccount(acmeProfileUuid: string, uuid: string | number): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}`, "DELETE")
+         new HttpRequestOptions(`${extBaseUrl}/${acmeProfileUuid}/acmeAccounts/${uuid}`, "POST")
       );
 
    }
 
 
-   enableAcmeAccount(uuid: string | number): Observable<void> {
+   enableAcmeAccount(acmeProfileUuid: string, uuid: string | number): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/enable`, "PUT")
+         new HttpRequestOptions(`${extBaseUrl}/${acmeProfileUuid}/acmeAccounts/${uuid}/enable`, "PATCH")
       );
 
    }
 
 
-   disableAcmeAccount(uuid: string | number): Observable<void> {
+   disableAcmeAccount(acmeProfileUuid: string, uuid: string | number): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/${uuid}/disable`, "PUT")
+         new HttpRequestOptions(`${extBaseUrl}/${acmeProfileUuid}/acmeAccounts/${uuid}/disable`, "PATCH")
       );
 
    }
@@ -72,7 +74,7 @@ export class AcmeAccountManagementBackend implements model.AcmeAccountManagement
    bulkEnableAcmeAccount(uuids: (string | number)[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/enable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/enable`, "PATCH", uuids)
       );
 
    }
@@ -81,7 +83,7 @@ export class AcmeAccountManagementBackend implements model.AcmeAccountManagement
    bulkDisableAcmeAccount(uuids: (string | number)[]): Observable<void> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}/disable`, "PUT", uuids)
+         new HttpRequestOptions(`${baseUrl}/disable`, "PATCH", uuids)
       );
 
    }

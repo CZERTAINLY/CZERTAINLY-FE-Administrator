@@ -37,11 +37,11 @@ function CertificateAttributes({ certificate }: Props) {
          },
          {
             id: "validFrom",
-            columns: ["Valid From", <span style={{whiteSpace: "nowrap"}}>{certificate?.notBefore ? dateFormatter(certificate.notBefore) : ""}</span>]
+            columns: ["Valid From", <span style={{ whiteSpace: "nowrap" }}>{certificate?.notBefore ? dateFormatter(certificate.notBefore) : ""}</span>]
          },
          {
             id: "validTo",
-            columns: ["Valid To", <span style={{whiteSpace: "nowrap"}}>{certificate?.notAfter ? dateFormatter(certificate.notAfter) : ""}</span>]
+            columns: ["Valid To", <span style={{ whiteSpace: "nowrap" }}>{certificate?.notAfter ? dateFormatter(certificate.notAfter) : ""}</span>]
          },
          {
             id: "serialNumber",
@@ -54,10 +54,15 @@ function CertificateAttributes({ certificate }: Props) {
 
    return (
 
-      <CustomTable
-         headers={detailHeaders}
-         data={attributes}
-      />
+      <>
+         {
+            certificate ? (
+               <CustomTable headers={detailHeaders} data={attributes} />
+            ) : (
+               <div className="text-center">Certificate information not available</div>
+            )
+         }
+      </>
 
    );
 }

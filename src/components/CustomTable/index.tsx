@@ -30,9 +30,11 @@ interface Props {
    canSearch?: boolean;
    hasHeader?: boolean;
    hasCheckboxes?: boolean;
+   hasAllCheckBox?: boolean;
    multiSelect?: boolean;
    hasPagination?: boolean;
    hasDetails?: boolean;
+   checkedRows?: (number | string)[];
    paginationData?: {
       page: number;
       totalItems: number;
@@ -45,6 +47,7 @@ interface Props {
    onPageChanged?: (page: number) => void;
 }
 
+const emptyCheckedRows: (string | number)[] = [];
 
 function CustomTable({
    headers,
@@ -52,10 +55,12 @@ function CustomTable({
    canSearch,
    hasHeader = true,
    hasCheckboxes,
+   hasAllCheckBox = true,
    multiSelect = true,
    hasPagination,
    hasDetails,
    paginationData,
+   checkedRows,
    onCheckedRowsChanged,
    onPageSizeChanged,
    onPageChanged,
@@ -63,7 +68,7 @@ function CustomTable({
 
    const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
    const [tblData, setTblData] = useState<TableDataRow[]>(data);
-   const [tblCheckedRows, setTblCheckedRows] = useState<(string | number)[]>([]);
+   const [tblCheckedRows, setTblCheckedRows] = useState<(string | number)[]>(checkedRows || emptyCheckedRows);
 
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(10);
@@ -74,6 +79,14 @@ function CustomTable({
    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
    const [expandedRow, setExpandedRow] = useState<string | number>();
+
+
+   useEffect(
+      () => {
+         setTblCheckedRows(checkedRows || emptyCheckedRows);
+      },
+      [checkedRows]
+   );
 
 
    const firstPage = useCallback(
@@ -254,11 +267,12 @@ function CustomTable({
             return;
          }
 
-         const checkedRows = tblData.map(row => row.id);
+         const checkedRows = tblData.slice((page - 1) * pageSize, page * pageSize).map(row => row.id);
+
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, [tblData, onCheckedRowsChanged]
+      }, [tblData, onCheckedRowsChanged, hasPagination, pageSize, paginationData, page]
 
    );
 
@@ -269,7 +283,7 @@ function CustomTable({
 
          const target = e.target as HTMLElement;
 
-         if (hasDetails && target.localName !== "input" && target.localName !== "button" && (target.localName !== "i" || target.hasAttribute("data-expander") ) ) {
+         if (hasDetails && target.localName !== "input" && target.localName !== "button" && (target.localName !== "i" || target.hasAttribute("data-expander"))) {
 
             if (expandedRow === rowId) {
                setExpandedRow(undefined);
@@ -405,9 +419,8 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
          if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
-
          return columns.map(
 
             header => (
@@ -423,7 +436,11 @@ function CustomTable({
                      {
                         header.id === "__checkbox__" ? (
 
-                           <input type="checkbox" checked={tblCheckedRows.length === tblData.length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+                           hasAllCheckBox && multiSelect? (
+                              <input type="checkbox" checked={tblCheckedRows.length === tblData.slice((page - 1) * pageSize, page * pageSize).length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+                           ) : (
+                              <>&nbsp;</> 
+                           )
 
                         ) : header.sortable ? (
 
@@ -469,7 +486,7 @@ function CustomTable({
 
          )
       },
-      [tblHeaders, hasCheckboxes, multiSelect, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, onCheckAllCheckboxClick]
+      [tblHeaders, hasCheckboxes, multiSelect, hasAllCheckBox, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, tblData, onCheckAllCheckboxClick]
 
    );
 
@@ -492,7 +509,7 @@ function CustomTable({
 
                <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
-                  {!hasDetails ? (<></>) : <td id="show-detail-more-column" key="show-detail-more-column">
+                  {!hasDetails ? (<></>) : !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
                      {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
                   </td>
                   }
@@ -523,15 +540,33 @@ function CustomTable({
 
                      {
                         row.detailColumns && expandedRow === row.id ? (
-                           row.detailColumns.map(e => {
-                              return (
-                                 <td>
-                                    <div>
-                                       {e}
-                                    </div>
-                                 </td>
+
+                           row.detailColumns.length === 1 ? (
+
+                              <td colSpan={row.columns.length + (hasCheckboxes ? 1 : 0) + (hasDetails ? 1 : 0)} className={styles.detailCell}>
+                                 {row.detailColumns[0]}
+                              </td>
+
+                           ) : (
+
+                              row.detailColumns.map(
+
+                                 (e, index) => {
+
+                                    return (
+                                       <td key={index}>
+                                          <div>
+                                             {e}
+                                          </div>
+                                       </td>
+                                    )
+
+                                 }
+
                               )
-                           })
+
+                           )
+
                         ) : (
                            <></>
                         )

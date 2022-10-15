@@ -67,6 +67,16 @@ export default function AttributeEditor({
    // stores previous callback data in order to be possible to detect what data changed
    const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any; }>({});
 
+   // workaround to be possible to set options from multiple places;
+   // multiple effects can modify opts during single render call
+   let opts: { [attributeName: string]: { label: string, value: any }[] } = {};
+
+   useEffect(
+      () => {
+         dispatch(connectorActions.resetState());
+      },
+      [dispatch]
+   );
 
    /**
     * Gets the value from the object property identified by path
@@ -380,7 +390,10 @@ export default function AttributeEditor({
 
          )
 
-         setOptions({ ...options, ...newOptions });
+         // multiple effects can modify opts during single render call
+         // eslint-disable-next-line react-hooks/exhaustive-deps
+         opts = { ...opts, ...newOptions };
+         setOptions({ ...options, ...opts });
 
          setPrevDescriptors(attributeDescriptors);
          setPrevAttributes(attributes);
@@ -517,7 +530,10 @@ export default function AttributeEditor({
             // Update options
 
             if (Array.isArray(callbackData[callbackId])) {
-               setOptions({ ...options, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) });
+               // multiple effects can modify opts during single render call
+               // eslint-disable-next-line react-hooks/exhaustive-deps
+               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) };
+               setOptions({ ...options, ...opts });
                continue;
             }
 

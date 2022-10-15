@@ -38,7 +38,7 @@ export default function EntityForm({
    const dispatch = useDispatch();
    const history = useHistory();
 
-   const { params } = useRouteMatch<{ id: string }>();
+   const { params } = useRouteMatch<{ id: string, entityUuid: string }>();
 
    const editMode = useMemo(
       () => params.id !== undefined,
@@ -80,7 +80,7 @@ export default function EntityForm({
          }
 
          if (editMode && (!locationSelector || locationSelector.uuid !== params.id)) {
-            dispatch(locationActions.getLocationDetail({ uuid: params.id }));
+            dispatch(locationActions.getLocationDetail({ entityUuid: params.entityUuid, uuid: params.id }));
          }
 
 
@@ -89,7 +89,7 @@ export default function EntityForm({
          }
 
       },
-      [dispatch, editMode, locationSelector, params.id, init]
+      [dispatch, editMode, locationSelector, params.id, init,  params.entityUuid]
 
    );
 

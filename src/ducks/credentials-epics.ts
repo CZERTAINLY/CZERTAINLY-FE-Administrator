@@ -120,6 +120,7 @@ const listCredentialProviders: AppEpic = (action$, state, deps) => {
                   connectors: providers.map(transformConnectorDTOToModel)
                })
             ),
+
             catchError((err) =>
                of(
                   slice.actions.listCredentialProvidersFailure({ error: extractError(err, "Failed to get Credential Provider list") })
@@ -163,6 +164,7 @@ const getCredentialProviderAttributeDescriptors: AppEpic = (action$, state, deps
                   credentialProviderAttributesDescriptors: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
                })
             ),
+
             catchError(
                err => of(slice.actions.getCredentialProviderAttributesDescriptorsFailure({ error: extractError(err, "Failed to get Credential Provider Attribute Descriptor list") }))
             )
@@ -207,7 +209,7 @@ const createCredential: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createCredentialSuccess({ uuid })
+               obj => slice.actions.createCredentialSuccess({ uuid: obj.uuid })
             ),
 
             catchError(
@@ -226,6 +228,7 @@ const createCredential: AppEpic = (action$, state, deps) => {
 const createCredentialSuccess: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
+
       filter(
          slice.actions.createCredentialSuccess.match
       ),
@@ -235,6 +238,7 @@ const createCredentialSuccess: AppEpic = (action$, state, deps) => {
             return EMPTY;
          }
       )
+
    )
 
 }
@@ -334,6 +338,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
                   credential: transformCredentialDtoToModel(credential)
                })
             ),
+
             catchError(
                err => of(slice.actions.updateCredentialFailure({ error: extractError(err, "Failed to update Credential") }))
             )
@@ -350,6 +355,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
 const updateCredentialSuccess: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
+
       filter(
          slice.actions.updateCredentialSuccess.match
       ),
@@ -359,6 +365,7 @@ const updateCredentialSuccess: AppEpic = (action$, state, deps) => {
             return EMPTY;
          }
       )
+
    )
 
 }
@@ -395,9 +402,7 @@ const bulkDeleteCredential: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-
                err => of(slice.actions.bulkDeleteCredentialsFailure({ error: extractError(err, "Failed to update Credential") }))
-
             )
 
          )
@@ -419,7 +424,9 @@ const bulkDeleteCredentialFailure: AppEpic = (action$, state, deps) => {
       map(
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
+
    );
+
 }
 
 
@@ -436,6 +443,7 @@ const bulkForceDeleteCredentials: AppEpic = (action$, state, deps) => {
             map(
                () => slice.actions.bulkForceDeleteCredentialsSuccess({ uuids: action.payload.uuids })
             ),
+
             catchError(
                err => of(slice.actions.bulkForceDeleteCredentialsFailure({ error: extractError(err, "Failed to update Credential") }))
             )

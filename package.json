@@ -1,6 +1,6 @@
 {
    "name": "czertainly-frontend-administrator",
-   "version": "2.3.0",
+   "version": "2.4.0",
    "homepage": "/administrator",
    "private": true,
    "dependencies": {
@@ -46,7 +46,6 @@
       "reselect": "^4.1.6",
       "rxjs": "^6.6.3",
       "ts-rest-client": "^1.2.5",
-      "ts-rest-client-fetch": "^1.1.4",
       "typesafe-actions": "^5.1.0",
       "typescript": "~4.6.3"
    },

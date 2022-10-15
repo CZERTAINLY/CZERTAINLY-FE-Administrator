@@ -77,13 +77,13 @@ export const slice = createSlice({
 
       resetState: (state, action: PayloadAction<void>) => {
 
-         for (const key in state) {
-            if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
-         }
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
 
-         for (const key in initialState) {
-            (state as any)[key] = (initialState as any)[key];
-         }
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
 
       },
 
@@ -124,7 +124,7 @@ export const slice = createSlice({
       },
 
 
-      getLocationDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+      getLocationDetail: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.location = undefined;
          state.isFetchingDetail = true;
@@ -160,7 +160,7 @@ export const slice = createSlice({
       },
 
 
-      addLocationSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      addLocationSuccess: (state, action: PayloadAction<{ location: LocationModel, entityUuid: string }>) => {
 
          state.isCreating = false;
          state.locations.push(action.payload.location);
@@ -204,7 +204,7 @@ export const slice = createSlice({
       },
 
 
-      deleteLocation: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
+      deleteLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string, redirect?: string }>) => {
 
          state.isDeleting = true;
 
@@ -227,10 +227,10 @@ export const slice = createSlice({
       },
 
 
-      enableLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      enableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
-
+         
       },
 
 
@@ -239,6 +239,7 @@ export const slice = createSlice({
          state.isEnabling = false;
          const location = state.locations.find(l => l.uuid === action.payload.uuid);
          if (location) location.enabled = true;
+         if (state.location?.uuid === action.payload.uuid) state.location.enabled = true;
 
       },
 
@@ -250,7 +251,7 @@ export const slice = createSlice({
       },
 
 
-      disableLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      disableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isDisabling = true;
 
@@ -262,6 +263,7 @@ export const slice = createSlice({
          state.isDisabling = false;
          const location = state.locations.find(l => l.uuid === action.payload.uuid);
          if (location) location.enabled = false;
+         if (state.location?.uuid === action.payload.uuid) state.location.enabled = false;
       },
 
 
@@ -272,7 +274,7 @@ export const slice = createSlice({
       },
 
 
-      syncLocation: (state, action: PayloadAction<{ uuid: string }>) => {
+      syncLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isSyncing = true;
 
@@ -282,8 +284,18 @@ export const slice = createSlice({
       syncLocationSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
 
          state.isSyncing = false;
+
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
-         if (index > 0) state.locations[index] = action.payload.location;
+
+         if (index > 0) {
+            state.locations[index] = action.payload.location;
+         } else {
+            state.locations.push(action.payload.location);
+         }
+
+         if (state.location?.uuid === action.payload.location.uuid) {
+            state.location = action.payload.location;
+         }
 
       },
 
@@ -295,7 +307,7 @@ export const slice = createSlice({
       },
 
 
-      getPushAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
+      getPushAttributes: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isFetchingPushAttributeDescriptors = true;
 
@@ -317,7 +329,7 @@ export const slice = createSlice({
       },
 
 
-      getCSRAttributes: (state, action: PayloadAction<{ uuid: string }>) => {
+      getCSRAttributes: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isFetchingCSRAttributeDescriptors = true;
 
@@ -340,6 +352,7 @@ export const slice = createSlice({
 
 
       pushCertificate: (state, action: PayloadAction<{
+         entityUuid: string,
          locationUuid: string,
          certificateUuid: string,
          pushAttributes: AttributeModel[]
@@ -368,6 +381,7 @@ export const slice = createSlice({
 
 
       issueCertificate: (state, action: PayloadAction<{
+         entityUuid: string,
          locationUuid: string,
          raProfileUuid: string,
          csrAttributes: AttributeModel[],
@@ -396,7 +410,7 @@ export const slice = createSlice({
       },
 
 
-      autoRenewCertificate: (state, action: PayloadAction<{ locationUuid: string, certificateUuid: string }>) => {
+      autoRenewCertificate: (state, action: PayloadAction<{ entityUuid: string, locationUuid: string, certificateUuid: string }>) => {
 
          state.isAutoRenewingCertificate = true;
 
@@ -421,7 +435,7 @@ export const slice = createSlice({
       },
 
 
-      removeCertificate: (state, action: PayloadAction<{ locationUuid: string, certificateUuid: string }>) => {
+      removeCertificate: (state, action: PayloadAction<{ entityUuid: string, locationUuid: string, certificateUuid: string }>) => {
 
          state.isRemovingCertificate = true;
 

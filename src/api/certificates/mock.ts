@@ -114,34 +114,77 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
    listLocations(uuid: string): Observable<LocationDTO[]> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "listLocations not Implemented" });
+            }
+         )
+      );
 
    }
 
 
    getCertificateHistory(uuid: string): Observable<model.CertificateEventHistoryDTO[]> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "getCertificateHistory Not Implemented" });
+            }
+         )
+      );
 
    }
 
 
-   uploadCertificate(certificate: string): Observable<string> {
+   uploadCertificate(certificate: string): Observable<{ uuid: string}> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "uploadCertificate Not Implemented" });
+            }
+         )
+      );
+
    }
 
 
    deleteCertificate(uuid: string): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "deleteCertificate Not Implemented" });
+            }
+         )
+      );
 
    }
 
 
    updateGroup(uuid: string, groupUuid: string): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "updateGroup Not Implemented" });
+            }
+         )
+      );
 
    }
 
@@ -151,14 +194,30 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
 
    updateRaProfile(uuid: string, raProfileUuid: string): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "updateRaProfile Not Implemented" });
+            }
+         )
+      );
 
    }
 
 
    updateOwner(uuid: string, owner: string): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "updateOwner Not Implemented" });
+            }
+         )
+      );
 
    }
 
@@ -170,19 +229,17 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
       allSelect: boolean
    ): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "bulkUpdateGroup Not Implemented" });
+            }
+         )
+      );
 
    }
-
-
-   /*
-   bulkUpdateEntity(
-      certificateIds: string[],
-      uuid: string,
-      inFilter: any,
-      allSelect: boolean
-   ): Observable<void>;
-   */
 
 
    bulkUpdateRaProfile(
@@ -192,7 +249,15 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
       allSelect: boolean
    ): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "bulkUpdateRaProfile Not Implemented" });
+            }
+         )
+      );
 
    }
 
@@ -204,7 +269,15 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
       allSelect: boolean
    ): Observable<void> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "bulkUpdateOwner Not Implemented" });
+            }
+         )
+      );
 
    }
 
@@ -215,26 +288,42 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
       allSelect: boolean
    ): Observable<model.CertificateBulkDeleteResultDTO> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         null
+      ).pipe(
+         map(
+            () => {
+               throw new HttpErrorResponse({ status: 404, statusText: "bulkDeleteCertificate Not Implemented" });
+            }
+         )
+      );
 
    }
 
 
    getAvailableCertificateFilters(): Observable<model.AvailableCertificateFilterDTO[]> {
 
-      throw new HttpErrorResponse({ status: 404, statusText: "Not Implemented"});
+      return of(
+         dbData.certificateFilters
+      ).pipe(
+         delay(randomDelay())
+      );
 
    }
 
    checkCompliance(uuids: string[]): Observable<void> {
+
       return of(uuids).pipe(
+
          delay(randomDelay()),
          map(
             uuids => {
                console.log("Compliance Check Completed", uuids);
             }
          )
+
       )
+
    }
 
 

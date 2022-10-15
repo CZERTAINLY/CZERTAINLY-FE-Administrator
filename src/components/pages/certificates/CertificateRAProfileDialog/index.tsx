@@ -44,7 +44,7 @@ export default function CertificateGroupDialog({
 
       () => {
          if (!selectedRaProfile) return;
-         dispatch(actions.bulkUpdateRaProfile({ uuids, raProfileUuid: selectedRaProfile.value, inFilter: [], allSelect: false }));
+         dispatch(actions.bulkUpdateRaProfile({ uuids, raProfileUuid: selectedRaProfile.value.split(":#")[0], authorityUuid: selectedRaProfile.value.split(":#")[1], inFilter: [], allSelect: false }));
          onUpdate();
       },
       [dispatch, onUpdate, selectedRaProfile, uuids]
@@ -61,7 +61,7 @@ export default function CertificateGroupDialog({
 
             <Select
                id="raProfile"
-               options={raProfiles.map(raProfile => ({ value: raProfile.uuid, label: raProfile.name }))}
+               options={raProfiles.map(raProfile => ({ value: raProfile.uuid + ":#" + raProfile.authorityInstanceUuid, label: raProfile.name }))}
                value={selectedRaProfile}
                onChange={(e) => setSelectedRaProfile(e)}
 

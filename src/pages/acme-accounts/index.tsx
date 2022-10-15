@@ -14,7 +14,7 @@ function AcmeAccounts() {
       <Switch>
 
          <Route path={path} component={AccountsList} exact />
-         <Route path={`${path}/detail/:id`} component={AccountDetail} exact />
+         <Route path={`${path}/detail/:acmeProfileUuid/:id`} component={AccountDetail} exact />
 
       </Switch>
 

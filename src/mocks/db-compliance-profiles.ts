@@ -119,12 +119,14 @@ export const dbComplianceProfiles: DbComplianceProfiles = {
             {
                 "uuid": "59ee9171-f1ca-4c36-8bdd-f8b53001d772",
                 "name": "czertainly",
-                "enabled": true
+                "enabled": true,
+                authorityInstanceUuid: "6a4bceef-5eb4-4b35-b3c5-b664a6be4d72",
             },
             {
                 "uuid": "5c0deb4e-a22d-475b-aefc-8021dd5631d6",
                 "name": "lab02-ADCS-WebServer",
-                "enabled": true
+                "enabled": true,
+                authorityInstanceUuid: "6a4bceef-5eb4-4b35-b3c5-b664a6be4d72",
             }
         ]
     },

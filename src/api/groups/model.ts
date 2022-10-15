@@ -8,7 +8,7 @@ export interface GroupDTO {
 }
 
 export interface GroupManagementApi {
-  createNewGroup(name: string, description: any): Observable<string>;
+  createNewGroup(name: string, description: any): Observable<{ uuid: string}>;
   getGroupsList(): Observable<GroupDTO[]>;
   getGroupDetail(uuid: string): Observable<GroupDTO>;
   deleteGroup(uuid: string): Observable<void>;

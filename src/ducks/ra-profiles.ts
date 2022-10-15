@@ -4,6 +4,7 @@ import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { raComplianceProfileDTO } from "api/profiles";
 
 export type State = {
 
@@ -32,6 +33,8 @@ export type State = {
 
    isFetchingAcmeDetails: boolean;
 
+   isFetchingAssociatedComplianceProfiles: boolean;
+
    isCreating: boolean;
    isDeleting: boolean;
    isBulkDeleting: boolean;
@@ -45,6 +48,8 @@ export type State = {
    isCheckingCompliance: boolean;
    isAssociatingComplianceProfile: boolean;
    isDissociatingComplianceProfile: boolean;
+
+   associatedComplianceProfiles: raComplianceProfileDTO[];
 
 };
 
@@ -64,6 +69,7 @@ export const initialState: State = {
    isFetchingIssuanceAttributes: false,
    isFetchinRevocationAttributes: false,
    isFetchingAcmeDetails: false,
+   isFetchingAssociatedComplianceProfiles: false,
    isCreating: false,
    isDeleting: false,
    isBulkDeleting: false,
@@ -77,6 +83,7 @@ export const initialState: State = {
    isCheckingCompliance: false,
    isAssociatingComplianceProfile: false,
    isDissociatingComplianceProfile: false,
+   associatedComplianceProfiles: [],
 
 };
 
@@ -91,15 +98,13 @@ export const slice = createSlice({
 
       resetState: (state, action: PayloadAction<void>) => {
 
-         for (const key in state) {
-            if (!initialState.hasOwnProperty(key)) {
-               (state as any)[key] = undefined;
-            }
-         }
+         Object.keys(state).forEach(
+            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
+         );
 
-         for (const key in initialState) {
-            (state as any)[key] = (initialState as any)[key];
-         }
+         Object.keys(initialState).forEach(
+            key => (state as any)[key] = (initialState as any)[key]
+         );
 
       },
 
@@ -156,7 +161,7 @@ export const slice = createSlice({
       },
 
 
-      listAuthorizedClients: (state, action: PayloadAction<{ uuid: string }>) => {
+      listAuthorizedClients: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.authorizedClients = undefined;
          state.isFetchingAuthorizedClients = true;
@@ -179,7 +184,7 @@ export const slice = createSlice({
       },
 
 
-      getRaProfileDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+      getRaProfileDetail: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.raProfile = undefined;
          state.isFetchingDetail = true;
@@ -214,7 +219,7 @@ export const slice = createSlice({
       },
 
 
-      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      createRaProfileSuccess: (state, action: PayloadAction<{ uuid: string , authorityInstanceUuid: string}>) => {
 
          state.isCreating = false;
 
@@ -233,7 +238,8 @@ export const slice = createSlice({
          authorityInstanceUuid: string,
          description: string,
          enabled: boolean,
-         attributes: AttributeModel[]
+         attributes: AttributeModel[],
+         redirect?: string
       }>) => {
 
          state.isUpdating = true;
@@ -241,7 +247,7 @@ export const slice = createSlice({
       },
 
 
-      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
+      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel, redirect?: string }>) => {
 
          state.isUpdating = false;
          state.raProfile = action.payload.raProfile;
@@ -256,7 +262,7 @@ export const slice = createSlice({
       },
 
 
-      enableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+      enableRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
 
@@ -282,7 +288,7 @@ export const slice = createSlice({
       },
 
 
-      disableRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+      disableRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isDisabling = true;
 
@@ -308,14 +314,14 @@ export const slice = createSlice({
       },
 
 
-      deleteRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string, redirect?:string }>) => {
 
          state.isDeleting = true;
 
       },
 
 
-      deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
 
          state.isDeleting = false;
 
@@ -335,6 +341,7 @@ export const slice = createSlice({
 
 
       activateAcme: (state, action: PayloadAction<{
+         authorityUuid: string,
          uuid: string,
          acmeProfileUuid: string,
          issueCertificateAttributes: AttributeModel[],
@@ -361,7 +368,7 @@ export const slice = createSlice({
       },
 
 
-      deactivateAcme: (state, action: PayloadAction<{ uuid: string }>) => {
+      deactivateAcme: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isDeactivatingAcme = true;
 
@@ -383,7 +390,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeDetails: (state, action: PayloadAction<{ uuid: string }>) => {
+      getAcmeDetails: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isFetchingAcmeDetails = true;
 
@@ -492,7 +499,7 @@ export const slice = createSlice({
       },
 
 
-      listIssuanceAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
+      listIssuanceAttributeDescriptors: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isFetchingIssuanceAttributes = true;
 
@@ -515,7 +522,7 @@ export const slice = createSlice({
       },
 
 
-      listRevocationAttributeDescriptors: (state, action: PayloadAction<{ uuid: string }>) => {
+      listRevocationAttributeDescriptors: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.isFetchinRevocationAttributes = true;
 
@@ -562,7 +569,7 @@ export const slice = createSlice({
 
          if (!state.raProfile) return;
 
-         state.raProfile.complianceProfiles = (state.raProfile.complianceProfiles || []).concat([{uuid: action.payload.complianceProfileUuid, name: action.payload.complianceProfileName, description: action.payload.description}]);
+         state.associatedComplianceProfiles = (state.associatedComplianceProfiles || []).concat([{uuid: action.payload.complianceProfileUuid, name: action.payload.complianceProfileName, description: action.payload.description}]);
 
       },
 
@@ -583,15 +590,38 @@ export const slice = createSlice({
          state.isDissociatingComplianceProfile = false;
 
          if (!state.raProfile) return;
-         if (!state.raProfile.complianceProfiles) return;
-         const raProfileIndex = state.raProfile.complianceProfiles.findIndex(profile => profile.uuid === action.payload.complianceProfileUuid);
-         if (raProfileIndex >= 0) state.raProfile.complianceProfiles.splice(raProfileIndex, 1);
+         if (!state.associatedComplianceProfiles) return;
+         const raProfileIndex = state.associatedComplianceProfiles.findIndex(profile => profile.uuid === action.payload.complianceProfileUuid);
+         if (raProfileIndex >= 0) state.associatedComplianceProfiles.splice(raProfileIndex, 1);
       },
 
       dissociateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDissociatingComplianceProfile = false;
       },
+
+      getComplianceProfilesForRaProfile: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
+
+         state.associatedComplianceProfiles = [];
+         state.isFetchingAssociatedComplianceProfiles = true;
+
+      },
+
+
+      getComplianceProfilesForRaProfileSuccess: (state, action: PayloadAction<{ complianceProfiles: raComplianceProfileDTO[] }>) => {
+
+         state.isFetchingAssociatedComplianceProfiles = false;
+         state.associatedComplianceProfiles = action.payload.complianceProfiles;
+
+      },
+
+
+      getComplianceProfilesForRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingAssociatedComplianceProfiles = false;
+
+      },
+
 
    }
 });
@@ -627,6 +657,8 @@ const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
 const isActivatingAcme = createSelector(state, (state: State) => state.isActivatingAcme);
 const isDeactivatingAcme = createSelector(state, (state: State) => state.isDeactivatingAcme);
+const isFetchingAssociatedComplianceProfiles = createSelector(state, (state: State) => state.isFetchingAssociatedComplianceProfiles);
+const associatedComplianceProfiles = createSelector(state, (state: State) => state.associatedComplianceProfiles);
 
 
 export const selectors = {
@@ -660,7 +692,9 @@ export const selectors = {
    isDisabling,
    isBulkDisabling,
    isActivatingAcme,
-   isDeactivatingAcme
+   isDeactivatingAcme,
+   isFetchingAssociatedComplianceProfiles,
+   associatedComplianceProfiles,
 
 };
 

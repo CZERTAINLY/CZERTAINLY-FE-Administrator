@@ -27,10 +27,10 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                list => slice.actions.listConnectorsSuccess({
                   connectorList: list.map(transformConnectorDTOToModel)
                }),
+            ),
 
-               catchError(
-                  err => of(slice.actions.listConnectorsFailure({ error: extractError(err, "Failed to get connector list") }))
-               )
+            catchError(
+               err => of(slice.actions.listConnectorsFailure({ error: extractError(err, "Failed to get connector list") }))
             )
 
          )
@@ -257,7 +257,7 @@ const createConnector: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.connectors.getConnectorDetail(uuid).pipe(
+               obj => deps.apiClients.connectors.getConnectorDetail(obj.uuid).pipe(
 
                   map(
                      connector => slice.actions.createConnectorSuccess({
@@ -799,13 +799,17 @@ const callback: AppEpic = (action$, state, deps) => {
                }
             ),
 
-            catchError(err => of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId, error: extractError(err, "Connector callback failure") })))
+            catchError(
+               err => of(slice.actions.callbackFailure({ callbackId: action.payload.callbackId, error: extractError(err, "Connector callback failure") }))
+            )
 
          )
 
       ),
 
-      catchError(err => of(slice.actions.callbackFailure({ callbackId: "", error: extractError(err, "Failed to perform connector callback") })))
+      catchError(
+         err => of(slice.actions.callbackFailure({ callbackId: "", error: extractError(err, "Failed to perform connector callback") }))
+      )
 
    )
 

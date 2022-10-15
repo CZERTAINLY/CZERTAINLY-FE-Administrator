@@ -62,11 +62,11 @@ function LocationList() {
       () => {
 
          for (const uuid of checkedRows) {
-            dispatch(actions.enableLocation({ uuid }));
+            dispatch(actions.enableLocation({ entityUuid: locations.find(data => data.uuid === uuid)?.entityInstanceUuid || "", uuid }));
          }
 
       },
-      [checkedRows, dispatch]
+      [checkedRows, dispatch, locations]
 
    );
 
@@ -76,11 +76,11 @@ function LocationList() {
       () => {
 
          for (const uuid of checkedRows) {
-            dispatch(actions.disableLocation({ uuid }));
+            dispatch(actions.disableLocation({ entityUuid: locations.find(data => data.uuid === uuid)?.entityInstanceUuid || "", uuid }));
          }
 
       },
-      [checkedRows, dispatch]
+      [checkedRows, dispatch, locations]
 
    );
 
@@ -103,10 +103,10 @@ function LocationList() {
 
          setConfirmDelete(false);
 
-         checkedRows.map(uuid => dispatch(actions.deleteLocation({ uuid })));
+         checkedRows.map(uuid => dispatch(actions.deleteLocation({ entityUuid: locations.find(data => data.uuid === uuid)?.entityInstanceUuid || "", uuid })));
 
       },
-      [dispatch, checkedRows]
+      [dispatch, checkedRows, locations]
 
    );
 
@@ -169,7 +169,7 @@ function LocationList() {
             width: "auto",
          },
          {
-            content: <MDBColumnName columnName="Multiple Entires" />,
+            content: <MDBColumnName columnName="Multiple Entries" />,
             align: "center",
             sortable: true,
             id: "multiEntries",
@@ -206,7 +206,7 @@ function LocationList() {
 
             columns: [
 
-               <Link to={`${path}/detail/${location.uuid}`}>{location.name}</Link>,
+               <Link to={`${path}/detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
 
                location.description || "",
 

@@ -39,7 +39,9 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                   })
                ),
 
-               catchError(err => of(slice.actions.listCertificatesFailure({ error: extractError(err, "Failed to get certificates list") })))
+               catchError(
+                  err => of(slice.actions.listCertificatesFailure({ error: extractError(err, "Failed to get certificates list") }))
+               )
 
             )
          }
@@ -81,6 +83,7 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
             map(
                certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertDTOToModel(certificate) })
             ),
+
             catchError(
                err => of(slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }))
             )
@@ -124,6 +127,7 @@ const getCertificateValidationResult: AppEpic = (action$, state, deps) => {
             map(
                result => slice.actions.getCertificateValidationResultSuccess(result)
             ),
+
             catchError(
                err => of(slice.actions.getCertificateValidationResultFailure({ error: extractError(err, "Failed to get certificate validation result") }))
             )
@@ -165,7 +169,8 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.operations.issueCertificate(
             action.payload.raProfileUuid,
             action.payload.pkcs10,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.authorityUuid
          ).pipe(
 
             map(
@@ -235,12 +240,14 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
             action.payload.uuid,
             action.payload.raProfileUuid,
             action.payload.reason,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute))
+            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
+            action.payload.authorityUuid
          ).pipe(
 
             map(
                () => slice.actions.revokeCertificateSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.revokeCertificateFailure({ error: extractError(err, "Failed to revoke certificate") }))
             )
@@ -282,12 +289,14 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.operations.renewCertificate(
             action.payload.uuid,
             action.payload.raProfileUuid,
-            action.payload.pkcs10
+            action.payload.pkcs10,
+            action.payload.authorityUuid,
          ).pipe(
 
             map(
                operation => slice.actions.renewCertificateSuccess({ uuid: operation.uuid })
             ),
+
             catchError(
                err => of(slice.actions.renewCertificateFailure({ error: extractError(err, "Failed to renew certificate") }))
             )
@@ -352,6 +361,7 @@ const getAvailableCertificateFilters: AppEpic = (action$, state, deps) => {
                   availableCertificateFilters: filters.map(filter => transformAvailableCertificateFilterDTOToModel(filter))
                })
             ),
+
             catchError(
                err => of(slice.actions.getAvailableCertificateFiltersFailure({ error: extractError(err, "Failed to get available certificate filters") }))
             )
@@ -397,6 +407,7 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
                   certificateHistory: records.map(record => transformCertificateHistoryDTOToModel(record))
                })
             ),
+
             catchError(
                err => of(slice.actions.getCertificateHistoryFailure({ error: extractError(err, "Failed to get certificate history") }))
             )
@@ -442,6 +453,7 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
                   certificateLocations: locations.map(location => transformLocationDtoToModel(location))
                })
             ),
+
             catchError(
                err => of(slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }))
             )
@@ -485,6 +497,7 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
             map(
                () => slice.actions.deleteCertificateSuccess({ uuid: action.payload.uuid })
             ),
+
             catchError(
                err => of(slice.actions.deleteCertificateFailure({ error: extractError(err, "Failed to delete certificate") }))
             )
@@ -560,12 +573,14 @@ const updateGroup: AppEpic = (action$, state, deps) => {
                         group: transformGroupDtoToModel(group)
                      })
                   ),
+
                   catchError(
                      err => of(slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }))
                   )
 
                ),
             ),
+
             catchError(
                err => of(slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }))
             )
@@ -611,7 +626,7 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
 
                   map(
                      raProfile => slice.actions.updateRaProfileSuccess({
@@ -620,6 +635,7 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
                         raProfile: transformRaProfileDTOToCertificateModel(raProfile)
                      })
                   ),
+
                   catchError(
                      err => of(slice.actions.updateRaProfileFailure({ error: extractError(err, "Failed to update RA profile") }))
                   )
@@ -677,6 +693,7 @@ const updateOwner: AppEpic = (action$, state, deps) => {
                   owner: action.payload.owner
                }),
             ),
+
             catchError(
                err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to update owner") }))
             )
@@ -737,13 +754,17 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
 
                   ),
 
-                  catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") })))
+                  catchError(
+                     err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") }))
+                  )
 
                )
 
             ),
 
-            catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") })))
+            catchError(
+               err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") }))
+            )
 
          )
 
@@ -788,7 +809,7 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
 
                   map(
 
@@ -801,13 +822,17 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
 
                   ),
 
-                  catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") })))
+                  catchError(
+                     err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") }))
+                  )
 
                )
 
             ),
 
-            catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") })))
+            catchError(
+               err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") }))
+            )
 
          )
 
@@ -861,7 +886,9 @@ const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
 
             ),
 
-            catchError(err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update owner") })))
+            catchError(
+               err => of(slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update owner") }))
+            )
 
          )
 
@@ -905,15 +932,18 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
 
             map(
 
-               () => slice.actions.bulkDeleteSuccess({
+               (result) => slice.actions.bulkDeleteSuccess({
                   uuids: action.payload.uuids,
                   inFilter: action.payload.inFilter,
                   allSelect: action.payload.allSelect,
+                  response: result,
                }),
 
             ),
 
-            catchError(err => of(slice.actions.bulkDeleteFailure({ error: extractError(err, "Failed to bulk delete certificates") })))
+            catchError(
+               err => of(slice.actions.bulkDeleteFailure({ error: extractError(err, "Failed to bulk delete certificates") }))
+            )
 
          )
 
@@ -923,6 +953,21 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
 
 }
 
+
+const bulkDeleteSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteSuccess.match
+      ),
+      map(
+         action => alertActions.success(action.payload.response.message)
+      )
+
+   )
+
+}
 
 const bulkDeleteFailure: AppEpic = (action$, state, deps) => {
 
@@ -955,24 +1000,28 @@ const uploadCertificate: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               uuid => deps.apiClients.certificates.getCertificateDetail(uuid).pipe(
+               obj => deps.apiClients.certificates.getCertificateDetail(obj.uuid).pipe(
 
                   map(
 
                      certificate => slice.actions.uploadCertificateSuccess({
-                        uuid,
+                        uuid: obj.uuid,
                         certificate,
                      })
 
                   ),
 
-                  catchError(err => of(slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") })))
+                  catchError(
+                     err => of(slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") }))
+                  )
 
                )
 
             ),
 
-            catchError(err => of(slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") })))
+            catchError(
+               err => of(slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") }))
+            )
 
          )
 
@@ -1010,6 +1059,7 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.operations.getIssuanceAttributes(
             action.payload.raProfileUuid,
+            action.payload.authorityUuid,
          ).pipe(
 
             map(
@@ -1021,7 +1071,9 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
 
             ),
 
-            catchError(err => of(slice.actions.getIssuanceAttributesFailure({ error: extractError(err, "Failed to get issuance attributes") })))
+            catchError(
+               err => of(slice.actions.getIssuanceAttributesFailure({ error: extractError(err, "Failed to get issuance attributes") }))
+            )
 
          )
 
@@ -1059,6 +1111,7 @@ const getRevocationAttributes: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.operations.getRevocationAttributes(
             action.payload.raProfileUuid,
+            action.payload.authorityUuid,
          ).pipe(
 
             map(
@@ -1070,7 +1123,9 @@ const getRevocationAttributes: AppEpic = (action$, state, deps) => {
 
             ),
 
-            catchError(err => of(slice.actions.getRevocationAttributesFailure({ error: extractError(err, "Failed to get revocation attributes") })))
+            catchError(
+               err => of(slice.actions.getRevocationAttributesFailure({ error: extractError(err, "Failed to get revocation attributes") }))
+            )
 
          )
 
@@ -1113,6 +1168,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
             map(
                () => slice.actions.checkComplianceSuccess()
             ),
+
             catchError(
                err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
 
@@ -1150,11 +1206,11 @@ const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
          slice.actions.checkComplianceSuccess.match
       ),
       map(
-
          action => alertActions.success("Compliance Check for the certificates initiated")
       )
 
    );
+
 }
 
 
@@ -1195,6 +1251,7 @@ const epics = [
    bulkUpdateOwner,
    bulkUpdateOwnerFailure,
    bulkDelete,
+   bulkDeleteSuccess,
    bulkDeleteFailure,
    uploadCertificate,
    uploadCertificateFailure,

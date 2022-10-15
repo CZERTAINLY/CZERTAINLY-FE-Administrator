@@ -112,7 +112,7 @@ const createGroup: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               uuid => slice.actions.createGroupSuccess({ uuid })
+               obj => slice.actions.createGroupSuccess({ uuid: obj.uuid })
             ),
 
             catchError(
@@ -151,10 +151,10 @@ const createGroupSuccess: AppEpic = (action$, state, deps) => {
 const createGroupFailure: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
+
       filter(
          slice.actions.createGroupFailure.match
       ),
-
       map(
          action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )

@@ -1,31 +1,36 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions } from "ts-rest-client";
-import { FetchHttpService } from "ts-rest-client-fetch";
 
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
-import { CertificateRevocationReason } from "types/certificate";
+import { FetchHttpService, HttpRequestOptions } from "utils/FetchHttpService";
 
 import * as model from "./model";
 import { CertificateIssuanceDTO } from "./model";
+import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { CertificateRevocationReason } from "types/certificate";
 
-const baseUrl = "/api/v2/operations/";
+const baseUrl = "/v2/operations";
 
 export class OperationsBackend implements model.OperationsApi {
 
+
    private _fetchService: FetchHttpService;
 
-   constructor() {
-      this._fetchService = new FetchHttpService();
+
+   constructor(fetchService: FetchHttpService) {
+
+      this._fetchService = fetchService;
+
    }
+
 
    issueCertificate(
       raProfileUuid: string,
       pkcs10: string,
       attributes: AttributeDTO[],
+      authorityUuid: string
    ): Observable<{ uuid: string, certificateData: string }> {
 
       return this._fetchService.request(
-         new HttpRequestOptions(`${baseUrl}${raProfileUuid}/issue`, "POST", {
+         new HttpRequestOptions(`${baseUrl}/authorities/${authorityUuid}/raProfiles/${raProfileUuid}/certificates`, "POST", {
             raProfileUuid,
             pkcs10,
             attributes,
@@ -39,12 +44,13 @@ export class OperationsBackend implements model.OperationsApi {
       uuid: string,
       raProfileUuid: string,
       reason: CertificateRevocationReason,
-      attributes: AttributeDTO[]
+      attributes: AttributeDTO[],
+      authorityUuid: string
    ): Observable<void> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/${uuid}/revoke`,
+            `${baseUrl}/authorities/${authorityUuid}/raProfiles/${raProfileUuid}/certificates/${uuid}/revoke`,
             "POST",
             {
                reason,
@@ -60,11 +66,12 @@ export class OperationsBackend implements model.OperationsApi {
       uuid: string,
       raProfileUuid: string,
       pkcs10: string,
+      authorityUuid: string
    ): Observable<CertificateIssuanceDTO> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/${uuid}/renew`,
+            `${baseUrl}/authorities/${authorityUuid}/raProfiles/${raProfileUuid}/certificates/${uuid}/renew`,
             "POST",
             {
                pkcs10,
@@ -75,23 +82,22 @@ export class OperationsBackend implements model.OperationsApi {
    }
 
 
-   getIssuanceAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]> {
+   getIssuanceAttributes(raProfileUuid: string, authorityUuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/issue/attributes`,
+            `${baseUrl}/authorities/${authorityUuid}/raProfiles/${raProfileUuid}/attributes/issue`,
             "GET"
          )
       );
-
    }
 
 
-   getRevocationAttributes(raProfileUuid: string): Observable<AttributeDescriptorDTO[]> {
+   getRevocationAttributes(raProfileUuid: string, authorityUuid: string): Observable<AttributeDescriptorDTO[]> {
 
       return this._fetchService.request(
          new HttpRequestOptions(
-            `${baseUrl}${raProfileUuid}/revoke/attributes`,
+            `${baseUrl}/authorities/${authorityUuid}/raProfiles/${raProfileUuid}/attributes/revoke`,
             "GET"
          )
       );
