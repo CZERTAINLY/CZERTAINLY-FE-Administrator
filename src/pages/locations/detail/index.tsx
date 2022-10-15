@@ -519,6 +519,7 @@ export default function LocationDetail() {
                headers={certHeaders}
                data={certData}
                hasCheckboxes={true}
+               multiSelect={false}
                onCheckedRowsChanged={
                   (rows) => { setCertCheckedRows(rows as string[]) }
                }
