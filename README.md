@@ -43,13 +43,11 @@ For more information, refer to the [CZERTAINLY documentation](https://docs.czert
 
 ## Docker container
 
-Admin Web Interface is provided as a Docker container. Use the `docker pull harbor.3key.company/czertainly/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
+Admin Web Interface is provided as a Docker container. Use the `docker pull 3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
 
-| Variable       | Description                                                        | Required | Default value     |
-|----------------|--------------------------------------------------------------------|----------|-------------------|
-| `BASE_URL`     | URL Path of the frontend application                               | No       | `/administrator`  |
-| `API_URL`      | URL Path of the CZERTAINLY API for the web application             | No       | `/api`            |
-| `LOGIN_URL`    | URL Path of the login page                                         | No       | `/login`          |
-| `LOGOUT_URL`   | URL Path of the logout page                                        | No       | `/logout`         |
-
-* Default variable values are defined in the Dockerfile
+| Variable     | Description                                            | Required                                        | Default value    |
+|--------------|--------------------------------------------------------|-------------------------------------------------|------------------|
+| `BASE_URL`   | URL Path of the frontend application                   | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/administrator` |
+| `API_URL`    | URL Path of the CZERTAINLY API for the web application | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/api`           |
+| `LOGIN_URL`  | URL Path of the login page                             | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/login`         |
+| `LOGOUT_URL` | URL Path of the logout page                            | ![NO](https://img.shields.io/badge/-NO-red.svg) | `/logout`        |
