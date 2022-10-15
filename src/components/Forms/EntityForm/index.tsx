@@ -57,8 +57,6 @@ export default function EntityForm({
    const isCreating = useSelector(entitySelectors.isCreating);
    const isUpdating = useSelector(entitySelectors.isUpdating);
 
-   const [init, setInit] = useState(true);
-
    const [entity, setEntity] = useState<EntityModel>();
    const [entityProvider, setEntityProvider] = useState<ConnectorModel>();
 
@@ -70,26 +68,28 @@ export default function EntityForm({
    useEffect(
 
       () => {
+         dispatch(entityActions.resetState());
+         dispatch(connectorActions.clearCallbackData());
+         dispatch(entityActions.listEntityProviders());
 
-         if (init) {
-            dispatch(entityActions.resetState());
-            dispatch(connectorActions.clearCallbackData());
-            if (editMode && (!entitySelector || entitySelector.uuid !== params.id)) {
-               dispatch(entityActions.getEntityDetail({ uuid: params.id }));
-            }
-            setInit(false);
+         if (editMode) {
+            dispatch(entityActions.getEntityDetail({ uuid: params.id }));
          }
+      },
+      [dispatch, editMode, params.id]
 
-         if (init) {
-            dispatch(entityActions.listEntityProviders());
-         }
+   );
+
+   useEffect(
+
+      () => {
 
          if (editMode && entitySelector?.uuid === params.id) {
             setEntity(entitySelector);
          }
 
       },
-      [dispatch, editMode, params.id, entitySelector, entityProviders, isFetchingEntityProviders, init]
+      [dispatch, editMode, params.id, entitySelector, entityProviders, isFetchingEntityProviders]
 
    );
 
