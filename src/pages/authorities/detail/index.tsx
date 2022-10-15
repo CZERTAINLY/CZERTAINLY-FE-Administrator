@@ -40,7 +40,7 @@ export default function AuthorityDetail() {
       () => {
 
          if (!params.id) return;
-
+         dispatch(actions.resetState());
          dispatch(actions.getAuthorityDetail({ uuid: params.id }));
 
       },

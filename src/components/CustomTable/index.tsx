@@ -267,16 +267,7 @@ function CustomTable({
             return;
          }
 
-         const checkedRows = tblData.filter(
-
-            (row, index) => {
-               if (!hasPagination) return true;
-               if (pageSize === 0) return true;
-               return paginationData ? true : index >= (page - 1) * pageSize && index < page * pageSize;
-            }
-
-         ).map(row => row.id);
-
+         const checkedRows = tblData.slice((page - 1) * pageSize, page * pageSize).map(row => row.id);
 
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
@@ -428,9 +419,8 @@ function CustomTable({
 
          const columns = tblHeaders ? [...tblHeaders] : [];
 
-         if (hasCheckboxes && multiSelect) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
+         if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
          if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
-
          return columns.map(
 
             header => (
@@ -446,10 +436,10 @@ function CustomTable({
                      {
                         header.id === "__checkbox__" ? (
 
-                           hasAllCheckBox ? (
-                              <input type="checkbox" checked={tblCheckedRows.length === tblData.length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+                           hasAllCheckBox && multiSelect? (
+                              <input type="checkbox" checked={tblCheckedRows.length === tblData.slice((page - 1) * pageSize, page * pageSize).length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
                            ) : (
-                              <>&nbsp;</>
+                              <>&nbsp;</> 
                            )
 
                         ) : header.sortable ? (
@@ -496,7 +486,7 @@ function CustomTable({
 
          )
       },
-      [tblHeaders, hasCheckboxes, multiSelect, hasAllCheckBox, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, onCheckAllCheckboxClick]
+      [tblHeaders, hasCheckboxes, multiSelect, hasAllCheckBox, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, tblData, onCheckAllCheckboxClick]
 
    );
 

@@ -38,6 +38,7 @@ export default function EntityDetail() {
       () => {
 
          if (!params.id) return;
+         dispatch(actions.resetState());
 
          dispatch(actions.getEntityDetail({ uuid: params.id }));
 
