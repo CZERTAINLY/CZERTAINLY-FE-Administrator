@@ -1,6 +1,6 @@
 {
    "name": "czertainly-frontend-administrator",
-   "version": "2.4.0",
+   "version": "2.4.1-SNAPSHOT",
    "homepage": "/administrator",
    "private": true,
    "dependencies": {
