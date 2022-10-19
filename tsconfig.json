@@ -1,5 +1,4 @@
 {
-
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -8,24 +7,20 @@
       "esnext"
     ],
     "allowJs": true,
-    "baseUrl": "src",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "noFallthroughCasesInSwitch": true,
-    "sourceMap": true
+    "jsx": "react-jsx"
   },
-
   "include": [
-    "src/**/*"
-   ]
-
+    "src"
+  ]
 }

@@ -1,1 +1,0 @@
-export type Status = "inProgress" | "completed" | "success" | "failed";
