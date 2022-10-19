@@ -1,4 +1,3 @@
-import { Observable } from "rxjs";
 import { combineEpics, Epic } from "redux-observable";
 import { AnyAction, combineReducers } from "redux";
 
@@ -65,7 +64,7 @@ export interface EpicDependencies {
 }
 
 
-export type AppState = Observable<ReturnType<typeof reducers>>;
+export type AppState = ReturnType<typeof reducers>;
 
 
 export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;

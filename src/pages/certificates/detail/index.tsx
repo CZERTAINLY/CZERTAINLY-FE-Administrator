@@ -650,9 +650,9 @@ export default function CertificateDetail() {
       </h5>
    );
 
-   const attributesTitle = (
+   const propertiesTitle = (
       <h5>
-         Certificate <span className="fw-semi-bold">Attributes</span>
+         Certificate <span className="fw-semi-bold">Properties</span>
       </h5>
    );
 
@@ -808,7 +808,7 @@ export default function CertificateDetail() {
 
 
 
-   const attributeHeaders: TableHeader[] = useMemo(
+   const propertiesHeaders: TableHeader[] = useMemo(
 
       () => [
          {
@@ -892,7 +892,7 @@ export default function CertificateDetail() {
       [certificate]
    )
 
-   const attributeData: TableDataRow[] = useMemo(
+   const propertiesData: TableDataRow[] = useMemo(
 
       () => !certificate ? [] : [
          {
@@ -910,7 +910,7 @@ export default function CertificateDetail() {
                   data-tip
                   onClick={() => setUpdateOwner(true)}
                >
-                  <i className="fa fa-refresh" />
+                  <i className="fa fa-pencil-square-o" />
                   <ToolTip id="updateOwner" message="Update Owner" />
                </Button>
             ],
@@ -930,7 +930,7 @@ export default function CertificateDetail() {
                   data-tip
                   onClick={() => setUpdateGroup(true)}
                >
-                  <i className="fa fa-refresh" />
+                  <i className="fa fa-pencil-square-o" />
                   <ToolTip id="updateGroup" message="Update Group" />
                </Button>
             ],
@@ -950,14 +950,14 @@ export default function CertificateDetail() {
                   data-tip
                   onClick={() => setUpdateRaProfile(true)}
                >
-                  <i className="fa fa-refresh" />
+                  <i className="fa fa-pencil-square-o" />
                   <ToolTip id="updateRaProfile" message="Update RA Profile" />
                </Button>
             ],
          },
          {
             id: "type",
-            columns: ["Type", certificate.certificateType || ""],
+            columns: ["Type", certificate.certificateType || "", ""],
          },
       ],
       [certificate]
@@ -1301,11 +1301,11 @@ export default function CertificateDetail() {
                   />
                </Widget>
 
-               <Widget title={attributesTitle}>
+               <Widget title={propertiesTitle}>
                   <br />
                   <CustomTable
-                     headers={attributeHeaders}
-                     data={attributeData}
+                     headers={propertiesHeaders}
+                     data={propertiesData}
                   />
                </Widget>
 
