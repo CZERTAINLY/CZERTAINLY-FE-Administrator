@@ -65,7 +65,7 @@ export interface EpicDependencies {
 }
 
 
-export type AppState = Observable<ReturnType<typeof reducers>>;
+export type AppState = ReturnType<typeof reducers>;
 
 
 export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;

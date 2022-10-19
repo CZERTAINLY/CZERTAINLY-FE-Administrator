@@ -230,7 +230,7 @@ export const slice = createSlice({
       enableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
-         
+
       },
 
 
@@ -363,7 +363,7 @@ export const slice = createSlice({
       },
 
 
-      pushCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      pushCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel, certificateUuid: string }>) => {
 
          state.isPushingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
@@ -417,13 +417,12 @@ export const slice = createSlice({
       },
 
 
-      autoRenewCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      autoRenewCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel, certificateUuid: string }>) => {
 
          state.isAutoRenewingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
          if (index > 0) state.locations[index] = action.payload.location;
          if (state.location?.uuid === action.payload.location.uuid) state.location = action.payload.location;
-
 
       },
 
@@ -442,7 +441,7 @@ export const slice = createSlice({
       },
 
 
-      removeCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      removeCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel, certificateUuid: string }>) => {
 
          state.isRemovingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);

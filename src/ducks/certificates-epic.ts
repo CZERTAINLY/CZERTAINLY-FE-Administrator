@@ -1,5 +1,5 @@
 import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import history from "browser-history";
 
@@ -244,8 +244,13 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
             action.payload.authorityUuid
          ).pipe(
 
-            map(
-               () => slice.actions.revokeCertificateSuccess({ uuid: action.payload.uuid })
+            mergeMap(
+
+               () => of(
+                  slice.actions.revokeCertificateSuccess({ uuid: action.payload.uuid }),
+                  slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
+               )
+
             ),
 
             catchError(
@@ -254,6 +259,22 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
 
          )
 
+      )
+
+   )
+
+}
+
+
+const revokeCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.revokeCertificateSuccess.match
+      ),
+      map(
+         action => slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
       )
 
    )
@@ -1225,6 +1246,7 @@ const epics = [
    issueCertificateSuccess,
    issueCertificateFailure,
    revokeCertificate,
+   revokeCertificateSuccess,
    revokeCertificateFailure,
    renewCertificate,
    renewCertificateSuccess,

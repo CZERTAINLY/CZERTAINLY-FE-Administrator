@@ -8,6 +8,8 @@ import { actions as alertActions } from "./alerts";
 import { extractError } from "utils/net";
 import { slice } from "./locations";
 
+import { slice as certsSlice } from "./certificates";
+
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformLocationDtoToModel } from "./transform/locations";
 
@@ -502,8 +504,11 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
             action.payload.pushAttributes.map(transformAttributeModelToDTO)
          ).pipe(
 
-            map(
-               location => slice.actions.pushCertificateSuccess({ location: transformLocationDtoToModel(location) })
+            mergeMap(
+               location => of(
+                  slice.actions.pushCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
+                  certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid })
+               )
             ),
 
             catchError(
@@ -511,6 +516,27 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
             )
 
          )
+
+      )
+
+   );
+
+}
+
+
+const pushCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.pushCertificateSuccess.match
+      ),
+      switchMap(
+
+         action => state.value.certificates.certificateDetail?.uuid === action.payload.certificateUuid ?
+            of(certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid }))
+            :
+            EMPTY
 
       )
 
@@ -601,7 +627,7 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               location => slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location) })
+               location => slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid })
             ),
 
             catchError(
@@ -615,6 +641,29 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
    );
 
 }
+
+
+
+const autoRenewCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.autoRenewCertificateSuccess.match
+      ),
+      switchMap(
+
+         action => state.value.certificates.certificateDetail?.uuid === action.payload.certificateUuid ?
+            of(certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid }))
+            :
+            EMPTY
+
+      )
+
+   );
+
+}
+
 
 
 const autoRenewCertificateFailure: AppEpic = (action$, state, deps) => {
@@ -649,7 +698,7 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
          ).pipe(
 
             map(
-               location => slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location) })
+               location => slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid })
             ),
 
             catchError(
@@ -664,6 +713,26 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
 
 }
 
+
+const removeCertificateSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.removeCertificateSuccess.match
+      ),
+      switchMap(
+
+         action => state.value.certificates.certificateDetail?.uuid === action.payload.certificateUuid ?
+            of(certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid }))
+            :
+            EMPTY
+
+      )
+
+   );
+
+}
 
 const removeCertificateFailure: AppEpic = (action$, state, deps) => {
 
@@ -748,12 +817,15 @@ const epics = [
    getCSRAttributes,
    getCSRAttributesFailure,
    pushCertificate,
+   pushCertificateSuccess,
    pushCertificateFailure,
    issueCertificate,
    issueCertificateFailure,
    autoRenewCertificate,
+   autoRenewCertificateSuccess,
    autoRenewCertificateFailure,
    removeCertificate,
+   removeCertificateSuccess,
    removeCertificateFailure,
    syncLocation,
    syncLocationFailure
