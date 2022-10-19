@@ -615,6 +615,22 @@ const updateGroup: AppEpic = (action$, state, deps) => {
 }
 
 
+const updateGroupSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateGroupSuccess.match
+      ),
+      map(
+         action => slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
+      )
+
+   )
+
+}
+
+
 const updateGroupFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -678,6 +694,21 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 };
 
 
+const updateRaProfileSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+filter(
+         slice.actions.updateRaProfileSuccess.match
+      ),
+      map(
+         action => slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
+      )
+
+   )
+
+}
+
+
 const updateRaProfileFailure: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
@@ -721,6 +752,22 @@ const updateOwner: AppEpic = (action$, state, deps) => {
 
          )
 
+      )
+
+   )
+
+}
+
+
+const updateOwnerSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.updateOwnerSuccess.match
+      ),
+      map(
+         action => slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
       )
 
    )
@@ -1261,10 +1308,13 @@ const epics = [
    deleteCertificateSuccess,
    deleteCertificateFailure,
    updateGroup,
+   updateGroupSuccess,
    updateGroupFailure,
    updateRaProfile,
+   updateRaProfileSuccess,
    updateRaProfileFailure,
    updateOwner,
+   updateOwnerSuccess,
    updateOwnerFailure,
    bulkUpdateGroup,
    bulkUpdateGroupFailure,

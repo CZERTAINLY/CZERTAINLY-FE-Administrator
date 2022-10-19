@@ -1,4 +1,3 @@
-import { Observable } from "rxjs";
 import { combineEpics, Epic } from "redux-observable";
 import { AnyAction, combineReducers } from "redux";
 
