@@ -957,7 +957,7 @@ export default function CertificateDetail() {
          },
          {
             id: "type",
-            columns: ["Type", certificate.certificateType || ""],
+            columns: ["Type", certificate.certificateType || "", ""],
          },
       ],
       [certificate]
