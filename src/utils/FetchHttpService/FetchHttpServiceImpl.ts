@@ -25,9 +25,8 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
       // workaround for
 
       // --- This should be rewritten instead of using the ts-rest-client library ---
-
       const opts = new HttpRequestOptions(
-         `${this._baseUrl}${options.url}`,
+         `${this._baseUrl}${options.getUrl()}`,
          options.method,
          options.body === null ? undefined : options.body,
          options.headers
