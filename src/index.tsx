@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './pages/store';
 import reportWebVitals from './reportWebVitals';
-import './index.css';
 import { AppRouter } from "./pages/AppRouter";
+import "./styles/theme.scss";
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);

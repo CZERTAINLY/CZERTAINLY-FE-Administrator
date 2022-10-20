@@ -1,11 +1,13 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import App from "../App";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import Home from "./home";
 
 export const AppRouter = () => {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename={(window as any).__ENV__.BASE_URL}>
             <Routes>
-                <Route path="/app" element={<App />} />
+                <Route path="/" element={<Navigate to="/app/home" />} />
+                <Route path="/app" element={<Navigate to="/app/home" />} />
+                <Route path="/app/home" element={<Home />} />
 
                 <Route path="*" element={<h1>404</h1>} />
             </Routes>
