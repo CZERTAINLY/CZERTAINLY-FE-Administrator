@@ -2,12 +2,20 @@ import React from 'react';
 import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import './App.css';
+import { useNavigate } from "react-router-dom";
 
 function App() {
+  const navigate = useNavigate();
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <button
+            className="App-link"
+            onClick={() => navigate(-1)}
+        >
+          Go Back
+        </button>
         <Counter />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
