@@ -139,16 +139,6 @@ export default function CertificateDetail() {
 
    )
 
-   useEffect(
-
-      () => {
-
-         if (!params.id || !updateGroup) return;
-         dispatch(groupAction.listGroups());
-
-      },
-      [dispatch, updateGroup, params.id]
-   )
 
    useEffect(
 
@@ -159,6 +149,7 @@ export default function CertificateDetail() {
       },
       [dispatch, groups]
    )
+
 
    useEffect(
 
