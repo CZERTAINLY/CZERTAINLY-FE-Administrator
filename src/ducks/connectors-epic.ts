@@ -640,7 +640,7 @@ const authorizeConnector: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.connectors.authorizeConnector(action.payload.uuid).pipe(
 
             map(
-               () => slice.actions.authorizeConnectorAuccess({ uuid: action.payload.uuid })
+               () => slice.actions.authorizeConnectorSuccess({ uuid: action.payload.uuid })
             ),
 
             catchError(
@@ -650,6 +650,25 @@ const authorizeConnector: AppEpic = (action$, state, deps) => {
          )
 
       )
+   )
+
+}
+
+
+const authorizeConnectorSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.authorizeConnectorSuccess.match
+      ),
+      mergeMap(
+         action => of(
+            slice.actions.getConnectorDetail({ uuid: action.payload.uuid }),
+            slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
+         )
+      )
+
    )
 
 }
@@ -693,6 +712,22 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
          )
 
       )
+   )
+
+}
+
+
+const bulkAuthorizeConnectorsSuccess: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkAuthorizeConnectorsSuccess.match
+      ),
+      map(
+         () => slice.actions.listConnectors(),
+      )
+
    )
 
 }
@@ -861,9 +896,10 @@ const epics = [
    bulkReconnectConnectors,
    bulkReconnectConnectorsFailure,
    authorizeConnector,
+   authorizeConnectorSuccess,
    authorizeConnectorFailure,
    bulkAuthorizeConnectors,
-   bulkAuthorizeConnectorsFailure,
+   bulkAuthorizeConnectorsSuccess,
    bulkAuthorizeConnectorsFailure,
    bulkForceDeleteConnectors,
    bulkForceDeleteConnectorsSuccess,
