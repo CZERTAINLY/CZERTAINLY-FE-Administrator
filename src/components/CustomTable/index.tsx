@@ -272,7 +272,7 @@ function CustomTable({
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, [tblData, onCheckedRowsChanged, hasPagination, pageSize, paginationData, page]
+      }, [tblData, onCheckedRowsChanged, pageSize, page]
 
    );
 
@@ -439,7 +439,7 @@ function CustomTable({
                            hasAllCheckBox && multiSelect? (
                               <input type="checkbox" checked={tblCheckedRows.length === tblData.slice((page - 1) * pageSize, page * pageSize).length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
                            ) : (
-                              <>&nbsp;</> 
+                              <>&nbsp;</>
                            )
 
                         ) : header.sortable ? (
@@ -486,7 +486,7 @@ function CustomTable({
 
          )
       },
-      [tblHeaders, hasCheckboxes, multiSelect, hasAllCheckBox, hasDetails, onColumnSortClick, tblCheckedRows.length, tblData.length, tblData, onCheckAllCheckboxClick]
+      [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, tblCheckedRows.length, tblData, page, pageSize, onCheckAllCheckboxClick]
 
    );
 
