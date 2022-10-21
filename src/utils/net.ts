@@ -1,5 +1,5 @@
 import { Observable, from } from "rxjs";
-import { HttpErrorResponse, StringMap } from "ts-rest-client";
+import { HttpErrorResponse } from "./FetchHttpService";
 
 
 export function createNewResource<T = any>(
@@ -44,7 +44,7 @@ async function doFetch<T>(
          return await getResponseBody(response);
       }
 
-      const responseHeaders = {} as StringMap;
+      const responseHeaders: { [key: string]: string } = {};
 
       if (response.headers) {
          response.headers.forEach((value, key) => (responseHeaders[key] = value));

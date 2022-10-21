@@ -1,5 +1,8 @@
 import { Observable } from "rxjs";
-import { HttpRequestOptions, HttpErrorResponse, NamedValues } from "ts-rest-client";
+
+import { NamedValues } from "./NamedValues";
+import { HttpRequestOptions } from "./HttpRequestOptions";
+import { HttpErrorResponse } from "./HttpErrorResponse";
 
 export { HttpRequestOptions };
 export { NamedValues };

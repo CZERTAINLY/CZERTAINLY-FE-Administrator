@@ -4,6 +4,7 @@
   "homepage": "/administrator",
   "private": true,
   "dependencies": {
+    "@fidm/x509": "^1.2.1",
     "@reduxjs/toolkit": "^1.8.6",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -22,6 +23,7 @@
     "react-scripts": "^5.0.1",
     "reactstrap": "^9.1.4",
     "redux-observable": "^2.0.0",
+    "rxjs": "^7.5.7",
     "sass": "^1.55.0",
     "ts-rest-client": "^1.2.5",
     "typescript": "^4.8.4",

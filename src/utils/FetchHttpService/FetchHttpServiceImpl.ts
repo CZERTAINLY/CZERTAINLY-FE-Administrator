@@ -1,12 +1,14 @@
 import { Observable } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
-import { FetchHttpService as IFetchHttpService } from "./FetchHttpService";
 
-import { HttpErrorResponse, HttpRequestOptions } from "ts-rest-client";
+import { FetchHttpService } from "./FetchHttpService";
+import { HttpRequestOptions } from "./HttpRequestOptions";
+import { HttpErrorResponse } from "./HttpErrorResponse";
+
 import { switchMap } from "rxjs/operators";
-import { useNavigate } from "react-router-dom";
 
-export class FetchHttpServiceImpl implements IFetchHttpService {
+
+export class FetchHttpServiceImpl implements FetchHttpService {
 
 
    private _baseUrl: string;
@@ -21,9 +23,6 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
 
    public request(options: HttpRequestOptions): Observable<any> {
 
-      // workaround for
-
-      // --- This should be rewritten instead of using the ts-rest-client library ---
       const opts = new HttpRequestOptions(
          `${this._baseUrl}${options.getUrl()}`,
          options.method,
@@ -33,11 +32,10 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
 
       const fetchOpts: RequestInit = {};
 
+
       if (options.method) fetchOpts.method = options.method;
       if (options.body) fetchOpts.body = options.getSerializedBody();
       if (options.headers) fetchOpts.headers = new Headers(options.headers.values);
-
-      // --- !!! ---
 
 
       return fromFetch(opts.url, fetchOpts).pipe(
@@ -54,8 +52,10 @@ export class FetchHttpServiceImpl implements IFetchHttpService {
                if (response.headers) response.headers.forEach((value, key) => headers[key] = value);
 
                if (response.status === 401) {
-                  const navigate = useNavigate();
-                  navigate(`/app/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                  // !!! SOLVE PROBLEM WITH REDIRECTION TO LOGIN PAGE !!!
+                  // history.push(`/app/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                  throw new Error("SOLVE PROBLEM WITH REDIRECTION TO LOGIN PAGE");
+                  // !!! SOLVE PROBLEM WITH REDIRECTION TO LOGIN PAGE !!!
                }
 
                throw new HttpErrorResponse({
