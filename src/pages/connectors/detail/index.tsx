@@ -576,11 +576,11 @@ export default function ConnectorDetail() {
 
          <Dialog
             isOpen={confirmAuthorize}
-            caption="Authorize Connector"
-            body="You are about to authorize an Connector. Is this what you want to do?"
+            caption="Approce Connector"
+            body="You are about to approve an Connector. Is this what you want to do?"
             toggle={() => setConfirmAuthorize(false)}
             buttons={[
-               { color: "success", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
+               { color: "success", onClick: onAuthorizeConfirmed, body: "Yes, approve" },
                { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
             ]}
          />

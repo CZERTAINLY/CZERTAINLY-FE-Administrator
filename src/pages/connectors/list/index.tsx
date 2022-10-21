@@ -354,11 +354,11 @@ function ConnectorList() {
 
          <Dialog
             isOpen={confirmAuthorize}
-            caption={`Authorize ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-            body={`You are about to authorize a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
+            caption={`Approve ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+            body={`You are about to approve a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
             toggle={() => setConfirmAuthorize(false)}
             buttons={[
-               { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
+               { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, approve" },
                { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
             ]}
          />
