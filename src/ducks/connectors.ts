@@ -530,7 +530,7 @@ export const slice = createSlice({
       },
 
 
-      authorizeConnectorAuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      authorizeConnectorSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isAuthorizing = false;
          state.connector!.status = "connected"

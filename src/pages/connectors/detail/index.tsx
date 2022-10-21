@@ -206,7 +206,7 @@ export default function ConnectorDetail() {
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
-         { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true) } }
+         { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Approve", onClick: () => { setConfirmAuthorize(true) } }
       ],
       [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize, connector]
 
@@ -576,11 +576,11 @@ export default function ConnectorDetail() {
 
          <Dialog
             isOpen={confirmAuthorize}
-            caption="Authorize Connector"
-            body="You are about to authorize an Connector. Is this what you want to do?"
+            caption="Approce Connector"
+            body="You are about to approve an Connector. Is this what you want to do?"
             toggle={() => setConfirmAuthorize(false)}
             buttons={[
-               { color: "success", onClick: onAuthorizeConfirmed, body: "Yes, authorize" },
+               { color: "success", onClick: onAuthorizeConfirmed, body: "Yes, approve" },
                { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
             ]}
          />
