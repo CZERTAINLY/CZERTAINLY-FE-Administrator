@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "reactstrap";
 
-import Widget from "../../components/Widget";
+import Widget from "components/Widget";
 
 function Home() {
 

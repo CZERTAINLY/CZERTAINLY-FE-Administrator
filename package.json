@@ -1,6 +1,7 @@
 {
   "name": "czertainly-administrator",
   "version": "0.1.0",
+  "homepage": "/administrator",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.6",
@@ -22,6 +23,7 @@
     "reactstrap": "^9.1.4",
     "redux-observable": "^2.0.0",
     "sass": "^1.55.0",
+    "ts-rest-client": "^1.2.5",
     "typescript": "^4.8.4",
     "web-vitals": "^2.1.4"
   },

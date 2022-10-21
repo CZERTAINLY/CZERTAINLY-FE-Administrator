@@ -2,7 +2,7 @@ import React from "react";
 import cx from "classnames";
 
 import style from "./Widget.module.scss";
-import Spinner from "../Spinner";
+import Spinner from "components/Spinner";
 
 interface Props {
    title?: string | React.ReactNode;
