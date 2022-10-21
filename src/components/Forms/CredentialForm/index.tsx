@@ -58,8 +58,6 @@ export default function CredentialForm({
    const isCreating = useSelector(selectors.isCreating);
    const isUpdating = useSelector(selectors.isUpdating);
 
-   const [init, setInit] = useState(true);
-
    const [credential, setCredential] = useState<CredentialModel>();
    const [credentialProvider, setCredentialProvider] = useState<ConnectorModel>();
 
@@ -68,35 +66,52 @@ export default function CredentialForm({
       [isFetchingCredentialDetail, isFetchingCredentialProviders, isCreating, isUpdating, isFetchingAttributeDescriptors]
    );
 
+
+   useEffect(
+      () => {
+         dispatch(actions.listCredentialProviders());
+         dispatch(connectorsActions.clearCallbackData());
+
+         if (editMode) dispatch(actions.getCredentialDetail({ uuid: params.id }));
+      },
+      [dispatch, editMode, params.id]
+   );
+
+
+   useEffect(
+      () => {
+
+         if (editMode && credentialSelector && credential?.uuid !== credentialSelector.uuid) {
+            setCredential(credentialSelector);
+         }
+
+      },
+      [editMode, credential, credentialSelector]
+   );
+
+
    useEffect(
 
       () => {
 
-         if (editMode && (!credentialSelector || credentialSelector.uuid !== params.id)) {
-            dispatch(actions.getCredentialDetail({ uuid: params.id }));
-         }
+         if (editMode && credentialProviders && credentialProviders.length > 0 && credential?.uuid === params.id) {
 
-         if (init) {
-            dispatch(actions.listCredentialProviders());
-            dispatch(connectorsActions.clearCallbackData());
-         }
+            const provider = credentialProviders.find(p => p.uuid === credential?.connectorUuid);
+            if (!provider) return;
 
-         if (editMode && credentialSelector?.uuid === params.id) {
-            setCredential(credentialSelector);
-         }
+            setCredentialProvider(provider);
 
-         if (editMode && credentialSelector?.uuid === params.id && credentialProviders && credentialProviders.length > 0) {
-            const provider = credentialProviders.find(p => p.uuid === credentialSelector.connectorUuid);
-            if (provider) {
-               setCredentialProvider(provider);
-               dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialSelector.connectorUuid, kind: credentialSelector.kind }));
-            }
-         }
+            dispatch(
+               actions.getCredentialProviderAttributesDescriptors({
+                  uuid: credential.connectorUuid,
+                  kind: credential.kind
+               })
+            );
 
-         if (init) setInit(false);
+         }
 
       },
-      [dispatch, editMode, params.id, credentialSelector, credentialProviders, isFetchingCredentialProviders, init]
+      [credential, credentialProviders, dispatch, editMode, params.id]
 
    );
 
