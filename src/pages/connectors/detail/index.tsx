@@ -206,7 +206,7 @@ export default function ConnectorDetail() {
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "plug", disabled: false, tooltip: "Reconnect", onClick: () => { onReconnectClick() } },
-         { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Authorize", onClick: () => { setConfirmAuthorize(true) } }
+         { icon: "check", disabled: connector ? connector.status === "connected" : false, tooltip: "Approve", onClick: () => { setConfirmAuthorize(true) } }
       ],
       [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize, connector]
 
