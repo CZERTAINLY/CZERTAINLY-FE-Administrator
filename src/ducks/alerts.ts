@@ -115,11 +115,11 @@ setInterval(
       alerts.messages.forEach(
          message => {
 
-            if (Date.now() - message.time > 7000) {
+            if (Date.now() - message.time > 17000) {
                store.dispatch(actions.hide(message.id));
             }
 
-            if (Date.now() - message.time > 10000) {
+            if (Date.now() - message.time > 20000) {
                store.dispatch(actions.dismiss(message.id));
             }
 

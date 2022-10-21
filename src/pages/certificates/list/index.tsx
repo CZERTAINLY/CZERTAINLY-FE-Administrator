@@ -82,7 +82,7 @@ export default function CertificateList({
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
          setFilters(currentFilters);
       },
-      [dispatch]
+      [currentFilters, dispatch]
 
    );
 
@@ -93,7 +93,7 @@ export default function CertificateList({
          if (!filters) return;
          dispatch(actions.setCurrentFilters({currentFilters: filters}));
       },
-      [filters]
+      [dispatch, filters]
    );
 
 
