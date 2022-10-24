@@ -7,6 +7,7 @@ import { initialState as initialAlertsState, slice as alertsSlice } from "./aler
 
 import { initialState as initialAuthState, slice as authSlice } from "./auth";
 import authEpics from "./auth-epics";
+import startupEpics from "./startup-epics";
 
 
 export interface EpicDependencies {
@@ -33,4 +34,5 @@ export const reducers = combineReducers<typeof initialState, any>({
 
 export const epics = combineEpics(
     ...authEpics,
+    ...startupEpics,
 );
