@@ -1,5 +1,4 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
 
 import logo from "resources/images/czertainly_logo.svg";
 import style from "./style.module.scss";
