@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Home from "./home";
-import Layout from "components/Layout";
+import Home from "./pages/home";
+import Layout from "./Layout";
+import About from "./pages/about";
 
 export const AppRouter = () => {
     return (
@@ -10,11 +11,11 @@ export const AppRouter = () => {
                     <Route path="/" element={<Navigate to="/app/home" />} />
                     <Route path="/app" element={<Navigate to="/app/home" />} />
                     <Route path="/app/home" element={<Home />} />
+                    <Route path="/app/about" element={<About />} />
 
                     {/*<Route path="/app/users" component={Users} />*/}
                     {/*<Route path="/app/roles" component={Roles} />*/}
                     {/*<Route path="/app/audit" component={AuditLogs} />*/}
-                    {/*<Route path="/app/about" component={About} />*/}
                     {/*<Route path="/app/connectors" component={Connectors} />*/}
                     {/*<Route path="/app/dashboard" component={Dashboard} />*/}
                     {/*<Route path="/app/raprofiles" component={RaProfiles} />*/}

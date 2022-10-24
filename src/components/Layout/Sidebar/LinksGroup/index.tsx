@@ -48,7 +48,7 @@ function LinksGroup(props: Props) {
 
    const createChildLinks = () => {
 
-      const matchClassName = cx(style.headerLinkActive);
+      const matchClassName = cx(style.headerLink);
       const arrowClassName = cx("fa fa-angle-down arrow", style.arrow, { [style.arrowActive]: isOpen });
 
       return (
