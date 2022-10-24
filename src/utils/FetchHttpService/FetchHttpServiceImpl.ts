@@ -51,13 +51,6 @@ export class FetchHttpServiceImpl implements FetchHttpService {
                const headers: { [key: string]: string } = {};
                if (response.headers) response.headers.forEach((value, key) => headers[key] = value);
 
-               if (response.status === 401) {
-                  // !!! SOLVE PROBLEM WITH REDIRECTION TO LOGIN PAGE !!!
-                  // history.push(`/app/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-                  throw new Error("SOLVE PROBLEM WITH REDIRECTION TO LOGIN PAGE");
-                  // !!! SOLVE PROBLEM WITH REDIRECTION TO LOGIN PAGE !!!
-               }
-
                throw new HttpErrorResponse({
                   error,
                   headers,
