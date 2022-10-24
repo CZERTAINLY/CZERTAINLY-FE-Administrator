@@ -1,6 +1,6 @@
-import { Certificate, DistinguishedName } from '@fidm/x509';
-
 import { CertificateModel, CertificateSubjectAlternativeNamesModel } from 'models';
+
+
 
 function getDistinguishedName(dn: DistinguishedName): string {
 

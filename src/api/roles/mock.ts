@@ -1,6 +1,6 @@
 import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
-import { HttpErrorResponse } from 'ts-rest-client';
+import { HttpErrorResponse } from "utils/FetchHttpService";
 
 import { dbData } from 'mocks/db';
 import { randomDelay } from 'utils/mock';

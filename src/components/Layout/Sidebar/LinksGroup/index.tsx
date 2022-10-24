@@ -1,6 +1,5 @@
 import cx from "classnames";
 import React, { useCallback, useState } from "react";
-import { Route, RouteChildrenProps } from "react-router";
 import { NavLink } from "react-router-dom";
 import { Collapse } from "reactstrap";
 
@@ -33,12 +32,13 @@ function LinksGroup(props: Props) {
 
          <li key={props._key} className={cx(style.headerLink, props.className)}>
 
-            <NavLink to={props.headerLink || ""} activeClassName={style.headerLinkActive}>
+            <NavLink to={props.headerLink || ""} className={({ isActive }) => isActive ? style.headerLinkActive : undefined}>
                <div>
                   <i className={props.glyph} />{" "}
                   <span className={style.menuLabel}>{props.header}</span>
                </div>
             </NavLink>
+
          </li>
 
       )
@@ -46,9 +46,9 @@ function LinksGroup(props: Props) {
    }
 
 
-   const createChildLinks = (match: RouteChildrenProps<{ [x: string]: string | undefined; }, unknown>) => {
+   const createChildLinks = () => {
 
-      const matchClassName = cx({ [style.headerLinkActive]: !!match && match.match!.url.indexOf(props.headerLink!) > 0 });
+      const matchClassName = cx(style.headerLinkActive);
       const arrowClassName = cx("fa fa-angle-down arrow", style.arrow, { [style.arrowActive]: isOpen });
 
       return (
@@ -76,7 +76,7 @@ function LinksGroup(props: Props) {
 
                         <li key={child.link} className={cx(style.headerLink, props.className)}>
 
-                           <NavLink to={child.link} activeClassName={style.headerLinkActive}>
+                           <NavLink to={child.link} className={({ isActive }) => isActive ? style.headerLinkActive : undefined}>
                               <div>
                                  <i className={props.glyph} />{" "}
                                  <span className={style.menuLabel}>{child.name}</span>
@@ -101,9 +101,13 @@ function LinksGroup(props: Props) {
 
    if (!props.childrenLinks) return createHeaderLink();
 
+   return createChildLinks();
+
+   /**
    return (
       <Route path={props.headerLink} children={(match) => createChildLinks(match)} />
    );
+    */
 
 }
 

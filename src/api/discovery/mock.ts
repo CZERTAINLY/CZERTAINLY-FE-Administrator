@@ -4,7 +4,7 @@ import { delay, map } from "rxjs/operators";
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
-import { HttpErrorResponse } from "ts-rest-client";
+import { HttpErrorResponse } from "utils/FetchHttpService";
 import { ConnectorDTO } from "api/connectors";
 import { AttributeDTO } from "api/_common/attributeDTO";
 

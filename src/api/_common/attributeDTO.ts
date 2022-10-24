@@ -1,6 +1,6 @@
 import { FunctionGroupCode } from "types/connectors";
 import { AttributeCallbackMappingTarget_AttributeCallbackModel, AttributeType, AttributeValue } from "types/attributes";
-import { HttpMethod } from "ts-rest-client";
+import { HttpMethod } from "utils/FetchHttpService/HttpRequestOptions";
 
 
 export interface AttributeContentDTO {

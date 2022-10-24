@@ -5,7 +5,7 @@ import * as model from "./model";
 
 import { dbData } from "mocks/db";
 import { randomDelay } from "utils/mock";
-import { HttpErrorResponse } from "ts-rest-client";
+import { HttpErrorResponse } from "utils/FetchHttpService";
 
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 

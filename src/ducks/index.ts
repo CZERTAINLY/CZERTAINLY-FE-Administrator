@@ -1,15 +1,22 @@
 import { combineEpics, Epic } from "redux-observable";
 import { AnyAction, combineReducers } from "redux";
 
+import { ApiClients } from "api";
+
 import { initialState as initialAlertsState, slice as alertsSlice } from "./alerts";
 
 import { initialState as initialAuthState, slice as authSlice } from "./auth";
 import authEpics from "./auth-epics";
 
+
+export interface EpicDependencies {
+   apiClients: ApiClients;
+}
+
 export type AppState = ReturnType<typeof reducers>;
 
 
-export type AppEpic = Epic<AnyAction, AnyAction, AppState>;
+export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
 
 
 export const initialState = {

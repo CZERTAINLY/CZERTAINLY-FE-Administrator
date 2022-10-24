@@ -1,14 +1,11 @@
 import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import LinksGroup from "./LinksGroup";
 import style from "./Sidebar.module.scss";
 import logo from "images/czertainly_white_H.svg";
-import { inIFrame } from "utils/inIFrame";
 
-function Sidebar() {
-
-   const inFrame = inIFrame();
+export default function Sidebar() {
 
    return (
 
@@ -24,7 +21,7 @@ function Sidebar() {
 
             <ul>
 
-               {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
+               <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" />
                <LinksGroup _key="/app/dashboard" header="Dashboard" headerLink="/app/dashboard" />
                <LinksGroup _key="/app/certificates" header="Certificates" headerLink="/app/certificates" />
                <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
@@ -71,7 +68,7 @@ function Sidebar() {
 
 
                <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
-               {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}
+               <LinksGroup _key="/app/about" header="About" headerLink="/app/about" />
 
             </ul>
 
@@ -79,6 +76,5 @@ function Sidebar() {
 
       </nav>
    );
-}
 
-export default withRouter(Sidebar);
+}

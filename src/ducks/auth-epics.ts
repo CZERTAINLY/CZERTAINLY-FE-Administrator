@@ -1,6 +1,6 @@
 import { EMPTY, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import history from "browser-history";
+// import history from "browser-history";
 
 import { AppEpic } from 'ducks';
 
@@ -113,9 +113,11 @@ const updateProfileSuccess: AppEpic = (action$, state$, deps) => {
 
          action => {
             if (action.payload.redirect) {
-               history.push(action.payload.redirect);
+               throw new Error("REDIRECT NOT IMPLEMENTED");
+               //history.push(action.payload.redirect);
             } else {
-               history.goBack();
+               throw new Error("REDIRECT NOT IMPLEMENTED");
+               //history.goBack();
             }
             return EMPTY;
          }
