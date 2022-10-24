@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import LinksGroup from "./LinksGroup";
 import style from "./Sidebar.module.scss";
-import logo from "images/czertainly_white_H.svg";
+import logo from "resources/images/czertainly_white_H.svg";
 
 export default function Sidebar() {
 

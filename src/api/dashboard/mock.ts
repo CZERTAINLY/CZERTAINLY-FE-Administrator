@@ -1,5 +1,5 @@
 import { Observable, of } from "rxjs";
-import { dbData } from "mocks/db";
+import { dbData } from "api/_mocks/db";
 import * as model from "./model";
 
 export class DashboardManagementMock implements model.DashboardManagementApi {

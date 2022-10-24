@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import reportWebVitals from './reportWebVitals';
 import { AppRouter } from "./components/AppRouter";
-import "./styles/theme.scss";
+import "./resources/styles/theme.scss";
 import configureStore from "./store";
 
 const container = document.getElementById('root')!;

@@ -4,7 +4,7 @@ import { HttpErrorResponse } from "utils/FetchHttpService";
 
 import * as model from "./model";
 
-import { dbData } from "mocks/db";
+import { dbData } from "api/_mocks/db";
 import { randomDelay } from "utils/mock";
 
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";

@@ -6,7 +6,7 @@ import { randomDelay } from "utils/mock";
 
 import { AttributeDescriptorCollectionDTO, AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
-import { dbData } from "mocks/db";
+import { dbData } from "api/_mocks/db";
 
 import * as model from "./model";
 import { AuthType, FunctionGroupCode } from "types/connectors";

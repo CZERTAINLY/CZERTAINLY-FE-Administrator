@@ -1,7 +1,7 @@
 import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 
-import { dbData } from "mocks/db";
+import { dbData } from "api/_mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
 import { HttpErrorResponse } from "utils/FetchHttpService";
