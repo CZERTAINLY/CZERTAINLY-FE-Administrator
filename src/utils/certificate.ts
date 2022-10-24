@@ -1,7 +1,37 @@
-import { CertificateModel, CertificateSubjectAlternativeNamesModel } from 'models';
+import { CertificateModel } from 'models';
+
+export const emptyCertificate: CertificateModel = {
+   uuid: "",
+   commonName: "",
+   serialNumber: "",
+   issuerCommonName: "",
+   certificateContent: "",
+   issuerDn: "",
+   subjectDn: "",
+   notBefore: "",
+   notAfter: "",
+   publicKeyAlgorithm: "",
+   signatureAlgorithm: "",
+   keySize: -1,
+   keyUsage: [],
+   extendedKeyUsage: [],
+   basicConstraints: "",
+   status: "unknown",
+   fingerprint: "",
+   certificateType: "X509",
+   issuerSerialNumber: "",
+   subjectAlternativeNames: {}
+}
+
+export function certificatePEM2CertificateModel(pem: string): CertificateModel {
+
+   return emptyCertificate;
+
+}
 
 
 
+/*
 function getDistinguishedName(dn: DistinguishedName): string {
 
    const segments = [] as string[];
@@ -252,3 +282,4 @@ export function formatPEM(pemString: string) {
    }
 
 }
+*/
