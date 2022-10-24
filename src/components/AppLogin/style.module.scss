@@ -22,10 +22,19 @@
 
 }
 
+
+.container > * {
+
+   white-space: nowrap;
+
+ }
+
+
 .container > img {
    width: 25em;
    padding: 4em;
 }
+
 
 .container > button {
    width: 80%;
