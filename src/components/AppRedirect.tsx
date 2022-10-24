@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { actions, selectors } from 'ducks/app-redirect';
 
-export function AppRedirect() {
+export default function AppRedirect() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();

@@ -3,7 +3,7 @@ import React from "react";
 import logo from "resources/images/czertainly_logo.svg";
 import style from "./style.module.scss";
 
-export function AppLogin() {
+export default function AppLogin() {
 
    return (
 

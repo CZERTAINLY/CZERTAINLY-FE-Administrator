@@ -1,18 +1,19 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useMemo } from "react";
 
 import { selectors } from "ducks/auth";
 
 import Home from "./pages/home";
 import Layout from "./Layout";
 import About from "./pages/about";
-
-import { AppRedirect } from "./AppRedirect";
-import { AppLogin } from "./AppLogin/AppLogin";
-import { useSelector } from "react-redux";
 import Spinner from "./Spinner";
-import { useMemo } from "react";
 
-export const AppRouter = () => {
+import AppRedirect from "./AppRedirect";
+import AppLogin from "./AppLogin/AppLogin";
+
+
+export default function AppRouter() {
 
    const profile = useSelector(selectors.profile);
 
