@@ -68,11 +68,7 @@ export const AppRouter = () => {
                   ?
                   appRoutes
                   :
-                  (
-
-                     <Route path="*" element={<Spinner active={true} />} />
-
-                  )
+                  <Route path="*" element={<Spinner active={true} />} />
 
             }
 
