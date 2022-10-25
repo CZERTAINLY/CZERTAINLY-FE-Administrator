@@ -11,7 +11,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 
-export default function ProfileDetail() {
+export default function UserProfileDetail() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();

@@ -21,7 +21,7 @@ interface FormValues {
 }
 
 
-function UserProfileForm() {
+export default function UserProfileForm() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate()
@@ -221,5 +221,3 @@ function UserProfileForm() {
    )
 
 }
-
-export default UserProfileForm;
