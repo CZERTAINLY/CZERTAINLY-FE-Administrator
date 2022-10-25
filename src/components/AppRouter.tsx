@@ -74,11 +74,7 @@ export default function AppRouter() {
             <Route path="/login" element={<AppLogin />} />
 
             {
-               profile && appRoutes
-            }
-
-            {
-               !profile && <Route path="*" element={<Spinner active={true}/>}/>
+               profile ? appRoutes : <Route path="*" element={<Spinner active={true}/>}/>
             }
 
          </Routes>
