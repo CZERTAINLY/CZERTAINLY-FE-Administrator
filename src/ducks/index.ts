@@ -7,11 +7,13 @@ import { initialState as initialAlertsState, slice as alertsSlice } from "./aler
 import { initialState as initialAppRedirectState, slice as appRedirectSlice } from "./app-redirect";
 import { initialState as initialAuthState, slice as authSlice } from "./auth";
 import { initialState as initialDashboardState, slice as dashboardSlice } from "./dashboard";
+import { initialState as initialGroupsState, slice as groupsSlice } from "./groups";
 
 import authEpics from "./auth-epics";
 import appRedirectEpics from "./app-redirect-epics";
 import startupEpics from "./startup-epics";
 import dashboardEpics from "./dashboard-epics";
+import groupsEpics from "./groups-epics";
 
 
 export interface EpicDependencies {
@@ -29,6 +31,7 @@ export const initialState = {
    [appRedirectSlice.name]: initialAppRedirectState,
    [authSlice.name]: initialAuthState,
    [dashboardSlice.name]: initialDashboardState,
+   [groupsSlice.name]: initialGroupsState,
 };
 
 
@@ -37,12 +40,14 @@ export const reducers = combineReducers<typeof initialState, any>({
    [appRedirectSlice.name]: appRedirectSlice.reducer,
    [authSlice.name]: authSlice.reducer,
    [dashboardSlice.name]: dashboardSlice.reducer,
+   [groupsSlice.name]: groupsSlice.reducer,
 });
 
 
 export const epics = combineEpics(
-    ...startupEpics,
-    ...authEpics,
-    ...appRedirectEpics,
-    ...dashboardEpics,
+   ...startupEpics,
+   ...authEpics,
+   ...appRedirectEpics,
+   ...dashboardEpics,
+   ...groupsEpics,
 );

@@ -14,6 +14,10 @@ import Home from "./_pages/home";
 import About from "./_pages/about";
 import Dashboard from "./_pages/dashboard";
 
+import GroupList from "./_pages/group/list";
+import GroupDetail from "./_pages/group/detail";
+import GroupEdit from "./_pages/group/form";
+
 import UserProfileDetail from "./_pages/user-profile/detail";
 import UserProfileEdit from "./_pages/user-profile/form";
 
@@ -46,7 +50,13 @@ export default function AppRouter() {
                 {/*<Route path="/app/locations" component={Locations} />*/}
                 {/*<Route path="/app/acmeaccounts" component={AcmeAccounts} />*/}
                 {/*<Route path="/app/acmeprofiles" component={AcmeProfiles} />*/}
+
                 {/*<Route path="/app/groups" component={Groups} />*/}
+                <Route path="/app/groups" element={<GroupList />} />
+                <Route path="/app/groups/detail/:id" element={<GroupDetail />} />
+                <Route path="/app/groups/add" element={<GroupEdit />} />
+                <Route path="/app/groups/edit/:id" element={<GroupEdit />} />
+
                 {/*<Route path="/app/discovery" component={Discovery} />*/}
                 {/*<Route path="/app/certificates" component={Certificates} />*/}
                 {/*<Route path="/app/complianceprofiles" component={ComplianceProfiles} />*/}
@@ -55,7 +65,13 @@ export default function AppRouter() {
                 <Route path="/app/userprofile/edit" element={<UserProfileEdit />} />
 
              </Route >
+
+             {/*
+             Please keep this remarked until migration is finished
              <Route path="*" element={<Navigate to="/app/home"/>}/>
+             */}
+             <Route path="*" element={<h1>404</h1>}/>
+
           </>
 
       ),
