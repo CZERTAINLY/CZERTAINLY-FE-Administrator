@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 
 import { selectors } from "ducks/auth";
 
@@ -20,6 +20,9 @@ import GroupEdit from "./_pages/group/form";
 
 import UserProfileDetail from "./_pages/user-profile/detail";
 import UserProfileEdit from "./_pages/user-profile/form";
+import ConnectorList from "./_pages/connectors/list";
+import ConnectorDetail from "./_pages/connectors/detail";
+import ConnectorEdit from "./_pages/connectors/form";
 
 
 export default function AppRouter() {
@@ -39,10 +42,15 @@ export default function AppRouter() {
                 <Route path="/app/about" element={<About />} />
                 <Route path="/app/dashboard" element={<Dashboard />} />
 
+                <Route path="/app/connectors" element={<ConnectorList/>} />
+                <Route path="/app/connectors/list" element={<Navigate to="/app/connectors" />} />
+                <Route path="/app/connectors/detail/:id" element={<ConnectorDetail/>} />
+                <Route path="/app/connectors/edit/:id" element={<ConnectorEdit/>} />
+                <Route path="/app/connectors/add" element={<ConnectorEdit/>} />
+
                 {/*<Route path="/app/users" component={Users} />*/}
                 {/*<Route path="/app/roles" component={Roles} />*/}
                 {/*<Route path="/app/audit" component={AuditLogs} />*/}
-                {/*<Route path="/app/connectors" component={Connectors} />*/}
                 {/*<Route path="/app/raprofiles" component={RaProfiles} />*/}
                 {/*<Route path="/app/credentials" component={Credentials} />*/}
                 {/*<Route path="/app/authorities" component={Authorities} />*/}
