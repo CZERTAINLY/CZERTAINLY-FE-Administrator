@@ -23,20 +23,24 @@
 }
 
 
-.container > * {
-
-   white-space: nowrap;
-
- }
-
-
-.container > img {
+.container>img {
    width: 25em;
    padding: 4em;
 }
 
 
-.container > button {
+.container>h3 {
+   white-space: nowrap;
+}
+
+
+.container>p {
+   max-width: 25em;
+   text-align: center;
+}
+
+
+.container>button {
    width: 80%;
 
    border: none;
@@ -45,4 +49,6 @@
 
    font-weight: bold;
    padding: 0.5em;
+
+   margin-top: 2em;
 }

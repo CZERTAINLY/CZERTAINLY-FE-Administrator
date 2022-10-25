@@ -24,8 +24,11 @@ export default function AppLogin() {
 
       <div className={style.container}>
 
-         <h3>You are not authorized to view this page</h3>
          <img src={logo} alt="Czertainly" />
+         <h3>You are not authorized to view this page</h3>
+         <p>
+         If you believe you should have access, check your client certificate or try another login method.
+         </p>
          <button onClick={() => redirect()}>Login</button>
 
       </div>
