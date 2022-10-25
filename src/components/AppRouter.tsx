@@ -4,13 +4,15 @@ import { useMemo } from "react";
 
 import { selectors } from "ducks/auth";
 
-import Home from "./pages/home";
 import Layout from "./Layout";
-import About from "./pages/about";
 import Spinner from "./Spinner";
 
 import AppRedirect from "./AppRedirect";
 import AppLogin from "./AppLogin/AppLogin";
+
+import Home from "./_pages/home";
+import About from "./_pages/about";
+import Dashboard from "./_pages/dashboard";
 
 
 export default function AppRouter() {
@@ -27,12 +29,12 @@ export default function AppRouter() {
             <Route path="/app" element={<Navigate to="/app/home" />} />
             <Route path="/app/home" element={<Home />} />
             <Route path="/app/about" element={<About />} />
+            <Route path="/app/dashboard" element={<Dashboard />} />
 
             {/*<Route path="/app/users" component={Users} />*/}
             {/*<Route path="/app/roles" component={Roles} />*/}
             {/*<Route path="/app/audit" component={AuditLogs} />*/}
             {/*<Route path="/app/connectors" component={Connectors} />*/}
-            {/*<Route path="/app/dashboard" component={Dashboard} />*/}
             {/*<Route path="/app/raprofiles" component={RaProfiles} />*/}
             {/*<Route path="/app/credentials" component={Credentials} />*/}
             {/*<Route path="/app/authorities" component={Authorities} />*/}
@@ -64,16 +66,10 @@ export default function AppRouter() {
             <Route path="/login" element={<AppLogin />} />
 
             {
-
-               profile
-                  ?
-                  appRoutes
-                  :
-                  <Route path="*" element={<Spinner active={true} />} />
-
+               profile && appRoutes
             }
 
-            <Route path="*" element={<h1>404</h1>} />
+            <Route path="*" element={<Spinner active={true} />} />
 
          </Routes>
 
@@ -81,4 +77,4 @@ export default function AppRouter() {
 
    );
 
-};
+}

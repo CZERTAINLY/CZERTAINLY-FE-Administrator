@@ -16,6 +16,7 @@
     "classnames": "latest",
     "font-awesome": "latest",
     "react": "latest",
+    "react-apexcharts": "^1.4.0",
     "react-dom": "latest",
     "react-redux": "latest",
     "react-router-dom": "latest",
