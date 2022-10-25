@@ -3,8 +3,9 @@ import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 
+import { actions as appRedirectActions } from "./app-redirect";
+
 import { transformDashbaordDTOToModel } from './transform/dashboard';
-import { extractError } from 'utils/net';
 
 import { slice } from "./dashboard";
 
@@ -26,7 +27,14 @@ const getDashboard: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getDashboardFailed({ error: extractError(err, "Failed to get dashboard data") }))
+
+                error => {
+                    return of(
+                        slice.actions.getDashboardFailed(),
+                        appRedirectActions.fetchError({ error, message: "Failed to get dashboard data" })
+                    )
+                }
+
             )
 
          )
