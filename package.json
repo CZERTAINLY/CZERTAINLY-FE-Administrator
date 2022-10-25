@@ -18,7 +18,7 @@
     "react": "latest",
     "react-apexcharts": "latest",
     "react-dom": "latest",
-    "react-final-form": "^6.5.9",
+    "react-final-form": "latest",
     "react-redux": "latest",
     "react-router-dom": "latest",
     "react-scripts": "latest",
