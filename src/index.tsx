@@ -12,11 +12,23 @@ const root = createRoot(container);
 export const store = configureStore();
 
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <AppRouter />
-    </Provider>
-  </React.StrictMode>
+
+   process.env.NODE_ENV === 'development' ? (
+
+      <Provider store={store}>
+         <AppRouter />
+      </Provider>
+
+   ) : (
+
+      <React.StrictMode>
+         <Provider store={store}>
+            <AppRouter />
+         </Provider >
+      </React.StrictMode >
+
+   )
+
 );
 
 // If you want to start measuring performance in your app, pass a function
