@@ -39,7 +39,7 @@ export default function AppRouter() {
                 <Route path="/app/dashboard" element={<Dashboard />} />
 
                 <Route path="/app/connectors" element={<ConnectorList/>} />
-                <Route path="/app/connectors/list" element={<ConnectorList/>} />
+                <Route path="/app/connectors/list" element={<Navigate to="/app/connectors" />} />
                 <Route path="/app/connectors/detail/:id" element={<ConnectorDetail/>} />
                 <Route path="/app/connectors/edit/:id" element={<ConnectorEdit/>} />
                 <Route path="/app/connectors/add" element={<ConnectorEdit/>} />

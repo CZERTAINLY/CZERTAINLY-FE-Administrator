@@ -16,7 +16,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 import Dialog from "components/Dialog";
-import {attributeFieldNameTransform} from "utils/attributes";
+import { attributeFieldNameTransform } from "utils/attributes";
 import { inventoryStatus } from "utils/connector";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -112,8 +112,7 @@ export default function ConnectorDetail() {
    const onEditClick = useCallback(
 
       () => {
-
-         navigate(`../../connectors/edit/${connector?.uuid}`);
+         navigate(`/app/connectors/edit/${connector?.uuid}`);
 
       },
       [connector, navigate]
