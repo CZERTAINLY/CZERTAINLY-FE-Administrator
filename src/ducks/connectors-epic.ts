@@ -5,7 +5,11 @@ import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
 import { slice } from "./connectors";
+import { actions as appRedirectActions } from "./app-redirect";
+
+import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
 import { transformConnectorDTOToModel, transformFunctionGroupDTOtoModel } from "./transform/connectors";
+
 import {
     transformAttributeCallbackDataModelToDto,
     transformAttributeDescriptorDTOToModel,
@@ -13,8 +17,6 @@ import {
     transformConnectorHealthDTOToModel,
     transfromAttributeDescriptorCollectionDTOToModel
 } from "./transform/attributes";
-import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
-import { actions as appRedirectActions } from "./app-redirect";
 
 
 const listConnectors: AppEpic = (action$, state, deps) => {

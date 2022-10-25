@@ -55,9 +55,9 @@ export default function ConnectorDetail() {
 
          setFunctionGroup(undefined);
          if (id) {
-             dispatch(actions.getConnectorDetail({uuid: id}));
-             dispatch(actions.getConnectorHealth({uuid: id}));
-             dispatch(actions.getConnectorAllAttributesDescriptors({uuid: id}));
+            dispatch(actions.getConnectorDetail({ uuid: id }));
+            dispatch(actions.getConnectorHealth({ uuid: id }));
+            dispatch(actions.getConnectorAllAttributesDescriptors({ uuid: id }));
          }
 
       },
@@ -128,7 +128,6 @@ export default function ConnectorDetail() {
          dispatch(actions.reconnectConnector({ uuid: connector.uuid }));
 
       },
-
       [connector, dispatch]
 
    );

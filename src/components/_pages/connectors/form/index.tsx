@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Form, Field } from "react-final-form";
 import {
-    Badge,
-    Button,
-    ButtonGroup,
-    Container,
-    Form as BootstrapForm,
-    FormFeedback,
-    FormGroup,
-    Input,
-    Label,
-    Table
+   Badge,
+   Button,
+   ButtonGroup,
+   Container,
+   Form as BootstrapForm,
+   FormFeedback,
+   FormGroup,
+   Input,
+   Label,
+   Table
 } from "reactstrap";
 
 import ProgressButton from "components/ProgressButton";
@@ -48,7 +48,9 @@ export default function ConnectorForm() {
 
    const editMode = !!id;
 
+
    const optionsForAuth: { label: string, value: AuthType }[] = useMemo(
+
       () => [
          {
             label: "No Auth",
@@ -64,6 +66,7 @@ export default function ConnectorForm() {
          },
       ],
       []
+
    );
 
 
@@ -121,8 +124,8 @@ export default function ConnectorForm() {
          }
 
       },
-
       [editMode, id, connectorSelector, isFetching, dispatch]
+
    )
 
 
@@ -155,6 +158,7 @@ export default function ConnectorForm() {
 
       },
       [editMode, connector, selectedAuthType.value, dispatch]
+
    );
 
 
@@ -169,15 +173,18 @@ export default function ConnectorForm() {
 
 
    const onConnectClick = (values: FormValues) => {
+
       if (editMode) {
          dispatch(connectorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
       } else {
          dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
       }
+
    };
 
 
    const endPointsHeaders: TableHeader[] = useMemo(
+
       () => [
          {
             id: "name",
@@ -197,6 +204,7 @@ export default function ConnectorForm() {
          }
       ],
       []
+
    )
 
 
@@ -216,360 +224,363 @@ export default function ConnectorForm() {
          )
       },
       []
+
    );
 
 
    const defaultValues = useMemo(
+
       () => ({
          name: editMode ? connector?.name : "",
          url: editMode ? connector?.url || "" : "",
          authenticationType: editMode ? optionsForAuth.find(opt => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
       }),
       [editMode, optionsForAuth, connector]
+
    );
 
    return (
 
-       <Container className="themed-container" fluid>
-          <div>
+      <Container className="themed-container" fluid>
+         <div>
 
-             <Form onSubmit={onSubmit} initialValues={defaultValues}>
+            <Form onSubmit={onSubmit} initialValues={defaultValues}>
 
-                {({ handleSubmit, pristine, submitting, values }) => (
+               {({ handleSubmit, pristine, submitting, values }) => (
 
-                   <BootstrapForm onSubmit={handleSubmit}>
+                  <BootstrapForm onSubmit={handleSubmit}>
 
-                      <Widget title={<h5>{editMode ? "Edit" : "Add new"} <span className="fw-semi-bold">Connector</span></h5>}>
+                     <Widget title={<h5>{editMode ? "Edit" : "Add new"} <span className="fw-semi-bold">Connector</span></h5>}>
 
-                         <Field
-                            name="url"
-                            validate={composeValidators(validateRequired(), validateUrl())}
-                         >
+                        <Field
+                           name="url"
+                           validate={composeValidators(validateRequired(), validateUrl())}
+                        >
 
-                            {({ input, meta }) => (
+                           {({ input, meta }) => (
 
-                               <FormGroup>
+                              <FormGroup>
 
-                                  <Label for="url">URL</Label>
-                                  <Input
-                                     {...input}
-                                     valid={!meta.error && meta.touched}
-                                     invalid={!!meta.error && meta.touched}
-                                     type="text"
-                                     placeholder="URL of the connector service"
-                                  />
-                                  <FormFeedback>{meta.error}</FormFeedback>
+                                 <Label for="url">URL</Label>
+                                 <Input
+                                    {...input}
+                                    valid={!meta.error && meta.touched}
+                                    invalid={!!meta.error && meta.touched}
+                                    type="text"
+                                    placeholder="URL of the connector service"
+                                 />
+                                 <FormFeedback>{meta.error}</FormFeedback>
 
-                               </FormGroup>
+                              </FormGroup>
 
-                            )}
+                           )}
 
-                         </Field>
+                        </Field>
 
-                         <Field name="authenticationType">
+                        <Field name="authenticationType">
 
-                            {({ input, meta, }) => (
+                           {({ input, meta, }) => (
 
-                               <FormGroup>
+                              <FormGroup>
 
-                                  <Label for="authenticationType">Authentication Type</Label>
+                                 <Label for="authenticationType">Authentication Type</Label>
 
-                                  <Select
-                                     {...input}
-                                     maxMenuHeight={140}
-                                     menuPlacement="auto"
-                                     options={optionsForAuth}
-                                     placeholder="Select Auth Type"
-                                     onChange={(e) => { input.onChange(e); setSelectedAuthType(e); }}
-                                  />
+                                 <Select
+                                    {...input}
+                                    maxMenuHeight={140}
+                                    menuPlacement="auto"
+                                    options={optionsForAuth}
+                                    placeholder="Select Auth Type"
+                                    onChange={(e) => { input.onChange(e); setSelectedAuthType(e); }}
+                                 />
 
-                                  <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
 
-                               </FormGroup>
+                              </FormGroup>
 
-                            )}
+                           )}
 
-                         </Field>
+                        </Field>
 
-                         {
-                            values.authenticationType.value === "basic" ? (
+                        {
+                           values.authenticationType.value === "basic" ? (
 
-                               <div>
+                              <div>
 
-                                  <Field name="username">
+                                 <Field name="username">
 
-                                     {({ input, meta }) => (
+                                    {({ input, meta }) => (
 
-                                        <FormGroup>
+                                       <FormGroup>
 
-                                           <Label for="username">Username</Label>
+                                          <Label for="username">Username</Label>
 
-                                           <Input
-                                              {...input}
-                                              valid={!meta.error && meta.touched}
-                                              invalid={!!meta.error && meta.touched}
-                                              type="text"
-                                              placeholder="Username"
-                                           //disabled={editMode}
-                                           />
-                                           <FormFeedback>{meta.error}</FormFeedback>
+                                          <Input
+                                             {...input}
+                                             valid={!meta.error && meta.touched}
+                                             invalid={!!meta.error && meta.touched}
+                                             type="text"
+                                             placeholder="Username"
+                                          //disabled={editMode}
+                                          />
+                                          <FormFeedback>{meta.error}</FormFeedback>
 
-                                        </FormGroup>
-                                     )}
+                                       </FormGroup>
+                                    )}
 
-                                  </Field>
+                                 </Field>
 
-                                  <Field name="password">
+                                 <Field name="password">
 
-                                     {({ input, meta }) => (
+                                    {({ input, meta }) => (
 
-                                        <FormGroup>
+                                       <FormGroup>
 
-                                           <Label for="password">Password</Label>
+                                          <Label for="password">Password</Label>
 
-                                           <Input
-                                              {...input}
-                                              valid={!meta.error && meta.touched}
-                                              invalid={!!meta.error && meta.touched}
-                                              type="password"
-                                              placeholder="Password"
-                                           // disabled={editMode}
-                                           />
+                                          <Input
+                                             {...input}
+                                             valid={!meta.error && meta.touched}
+                                             invalid={!!meta.error && meta.touched}
+                                             type="password"
+                                             placeholder="Password"
+                                          // disabled={editMode}
+                                          />
 
-                                           <FormFeedback>{meta.error}</FormFeedback>
+                                          <FormFeedback>{meta.error}</FormFeedback>
 
-                                        </FormGroup>
+                                       </FormGroup>
 
-                                     )}
+                                    )}
 
-                                  </Field>
+                                 </Field>
 
-                               </div>
+                              </div>
 
-                            ) : null
-                         }
+                           ) : null
+                        }
 
-                         {
-                            values.authenticationType.value === "certificate" ? (
+                        {
+                           values.authenticationType.value === "certificate" ? (
 
-                               <Field name="clientCert">
+                              <Field name="clientCert">
 
-                                  {({ input, meta }) => (
+                                 {({ input, meta }) => (
 
-                                     <FormGroup>
+                                    <FormGroup>
 
-                                        <Label for="clientCert">Client Certificate</Label>
+                                       <Label for="clientCert">Client Certificate</Label>
 
-                                        <Input
-                                           {...input}
-                                           valid={!meta.error && meta.touched}
-                                           invalid={!!meta.error && meta.touched}
-                                           type="file"
-                                           placeholder="clientCert"
-                                        // disabled={editMode}
-                                        />
+                                       <Input
+                                          {...input}
+                                          valid={!meta.error && meta.touched}
+                                          invalid={!!meta.error && meta.touched}
+                                          type="file"
+                                          placeholder="clientCert"
+                                       // disabled={editMode}
+                                       />
 
-                                        <FormFeedback>{meta.error}</FormFeedback>
+                                       <FormFeedback>{meta.error}</FormFeedback>
 
-                                     </FormGroup>
+                                    </FormGroup>
 
-                                  )}
+                                 )}
 
-                               </Field>
+                              </Field>
 
-                            ) : null
-                         }
+                           ) : null
+                        }
 
-                         <div className="d-flex justify-content-end">
+                        <div className="d-flex justify-content-end">
 
-                            <ButtonGroup>
+                           <ButtonGroup>
 
-                               <Button
+                              <Button
 
-                                  color="success"
-                                  onClick={() => onConnectClick(values)}
-                                  disabled={submitting || isConnecting || isReconnecting}
-                               >
-                                  {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}
-                               </Button>
+                                 color="success"
+                                 onClick={() => onConnectClick(values)}
+                                 disabled={submitting || isConnecting || isReconnecting}
+                              >
+                                 {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}
+                              </Button>
 
-                            </ButtonGroup>
+                           </ButtonGroup>
 
-                         </div>
+                        </div>
 
-                      </Widget>
+                     </Widget>
 
-                      {
-                         connectionDetails ? (
+                     {
+                        connectionDetails ? (
 
-                            <Widget title="Connection Details" busy={isConnecting}>
+                           <Widget title="Connection Details" busy={isConnecting}>
 
-                               <Table className="table-hover" size="sm">
+                              <Table className="table-hover" size="sm">
 
-                                  <tbody>
+                                 <tbody>
 
-                                     <tr>
-                                        <td>URL</td>
-                                        <td>{values.url}</td>
-                                     </tr>
+                                    <tr>
+                                       <td>URL</td>
+                                       <td>{values.url}</td>
+                                    </tr>
 
-                                     <tr>
+                                    <tr>
 
-                                        <td>Connector Status</td>
-                                        <td>
-                                           <InventoryStatusBadge status={connectionDetails.length > 0 ? "connected" : "failed"} />
-                                        </td>
+                                       <td>Connector Status</td>
+                                       <td>
+                                          <InventoryStatusBadge status={connectionDetails.length > 0 ? "connected" : "failed"} />
+                                       </td>
 
-                                     </tr>
+                                    </tr>
 
-                                     <tr>
+                                    <tr>
 
-                                        <td>Function Group(s)</td>
-                                        <td>
-                                           {connectionDetails.map(
-                                              functionGroup => (
-                                                 <div>
-                                                    <Badge color="primary">
-                                                       {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
-                                                    </Badge>
-                                                    &nbsp;
-                                                 </div>
-                                              )
-                                           )}
-                                        </td>
+                                       <td>Function Group(s)</td>
+                                       <td>
+                                          {connectionDetails.map(
+                                             functionGroup => (
+                                                <div>
+                                                   <Badge color="primary">
+                                                      {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                   </Badge>
+                                                   &nbsp;
+                                                </div>
+                                             )
+                                          )}
+                                       </td>
 
-                                     </tr>
+                                    </tr>
 
-                                  </tbody>
+                                 </tbody>
 
-                               </Table>
+                              </Table>
 
 
-                               {
+                              {
 
-                                  connectionDetails && connectionDetails.length > 0 ? (
+                                 connectionDetails && connectionDetails.length > 0 ? (
 
-                                     <div>
+                                    <div>
 
-                                        <b>Connector Functionality Description</b>
+                                       <b>Connector Functionality Description</b>
 
-                                        <hr />{" "}
+                                       <hr />{" "}
 
-                                        {connectionDetails.map(
+                                       {connectionDetails.map(
 
-                                           functionGroup => (
+                                          functionGroup => (
 
-                                              <Widget key={functionGroup.name} title={
+                                             <Widget key={functionGroup.name} title={
 
-                                                 <>
+                                                <>
 
-                                                    {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                   {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
 
-                                                    <div className="pull-right mt-n-xs">
-                                                       {
-                                                          functionGroup.kinds.map(kinds =>
-                                                             <>
-                                                                &nbsp;
-                                                                <Badge color="secondary">
-                                                                   {kinds}
-                                                                </Badge>
-                                                             </>
-                                                          )
-                                                       }
-                                                    </div>
+                                                   <div className="pull-right mt-n-xs">
+                                                      {
+                                                         functionGroup.kinds.map(kinds =>
+                                                            <>
+                                                               &nbsp;
+                                                               <Badge color="secondary">
+                                                                  {kinds}
+                                                               </Badge>
+                                                            </>
+                                                         )
+                                                      }
+                                                   </div>
 
-                                                 </>
+                                                </>
 
-                                              }>
+                                             }>
 
-                                                 <CustomTable
-                                                    headers={endPointsHeaders}
-                                                    data={getEndPointInfo(functionGroup?.endPoints)}
-                                                 />
+                                                <CustomTable
+                                                   headers={endPointsHeaders}
+                                                   data={getEndPointInfo(functionGroup?.endPoints)}
+                                                />
 
-                                              </Widget>
+                                             </Widget>
 
-                                           )
+                                          )
 
-                                        )}
+                                       )}
 
-                                     </div>
+                                    </div>
 
-                                  ) : null}
+                                 ) : null}
 
-                               {
+                              {
 
-                                  connectionDetails && connectionDetails.length > 0 ? (
+                                 connectionDetails && connectionDetails.length > 0 ? (
 
-                                     <div>
+                                    <div>
 
-                                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())} >
+                                       <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())} >
 
-                                           {({ input, meta }) => (
+                                          {({ input, meta }) => (
 
-                                              <FormGroup>
+                                             <FormGroup>
 
-                                                 <Label for="name">Connector Name</Label>
+                                                <Label for="name">Connector Name</Label>
 
-                                                 <Input
-                                                    {...input}
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                    type="text"
-                                                    placeholder="Connector Name"
-                                                    disabled={editMode}
-                                                 />
+                                                <Input
+                                                   {...input}
+                                                   valid={!meta.error && meta.touched}
+                                                   invalid={!!meta.error && meta.touched}
+                                                   type="text"
+                                                   placeholder="Connector Name"
+                                                   disabled={editMode}
+                                                />
 
-                                                 <FormFeedback>{meta.error}</FormFeedback>
+                                                <FormFeedback>{meta.error}</FormFeedback>
 
-                                              </FormGroup>
+                                             </FormGroup>
 
-                                           )}
+                                          )}
 
-                                        </Field>
+                                       </Field>
 
-                                        <div className="d-flex justify-content-end">
+                                       <div className="d-flex justify-content-end">
 
-                                           <ButtonGroup>
+                                          <ButtonGroup>
 
-                                              <Button
-                                                 color="default"
-                                                 onClick={onCancel}
-                                                 disabled={submitting}
-                                              >
-                                                 Cancel
-                                              </Button>
+                                             <Button
+                                                color="default"
+                                                onClick={onCancel}
+                                                disabled={submitting}
+                                             >
+                                                Cancel
+                                             </Button>
 
-                                              <ProgressButton
-                                                 title={submitTitle}
-                                                 inProgressTitle={inProgressTitle}
-                                                 inProgress={submitting}
-                                                 disabled={pristine}
-                                              />
+                                             <ProgressButton
+                                                title={submitTitle}
+                                                inProgressTitle={inProgressTitle}
+                                                inProgress={submitting}
+                                                disabled={pristine}
+                                             />
 
-                                           </ButtonGroup>
+                                          </ButtonGroup>
 
-                                        </div>
+                                       </div>
 
-                                     </div>
+                                    </div>
 
-                                  ) : null
+                                 ) : null
 
-                               }
+                              }
 
-                            </Widget>
+                           </Widget>
 
-                         ) : null
+                        ) : null
 
-                      }
+                     }
 
-                   </BootstrapForm>
+                  </BootstrapForm>
 
-                )}
-             </Form>
+               )}
+            </Form>
 
-          </div>
-       </Container>
+         </div>
+      </Container>
 
    );
 }

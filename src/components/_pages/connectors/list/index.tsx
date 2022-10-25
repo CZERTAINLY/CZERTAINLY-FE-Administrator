@@ -40,74 +40,92 @@ export default function ConnectorList() {
 
 
    useEffect(
+
       () => {
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.listConnectors());
       },
       [dispatch]
+
    );
 
 
    useEffect(
+
       () => {
          setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
       },
       [bulkDeleteErrorMessages]
+
    );
 
 
    const onAddClick = useCallback(
+
       () => {
-          navigate(`${location.pathname}/add`);
-      }, [navigate, location.pathname]
+         navigate(`${location.pathname}/add`);
+      },
+      [navigate, location.pathname]
+
    );
 
 
    const onReconnectClick = useCallback(
+
       () => {
          dispatch(actions.bulkReconnectConnectors({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
+
    );
 
 
    const setCheckedRows = useCallback(
+
       (rows: (string | number)[]) => {
          dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
       },
       [dispatch]
+
    );
 
 
    const onDeleteConfirmed = useCallback(
+
       () => {
          setConfirmDelete(false);
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkDeleteConnectors({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
+
    );
 
 
    const onForceDeleteConfirmed = useCallback(
+
       () => {
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.bulkForceDeleteConnectors({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
+
    );
 
 
    const onAuthorizeConfirmed = useCallback(
+
       () => {
          setConfirmAuthorize(false);
          dispatch(actions.bulkAuthorizeConnectors({ uuids: checkedRows }));
       },
       [dispatch, checkedRows]
+
    );
 
 
    const buttons: WidgetButtonProps[] = useMemo(
+
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
@@ -115,6 +133,7 @@ export default function ConnectorList() {
          { icon: "check", disabled: checkedRows.length === 0, tooltip: "Approve", onClick: () => { setConfirmAuthorize(true); } }
       ],
       [checkedRows, onAddClick, onReconnectClick]
+
    );
 
 
@@ -177,22 +196,19 @@ export default function ConnectorList() {
 
    const getFunctionGroups = useCallback(
 
-      (functionGroups: FunctionGroupModel[]) => {
+      (functionGroups: FunctionGroupModel[]) => functionGroups.map(
 
-         return functionGroups.map(
+         group => (
 
-            group => (
-
-               <div key={group.uuid}>
-                  <Badge color="primary">
-                     {attributeFieldNameTransform[group.name || ""] || group.name}
-                  </Badge>
-               </div>
-
-            )
+            <div key={group.uuid}>
+               <Badge color="primary">
+                  {attributeFieldNameTransform[group.name || ""] || group.name}
+               </Badge>
+            </div>
 
          )
-      },
+
+      ),
       []
 
    );
@@ -309,6 +325,7 @@ export default function ConnectorList() {
 
                ],
             }
+
          }
 
       ),
