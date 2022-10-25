@@ -14,6 +14,9 @@ import Home from "./_pages/home";
 import About from "./_pages/about";
 import Dashboard from "./_pages/dashboard";
 
+import UserProfileDetail from "./_pages/user-profile/detail";
+import UserProfileEdit from "./_pages/user-profile/form";
+
 
 export default function AppRouter() {
 
@@ -46,7 +49,9 @@ export default function AppRouter() {
             {/*<Route path="/app/discovery" component={Discovery} />*/}
             {/*<Route path="/app/certificates" component={Certificates} />*/}
             {/*<Route path="/app/complianceprofiles" component={ComplianceProfiles} />*/}
-            {/*<Route path="/app/userprofile" component={UserProfile} />*/}
+
+            <Route path="/app/userprofile" element={<UserProfileDetail />} />
+            <Route path="/app/userprofile/edit" element={<UserProfileEdit />} />
 
          </Route >
 
