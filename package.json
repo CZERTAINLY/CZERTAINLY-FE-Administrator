@@ -22,6 +22,7 @@
     "react-redux": "latest",
     "react-router-dom": "latest",
     "react-scripts": "latest",
+    "react-select": "latest",
     "reactstrap": "latest",
     "redux-observable": "latest",
     "rxjs": "latest",
