@@ -54,7 +54,7 @@ export default function AppRedirect() {
 
          if (!redirectUrl) return;
          dispatch(actions.clearRedirectUrl());
-         navigate(redirectUrl);
+         navigate(redirectUrl, { relative: "path" });
 
       },
       [dispatch, navigate, redirectUrl]
