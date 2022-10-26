@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useMatch, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { Container } from "reactstrap";
 
@@ -15,10 +15,9 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 export default function GroupDetail() {
 
    const dispatch = useDispatch();
-
-   const match = useMatch("/app/groups/detail/:id");
-
    const navigate = useNavigate();
+
+   const { id } = useParams();
 
    const group = useSelector(selectors.group);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
@@ -30,12 +29,12 @@ export default function GroupDetail() {
 
       () => {
 
-         if (!match?.params.id ) return;
+         if (!id) return;
 
-         dispatch(actions.getGroupDetail({ uuid: match.params.id }));
+         dispatch(actions.getGroupDetail({ uuid: id }));
 
       },
-      [match, dispatch]
+      [dispatch, id]
 
    );
 

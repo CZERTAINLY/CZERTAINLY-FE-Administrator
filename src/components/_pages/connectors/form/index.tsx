@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Form, Field } from "react-final-form";
+
 import {
    Badge,
    Button,
@@ -14,22 +17,19 @@ import {
    Table
 } from "reactstrap";
 
-import ProgressButton from "components/ProgressButton";
-
-import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
-
-import InventoryStatusBadge from "../ConnectorStatus";
-import Widget from "components/Widget";
-import Select from "react-select";
-
 import { ConnectorModel, EndpointModel } from "models/connectors";
-import { useDispatch, useSelector } from "react-redux";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
 import { AuthType } from "types/connectors";
+
+import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
+
+import ProgressButton from "components/ProgressButton";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import InventoryStatusBadge from "../ConnectorStatus";
+import Widget from "components/Widget";
+import Select from "react-select";
 import { attributeFieldNameTransform } from "utils/attributes";
-import { useNavigate, useParams } from "react-router-dom";
 
 
 interface FormValues {
@@ -46,8 +46,7 @@ export default function ConnectorForm() {
 
    const { id } = useParams();
 
-   const editMode = !!id;
-
+   const editMode = useMemo( () => !!id, [id] );
 
    const optionsForAuth: { label: string, value: AuthType }[] = useMemo(
 
@@ -129,7 +128,6 @@ export default function ConnectorForm() {
    )
 
 
-
    const onSubmit = useCallback(
 
       (values: FormValues) => {
@@ -172,15 +170,40 @@ export default function ConnectorForm() {
    )
 
 
-   const onConnectClick = (values: FormValues) => {
+   const onConnectClick = useCallback(
 
-      if (editMode) {
-         dispatch(connectorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
-      } else {
-         dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
-      }
+      (values: FormValues) => {
 
-   };
+         if (editMode) {
+            dispatch(connectorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
+         } else {
+            dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
+         }
+
+      },
+      [connector, dispatch, editMode]
+
+   );
+
+
+   const getEndPointInfo = useCallback(
+
+      (endpoints: EndpointModel[]): TableDataRow[] => {
+         return endpoints.map(
+            (endpoint: EndpointModel) => ({
+               id: endpoint.name,
+               columns: [
+                  endpoint.name,
+                  endpoint.context,
+                  endpoint.method
+               ]
+            })
+
+         )
+      },
+      []
+
+   );
 
 
    const endPointsHeaders: TableHeader[] = useMemo(
@@ -206,26 +229,6 @@ export default function ConnectorForm() {
       []
 
    )
-
-
-   const getEndPointInfo = useCallback(
-
-      (endpoints: EndpointModel[]): TableDataRow[] => {
-         return endpoints.map(
-            (endpoint: EndpointModel) => ({
-               id: endpoint.name,
-               columns: [
-                  endpoint.name,
-                  endpoint.context,
-                  endpoint.method
-               ]
-            })
-
-         )
-      },
-      []
-
-   );
 
 
    const defaultValues = useMemo(

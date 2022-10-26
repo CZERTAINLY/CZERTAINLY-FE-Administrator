@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useMatch, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { Form, Field } from "react-final-form";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
@@ -24,12 +24,9 @@ export default function GroupForm() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
-   const match = useMatch("/app/groups/edit/:id");
+   const { id } = useParams();
 
-   const editMode = useMemo(
-      () => match?.params.id !== undefined,
-      [match]
-   );
+   const editMode = useMemo( () => !!id, [id] );
 
    const groupSelector = useSelector(selectors.group);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
@@ -50,13 +47,13 @@ export default function GroupForm() {
       (values: FormValues) => {
 
          if (editMode) {
-            dispatch(actions.updateGroup({ groupUuid: match!.params.id!, name: values.name, description: values.description }));
+            dispatch(actions.updateGroup({ groupUuid: id!, name: values.name, description: values.description }));
          } else {
             dispatch(actions.createGroup({ name: values.name, description: values.description }));
          }
 
       },
-      [dispatch, editMode, match]
+      [dispatch, editMode, id]
 
    );
 
@@ -87,11 +84,13 @@ export default function GroupForm() {
 
 
    const defaultValues: FormValues = useMemo(
+
       () => ({
          name: editMode ? group?.name || "" : "",
          description: editMode ? group?.description || "" : "",
       }),
       [editMode, group]
+
    );
 
 
