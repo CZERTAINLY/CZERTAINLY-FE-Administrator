@@ -36,48 +36,49 @@ export default function AppRouter() {
          <>
             <Route element={< Layout />}>
 
-               <Route path="/" element={<Navigate to="/app/home" />} />
-               <Route path="/app" element={<Navigate to="/app/home" />} />
-               <Route path="/app/home" element={<Home />} />
-               <Route path="/app/about" element={<About />} />
-               <Route path="/app/dashboard" element={<Dashboard />} />
+               <Route path="" element={<Navigate to="/home" />} />
+               <Route path="/" element={<Navigate to="/home" />} />
 
-               <Route path="/app/connectors" element={<ConnectorList />} />
-               <Route path="/app/connectors/list" element={<Navigate to="/app/connectors" />} />
-               <Route path="/app/connectors/detail/:id" element={<ConnectorDetail />} />
-               <Route path="/app/connectors/edit/:id" element={<ConnectorEdit />} />
-               <Route path="/app/connectors/add" element={<ConnectorEdit />} />
+               <Route path="/home" element={<Home />} />
+               <Route path="/about" element={<About />} />
+               <Route path="/dashboard" element={<Dashboard />} />
 
-               {/*<Route path="/app/users" component={Users} />*/}
-               {/*<Route path="/app/roles" component={Roles} />*/}
-               {/*<Route path="/app/audit" component={AuditLogs} />*/}
-               {/*<Route path="/app/raprofiles" component={RaProfiles} />*/}
-               {/*<Route path="/app/credentials" component={Credentials} />*/}
-               {/*<Route path="/app/authorities" component={Authorities} />*/}
-               {/*<Route path="/app/entities" component={Entities} />*/}
-               {/*<Route path="/app/locations" component={Locations} />*/}
-               {/*<Route path="/app/acmeaccounts" component={AcmeAccounts} />*/}
-               {/*<Route path="/app/acmeprofiles" component={AcmeProfiles} />*/}
+               <Route path="/connectors" element={<ConnectorList />} />
+               <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
+               <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
+               <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
+               <Route path="/connectors/add" element={<ConnectorEdit />} />
 
-               <Route path="/app/groups" element={<GroupList />} />
-               <Route path="/app/groups/list" element={<Navigate to="/app/groups" />} />
-               <Route path="/app/groups/detail/:id" element={<GroupDetail />} />
-               <Route path="/app/groups/add" element={<GroupEdit />} />
-               <Route path="/app/groups/edit/:id" element={<GroupEdit />} />
+               {/*<Route path="/users" component={Users} />*/}
+               {/*<Route path="/roles" component={Roles} />*/}
+               {/*<Route path="/audit" component={AuditLogs} />*/}
+               {/*<Route path="/raprofiles" component={RaProfiles} />*/}
+               {/*<Route path="/credentials" component={Credentials} />*/}
+               {/*<Route path="/authorities" component={Authorities} />*/}
+               {/*<Route path="/entities" component={Entities} />*/}
+               {/*<Route path="/locations" component={Locations} />*/}
+               {/*<Route path="/acmeaccounts" component={AcmeAccounts} />*/}
+               {/*<Route path="/acmeprofiles" component={AcmeProfiles} />*/}
 
-               {/*<Route path="/app/discovery" component={Discovery} />*/}
-               {/*<Route path="/app/certificates" component={Certificates} />*/}
-               {/*<Route path="/app/complianceprofiles" component={ComplianceProfiles} />*/}
+               <Route path="/groups" element={<GroupList />} />
+               <Route path="/groups/list" element={<Navigate to="/groups" />} />
+               <Route path="/groups/detail/:id" element={<GroupDetail />} />
+               <Route path="/groups/add" element={<GroupEdit />} />
+               <Route path="/groups/edit/:id" element={<GroupEdit />} />
 
-               <Route path="/app/userprofile" element={<UserProfileDetail />} />
-               <Route path="/app/userprofile/edit" element={<UserProfileEdit />} />
+               {/*<Route path="/discovery" component={Discovery} />*/}
+               {/*<Route path="/certificates" component={Certificates} />*/}
+               {/*<Route path="/complianceprofiles" component={ComplianceProfiles} />*/}
+
+               <Route path="/userprofile" element={<UserProfileDetail />} />
+               <Route path="/userprofile/edit" element={<UserProfileEdit />} />
 
             </Route >
 
             {
                /*
                Please keep this remarked until migration is finished
-               <Route path="*" element={<Navigate to="/app/home"/>}/>
+               <Route path="*" element={<Navigate to="/home"/>}/>
                */
             }
             <Route path="*" element={<h1>404</h1>} />
