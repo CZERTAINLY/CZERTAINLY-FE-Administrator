@@ -112,10 +112,10 @@ export default function ConnectorDetail() {
    const onEditClick = useCallback(
 
       () => {
-         navigate(`/app/connectors/edit/${connector?.uuid}`);
+         navigate(`../../edit/${connector?.uuid}`, { relative: "path" });
 
       },
-      [connector, navigate]
+      [connector?.uuid, navigate]
 
    );
 
