@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container, Table } from "reactstrap";
 
 import { actions, selectors } from "ducks/connectors";
@@ -18,7 +18,6 @@ export default function ConnectorList() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
-   const location = useLocation();
 
    const checkedRows = useSelector(selectors.checkedRows);
    const connectors = useSelector(selectors.connectors);
@@ -63,9 +62,9 @@ export default function ConnectorList() {
    const onAddClick = useCallback(
 
       () => {
-         navigate(`${location.pathname}/add`);
+         navigate(`./add`);
       },
-      [navigate, location.pathname]
+      [navigate]
 
    );
 
@@ -313,7 +312,7 @@ export default function ConnectorList() {
                id: connector.uuid,
                columns: [
 
-                  <span style={{ whiteSpace: "nowrap" }}><Link to={`${location.pathname}/detail/${connector.uuid}`}>{connector.name}</Link></span>,
+                  <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${connector.uuid}`}>{connector.name}</Link></span>,
 
                   <span style={{ whiteSpace: "nowrap" }}>{getFunctionGroups(connector.functionGroups)}</span>,
 
@@ -329,7 +328,7 @@ export default function ConnectorList() {
          }
 
       ),
-      [connectors, getFunctionGroups, getKinds, location.pathname]
+      [connectors, getFunctionGroups, getKinds]
 
    );
 

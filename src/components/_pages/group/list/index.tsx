@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { actions, selectors } from "ducks/groups";
 
@@ -15,7 +15,6 @@ export default function GroupList() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
-   const location = useLocation();
 
    const checkedRows = useSelector(selectors.checkedRows);
    const groups = useSelector(selectors.groups);
@@ -47,10 +46,10 @@ export default function GroupList() {
 
       () => {
 
-         navigate(`${location.pathname}/add`);
+         navigate(`./add`);
 
       },
-      [location.pathname, navigate]
+      [navigate]
 
    );
 
@@ -140,7 +139,7 @@ export default function GroupList() {
 
             columns: [
 
-               <NavLink to={`${location.pathname}/detail/${group.uuid}`}>{group.name}</NavLink>,
+               <Link to={`$./detail/${group.uuid}`}>{group.name}</Link>,
 
                group.description || ""
 
@@ -148,7 +147,7 @@ export default function GroupList() {
 
          })
       ),
-      [groups, location.pathname]
+      [groups]
 
    )
 

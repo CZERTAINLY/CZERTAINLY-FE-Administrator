@@ -88,7 +88,7 @@ const create: AppEpic = (action$, state, deps) => {
             mergeMap(
                role => of(
                   slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) }),
-                  appRedirectActions.redirect({ url: `./detail/${role.uuid}` }),
+                  appRedirectActions.redirect({ url: `../detail/${role.uuid}` }),
 
                )
             ),
@@ -127,7 +127,7 @@ const update: AppEpic = (action$, state, deps) => {
             mergeMap(
                role => of(
                   slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) }),
-                  appRedirectActions.redirect({ url: `./detail/${role.uuid}` }),
+                  appRedirectActions.redirect({ url: `../../detail/${role.uuid}` }),
                )
             ),
 

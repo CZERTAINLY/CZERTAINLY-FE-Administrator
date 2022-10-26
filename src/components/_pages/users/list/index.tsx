@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/users";
@@ -15,7 +15,6 @@ export default function UsersList() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
-   const location = useLocation();
 
    const checkedRows = useSelector(selectors.usersListCheckedRows);
    const users = useSelector(selectors.users);
@@ -48,10 +47,10 @@ export default function UsersList() {
 
       () => {
 
-         navigate(`${location.pathname}/add`);
+         navigate(`./add`);
 
       },
-      [location.pathname, navigate]
+      [navigate]
 
    );
 
@@ -254,7 +253,7 @@ export default function UsersList() {
 
             columns: [
 
-               <span style={{ whiteSpace: "nowrap" }}><NavLink to={`${location.pathname}/detail/${user.uuid}`}>{user.username}</NavLink></span>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${user.uuid}`}>{user.username}</Link></span>,
 
                <span style={{ whiteSpace: "nowrap" }}>{user.description || ""}</span>,
 
@@ -271,7 +270,7 @@ export default function UsersList() {
             ]
          })
       ),
-      [users, location.pathname]
+      [users]
    );
 
 
