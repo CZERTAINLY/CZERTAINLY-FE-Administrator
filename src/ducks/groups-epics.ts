@@ -1,11 +1,11 @@
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import { actions as appRedirectActions } from "./app-redirect";
-
 import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
+
 import { slice } from "./groups";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformGroupDtoToModel } from "./transform/groups";
 

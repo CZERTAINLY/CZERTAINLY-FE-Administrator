@@ -30,6 +30,13 @@ export function certificatePEM2CertificateModel(pem: string): CertificateModel {
 }
 
 
+export function getCertificateInformation(encoded: string): CertificateModel {
+
+   return emptyCertificate;
+
+}
+
+
 
 /*
 function getDistinguishedName(dn: DistinguishedName): string {

@@ -11,11 +11,11 @@ import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
 import { transformConnectorDTOToModel, transformFunctionGroupDTOtoModel } from "./transform/connectors";
 
 import {
-    transformAttributeCallbackDataModelToDto,
-    transformAttributeDescriptorDTOToModel,
-    transformAttributeModelToDTO,
-    transformConnectorHealthDTOToModel,
-    transfromAttributeDescriptorCollectionDTOToModel
+   transformAttributeCallbackDataModelToDto,
+   transformAttributeDescriptorDTOToModel,
+   transformAttributeModelToDTO,
+   transformConnectorHealthDTOToModel,
+   transfromAttributeDescriptorCollectionDTOToModel
 } from "./transform/attributes";
 
 
@@ -38,8 +38,8 @@ const listConnectors: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.listConnectorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to get connector list" })
+                  slice.actions.listConnectorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to get connector list" })
                )
             )
 
@@ -68,8 +68,8 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
             ),
             catchError(
                error => of(
-                   slice.actions.getConnectorDetailFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to get connector detail" })
+                  slice.actions.getConnectorDetailFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to get connector detail" })
                )
             )
 
@@ -107,8 +107,8 @@ const getConnectorAttributesDescriptors: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.getConnectorAttributesDescriptorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to get connector attributes" })
+                  slice.actions.getConnectorAttributesDescriptorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to get connector attributes" })
                )
             )
 
@@ -139,8 +139,8 @@ const getConnectorAllAttributesDescriptors: AppEpic = (action$, state, deps) => 
 
             catchError(
                error => of(
-                   slice.actions.getAllConnectorAllAttributesDescriptorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to get all connector attributes" })
+                  slice.actions.getAllConnectorAllAttributesDescriptorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to get all connector attributes" })
                )
             )
          )
@@ -168,8 +168,8 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.getConnectorHealthFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to get connector health" })
+                  slice.actions.getConnectorHealthFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to get connector health" })
                )
             )
 
@@ -203,17 +203,17 @@ const createConnector: AppEpic = (action$, state, deps) => {
 
                   mergeMap(
                      connector => of(
-                         slice.actions.createConnectorSuccess({
-                            connector: transformConnectorDTOToModel(connector)
-                            }),
-                         appRedirectActions.redirect({ url: `./detail/${connector.uuid}` })
+                        slice.actions.createConnectorSuccess({
+                           connector: transformConnectorDTOToModel(connector)
+                        }),
+                        appRedirectActions.redirect({ url: `./detail/${connector.uuid}` })
                      )
                   ),
 
                   catchError(
                      error => of(
-                         slice.actions.createConnectorFailure(),
-                         appRedirectActions.fetchError({ error, message: "Failed to get created connector" })
+                        slice.actions.createConnectorFailure(),
+                        appRedirectActions.fetchError({ error, message: "Failed to get created connector" })
                      )
                   )
 
@@ -222,10 +222,10 @@ const createConnector: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-                error => of(
-                    slice.actions.createConnectorFailure(),
-                    appRedirectActions.fetchError({ error, message: "Failed to create connector" })
-                )
+               error => of(
+                  slice.actions.createConnectorFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to create connector" })
+               )
             )
 
          )
@@ -258,8 +258,8 @@ const updateConnector: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.updateConnectorFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to update connector" })
+                  slice.actions.updateConnectorFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to update connector" })
                )
             )
 
@@ -284,13 +284,13 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
 
             mergeMap(
                () => of(slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid }),
-                   appRedirectActions.redirect({ url: "../" }))
+                  appRedirectActions.redirect({ url: "../" }))
             ),
 
             catchError(
                error => of(
-                   slice.actions.deleteConnectorFailure({ error: extractError(error, "Failed to delete connector") }),
-                   appRedirectActions.fetchError({ error, message: "Failed to delete connector" })
+                  slice.actions.deleteConnectorFailure({ error: extractError(error, "Failed to delete connector") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete connector" })
                )
             )
 
@@ -322,8 +322,8 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.bulkDeleteConnectorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to delete connector" })
+                  slice.actions.bulkDeleteConnectorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete connector" })
                )
             )
 
@@ -359,8 +359,8 @@ const connectConnector: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.connectConnectorFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to connect to connector" })
+                  slice.actions.connectConnectorFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to connect to connector" })
                )
             )
 
@@ -385,18 +385,18 @@ const reconnectConnector: AppEpic = (action$, state, deps) => {
 
             mergeMap(
                connection => of(
-                   slice.actions.reconnectConnectorSuccess({
-                        uuid: action.payload.uuid,
-                        functionGroups: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
-                   }),
-                   slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
+                  slice.actions.reconnectConnectorSuccess({
+                     uuid: action.payload.uuid,
+                     functionGroups: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
+                  }),
+                  slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
                )
             ),
 
             catchError(
                error => of(
-                   slice.actions.reconnectConnectorFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to reconnect to connector" })
+                  slice.actions.reconnectConnectorFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to reconnect to connector" })
                )
             )
 
@@ -425,8 +425,8 @@ const bulkReconnectConnectors: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.bulkReconnectConnectorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to bulk reconnect to connectors" })
+                  slice.actions.bulkReconnectConnectorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to bulk reconnect to connectors" })
                )
             )
 
@@ -451,16 +451,16 @@ const authorizeConnector: AppEpic = (action$, state, deps) => {
 
             mergeMap(
                () => of(
-                   slice.actions.authorizeConnectorSuccess({ uuid: action.payload.uuid }),
-                   slice.actions.getConnectorDetail({ uuid: action.payload.uuid }),
-                   slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
+                  slice.actions.authorizeConnectorSuccess({ uuid: action.payload.uuid }),
+                  slice.actions.getConnectorDetail({ uuid: action.payload.uuid }),
+                  slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
                )
             ),
 
             catchError(
                error => of(
-                   slice.actions.authorizeConnectorFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to authorize connector" })
+                  slice.actions.authorizeConnectorFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to authorize connector" })
                )
             )
 
@@ -485,13 +485,13 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
 
             mergeMap(
                () => of(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }),
-                   slice.actions.listConnectors())
+                  slice.actions.listConnectors())
             ),
 
             catchError(
                error => of(
-                   slice.actions.bulkAuthorizeConnectorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to bulk authorize connectors" })
+                  slice.actions.bulkAuthorizeConnectorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to bulk authorize connectors" })
                )
             )
 
@@ -515,20 +515,26 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.connectors.bulkForceDeleteConnectors(action.payload.uuids).pipe(
 
             mergeMap(
-               () => iif(() => !!action.payload.successRedirect,
-                   of(
-                        slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids, successRedirect: action.payload.successRedirect }),
-                        appRedirectActions.redirect({ url: action.payload.successRedirect! })
-                   ),
-                   of(slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids, successRedirect: action.payload.successRedirect }))
+
+               () => iif(
+
+                  () => !!action.payload.successRedirect,
+                  of(
+                     slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids, successRedirect: action.payload.successRedirect }),
+                     appRedirectActions.redirect({ url: action.payload.successRedirect! })
+                  ),
+                  of(
+                     slice.actions.bulkForceDeleteConnectorsSuccess({ uuids: action.payload.uuids, successRedirect: action.payload.successRedirect })
+                  )
+
                ),
 
             ),
 
             catchError(
                error => of(
-                   slice.actions.bulkForceDeleteConnectorsFailure(),
-                   appRedirectActions.fetchError({ error, message: "Failed to force delete connectors" })
+                  slice.actions.bulkForceDeleteConnectorsFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to force delete connectors" })
                )
             )
 
@@ -565,8 +571,8 @@ const callback: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                   slice.actions.callbackFailure({ callbackId: action.payload.callbackId }),
-                   appRedirectActions.fetchError({ error, message: "Connector callback failure" })
+                  slice.actions.callbackFailure({ callbackId: action.payload.callbackId }),
+                  appRedirectActions.fetchError({ error, message: "Connector callback failure" })
                )
             )
 
@@ -576,8 +582,8 @@ const callback: AppEpic = (action$, state, deps) => {
 
       catchError(
          error => of(
-             slice.actions.callbackFailure({ callbackId: "" }),
-             appRedirectActions.fetchError({ error, message: "Failed to perform connector callback" })
+            slice.actions.callbackFailure({ callbackId: "" }),
+            appRedirectActions.fetchError({ error, message: "Failed to perform connector callback" })
          )
       )
 

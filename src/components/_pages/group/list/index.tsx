@@ -114,14 +114,14 @@ export default function GroupList() {
       () => [
          {
             id: "name",
-            content: <strong>Name</strong>,
+            content: "Name",
             sortable: true,
             sort: "asc",
             width: "15%",
          },
          {
             id: "description",
-            content: <strong>Description</strong>,
+            content: "Description",
             sortable: true,
          }
       ],

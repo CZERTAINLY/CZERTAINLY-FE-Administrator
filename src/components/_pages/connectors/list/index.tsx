@@ -264,33 +264,33 @@ export default function ConnectorList() {
 
       () => [
          {
-            content: <strong>Name</strong>,
+            content: "Name",
             sortable: true,
             sort: "asc",
             id: "connectorName",
             width: "25%",
          },
          {
-            content: <strong>Function Groups</strong>,
+            content: "Function Groups",
             align: "center",
             sortable: true,
             id: "connectorFunctions",
             width: "15%",
          },
          {
-            content: <strong>Kinds</strong>,
+            content: "Kinds",
             sortable: true,
             id: "kinds",
             width: "15%",
             align: "center"
          },
          {
-            content: <strong>URL</strong>,
+            content: "URL",
             sortable: true,
             id: "connectorUrl",
          },
          {
-            content: <strong>Status</strong>,
+            content: "Status",
             sortable: true,
             id: "connectorStatus",
             width: "5%",

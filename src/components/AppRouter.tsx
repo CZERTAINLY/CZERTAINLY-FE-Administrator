@@ -20,9 +20,14 @@ import GroupEdit from "./_pages/group/form";
 
 import UserProfileDetail from "./_pages/user-profile/detail";
 import UserProfileEdit from "./_pages/user-profile/form";
+
 import ConnectorList from "./_pages/connectors/list";
 import ConnectorDetail from "./_pages/connectors/detail";
 import ConnectorEdit from "./_pages/connectors/form";
+
+import UsersList from "./_pages/users/list";
+import UserDetail from "./_pages/users/detail";
+import UserEdit from "./_pages/users/form";
 
 
 export default function AppRouter() {
@@ -49,7 +54,13 @@ export default function AppRouter() {
                <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
                <Route path="/connectors/add" element={<ConnectorEdit />} />
 
-               {/*<Route path="/users" component={Users} />*/}
+               <Route path="/users" element={<UsersList />} />
+               <Route path="/users/list" element={<Navigate to="/users" />} />
+               <Route path="/users/detail/:id" element={<UserDetail />} />
+               <Route path="/users/edit/:id" element={<UserEdit />} />
+               <Route path="/users/add" element={<UserEdit />} />
+
+
                {/*<Route path="/roles" component={Roles} />*/}
                {/*<Route path="/audit" component={AuditLogs} />*/}
                {/*<Route path="/raprofiles" component={RaProfiles} />*/}
