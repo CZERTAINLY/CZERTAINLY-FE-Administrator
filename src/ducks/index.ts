@@ -54,9 +54,5 @@ export const epics = combineEpics(
    ...appRedirectEpics,
    ...dashboardEpics,
    ...groupsEpics,
-   ...startupEpics,
-   ...authEpics,
-   ...appRedirectEpics,
-   ...dashboardEpics,
    ...connectorsEpics,
 );
