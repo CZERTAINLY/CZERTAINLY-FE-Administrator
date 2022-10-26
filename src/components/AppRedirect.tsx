@@ -40,7 +40,7 @@ export default function AppRedirect() {
             window.location.toString().substring(window.location.origin.length)
          );
 
-         navigate(`/login?redirect=${url}`);
+         navigate(`${__ENV__.LOGIN_URL}}?redirect=${url}`);
 
       },
       [dispatch, navigate, unauthorized]
