@@ -43,6 +43,9 @@ import AcmeProfilesList from "./_pages/acme-profiles/list";
 import AcmeProfileDetail from "./_pages/acme-profiles/detail";
 import AcmeProfileEdit from "./_pages/acme-profiles/form";
 
+import AcmeAccountsList from "./_pages/acme-accounts/list";
+import AcmeAccountDetail from "./_pages/acme-accounts/detail";
+
 import GroupList from "./_pages/group/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
@@ -103,6 +106,10 @@ export default function AppRouter() {
                <Route path="/acmeprofiles/detail/:id" element={<AcmeProfileDetail />} />
                <Route path="/acmeprofiles/edit/:id" element={<AcmeProfileEdit />} />
                <Route path="/acmeprofiles/add" element={<AcmeProfileEdit />} />
+
+               <Route path="/acmeaccounts" element={<AcmeAccountsList />} />
+               <Route path="/acmeaccounts/list" element={<Navigate to="/acmeaccounts" />} />
+               <Route path="/acmeaccounts/detail/:acmeProfileId/:id" element={<AcmeAccountDetail />} />
 
                <Route path="/groups" element={<GroupList />} />
                <Route path="/groups/list" element={<Navigate to="/groups" />} />
