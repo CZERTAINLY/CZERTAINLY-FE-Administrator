@@ -36,8 +36,12 @@ import AuthorityDetail from "./_pages/authorities/detail";
 import AuthorityEdit from "./_pages/authorities/form";
 
 import RaProfilesList from "./_pages/ra-profiles/list";
-import RaProfilesDetail from "./_pages/ra-profiles/detail";
-import RaProfilesEdit from "./_pages/ra-profiles/form";
+import RaProfileDetail from "./_pages/ra-profiles/detail";
+import RaProfileEdit from "./_pages/ra-profiles/form";
+
+import AcmeProfilesList from "./_pages/acme-profiles/list";
+import AcmeProfileDetail from "./_pages/acme-profiles/detail";
+import AcmeProfileEdit from "./_pages/acme-profiles/form";
 
 import GroupList from "./_pages/group/list";
 import GroupDetail from "./_pages/group/detail";
@@ -90,9 +94,15 @@ export default function AppRouter() {
 
                <Route path="/raprofiles" element={<RaProfilesList />} />
                <Route path="/raprofiles/list" element={<Navigate to="/raprofiles" />} />
-               <Route path="/raprofiles/detail/:authorityId/:id" element={<RaProfilesDetail />} />
-               <Route path="/raprofiles/add" element={<RaProfilesEdit />} />
-               <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfilesEdit />} />
+               <Route path="/raprofiles/detail/:authorityId/:id" element={<RaProfileDetail />} />
+               <Route path="/raprofiles/add" element={<RaProfileEdit />} />
+               <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfileEdit />} />
+
+               <Route path="/acmeprofiles" element={<AcmeProfilesList />} />
+               <Route path="/acmeprofiles/list" element={<Navigate to="/acmeprofiles" />} />
+               <Route path="/acmeprofiles/detail/:id" element={<AcmeProfileDetail />} />
+               <Route path="/acmeprofiles/edit/:id" element={<AcmeProfileEdit />} />
+               <Route path="/acmeprofiles/add" element={<AcmeProfileEdit />} />
 
                <Route path="/groups" element={<GroupList />} />
                <Route path="/groups/list" element={<Navigate to="/groups" />} />
@@ -102,6 +112,7 @@ export default function AppRouter() {
 
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
+
 
             </Route >
 

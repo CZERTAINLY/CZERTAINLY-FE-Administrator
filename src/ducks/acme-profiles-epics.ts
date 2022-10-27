@@ -105,7 +105,7 @@ const createAcmeProfile: AppEpic = (action$, state$, deps) => {
             mergeMap(
                acmeProfile => of(
                   slice.actions.createAcmeProfileSuccess({ uuid: acmeProfile.uuid }),
-                  appRedirectActions.redirect({ url: `./detail/${acmeProfile.uuid}` })
+                  appRedirectActions.redirect({ url: `../detail/${acmeProfile.uuid}` })
                )
             ),
 
@@ -192,7 +192,7 @@ const deleteAcmeProfile: AppEpic = (action$, state$, deps) => {
             mergeMap(
                () => of(
                   slice.actions.deleteAcmeProfileSuccess({ uuid: action.payload.uuid }),
-                  appRedirectActions.redirect({ url: "../" })
+                  appRedirectActions.redirect({ url: "../../" })
                )
             ),
 
