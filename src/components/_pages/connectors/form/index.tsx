@@ -29,7 +29,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import InventoryStatusBadge from "../ConnectorStatus";
 import Widget from "components/Widget";
 import Select from "react-select";
-import { attributeFieldNameTransform } from "utils/attributes";
+import { attributeFieldNameTransform } from "utils/attributes/attributes";
 
 
 interface FormValues {

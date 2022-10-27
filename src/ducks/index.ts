@@ -12,6 +12,7 @@ import { initialState as initialConnectorsState, slice as connectorsSlice } from
 import { initialState as initialUsersState, slice as usersSlice } from "./users";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
 import { initialState as initialCertificatesState, slice as certificatesSlice } from "./certificates";
+import { initialState as initialAuthoritiesState, slice as authoritiesSlice } from "./authorities";
 
 
 import authEpics from "./auth-epics";
@@ -23,6 +24,7 @@ import connectorsEpics from "./connectors-epic";
 import usersEpics from "./users-epics";
 import rolesEpics from "./roles-epics";
 import certificatesEpics from "./certificates-epics";
+import authoritiesEpics from "./authorities-epics";
 
 
 export interface EpicDependencies {
@@ -45,6 +47,7 @@ export const initialState = {
    [usersSlice.name]: initialUsersState,
    [rolesSlice.name]: initialRolesState,
    [certificatesSlice.name]: initialCertificatesState,
+   [authoritiesSlice.name]: initialAuthoritiesState,
 };
 
 
@@ -58,6 +61,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [usersSlice.name]: usersSlice.reducer,
    [rolesSlice.name]: rolesSlice.reducer,
    [certificatesSlice.name]: certificatesSlice.reducer,
+   [authoritiesSlice.name]: authoritiesSlice.reducer,
 });
 
 
@@ -70,5 +74,6 @@ export const epics = combineEpics(
    ...connectorsEpics,
    ...usersEpics,
    ...rolesEpics,
-   ...certificatesEpics
+   ...certificatesEpics,
+   ...authoritiesEpics,
 );

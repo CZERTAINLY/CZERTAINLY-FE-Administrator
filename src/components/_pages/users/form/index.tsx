@@ -44,7 +44,7 @@ function UserForm() {
 
    const { id } = useParams();
 
-   const editMode = useMemo( () => !!id, [id] );
+   const editMode = useMemo(() => !!id, [id]);
 
    const userSelector = useSelector(userSelectors.user);
    const rolesSelector = useSelector(rolesSelectors.roles);
@@ -416,6 +416,54 @@ function UserForm() {
    );
 
 
+   const title = useMemo(
+
+      () => (
+
+
+         <>
+
+            {
+               editMode ? <></> :
+
+                  <div style={{ float: "right", color: "black" }}>
+
+                     <Field name="enabled">
+
+                        {({ input, meta }) => (
+
+                           <Label for="enabled">
+
+                              <Input
+                                 {...input}
+                                 id="enabled"
+                                 type="checkbox"
+                                 label="Enabled"
+                                 checked={input.value}
+                              />
+
+                              &nbsp;&nbsp;Enabled
+
+                           </Label>
+
+                        )}
+
+
+                     </Field>
+
+                  </div>
+            }
+
+            {editMode ? "Edit user" : "Create user"}
+
+         </>
+
+      ),
+      [editMode]
+
+   )
+
+
    return (
 
       <>
@@ -427,49 +475,8 @@ function UserForm() {
                <BootstrapForm onSubmit={handleSubmit}>
 
                   <Widget
-
-                     title={
-
-                        <>
-
-                           {
-                              editMode ? <></> :
-
-                                 <div style={{ float: "right", color: "black" }}>
-
-                                    <Field name="enabled">
-
-                                       {({ input, meta }) => (
-
-                                          <Label for="enabled">
-
-                                             <Input
-                                                {...input}
-                                                id="enabled"
-                                                type="checkbox"
-                                                label="Enabled"
-                                                checked={input.value}
-                                             />
-
-                                             &nbsp;&nbsp;Enabled
-
-                                          </Label>
-
-                                       )}
-
-
-                                    </Field>
-
-                                 </div>
-                           }
-
-                           { editMode ? "Edit user" : "Create user" }
-
-                        </>
-                     }
-
+                     title={title}
                      busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles || isUpdatingUser || isCreatingUser}
-
                   >
 
 
@@ -608,7 +615,6 @@ function UserForm() {
                                  menuPlacement="auto"
                                  options={optionsForInput}
                                  placeholder="Select Input Type"
-                                 onChange={(e) => { input.onChange(e) }}
                                  isDisabled={user?.systemUser}
                               />
 

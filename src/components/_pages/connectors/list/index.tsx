@@ -10,7 +10,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
-import { attributeFieldNameTransform } from "utils/attributes";
+import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { FunctionGroupModel } from "models/connectors";
 import { inventoryStatus } from "utils/connector";
 

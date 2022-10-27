@@ -1,6 +1,6 @@
 import { AttributeContentModel } from "models/attributes/AttributeContentModel"
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { attributeFieldNameTransform } from "utils/attributes";
+import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { useCallback, useMemo } from "react";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";

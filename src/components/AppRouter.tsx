@@ -14,16 +14,8 @@ import Home from "./_pages/home";
 import About from "./_pages/about";
 import Dashboard from "./_pages/dashboard";
 
-import GroupList from "./_pages/group/list";
-import GroupDetail from "./_pages/group/detail";
-import GroupEdit from "./_pages/group/form";
-
 import UserProfileDetail from "./_pages/user-profile/detail";
 import UserProfileEdit from "./_pages/user-profile/form";
-
-import ConnectorList from "./_pages/connectors/list";
-import ConnectorDetail from "./_pages/connectors/detail";
-import ConnectorEdit from "./_pages/connectors/form";
 
 import UsersList from "./_pages/users/list";
 import UserDetail from "./_pages/users/detail";
@@ -35,6 +27,17 @@ import RoleEdit from "./_pages/roles/RoleForm";
 import RoleUsers from "./_pages/roles/RoleUsersForm";
 import RolePermissions from "./_pages/roles/RolePermissionsForm";
 
+import ConnectorList from "./_pages/connectors/list";
+import ConnectorDetail from "./_pages/connectors/detail";
+import ConnectorEdit from "./_pages/connectors/form";
+
+import AuthoritiesList from "./_pages/authorities/list";
+import AuthorityDetail from "./_pages/authorities/detail";
+import AuthorityEdit from "./_pages/authorities/form";
+
+import GroupList from "./_pages/group/list";
+import GroupDetail from "./_pages/group/detail";
+import GroupEdit from "./_pages/group/form";
 
 
 export default function AppRouter() {
@@ -55,12 +58,6 @@ export default function AppRouter() {
                <Route path="/about" element={<About />} />
                <Route path="/dashboard" element={<Dashboard />} />
 
-               <Route path="/connectors" element={<ConnectorList />} />
-               <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
-               <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
-               <Route path="/connectors/add" element={<ConnectorEdit />} />
-               <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
-
                <Route path="/users" element={<UsersList />} />
                <Route path="/users/list" element={<Navigate to="/users" />} />
                <Route path="/users/detail/:id" element={<UserDetail />} />
@@ -75,6 +72,17 @@ export default function AppRouter() {
                <Route path="/roles/users/:id" element={<RoleUsers />} />
                <Route path="/roles/permissions/:id" element={<RolePermissions />} />
 
+               <Route path="/connectors" element={<ConnectorList />} />
+               <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
+               <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
+               <Route path="/connectors/add" element={<ConnectorEdit />} />
+               <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
+
+               <Route path="/authorities" element={<AuthoritiesList />} />
+               <Route path={`/authorities/list`} element={<Navigate to="/authorities" />} />
+               <Route path={`/authorities/detail/:id`} element={<AuthorityDetail />} />
+               <Route path={`/authorities/add`} element={<AuthorityEdit />} />
+               <Route path={`/authorities/edit/:id`} element={<AuthorityEdit />} />
 
                {/*<Route path="/roles" component={Roles} />*/}
                {/*<Route path="/audit" component={AuditLogs} />*/}
