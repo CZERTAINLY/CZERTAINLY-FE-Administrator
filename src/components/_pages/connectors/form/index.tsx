@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import { Form, Field } from "react-final-form";
 
+import Select from "react-select";
 import {
    Badge,
    Button,
@@ -18,6 +18,7 @@ import {
 } from "reactstrap";
 
 import { ConnectorModel, EndpointModel } from "models/connectors";
+import { attributeFieldNameTransform } from "utils/attributes/attributes";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
 import { AuthType } from "types/connectors";
@@ -26,10 +27,8 @@ import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl 
 
 import ProgressButton from "components/ProgressButton";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import InventoryStatusBadge from "../ConnectorStatus";
 import Widget from "components/Widget";
-import Select from "react-select";
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
+import InventoryStatusBadge from "../ConnectorStatus";
 
 
 interface FormValues {

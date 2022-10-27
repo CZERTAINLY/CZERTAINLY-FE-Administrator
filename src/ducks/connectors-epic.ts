@@ -252,8 +252,11 @@ const updateConnector: AppEpic = (action$, state, deps) => {
             action.payload.authAttributes?.map(transformAttributeModelToDTO)
          ).pipe(
 
-            map(
-               connector => slice.actions.updateConnectorSuccess({ connector: transformConnectorDTOToModel(connector) })
+            mergeMap(
+               connector => of(
+                  slice.actions.updateConnectorSuccess({ connector: transformConnectorDTOToModel(connector) }),
+                  appRedirectActions.redirect({ url: `../../detail/${connector.uuid}` })
+               )
             ),
 
             catchError(
@@ -284,7 +287,7 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
 
             mergeMap(
                () => of(slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid }),
-                  appRedirectActions.redirect({ url: "../" }))
+                  appRedirectActions.redirect({ url: "../../" }))
             ),
 
             catchError(

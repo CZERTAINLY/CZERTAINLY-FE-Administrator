@@ -35,6 +35,10 @@ import AuthoritiesList from "./_pages/authorities/list";
 import AuthorityDetail from "./_pages/authorities/detail";
 import AuthorityEdit from "./_pages/authorities/form";
 
+import RaProfilesList from "./_pages/ra-profiles/list";
+import RaProfilesDetail from "./_pages/ra-profiles/detail";
+import RaProfilesEdit from "./_pages/ra-profiles/form";
+
 import GroupList from "./_pages/group/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
@@ -79,30 +83,22 @@ export default function AppRouter() {
                <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
 
                <Route path="/authorities" element={<AuthoritiesList />} />
-               <Route path={`/authorities/list`} element={<Navigate to="/authorities" />} />
-               <Route path={`/authorities/detail/:id`} element={<AuthorityDetail />} />
-               <Route path={`/authorities/add`} element={<AuthorityEdit />} />
-               <Route path={`/authorities/edit/:id`} element={<AuthorityEdit />} />
+               <Route path="/authorities/list" element={<Navigate to="/authorities" />} />
+               <Route path="/authorities/detail/:id" element={<AuthorityDetail />} />
+               <Route path="/authorities/add" element={<AuthorityEdit />} />
+               <Route path="/authorities/edit/:id" element={<AuthorityEdit />} />
 
-               {/*<Route path="/roles" component={Roles} />*/}
-               {/*<Route path="/audit" component={AuditLogs} />*/}
-               {/*<Route path="/raprofiles" component={RaProfiles} />*/}
-               {/*<Route path="/credentials" component={Credentials} />*/}
-               {/*<Route path="/authorities" component={Authorities} />*/}
-               {/*<Route path="/entities" component={Entities} />*/}
-               {/*<Route path="/locations" component={Locations} />*/}
-               {/*<Route path="/acmeaccounts" component={AcmeAccounts} />*/}
-               {/*<Route path="/acmeprofiles" component={AcmeProfiles} />*/}
+               <Route path="/raprofiles" element={<RaProfilesList />} />
+               <Route path="/raprofiles/list" element={<Navigate to="/raprofiles" />} />
+               <Route path="/raprofiles/detail/:authorityId/:id" element={<RaProfilesDetail />} />
+               <Route path="/raprofiles/add" element={<RaProfilesEdit />} />
+               <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfilesEdit />} />
 
                <Route path="/groups" element={<GroupList />} />
                <Route path="/groups/list" element={<Navigate to="/groups" />} />
                <Route path="/groups/detail/:id" element={<GroupDetail />} />
                <Route path="/groups/add" element={<GroupEdit />} />
                <Route path="/groups/edit/:id" element={<GroupEdit />} />
-
-               {/*<Route path="/discovery" component={Discovery} />*/}
-               {/*<Route path="/certificates" component={Certificates} />*/}
-               {/*<Route path="/complianceprofiles" component={ComplianceProfiles} />*/}
 
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />

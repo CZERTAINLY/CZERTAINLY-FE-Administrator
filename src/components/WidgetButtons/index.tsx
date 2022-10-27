@@ -4,6 +4,7 @@ import { Button, ButtonProps } from "reactstrap";
 
 export interface WidgetButtonProps {
    icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock";
+   id?: string;
    tooltip?: any;
    disabled: boolean;
    custom?: React.ReactNode;
@@ -72,7 +73,7 @@ function WidgetButtons({ buttons }: Props) {
       let style;
 
       let btnProps: ButtonProps = {
-         key: button.icon + button.tooltip || "",
+         key: button.icon + button.tooltip + button.id || "",
          className: "btn btn-link",
          color: "white",
          onClick: button.onClick,
