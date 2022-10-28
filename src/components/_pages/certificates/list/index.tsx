@@ -16,13 +16,13 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import Dialog from "components/Dialog";
-import CertificateStatus from "../CertificateStatus";
 import CertificateUploadDialog from "../CertificateUploadDialog";
 import CertificateGroupDialog from "../CertificateGroupDialog";
 import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateInventoryFilter from "../CertificateInventoryFilter";
 import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
+import CertificateStatusIcon from "../CertificateStatusIcon";
 
 
 interface Props {
@@ -362,7 +362,7 @@ export default function CertificateList({
 
                columns: [
 
-                  <CertificateStatus status={certificate.status} />,
+                  <CertificateStatusIcon status={certificate.status} />,
 
                   <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
 
