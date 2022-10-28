@@ -27,7 +27,10 @@ import RoleEdit from "./_pages/roles/RoleForm";
 import RoleUsers from "./_pages/roles/RoleUsersForm";
 import RolePermissions from "./_pages/roles/RolePermissionsForm";
 
-import ConnectorList from "./_pages/connectors/list";
+import CertificatesList from "./_pages/certificates/list";
+import CertificateDetail from "./_pages/certificates/detail";
+
+import ConnectorsList from "./_pages/connectors/list";
 import ConnectorDetail from "./_pages/connectors/detail";
 import ConnectorEdit from "./_pages/connectors/form";
 
@@ -94,7 +97,11 @@ export default function AppRouter() {
                <Route path="/roles/users/:id" element={<RoleUsers />} />
                <Route path="/roles/permissions/:id" element={<RolePermissions />} />
 
-               <Route path="/connectors" element={<ConnectorList />} />
+               <Route path="/certificates" element={<CertificatesList />} />
+               <Route path="/certificates/list" element={<Navigate to="/certificates" />} />
+               <Route path="/certificates/detail/:id" element={<CertificateDetail />} />
+
+               <Route path="/connectors" element={<ConnectorsList />} />
                <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
                <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
                <Route path="/connectors/add" element={<ConnectorEdit />} />
