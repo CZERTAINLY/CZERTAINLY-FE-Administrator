@@ -1,8 +1,11 @@
 import "jszip";
+
 import { saveAs } from "file-saver";
+import { Buffer } from "buffer";
 
 import { CertificateModel } from "models/certificate";
 import JSZip from "jszip";
+
 
 
 export function downloadFile(content: any, fileName: string) {
