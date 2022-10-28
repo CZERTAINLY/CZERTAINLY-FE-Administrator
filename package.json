@@ -1,59 +1,63 @@
 {
-  "name": "czertainly-administrator",
-  "version": "0.1.0",
-  "homepage": "/administrator",
-  "private": true,
-  "dependencies": {
-    "@reduxjs/toolkit": "latest",
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
-    "@testing-library/user-event": "latest",
-    "@types/jest": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "bootstrap": "latest",
-    "classnames": "latest",
-    "font-awesome": "latest",
-    "i": "^0.3.7",
-    "npm": "^8.19.2",
-    "react": "latest",
-    "react-apexcharts": "latest",
-    "react-dom": "latest",
-    "react-final-form": "latest",
-    "react-redux": "latest",
-    "react-router-dom": "latest",
-    "react-scripts": "latest",
-    "react-select": "latest",
-    "reactstrap": "latest",
-    "redux-observable": "latest",
-    "rxjs": "latest",
-    "sass": "latest",
-    "typescript": "latest",
-    "web-vitals": "latest"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
-}
+   "name": "czertainly-administrator",
+   "version": "0.1.0",
+   "homepage": "/administrator",
+   "private": true,
+   "dependencies": {
+     "@reduxjs/toolkit": "latest",
+     "@testing-library/jest-dom": "latest",
+     "@testing-library/react": "latest",
+     "@testing-library/user-event": "latest",
+     "@types/file-saver": "latest",
+     "@types/jest": "latest",
+     "@types/node": "latest",
+     "@types/react": "latest",
+     "@types/react-dom": "latest",
+     "bootstrap": "latest",
+     "classnames": "latest",
+     "file-saver": "latest",
+     "font-awesome": "latest",
+     "jszip": "latest",
+     "i": "^0.3.7",
+     "npm": "^8.19.2",
+     "react": "latest",
+     "react-apexcharts": "latest",
+     "react-dom": "latest",
+     "react-final-form": "latest",
+     "react-redux": "latest",
+     "react-router-dom": "latest",
+     "react-scripts": "latest",
+     "react-select": "latest",
+     "reactstrap": "latest",
+     "redux-observable": "latest",
+     "rxjs": "latest",
+     "sass": "latest",
+     "typescript": "latest",
+     "web-vitals": "latest"
+   },
+   "scripts": {
+     "start": "react-scripts start",
+     "build": "react-scripts build",
+     "test": "react-scripts test",
+     "eject": "react-scripts eject"
+   },
+   "eslintConfig": {
+     "extends": [
+       "react-app",
+       "react-app/jest"
+     ]
+   },
+   "browserslist": {
+     "production": [
+       ">0.2%",
+       "not dead",
+       "not op_mini all"
+     ],
+     "development": [
+       "last 1 chrome version",
+       "last 1 firefox version",
+       "last 1 safari version"
+     ]
+   }
+
+ }

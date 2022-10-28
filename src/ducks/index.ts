@@ -19,6 +19,7 @@ import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } 
 import { initialState as initialComplianceProfilesState, slice as initialComplianceProfilesSlice } from "./compliance-profiles";
 import { initialState as initialCredentialsState, slice as initialCredentialsSlice } from "./credentials";
 import { initialState as initialEntitiesState, slice as initialEntitiesSlice } from "./entities";
+import { initialState as initialLocationsState, slice as initialLocationsSlice } from "./locations";
 
 import authEpics from "./auth-epics";
 import appRedirectEpics from "./app-redirect-epics";
@@ -36,6 +37,7 @@ import acmeProfilesEpics from "./acme-profiles-epics";
 import complianceProfilesEpics from "./compliance-profiles-epics";
 import credentialsEpics from "./credentials-epics";
 import entitiesEpics from "./entities-epics";
+import locationsEpics from "./locations-epics";
 
 
 export interface EpicDependencies {
@@ -66,6 +68,7 @@ export const initialState = {
    [initialComplianceProfilesSlice.name]: initialComplianceProfilesState,
    [initialCredentialsSlice.name]: initialCredentialsState,
    [initialEntitiesSlice.name]: initialEntitiesState,
+   [initialLocationsSlice.name]: initialLocationsState,
 };
 
 
@@ -86,6 +89,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
    [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
    [initialEntitiesSlice.name]: initialEntitiesSlice.reducer,
+   [initialLocationsSlice.name]: initialLocationsSlice.reducer,
 });
 
 
@@ -106,4 +110,5 @@ export const epics = combineEpics(
    ...complianceProfilesEpics,
    ...credentialsEpics,
    ...entitiesEpics,
+   ...locationsEpics,
 );

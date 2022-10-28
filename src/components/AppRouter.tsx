@@ -58,6 +58,10 @@ import EntitiesList from "./_pages/entities/list";
 import EntityDetail from "./_pages/entities/detail";
 import EntityEdit from "./_pages/entities/form";
 
+import LocationsList from "./_pages/locations/list";
+import LocationDetail from "./_pages/locations/detail";
+import LocationEdit from "./_pages/locations/form";
+
 export default function AppRouter() {
 
    const profile = useSelector(selectors.profile);
@@ -135,6 +139,12 @@ export default function AppRouter() {
                <Route path="/entities/detail/:id" element={<EntityDetail />} />
                <Route path="/entities/add" element={<EntityEdit />} />
                <Route path="/entities/edit/:id" element={<EntityEdit />} />
+
+               <Route path="/locations" element={<LocationsList />} />
+               <Route path="/locations/list" element={<Navigate to="/locations" />} />
+               <Route path="/locations/detail/:entityId/:id" element={<LocationDetail />} />
+               <Route path="/locations/add" element={<LocationEdit />} />
+               <Route path="/locations/edit/:entityId/:id" element={<LocationEdit />} />
 
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
