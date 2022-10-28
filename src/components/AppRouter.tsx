@@ -54,6 +54,9 @@ import CredentialsList from "./_pages/credentials/list";
 import CredentialDetail from "./_pages/credentials/detail";
 import CredentialEdit from "./_pages/credentials/form";
 
+import EntitiesList from "./_pages/entities/list";
+import EntityDetail from "./_pages/entities/detail";
+import EntityEdit from "./_pages/entities/form";
 
 export default function AppRouter() {
 
@@ -126,6 +129,12 @@ export default function AppRouter() {
                <Route path="/credentials/detail/:id" element={<CredentialDetail />} />
                <Route path="/credentials/add" element={<CredentialEdit />} />
                <Route path="/credentials/edit/:id" element={<CredentialEdit />} />
+
+               <Route path="/entities" element={<EntitiesList />} />
+               <Route path="/entities/list" element={<Navigate to="/entities" />} />
+               <Route path="/entities/detail/:id" element={<EntityDetail />} />
+               <Route path="/entities/add" element={<EntityEdit />} />
+               <Route path="/entities/edit/:id" element={<EntityEdit />} />
 
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
