@@ -1,4 +1,4 @@
-import { EMPTY, iif, of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
@@ -7,7 +7,6 @@ import { extractError } from "utils/net";
 import * as slice from "./roles";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { actions as alertActions } from "./alerts";
 import { transformRoleDetailDTOToModel, transformRoleDTOToModel, transformSubjectPermissionsDTOToModel } from "./transform/roles";
 import { transformUserDTOToModel } from "./transform/users";
 

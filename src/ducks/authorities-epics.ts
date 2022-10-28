@@ -1,4 +1,4 @@
-import { EMPTY, iif, of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
