@@ -1,24 +1,26 @@
-import styles from "./connectorDetails.module.scss";
-
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
-import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-
-import { actions, selectors } from "ducks/connectors";
 
 import Select from "react-select";
 import { Badge, Col, Container, Row, Table } from "reactstrap";
+
+import styles from "./connectorDetails.module.scss";
+
+import { actions, selectors } from "ducks/connectors";
+
+import { attributeFieldNameTransform } from "utils/attributes/attributes";
+import { inventoryStatus } from "utils/connector";
+
+import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
+import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 import Dialog from "components/Dialog";
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
-import { inventoryStatus } from "utils/connector";
-import { useNavigate, useParams } from "react-router-dom";
+
 
 
 export default function ConnectorDetail() {
