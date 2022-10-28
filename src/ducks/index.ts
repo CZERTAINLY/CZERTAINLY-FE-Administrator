@@ -17,7 +17,7 @@ import { initialState as initialRaProfilesState, slice as raProfilesSlice } from
 import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } from "./acme-accounts";
 import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
 import { initialState as initialComplianceProfilesState, slice as initialComplianceProfilesSlice } from "./compliance-profiles";
-
+import { initialState as initialCredentialsState, slice as initialCredentialsSlice } from "./credentials";
 
 import authEpics from "./auth-epics";
 import appRedirectEpics from "./app-redirect-epics";
@@ -33,11 +33,13 @@ import raProfilesEpics from "./ra-profiles-epics";
 import acmeAccountsEpics from "./acme-accounts-epics";
 import acmeProfilesEpics from "./acme-profiles-epics";
 import complianceProfilesEpics from "./compliance-profiles-epics";
+import credentialsEpics from "./credentials-epics";
 
 
 export interface EpicDependencies {
    apiClients: ApiClients;
 }
+
 
 export type AppState = ReturnType<typeof reducers>;
 
@@ -59,7 +61,8 @@ export const initialState = {
    [raProfilesSlice.name]: initialRaProfilesState,
    [acmeAccountsSlice.name]: initialAcmeAccountsState,
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
-   [initialComplianceProfilesSlice.name]: initialComplianceProfilesState
+   [initialComplianceProfilesSlice.name]: initialComplianceProfilesState,
+   [initialCredentialsSlice.name]: initialCredentialsState,
 };
 
 
@@ -77,7 +80,8 @@ export const reducers = combineReducers<typeof initialState, any>({
    [raProfilesSlice.name]: raProfilesSlice.reducer,
    [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
    [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
-   [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer
+   [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
+   [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
 });
 
 
@@ -95,5 +99,6 @@ export const epics = combineEpics(
    ...raProfilesEpics,
    ...acmeAccountsEpics,
    ...acmeProfilesEpics,
-   ...complianceProfilesEpics
+   ...complianceProfilesEpics,
+   ...credentialsEpics,
 );

@@ -50,6 +50,10 @@ import GroupList from "./_pages/group/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
 
+import CredentialsList from "./_pages/credentials/list";
+import CredentialDetail from "./_pages/credentials/detail";
+import CredentialEdit from "./_pages/credentials/form";
+
 
 export default function AppRouter() {
 
@@ -116,6 +120,12 @@ export default function AppRouter() {
                <Route path="/groups/detail/:id" element={<GroupDetail />} />
                <Route path="/groups/add" element={<GroupEdit />} />
                <Route path="/groups/edit/:id" element={<GroupEdit />} />
+
+               <Route path="/credentials" element={<CredentialsList />} />
+               <Route path="/credentials/list" element={<Navigate to="/credentials" />} />
+               <Route path="/credentials/detail/:id" element={<CredentialDetail />} />
+               <Route path="/credentials/add" element={<CredentialEdit />} />
+               <Route path="/credentials/edit/:id" element={<CredentialEdit />} />
 
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
