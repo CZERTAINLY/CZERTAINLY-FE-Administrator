@@ -214,7 +214,7 @@ export const slice = createSlice({
       bulkDeleteComplianceProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
          state.isBulkDeleting = false;
-         if (action.payload.errors.length > 0) {
+         if (action.payload.errors?.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return
          }
