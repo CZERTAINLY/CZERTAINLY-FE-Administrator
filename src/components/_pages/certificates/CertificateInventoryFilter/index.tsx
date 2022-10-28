@@ -1,7 +1,7 @@
 import cx from "classnames";
 import styles from "./CertificateInventoryFilter.module.scss";
 
-import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectors, actions } from "ducks/certificates"
@@ -125,8 +125,8 @@ export default function CertificateInventoryFilter({
 
    const onUnselectFiltersClick = useCallback(
 
-      (e: MouseEvent<HTMLDivElement>) => {
-         if (e.currentTarget.id === "unselectFilters") { setSelectedFilter(-1) }
+      (e: React.MouseEvent<HTMLDivElement>) => {
+         if ((e.target as HTMLDivElement).id === "unselectFilters") { setSelectedFilter(-1) }
       },
       [setSelectedFilter]
 
@@ -292,10 +292,8 @@ export default function CertificateInventoryFilter({
 
                      <Col md={0.1}>
 
-                        <Label>&nbsp;</Label>
-
                         <Button
-                           style={{ width: "100%" }}
+                           style={{ width: "100%", marginBottom: "0.5em" }}
                            color="primary"
                            disabled={!filterField || !filterCondition /*|| !filterValue*/}
                            onClick={onUpdateFilterClick}
