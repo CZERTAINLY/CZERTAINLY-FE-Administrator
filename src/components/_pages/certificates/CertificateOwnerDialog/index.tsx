@@ -52,7 +52,7 @@ export default function CertificateOwnerDialog({
 
          <FormGroup>
 
-            <Label for="owner">File name</Label>
+            <Label for="owner">Owner</Label>
 
             <Input
                id="owner"
