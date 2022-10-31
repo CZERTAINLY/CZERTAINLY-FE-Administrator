@@ -42,6 +42,10 @@ import RaProfilesList from "./_pages/ra-profiles/list";
 import RaProfileDetail from "./_pages/ra-profiles/detail";
 import RaProfileEdit from "./_pages/ra-profiles/form";
 
+import ComplianceProfilesList from "./_pages/compliance-profiles/list";
+import ComplianceProfileDetail from "./_pages/compliance-profiles/detail";
+import ComplianceProfileEdit from "./_pages/compliance-profiles/form";
+
 import AcmeProfilesList from "./_pages/acme-profiles/list";
 import AcmeProfileDetail from "./_pages/acme-profiles/detail";
 import AcmeProfileEdit from "./_pages/acme-profiles/form";
@@ -119,6 +123,11 @@ export default function AppRouter() {
                <Route path="/raprofiles/add" element={<RaProfileEdit />} />
                <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfileEdit />} />
 
+               <Route path="/complianceprofiles" element={<ComplianceProfilesList />} />
+               <Route path="/complianceprofiles/list" element={<Navigate to="/complianceprofiles" />} />
+               <Route path="/complianceprofiles/detail/:id" element={<ComplianceProfileDetail />} />
+               <Route path="/complianceprofiles/add" element={<ComplianceProfileEdit />} />
+
                <Route path="/acmeprofiles" element={<AcmeProfilesList />} />
                <Route path="/acmeprofiles/list" element={<Navigate to="/acmeprofiles" />} />
                <Route path="/acmeprofiles/detail/:id" element={<AcmeProfileDetail />} />
@@ -155,7 +164,6 @@ export default function AppRouter() {
 
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
-
 
             </Route >
 

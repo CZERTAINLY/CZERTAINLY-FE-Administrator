@@ -101,7 +101,7 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
             mergeMap(
                obj => of(
                   slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
-                  appRedirectActions.redirect({ url: `./detail/${obj.uuid}` })
+                  appRedirectActions.redirect({ url: `../detail/${obj.uuid}` })
                )
             ),
 
@@ -135,7 +135,7 @@ const deleteComplianceProfile: AppEpic = (action$, state$, deps) => {
             mergeMap(
                () => of(
                   slice.actions.deleteComplianceProfileSuccess({ uuid: action.payload.uuid }),
-                  appRedirectActions.redirect({ url: "../" })
+                  appRedirectActions.redirect({ url: "../../" })
                )
             ),
 
