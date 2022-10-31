@@ -34,6 +34,10 @@ import ConnectorsList from "./_pages/connectors/list";
 import ConnectorDetail from "./_pages/connectors/detail";
 import ConnectorEdit from "./_pages/connectors/form";
 
+import DiscoveriesList from "./_pages/discoveries/list";
+import DiscoveryDetail from "./_pages/discoveries/detail";
+import DiscoveryEdit from "./_pages/discoveries/form";
+
 import AuthoritiesList from "./_pages/authorities/list";
 import AuthorityDetail from "./_pages/authorities/detail";
 import AuthorityEdit from "./_pages/authorities/form";
@@ -110,6 +114,11 @@ export default function AppRouter() {
                <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
                <Route path="/connectors/add" element={<ConnectorEdit />} />
                <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
+
+               <Route path="/discoveries" element={<DiscoveriesList />} />
+               <Route path="/discoveries/list" element={<Navigate to="/discoveries" />} />
+               <Route path="/discoveries/detail/:id" element={<DiscoveryDetail />} />
+               <Route path="/discoveries/add" element={<DiscoveryEdit />} />
 
                <Route path="/authorities" element={<AuthoritiesList />} />
                <Route path="/authorities/list" element={<Navigate to="/authorities" />} />

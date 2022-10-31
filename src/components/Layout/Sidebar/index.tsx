@@ -24,7 +24,7 @@ export default function Sidebar() {
                <LinksGroup _key="/home" header="Home" headerLink="/home" />
                <LinksGroup _key="/dashboard" header="Dashboard" headerLink="/dashboard" />
                <LinksGroup _key="/certificates" header="Certificates" headerLink="/certificates" />
-               <LinksGroup _key="/discovery" header="Discovery" headerLink="/discovery" />
+               <LinksGroup _key="/discovery" header="Discoveries" headerLink="/discoveries" />
                <LinksGroup _key="/connectors" header="Connectors" headerLink="/connectors" />
 
                <LinksGroup

@@ -9,6 +9,7 @@ import { initialState as initialAuthState, slice as authSlice } from "./auth";
 import { initialState as initialDashboardState, slice as dashboardSlice } from "./dashboard";
 import { initialState as initialGroupsState, slice as groupsSlice } from "./groups";
 import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
+import { initialState as initialDiscoveriesState, slice as discoveriesSlice } from "./discoveries";
 import { initialState as initialUsersState, slice as usersSlice } from "./users";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
 import { initialState as initialCertificatesState, slice as certificatesSlice } from "./certificates";
@@ -27,6 +28,7 @@ import startupEpics from "./startup-epics";
 import dashboardEpics from "./dashboard-epics";
 import groupsEpics from "./groups-epics";
 import connectorsEpics from "./connectors-epic";
+import discoveriesEpics from "./discoveries-epics";
 import usersEpics from "./users-epics";
 import rolesEpics from "./roles-epics";
 import certificatesEpics from "./certificates-epics";
@@ -58,6 +60,7 @@ export const initialState = {
    [dashboardSlice.name]: initialDashboardState,
    [groupsSlice.name]: initialGroupsState,
    [connectorsSlice.name]: initialConnectorsState,
+   [discoveriesSlice.name]: initialDiscoveriesState,
    [usersSlice.name]: initialUsersState,
    [rolesSlice.name]: initialRolesState,
    [certificatesSlice.name]: initialCertificatesState,
@@ -79,6 +82,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [dashboardSlice.name]: dashboardSlice.reducer,
    [groupsSlice.name]: groupsSlice.reducer,
    [connectorsSlice.name]: connectorsSlice.reducer,
+   [discoveriesSlice.name]: discoveriesSlice.reducer,
    [usersSlice.name]: usersSlice.reducer,
    [rolesSlice.name]: rolesSlice.reducer,
    [certificatesSlice.name]: certificatesSlice.reducer,
@@ -100,6 +104,7 @@ export const epics = combineEpics(
    ...dashboardEpics,
    ...groupsEpics,
    ...connectorsEpics,
+   ...discoveriesEpics,
    ...usersEpics,
    ...rolesEpics,
    ...certificatesEpics,
