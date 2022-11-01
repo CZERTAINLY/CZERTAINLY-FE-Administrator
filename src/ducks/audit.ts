@@ -1,13 +1,14 @@
 import { AuditLogModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { FormValues } from "components/_pages/auditLogs/AuditLogsFilters";
 
 
 export type State = {
 
    loadedPageNumber?: number;
    loadedPageSize?: number;
-   totalPagesAvailable?: number;
+   totalPagesAvailable: number;
 
    pageData: AuditLogModel[];
    isFetchingPageData: boolean;
@@ -26,6 +27,8 @@ export type State = {
 
 
 export const initialState: State = {
+
+   totalPagesAvailable: 0,
 
    pageData: [],
    isFetchingPageData: false,
@@ -55,13 +58,12 @@ export const slice = createSlice({
          page: number,
          size: number,
          sort?: string,
-         filters?: { [key: string]: string }
+         filters?: FormValues
       }>) => {
 
          state.pageData = [];
          state.loadedPageNumber = undefined;
          state.loadedPageSize = undefined;
-         state.totalPagesAvailable = undefined;
          state.isFetchingPageData = true;
 
       },
@@ -157,7 +159,7 @@ export const slice = createSlice({
 
       },
 
-      purgeLogs: (state, action: PayloadAction<{ queryString: string, sort?: string, filters?: { [key: string]: string }}> ) => {
+      purgeLogs: (state, action: PayloadAction<{ queryString: string, sort?: string, filters?: FormValues}> ) => {
 
          state.isPurging = true;
 

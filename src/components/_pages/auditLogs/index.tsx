@@ -1,20 +1,18 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Button, Container, Input, Pagination, PaginationItem, PaginationLink, Table } from "reactstrap";
-import cx from "classnames";
+import { Button, Container } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import { actions as auditLogActions, selectors } from "ducks/audit";
 
-import { AuditLogModel } from "models";
-
-import AuditLogsFilters, { FormValues as FilterValues, } from "./AuditLogsFilters";
+import AuditLogsFilters, { FormValues, } from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
 import Widget from "components/Widget";
 
 import styles from "./auditLogs.module.scss";
 import { dateFormatter } from "utils/dateUtil";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 const defaultPageSize = 10;
 
@@ -22,7 +20,6 @@ function AuditLogs() {
 
    const dispatch = useDispatch();
 
-   const loadedPageNumber = useSelector(selectors.loadedPageNumber);
    const totalPages = useSelector(selectors.totalPagesAvailable);
    const isFetchingPageData = useSelector(selectors.isFetchingPageData);
    const isFetchingObjects = useSelector(selectors.isFetchingObjects);
@@ -40,16 +37,8 @@ function AuditLogs() {
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(defaultPageSize);
 
-   const [logData, setLogData] = useState<{ [pageIndex: number]: AuditLogModel[] }>({});
-   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
-
    const [sort, setSort] = useState<string | undefined>(undefined);
-   const [filters, setFilters] = useState<{ [key: string]: string } | undefined>(undefined);
-
-   const firstPage = useCallback(() => setPage(1), [setPage]);
-   const prevPage = useCallback(() => setPage(page - 1), [page, setPage]);
-   const nextPage = useCallback(() => setPage(page + 1), [page, setPage]);
-   const lastPage = useCallback(() => setPage(totalPages || 0), [setPage, totalPages]);
+   const [filters, setFilters] = useState<FormValues>({});
 
 
    useEffect(
@@ -66,7 +55,6 @@ function AuditLogs() {
    );
 
 
-   // load when anything except page changes
    useEffect(
 
       () => {
@@ -74,87 +62,22 @@ function AuditLogs() {
          dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
 
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [pageSize, sort, filters, dispatch]
-
-   );
-
-
-   // load when page changes but not loaded
-   useEffect(
-
-      () => {
-
-         if (logData && logData[page - 1]) return;
-
-         dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
-
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [logData, page]
-
-   );
-
-
-   useEffect(
-
-      () => {
-
-         if (loadedPageNumber === undefined) return;
-
-         const data = { ...logData };
-         data[loadedPageNumber] = logs;
-
-         setLogData(data);
-
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [logs, loadedPageNumber]
-
-   );
-
-
-   const onPageSizeChange = useCallback(
-
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-
-         setLogData({});
-         setPageSize(+event.target.value);
-         setPage(1);
-
-      },
-      [setPageSize]
-
-   );
-
-
-   const onSortChange = useCallback(
-
-      (sortColumn: string | null, direction: string | null) => {
-
-         if (!sortColumn || !direction) {
-            setSort(undefined);
-         } else {
-            setSort(`${sortColumn},${direction}`);
-         }
-
-      },
-      [setSort]
+      [page, pageSize, sort, filters, dispatch]
 
    );
 
 
    const onFiltersChanged = useCallback(
 
-      (filters: FilterValues) => {
+      (filters: FormValues) => {
 
          const filterValues = Object.entries(filters).reduce(
             (acc, [key, value]) =>
                value ? { ...acc, [key]: value.toString() } : acc, {}
          );
 
-         setLogData({});
          setFilters(filterValues);
+         setPage(1);
 
       },
       [setFilters]
@@ -166,25 +89,14 @@ function AuditLogs() {
 
       () => {
 
-         setLogData({});
-         setFilters(undefined);
+         setFilters({});
+         setPage(1);
 
       },
       [setFilters]
 
    );
 
-
-   const lineBreakFormatter = useCallback(
-
-      (content: any) => {
-
-         return <div style={{ wordBreak: "break-word" }}>{content}</div>;
-
-      },
-      []
-
-   );
 
    const queryString = useMemo(
 
@@ -235,8 +147,124 @@ function AuditLogs() {
 
    );
 
+    const auditLogsRowHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                content: "Id",
+                // sortable: true,
+                // sortType: "numeric",
+                align: "left",
+                id: "id",
+                width: "5%"
+            },
+            {
+                content: "Author",
+                // sortable: true,
+                align: "left",
+                id: "author",
+                width: "10%"
+            },
+            {
+                content: "Created",
+                // sortable: true,
+                // sortType: "date",
+                id: "created",
+                width: "10%"
+            },
+            {
+                content: "Operation Status",
+                id: "",
+                width: "10%"
+            },
+            {
+                content: "Origination",
+                id: "",
+                width: "5%"
+            },
+            {
+                content: "Affected Data",
+                id: "",
+                width: "5%"
+            },
+            {
+                content: "Object Identifier",
+                id: "",
+                width: "10%"
+            },
+            {
+                content: "Operation",
+                id: "",
+                width: "10%"
+            },
+            {
+                content: "Additional Data",
+                id: "",
+                width: "10%"
+            },
+        ],
+        []
 
-   return (
+    );
+
+    const auditLogsList: TableDataRow[] = useMemo(
+
+        () => logs.map(
+
+            log => {
+
+                return {
+
+                    id: log.id,
+
+                    columns: [
+
+                        ""+log.id,
+                        log.author,
+                        <span style={{whiteSpace: "nowrap"}}>{dateFormatter(log.created)}</span>,
+                        log.operationStatus,
+                        log.origination,
+                        log.affected,
+                        log.objectIdentifier,
+                        log.operation,
+                        log.additionalData ? <span className={styles.showMore}>Show more...</span> : "None",
+                    ],
+
+                    detailColumns: !log.additionalData ? undefined : [<></>, <ObjectValues obj={log.additionalData} />]
+
+                }
+
+            }
+
+        ),
+        [logs]
+
+    );
+
+    const paginationData = useMemo(
+
+        () => ({
+            page: page,
+            totalItems: totalPages,
+            pageSize: pageSize,
+            totalPages: Math.ceil(totalPages / pageSize),
+            itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+        }),
+        [page, totalPages, pageSize]
+
+    );
+
+    const onPageSizeChanged = useCallback(
+
+        (pageSize: number) => {
+            setPageSize(pageSize);
+            setPage(1);
+        },
+        [setPageSize, setPage]
+
+    );
+
+
+    return (
 
       <Container className="themed-container" fluid>
 
@@ -255,130 +283,16 @@ function AuditLogs() {
 
          <Widget title={auditLogsTitle} busy={isBusy}>
 
-            <Table className={cx("table-hover", styles.logsTable)} size="sm">
-
-               <SortTableHeader onSortChange={onSortChange}>
-
-                  <SortColumnHeader id="id" text={lineBreakFormatter("Id")} />
-                  <SortColumnHeader id="author" text={lineBreakFormatter("Author")} />
-                  <SortColumnHeader id="created" text={lineBreakFormatter("Created")} />
-
-                  <th>
-                     <strong>{lineBreakFormatter("Operation Status")}</strong>
-                  </th>
-
-                  <th>
-                     <strong>{lineBreakFormatter("Origination")}</strong>
-                  </th>
-
-                  <th>
-                     <strong>{lineBreakFormatter("Affected Data")}</strong>
-                  </th>
-
-                  <th>
-                     <strong>{lineBreakFormatter("Object Identifier")}</strong>
-                  </th>
-
-                  <th>
-                     <strong>{lineBreakFormatter("Operation")}</strong>
-                  </th>
-
-                  <th>
-                     <strong>{lineBreakFormatter("Additional Data")}</strong>
-                  </th>
-
-               </SortTableHeader>
-
-               <tbody>
-
-                  {!logData || !logData[page - 1] ? <></> : logData[page - 1].map(
-
-                     (item) => (
-
-                        <Fragment key={item.id}>
-
-                           <tr>
-                              <td>{item.id}</td>
-                              <td>{lineBreakFormatter(item.author)}</td>
-                              <td className={styles.dateCell} style={{whiteSpace: "nowrap"}}>{dateFormatter(item.created)}</td>
-                              <td>{lineBreakFormatter(item.operationStatus)}</td>
-                              <td>{lineBreakFormatter(item.origination)}</td>
-                              <td>{lineBreakFormatter(item.affected)}</td>
-                              <td>{lineBreakFormatter(item.objectIdentifier)}</td>
-                              <td>{lineBreakFormatter(item.operation)}</td>
-
-                              {item.additionalData ? (
-
-                                 <td onClick={() => setExpandedRowId(expandedRowId === item.id ? null : item.id)}>
-
-                                    <span className={styles.showMore}>Show more...</span>
-
-                                 </td>
-                              ) : (
-                                 <td>None</td>
-                              )}
-
-                           </tr>
-
-                           <tr className={cx(styles.detailRow, { [styles.hidden]: expandedRowId !== item.id, })}>
-
-                              <td colSpan={9}>
-                                 <ObjectValues obj={item.additionalData} className={cx({ [styles.hidden]: expandedRowId !== item.id })} />
-                              </td>
-
-                           </tr>
-
-                        </Fragment>
-
-                     )
-                  )}
-
-               </tbody>
-
-            </Table>
-
-            <div className={styles.paginationContainer}>
-
-               <div>
-                  <Input type="select" value={pageSize} onChange={onPageSizeChange}>
-                     <option>10</option>
-                     <option>20</option>
-                     <option>50</option>
-                     <option>100</option>
-                  </Input>
-               </div>
-
-               <Pagination size="sm" aria-label="Audit Logs navigation">
-
-                  <PaginationItem>
-                     <PaginationLink first onClick={firstPage} />
-                  </PaginationItem>
-
-                  <PaginationItem disabled={page === 1}>
-                     <PaginationLink previous onClick={prevPage} />
-                  </PaginationItem>
-
-                  <PaginationItem active>
-                     <PaginationLink>{page}</PaginationLink>
-                  </PaginationItem>
-
-                  <PaginationItem disabled={page >= (totalPages || 1)}>
-                     <PaginationLink next onClick={nextPage} />
-                  </PaginationItem>
-
-                  <PaginationItem>
-                     <PaginationLink last onClick={lastPage} />
-                  </PaginationItem>
-
-               </Pagination>
-
-
-               <span>
-                  {`Showing ${page} of ${totalPages || 1} pages`}
-               </span>
-
-            </div>
-
+             <CustomTable
+                 headers={auditLogsRowHeaders}
+                 data={auditLogsList}
+                 hasPagination={true}
+                 hasDetails={true}
+                 canSearch={false}
+                 paginationData={paginationData}
+                 onPageChanged={setPage}
+                 onPageSizeChanged={onPageSizeChanged}
+             />
 
          </Widget>
 

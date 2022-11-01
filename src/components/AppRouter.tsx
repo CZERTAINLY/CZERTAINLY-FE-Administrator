@@ -72,6 +72,7 @@ import EntityEdit from "./_pages/entities/form";
 import LocationsList from "./_pages/locations/list";
 import LocationDetail from "./_pages/locations/detail";
 import LocationEdit from "./_pages/locations/form";
+import AuditLogs from "./_pages/auditLogs";
 
 export default function AppRouter() {
 
@@ -174,6 +175,7 @@ export default function AppRouter() {
                <Route path="/userprofile" element={<UserProfileDetail />} />
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
 
+               <Route path="/audit" element={<AuditLogs />} />
             </Route >
 
             {
