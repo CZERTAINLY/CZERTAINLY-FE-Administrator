@@ -17,6 +17,7 @@
       "buffer": "latest",
       "classnames": "latest",
       "file-saver": "latest",
+      "final-form-calculate": "^1.3.2",
       "font-awesome": "latest",
       "i": "^0.3.7",
       "jszip": "latest",
