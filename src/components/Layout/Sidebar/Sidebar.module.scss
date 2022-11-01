@@ -29,6 +29,11 @@
 .link {
    text-decoration: none;
    color: white;
+
+   &:hover {
+      text-decoration: none;
+   }
+
 }
 
 .header {

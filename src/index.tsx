@@ -3,8 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import reportWebVitals from './reportWebVitals';
 import AppRouter from "./components/AppRouter";
-import "./resources/styles/theme.scss";
 import configureStore from "./store";
+
+import "./resources/styles/theme.scss";
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);

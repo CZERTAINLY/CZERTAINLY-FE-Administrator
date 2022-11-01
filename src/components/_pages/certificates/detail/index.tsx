@@ -1086,8 +1086,8 @@ export default function CertificateDetail() {
             columns: ["Key Usage",
                (certificate?.keyUsage?.map(function (name) {
                   return (
-                     <div key={name}>
-                        <Badge style={{ backgroundColor: "Metalic Blue" }}>
+                     <div key={name} style={{margin: "1px"}}>
+                        <Badge>
                            {name}
                         </Badge>
                         &nbsp;
@@ -1101,8 +1101,8 @@ export default function CertificateDetail() {
             columns: ["Extended Key Usage",
                (certificate?.extendedKeyUsage?.map(function (name) {
                   return (
-                     <div key={name}>
-                        <Badge style={{ backgroundColor: "Metalic Blue" }}>
+                     <div key={name} style={{margin: "1px"}}>
+                        <Badge>
                            {name}
                         </Badge>
                         &nbsp;

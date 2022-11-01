@@ -5,6 +5,7 @@
 }
 
 .headerLink {
+
    a {
       display: flex;
       color: #ffffff;
@@ -17,6 +18,7 @@
       &:active,
       &:focus {
          font-weight: $font-weight-semi-bold;
+         text-decoration: none;
       }
    }
 

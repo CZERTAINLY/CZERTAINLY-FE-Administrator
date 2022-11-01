@@ -1,7 +1,5 @@
 .filterBadge {
-   color: rgb(73, 73, 73);
-   background-color: rgb(255, 255, 255);
-   border: 1px solid rgb(78, 78, 78);
+   border: 1px solid rgb(78, 78, 78) !important;
    font-weight: 500;
    margin-right: 5px;
    margin-bottom: 5px;
@@ -10,16 +8,6 @@
 }
 
 .filterBadge:hover {
-   box-shadow: 0 0 5px #b5bdc5;
-   background-color: rgb(236, 236, 236);
- }
-
-.filterBadge[data-selected="true"] {
-   background-color: rgb(78, 78, 78);
-   color: rgb(255, 255, 255);
-}
-
-.filterBadge:hover[data-selected="true"] {
    box-shadow: 0 0 5px #b5bdc5;
  }
 

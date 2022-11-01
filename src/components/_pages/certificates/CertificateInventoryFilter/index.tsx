@@ -1,4 +1,3 @@
-import cx from "classnames";
 import styles from "./CertificateInventoryFilter.module.scss";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -290,10 +289,10 @@ export default function CertificateInventoryFilter({
 
                      </Col>
 
-                     <Col md={0.1}>
+                     <Col md="auto">
 
                         <Button
-                           style={{ width: "100%", marginBottom: "0.5em" }}
+                           style={{ width: "7em", marginTop: "2em" }}
                            color="primary"
                            disabled={!filterField || !filterCondition /*|| !filterValue*/}
                            onClick={onUpdateFilterClick}
@@ -311,13 +310,14 @@ export default function CertificateInventoryFilter({
                   filters.map(
                      (f, i) => (
 
-                        <Badge key={f.field + i} className={cx(styles.filterBadge)} onClick={() => toggleFilter(i)} data-selected={selectedFilter === i ? "true" : "false"}>
+                        <Badge className={styles.filterBadge} key={f.field + i} onClick={() => toggleFilter(i)} color={selectedFilter === i ? "primary" : "secondary"}>
+
                            '{f.field}'&nbsp;
                            {f.condition}&nbsp;
                            {Array.isArray(f.value) && f.value.length > 1 ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : f.value ? `'${f.value}'` : ""}
 
                            <span
-                              className={cx(styles.filterBadgeSpan)}
+                              className={styles.filterBadgeSpan}
                               onClick={() => onRemoveFilterClick(i)}
                            >
                               &times;

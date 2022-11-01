@@ -166,7 +166,7 @@ export default function ConnectorList() {
 
             group => (
 
-               <div key={group.uuid}>
+               <div key={group.uuid}  style={{margin: "1px"}}>
 
                   {group.kinds.map(
 
@@ -200,7 +200,7 @@ export default function ConnectorList() {
          group => (
 
             <div key={group.uuid}>
-               <Badge color="primary">
+               <Badge color="primary" style={{margin: "1px"}}>
                   {attributeFieldNameTransform[group.name || ""] || group.name}
                </Badge>
             </div>

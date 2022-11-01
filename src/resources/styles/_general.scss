@@ -16,7 +16,14 @@ body,
 a {
   cursor: pointer;
   transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  text-decoration: none;
+
+   &:hover {
+      text-decoration: underline;
+   }
+
 }
+
 
 th {
   font-weight: 600;

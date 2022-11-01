@@ -46,6 +46,14 @@
   padding: 0.5rem 2.25rem;
 }
 
+.nav-link {
+   text-decoration: none;
+
+   &:hover {
+      text-decoration: none;
+   }
+}
+
 @media (min-width: $grid-float-breakpoint) {
   .navbar-right {
     .dropdown-menu {
