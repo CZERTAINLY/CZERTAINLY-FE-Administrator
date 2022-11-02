@@ -20,7 +20,6 @@ const listLogs: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.getLogs(
             action.payload.page,
             action.payload.size,
-            action.payload.sort,
             action.payload.filters
          ).pipe(
 
@@ -146,7 +145,7 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
 
             map(
-               () => slice.actions.listLogs({ page: 0, size: 10, sort: action.payload.sort, filters: action.payload.filters })
+               () => slice.actions.listLogs({ page: 0, size: 10, filters: action.payload.filters })
             ),
 
             catchError(

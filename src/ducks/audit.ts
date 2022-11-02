@@ -6,8 +6,8 @@ import { FormValues } from "components/_pages/auditLogs/AuditLogsFilters";
 
 export type State = {
 
-   loadedPageNumber?: number;
-   loadedPageSize?: number;
+   loadedPageNumber: number;
+   loadedPageSize: number;
    totalPagesAvailable: number;
 
    pageData: AuditLogModel[];
@@ -28,6 +28,8 @@ export type State = {
 
 export const initialState: State = {
 
+   loadedPageNumber: 0,
+   loadedPageSize: 0,
    totalPagesAvailable: 0,
 
    pageData: [],
@@ -57,13 +59,10 @@ export const slice = createSlice({
       listLogs: (state, action: PayloadAction<{
          page: number,
          size: number,
-         sort?: string,
          filters?: FormValues
       }>) => {
 
          state.pageData = [];
-         state.loadedPageNumber = undefined;
-         state.loadedPageSize = undefined;
          state.isFetchingPageData = true;
 
       },
@@ -78,6 +77,7 @@ export const slice = createSlice({
 
          state.isFetchingPageData = false;
          state.loadedPageNumber = action.payload.page;
+         state.loadedPageSize = action.payload.size;
          state.pageData = action.payload.data;
          state.totalPagesAvailable = action.payload.total
 
@@ -159,7 +159,7 @@ export const slice = createSlice({
 
       },
 
-      purgeLogs: (state, action: PayloadAction<{ queryString: string, sort?: string, filters?: FormValues}> ) => {
+      purgeLogs: (state, action: PayloadAction<{ queryString: string, filters?: FormValues}> ) => {
 
          state.isPurging = true;
 

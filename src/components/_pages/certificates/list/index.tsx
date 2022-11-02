@@ -406,6 +406,7 @@ export default function CertificateList({
          page: pageNumber,
          totalItems: totalItems,
          pageSize: pageSize,
+         loadedPageSize: pageSize,
          totalPages: Math.ceil(totalItems / pageSize),
          itemsPerPageOptions: selectCertsOnly ? [10, 20] : [10, 20, 50, 100, 200, 500, 1000],
       }),

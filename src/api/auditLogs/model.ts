@@ -20,7 +20,7 @@ export type PagedAuditLog = PagedDataDTO<AuditLogDTO>;
 
 export interface AuditLogsApi {
 
-   getLogs(pageNumber: number, pageSize: number, sort?: string, filters?: FormValues): Observable<PagedAuditLog>;
+   getLogs(pageNumber: number, pageSize: number, filters?: FormValues): Observable<PagedAuditLog>;
 
    getObjects(): Observable<string[]>;
 

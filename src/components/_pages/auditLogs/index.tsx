@@ -21,6 +21,7 @@ function AuditLogs() {
    const dispatch = useDispatch();
 
    const totalPages = useSelector(selectors.totalPagesAvailable);
+   const loadedPageSize = useSelector(selectors.loadedPageSize);
    const isFetchingPageData = useSelector(selectors.isFetchingPageData);
    const isFetchingObjects = useSelector(selectors.isFetchingObjects);
    const isFetchingOperations = useSelector(selectors.isFetchingOperations);
@@ -37,7 +38,6 @@ function AuditLogs() {
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(defaultPageSize);
 
-   const [sort, setSort] = useState<string | undefined>(undefined);
    const [filters, setFilters] = useState<FormValues>({});
 
 
@@ -59,10 +59,10 @@ function AuditLogs() {
 
       () => {
 
-         dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, sort, filters }));
+         dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, filters }));
 
       },
-      [page, pageSize, sort, filters, dispatch]
+      [page, pageSize, filters, dispatch]
 
    );
 
@@ -114,10 +114,10 @@ function AuditLogs() {
 
         () => {
 
-            dispatch(auditLogActions.purgeLogs({queryString, sort, filters}));
+            dispatch(auditLogActions.purgeLogs({queryString, filters}));
 
         },
-        [dispatch, queryString, sort, filters]
+        [dispatch, queryString, filters]
 
     );
 
@@ -243,13 +243,14 @@ function AuditLogs() {
     const paginationData = useMemo(
 
         () => ({
-            page: page,
-            totalItems: totalPages,
-            pageSize: pageSize,
-            totalPages: Math.ceil(totalPages / pageSize),
-            itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+            page,
+            totalItems: page === totalPages ? (totalPages - 1) * pageSize + loadedPageSize : totalPages * pageSize,
+            pageSize,
+            loadedPageSize,
+            totalPages,
+            itemsPerPageOptions: [10, 20, 50, 100],
         }),
-        [page, totalPages, pageSize]
+        [page, totalPages, pageSize, loadedPageSize]
 
     );
 

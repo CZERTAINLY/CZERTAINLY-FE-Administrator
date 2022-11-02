@@ -39,6 +39,7 @@ interface Props {
       page: number;
       totalItems: number;
       pageSize: number;
+      loadedPageSize: number;
       totalPages: number;
       itemsPerPageOptions: number[];
    }
@@ -507,7 +508,7 @@ function CustomTable({
 
             <Fragment key={row.id}>
 
-               <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
+               <tr key={`tr${row.id}`} {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
                   {!hasDetails ? (<></>) : !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
                      {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
@@ -536,7 +537,7 @@ function CustomTable({
 
                {!hasDetails ? (<></>) : (
 
-                  <tr>
+                  <tr key={`trd${row.id}`}>
 
                      {
                         row.detailColumns && expandedRow === row.id ? (
@@ -683,7 +684,7 @@ function CustomTable({
                      paginationData
                         ?
                         <div>
-                           Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to {(paginationData.page - 1) * paginationData.pageSize + paginationData.pageSize > paginationData.totalItems ? paginationData.totalItems : (paginationData.page - 1) * paginationData.pageSize + paginationData.pageSize} items of {paginationData.totalItems}
+                           Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to {(paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize > paginationData.totalItems ? paginationData.totalItems : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize} items of { paginationData.totalItems }
                         </div>
                         :
                         <div>
