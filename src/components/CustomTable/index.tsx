@@ -268,12 +268,13 @@ function CustomTable({
             return;
          }
 
-         const checkedRows = tblData.slice((page - 1) * pageSize, page * pageSize).map(row => row.id);
+         const ps = paginationData ? paginationData.pageSize : pageSize;
+         const checkedRows = tblData.slice((page - 1) * ps, page * ps).map(row => row.id);
 
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, [tblData, onCheckedRowsChanged, pageSize, page]
+      }, [paginationData, pageSize, tblData, page, onCheckedRowsChanged]
 
    );
 
@@ -413,6 +414,17 @@ function CustomTable({
 
    );
 
+   const checkAllChecked = useMemo(
+
+      () => {
+         const ps = paginationData ? paginationData.pageSize : pageSize;
+         return tblCheckedRows.length === tblData.slice((page - 1) * ps, page * ps).length && tblData.length > 0;
+      },
+
+      [tblData, tblCheckedRows, paginationData, pageSize, page]
+
+   );
+
 
    const header = useMemo(
 
@@ -438,7 +450,7 @@ function CustomTable({
                         header.id === "__checkbox__" ? (
 
                            hasAllCheckBox && multiSelect? (
-                              <input type="checkbox" checked={tblCheckedRows.length === tblData.slice((page - 1) * pageSize, page * pageSize).length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+                              <input type="checkbox" checked={checkAllChecked} onChange={onCheckAllCheckboxClick} />
                            ) : (
                               <>&nbsp;</>
                            )
@@ -487,7 +499,7 @@ function CustomTable({
 
          )
       },
-      [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, tblCheckedRows.length, tblData, page, pageSize, onCheckAllCheckboxClick]
+      [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick]
 
    );
 
