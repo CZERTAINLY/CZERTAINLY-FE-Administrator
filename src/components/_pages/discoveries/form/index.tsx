@@ -42,6 +42,8 @@ export default function DiscoveryForm() {
    const isFetchingAttributeDescriptors = useSelector(discoverySelectors.isFetchingDiscoveryProviderAttributeDescriptors);
    const isCreating = useSelector(discoverySelectors.isCreating);
 
+   const [init, setInit] = useState(true);
+
    const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorModel>();
 
    const isBusy = useMemo(
@@ -53,12 +55,15 @@ export default function DiscoveryForm() {
 
       () => {
 
-         dispatch(discoveryActions.resetState());
-         dispatch(connectorActions.clearCallbackData());
-         dispatch(discoveryActions.listDiscoveryProviders());
+         if (init) {
+             dispatch(discoveryActions.resetState());
+             dispatch(connectorActions.clearCallbackData());
+             dispatch(discoveryActions.listDiscoveryProviders());
+             setInit(false);
+         }
 
       },
-      [dispatch, discoverySelector, discoveryProviders, isFetchingDiscoveryProviders]
+      [dispatch, discoverySelector, discoveryProviders, isFetchingDiscoveryProviders, init]
 
    );
 
