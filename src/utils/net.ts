@@ -106,14 +106,41 @@ export function extractError(err: HttpErrorResponse, headline: string): string {
       return `${headline}. ${err.error.join(", ")}`;
    }
 
-   if (err.error.message) return `${headline}: ${err.error.message}`;
+   if (err.error.message) {
+
+      const jsons = /{[^}]*}/gm.exec(err.error.message);
+      if (!jsons) return `${headline}: ${err.error.message}`;
+
+      let msg: string = err.error.message.replace(/(<([^>]+)>)/ig, "");
+
+      for (let i = 0; i < jsons.length; i++) {
+
+         const json = JSON.parse(jsons[i]);
+
+         let obj = "";
+
+         Object.keys(json).forEach(
+            key => {
+               obj += `<br />${key === "message" ? "" : `${key}: `}${json[key]}<br />`;
+            }
+         );
+
+         msg = msg.replace(/{[^}]*}/, obj);
+
+      }
+
+      msg = msg.replace(/\\n/g, "");
+
+      return `${headline}: ${msg}`;
+
+   }
 
    if (typeof err.error === "string") {
 
       try {
          const json = JSON.parse(err.error);
          if (json.message) return `${headline}: ${json.message}`;
-      } catch (e) {}
+      } catch (e) { }
 
       return `${headline}: ${err.error}`;
    }

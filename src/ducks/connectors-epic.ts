@@ -541,7 +541,7 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
                )
             )
 
-         )
+   )
 
       )
 

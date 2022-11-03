@@ -142,16 +142,6 @@ export default function CertificateDetail() {
 
    )
 
-   useEffect(
-
-      () => {
-
-         if (!id || !updateGroup) return;
-         dispatch(groupAction.listGroups());
-
-      },
-      [dispatch, updateGroup, id]
-   )
 
    useEffect(
 
