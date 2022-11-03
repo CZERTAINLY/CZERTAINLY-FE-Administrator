@@ -268,7 +268,7 @@ const deleteAuthority: AppEpic = (action$, state$, deps) => {
             mergeMap(
                () => of(
                   slice.actions.deleteAuthoritySuccess({ uuid: action.payload.uuid }),
-                  appRedirectActions.redirect({ url: "../" })
+                  appRedirectActions.redirect({ url: "../../" })
                )
             ),
 
