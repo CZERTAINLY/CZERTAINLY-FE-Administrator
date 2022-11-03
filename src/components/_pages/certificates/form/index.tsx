@@ -1,155 +1,155 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router";
-
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Form, Field } from "react-final-form";
-import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row, } from "reactstrap";
 
-import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
+import { useDispatch, useSelector } from "react-redux";
 
-import { AuthType } from "types/connectors";
-import { ConnectorModel, EndpointModel } from "models/connectors";
+import { validateRequired } from "utils/validators";
+import { mutators } from "utils/attributes/attributeEditorMutators";
 
-import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
+import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
+import { actions as raProfileActions, selectors as raProfileSelectors, } from "ducks/ra-profiles";
+import { actions as connectorActions } from "ducks/connectors";
 
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
-
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import InventoryStatusBadge from "components/_pages/connectors/ConnectorStatus";
-import Widget from "components/Widget";
-import Select from "react-select";
 import ProgressButton from "components/ProgressButton";
 
+import Select, { SingleValue } from "react-select";
+import Widget from "components/Widget";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import { RaProfileModel } from "models/ra-profiles";
+import { FormApi } from "final-form";
+import { collectFormAttributes } from "utils/attributes/attributes";
+import { useNavigate } from "react-router-dom";
 
 
 interface FormValues {
-   uuid: string;
-   name: string;
-   url: string;
-   authenticationType: { value: AuthType };
+   raProfile: SingleValue<{ label: string; value: RaProfileModel }> | null;
+   pkcs10: File | null;
+   fileName: string;
+   contentType: string;
+   file: string;
 }
 
-interface Props {
-   title: JSX.Element;
-}
-
-function ConnectorForm({ title }: Props) {
+export default function CertificateForm() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
-   const { id } = useParams();
+   const raProfiles = useSelector(raProfileSelectors.raProfiles);
+   const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
 
-   const editMode = useMemo(() => !!id, [id]);
+   const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
+   useEffect(() => {
 
-   const optionsForAuth: { label: string, value: AuthType }[] = useMemo(
-      () => [
-         {
-            label: "No Auth",
-            value: "none",
-         },
-         {
-            label: "Basic Auth",
-            value: "basic",
-         },
-         {
-            label: "Client Cert",
-            value: "certificate",
-         },
-      ],
-      []
-   );
+      dispatch(raProfileActions.listRaProfiles());
+      dispatch(connectorActions.clearCallbackData());
+
+   }, [dispatch]);
 
 
-   const isFetching = useSelector(connectorSelectors.isFetchingDetail);
-   // const isCreating = useSelector(connectorSelectors.isCreating);
-   // const isUpdating = useSelector(connectorSelectors.isUpdating);
-   const isConnecting = useSelector(connectorSelectors.isConnecting);
-   const isReconnecting = useSelector(connectorSelectors.isReconnecting);
+   const onFileLoaded = useCallback(
 
-   const connectorSelector = useSelector(connectorSelectors.connector);
-   const connectionDetails = useSelector(connectorSelectors.connectorConnectionDetails);
+      (form: FormApi<FormValues>, data: { target: any; }, fileName: string) => {
 
-   const [connector, setConnector] = useState<ConnectorModel>();
+         const fileInfo = data.target!.result as string;
 
-   const [selectedAuthType, setSelectedAuthType] = useState<{ label: string, value: AuthType }>(
-      editMode ? optionsForAuth.find(opt => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0]
-   );
+         const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
+         const fileContent = fileInfo.split(",")[1];
 
-   const submitTitle = editMode ? "Save" : "Create";
-   const connectTitle = editMode ? "Reconnect" : "Connect";
-   const inProgressTitle = editMode ? "Saving..." : "Creating...";
-   const connectProgressTitle = editMode ? "Reconnecting..." : "Connecting...";
-
-
-   useEffect(
-
-      () => {
-
-         if (id && (!connectorSelector || connectorSelector.uuid !== id) && !isFetching) {
-            dispatch(connectorActions.getConnectorDetail({ uuid: id }));
-         }
-
-         if (id && (connectorSelector && connectorSelector.uuid === id && !isFetching)) {
-            dispatch(connectorActions.reconnectConnector({ uuid: id }));
-         }
-
-         if (id && connectorSelector?.uuid === id) {
-
-            setConnector(connectorSelector);
-
-         } else {
-
-            dispatch(connectorActions.clearConnectionDetails());
-            dispatch(connectorActions.clearCallbackData());
-
-            setConnector({
-               uuid: "",
-               name: "",
-               url: "",
-               authType: "none",
-               status: "unavailable",
-               functionGroups: [],
-            });
-
-         }
+         form.mutators.setAttribute("fileName", fileName);
+         form.mutators.setAttribute("contentType", contentType);
+         form.mutators.setAttribute("file", fileContent);
 
       },
-      [editMode, id, connectorSelector, isFetching, dispatch]
+      []
+
+   );
+
+
+   const onFileChanged = useCallback(
+
+      (e: React.ChangeEvent<HTMLInputElement>, form: FormApi<FormValues>) => {
+
+         if (!e.target.files || e.target.files.length === 0) return;
+
+         const fileName = e.target.files[0].name;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.target.files[0]);
+         reader.onload = (data) => onFileLoaded(form, data, fileName);
+
+      },
+      [onFileLoaded]
 
    )
 
 
+   const onFileDrop = useCallback(
 
-   const onSubmit = useCallback(
+      (e: React.DragEvent<HTMLDivElement>, form: FormApi<FormValues>) => {
+
+         e.preventDefault();
+
+         if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+
+         const fileName = e.dataTransfer.files[0].name;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.dataTransfer.files[0]);
+         reader.onload = (data) => { onFileLoaded(form, data, fileName); }
+
+      },
+      [onFileLoaded]
+
+   )
+
+
+   const onFileDragOver = useCallback(
+
+      (e: React.DragEvent<HTMLInputElement>) => {
+
+         e.preventDefault();
+      },
+      []
+
+   )
+
+
+   const submitCallback = useCallback(
 
       (values: FormValues) => {
 
-         if (editMode) {
+         if (!values.raProfile) return;
 
-            if (!connector) return;
+         const attributes = collectFormAttributes("issuance_attributes", issuanceAttributeDescriptors[values.raProfile.value.uuid], values);
 
-            dispatch(connectorActions.updateConnector({
-               uuid: connector?.uuid,
-               url: values.url,
-               authType: selectedAuthType.value,
-               // authAttributes: []
-            }))
-
-         } else {
-
-            dispatch(connectorActions.createConnector({
-               name: values.name,
-               url: values.url,
-               authType: selectedAuthType.value,
-               // authAttributes: []
-            }))
-
-         }
+         dispatch(certificateActions.issueCertificate({
+            raProfileUuid: values.raProfile.value.uuid,
+            pkcs10: values.file,
+            authorityUuid: values.raProfile.value.authorityInstanceUuid,
+            attributes,
+            
+         }));
 
       },
-      [editMode, connector, selectedAuthType.value, dispatch]
+      [dispatch, issuanceAttributeDescriptors]
+
+   );
+
+
+   const onRaProfileChange = useCallback(
+
+      (event: SingleValue<{ label: string; value: RaProfileModel }>) => {
+
+         if (!event) return;
+         dispatch(certificateActions.getIssuanceAttributes({ raProfileUuid: event.value.uuid, authorityUuid: event.value.authorityInstanceUuid }));
+
+         /*setRaProfUuid(event?.value || "");
+         dispatch(actions.requestIssuanceAttributes(event?.value || ""));
+         */
+      },
+      [dispatch]
 
    );
 
@@ -161,364 +161,103 @@ function ConnectorForm({ title }: Props) {
       },
       [navigate]
 
-   )
-
-
-   const onConnectClick = (values: FormValues) => {
-      if (editMode) {
-         dispatch(connectorActions.connectConnector({ uuid: connector!.uuid, url: values.url, authType: values.authenticationType.value }));
-      } else {
-         dispatch(connectorActions.connectConnector({ url: values.url, authType: values.authenticationType.value }));
-      }
-   };
-
-
-   const endPointsHeaders: TableHeader[] = useMemo(
-      () => [
-         {
-            id: "name",
-            sortable: true,
-            sort: "asc",
-            content: "Name"
-         },
-         {
-            id: "context",
-            sortable: true,
-            content: "Context"
-         },
-         {
-            id: "method",
-            sortable: true,
-            content: "Method"
-         }
-      ],
-      []
-   )
-
-
-   const getEndPointInfo = useCallback(
-
-      (endpoints: EndpointModel[]): TableDataRow[] => {
-         return endpoints.map(
-            (endpoint: EndpointModel) => ({
-               id: endpoint.name,
-               columns: [
-                  endpoint.name,
-                  endpoint.context,
-                  endpoint.method
-               ]
-            })
-
-         )
-      },
-      []
    );
 
 
-   const defaultValues = useMemo(
+   const options = useMemo(
+
+      () => raProfiles.map(
+
+         raProfile => ({
+            label: raProfile.name,
+            value: raProfile
+         })
+
+      ),
+      [raProfiles]
+
+   );
+
+
+   const defaultValues: FormValues = useMemo(
+
       () => ({
-         name: editMode ? connector?.name : "",
-         url: editMode ? connector?.url || "" : "",
-         authenticationType: editMode ? optionsForAuth.find(opt => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
+         raProfile: null,
+         pkcs10: null,
+         fileName: "",
+         contentType: "",
+         file: ""
       }),
-      [editMode, optionsForAuth, connector]
+      []
+
    );
 
 
    return (
 
-      <div>
+      <Widget title={<h5>Add new <span className="fw-semi-bold">Certificate</span></h5>} busy={issuingCertificate}>
 
-         <Form onSubmit={onSubmit} initialValues={defaultValues}>
+         <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }} >
 
-            {({ handleSubmit, pristine, submitting, values }) => (
+            {({ handleSubmit, valid, submitting, values, form }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
 
-                  <Widget title={title}>
+                  <Field name="raProfile" validate={validateRequired()}>
 
-                     <Field
-                        name="url"
-                        validate={composeValidators(validateRequired(), validateUrl())}
-                     >
+                     {({ input, meta, onChange }) => (
 
-                        {({ input, meta }) => (
+                        <FormGroup>
 
-                           <FormGroup>
+                           <Label for="raProfile">RA Profile</Label>
 
-                              <Label for="url">URL</Label>
-                              <Input
-                                 {...input}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                                 type="text"
-                                 placeholder="URL of the connector service"
-                              />
-                              <FormFeedback>{meta.error}</FormFeedback>
+                           <Select
+                              {...input}
+                              id="raProfile"
+                              maxMenuHeight={140}
+                              menuPlacement="auto"
+                              options={options}
+                              placeholder="Select RA Profile"
+                              onChange={e => { onRaProfileChange(e); input.onChange(e) }}
+                           />
 
-                           </FormGroup>
+                           <FormFeedback>{meta.error}</FormFeedback>
 
-                        )}
+                        </FormGroup>
 
-                     </Field>
+                     )}
 
-                     <Field name="authenticationType">
+                  </Field>
 
-                        {({ input, meta, }) => (
-
-                           <FormGroup>
-
-                              <Label for="authenticationType">Authentication Type</Label>
-
-                              <Select
-                                 {...input}
-                                 maxMenuHeight={140}
-                                 menuPlacement="auto"
-                                 options={optionsForAuth}
-                                 placeholder="Select Auth Type"
-                                 onChange={(e) => { input.onChange(e); setSelectedAuthType(e); }}
-                              />
-
-                              <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                     {
-                        values.authenticationType.value === "basic" ? (
-
-                           <div>
-
-                              <Field name="username">
-
-                                 {({ input, meta }) => (
-
-                                    <FormGroup>
-
-                                       <Label for="username">Username</Label>
-
-                                       <Input
-                                          {...input}
-                                          valid={!meta.error && meta.touched}
-                                          invalid={!!meta.error && meta.touched}
-                                          type="text"
-                                          placeholder="Username"
-                                       //disabled={editMode}
-                                       />
-                                       <FormFeedback>{meta.error}</FormFeedback>
-
-                                    </FormGroup>
-                                 )}
-
-                              </Field>
-
-                              <Field name="password">
-
-                                 {({ input, meta }) => (
-
-                                    <FormGroup>
-
-                                       <Label for="password">Password</Label>
-
-                                       <Input
-                                          {...input}
-                                          valid={!meta.error && meta.touched}
-                                          invalid={!!meta.error && meta.touched}
-                                          type="password"
-                                          placeholder="Password"
-                                       // disabled={editMode}
-                                       />
-
-                                       <FormFeedback>{meta.error}</FormFeedback>
-
-                                    </FormGroup>
-
-                                 )}
-
-                              </Field>
-
-                           </div>
-
-                        ) : null
-                     }
-
-                     {
-                        values.authenticationType.value === "certificate" ? (
-
-                           <Field name="clientCert">
-
-                              {({ input, meta }) => (
-
-                                 <FormGroup>
-
-                                    <Label for="clientCert">Client Certificate</Label>
-
-                                    <Input
-                                       {...input}
-                                       valid={!meta.error && meta.touched}
-                                       invalid={!!meta.error && meta.touched}
-                                       type="file"
-                                       placeholder="clientCert"
-                                    // disabled={editMode}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-
-                                 </FormGroup>
-
-                              )}
-
-                           </Field>
-
-                        ) : null
-                     }
-
-                     <div className="d-flex justify-content-end">
-
-                        <ButtonGroup>
-
-                           <Button
-
-                              color="success"
-                              onClick={() => onConnectClick(values)}
-                              disabled={submitting || isConnecting || isReconnecting}
-                           >
-                              {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}
-                           </Button>
-
-                        </ButtonGroup>
-
-                     </div>
-
-                  </Widget>
 
                   {
-                     connectionDetails ? (
 
-                        <Widget title="Connection Details" busy={isConnecting}>
+                     !values.raProfile ? <></> : (
 
-                           <Table className="table-hover" size="sm">
+                        <>
 
-                              <tbody>
+                           <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={(e) => onFileDrop(e, form)} onDragOver={onFileDragOver}>
 
-                                 <tr>
-                                    <td>URL</td>
-                                    <td>{values.url}</td>
-                                 </tr>
+                              <Row>
 
-                                 <tr>
+                                 <Col>
 
-                                    <td>Connector Status</td>
-                                    <td>
-                                       <InventoryStatusBadge status={connectionDetails.length > 0 ? "connected" : "failed"} />
-                                    </td>
-
-                                 </tr>
-
-                                 <tr>
-
-                                    <td>Function Group(s)</td>
-                                    <td>
-                                       {connectionDetails.map(
-                                          functionGroup => (
-                                             <div>
-                                                <Badge color="primary" searchvalue={attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}>
-                                                   {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
-                                                </Badge>
-                                                &nbsp;
-                                             </div>
-                                          )
-                                       )}
-                                    </td>
-
-                                 </tr>
-
-                              </tbody>
-
-                           </Table>
-
-
-                           {
-
-                              connectionDetails && connectionDetails.length > 0 ? (
-
-                                 <div>
-
-                                    <b>Connector Functionality Description</b>
-
-                                    <hr />{" "}
-
-                                    {connectionDetails.map(
-
-                                       functionGroup => (
-
-                                          <Widget key={functionGroup.name} title={
-
-                                             <>
-
-                                                {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
-
-                                                <div className="pull-right mt-n-xs">
-
-                                                   {
-                                                      functionGroup.kinds.map(kinds =>
-                                                         <>
-                                                            &nbsp;
-                                                            <Badge key={kinds} color="secondary" searchvalue={kinds}>
-                                                               {kinds}
-                                                            </Badge>
-                                                         </>
-                                                      )
-                                                   }
-
-                                                </div>
-
-                                             </>
-
-                                          }>
-
-                                             <CustomTable
-                                                headers={endPointsHeaders}
-                                                data={getEndPointInfo(functionGroup?.endPoints)}
-                                             />
-
-                                          </Widget>
-
-                                       )
-
-                                    )}
-
-                                 </div>
-
-                              ) : null}
-
-                           {
-
-                              connectionDetails && connectionDetails.length > 0 ? (
-
-                                 <div>
-
-                                    <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())} >
+                                    <Field name="fileName">
 
                                        {({ input, meta }) => (
 
                                           <FormGroup>
 
-                                             <Label for="name">Connector Name</Label>
+                                             <Label for="fileName">File name</Label>
 
                                              <Input
                                                 {...input}
-                                                valid={!meta.error && meta.touched}
-                                                invalid={!!meta.error && meta.touched}
+                                                id="fileName"
                                                 type="text"
-                                                placeholder="Connector Name"
-                                                disabled={editMode}
+                                                placeholder="File not selected"
+                                                disabled={true}
+                                                style={{ textAlign: "center" }}
                                              />
-
-                                             <FormFeedback>{meta.error}</FormFeedback>
 
                                           </FormGroup>
 
@@ -526,49 +265,123 @@ function ConnectorForm({ title }: Props) {
 
                                     </Field>
 
-                                    <div className="d-flex justify-content-end">
+                                 </Col>
 
-                                       <ButtonGroup>
+                                 <Col>
 
-                                          <Button
-                                             color="default"
-                                             onClick={onCancel}
-                                             disabled={submitting}
-                                          >
-                                             Cancel
-                                          </Button>
+                                    <Field name="contentType">
 
-                                          <ProgressButton
-                                             title={submitTitle}
-                                             inProgressTitle={inProgressTitle}
-                                             inProgress={submitting}
-                                             disabled={pristine}
-                                          />
+                                       {({ input, meta }) => (
 
-                                       </ButtonGroup>
+                                          <FormGroup>
 
-                                    </div>
+                                             <Label for="contentType">Content type</Label>
 
-                                 </div>
+                                             <Input
+                                                {...input}
+                                                id="contentType"
+                                                type="text"
+                                                placeholder="File not selected"
+                                                disabled={true}
+                                                style={{ textAlign: "center" }}
+                                             />
 
-                              ) : null
+                                          </FormGroup>
 
-                           }
+                                       )}
 
-                        </Widget>
+                                    </Field>
 
-                     ) : null
+                                 </Col>
+
+                              </Row>
+
+                              <Field name="file" validate={validateRequired()}>
+
+                                 {({ input, meta }) => (
+
+                                    <FormGroup>
+
+                                       <Label for="fileContent">File content</Label>
+
+                                       <Input
+                                          {...input}
+                                          id="fileContent"
+                                          type="textarea"
+                                          rows={6}
+                                          placeholder={`Select or drag & drop a certificate File`}
+                                          readOnly={true}
+                                       />
+
+                                       <FormFeedback>{meta.error}</FormFeedback>
+
+                                    </FormGroup>
+
+                                 )}
+
+                              </Field>
+
+
+
+                              <FormGroup style={{ textAlign: "right" }}>
+
+                                 <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
+
+                                 <Input id="file" type="file" style={{ display: "none" }} onChange={(e) => onFileChanged(e, form)} />
+
+                              </FormGroup>
+
+                              <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
+                                 Select or Drag &amp; Drop file to Drop Zone.
+                              </div>
+
+                           </div>
+
+                           <AttributeEditor
+                              id="issuance_attributes"
+                              attributeDescriptors={issuanceAttributeDescriptors[values.raProfile.value.uuid] || []}
+                              authorityUuid={values.raProfile.value.authorityInstanceUuid}
+                           />
+
+
+                        </>
+
+                     )
 
                   }
+
+                  <br />
+
+                  <div className="d-flex justify-content-end">
+
+                     <ButtonGroup>
+
+                        <ProgressButton
+                           title="Create"
+                           inProgressTitle="Creating"
+                           inProgress={submitting || issuingCertificate}
+                           disabled={!valid}
+                        />
+
+                        <Button
+                           color="default"
+                           onClick={onCancel}
+                           disabled={submitting}
+                        >
+                           Cancel
+                        </Button>
+
+                     </ButtonGroup>
+
+                  </div>
 
                </BootstrapForm>
 
             )}
+
          </Form>
 
-      </div>
+      </Widget>
 
    );
 }
-
-export default ConnectorForm;

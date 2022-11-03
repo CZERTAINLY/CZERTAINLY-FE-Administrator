@@ -29,6 +29,7 @@ import RolePermissions from "./_pages/roles/RolePermissionsForm";
 
 import CertificatesList from "./_pages/certificates/list";
 import CertificateDetail from "./_pages/certificates/detail";
+import CertificateEdit from "./_pages/certificates/form";
 
 import ConnectorsList from "./_pages/connectors/list";
 import ConnectorDetail from "./_pages/connectors/detail";
@@ -109,6 +110,7 @@ export default function AppRouter() {
                <Route path="/certificates" element={<CertificatesList />} />
                <Route path="/certificates/list" element={<Navigate to="/certificates" />} />
                <Route path="/certificates/detail/:id" element={<CertificateDetail />} />
+               <Route path="/certificates/add" element={<CertificateEdit />} />
 
                <Route path="/connectors" element={<ConnectorsList />} />
                <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
