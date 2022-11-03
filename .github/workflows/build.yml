@@ -20,7 +20,7 @@ jobs:
       - name: Test build
         run: |
           npm install
-          npm build
+          npm run build
   build:
     if: github.event_name != 'pull_request'
     name: Build
