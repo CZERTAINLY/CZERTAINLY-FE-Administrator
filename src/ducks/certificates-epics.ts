@@ -136,7 +136,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
             mergeMap(
                operation => of(
                   slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
-                  appRedirectActions.redirect({ url: `./detail/${operation.uuid}` })
+                  appRedirectActions.redirect({ url: `../detail/${operation.uuid}` })
                )
             ),
 
