@@ -1,6 +1,6 @@
 import { ComplianceConnectorAndGroupsDTO, ComplianceConnectorAndRulesDTO, ComplianceGroupsDTO, ComplianceProfileDTO, ComplianceProfileListItemDTO, ComplianceRuleDTO } from "api/compliance-profile";
 import { raComplianceProfileDTO } from "api/profiles";
-import { raComplianceProfileModel } from "models";
+import { raComplianceProfileModel } from "models/ra-profiles";
 import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceGroupsModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRuleModel } from "models/compliance-profiles";
 
 export function transformComplianceProfileListDtoToModel(complianceProfileDto: ComplianceProfileListItemDTO): ComplianceProfileListItemModel {

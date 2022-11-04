@@ -1,12 +1,11 @@
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import history from "browser-history";
-
-import { actions as alertActions } from "./alerts";
-import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
+import { extractError } from "utils/net";
+
 import { slice } from "./credentials";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformCredentialDtoToModel } from "./transform/credentials";
 import { transformConnectorDTOToModel } from "./transform/connectors";
@@ -31,27 +30,14 @@ const listCredentials: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listCredentialsFailure({ error: extractError(err, "Failed to get Credential list") }))
+               error => of(
+                  slice.actions.listCredentialsFailure({ error: extractError(error, "Failed to get Credential list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Credential list" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const listCredentialsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listCredentialsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -77,27 +63,14 @@ const getCredentialDetail: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getCredentialDetailFailure({ error: extractError(err, "Failed to get Credential") }))
+               error => of(
+                  slice.actions.getCredentialDetailFailure({ error: extractError(error, "Failed to get Credential") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Credential" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getCredentialDetailFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getCredentialDetailFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -121,24 +94,13 @@ const listCredentialProviders: AppEpic = (action$, state, deps) => {
                })
             ),
 
-            catchError((err) =>
-               of(
-                  slice.actions.listCredentialProvidersFailure({ error: extractError(err, "Failed to get Credential Provider list") })
+            catchError(
+               error => of(
+                  slice.actions.listCredentialProvidersFailure({ error: extractError(error, "Failed to get Credential Provider list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Credential Provider list" })
                )
             )
          )
-      )
-   );
-}
-
-const getCredentialProvidersFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-      filter(
-         slice.actions.listCredentialProvidersFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
    );
 }
@@ -166,7 +128,10 @@ const getCredentialProviderAttributeDescriptors: AppEpic = (action$, state, deps
             ),
 
             catchError(
-               err => of(slice.actions.getCredentialProviderAttributesDescriptorsFailure({ error: extractError(err, "Failed to get Credential Provider Attribute Descriptor list") }))
+               error => of(
+                  slice.actions.getCredentialProviderAttributesDescriptorsFailure({ error: extractError(error, "Failed to get Credential Provider Attribute Descriptor list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Credential Provider Attribute Descriptor list" })
+               )
             )
 
          )
@@ -174,21 +139,6 @@ const getCredentialProviderAttributeDescriptors: AppEpic = (action$, state, deps
       )
 
    );
-}
-
-
-const getCredentialProviderAttributeDescriptorsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getCredentialProviderAttributesDescriptorsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
-
 }
 
 
@@ -208,12 +158,18 @@ const createCredential: AppEpic = (action$, state, deps) => {
             action.payload.attributes
          ).pipe(
 
-            map(
-               obj => slice.actions.createCredentialSuccess({ uuid: obj.uuid })
+            mergeMap(
+               obj => of(
+                  slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
+                  appRedirectActions.redirect({ url: `../detail/${obj.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.createCredentialFailure({ error: extractError(err, "Failed to create Credential") }))
+               error => of(
+                  slice.actions.createCredentialFailure({ error: extractError(error, "Failed to create Credential") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to create Credential" })
+               )
             )
 
          )
@@ -222,39 +178,6 @@ const createCredential: AppEpic = (action$, state, deps) => {
 
    );
 
-}
-
-
-const createCredentialSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createCredentialSuccess.match
-      ),
-      switchMap(
-         action => {
-            history.push(`./detail/${action.payload.uuid}`);
-            return EMPTY;
-         }
-      )
-
-   )
-
-}
-
-
-const createCredentialFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createCredentialFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
 }
 
 
@@ -269,51 +192,24 @@ const deleteCredential: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.credentials.deleteCredential(action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteCredentialSuccess({ uuid: action.payload.uuid })
+            mergeMap(
+               () => of(
+                  slice.actions.deleteCredentialSuccess({ uuid: action.payload.uuid }),
+                  appRedirectActions.redirect({ url: "../../" })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.deleteCredentialFailure({ error: extractError(err, "Failed to delete Credential") }))
+               error => of(
+                  slice.actions.deleteCredentialFailure({ error: extractError(error, "Failed to delete Credential") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete Credential" })
+               )
             )
 
          )
 
       )
 
-   );
-
-}
-
-
-const deleteCredentialSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteCredentialSuccess.match
-      ),
-      switchMap(
-         () => {
-            history.push("../");
-            return EMPTY
-         }
-      )
-   )
-
-}
-
-
-const deleteCredentialFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteCredentialFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
    );
 
 }
@@ -333,54 +229,30 @@ const updateCredential: AppEpic = (action$, state, deps) => {
             action.payload.attributes.map(transformAttributeModelToDTO)
          ).pipe(
 
-            map(
-               credential => slice.actions.updateCredentialSuccess({
-                  credential: transformCredentialDtoToModel(credential)
-               })
+            mergeMap(
+
+               credential => of(
+
+                  slice.actions.updateCredentialSuccess({
+                     credential: transformCredentialDtoToModel(credential)
+                  }),
+
+                  appRedirectActions.redirect({ url: "../../detail/" + credential.uuid })
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.updateCredentialFailure({ error: extractError(err, "Failed to update Credential") }))
+               error => of(
+                  slice.actions.updateCredentialFailure({ error: extractError(error, "Failed to update Credential") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to update Credential" })
+               )
             )
 
          )
 
       )
 
-   );
-
-}
-
-
-const updateCredentialSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateCredentialSuccess.match
-      ),
-      switchMap(
-         action => {
-            history.push(`../detail/${action.payload.credential.uuid}`);
-            return EMPTY;
-         }
-      )
-
-   )
-
-}
-
-
-const updateCredentialFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateCredentialFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
    );
 
 }
@@ -402,27 +274,14 @@ const bulkDeleteCredential: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDeleteCredentialsFailure({ error: extractError(err, "Failed to update Credential") }))
+               error => of(
+                  slice.actions.bulkDeleteCredentialsFailure({ error: extractError(error, "Failed to update Credential") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to update Credential" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkDeleteCredentialFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDeleteCredentialsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -445,7 +304,10 @@ const bulkForceDeleteCredentials: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkForceDeleteCredentialsFailure({ error: extractError(err, "Failed to update Credential") }))
+               error => of(
+                  slice.actions.bulkForceDeleteCredentialsFailure({ error: extractError(error, "Failed to update Credential") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to update Credential" })
+               )
             )
 
          )
@@ -457,44 +319,16 @@ const bulkForceDeleteCredentials: AppEpic = (action$, state, deps) => {
 }
 
 
-const bulkForceDeleteCredentialsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteCredentialsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listCredentials,
-   listCredentialsFailure,
    listCredentialProviders,
-   getCredentialProvidersFailure,
    getCredentialProviderAttributeDescriptors,
-   getCredentialProviderAttributeDescriptorsFailure,
    getCredentialDetail,
-   getCredentialDetailFailure,
    createCredential,
-   createCredentialFailure,
-   createCredentialSuccess,
    deleteCredential,
-   deleteCredentialSuccess,
-   deleteCredentialFailure,
    updateCredential,
-   updateCredentialSuccess,
-   updateCredentialFailure,
    bulkDeleteCredential,
-   bulkDeleteCredentialFailure,
    bulkForceDeleteCredentials,
-   bulkForceDeleteCredentialsFailure
 ];
 
 export default epics;

@@ -1,0 +1,14 @@
+.filtersForm {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.formLine {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: 10px;
+
+  div:not(:last-child) {
+    margin-right: 10px;
+  }
+}

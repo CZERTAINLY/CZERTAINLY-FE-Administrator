@@ -1,0 +1,41 @@
+/**
+ * Custom application mixins available through out the app
+ */
+
+// define sass mixin
+// Generates single property classes
+// -------------------------
+@mixin property-variants($base, $property, $variants: ()) {
+  @each $size, $value in $variants {
+    @if $size == 'md' {
+      #{$base} {
+        #{$property}: $value;
+      }
+
+      #{$base}-n {
+        #{$property}: $value;
+      }
+    }
+
+    #{$base}-#{$size} {
+      #{$property}: $value;
+    }
+
+    #{$base}-n-#{$size} {
+      #{$property}: -$value;
+    }
+  }
+}
+
+@mixin bg-variant($parent, $color, $ignore-warning: false) {
+  #{$parent} {
+    background-color: $color !important;
+  }
+  a#{$parent},
+  button#{$parent} {
+    &:hover,
+    &:focus {
+      background-color: darken($color, 10%) !important;
+    }
+  }
+}

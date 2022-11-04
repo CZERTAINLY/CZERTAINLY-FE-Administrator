@@ -3,7 +3,7 @@ import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models
 import { transformAttributeDTOToModel, transformAttributeModelToDTO } from "./attributes";
 
 export function transformRaProfileDtoToModel(raProfileDto: RaProfileDTO): RaProfileModel {
-   
+
    return {
       uuid: raProfileDto.uuid,
       name: raProfileDto.name,

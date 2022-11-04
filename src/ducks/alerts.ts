@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MessageModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector } from 'reselect';
-import { store } from "../index"
+import { store } from "index"
 
 
 export type State = {

@@ -1,8 +1,8 @@
 import { AnyAction, applyMiddleware, compose } from "redux";
 import { createEpicMiddleware } from "redux-observable";
 
-import { backendClient, mockClient } from "api";
-import { AppState, epics, initialState, reducers } from "ducks";
+import { backendClient, mockClient } from "./api";
+import { AppState, epics, initialState, reducers } from "./ducks";
 import { configureStore } from "@reduxjs/toolkit";
 
 export default function configure() {

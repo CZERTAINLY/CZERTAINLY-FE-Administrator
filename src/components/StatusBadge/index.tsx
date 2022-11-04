@@ -1,5 +1,5 @@
 import React from "react";
-import { MDBBadge } from "mdbreact";
+import { Badge } from "reactstrap";
 
 interface Props {
    enabled: boolean | undefined;
@@ -14,25 +14,25 @@ function StatusBadge({
       case true:
 
          return (
-            <MDBBadge color="success">
+            <Badge color="success">
                Enabled
-            </MDBBadge>
+            </Badge>
          );
 
       case false:
 
          return (
-            <MDBBadge color="danger">
+            <Badge color="danger">
                Disabled
-            </MDBBadge>
+            </Badge>
          );
 
       default:
 
          return (
-            <MDBBadge color="secondary">
+            <Badge color="secondary">
                Unknown
-            </MDBBadge>
+            </Badge>
          );
 
    }

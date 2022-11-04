@@ -1,12 +1,10 @@
 import React from "react";
 import { Button, ButtonProps } from "reactstrap";
-import ToolTip from "../ToolTip";
 
 
 export interface WidgetButtonProps {
    icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock";
-   additionalTooltipId?: string;
-   tooltipScheme?: "dark" | "success" | "warning" | "error" | "info" | "light";
+   id?: string;
    tooltip?: any;
    disabled: boolean;
    custom?: React.ReactNode;
@@ -75,22 +73,11 @@ function WidgetButtons({ buttons }: Props) {
       let style;
 
       let btnProps: ButtonProps = {
-         key: button.icon + button.tooltip + button.additionalTooltipId || "",
+         key: button.icon + button.tooltip + button.id || "",
          className: "btn btn-link",
          color: "white",
          onClick: button.onClick,
          disabled: button.disabled,
-      }
-
-      if (button.tooltip) {
-
-         const toolTipId = `btn_tooltip_${button.tooltip}_${button.additionalTooltipId || ""}`;
-
-         btnProps["data-for"] = toolTipId;
-         btnProps["data-tip"] = "";
-
-         toolTip = <ToolTip id={toolTipId} message={button.tooltip} tooltipType={button.tooltipScheme}/>
-
       }
 
       if (!button.disabled) {
@@ -102,7 +89,7 @@ function WidgetButtons({ buttons }: Props) {
          ( <span key={button.icon + button.tooltip}>{ button.custom }</span>)
          :
          (
-            <Button {...btnProps}>
+            <Button {...btnProps} title={button.tooltip}>
                <i className={classNames[button.icon]} style={style} />
                {toolTip}
             </Button>

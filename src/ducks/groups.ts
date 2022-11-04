@@ -36,6 +36,7 @@ export const slice = createSlice({
    initialState,
 
    reducers: {
+
       resetState: (state, action: PayloadAction<void>) => {
 
          Object.keys(state).forEach(
@@ -55,64 +56,99 @@ export const slice = createSlice({
 
       },
 
+
       listGroups: (state, action: PayloadAction<void>) => {
 
          state.groups = [];
          state.isFetchingList = true;
+
       },
+
 
       listGroupsSuccess: (state, action: PayloadAction<{ groups: GroupModel[] }>) => {
 
          state.groups = action.payload.groups;
          state.isFetchingList = false;
+
       },
+
 
       listGroupsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false;
+
       },
+
 
       getGroupDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+
          state.group = undefined;
          state.isFetchingDetail = true;
+
       },
+
 
       getGroupDetailSuccess: (state, action: PayloadAction<{ group: GroupModel }>) => {
+
          state.group = action.payload.group;
          state.isFetchingDetail = false;
+
       },
 
+
       getGroupDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
          state.isFetchingDetail = false;
+
       },
 
       createGroup: (state, action: PayloadAction<{ name: string, description?: string }>) => {
+
          state.isCreating = true;
+
       },
+
 
       createGroupSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+
          state.isCreating = false;
+
       },
+
 
       createGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
          state.isCreating = false;
+
       },
+
 
       updateGroup: (state, action: PayloadAction<{ groupUuid: string, name: string, description?: string }>) => {
+
          state.isUpdating = true;
+
       },
+
 
       updateGroupSuccess: (state, action: PayloadAction<{ group: GroupModel }>) => {
+
          state.isUpdating = false;
          state.group = action.payload.group;
+
       },
+
 
       updateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
          state.isUpdating = false;
+
       },
 
+
       deleteGroup: (state, action: PayloadAction<{ uuid: string }>) => {
+
          state.isDeleting = true;
+
       },
 
 
@@ -164,6 +200,7 @@ export const slice = createSlice({
          state.isBulkDeleting = false;
 
       }
+
    }
 });
 

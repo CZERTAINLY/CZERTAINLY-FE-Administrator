@@ -146,7 +146,7 @@ export const slice = createSlice({
       },
 
 
-      listConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingList = false;
 
@@ -181,7 +181,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getConnectorDetailFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingDetail = false;
 
@@ -213,7 +213,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getConnectorAttributesDescriptorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingAllAttributes = false;
 
@@ -236,7 +236,7 @@ export const slice = createSlice({
       },
 
 
-      getAllConnectorAllAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getAllConnectorAllAttributesDescriptorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingAllAttributes = false;
 
@@ -259,7 +259,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorHealthFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getConnectorHealthFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingHealth = false;
 
@@ -298,7 +298,7 @@ export const slice = createSlice({
       },
 
 
-      createConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      createConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isCreating = false;
 
@@ -334,7 +334,7 @@ export const slice = createSlice({
       },
 
 
-      updateConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      updateConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isUpdating = false;
 
@@ -387,7 +387,7 @@ export const slice = createSlice({
 
          state.isBulkDeleting = false;
 
-         if (action.payload.errors.length > 0) {
+         if (action.payload.errors?.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return;
          }
@@ -411,7 +411,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkDeleting = false;
 
@@ -450,7 +450,7 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkForceDeleting = false;
 
@@ -473,7 +473,7 @@ export const slice = createSlice({
       },
 
 
-      connectConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      connectConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isConnecting = false;
 
@@ -496,7 +496,7 @@ export const slice = createSlice({
       },
 
 
-      reconnectConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      reconnectConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isReconnecting = false;
 
@@ -516,7 +516,7 @@ export const slice = createSlice({
       },
 
 
-      bulkReconnectConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkReconnectConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkReconnecting = false;
 
@@ -537,7 +537,7 @@ export const slice = createSlice({
       },
 
 
-      authorizeConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      authorizeConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isAuthorizing = false;
 
@@ -558,7 +558,7 @@ export const slice = createSlice({
       },
 
 
-      bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkAuthorizing = false;
 
@@ -586,7 +586,7 @@ export const slice = createSlice({
       },
 
 
-      callbackFailure: (state, action: PayloadAction<{ callbackId: string, error: string | undefined }>) => {
+      callbackFailure: (state, action: PayloadAction<{ callbackId: string }>) => {
 
          state.isRunningCallback[action.payload.callbackId] = false;
       }

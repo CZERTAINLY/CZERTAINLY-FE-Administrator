@@ -1,11 +1,9 @@
-import { EMPTY, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import history from "browser-history";
 
 import { AppEpic } from 'ducks';
 
-import { actions as alertActions } from "./alerts";
-import { extractError } from 'utils/net';
+import { actions as appRedirectActions } from "./app-redirect";
 
 import * as slice from './auth';
 import { transformResourceDetailDTOToModel } from './transform/auth';
@@ -19,6 +17,7 @@ const getProfile: AppEpic = (action$, state$, deps) => {
          slice.actions.getProfile.match
       ),
       switchMap(
+
          () => deps.apiClients.auth.profile().pipe(
 
             map(
@@ -26,27 +25,18 @@ const getProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getProfileFailure({ error: extractError(err, "Failed to get user profile") }))
+
+               error => {
+                  return of(
+                     slice.actions.getProfileFailure(),
+                     appRedirectActions.fetchError({ error, message: "Failed to get user profile" })
+                  )
+               }
+
             )
 
          )
 
-      )
-
-   );
-
-};
-
-
-const getProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getProfileFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -66,35 +56,20 @@ const updateProfile: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.auth.updateProfile(action.payload.profile).pipe(
 
             map(
-
                profile => slice.actions.updateProfileSuccess({ profile, redirect: action.payload.redirect })
-
             ),
 
             catchError(
 
-               err => of(slice.actions.updateProfileFailure({ error: extractError(err, "Failed to update user profile") }))
+               error => of(
+                  slice.actions.updateProfileFailure(),
+                  appRedirectActions.fetchError({ error, message: "Failed to update user profile" })
+               )
 
             )
 
          )
 
-      )
-
-   );
-
-};
-
-
-const updateProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateProfileFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -109,16 +84,15 @@ const updateProfileSuccess: AppEpic = (action$, state$, deps) => {
       filter(
          slice.actions.updateProfileSuccess.match
       ),
-      switchMap(
+      map(
 
-         action => {
-            if (action.payload.redirect) {
-               history.push(action.payload.redirect);
-            } else {
-               history.goBack();
-            }
-            return EMPTY;
-         }
+         action =>
+
+            action.payload.redirect ?
+
+               appRedirectActions.redirect({ url: action.payload.redirect })
+               :
+               appRedirectActions.goBack()
 
       )
 
@@ -142,26 +116,15 @@ const getResources: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getResourcesFailure({ error: extractError(err, "Failed to get user resources") }))
+
+               err => of(
+                  slice.actions.getResourcesFailure(),
+                  appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get user resources" })
+               )
+
             )
 
          )
-      )
-
-   );
-
-};
-
-
-const getResourcesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getResourcesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -185,7 +148,12 @@ const listObjects: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") }))
+
+               err => of(
+                  slice.actions.listObjectsFailure(),
+                  appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get objects list" })
+               )
+
             )
 
          )
@@ -197,32 +165,12 @@ const listObjects: AppEpic = (action$, state$, deps) => {
 };
 
 
-const listObjectsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listObjectsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-};
-
-
 export const epics = [
    getProfile,
-   getProfileFailure,
    getResources,
    updateProfile,
    updateProfileSuccess,
-   updateProfileFailure,
-   getResourcesFailure,
    listObjects,
-   listObjectsFailure
 ];
 
 

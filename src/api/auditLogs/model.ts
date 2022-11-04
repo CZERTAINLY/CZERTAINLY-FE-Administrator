@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from 'types/auditlog';
 
 import { PagedDataDTO } from "../_common/pagedDataDTO";
+import { FormValues } from "components/_pages/auditLogs/AuditLogsFilters";
 
 export interface AuditLogDTO {
    id: number;
@@ -19,7 +20,7 @@ export type PagedAuditLog = PagedDataDTO<AuditLogDTO>;
 
 export interface AuditLogsApi {
 
-   getLogs(pageNumber: number, pageSize: number, sort?: string, filters?: { [key: string]: string }): Observable<PagedAuditLog>;
+   getLogs(pageNumber: number, pageSize: number, filters?: FormValues): Observable<PagedAuditLog>;
 
    getObjects(): Observable<string[]>;
 

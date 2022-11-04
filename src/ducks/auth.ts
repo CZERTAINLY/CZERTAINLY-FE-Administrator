@@ -3,7 +3,7 @@ import { createFeatureSelector } from 'utils/ducks';
 
 import { ResourceDetailModel } from 'models';
 import { UserDetailModel } from 'models/users';
-import { ProfileDetailModel } from 'models/user-profile';
+import { ProfileDetailModel } from 'models/userProfile';
 
 export type State = {
 
@@ -73,7 +73,7 @@ export const slice = createSlice({
       },
 
 
-      getProfileFailure(state, action: PayloadAction<{ error: string }>) {
+      getProfileFailure(state, action: PayloadAction<void>) {
 
          state.isFetchingProfile = false;
 
@@ -95,7 +95,7 @@ export const slice = createSlice({
       },
 
 
-      updateProfileFailure(state, action: PayloadAction<{ error: string }>) {
+      updateProfileFailure(state, action: PayloadAction<void>) {
 
          state.isUpdatingProfile = false;
 
@@ -118,7 +118,7 @@ export const slice = createSlice({
       },
 
 
-      getResourcesFailure(state, action: PayloadAction<{ error: string }>) {
+      getResourcesFailure(state, action: PayloadAction<void>) {
 
          state.isFetchingResources = false;
 
@@ -141,7 +141,7 @@ export const slice = createSlice({
       },
 
 
-      listObjectsFailure(state, action: PayloadAction<{ error: string }>) {
+      listObjectsFailure(state, action: PayloadAction<void>) {
 
          state.isFetchingObjects = false;
 

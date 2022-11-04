@@ -1,13 +1,14 @@
 import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
-import { HttpErrorResponse } from "ts-rest-client";
 import { randomDelay } from "utils/mock";
-import { dbData } from "mocks/db";
+import { HttpErrorResponse } from "utils/FetchHttpService";
+
+import { dbData } from "api/_mocks/db";
 
 import * as model from "./model";
-import { getOrCreateCertificate } from "mocks/helpers";
+import { getOrCreateCertificate } from "api/_mocks/helpers";
 import { CertificateDTO } from "api/certificates";
-import { DbUser } from "mocks/db-users";
+import { DbUser } from "api/_mocks/db-users";
 import { RoleDTO } from "api/roles";
 
 

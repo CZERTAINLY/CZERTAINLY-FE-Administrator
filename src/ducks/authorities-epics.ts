@@ -1,12 +1,12 @@
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { iif, of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import history from "browser-history";
-
-import { actions as alertActions } from "./alerts";
-import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
+import { extractError } from "utils/net";
+
 import { slice } from "./authorities";
+import { actions as appRedirectActions } from "./app-redirect";
+
 import { transformAuthorityDtoToModel } from "./transform/authorities";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformConnectorDTOToModel } from "./transform/connectors";
@@ -30,7 +30,10 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listAuthoritiesFailure({ error: extractError(err, "Failed to get Authorities list") }))
+               err => of(
+                  slice.actions.listAuthoritiesFailure({ error: extractError(err, "Failed to get Authorities list") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get Authorities list" })
+               )
             )
 
          )
@@ -42,26 +45,9 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listAuthoritiesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listAuthoritiesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
-
 
       filter(
          slice.actions.getAuthorityDetail.match
@@ -76,28 +62,14 @@ const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getAuthorityDetailFailure({ error: extractError(err, "Failed to get Authority detail") }))
+               err => of(
+                  slice.actions.getAuthorityDetailFailure({ error: extractError(err, "Failed to get Authority detail") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get Authority detail" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getAuthorityDetailFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getAuthorityDetailFailure.match
-      ),
-
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -122,23 +94,13 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               (err) =>of(slice.actions.listAuthorityProvidersFailure({ error: extractError(err, "Failed to get Authority Provider list") }))
+               (err) => of(
+                  slice.actions.listAuthorityProvidersFailure({ error: extractError(err, "Failed to get Authority Provider list") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get Authority Provider list" })
+               )
             )
 
          )
-      )
-   );
-}
-
-
-const listAuthorityProvidersFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-      filter(
-         slice.actions.listAuthorityProvidersFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
    );
 }
@@ -166,7 +128,10 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
             ),
 
             catchError(
-               err => of(slice.actions.getAuthorityProviderAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Authority Provider Attribute Descriptor list") }))
+               err => of(
+                  slice.actions.getAuthorityProviderAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Authority Provider Attribute Descriptor list") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get Authority Provider Attribute Descriptor list" })
+               )
             )
 
          )
@@ -175,22 +140,6 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
 
    );
 }
-
-
-const getAuthorityProviderAttributesDescriptorsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getAuthorityProviderAttributeDescriptorsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
-
-}
-
 
 
 const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
@@ -212,7 +161,10 @@ const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getRAProfilesAttributesDescriptorsFailure({ error: extractError(err, "Failed to get RA Profile Attribute Descriptor list") }))
+               err => of(
+                  slice.actions.getRAProfilesAttributesDescriptorsFailure({ error: extractError(err, "Failed to get RA Profile Attribute Descriptor list") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get RA Profile Attribute Descriptor list" })
+               )
             )
 
          )
@@ -223,21 +175,6 @@ const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
 
 }
 
-
-const getRAProfilesAttributesDescriptorsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getRAProfilesAttributesDescriptorsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
 
 const createAuthority: AppEpic = (action$, state$, deps) => {
 
@@ -255,53 +192,22 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
             action.payload.kind
          ).pipe(
 
-            map(
-               obj => slice.actions.createAuthoritySuccess({ uuid: obj.uuid })
+            mergeMap(
+               obj => of(
+                  slice.actions.createAuthoritySuccess({ uuid: obj.uuid }),
+                  appRedirectActions.redirect({ url: `../detail/${obj.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.createAuthorityFailure({ error: extractError(err, "Failed to create Authority") }))
+               err => of(
+                  slice.actions.createAuthorityFailure({ error: extractError(err, "Failed to create Authority") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to create Authority" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const createAuthoritySuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createAuthoritySuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.uuid}`);
-            return EMPTY;
-         }
-      )
-
-   );
-
-}
-
-
-const createAuthorityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createAuthorityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -324,53 +230,23 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
             action.payload.attributes.map(transformAttributeModelToDTO),
          ).pipe(
 
-            map(
-               authorityDto => slice.actions.updateAuthoritySuccess({ authority: transformAuthorityDtoToModel(authorityDto) })
+            mergeMap(
+               authorityDto => of(
+                  slice.actions.updateAuthoritySuccess({ authority: transformAuthorityDtoToModel(authorityDto) }),
+                  appRedirectActions.redirect({ url: `../../detail/${authorityDto.uuid}` })
+
+               )
             ),
 
             catchError(
-               err => of(slice.actions.updateAuthorityFailure({ error: extractError(err, "Failed to update Authority") }))
+               err => of(
+                  slice.actions.updateAuthorityFailure({ error: extractError(err, "Failed to update Authority") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to update Authority" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const updateAuthoritySuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateAuthoritySuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            history.push(`../detail/${action.payload.authority.uuid}`);
-            return EMPTY;
-         }
-      )
-
-   );
-
-}
-
-
-const updateAuthorityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateAuthorityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -389,53 +265,22 @@ const deleteAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.deleteAuthority(action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteAuthoritySuccess({ uuid: action.payload.uuid })
+            mergeMap(
+               () => of(
+                  slice.actions.deleteAuthoritySuccess({ uuid: action.payload.uuid }),
+                  appRedirectActions.redirect({ url: "../../" })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.deleteAuthorityFailure({ error: extractError(err, "Failed to delete Authority") }))
+               err => of(
+                  slice.actions.deleteAuthorityFailure({ error: extractError(err, "Failed to delete Authority") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete Authority" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deleteAuthoritySuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteAuthoritySuccess.match
-      ),
-      switchMap(
-
-         () => {
-            history.push(`../`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const deleteAuthorityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteAuthorityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -459,27 +304,14 @@ const bulkDeleteAuthority: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk delete Authorities") }))
+               err => of(
+                  slice.actions.bulkDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk delete Authorities") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete Authorities" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkDeleteAuthorityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDeleteAuthorityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -499,12 +331,27 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.bulkForceDeleteAuthority(action.payload.uuids).pipe(
 
-            map(
-               () => slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
+            mergeMap(
+
+               () => iif(
+
+                  () => !!action.payload.redirect,
+                  of(
+                     slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.bulkForceDeleteAuthoritySuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
+                  )
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.bulkForceDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk force delete Authorities") }))
+               err => of(
+                  slice.actions.bulkForceDeleteAuthorityFailure({ error: extractError(err, "Failed to bulk force delete Authorities") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to bulk force delete Authorities" })
+               )
             )
 
          )
@@ -516,66 +363,17 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
 }
 
 
-const bulkForceDeleteAuthoritySuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteAuthoritySuccess.match
-      ),
-      switchMap(
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-const bulkForceDeleteAuthorityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteAuthorityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listAuthorities,
-   listAuthoritiesFailure,
    getAuthorityDetail,
-   getAuthorityDetailFailure,
    listAuthorityProviders,
-   listAuthorityProvidersFailure,
    getAuthorityProviderAttributesDescriptors,
-   getAuthorityProviderAttributesDescriptorsFailure,
    getRAProfilesAttributesDescriptors,
-   getRAProfilesAttributesDescriptorsFailure,
    createAuthority,
-   createAuthoritySuccess,
-   createAuthorityFailure,
    updateAuthority,
-   updateAuthoritySuccess,
-   updateAuthorityFailure,
    deleteAuthority,
-   deleteAuthoritySuccess,
-   deleteAuthorityFailure,
    bulkDeleteAuthority,
-   bulkDeleteAuthorityFailure,
    bulkForceDeleteAuthority,
-   bulkForceDeleteAuthoritySuccess,
-   bulkForceDeleteAuthorityFailure,
 ];
 
 

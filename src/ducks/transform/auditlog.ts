@@ -1,5 +1,5 @@
 import { AuditLogDTO } from "api/auditLogs";
-import { AuditLogModel } from "models";
+import { AuditLogModel } from "models/audit-log";
 
 export function transformAuditLogDTOToModel(auditLog: AuditLogDTO): AuditLogModel {
 

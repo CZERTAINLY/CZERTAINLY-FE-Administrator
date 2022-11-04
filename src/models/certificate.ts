@@ -1,4 +1,3 @@
-import { DistinguishedName, Extension, PublicKey } from "@fidm/x509";
 import { CertificateEvent, CertificateFilterCondition, CertificateFilterField, Status, ValidationStatus } from "types/certificate";
 import { AttributeModel } from "./attributes/AttributeModel";
 import { GroupModel } from "./groups";
@@ -164,10 +163,10 @@ export interface X509Certificate {
    readonly uris: string[];
    readonly validFrom: Date;
    readonly validTo: Date;
-   readonly issuer: DistinguishedName;
-   readonly subject: DistinguishedName;
-   readonly extensions: Extension[];
-   readonly publicKey: PublicKey;
+   readonly issuer: string;
+   readonly subject: string;
+   readonly extensions: string[];
+   readonly publicKey: string;
    readonly publicKeyRaw: Buffer;
    //readonly tbsCertificate: ASN1;
 

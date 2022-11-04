@@ -1,4 +1,4 @@
-import { HttpMethod } from "ts-rest-client";
+import { HttpMethod } from "utils/FetchHttpService/HttpRequestOptions";
 import { AttributeDescriptorCallbackMappingModel } from "./AttributeDescriptorCallbackMappingModel";
 
 export interface AttributeDescriptorCallbackModel {

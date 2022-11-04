@@ -1,13 +1,12 @@
-import { EMPTY, of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, switchMap, mergeMap } from "rxjs/operators";
-
-import history from "browser-history";
 
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
-import { actions as alertActions } from "./alerts";
 import { slice } from "./entities";
+import { actions as appRedirectActions } from "./app-redirect";
+
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformEntityDtoToModel } from "./transform/entities";
 import { transformConnectorDTOToModel } from "./transform/connectors";
@@ -29,25 +28,13 @@ const listEntityProviders: AppEpic = (action$, state, deps) => {
                })
             ),
 
-            catchError((err) =>
-               of(
-                  slice.actions.listEntityProvidersFailure({ error: extractError(err, "Failed to get Entity Provider list") })
+            catchError(
+               error => of(
+                  slice.actions.listEntityProvidersFailure({ error: extractError(error, "Failed to get Entity Provider list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Entity Provider list" })
                )
             )
          )
-      )
-   );
-}
-
-
-const listAuthorityProvidersFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-      filter(
-         slice.actions.listEntityProvidersFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
    );
 }
@@ -75,7 +62,10 @@ const getEntityProviderAttributesDescriptors: AppEpic = (action$, state, deps) =
             ),
 
             catchError(
-               err => of(slice.actions.getEntityProviderAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Entity Provider Attribute Descriptor list") }))
+               error => of(
+                  slice.actions.getEntityProviderAttributeDescriptorsFailure({ error: extractError(error, "Failed to get Entity Provider Attribute Descriptor list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Entity Provider Attribute Descriptor list" })
+               )
             )
 
          )
@@ -83,21 +73,6 @@ const getEntityProviderAttributesDescriptors: AppEpic = (action$, state, deps) =
       )
 
    );
-}
-
-
-const getAuthorityProviderAttributesDescriptorsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getEntityProviderAttributeDescriptorsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
-
 }
 
 
@@ -119,28 +94,15 @@ const listEntities: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listEntitiesFailure({ error: extractError(err, "Failed to get list of Entities") }))
+               error => of(
+                  slice.actions.listEntitiesFailure({ error: extractError(error, "Failed to get list of Entities") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get list of Entities" })
+               )
             )
 
 
          )
 
-      )
-
-   );
-
-}
-
-
-const listEntitiesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listEntitiesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -164,27 +126,14 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getEntityDetailFailure({ error: extractError(err, "Failed to get Entity detail") }))
+               error => of(
+                  slice.actions.getEntityDetailFailure({ error: extractError(error, "Failed to get Entity detail") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Entity detail" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getEntityDetailFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getEntityDetailFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -208,55 +157,24 @@ const addEntity: AppEpic = (action$, state$, deps) => {
             action.payload.kind
          ).pipe(
 
-            map(
-               obj => slice.actions.addEntitySuccess({ uuid: obj.uuid })
+            mergeMap(
+               obj => of(
+                  slice.actions.addEntitySuccess({ uuid: obj.uuid }),
+                  appRedirectActions.redirect({ url: `../detail/${obj.uuid}` })
+               )
             ),
 
             catchError(
 
-               err => of(slice.actions.addEntityFailure({ error: extractError(err, "Failed to add Entity") }))
+               error => of(
+                  slice.actions.addEntityFailure({ error: extractError(error, "Failed to add Entity") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to add Entity" })
+               )
 
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const addEntitySuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.addEntitySuccess.match
-      ),
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   );
-
-}
-
-
-const addEntityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.addEntityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -278,12 +196,18 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
             action.payload.attributes.map(transformAttributeModelToDTO)
          ).pipe(
 
-            map(
-               entity => slice.actions.updateEntitySuccess({ entity: transformEntityDtoToModel(entity) })
+            mergeMap(
+               entity => of(
+                  slice.actions.updateEntitySuccess({ entity: transformEntityDtoToModel(entity) }),
+                  appRedirectActions.redirect({ url: `../../detail/${entity.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.updateEntityFailure({ error: extractError(err, "Failed to update Entity") }))
+               error => of(
+                  slice.actions.updateEntityFailure({ error: extractError(error, "Failed to update Entity") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to update Entity" })
+               )
             )
 
          )
@@ -293,44 +217,6 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
    );
 
 }
-
-
-const updateEntitySuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateEntitySuccess.match
-      ),
-      switchMap(
-
-         action => {
-            history.push(`../detail/${action.payload.entity.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   );
-
-}
-
-
-const updateEntityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateEntityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
 
 
 const deleteEntity: AppEpic = (action$, state$, deps) => {
@@ -344,53 +230,29 @@ const deleteEntity: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.entities.removeEntity(action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteEntitySuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+            mergeMap(
+               () => iif(
+
+                  () => !!action.payload.redirect,
+                  of(
+                     slice.actions.deleteEntitySuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.deleteEntitySuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect }),
+                  )
+               )
             ),
 
             catchError(
-               err => of(slice.actions.deleteEntityFailure({ error: extractError(err, "Failed to delete Entity") }))
+               error => of(
+                  slice.actions.deleteEntityFailure({ error: extractError(error, "Failed to delete Entity") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete Entity" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deleteEntitySuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteEntitySuccess.match
-      ),
-      switchMap(
-
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-};
-
-
-const deleteEntityFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteEntityFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -414,7 +276,10 @@ const listLocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listLocationAttributeDescriptorsFailure({ error: extractError(err, "Failed to get Location Attribute Descriptors") }))
+               error => of(
+                  slice.actions.listLocationAttributeDescriptorsFailure({ error: extractError(error, "Failed to get Location Attribute Descriptors") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Location Attribute Descriptors" })
+               )
             )
 
          )
@@ -426,42 +291,15 @@ const listLocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listLocationAttributeDescriptorsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listLocationAttributeDescriptorsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listEntityProviders,
-   listAuthorityProvidersFailure,
    getEntityProviderAttributesDescriptors,
-   getAuthorityProviderAttributesDescriptorsFailure,
    listEntities,
-   listEntitiesFailure,
    getEntityDetail,
-   getEntityDetailFailure,
    addEntity,
-   addEntitySuccess,
-   addEntityFailure,
    updateEntity,
-   updateEntitySuccess,
-   updateEntityFailure,
    deleteEntity,
-   deleteEntitySuccess,
-   deleteEntityFailure,
    listLocationAttributeDescriptors,
-   listLocationAttributeDescriptorsFailure
 ];
 
 

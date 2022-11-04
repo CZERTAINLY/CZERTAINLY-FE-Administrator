@@ -1,14 +1,12 @@
 import { AppEpic } from "ducks";
-import { EMPTY, of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import history from "browser-history";
-
-import { actions as alertActions } from "./alerts";
 import { extractError } from "utils/net";
-import { slice } from "./locations";
 
+import { slice } from "./locations";
 import { slice as certsSlice } from "./certificates";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transformLocationDtoToModel } from "./transform/locations";
@@ -31,27 +29,15 @@ const listLocations: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listLocationsFailure({ error: extractError(err, "Failed to get Location list") }))
+               error => of(
+                  slice.actions.listLocationsFailure({ error: extractError(error, "Failed to get Location list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Location list" })
+               )
             )
 
          )
       )
    );
-}
-
-
-const listLocationsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listLocationsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
-
 }
 
 
@@ -71,27 +57,14 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getLocationDetailFailure({ error: extractError(err, "Failed to get Location detail") }))
+               error => of(
+                  slice.actions.getLocationDetailFailure({ error: extractError(error, "Failed to get Location detail") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Location detail" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getLocationDetailFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getLocationDetailFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -120,8 +93,11 @@ const addLocation: AppEpic = (action$, state, deps) => {
 
                obj => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, obj.uuid).pipe(
 
-                  map(
-                     location => slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location), entityUuid: action.payload.entityUuid })
+                  mergeMap(
+                     location => of(
+                        slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location), entityUuid: action.payload.entityUuid }),
+                        appRedirectActions.redirect({ url: `../detail/${action.payload.entityUuid}/${location.uuid}` })
+                     )
                   )
 
                )
@@ -129,46 +105,14 @@ const addLocation: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.addLocationFailure({ error: extractError(err, "Failed to add Location") }))
+               error => of(
+                  slice.actions.addLocationFailure({ error: extractError(error, "Failed to add Location") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to add Location" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const addLocationSuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.addLocationSuccess.match
-      ),
-      switchMap(
-         action => {
-            history.push(`./detail/${action.payload.entityUuid}/${action.payload.location.uuid}`);
-            return EMPTY;
-         }
-      )
-
-   );
-
-}
-
-
-const addLocationFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.addLocationFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -193,51 +137,22 @@ const editLocation: AppEpic = (action$, state, deps) => {
             action.payload.enabled
          ).pipe(
 
-            map(
-               location => slice.actions.editLocationSuccess({ location: transformLocationDtoToModel(location) })
+            mergeMap(
+               location => of(
+                  slice.actions.editLocationSuccess({ location: transformLocationDtoToModel(location) }),
+                  appRedirectActions.redirect({ url: `../../../detail/${action.payload.entityUuid}/${location.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.editLocationFailure({ error: extractError(err, "Failed to edit Location") }))
+               error => of(
+                  slice.actions.editLocationFailure({ error: extractError(error, "Failed to edit Location") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to edit Location" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const editLocationSuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.editLocationSuccess.match
-      ),
-      switchMap(
-         action => {
-            history.push(`../../detail/${action.payload.location.entityInstanceUuid}/${action.payload.location.uuid}`);
-            return EMPTY;
-         }
-      )
-
-   );
-
-}
-
-
-const editLocationFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.editLocationFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -256,55 +171,28 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.locations.deleteLocation(action.payload.entityUuid, action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+            mergeMap(
+               () => iif(
+                  () => !!action.payload.redirect,
+                  of(
+                     slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.deleteLocationSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+                  )
+               )
             ),
 
             catchError(
-               err => of(slice.actions.deleteLocationFailure({ error: extractError(err, "Failed to delete Location") }))
+               error => of(
+                  slice.actions.deleteLocationFailure({ error: extractError(error, "Failed to delete Location") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete Location" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-
-
-const deleteLocationSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteLocationSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-};
-
-
-const deleteLocationFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteLocationFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -328,27 +216,14 @@ const enableLocation: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.enableLocationFailure({ error: extractError(err, "Failed to enable Location") }))
+               error => of(
+                  slice.actions.enableLocationFailure({ error: extractError(error, "Failed to enable Location") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to enable Location" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const enableLocationFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.enableLocationFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -372,27 +247,14 @@ const disableLocation: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.disableLocationFailure({ error: extractError(err, "Failed to disable Location") }))
+               error => of(
+                  slice.actions.disableLocationFailure({ error: extractError(error, "Failed to disable Location") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to disable Location" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const disableLocationFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.disableLocationFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -416,27 +278,14 @@ const getPushAttributes: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getPushAttributesFailure({ error: extractError(err, "Failed to get Push Attributes") }))
+               error => of(
+                  slice.actions.getPushAttributesFailure({ error: extractError(error, "Failed to get Push Attributes") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Push Attributes" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getPushAttributesFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getPushAttributesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -460,27 +309,14 @@ const getCSRAttributes: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getCSRAttributesFailure({ error: extractError(err, "Failed to get CSR Attributes") }))
+               error => of(
+                  slice.actions.getCSRAttributesFailure({ error: extractError(error, "Failed to get CSR Attributes") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get CSR Attributes" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getCSRAttributesFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getCSRAttributesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -512,48 +348,14 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.pushCertificateFailure({ error: extractError(err, "Failed to push Certificate") }))
+               error => of(
+                  slice.actions.pushCertificateFailure({ error: extractError(error, "Failed to push Certificate") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to push Certificate" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const pushCertificateSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.pushCertificateSuccess.match
-      ),
-      switchMap(
-
-         action => state.value.certificates.certificateDetail?.uuid === action.payload.certificateUuid ?
-            of(certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid }))
-            :
-            EMPTY
-
-      )
-
-   );
-
-}
-
-
-const pushCertificateFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.pushCertificateFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -583,27 +385,14 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.issueCertificateFailure({ error: extractError(err, "Failed to issue Certificate") }))
+               error => of(
+                  slice.actions.issueCertificateFailure({ error: extractError(error, "Failed to issue Certificate") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to issue Certificate" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const issueCertificateFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.issueCertificateFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -626,55 +415,22 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
             action.payload.certificateUuid
          ).pipe(
 
-            map(
-               location => slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid })
+            mergeMap(
+               location => of(
+                  slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
+                  certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.autoRenewCertificateFailure({ error: extractError(err, "Failed to auto-renew Certificate") }))
+               error => of(
+                  slice.actions.autoRenewCertificateFailure({ error: extractError(error, "Failed to auto-renew Certificate") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to auto-renew Certificate" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-
-const autoRenewCertificateSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.autoRenewCertificateSuccess.match
-      ),
-      switchMap(
-
-         action => state.value.certificates.certificateDetail?.uuid === action.payload.certificateUuid ?
-            of(certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid }))
-            :
-            EMPTY
-
-      )
-
-   );
-
-}
-
-
-
-const autoRenewCertificateFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.autoRenewCertificateFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -697,12 +453,18 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
             action.payload.certificateUuid
          ).pipe(
 
-            map(
-               location => slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid })
+            mergeMap(
+               location => of(
+                  slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
+                  certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.removeCertificateFailure({ error: extractError(err, "Failed to remove Certificate") }))
+               error => of(
+                  slice.actions.removeCertificateFailure({ error: extractError(error, "Failed to remove Certificate") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to remove Certificate" })
+               )
             )
 
          )
@@ -714,40 +476,6 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
 }
 
 
-const removeCertificateSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.removeCertificateSuccess.match
-      ),
-      switchMap(
-
-         action => state.value.certificates.certificateDetail?.uuid === action.payload.certificateUuid ?
-            of(certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid }))
-            :
-            EMPTY
-
-      )
-
-   );
-
-}
-
-const removeCertificateFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.removeCertificateFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
 
 
 const syncLocation: AppEpic = (action$, state, deps) => {
@@ -766,7 +494,10 @@ const syncLocation: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.syncLocationFailure({ error: extractError(err, "Failed to sync Location") }))
+               error => of(
+                  slice.actions.syncLocationFailure({ error: extractError(error, "Failed to sync Location") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to sync Location" })
+               )
             )
 
          )
@@ -778,57 +509,21 @@ const syncLocation: AppEpic = (action$, state, deps) => {
 }
 
 
-const syncLocationFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.syncLocationFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listLocations,
-   listLocationsFailure,
    getLocationDetail,
-   getLocationDetailFailure,
    addLocation,
-   addLocationSuccess,
-   addLocationFailure,
    editLocation,
-   editLocationSuccess,
-   editLocationFailure,
    deleteLocation,
-   deleteLocationSuccess,
-   deleteLocationFailure,
    enableLocation,
-   enableLocationFailure,
    disableLocation,
-   disableLocationFailure,
    getPushAttributes,
-   getPushAttributesFailure,
    getCSRAttributes,
-   getCSRAttributesFailure,
    pushCertificate,
-   pushCertificateSuccess,
-   pushCertificateFailure,
    issueCertificate,
-   issueCertificateFailure,
    autoRenewCertificate,
-   autoRenewCertificateSuccess,
-   autoRenewCertificateFailure,
    removeCertificate,
-   removeCertificateSuccess,
-   removeCertificateFailure,
    syncLocation,
-   syncLocationFailure
 ];
 
 

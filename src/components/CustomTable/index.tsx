@@ -39,6 +39,7 @@ interface Props {
       page: number;
       totalItems: number;
       pageSize: number;
+      loadedPageSize: number;
       totalPages: number;
       itemsPerPageOptions: number[];
    }
@@ -267,12 +268,13 @@ function CustomTable({
             return;
          }
 
-         const checkedRows = tblData.slice((page - 1) * pageSize, page * pageSize).map(row => row.id);
+         const ps = paginationData ? paginationData.pageSize : pageSize;
+         const checkedRows = tblData.slice((page - 1) * ps, page * ps).map(row => row.id);
 
          setTblCheckedRows(checkedRows);
          if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
 
-      }, [tblData, onCheckedRowsChanged, pageSize, page]
+      }, [paginationData, pageSize, tblData, page, onCheckedRowsChanged]
 
    );
 
@@ -412,6 +414,17 @@ function CustomTable({
 
    );
 
+   const checkAllChecked = useMemo(
+
+      () => {
+         const ps = paginationData ? paginationData.pageSize : pageSize;
+         return tblCheckedRows.length === tblData.slice((page - 1) * ps, page * ps).length && tblData.length > 0;
+      },
+
+      [tblData, tblCheckedRows, paginationData, pageSize, page]
+
+   );
+
 
    const header = useMemo(
 
@@ -437,7 +450,7 @@ function CustomTable({
                         header.id === "__checkbox__" ? (
 
                            hasAllCheckBox && multiSelect? (
-                              <input type="checkbox" checked={tblCheckedRows.length === tblData.slice((page - 1) * pageSize, page * pageSize).length && tblData.length > 0} onChange={onCheckAllCheckboxClick} />
+                              <input type="checkbox" checked={checkAllChecked} onChange={onCheckAllCheckboxClick} />
                            ) : (
                               <>&nbsp;</>
                            )
@@ -486,7 +499,7 @@ function CustomTable({
 
          )
       },
-      [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, tblCheckedRows.length, tblData, page, pageSize, onCheckAllCheckboxClick]
+      [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick]
 
    );
 
@@ -507,7 +520,7 @@ function CustomTable({
 
             <Fragment key={row.id}>
 
-               <tr {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
+               <tr key={`tr${row.id}`} {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
                   {!hasDetails ? (<></>) : !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
                      {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}
@@ -536,7 +549,7 @@ function CustomTable({
 
                {!hasDetails ? (<></>) : (
 
-                  <tr>
+                  <tr key={`trd${row.id}`}>
 
                      {
                         row.detailColumns && expandedRow === row.id ? (
@@ -683,7 +696,7 @@ function CustomTable({
                      paginationData
                         ?
                         <div>
-                           Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to {(paginationData.page - 1) * paginationData.pageSize + paginationData.pageSize > paginationData.totalItems ? paginationData.totalItems : (paginationData.page - 1) * paginationData.pageSize + paginationData.pageSize} items of {paginationData.totalItems}
+                           Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to {(paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize > paginationData.totalItems ? paginationData.totalItems : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize} items of { paginationData.totalItems }
                         </div>
                         :
                         <div>

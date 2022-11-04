@@ -1,4 +1,4 @@
-@import "styles/app";
+@import "src/resources/styles/app";
 
 .root {
    width: $sidebar-width-open;
@@ -29,6 +29,11 @@
 .link {
    text-decoration: none;
    color: white;
+
+   &:hover {
+      text-decoration: none;
+   }
+
 }
 
 .header {

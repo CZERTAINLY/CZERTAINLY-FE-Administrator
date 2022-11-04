@@ -1,13 +1,14 @@
 import { AuditLogModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { FormValues } from "components/_pages/auditLogs/AuditLogsFilters";
 
 
 export type State = {
 
-   loadedPageNumber?: number;
-   loadedPageSize?: number;
-   totalPagesAvailable?: number;
+   loadedPageNumber: number;
+   loadedPageSize: number;
+   totalPagesAvailable: number;
 
    pageData: AuditLogModel[];
    isFetchingPageData: boolean;
@@ -26,6 +27,10 @@ export type State = {
 
 
 export const initialState: State = {
+
+   loadedPageNumber: 0,
+   loadedPageSize: 0,
+   totalPagesAvailable: 0,
 
    pageData: [],
    isFetchingPageData: false,
@@ -54,14 +59,10 @@ export const slice = createSlice({
       listLogs: (state, action: PayloadAction<{
          page: number,
          size: number,
-         sort?: string,
-         filters?: { [key: string]: string }
+         filters?: FormValues
       }>) => {
 
          state.pageData = [];
-         state.loadedPageNumber = undefined;
-         state.loadedPageSize = undefined;
-         state.totalPagesAvailable = undefined;
          state.isFetchingPageData = true;
 
       },
@@ -76,13 +77,14 @@ export const slice = createSlice({
 
          state.isFetchingPageData = false;
          state.loadedPageNumber = action.payload.page;
+         state.loadedPageSize = action.payload.size;
          state.pageData = action.payload.data;
          state.totalPagesAvailable = action.payload.total
 
       },
 
 
-      listLogsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listLogsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingPageData = false;
 
@@ -105,7 +107,7 @@ export const slice = createSlice({
       },
 
 
-      listObjectsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listObjectsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingObjects = false;
 
@@ -151,25 +153,25 @@ export const slice = createSlice({
       },
 
 
-      listStatusesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listStatusesFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingStatuses = false;
 
       },
 
-      purgeLogs: (state, action: PayloadAction<{ queryString: string, sort?: string, filters?: { [key: string]: string }}> ) => {
+      purgeLogs: (state, action: PayloadAction<{ queryString: string, filters?: FormValues}> ) => {
 
          state.isPurging = true;
 
       },
 
-      purgeLogsSuccess: (state, action: PayloadAction<{sort?: string, filters?: { [key: string]: string}}>) => {
+      purgeLogsSuccess: (state, action: PayloadAction<void>) => {
 
          state.isPurging = false;
 
       },
 
-      purgeLogsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      purgeLogsFailure: (state, action: PayloadAction<void>) => {
 
          state.isPurging = false;
 

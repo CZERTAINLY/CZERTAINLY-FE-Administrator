@@ -105,7 +105,7 @@ export const slice = createSlice({
       },
 
 
-      listAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false
 
@@ -137,7 +137,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false
 
@@ -174,7 +174,7 @@ export const slice = createSlice({
       },
 
 
-      createAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      createAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isCreating = false
 
@@ -221,7 +221,7 @@ export const slice = createSlice({
       },
 
 
-      updateAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      updateAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false
 
@@ -249,7 +249,7 @@ export const slice = createSlice({
       },
 
 
-      deleteAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      deleteAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false
          state.deleteErrorMessage = action.payload.error || "Unknown error";
@@ -277,7 +277,7 @@ export const slice = createSlice({
       },
 
 
-      enableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      enableAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isEnabling = false;
 
@@ -304,7 +304,7 @@ export const slice = createSlice({
       },
 
 
-      disableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      disableAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDisabling = false;
 
@@ -322,7 +322,7 @@ export const slice = createSlice({
       bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
 
          state.isBulkDeleting = false;
-         if (action.payload.errors.length > 0) {
+         if (action.payload.errors?.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return
          }
@@ -341,7 +341,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkDeleteAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDeleting = false;
 
@@ -373,7 +373,7 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkForceDeleteAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkForceDeleting = false;
 
@@ -405,7 +405,7 @@ export const slice = createSlice({
       },
 
 
-      bulkEnableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkEnableAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkEnabling = false
 
@@ -437,7 +437,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDisableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkDisableAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDisabling = false
 

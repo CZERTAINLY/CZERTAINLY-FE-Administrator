@@ -39,7 +39,7 @@ export const slice = createSlice({
       },
 
 
-      getDashboardFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getDashboardFailed: (state, action: PayloadAction<void>) => {
 
          state.isFetching = false;
 

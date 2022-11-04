@@ -1,10 +1,14 @@
 import { useCallback } from "react";
 import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { Field, useForm } from "react-final-form";
-import Select from "react-select";
-import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
-import { InputType } from "reactstrap/es/Input";
+
+import { Input, FormFeedback, FormText, Label, FormGroup } from "reactstrap";
+import { InputType } from "reactstrap/types/lib/Input";
+
 import { AttributeType } from "types/attributes";
+
+import Select from "react-select";
+
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
 
 
@@ -26,7 +30,7 @@ export function Attribute({
 
    const onFileLoaded = useCallback(
 
-      (data, fileName) => {
+      (data: ProgressEvent<FileReader>, fileName: string) => {
 
          const fileInfo = data.target!.result as string;
 

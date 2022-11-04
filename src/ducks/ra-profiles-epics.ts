@@ -1,11 +1,12 @@
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { iif, of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import { actions as alertActions } from "./alerts";
-import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
+import { extractError } from "utils/net";
+
 import { slice } from "./ra-profiles";
-import history from "browser-history";
+import { actions as appRedirectActions } from "./app-redirect";
+
 import { transformRaAcmeLinkDtoToModel, transformRaAuthorizedClientDtoToModel, transformRaProfileDtoToModel } from "./transform/ra-profiles";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
 import { transfromRaAcmeLinkDtoToModel } from "./transform/acme-profiles";
@@ -30,24 +31,12 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listRaProfilesFailure({ error: extractError(err, "Failed to get RA profiles list") }))
+               error => of(
+                  slice.actions.listRaProfilesFailure({ error: extractError(error, "Failed to get RA profiles list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get RA profiles list" })
+               )
             )
          )
-      )
-   );
-
-}
-
-
-const listRaProfilesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listRaProfilesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
    );
 
@@ -72,26 +61,13 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }))
+               err => of(
+                  slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get RA Profile detail" })
+               )
             )
 
          )
-      )
-
-   );
-
-}
-
-
-const getRaProfileDetailFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getRaProfileDetailFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -117,30 +93,16 @@ const listAuthorizedClients: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listAuthorizedClientsFailure({ error: extractError(err, "Failed to get list of authorized clients") }))
+               err => of(
+                  slice.actions.listAuthorizedClientsFailure({ error: extractError(err, "Failed to get list of authorized clients") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get list of authorized clients" })
+               )
             )
          )
 
       )
 
    );
-}
-
-
-const listAuthorizedClientsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listAuthorizedClientsFailure.match
-      ),
-
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
 }
 
 
@@ -161,12 +123,18 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
             action.payload.description
          ).pipe(
 
-            map(
-               obj => slice.actions.createRaProfileSuccess({ uuid: obj.uuid, authorityInstanceUuid: action.payload.authorityInstanceUuid })
+            mergeMap(
+               obj => of(
+                  slice.actions.createRaProfileSuccess({ uuid: obj.uuid, authorityInstanceUuid: action.payload.authorityInstanceUuid }),
+                  appRedirectActions.redirect({ url: `../detail/${action.payload.authorityInstanceUuid}/${obj.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.createRaProfileFailure({ error: extractError(err, "Failed to create profile") }))
+               err => of(
+                  slice.actions.createRaProfileFailure({ error: extractError(err, "Failed to create profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to create profile" })
+               )
             )
          )
       )
@@ -174,45 +142,6 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
    );
 
 }
-
-
-const createRaProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createRaProfileSuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.authorityInstanceUuid}/${action.payload.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const createRaProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-      filter(
-         slice.actions.createRaProfileFailure.match
-      ),
-
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
 
 
 const updateRaProfile: AppEpic = (action$, state$, deps) => {
@@ -232,11 +161,29 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
             action.payload.description
          ).pipe(
 
-            map(
-               raProfileDTO => slice.actions.updateRaProfileSuccess({
-                  raProfile: transformRaProfileDtoToModel(raProfileDTO),
-                  redirect: action.payload.redirect
-               })
+            mergeMap(
+
+               raProfileDTO => iif(
+
+                  () => !!action.payload.redirect,
+                  of(
+
+                     slice.actions.updateRaProfileSuccess({
+                        raProfile: transformRaProfileDtoToModel(raProfileDTO),
+                        redirect: action.payload.redirect
+                     }),
+
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+
+                  ),
+                  of(
+                     slice.actions.updateRaProfileSuccess({
+                        raProfile: transformRaProfileDtoToModel(raProfileDTO),
+                        redirect: action.payload.redirect
+                     })
+                  )
+               )
+
             ),
 
             catchError(
@@ -245,44 +192,6 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
 
          )
 
-      )
-
-   );
-
-}
-
-
-const updateRaProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateRaProfileSuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const updateRaProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateRaProfileFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -307,27 +216,15 @@ const enableRaProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.enableRaProfileFailure({ error: extractError(err, "Failed to enable profile") }))
+               err => of(
+                  slice.actions.enableRaProfileFailure({ error: extractError(err, "Failed to enable profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to enable profile" })
+               )
             )
 
          )
       )
 
-   );
-
-}
-
-
-const enableRaProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.enableRaProfileFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
    );
 
 }
@@ -350,27 +247,13 @@ const disableRaProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.enableRaProfileFailure({ error: extractError(err, "Failed to disable profile") }))
+               err => of(
+                  slice.actions.enableRaProfileFailure({ error: extractError(err, "Failed to disable profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to disable profile" })
+               )
             )
 
          )
-      )
-
-   );
-
-}
-
-
-const disableRaProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.disableRaProfileFailure.match
-      ),
-
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -389,53 +272,31 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.profiles.deleteRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+            mergeMap(
+
+               () => iif(
+
+                  () => !!action.payload.redirect,
+                  of(
+                     slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.deleteRaProfileSuccess({ uuid: action.payload.uuid })
+                  )
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete profile") }))
+               err => of(
+                  slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete profile" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deleteRaProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteRaProfileSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const deleteRaProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteRaProfileFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -467,27 +328,14 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.activateAcmeFailure({ error: extractError(err, "Failed to activate ACME") }))
+               err => of(
+                  slice.actions.activateAcmeFailure({ error: extractError(err, "Failed to activate ACME") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to activate ACME" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const activateAcmeFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.activateAcmeFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -511,27 +359,14 @@ const deactivateAcme: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.deactivateAcmeFailure({ error: extractError(err, "Failed to deactivate ACME") }))
+               err => of(
+                  slice.actions.deactivateAcmeFailure({ error: extractError(err, "Failed to deactivate ACME") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to deactivate ACME" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deactivateAcmeFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deactivateAcmeFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -557,7 +392,10 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getAcmeDetailsFailure({ error: extractError(err, "Failed to get ACME details") }))
+               err => of(
+                  slice.actions.getAcmeDetailsFailure({ error: extractError(err, "Failed to get ACME details") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get ACME details" })
+               )
             )
 
          )
@@ -568,21 +406,6 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
 
 }
 
-
-const getAcmeDetailsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getAcmeDetailsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
 
 
 const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
@@ -604,26 +427,13 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listIssuanceAttributesFailure({ error: extractError(err, "Failed to list issuance attributes") }))
+               err => of(
+                  slice.actions.listIssuanceAttributesFailure({ error: extractError(err, "Failed to list issuance attributes") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to list issuance attributes" })
+               )
             )
 
          )
-      )
-
-   );
-
-}
-
-
-const listIssuanceAttributeDescriptorsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listIssuanceAttributesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -651,7 +461,10 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listRevocationAttributeDescriptorsFailure({ error: extractError(err, "Failed to list revocation attributes") }))
+               err => of(
+                  slice.actions.listRevocationAttributeDescriptorsFailure({ error: extractError(err, "Failed to list revocation attributes") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to list revocation attributes" })
+               )
             )
 
          )
@@ -662,22 +475,6 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
 }
 
-
-const listRevocationAttributeDescriptorsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listRevocationAttributeDescriptorsFailure.match
-      ),
-
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
 
 
 const bulkEnableProfiles: AppEpic = (action$, state$, deps) => {
@@ -696,27 +493,14 @@ const bulkEnableProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkEnableRaProfilesFailure({ error: extractError(err, "Failed to enable profiles") }))
+               err => of(
+                  slice.actions.bulkEnableRaProfilesFailure({ error: extractError(err, "Failed to enable profiles") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to enable profiles" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkEnableProfilesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkEnableRaProfilesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -741,27 +525,14 @@ const bulkDisableProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDisableRaProfilesFailure({ error: extractError(err, "Failed to disable profiles") }))
+               err => of(
+                  slice.actions.bulkDisableRaProfilesFailure({ error: extractError(err, "Failed to disable profiles") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to disable profiles" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkDisableProfilesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDisableRaProfilesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -785,7 +556,10 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDeleteRaProfilesFailure({ error: extractError(err, "Failed to delete profiles") }))
+               err => of(
+                  slice.actions.bulkDeleteRaProfilesFailure({ error: extractError(err, "Failed to delete profiles") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete profiles" })
+               )
             )
 
          )
@@ -794,24 +568,6 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
    );
 
 }
-
-
-const bulkDeleteProfilesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDeleteRaProfilesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 
 
 const checkCompliance: AppEpic = (action$, state$, deps) => {
@@ -832,7 +588,10 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
+               err => of(
+                  slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to start compliance check") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to start compliance check" })
+               )
 
             )
 
@@ -841,38 +600,6 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const checkComplianceFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.checkComplianceFailed.match
-      ),
-      map(
-
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-}
-
-
-const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.checkComplianceSuccess.match
-      ),
-      map(
-
-         action => alertActions.success("Compliance Check for the certificates initiated")
-      )
-
-   );
 }
 
 
@@ -891,11 +618,19 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
          ).pipe(
 
             map(
-               () => slice.actions.associateRaProfileSuccess({ uuid: action.payload.uuid, complianceProfileUuid: action.payload.complianceProfileUuid, complianceProfileName: action.payload.complianceProfileName, description: action.payload.description })
+               () => slice.actions.associateRaProfileSuccess({
+                  uuid: action.payload.uuid,
+                  complianceProfileUuid: action.payload.complianceProfileUuid,
+                  complianceProfileName: action.payload.complianceProfileName,
+                  description: action.payload.description
+               })
             ),
 
             catchError(
-               err => of(slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }))
+               err => of(
+                  slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to associate RA Profile to Compliance Profile" })
+               )
             )
 
          )
@@ -903,21 +638,6 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const associateRaProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.associateRaProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -940,7 +660,10 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }))
+               err => of(
+                  slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to dissociate RA Profile from Compliance Profile" })
+               )
             )
 
          )
@@ -948,21 +671,6 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const dissociateRaProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.dissociateRaProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -984,7 +692,10 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getComplianceProfilesForRaProfileFailure({ error: extractError(err, "Failed to get associated Compliance Profiles") }))
+               err => of(
+                  slice.actions.getComplianceProfilesForRaProfileFailure({ error: extractError(err, "Failed to get associated Compliance Profiles") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get associated Compliance Profiles" })
+               )
             )
 
          )
@@ -995,67 +706,27 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
 }
 
 
-const getComplianceProfilesForRaProfileFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getComplianceProfilesForRaProfileFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listRaProfiles,
-   listRaProfilesFailure,
    listAuthorizedClients,
-   listAuthorizedClientsFailure,
    getRaProfileDetail,
-   getRaProfileDetailFailure,
    createRaProfile,
-   createRaProfileFailure,
-   createRaProfileSuccess,
    updateRaProfile,
-   updateRaProfileSuccess,
-   updateRaProfileFailure,
    enableRaProfile,
-   enableRaProfileFailure,
    disableRaProfile,
-   disableRaProfileFailure,
    deleteRaProfile,
-   deleteRaProfileSuccess,
-   deleteRaProfileFailure,
    activateAcme,
-   activateAcmeFailure,
    deactivateAcme,
-   deactivateAcmeFailure,
    getAcmeDetails,
-   getAcmeDetailsFailure,
    listIssuanceAttributeDescriptors,
-   listIssuanceAttributeDescriptorsFailure,
    listRevocationAttributeDescriptors,
-   listRevocationAttributeDescriptorsFailure,
    bulkEnableProfiles,
-   bulkEnableProfilesFailure,
    bulkDisableProfiles,
-   bulkDisableProfilesFailure,
    bulkDeleteProfiles,
-   bulkDeleteProfilesFailure,
    checkCompliance,
-   checkComplianceFailed,
-   checkComplianceSuccess,
    associateRaProfile,
-   associateRaProfileFailed,
    dissociateRaProfile,
-   dissociateRaProfileFailed,
    getComplianceProfilesForRaProfile,
-   getComplianceProfilesForRaProfileFailure
 ];
 
 

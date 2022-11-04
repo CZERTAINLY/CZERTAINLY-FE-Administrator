@@ -1,5 +1,5 @@
 import { GroupDTO } from "api/groups";
-import { GroupModel } from "models";
+import { GroupModel } from "models/groups";
 
 export function transformGroupDtoToModel(groupDto: GroupDTO): GroupModel {
 

@@ -19,15 +19,13 @@ export class AuditLogsBackend implements model.AuditLogsApi {
    }
 
 
-   getLogs(page: number, size: number, sort?: string, filters?: { [key: string]: string }): Observable<model.PagedAuditLog> {
+   getLogs(page: number, size: number, filters?: { [key: string]: string }): Observable<model.PagedAuditLog> {
 
       const params = new NamedValues({
          page: page.toString(),
          size: size.toString(),
          ...(filters || {}),
       });
-
-      if (sort) params.set('sort', sort);
 
       return this._fetchService.request
          (new HttpRequestOptions(

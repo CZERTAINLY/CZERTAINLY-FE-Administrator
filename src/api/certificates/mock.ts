@@ -1,10 +1,10 @@
 import { Observable, of } from "rxjs";
 import { delay, map } from "rxjs/operators";
-import { HttpErrorResponse } from "ts-rest-client";
+import { HttpErrorResponse } from "utils/FetchHttpService";
 
 import * as model from "./model";
 
-import { dbData } from "mocks/db";
+import { dbData } from "api/_mocks/db";
 import { randomDelay } from "utils/mock";
 import { LocationDTO } from "api/location";
 

@@ -1,5 +1,4 @@
-import { MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from "mdbreact";
-import { Button } from "reactstrap";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
 interface DialogButton {
 
@@ -24,17 +23,17 @@ export default function Dialog(props: Props) {
 
    return (
 
-      <MDBModal size={props.size || undefined} overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
+      <Modal size={props.size || undefined} overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
 
-         <MDBModalHeader toggle={() => { if (props.toggle) props.toggle() }}>
+         <ModalHeader toggle={() => { if (props.toggle) props.toggle() }}>
             {props.caption}
-         </MDBModalHeader>
+         </ModalHeader>
 
-         <MDBModalBody>
+         <ModalBody>
             {props.body}
-         </MDBModalBody>
+         </ModalBody>
 
-         <MDBModalFooter>
+         <ModalFooter>
 
             {!props.buttons ? <></> : props.buttons.map(
 
@@ -46,9 +45,9 @@ export default function Dialog(props: Props) {
 
             )}
 
-         </MDBModalFooter>
+         </ModalFooter>
 
-      </MDBModal>
+      </Modal>
 
    )
 

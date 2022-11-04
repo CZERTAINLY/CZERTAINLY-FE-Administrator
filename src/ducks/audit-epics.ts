@@ -2,11 +2,10 @@ import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
-import { extractError } from "utils/net";
 
 import * as slice from "./audit";
-import { actions as alertActions } from "./alerts";
 import { transformAuditLogDTOToModel } from "./transform/auditlog";
+import { actions as appRedirectActions } from "./app-redirect";
 
 
 const listLogs: AppEpic = (action$, state, deps) => {
@@ -21,7 +20,6 @@ const listLogs: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.getLogs(
             action.payload.page,
             action.payload.size,
-            action.payload.sort,
             action.payload.filters
          ).pipe(
 
@@ -35,27 +33,12 @@ const listLogs: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listLogsFailure({ error: extractError(err, "Failed to get audit logs list") }))
+               error => of(slice.actions.listLogsFailure(),
+                   appRedirectActions.fetchError({ error, message: "Failed to get audit logs list" }))
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const listLogsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listLogsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -79,27 +62,12 @@ const listObjects: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get objects list") }))
+               error => of(slice.actions.listObjectsFailure(),
+                   appRedirectActions.fetchError({ error, message: "Failed to get objects list" }))
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const listObjectsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listObjectsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -123,27 +91,12 @@ const listOperations: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listObjectsFailure({ error: extractError(err, "Failed to get operations list") }))
+               error => of(slice.actions.listObjectsFailure(),
+                   appRedirectActions.fetchError({ error, message: "Failed to get operations list" }))
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const listOperationsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listOperationsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.errors || "Unexpected error occured")
       )
 
    )
@@ -167,7 +120,8 @@ const listStatuses: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listStatusesFailure({ error: extractError(err, "Failed to get statuses list") }))
+               error => of(slice.actions.listStatusesFailure(),
+                   appRedirectActions.fetchError({ error, message: "Failed to get statuses list" }))
             )
 
          )
@@ -178,21 +132,6 @@ const listStatuses: AppEpic = (action$, state, deps) => {
 
 }
 
-
-const listStatusesFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listStatusesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
-      )
-
-   )
-
-}
 
 const purgeLogs: AppEpic = (action$, state, deps) => {
 
@@ -206,11 +145,12 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
 
             map(
-               () => slice.actions.purgeLogsSuccess({ filters: action.payload.filters, sort: action.payload.sort })
+               () => slice.actions.listLogs({ page: 0, size: 10, filters: action.payload.filters })
             ),
 
             catchError(
-               err => of(slice.actions.purgeLogsFailure({ error: extractError(err, "Failed to purge audit logs") }))
+               error => of(slice.actions.purgeLogsFailure(),
+                   appRedirectActions.fetchError({ error, message: "Failed to purge audit logs" }))
             )
 
          )
@@ -221,49 +161,12 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
 
 }
 
-
-const purgeLogsSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.purgeLogsSuccess.match
-      ),
-      map(
-         action => slice.actions.listLogs({ page: 0, size: 10, sort: action.payload.sort, filters: action.payload.filters })
-      )
-
-   )
-
-}
-
-const purgeLogsFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.purgeLogsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
-      )
-
-   )
-
-}
-
 const epics = [
    listLogs,
-   listLogsFailure,
    listObjects,
-   listObjectsFailure,
    listOperations,
-   listOperationsFailure,
    listStatuses,
-   listStatusesFailure,
    purgeLogs,
-   purgeLogsSuccess,
-   purgeLogsFailure
 ]
 
 export default epics

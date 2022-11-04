@@ -1,6 +1,6 @@
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { Observable } from "rxjs";
-import { HttpErrorResponse } from "ts-rest-client";
+import { HttpErrorResponse } from "utils/FetchHttpService";
 import { CertificateRevocationReason } from "types/certificate";
 
 import * as model from "./model";

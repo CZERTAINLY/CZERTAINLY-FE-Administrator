@@ -1,11 +1,12 @@
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import { actions as alertActions } from "./alerts";
 import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
+
 import { slice } from "./groups";
-import history from "browser-history";
+import { actions as appRedirectActions } from "./app-redirect";
+
 import { transformGroupDtoToModel } from "./transform/groups";
 
 
@@ -27,24 +28,12 @@ const listGroups: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listGroupsFailure({ error: extractError(err, "Failed to get Group list") }))
+               err => of(
+                  slice.actions.listGroupsFailure({ error: extractError(err, "Failed to get Group list") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get Group list" })
+               )
             )
          )
-      )
-   );
-
-}
-
-
-const listGroupsFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listGroupsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
    );
 
@@ -69,26 +58,13 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getGroupDetailFailure({ error: extractError(err, "Failed to get Group detail") }))
+               err => of(
+                  slice.actions.getGroupDetailFailure({ error: extractError(err, "Failed to get Group detail") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get Group detail" })
+               )
             )
 
          )
-      )
-
-   );
-
-}
-
-
-const getGroupDetailFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getGroupDetailFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -111,52 +87,24 @@ const createGroup: AppEpic = (action$, state$, deps) => {
             action.payload.description
          ).pipe(
 
-            map(
-               obj => slice.actions.createGroupSuccess({ uuid: obj.uuid })
+            mergeMap(
+
+               obj => of(
+                  slice.actions.createGroupSuccess({ uuid: obj.uuid }),
+                  appRedirectActions.redirect({ url: `./detail/${obj.uuid}` })
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.createGroupFailure({ error: extractError(err, "Failed to create group") }))
+
+               err => of(
+                  slice.actions.createGroupFailure({ error: extractError(err, "Failed to create group") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to create group" })
+               )
+
             )
          )
-      )
-
-   );
-
-}
-
-
-const createGroupSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createGroupSuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const createGroupFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createGroupFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -180,54 +128,26 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
             action.payload.description || ""
          ).pipe(
 
-            map(
-               groupDTO => slice.actions.updateGroupSuccess({ group: transformGroupDtoToModel(groupDTO) })
+            mergeMap(
+
+               groupDTO => of(
+                  slice.actions.updateGroupSuccess({ group: transformGroupDtoToModel(groupDTO) }),
+                  appRedirectActions.redirect({ url: `../../detail/${groupDTO.uuid}` })
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }))
+
+               err => of(
+                  slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to update group" })
+               )
+
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const updateGroupSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateGroupSuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            history.push(`../detail/${action.payload.group.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const updateGroupFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateGroupFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -246,53 +166,26 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.groups.deleteGroup(action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid })
+            mergeMap(
+
+               () => of(
+                  slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid }),
+                  appRedirectActions.redirect({ url: "../" })
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }))
+
+               err => of(
+                  slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete group" })
+               )
+
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deleteGroupSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteGroupSuccess.match
-      ),
-      switchMap(
-
-         () => {
-            history.push(`../`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const deleteGroupFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteGroupFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -316,7 +209,12 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDeleteGroupsFailure({ error: extractError(err, "Failed to delete groups") }))
+
+               err => of(
+                  slice.actions.bulkDeleteGroupsFailure({ error: extractError(err, "Failed to delete groups") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete groups" })
+               )
+
             )
 
          )
@@ -327,38 +225,13 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
 }
 
 
-const bulkDeleteProfilesFailure: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDeleteGroupsFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listGroups,
-   listGroupsFailure,
    getGroupDetail,
-   getGroupDetailFailure,
    createGroup,
-   createGroupFailure,
-   createGroupSuccess,
    updateGroup,
-   updateGroupSuccess,
-   updateGroupFailure,
    deleteGroup,
-   deleteGroupSuccess,
-   deleteGroupFailure,
    bulkDeleteProfiles,
-   bulkDeleteProfilesFailure
 ];
 
 

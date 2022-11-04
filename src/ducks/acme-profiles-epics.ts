@@ -1,11 +1,12 @@
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { iif, of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
-import { actions as alertActions } from "./alerts";
-import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
+import { extractError } from "utils/net";
+
 import { slice } from "./acme-profiles";
-import history from "browser-history";
+import { actions as appRedirectActions } from "./app-redirect";
+
 import { transformAcmeProfileDtoToModel, transformAcmeProfileListDtoToModel } from "./transform/acme-profiles";
 import { transformAttributeModelToDTO } from "./transform/attributes";
 
@@ -28,27 +29,14 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.listAcmeProfilesFailed({ error: extractError(err, "Failed to get ACME Profiles list") }))
+               error => of(
+                  slice.actions.listAcmeProfilesFailure({ error: extractError(error, "Failed to get ACME Profiles list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get ACME Profiles list" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const listAcmeProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listAcmeProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -73,27 +61,14 @@ const getAcmeProfileDetail: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getAcmeProfileFailed({ error: extractError(err, "Failed to get ACME Profile details") }))
+               error => of(
+                  slice.actions.getAcmeProfileFailure({ error: extractError(error, "Failed to get ACME Profile details") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get ACME Profile details" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getAcmeProfileDetailFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getAcmeProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -127,51 +102,22 @@ const createAcmeProfile: AppEpic = (action$, state$, deps) => {
             action.payload.requireTermsOfService
          ).pipe(
 
-            map(
-               obj => slice.actions.createAcmeProfileSuccess({ uuid: obj.uuid }),
+            mergeMap(
+               acmeProfile => of(
+                  slice.actions.createAcmeProfileSuccess({ uuid: acmeProfile.uuid }),
+                  appRedirectActions.redirect({ url: `../detail/${acmeProfile.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.createAcmeProfileFailed({ error: extractError(err, "Failed to create ACME Profile") }))
+               error => of(
+                  slice.actions.createAcmeProfileFailure({ error: extractError(error, "Failed to create ACME Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to create ACME Profile" })
+               )
             )
 
 
          )
-
-      )
-
-   )
-
-}
-
-
-const createAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createAcmeProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
-}
-
-
-const createAcmeProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createAcmeProfileSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.uuid}`);
-            return EMPTY;
-         }
 
       )
 
@@ -209,53 +155,22 @@ const updateAcmeProfile: AppEpic = (action$, state$, deps) => {
 
          ).pipe(
 
-            map(
-               acmeProfile => slice.actions.updateAcmeProfileSuccess({ acmeProfile: transformAcmeProfileDtoToModel(acmeProfile) })
+            mergeMap(
+               acmeProfile => of(
+                  slice.actions.updateAcmeProfileSuccess({ acmeProfile: transformAcmeProfileDtoToModel(acmeProfile) }),
+                  appRedirectActions.redirect({ url: `../../detail/${acmeProfile.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.updateAcmeProfileFailed({ error: extractError(err, "Failed to update ACME Profile") }))
+               err => of(
+                  slice.actions.updateAcmeProfileFailure({ error: extractError(err, "Failed to update ACME Profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to update ACME Profile" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const updateAcmeProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateAcmeProfileSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            history.push(`../detail/${action.payload.acmeProfile.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const updateAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateAcmeProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -274,52 +189,22 @@ const deleteAcmeProfile: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.acmeProfiles.deleteAcmeProfile(action.payload.uuid).pipe(
 
-            map(
-               () => slice.actions.deleteAcmeProfileSuccess({ uuid: action.payload.uuid })
+            mergeMap(
+               () => of(
+                  slice.actions.deleteAcmeProfileSuccess({ uuid: action.payload.uuid }),
+                  appRedirectActions.redirect({ url: "../../" })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.deleteAcmeProfileFailed({ error: extractError(err, "Failed to delete ACME Profile") }))
+               err => of(
+                  slice.actions.deleteAcmeProfileFailure({ error: extractError(err, "Failed to delete ACME Profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete ACME Profile" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deleteAcmeProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteAcmeProfileSuccess.match
-      ),
-      switchMap(
-
-         () => {
-            history.push(`../`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-const deleteAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteAcmeProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -343,7 +228,10 @@ const enableAcmeProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.enableAcmeProfileFailed({ error: extractError(err, "Failed to enable ACME Profile") }))
+               err => of(
+                  slice.actions.enableAcmeProfileFailure({ error: extractError(err, "Failed to enable ACME Profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to enable ACME Profile" })
+               )
             )
 
          )
@@ -351,22 +239,6 @@ const enableAcmeProfile: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const enableAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.enableAcmeProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
 }
 
 
@@ -386,27 +258,14 @@ const disableAcmeProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.disableAcmeProfileFailed({ error: extractError(err, "Failed to disable ACME Profile") }))
+               err => of(
+                  slice.actions.disableAcmeProfileFailure({ error: extractError(err, "Failed to disable ACME Profile") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to disable ACME Profile" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const disableAcmeProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.disableAcmeProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -431,7 +290,10 @@ const bulkDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDeleteAcmeProfilesFailed({ error: extractError(err, "Failed to delete ACME Accounts") }))
+               err => of(
+                  slice.actions.bulkDeleteAcmeProfilesFailure({ error: extractError(err, "Failed to delete ACME Accounts") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete ACME Accounts" })
+               )
             )
 
          )
@@ -439,22 +301,6 @@ const bulkDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
       )
 
    )
-
-}
-
-
-const bulkDeleteAcmeProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDeleteAcmeProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 
 }
 
@@ -471,51 +317,32 @@ const bulkForceDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.acmeProfiles.bulkForceDeleteAcmeProfiles(action.payload.uuids).pipe(
 
-            map(
-               () => slice.actions.bulkForceDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
+            mergeMap(
+
+               () => iif(
+
+                  () => !!action.payload.redirect,
+
+                  of(
+                     slice.actions.bulkForceDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.bulkForceDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
+                  )
+
+               )
             ),
 
             catchError(
-               err => of(slice.actions.bulkForceDeleteAcmeProfilesFailed({ error: extractError(err, "Failed to delete ACME Accounts") }))
+               err => of(
+                  slice.actions.bulkForceDeleteAcmeProfilesFailure({ error: extractError(err, "Failed to delete ACME Accounts") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete ACME Accounts" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkForceDeleteAcmeProfilesSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteAcmeProfilesSuccess.match
-      ),
-      switchMap(
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-const bulkForceDeleteAcmeProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteAcmeProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -539,27 +366,14 @@ const bulkEnableAcmeProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkEnableAcmeProfilesFailed({ error: extractError(err, "Failed to enable ACME Accounts") }))
+               err => of(
+                  slice.actions.bulkEnableAcmeProfilesFailure({ error: extractError(err, "Failed to enable ACME Accounts") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to enable ACME Accounts" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkEnableAcmeProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkEnableAcmeProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -583,7 +397,10 @@ const bulkDisableAcmeProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.bulkDisableAcmeProfilesFailed({ error: extractError(err, "Failed to disable ACME Accounts") }))
+               err => of(
+                  slice.actions.bulkDisableAcmeProfilesFailure({ error: extractError(err, "Failed to disable ACME Accounts") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to disable ACME Accounts" })
+               )
             )
 
          )
@@ -595,49 +412,18 @@ const bulkDisableAcmeProfiles: AppEpic = (action$, state$, deps) => {
 }
 
 
-const bulkDisableAcmeProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDisableAcmeProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-
-}
-
-
 const epics = [
    listAcmeProfiles,
-   listAcmeProfilesFailed,
    getAcmeProfileDetail,
-   getAcmeProfileDetailFailed,
    updateAcmeProfile,
-   updateAcmeProfileSuccess,
-   updateAcmeProfileFailed,
    createAcmeProfile,
-   createAcmeProfileFailed,
-   createAcmeProfileSuccess,
    deleteAcmeProfile,
-   deleteAcmeProfileSuccess,
-   deleteAcmeProfileFailed,
    enableAcmeProfile,
-   enableAcmeProfileFailed,
    disableAcmeProfile,
-   disableAcmeProfileFailed,
    bulkDeleteAcmeProfiles,
-   bulkDeleteAcmeProfilesFailed,
    bulkForceDeleteAcmeProfiles,
-   bulkForceDeleteAcmeProfilesSuccess,
-   bulkForceDeleteAcmeProfilesFailed,
    bulkEnableAcmeProfiles,
-   bulkEnableAcmeProfilesFailed,
    bulkDisableAcmeProfiles,
-   bulkDisableAcmeProfilesFailed
 ];
 
 
