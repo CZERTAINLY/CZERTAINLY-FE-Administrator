@@ -63,24 +63,6 @@ export class DiscoveryManagementBackend implements model.DiscoveryManagementApi 
    }
 
 
-   getDiscoveryProviderAttributes(
-      uuid: string,
-      kind: string
-
-   ): Observable<AttributeDTO[]> {
-
-      return this._fetchService.request(
-
-         new HttpRequestOptions(
-            `${baseUrlDiscoveryProvider}/${uuid}/discoveryProvider/${kind}/attributes`,
-            "GET"
-         )
-
-      );
-
-   }
-
-
    getDiscoveryDetail(uuid: string): Observable<model.DiscoveryDTO> {
 
       return this._fetchService.request(

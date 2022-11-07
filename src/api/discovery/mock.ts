@@ -66,26 +66,6 @@ export class DiscoveryManagementMock implements model.DiscoveryManagementApi {
     );
   }
 
-  getDiscoveryProviderAttributes(
-    uuid: string
-  ): Observable<AttributeDTO[]> {
-    return of(
-      dbData.discoveries.find(discovery => discovery.uuid === uuid)
-   ).pipe(
-
-      delay(randomDelay()),
-      map(
-
-         authority => {
-            if (!authority) throw new HttpErrorResponse({ status: 404 });
-            return authority.attributes || [];
-         }
-
-      )
-
-   )
-  }
-
   getDiscoveryDetail(uuid: string): Observable<model.DiscoveryDTO> {
     return of(
       dbData.discoveries.find((c) => c.uuid.toString() === uuid.toString())

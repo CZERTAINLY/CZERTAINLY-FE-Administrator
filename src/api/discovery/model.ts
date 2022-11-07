@@ -37,10 +37,6 @@ export interface DiscoveryManagementApi {
   getDiscoveryList(): Observable<DiscoveryDTO[]>;
   getDiscoveryDetail(uuid: string): Observable<DiscoveryDTO>;
   getDiscoveryProviderList(): Observable<ConnectorDTO[]>;
-  getDiscoveryProviderAttributes(
-    uuid: string,
-    kind: string
-  ): Observable<AttributeDTO[]>;
   deleteDiscovery(uuid: string): Observable<void>;
   bulkDeleteDiscovery(uuid: string[]): Observable<void>;
 }
