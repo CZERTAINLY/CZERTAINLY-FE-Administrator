@@ -57,7 +57,7 @@ export default function UserProfileDetail() {
 
          <div>
 
-            <div className="pull-right mt-n-xs">
+            <div className="fa-pull-right mt-n-xs">
                <WidgetButtons buttons={buttons} />
             </div>
 

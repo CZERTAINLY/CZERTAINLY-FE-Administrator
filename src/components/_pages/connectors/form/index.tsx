@@ -478,7 +478,7 @@ export default function ConnectorForm() {
 
                                                    {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
 
-                                                   <div className="pull-right mt-n-xs">
+                                                   <div className="fa-pull-right mt-n-xs">
                                                       {
                                                          functionGroup.kinds.map(kinds =>
                                                             <>

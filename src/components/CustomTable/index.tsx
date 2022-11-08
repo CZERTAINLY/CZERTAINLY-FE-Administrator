@@ -642,7 +642,7 @@ function CustomTable({
             canSearch
                ?
                <>
-                  <div className="pull-right mt-n-xs">
+                  <div className="fa-pull-right mt-n-xs">
                      <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
                   </div>
                   <br />
