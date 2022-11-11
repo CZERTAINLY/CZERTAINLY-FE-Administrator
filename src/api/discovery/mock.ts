@@ -6,7 +6,6 @@ import { randomDelay } from "utils/mock";
 import * as model from "./model";
 import { HttpErrorResponse } from "utils/FetchHttpService";
 import { ConnectorDTO } from "api/connectors";
-import { AttributeDTO } from "api/_common/attributeDTO";
 
 export class DiscoveryManagementMock implements model.DiscoveryManagementApi {
   createNewDiscovery(

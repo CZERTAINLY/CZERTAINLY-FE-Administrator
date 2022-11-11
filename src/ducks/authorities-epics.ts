@@ -7,9 +7,10 @@ import { extractError } from "utils/net";
 import { slice } from "./authorities";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformAuthorityDtoToModel } from "./transform/authorities";
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transformConnectorDTOToModel } from "./transform/connectors";
+import { transformAuthorityResponseDtoToModel } from "./transform/authorities";
+import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
+import { GetAttributesFunctionGroupEnum, ListConnectorsFunctionGroupEnum } from "types/openapi";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 
 
 const listAuthorities: AppEpic = (action$, state$, deps) => {
@@ -19,12 +20,12 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
       filter(slice.actions.listAuthorities.match),
       switchMap(
 
-         () => deps.apiClients.authorities.getAuthoritiesList().pipe(
+         () => deps.apiClients.authorities.listAuthorityInstances().pipe(
 
             map(
 
                authorities => slice.actions.listAuthoritiesSuccess({
-                  authorityList: authorities.map(transformAuthorityDtoToModel)
+                  authorityList: authorities.map(transformAuthorityResponseDtoToModel)
                })
 
             ),
@@ -55,10 +56,10 @@ const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.authorities.getAuthorityDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.authorities.getAuthorityInstance({uuid : action.payload.uuid }).pipe(
 
             map(
-               authorityDto => slice.actions.getAuthorityDetailSuccess({ authority: transformAuthorityDtoToModel(authorityDto) })
+               authorityDto => slice.actions.getAuthorityDetailSuccess({ authority: transformAuthorityResponseDtoToModel(authorityDto) })
             ),
 
             catchError(
@@ -85,11 +86,11 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
          slice.actions.listAuthorityProviders.match
       ),
       switchMap(
-         () => deps.apiClients.connectors.getConnectorsList("authorityProvider").pipe(
+         () => deps.apiClients.connectors.listConnectors({ functionGroup: ListConnectorsFunctionGroupEnum.AuthorityProvider }).pipe(
 
             map(
                providers => slice.actions.listAuthorityProvidersSuccess({
-                  connectors: providers.map(transformConnectorDTOToModel)
+                  connectors: providers.map(transformConnectorResponseDtoToModel)
                })
             ),
 
@@ -115,15 +116,16 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAttributes(
-            action.payload.uuid,
-            "authorityProvider",
-            action.payload.kind
+         action => deps.apiClients.connectors.getAttributes({
+                 uuid: action.payload.uuid,
+                 functionGroup: GetAttributesFunctionGroupEnum.AuthorityProvider,
+                 kind: action.payload.kind
+             }
          ).pipe(
 
             map(
                attributeDescriptors => slice.actions.getAuthorityProviderAttributesDescriptorsSuccess({
-                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
+                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -151,12 +153,12 @@ const getRAProfilesAttributesDescriptors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.authorities.listRAProfileAttributesDescriptors(action.payload.authorityUuid).pipe(
+         action => deps.apiClients.authorities.listRAProfileAttributes({ uuid: action.payload.authorityUuid }).pipe(
 
             map(
                descriptors => slice.actions.getRAProfilesAttributesDescriptorsSuccess({
                   authorityUuid: action.payload.authorityUuid,
-                  attributesDescriptors: descriptors.map(transformAttributeDescriptorDTOToModel)
+                  attributesDescriptors: descriptors.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -185,11 +187,13 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.authorities.createNewAuthority(
-            action.payload.name,
-            action.payload.attributes.map(transformAttributeModelToDTO),
-            action.payload.connectorUuid,
-            action.payload.kind
+         action => deps.apiClients.authorities.createAuthorityInstance({ authorityInstanceRequestDto : {
+                 name: action.payload.name,
+                 attributes: action.payload.attributes.map(transformAttributeRequestModelToDto),
+                 connectorUuid: action.payload.connectorUuid,
+                 kind: action.payload.kind
+             }
+         }
          ).pipe(
 
             mergeMap(
@@ -225,14 +229,15 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.authorities.updateAuthority(
-            action.payload.uuid,
-            action.payload.attributes.map(transformAttributeModelToDTO),
+         action => deps.apiClients.authorities.editAuthorityInstance({
+                 uuid: action.payload.uuid,
+                 authorityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto) },
+             },
          ).pipe(
 
             mergeMap(
                authorityDto => of(
-                  slice.actions.updateAuthoritySuccess({ authority: transformAuthorityDtoToModel(authorityDto) }),
+                  slice.actions.updateAuthoritySuccess({ authority: transformAuthorityResponseDtoToModel(authorityDto) }),
                   appRedirectActions.redirect({ url: `../../detail/${authorityDto.uuid}` })
 
                )
@@ -263,7 +268,7 @@ const deleteAuthority: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.authorities.deleteAuthority(action.payload.uuid).pipe(
+         action => deps.apiClients.authorities.deleteAuthorityInstance({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -297,7 +302,7 @@ const bulkDeleteAuthority: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.authorities.bulkDeleteAuthority(action.payload.uuids).pipe(
+         action => deps.apiClients.authorities.bulkDeleteAuthorityInstance({ requestBody: action.payload.uuids }).pipe(
 
             map(
                errors => slice.actions.bulkDeleteAuthoritySuccess({ uuids: action.payload.uuids, errors })
@@ -329,7 +334,7 @@ const bulkForceDeleteAuthority: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.authorities.bulkForceDeleteAuthority(action.payload.uuids).pipe(
+         action => deps.apiClients.authorities.forceDeleteAuthorityInstances({ requestBody: action.payload.uuids }).pipe(
 
             mergeMap(
 

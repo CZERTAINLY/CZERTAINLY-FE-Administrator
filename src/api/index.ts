@@ -4,10 +4,8 @@ import { UserManagementApi, UserManagementBackend, UserManagementMock } from "./
 import { RolesManagementApi, RolesManagementBackend, RolesManagementMock } from "./roles";
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
-import { AuthorityManagementApi, AuthorityManagementBackend, AuthorityManagementMock } from "./authority";
 import { EntityManagementApi, EntityManagementBackend, EntityManagementMock } from "./entity";
 import { LocationManagementApi, LocationManagementBackend, LocationManagementMock } from "./location";
-import { ConnectorManagementApi, ConnectorManagementBackend, ConnectorManagementMock } from "./connectors";
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
 import { OperationsApi, OperationsBackend, OperationsMock } from "./operations";
@@ -15,12 +13,17 @@ import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountMana
 import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
 import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
-import { ComplianceProfileManagementApi, ComplianceProfileManagementBackend, ComplianceProfileManagementMock } from "./compliance-profile";
+import {
+   ComplianceProfileManagementApi,
+   ComplianceProfileManagementBackend,
+   ComplianceProfileManagementMock
+} from "./compliance-profile";
 import { FetchHttpServiceImpl } from "utils/FetchHttpService";
+import { AuthorityManagementAPIApi, CallbackAPIApi, Configuration, ConnectorManagementAPIApi } from "../types/openapi";
 
 
 const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
-
+const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
 
 export interface ApiClients {
    auth: AuthApi;
@@ -29,9 +32,10 @@ export interface ApiClients {
    auditLogs: AuditLogsApi;
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
-   connectors: ConnectorManagementApi;
+   connectors: ConnectorManagementAPIApi;
+   callback: CallbackAPIApi;
    dashboard: DashboardManagementApi;
-   authorities: AuthorityManagementApi;
+   authorities: AuthorityManagementAPIApi;
    entities: EntityManagementApi;
    locations: LocationManagementApi;
    certificates: CertificateInventoryApi;
@@ -52,10 +56,11 @@ export const backendClient: ApiClients = {
    auditLogs: new AuditLogsBackend(fetchService),
    profiles: new ProfilesManagementBackend(fetchService),
    credentials: new CredentialManagementBackend(fetchService),
-   authorities: new AuthorityManagementBackend(fetchService),
+   authorities: new AuthorityManagementAPIApi(configuration),
    entities: new EntityManagementBackend(fetchService),
    locations: new LocationManagementBackend(fetchService),
-   connectors: new ConnectorManagementBackend(fetchService),
+   connectors: new ConnectorManagementAPIApi(configuration),
+   callback: new CallbackAPIApi(configuration),
    dashboard: new DashboardManagementBackend(fetchService),
    acmeAccounts: new AcmeAccountManagementBackend(fetchService),
    acmeProfiles: new AcmeProfilesManagementBackend(fetchService),
@@ -66,7 +71,7 @@ export const backendClient: ApiClients = {
 };
 
 
-export const mockClient: ApiClients = {
+export const mockClient: Partial<ApiClients> = {
    auth: new AuthMock(),
    users: new UserManagementMock(),
    roles: new RolesManagementMock(),
@@ -74,10 +79,10 @@ export const mockClient: ApiClients = {
    auditLogs: new AuditLogsMock(),
    profiles: new ProfilesManagementMock(),
    credentials: new CredentialManagementMock(),
-   authorities: new AuthorityManagementMock(),
+   // authorities: new AuthorityManagementMock(),
    entities: new EntityManagementMock(),
    locations: new LocationManagementMock(),
-   connectors: new ConnectorManagementMock(),
+   // connectors: new ConnectorManagementMock(),
    dashboard: new DashboardManagementMock(),
    acmeAccounts: new AcmeAccountManagementMock(),
    acmeProfiles: new AcmeProfilesManagementMock(),

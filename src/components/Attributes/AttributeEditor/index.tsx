@@ -8,9 +8,8 @@ import { AttributeDescriptorCallbackMappingModel } from "models/attributes/Attri
 import { selectors as connectorSelectors, actions as connectorActions } from "ducks/connectors";
 
 import Widget from "components/Widget";
-import { FunctionGroupCode } from "types/connectors";
+import { CallbackAttributeModel, FunctionGroupCode } from "types/connectors";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
 import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 import { Attribute } from "./Attribute";
 import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
@@ -175,15 +174,15 @@ export default function AttributeEditor({
     */
    const buildCallbackMappings = useCallback(
 
-      (descriptor: AttributeDescriptorModel): AttributeCallbackDataModel | undefined => {
+      (descriptor: AttributeDescriptorModel): CallbackAttributeModel | undefined => {
 
          let hasUndefinedMapping = false;
 
-         const data: AttributeCallbackDataModel = {
+         const data: CallbackAttributeModel = {
             uuid: "",
             name: "",
             pathVariable: {},
-            queryParameter: {},
+            requestParameter: {},
             body: {}
          };
 
@@ -196,7 +195,7 @@ export default function AttributeEditor({
                      let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
                      if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
                      if (value === undefined) hasUndefinedMapping = true;
-                     data[target][mapping.to] = value;
+                     data[target]![mapping.to] = value;
                   }
                )
 
@@ -299,22 +298,25 @@ export default function AttributeEditor({
                      mappings.name = descriptor.name;
                      mappings.uuid = descriptor.uuid;
 
-                     const url = authorityUuid
-                        ?
-                        `${authorityUuid}/callback`
+                      dispatch(authorityUuid
+                          ? connectorActions.callbackRaProfile({
+                                 callbackId: formAttributeName,
+                                 callbackRaProfile: {
+                                     authorityUuid: authorityUuid,
+                                     requestAttributeCallback: mappings
+                                 }
+                            })
                         :
-                        `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                        ;
-
-                     dispatch(
-
-                        connectorActions.callback({
-                           callbackId: formAttributeName,
-                           url,
-                           callbackData: mappings
-                        })
-
-                     );
+                          connectorActions.callbackConnector({
+                              callbackId: formAttributeName,
+                              callbackConnector: {
+                                  uuid: connectorUuid!,
+                                  kind: kind!,
+                                  functionGroup: functionGroupCode!,
+                                  requestAttributeCallback: mappings
+                              }
+                          })
+                      );
 
                   }
 
@@ -478,24 +480,28 @@ export default function AttributeEditor({
                         mappings.name = descriptor.name;
                         mappings.uuid = descriptor.uuid;
 
-                        const url = authorityUuid
-                           ?
-                           `${authorityUuid}/callback`
-                           :
-                           `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                           ;
 
-                        form.mutators.setAttribute(formAttributeName, undefined);
+                         dispatch(authorityUuid
+                             ? connectorActions.callbackRaProfile({
+                                 callbackId: formAttributeName,
+                                 callbackRaProfile: {
+                                     authorityUuid: authorityUuid,
+                                     requestAttributeCallback: mappings
+                                 }
+                             })
+                             :
+                             connectorActions.callbackConnector({
+                                 callbackId: formAttributeName,
+                                 callbackConnector: {
+                                     uuid: connectorUuid!,
+                                     kind: kind!,
+                                     functionGroup: functionGroupCode!,
+                                     requestAttributeCallback: mappings
+                                 }
+                             })
+                         );
 
-                        dispatch(
-
-                           connectorActions.callback({
-                              callbackId: formAttributeName,
-                              url,
-                              callbackData: mappings
-                           })
-
-                        );
+                         form.mutators.setAttribute(formAttributeName, undefined);
 
                      }
 

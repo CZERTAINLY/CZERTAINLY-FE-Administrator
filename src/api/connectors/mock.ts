@@ -12,7 +12,7 @@ import * as model from "./model";
 import { AuthType, FunctionGroupCode } from "types/connectors";
 
 
-export class ConnectorManagementMock implements model.ConnectorManagementApi {
+export class ConnectorManagementMock {
 
    createNewConnector(name: string, url: string, authType: AuthType, authAttributes: AttributeDTO[]): Observable<{ uuid: string}> {
 

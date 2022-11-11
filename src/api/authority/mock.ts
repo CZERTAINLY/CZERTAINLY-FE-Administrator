@@ -10,7 +10,7 @@ import { randomDelay } from "utils/mock";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
-export class AuthorityManagementMock implements model.AuthorityManagementApi {
+export class AuthorityManagementMock {
 
 
    validateRAProfileAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {

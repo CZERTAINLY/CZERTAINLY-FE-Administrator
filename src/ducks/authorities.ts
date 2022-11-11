@@ -1,12 +1,10 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { AuthorityModel } from "models/authorities";
-import { ConnectorModel } from "models/connectors";
-
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeDescriptorModel } from "../models/attributes/AttributeDescriptorModel";
+import { AuthorityRequestModel, AuthorityResponseModel } from "types/authorities";
+import { AttributeDescriptorModelNew, AttributeRequestModel } from "types/attributes";
+import { ConnectorResponseModel } from "types/connectors";
 
 
 export type State = {
@@ -16,12 +14,12 @@ export type State = {
    deleteErrorMessage: string;
    bulkDeleteErrorMessages: DeleteObjectErrorModel[];
 
-   authority?: AuthorityModel;
-   authorities: AuthorityModel[];
+   authority?: AuthorityResponseModel;
+   authorities: AuthorityResponseModel[];
 
-   authorityProviders?: ConnectorModel[];
-   authorityProviderAttributeDescriptors?: AttributeDescriptorModel[];
-   raProfileAttributeDescriptors?: AttributeDescriptorModel[];
+   authorityProviders?: ConnectorResponseModel[];
+   authorityProviderAttributeDescriptors?: AttributeDescriptorModelNew[];
+   raProfileAttributeDescriptors?: AttributeDescriptorModelNew[];
 
    isFetchingAuthorityProviders: boolean;
    isFetchingAuthorityProviderAttributeDescriptors: boolean;
@@ -122,7 +120,7 @@ export const slice = createSlice({
       },
 
 
-      listAuthorityProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorModel[] }>) => {
+      listAuthorityProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorResponseModel[] }>) => {
 
          state.authorityProviders = action.payload.connectors;
          state.isFetchingAuthorityProviders = false;
@@ -145,7 +143,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
+      getAuthorityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModelNew[] }>) => {
 
          state.authorityProviderAttributeDescriptors = action.payload.attributeDescriptor;
          state.isFetchingAuthorityProviderAttributeDescriptors = false;
@@ -167,7 +165,7 @@ export const slice = createSlice({
       },
 
 
-      getRAProfilesAttributesDescriptorsSuccess: (state, action: PayloadAction<{ authorityUuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+      getRAProfilesAttributesDescriptorsSuccess: (state, action: PayloadAction<{ authorityUuid: string, attributesDescriptors: AttributeDescriptorModelNew[] }>) => {
 
          state.isFetchingRAProfilesAttributesDescriptors = false;
          state.raProfileAttributeDescriptors = action.payload.attributesDescriptors;
@@ -190,7 +188,7 @@ export const slice = createSlice({
       },
 
 
-      listAuthoritiesSuccess: (state, action: PayloadAction<{ authorityList: AuthorityModel[] }>) => {
+      listAuthoritiesSuccess: (state, action: PayloadAction<{ authorityList: AuthorityResponseModel[] }>) => {
 
          state.authorities = action.payload.authorityList;
          state.isFetchingList = false;
@@ -213,7 +211,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorityDetailSuccess: (state, action: PayloadAction<{ authority: AuthorityModel }>) => {
+      getAuthorityDetailSuccess: (state, action: PayloadAction<{ authority: AuthorityResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -237,12 +235,7 @@ export const slice = createSlice({
       },
 
 
-      createAuthority: (state, action: PayloadAction<{
-         name: string,
-         connectorUuid: string,
-         attributes: AttributeModel[],
-         kind: string,
-      }>) => {
+      createAuthority: (state, action: PayloadAction<AuthorityRequestModel>) => {
 
          state.isCreating = true;
 
@@ -263,14 +256,14 @@ export const slice = createSlice({
       },
 
 
-      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeModel[] }>) => {
+      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[] }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      updateAuthoritySuccess: (state, action: PayloadAction<{ authority: AuthorityModel }>) => {
+      updateAuthoritySuccess: (state, action: PayloadAction<{ authority: AuthorityResponseModel }>) => {
 
          state.isUpdating = false;
 

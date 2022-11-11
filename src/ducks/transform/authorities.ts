@@ -1,16 +1,10 @@
-import { AuthorityDTO } from "api/authority";
-import { AuthorityModel } from "models/authorities";
+import { AuthorityResponseDto, AuthorityResponseModel } from "types/authorities";
 
-export function transformAuthorityDtoToModel(authorityDto: AuthorityDTO): AuthorityModel {
+export function transformAuthorityResponseDtoToModel(authorityResponseDto: AuthorityResponseDto): AuthorityResponseModel {
 
    return {
-      uuid: authorityDto.uuid,
-      name: authorityDto.name,
-      attributes: authorityDto.attributes || [],
-      status: authorityDto.status,
-      connectorUuid: authorityDto.connectorUuid,
-      connectorName: authorityDto.connectorName,
-      kind: authorityDto.kind
+      ...authorityResponseDto,
+      attributes: authorityResponseDto.attributes ?? [],
    }
 
 }
