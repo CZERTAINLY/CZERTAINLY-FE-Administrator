@@ -91,7 +91,7 @@ const createGroup: AppEpic = (action$, state$, deps) => {
 
                obj => of(
                   slice.actions.createGroupSuccess({ uuid: obj.uuid }),
-                  appRedirectActions.redirect({ url: `./detail/${obj.uuid}` })
+                  appRedirectActions.redirect({ url: `../detail/${obj.uuid}` })
                )
 
             ),

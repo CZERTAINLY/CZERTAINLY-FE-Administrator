@@ -139,7 +139,7 @@ export default function GroupList() {
 
             columns: [
 
-               <Link to={`$./detail/${group.uuid}`}>{group.name}</Link>,
+               <Link to={`./detail/${group.uuid}`}>{group.name}</Link>,
 
                group.description || ""
 
