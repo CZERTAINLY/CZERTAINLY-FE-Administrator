@@ -12,6 +12,7 @@
  */
 
 import type {
+    AttributeConstraintType,
     RangeAttributeConstraintData,
 } from './';
 
@@ -33,25 +34,13 @@ export interface RangeAttributeConstraint {
      */
     errorMessage?: string;
     /**
-     * Attribute Constraint Type
-     * @type {string}
+     * @type {AttributeConstraintType}
      * @memberof RangeAttributeConstraint
      */
-    type: RangeAttributeConstraintTypeEnum;
+    type: AttributeConstraintType;
     /**
      * @type {RangeAttributeConstraintData}
      * @memberof RangeAttributeConstraint
      */
     data?: RangeAttributeConstraintData;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum RangeAttributeConstraintTypeEnum {
-    RegExp = 'regExp',
-    Range = 'range',
-    DateTime = 'dateTime'
-}
-

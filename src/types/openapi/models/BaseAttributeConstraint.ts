@@ -12,6 +12,7 @@
  */
 
 import type {
+    AttributeConstraintType,
     DateTimeAttributeConstraint,
     DateTimeAttributeConstraintData,
     RangeAttributeConstraint,
@@ -19,44 +20,8 @@ import type {
 } from './';
 
 /**
+ * @type BaseAttributeConstraint
  * Optional regular expressions and constraints used for validating the Attribute content
  * @export
- * @interface BaseAttributeConstraint
  */
-export interface BaseAttributeConstraint {
-    /**
-     * Description of the constraint
-     * @type {string}
-     * @memberof BaseAttributeConstraint
-     */
-    description?: string;
-    /**
-     * Error message to be displayed for wrong data
-     * @type {string}
-     * @memberof BaseAttributeConstraint
-     */
-    errorMessage?: string;
-    /**
-     * Attribute Constraint Type
-     * @type {string}
-     * @memberof BaseAttributeConstraint
-     */
-    type: BaseAttributeConstraintTypeEnum;
-    /**
-     * Attribute Constraint Data
-     * @type {object}
-     * @memberof BaseAttributeConstraint
-     */
-    data: object;
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum BaseAttributeConstraintTypeEnum {
-    RegExp = 'regExp',
-    Range = 'range',
-    DateTime = 'dateTime'
-}
-
+export type BaseAttributeConstraint = DateTimeAttributeConstraint | RangeAttributeConstraint | RegexpAttributeConstraint;

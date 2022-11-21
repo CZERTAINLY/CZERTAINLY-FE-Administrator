@@ -13,10 +13,12 @@
 
 import type {
     AttributeCallback,
-    BaseAttribute,
+    AttributeType,
+    BaseAttributeDto,
 } from './';
 
 /**
+ * Group attribute and its content represents dynamic list of additional attributes retrieved by callback. Its content can not be edited and is not send in requests to store.
  * @export
  * @interface GroupAttribute
  */
@@ -40,55 +42,19 @@ export interface GroupAttribute {
      */
     description?: string;
     /**
-     * Content of the Attribute
-     * @type {Array<BaseAttribute>}
+     * List of all different types of attributes
+     * @type {Array<BaseAttributeDto>}
      * @memberof GroupAttribute
      */
-    content: Array<BaseAttribute>;
+    content?: Array<BaseAttributeDto>;
     /**
-     * Type of the Attribute
-     * @type {string}
+     * @type {AttributeType}
      * @memberof GroupAttribute
      */
-    type: GroupAttributeTypeEnum;
-    /**
-     * Type of the Content
-     * @type {string}
-     * @memberof GroupAttribute
-     */
-    contentType: GroupAttributeContentTypeEnum;
+    type: AttributeType;
     /**
      * @type {AttributeCallback}
      * @memberof GroupAttribute
      */
     attributeCallback?: AttributeCallback;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum GroupAttributeTypeEnum {
-    Data = 'data',
-    Group = 'group',
-    Info = 'info'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum GroupAttributeContentTypeEnum {
-    String = 'string',
-    Integer = 'integer',
-    Secret = 'secret',
-    File = 'file',
-    Boolean = 'boolean',
-    Credential = 'credential',
-    Date = 'date',
-    Float = 'float',
-    Object = 'object',
-    Text = 'text',
-    Time = 'time',
-    Datetime = 'datetime'
-}
-

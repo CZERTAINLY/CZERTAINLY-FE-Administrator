@@ -12,6 +12,7 @@
  */
 
 import type {
+    AttributeConstraintType,
     DateTimeAttributeConstraintData,
 } from './';
 
@@ -33,25 +34,13 @@ export interface DateTimeAttributeConstraint {
      */
     errorMessage?: string;
     /**
-     * Attribute Constraint Type
-     * @type {string}
+     * @type {AttributeConstraintType}
      * @memberof DateTimeAttributeConstraint
      */
-    type: DateTimeAttributeConstraintTypeEnum;
+    type: AttributeConstraintType;
     /**
      * @type {DateTimeAttributeConstraintData}
      * @memberof DateTimeAttributeConstraint
      */
     data?: DateTimeAttributeConstraintData;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum DateTimeAttributeConstraintTypeEnum {
-    RegExp = 'regExp',
-    Range = 'range',
-    DateTime = 'dateTime'
-}
-

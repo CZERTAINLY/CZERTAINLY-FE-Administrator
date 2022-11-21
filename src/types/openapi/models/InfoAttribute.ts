@@ -12,14 +12,55 @@
  */
 
 import type {
-    BaseAttribute,
+    AttributeContentType,
+    AttributeType,
     BaseAttributeContent,
-    InfoAttributeAllOf,
     InfoAttributeProperties,
 } from './';
 
 /**
- * @type InfoAttribute
+ * Info attribute contains content that is for information purpose or represents additional information for object (metadata). Its content can not be edited and is not send in requests to store.
  * @export
+ * @interface InfoAttribute
  */
-export type InfoAttribute = BaseAttribute & InfoAttributeAllOf;
+export interface InfoAttribute {
+    /**
+     * UUID of the Attribute for unique identification
+     * @type {string}
+     * @memberof InfoAttribute
+     */
+    uuid: string;
+    /**
+     * Name of the Attribute that is used for identification
+     * @type {string}
+     * @memberof InfoAttribute
+     */
+    name: string;
+    /**
+     * Optional description of the Attribute, should contain helper text on what is expected
+     * @type {string}
+     * @memberof InfoAttribute
+     */
+    description?: string;
+    /**
+     * Content of the Attribute
+     * @type {Array<BaseAttributeContent>}
+     * @memberof InfoAttribute
+     */
+    content: Array<BaseAttributeContent>;
+    /**
+     * @type {AttributeType}
+     * @memberof InfoAttribute
+     */
+    type: AttributeType;
+    /**
+     * @type {AttributeContentType}
+     * @memberof InfoAttribute
+     */
+    contentType: AttributeContentType;
+    /**
+     * @type {InfoAttributeProperties}
+     * @memberof InfoAttribute
+     */
+    properties: InfoAttributeProperties;
+}

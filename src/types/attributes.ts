@@ -1,13 +1,17 @@
-import { ListLocationAttributes200ResponseInner, RequestAttributeDto, ResponseAttributeDto } from "./openapi";
+import { BaseAttributeDto, RequestAttributeDto, ResponseAttributeDto } from "./openapi";
 
+//TODO remove
 export type AttributeCallbackMappingTarget_AttributeCallbackModel = "pathVariable" | "requestParameter" | "body";
 
+//TODO remove
 export type AttributeListValue = {
    id: number;
    name: string;
 }
+//TODO remove
 export type AttributeValue = string | number | boolean | AttributeListValue;
 
+//TODO remove
 export type AttributeType = "BOOLEAN" | "INTEGER" | "FLOAT" | "STRING" | "TEXT" | "DATE" | "TIME" | "DATETIME" | "FILE" | "SECRET" | "CREDENTIAL" | "JSON";
 
 export type AttributeRequestDto = RequestAttributeDto;
@@ -16,7 +20,7 @@ export type AttributeRequestModel = AttributeRequestDto;
 export type AttributeResponseDto = ResponseAttributeDto;
 export type AttributeResponseModel = AttributeResponseDto;
 
-export type AttributeDescriptorDto = ListLocationAttributes200ResponseInner;
+export type AttributeDescriptorDto = BaseAttributeDto;
 export type AttributeDescriptorModelNew = AttributeDescriptorDto;
 
 export type AttributeDescriptorCollectionDto = {

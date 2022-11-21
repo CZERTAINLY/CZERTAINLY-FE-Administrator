@@ -23,8 +23,9 @@ export interface DateAttributeContent {
      */
     reference?: string;
     /**
+     * Date attribute value
      * @type {string}
      * @memberof DateAttributeContent
      */
-    data?: string;
+    data: string;
 }

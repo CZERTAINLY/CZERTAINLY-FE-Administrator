@@ -12,7 +12,7 @@
  */
 
 /**
- * File Content
+ * Secret attribute content data
  * @export
  * @interface SecretAttributeContentData
  */

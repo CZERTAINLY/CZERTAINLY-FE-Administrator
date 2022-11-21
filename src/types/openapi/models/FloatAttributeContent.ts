@@ -27,5 +27,5 @@ export interface FloatAttributeContent {
      * @type {number}
      * @memberof FloatAttributeContent
      */
-    data?: number;
+    data: number;
 }

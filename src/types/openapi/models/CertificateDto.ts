@@ -13,8 +13,11 @@
 
 import type {
     CertificateComplianceResultDto,
+    CertificateStatus,
+    ComplianceStatus,
     GroupDto,
     LocationDto,
+    MetadataResponseDto,
     SimplifiedRaProfileDto,
 } from './';
 
@@ -115,17 +118,16 @@ export interface CertificateDto {
      */
     basicConstraints: string;
     /**
-     * Certificate meta data
-     * @type {{ [key: string]: object; }}
+     * Certificate metadata
+     * @type {Array<MetadataResponseDto>}
      * @memberof CertificateDto
      */
-    meta?: { [key: string]: object; };
+    metadata?: Array<MetadataResponseDto>;
     /**
-     * Status of the Certificate
-     * @type {string}
+     * @type {CertificateStatus}
      * @memberof CertificateDto
      */
-    status: CertificateDtoStatusEnum;
+    status: CertificateStatus;
     /**
      * @type {SimplifiedRaProfileDto}
      * @memberof CertificateDto
@@ -179,26 +181,12 @@ export interface CertificateDto {
      */
     nonCompliantRules?: Array<CertificateComplianceResultDto>;
     /**
-     * Certificate compliance status
-     * @type {string}
+     * @type {ComplianceStatus}
      * @memberof CertificateDto
      */
-    complianceStatus?: CertificateDtoComplianceStatusEnum;
+    complianceStatus?: ComplianceStatus;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateDtoStatusEnum {
-    Valid = 'valid',
-    Revoked = 'revoked',
-    Expired = 'expired',
-    Unknown = 'unknown',
-    Expiring = 'expiring',
-    New = 'new',
-    Invalid = 'invalid'
-}
 /**
  * @export
  * @enum {string}
@@ -206,14 +194,5 @@ export enum CertificateDtoStatusEnum {
 export enum CertificateDtoCertificateTypeEnum {
     X509 = 'X509',
     Ssh = 'SSH'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateDtoComplianceStatusEnum {
-    Ok = 'ok',
-    Nok = 'nok',
-    Na = 'na'
 }
 

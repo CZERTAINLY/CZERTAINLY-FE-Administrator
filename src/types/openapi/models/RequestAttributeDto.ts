@@ -16,7 +16,7 @@ import type {
 } from './';
 
 /**
- * List of Entity instance Attributes
+ * Request attribute to send attribute content for object
  * @export
  * @interface RequestAttributeDto
  */

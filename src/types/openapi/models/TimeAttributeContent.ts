@@ -30,5 +30,5 @@ export interface TimeAttributeContent {
      * @type {LocalTime}
      * @memberof TimeAttributeContent
      */
-    data?: LocalTime;
+    data: LocalTime;
 }

@@ -27,5 +27,5 @@ export interface IntegerAttributeContent {
      * @type {number}
      * @memberof IntegerAttributeContent
      */
-    data?: number;
+    data: number;
 }

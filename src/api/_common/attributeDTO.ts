@@ -1,6 +1,6 @@
-import { FunctionGroupCode } from "types/connectors";
 import { AttributeCallbackMappingTarget_AttributeCallbackModel, AttributeType, AttributeValue } from "types/attributes";
 import { HttpMethod } from "utils/FetchHttpService/HttpRequestOptions";
+import { FunctionGroupCode } from "types/openapi";
 
 
 export interface AttributeContentDTO {

@@ -1,7 +1,8 @@
-import { AuthType, FunctionGroupCode, Status } from "types/connectors";
+import { AuthType, Status } from "types/connectors";
 import { AttributeModel } from "./attributes/AttributeModel";
+import { FunctionGroupCode } from "../types/openapi";
 
-
+// TODO remove
 export interface EndpointModel {
    uuid?: string;
    name: string;
@@ -11,6 +12,7 @@ export interface EndpointModel {
 }
 
 
+// TODO remove
 export interface FunctionGroupModel {
    uuid: string;
    name: string;
@@ -20,6 +22,7 @@ export interface FunctionGroupModel {
 }
 
 
+// TODO remove
 export interface ConnectorModel {
    uuid: string;
    name: string;
@@ -31,11 +34,13 @@ export interface ConnectorModel {
 }
 
 
+// TODO remove
 export interface ConnectorHealthPartModel {
    [key: string]: ConnectorHealthModel;
 }
 
 
+// TODO remove
 export interface ConnectorHealthModel {
    status: "down" | "failed" | "notOk" | "nok" | "nOk" | "ok" | "nok" | "unknown";
    description?: string;

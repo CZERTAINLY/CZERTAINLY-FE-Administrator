@@ -13,6 +13,7 @@
 
 import type {
     EndpointDto,
+    FunctionGroupCode,
 } from './';
 
 /**
@@ -22,11 +23,10 @@ import type {
  */
 export interface FunctionGroupDto {
     /**
-     * Enumerated code of functional group
-     * @type {string}
+     * @type {FunctionGroupCode}
      * @memberof FunctionGroupDto
      */
-    functionGroupCode: FunctionGroupDtoFunctionGroupCodeEnum;
+    functionGroupCode: FunctionGroupCode;
     /**
      * List of supported functional group kinds
      * @type {Array<string>}
@@ -52,17 +52,3 @@ export interface FunctionGroupDto {
      */
     name: string;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum FunctionGroupDtoFunctionGroupCodeEnum {
-    CredentialProvider = 'credentialProvider',
-    LegacyAuthorityProvider = 'legacyAuthorityProvider',
-    AuthorityProvider = 'authorityProvider',
-    DiscoveryProvider = 'discoveryProvider',
-    EntityProvider = 'entityProvider',
-    ComplianceProvider = 'complianceProvider'
-}
-

@@ -12,6 +12,8 @@
  */
 
 import type {
+    AuthType,
+    ConnectorStatus,
     FunctionGroupDto,
     ResponseAttributeDto,
 } from './';
@@ -46,11 +48,10 @@ export interface ConnectorDto {
      */
     url: string;
     /**
-     * Type of authentication for the Connector
-     * @type {string}
+     * @type {AuthType}
      * @memberof ConnectorDto
      */
-    authType: ConnectorDtoAuthTypeEnum;
+    authType: AuthType;
     /**
      * List of Attributes for the authentication type
      * @type {Array<ResponseAttributeDto>}
@@ -58,32 +59,8 @@ export interface ConnectorDto {
      */
     authAttributes?: Array<ResponseAttributeDto>;
     /**
-     * Status of the Connector
-     * @type {string}
+     * @type {ConnectorStatus}
      * @memberof ConnectorDto
      */
-    status: ConnectorDtoStatusEnum;
+    status: ConnectorStatus;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum ConnectorDtoAuthTypeEnum {
-    None = 'none',
-    Basic = 'basic',
-    Certificate = 'certificate',
-    ApiKey = 'apiKey',
-    Jwt = 'jwt'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum ConnectorDtoStatusEnum {
-    WaitingForApproval = 'waitingForApproval',
-    Connected = 'connected',
-    Failed = 'failed',
-    Offline = 'offline'
-}
-

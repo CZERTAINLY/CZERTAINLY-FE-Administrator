@@ -30,5 +30,5 @@ export interface CredentialAttributeContent {
      * @type {CredentialDto}
      * @memberof CredentialAttributeContent
      */
-    data?: CredentialDto;
+    data: CredentialDto;
 }

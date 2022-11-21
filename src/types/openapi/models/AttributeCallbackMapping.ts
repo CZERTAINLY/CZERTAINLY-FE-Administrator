@@ -11,6 +11,12 @@
  * Do not edit the class manually.
  */
 
+import type {
+    AttributeContentType,
+    AttributeType,
+    AttributeValueTarget,
+} from './';
+
 /**
  * Mappings for the callback method
  * @export
@@ -24,17 +30,15 @@ export interface AttributeCallbackMapping {
      */
     from?: string;
     /**
-     * Type of the attribute. It is optional and must be set only if special behaviour is needed.
-     * @type {string}
+     * @type {AttributeType}
      * @memberof AttributeCallbackMapping
      */
-    attributeType?: AttributeCallbackMappingAttributeTypeEnum;
+    attributeType?: AttributeType;
     /**
-     * Type of the attribute content. 
-     * @type {string}
+     * @type {AttributeContentType}
      * @memberof AttributeCallbackMapping
      */
-    attributeContentType?: AttributeCallbackMappingAttributeContentTypeEnum;
+    attributeContentType?: AttributeContentType;
     /**
      * Name of the path variable or request param or body field which is to be used to assign value of attribute
      * @type {string}
@@ -43,10 +47,10 @@ export interface AttributeCallbackMapping {
     to: string;
     /**
      * Set of targets for propagating value.
-     * @type {Array<string>}
+     * @type {Array<AttributeValueTarget>}
      * @memberof AttributeCallbackMapping
      */
-    targets: Array<AttributeCallbackMappingTargetsEnum>;
+    targets: Array<AttributeValueTarget>;
     /**
      * Static value to be propagated to targets. It is optional and is set only if the value is known at attribute creation time.
      * @type {object}
@@ -54,41 +58,3 @@ export interface AttributeCallbackMapping {
      */
     value?: object;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum AttributeCallbackMappingAttributeTypeEnum {
-    Data = 'data',
-    Group = 'group',
-    Info = 'info'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum AttributeCallbackMappingAttributeContentTypeEnum {
-    String = 'string',
-    Integer = 'integer',
-    Secret = 'secret',
-    File = 'file',
-    Boolean = 'boolean',
-    Credential = 'credential',
-    Date = 'date',
-    Float = 'float',
-    Object = 'object',
-    Text = 'text',
-    Time = 'time',
-    Datetime = 'datetime'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum AttributeCallbackMappingTargetsEnum {
-    PathVariable = 'pathVariable',
-    RequestParameter = 'requestParameter',
-    Body = 'body'
-}
-

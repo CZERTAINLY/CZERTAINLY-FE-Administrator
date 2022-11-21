@@ -12,7 +12,7 @@
  */
 
 import type {
-    ComplianceRulesResponseDtoAttributesInner,
+    BaseAttributeDto,
 } from './';
 
 /**
@@ -47,10 +47,10 @@ export interface ComplianceRulesResponseDto {
     certificateType: ComplianceRulesResponseDtoCertificateTypeEnum;
     /**
      * Rule attributes
-     * @type {Array<ComplianceRulesResponseDtoAttributesInner>}
+     * @type {Array<BaseAttributeDto>}
      * @memberof ComplianceRulesResponseDto
      */
-    attributes?: Array<ComplianceRulesResponseDtoAttributesInner>;
+    attributes?: Array<BaseAttributeDto>;
     /**
      * Description of the rule
      * @type {string}

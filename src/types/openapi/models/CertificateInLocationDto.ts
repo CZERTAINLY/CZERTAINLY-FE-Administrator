@@ -12,6 +12,7 @@
  */
 
 import type {
+    MetadataResponseDto,
     RequestAttributeDto,
 } from './';
 
@@ -41,10 +42,10 @@ export interface CertificateInLocationDto {
     serialNumber: string;
     /**
      * Metadata of the Certificate in Location
-     * @type {{ [key: string]: object; }}
+     * @type {Array<MetadataResponseDto>}
      * @memberof CertificateInLocationDto
      */
-    metadata: { [key: string]: object; };
+    metadata: Array<MetadataResponseDto>;
     /**
      * Applied push attributes
      * @type {Array<RequestAttributeDto>}

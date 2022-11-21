@@ -12,11 +12,13 @@
  */
 
 import type {
+    AttributeContentType,
+    AttributeType,
     BaseAttributeContent,
 } from './';
 
 /**
- * List of Credential Attributes
+ * Response attribute with content for object it belongs to
  * @export
  * @interface ResponseAttributeDto
  */
@@ -40,17 +42,15 @@ export interface ResponseAttributeDto {
      */
     label: string;
     /**
-     * Type of the Attribute
-     * @type {string}
+     * @type {AttributeType}
      * @memberof ResponseAttributeDto
      */
-    type: ResponseAttributeDtoTypeEnum;
+    type: AttributeType;
     /**
-     * Content Type of the Attribute
-     * @type {string}
+     * @type {AttributeContentType}
      * @memberof ResponseAttributeDto
      */
-    contentType: ResponseAttributeDtoContentTypeEnum;
+    contentType: AttributeContentType;
     /**
      * Content of the Attribute
      * @type {Array<BaseAttributeContent>}
@@ -58,32 +58,3 @@ export interface ResponseAttributeDto {
      */
     content?: Array<BaseAttributeContent>;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum ResponseAttributeDtoTypeEnum {
-    Data = 'data',
-    Group = 'group',
-    Info = 'info'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum ResponseAttributeDtoContentTypeEnum {
-    String = 'string',
-    Integer = 'integer',
-    Secret = 'secret',
-    File = 'file',
-    Boolean = 'boolean',
-    Credential = 'credential',
-    Date = 'date',
-    Float = 'float',
-    Object = 'object',
-    Text = 'text',
-    Time = 'time',
-    Datetime = 'datetime'
-}
-

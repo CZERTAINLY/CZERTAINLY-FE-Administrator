@@ -13,6 +13,8 @@
 
 import type {
     DiscoveryCertificatesDto,
+    DiscoveryStatus,
+    MetadataResponseDto,
     ResponseAttributeDto,
 } from './';
 
@@ -40,11 +42,10 @@ export interface DiscoveryHistoryDto {
      */
     kind: string;
     /**
-     * Status of Discovery
-     * @type {string}
+     * @type {DiscoveryStatus}
      * @memberof DiscoveryHistoryDto
      */
-    status: DiscoveryHistoryDtoStatusEnum;
+    status: DiscoveryStatus;
     /**
      * Failure/Success Messages
      * @type {string}
@@ -95,20 +96,8 @@ export interface DiscoveryHistoryDto {
     attributes: Array<ResponseAttributeDto>;
     /**
      * Metadata of the Discovery
-     * @type {{ [key: string]: object; }}
+     * @type {Array<MetadataResponseDto>}
      * @memberof DiscoveryHistoryDto
      */
-    meta?: { [key: string]: object; };
+    metadata?: Array<MetadataResponseDto>;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum DiscoveryHistoryDtoStatusEnum {
-    InProgress = 'inProgress',
-    Failed = 'failed',
-    Completed = 'completed',
-    Warning = 'warning'
-}
-

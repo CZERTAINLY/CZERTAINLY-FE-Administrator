@@ -23,9 +23,9 @@ export interface ObjectAttributeContent {
      */
     reference?: string;
     /**
-     * Object attribute value
+     * Object attribute content data
      * @type {object}
      * @memberof ObjectAttributeContent
      */
-    data?: object;
+    data: object;
 }

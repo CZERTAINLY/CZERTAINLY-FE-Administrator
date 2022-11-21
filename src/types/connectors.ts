@@ -7,12 +7,9 @@ import {
     ConnectRequestDto as ConnectRequestDtoOpenApi,
     EndpointDto as EndpointDtoOpenApi,
     FunctionGroupDto as FunctionGroupDtoOpenApi,
-    FunctionGroupDtoFunctionGroupCodeEnum,
     HealthDto as HealthDtoOpenApi, RaProfileCallbackRequest, RequestAttributeCallback,
 } from "./openapi";
 import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
-
-export type FunctionGroupCode = FunctionGroupDtoFunctionGroupCodeEnum;
 
 export type AuthType = "none" | "basic" | "certificate" | "apiKey" | "jwt";
 

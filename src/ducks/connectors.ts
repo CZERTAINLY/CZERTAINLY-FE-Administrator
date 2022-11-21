@@ -7,13 +7,12 @@ import {
    ConnectorRequestModel,
    ConnectorResponseModel,
    ConnectorUpdateRequestModel,
-   ConnectRequestModel
+   ConnectRequestModel, FunctionGroupModel, HealthModel
 } from "types/connectors";
-import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
 
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 import { AttributeDescriptorCollectionModelNew, AttributeDescriptorModelNew } from "types/attributes";
-import { ConnectorDtoStatusEnum, GetAttributesFunctionGroupEnum } from "types/openapi";
+import { ConnectorStatus, FunctionGroupCode } from "types/openapi";
 
 
 export type State = {
@@ -21,7 +20,7 @@ export type State = {
    checkedRows: string[]
 
    connector?: ConnectorResponseModel;
-   connectorHealth?: ConnectorHealthModel;
+   connectorHealth?: HealthModel;
    connectorAttributes?: AttributeDescriptorCollectionModelNew;
    connectorConnectionDetails?: FunctionGroupModel[];
    connectors: ConnectorResponseModel[];
@@ -191,7 +190,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAttributesDescriptors: (state, action: PayloadAction<{ uuid: string, functionGroup: GetAttributesFunctionGroupEnum, kind: string }>) => {
+      getConnectorAttributesDescriptors: (state, action: PayloadAction<{ uuid: string, functionGroup: FunctionGroupCode, kind: string }>) => {
 
          if (
             state.connectorAttributes &&
@@ -254,7 +253,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorHealthSuccess: (state, action: PayloadAction<{ health: ConnectorHealthModel }>) => {
+      getConnectorHealthSuccess: (state, action: PayloadAction<{ health: HealthModel }>) => {
 
          state.isFetchingHealth = false;
          state.connectorHealth = action.payload.health;
@@ -529,7 +528,7 @@ export const slice = createSlice({
       authorizeConnectorSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isAuthorizing = false;
-         state.connector!.status = ConnectorDtoStatusEnum.Connected
+         state.connector!.status = ConnectorStatus.Connected
       },
 
 

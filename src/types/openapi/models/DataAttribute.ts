@@ -13,15 +13,67 @@
 
 import type {
     AttributeCallback,
-    BaseAttribute,
+    AttributeContentType,
+    AttributeType,
     BaseAttributeConstraint,
     BaseAttributeContent,
-    DataAttributeAllOf,
     DataAttributeProperties,
 } from './';
 
 /**
- * @type DataAttribute
+ * Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
  * @export
+ * @interface DataAttribute
  */
-export type DataAttribute = BaseAttribute & DataAttributeAllOf;
+export interface DataAttribute {
+    /**
+     * UUID of the Attribute for unique identification
+     * @type {string}
+     * @memberof DataAttribute
+     */
+    uuid: string;
+    /**
+     * Name of the Attribute that is used for identification
+     * @type {string}
+     * @memberof DataAttribute
+     */
+    name: string;
+    /**
+     * Optional description of the Attribute, should contain helper text on what is expected
+     * @type {string}
+     * @memberof DataAttribute
+     */
+    description?: string;
+    /**
+     * Content of the Attribute
+     * @type {Array<BaseAttributeContent>}
+     * @memberof DataAttribute
+     */
+    content?: Array<BaseAttributeContent>;
+    /**
+     * @type {AttributeType}
+     * @memberof DataAttribute
+     */
+    type: AttributeType;
+    /**
+     * @type {AttributeContentType}
+     * @memberof DataAttribute
+     */
+    contentType: AttributeContentType;
+    /**
+     * @type {DataAttributeProperties}
+     * @memberof DataAttribute
+     */
+    properties: DataAttributeProperties;
+    /**
+     * Optional regular expressions and constraints used for validating the Attribute content
+     * @type {Array<BaseAttributeConstraint>}
+     * @memberof DataAttribute
+     */
+    constraints?: Array<BaseAttributeConstraint>;
+    /**
+     * @type {AttributeCallback}
+     * @memberof DataAttribute
+     */
+    attributeCallback?: AttributeCallback;
+}

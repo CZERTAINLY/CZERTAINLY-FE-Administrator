@@ -19,7 +19,7 @@ import {
    ComplianceProfileManagementMock
 } from "./compliance-profile";
 import { FetchHttpServiceImpl } from "utils/FetchHttpService";
-import { AuthorityManagementAPIApi, CallbackAPIApi, Configuration, ConnectorManagementAPIApi } from "../types/openapi";
+import { AuthorityManagementApi, CallbackApi, Configuration, ConnectorManagementApi } from "../types/openapi";
 
 
 const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
@@ -32,10 +32,10 @@ export interface ApiClients {
    auditLogs: AuditLogsApi;
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
-   connectors: ConnectorManagementAPIApi;
-   callback: CallbackAPIApi;
+   connectors: ConnectorManagementApi;
+   callback: CallbackApi;
    dashboard: DashboardManagementApi;
-   authorities: AuthorityManagementAPIApi;
+   authorities: AuthorityManagementApi;
    entities: EntityManagementApi;
    locations: LocationManagementApi;
    certificates: CertificateInventoryApi;
@@ -56,11 +56,11 @@ export const backendClient: ApiClients = {
    auditLogs: new AuditLogsBackend(fetchService),
    profiles: new ProfilesManagementBackend(fetchService),
    credentials: new CredentialManagementBackend(fetchService),
-   authorities: new AuthorityManagementAPIApi(configuration),
+   authorities: new AuthorityManagementApi(configuration),
    entities: new EntityManagementBackend(fetchService),
    locations: new LocationManagementBackend(fetchService),
-   connectors: new ConnectorManagementAPIApi(configuration),
-   callback: new CallbackAPIApi(configuration),
+   connectors: new ConnectorManagementApi(configuration),
+   callback: new CallbackApi(configuration),
    dashboard: new DashboardManagementBackend(fetchService),
    acmeAccounts: new AcmeAccountManagementBackend(fetchService),
    acmeProfiles: new AcmeProfilesManagementBackend(fetchService),

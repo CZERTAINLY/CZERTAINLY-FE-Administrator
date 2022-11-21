@@ -1,5 +1,6 @@
 import { AttributeDTO } from "api/_common/attributeDTO";
-import { AuthType, FunctionGroupCode, Status } from "types/connectors";
+import { AuthType, Status } from "types/connectors";
+import { FunctionGroupCode } from "types/openapi";
 
 
 export interface EndpointDTO {

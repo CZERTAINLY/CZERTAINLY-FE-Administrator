@@ -12,6 +12,7 @@
  */
 
 /**
+ * Time attribute value
  * @export
  * @interface LocalTime
  */

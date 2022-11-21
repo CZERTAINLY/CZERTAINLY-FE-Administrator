@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Sort,
-} from './';
-
 /**
  * @export
  * @interface Pageable
@@ -24,30 +20,15 @@ export interface Pageable {
      * @type {number}
      * @memberof Pageable
      */
-    offset?: number;
-    /**
-     * @type {Sort}
-     * @memberof Pageable
-     */
-    sort?: Sort;
-    /**
-     * @type {boolean}
-     * @memberof Pageable
-     */
-    unpaged?: boolean;
-    /**
-     * @type {boolean}
-     * @memberof Pageable
-     */
-    paged?: boolean;
+    page?: number;
     /**
      * @type {number}
      * @memberof Pageable
      */
-    pageNumber?: number;
+    size?: number;
     /**
-     * @type {number}
+     * @type {Array<string>}
      * @memberof Pageable
      */
-    pageSize?: number;
+    sort?: Array<string>;
 }

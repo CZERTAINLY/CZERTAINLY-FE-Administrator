@@ -27,5 +27,5 @@ export interface StringAttributeContent {
      * @type {string}
      * @memberof StringAttributeContent
      */
-    data?: string;
+    data: string;
 }

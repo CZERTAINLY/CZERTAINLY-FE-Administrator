@@ -16,7 +16,7 @@ import type {
 } from './';
 
 /**
- * File Content
+ * File attribute content data
  * @export
  * @interface FileAttributeContentData
  */

@@ -13,11 +13,11 @@
 
 import type {
     CertificateInLocationDto,
+    MetadataResponseDto,
     ResponseAttributeDto,
 } from './';
 
 /**
- * Locations associated to the Certificate
  * @export
  * @interface LocationDto
  */
@@ -84,8 +84,8 @@ export interface LocationDto {
     certificates: Array<CertificateInLocationDto>;
     /**
      * Location metadata
-     * @type {{ [key: string]: object; }}
+     * @type {Array<MetadataResponseDto>}
      * @memberof LocationDto
      */
-    metadata?: { [key: string]: object; };
+    metadata?: Array<MetadataResponseDto>;
 }

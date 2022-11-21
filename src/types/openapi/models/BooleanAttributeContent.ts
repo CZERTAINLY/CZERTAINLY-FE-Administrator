@@ -27,5 +27,5 @@ export interface BooleanAttributeContent {
      * @type {boolean}
      * @memberof BooleanAttributeContent
      */
-    data?: boolean;
+    data: boolean;
 }

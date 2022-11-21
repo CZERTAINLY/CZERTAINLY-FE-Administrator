@@ -11,17 +11,20 @@
  * Do not edit the class manually.
  */
 
+import type {
+    HealthStatus,
+} from './';
+
 /**
  * @export
  * @interface HealthDto
  */
 export interface HealthDto {
     /**
-     * Current connector operational status
-     * @type {string}
+     * @type {HealthStatus}
      * @memberof HealthDto
      */
-    status: HealthDtoStatusEnum;
+    status: HealthStatus;
     /**
      * Detailed status description
      * @type {string}
@@ -35,14 +38,3 @@ export interface HealthDto {
      */
     parts?: { [key: string]: HealthDto; };
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum HealthDtoStatusEnum {
-    Ok = 'ok',
-    Nok = 'nok',
-    Unknown = 'unknown'
-}
-

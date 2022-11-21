@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    AttributeConstraintType,
+} from './';
+
 /**
  * @export
  * @interface RegexpAttributeConstraint
@@ -29,11 +33,10 @@ export interface RegexpAttributeConstraint {
      */
     errorMessage?: string;
     /**
-     * Attribute Constraint Type
-     * @type {string}
+     * @type {AttributeConstraintType}
      * @memberof RegexpAttributeConstraint
      */
-    type: RegexpAttributeConstraintTypeEnum;
+    type: AttributeConstraintType;
     /**
      * Regular Expression Attribute Constraint Data
      * @type {string}
@@ -41,14 +44,3 @@ export interface RegexpAttributeConstraint {
      */
     data?: string;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum RegexpAttributeConstraintTypeEnum {
-    RegExp = 'regExp',
-    Range = 'range',
-    DateTime = 'dateTime'
-}
-

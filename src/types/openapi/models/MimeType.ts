@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    MimeTypeCharset,
-} from './';
-
 /**
  * Type of the file uploaded
  * @export
@@ -37,10 +33,10 @@ export interface MimeType {
      */
     parameters?: { [key: string]: string; };
     /**
-     * @type {MimeTypeCharset}
+     * @type {boolean}
      * @memberof MimeType
      */
-    charset?: MimeTypeCharset;
+    wildcardType?: boolean;
     /**
      * @type {boolean}
      * @memberof MimeType
@@ -50,10 +46,10 @@ export interface MimeType {
      * @type {boolean}
      * @memberof MimeType
      */
-    wildcardType?: boolean;
+    concrete?: boolean;
     /**
-     * @type {boolean}
+     * @type {string}
      * @memberof MimeType
      */
-    concrete?: boolean;
+    charset?: string;
 }

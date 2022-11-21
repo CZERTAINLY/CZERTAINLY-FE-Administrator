@@ -9,8 +9,8 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformAuthorityResponseDtoToModel } from "./transform/authorities";
 import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
-import { GetAttributesFunctionGroupEnum, ListConnectorsFunctionGroupEnum } from "types/openapi";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { FunctionGroupCode } from "types/openapi";
 
 
 const listAuthorities: AppEpic = (action$, state$, deps) => {
@@ -86,7 +86,7 @@ const listAuthorityProviders: AppEpic = (action$, state, deps) => {
          slice.actions.listAuthorityProviders.match
       ),
       switchMap(
-         () => deps.apiClients.connectors.listConnectors({ functionGroup: ListConnectorsFunctionGroupEnum.AuthorityProvider }).pipe(
+         () => deps.apiClients.connectors.listConnectors({ functionGroup: FunctionGroupCode.AuthorityProvider }).pipe(
 
             map(
                providers => slice.actions.listAuthorityProvidersSuccess({
@@ -118,7 +118,7 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
 
          action => deps.apiClients.connectors.getAttributes({
                  uuid: action.payload.uuid,
-                 functionGroup: GetAttributesFunctionGroupEnum.AuthorityProvider,
+                 functionGroup: FunctionGroupCode.AuthorityProvider,
                  kind: action.payload.kind
              }
          ).pipe(

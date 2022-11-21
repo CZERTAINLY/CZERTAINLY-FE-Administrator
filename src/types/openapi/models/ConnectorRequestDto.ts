@@ -12,6 +12,7 @@
  */
 
 import type {
+    AuthType,
     RequestAttributeDto,
 } from './';
 
@@ -33,11 +34,10 @@ export interface ConnectorRequestDto {
      */
     url: string;
     /**
-     * Type of authentication for the Connector
-     * @type {string}
+     * @type {AuthType}
      * @memberof ConnectorRequestDto
      */
-    authType: ConnectorRequestDtoAuthTypeEnum;
+    authType: AuthType;
     /**
      * List of authentication Attributes. Required if the authentication type is not NONE
      * @type {Array<RequestAttributeDto>}
@@ -45,16 +45,3 @@ export interface ConnectorRequestDto {
      */
     authAttributes?: Array<RequestAttributeDto>;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum ConnectorRequestDtoAuthTypeEnum {
-    None = 'none',
-    Basic = 'basic',
-    Certificate = 'certificate',
-    ApiKey = 'apiKey',
-    Jwt = 'jwt'
-}
-
