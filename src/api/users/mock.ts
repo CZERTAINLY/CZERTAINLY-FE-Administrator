@@ -12,7 +12,7 @@ import { DbUser } from "api/_mocks/db-users";
 import { RoleDTO } from "api/roles";
 
 
-export class UserManagementMock implements model.UserManagementApi {
+export class UserManagementMock {
 
 
    list(): Observable<model.UserDTO[]> {

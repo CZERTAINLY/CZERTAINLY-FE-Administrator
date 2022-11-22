@@ -22,5 +22,5 @@ export type RoleResponseModel = RoleResponseDto;
 export type UserDetailDto = UserDetailDtoOpenApi;
 export type UserDetailModel = Omit<UserDetailDto, "certificate | roles"> & { certificate?: UserCertificateModel, roles: Array<RoleResponseModel> };
 
-export type UserRequestDto = UpdateUserRequestDto;
-export type UserRequestModel = UserRequestDto;
+export type UserUpdateRequestDto = UpdateUserRequestDto;
+export type UserUpdateRequestModel = UserUpdateRequestDto;

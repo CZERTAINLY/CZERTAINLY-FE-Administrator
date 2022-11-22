@@ -1,59 +1,43 @@
-import { RoleDetailDTO, RoleDTO, SubjectPermissionsDTO } from "api/roles";
-import { RoleDetailModel, RoleModel, SubjectPermissionsModel } from "models/roles";
-import { transformUserDTOToModel } from "./users";
+import {
+    ObjectPermissionsResponseDto,
+    ObjectPermissionsResponseModel,
+    ResourcePermissionsResponseDto,
+    ResourcePermissionsResponseModel,
+    RoleDetailDto,
+    RoleDetailModel,
+    RoleRequestDto,
+    RoleRequestModel,
+    SubjectPermissionsDto,
+    SubjectPermissionsModel
+} from "types/roles";
+import { transformUserResponseDtoToModel } from "./users";
 
 
-export function transformRoleDTOToModel(role: RoleDTO): RoleModel {
-
+export function transformRoleDetailDtoToModel(role: RoleDetailDto): RoleDetailModel {
    return {
-      uuid: role.uuid,
-      name: role.name,
-      description: role.description,
-      systemRole: role.systemRole,
+      ...role,
+      users: role.users.map(user => transformUserResponseDtoToModel(user))
    };
-
 }
 
-
-export function transformRoleDetailDTOToModel(role: RoleDetailDTO): RoleDetailModel {
-
-   return {
-      ...transformRoleDTOToModel(role),
-      users: role.users.map(user => transformUserDTOToModel(user))
-   };
-
+export function transformRoleRequestModelToDto(role: RoleRequestModel): RoleRequestDto {
+    return { ...role };
 }
 
+export function transformObjectPermissionsResponseDtoToModel(objectPermissions: ObjectPermissionsResponseDto): ObjectPermissionsResponseModel {
+    return { ...objectPermissions };
+}
 
-export function transformSubjectPermissionsDTOToModel(permissions: SubjectPermissionsDTO): SubjectPermissionsModel {
+export function transformResourcePermissionsResponseDtoToModel(resourcePermission: ResourcePermissionsResponseDto): ResourcePermissionsResponseModel {
+    return {
+        ...resourcePermission,
+        objects: resourcePermission.objects.map(transformObjectPermissionsResponseDtoToModel)
+    };
+}
 
+export function transformSubjectPermissionsDtoToModel(permissions: SubjectPermissionsDto): SubjectPermissionsModel {
    return {
-
-      allowAllResources: permissions.allowAllResources,
-
-      resources: permissions.resources.map(
-
-         resource => ({
-
-            name: resource.name,
-            allowAllActions: resource.allowAllActions,
-            actions: [ ...resource.actions ],
-
-            objects: resource.objects?.map(
-
-               object => ({
-                  uuid: object.uuid,
-                  name: object.name,
-                  allow: [ ...object.allow ],
-                  deny: [ ...object.deny ],
-               })
-
-            )
-
-         })
-
-      )
-
-   }
-
+        ...permissions,
+        resources: permissions.resources.map(transformResourcePermissionsResponseDtoToModel)
+   };
 }

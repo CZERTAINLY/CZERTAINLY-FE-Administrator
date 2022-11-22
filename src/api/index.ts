@@ -1,6 +1,4 @@
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
-import { UserManagementApi, UserManagementBackend, UserManagementMock } from "./users";
-import { RolesManagementApi, RolesManagementBackend, RolesManagementMock } from "./roles";
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { EntityManagementApi, EntityManagementBackend, EntityManagementMock } from "./entity";
@@ -23,8 +21,10 @@ import {
    AuthorityManagementApi,
    CallbackApi,
    Configuration,
-   ConnectorManagementApi
-} from "../types/openapi";
+   ConnectorManagementApi,
+   RoleManagementApi,
+   UserManagementApi
+} from "types/openapi";
 
 
 const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
@@ -33,7 +33,7 @@ const configuration = new Configuration({ basePath: ((window as any).__ENV__.API
 export interface ApiClients {
    auth: AuthenticationManagementApi;
    users: UserManagementApi;
-   roles: RolesManagementApi;
+   roles: RoleManagementApi;
    auditLogs: AuditLogsApi;
    profiles: ProfilesManagementApi;
    credentials: CredentialManagementApi;
@@ -55,8 +55,8 @@ export interface ApiClients {
 
 export const backendClient: ApiClients = {
    auth: new AuthenticationManagementApi(configuration),
-   users: new UserManagementBackend(fetchService),
-   roles: new RolesManagementBackend(fetchService),
+   users: new UserManagementApi(configuration),
+   roles: new RoleManagementApi(configuration),
    certificates: new CertificateInventoryBackend(fetchService),
    auditLogs: new AuditLogsBackend(fetchService),
    profiles: new ProfilesManagementBackend(fetchService),
@@ -78,8 +78,8 @@ export const backendClient: ApiClients = {
 
 export const mockClient: Partial<ApiClients> = {
    // auth: new AuthMock(),
-   users: new UserManagementMock(),
-   roles: new RolesManagementMock(),
+   // users: new UserManagementMock(),
+   // roles: new RolesManagementMock(),
    certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
    profiles: new ProfilesManagementMock(),

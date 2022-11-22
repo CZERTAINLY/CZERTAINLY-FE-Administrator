@@ -1,10 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
-import { ResourceModel, UserDetailModel, UserRequestModel } from "types/auth";
-
-// import { ResourceDetailModel } from 'models';
-// import { UserDetailModel } from 'models/users';
-// import { ProfileDetailModel } from 'models/userProfile';
+import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
 
 export type State = {
 
@@ -81,7 +77,7 @@ export const slice = createSlice({
       },
 
 
-      updateProfile(state, action: PayloadAction<{ profile: UserRequestModel, redirect?: string }>) {
+      updateProfile(state, action: PayloadAction<{ profile: UserUpdateRequestModel, redirect?: string }>) {
 
          state.isUpdatingProfile = true;
 

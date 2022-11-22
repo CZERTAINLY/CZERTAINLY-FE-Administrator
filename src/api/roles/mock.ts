@@ -7,7 +7,7 @@ import { randomDelay } from 'utils/mock';
 import * as model from './model';
 import { UserDTO } from 'api/users';
 
-export class RolesManagementMock implements model.RolesManagementApi {
+export class RolesManagementMock {
 
    list(): Observable<model.RoleDTO[]> {
 
