@@ -7,7 +7,7 @@ import * as model from './model';
 import { UserDetailDTO } from 'api/users';
 
 
-export class AuthMock implements model.AuthApi {
+export class AuthMock {
 
 
    profile(): Observable<UserDetailDTO> {

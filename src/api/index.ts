@@ -1,4 +1,3 @@
-import { AuthApi, AuthBackend, AuthMock } from "./auth";
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
 import { UserManagementApi, UserManagementBackend, UserManagementMock } from "./users";
 import { RolesManagementApi, RolesManagementBackend, RolesManagementMock } from "./roles";
@@ -19,14 +18,20 @@ import {
    ComplianceProfileManagementMock
 } from "./compliance-profile";
 import { FetchHttpServiceImpl } from "utils/FetchHttpService";
-import { AuthorityManagementApi, CallbackApi, Configuration, ConnectorManagementApi } from "../types/openapi";
+import {
+   AuthenticationManagementApi,
+   AuthorityManagementApi,
+   CallbackApi,
+   Configuration,
+   ConnectorManagementApi
+} from "../types/openapi";
 
 
 const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
 
 export interface ApiClients {
-   auth: AuthApi;
+   auth: AuthenticationManagementApi;
    users: UserManagementApi;
    roles: RolesManagementApi;
    auditLogs: AuditLogsApi;
@@ -49,7 +54,7 @@ export interface ApiClients {
 
 
 export const backendClient: ApiClients = {
-   auth: new AuthBackend(fetchService),
+   auth: new AuthenticationManagementApi(configuration),
    users: new UserManagementBackend(fetchService),
    roles: new RolesManagementBackend(fetchService),
    certificates: new CertificateInventoryBackend(fetchService),
@@ -72,7 +77,7 @@ export const backendClient: ApiClients = {
 
 
 export const mockClient: Partial<ApiClients> = {
-   auth: new AuthMock(),
+   // auth: new AuthMock(),
    users: new UserManagementMock(),
    roles: new RolesManagementMock(),
    certificates: new CertificateInventoryMock(),

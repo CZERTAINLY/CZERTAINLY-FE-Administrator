@@ -1,14 +1,15 @@
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
+import { ResourceModel, UserDetailModel, UserRequestModel } from "types/auth";
 
-import { ResourceDetailModel } from 'models';
-import { UserDetailModel } from 'models/users';
-import { ProfileDetailModel } from 'models/userProfile';
+// import { ResourceDetailModel } from 'models';
+// import { UserDetailModel } from 'models/users';
+// import { ProfileDetailModel } from 'models/userProfile';
 
 export type State = {
 
    profile?: UserDetailModel;
-   resources?: ResourceDetailModel[];
+   resources?: ResourceModel[];
    objects?: { uuid: string; name: string; }[];
 
    isFetchingProfile: boolean;
@@ -80,7 +81,7 @@ export const slice = createSlice({
       },
 
 
-      updateProfile(state, action: PayloadAction<{ profile: ProfileDetailModel, redirect?: string }>) {
+      updateProfile(state, action: PayloadAction<{ profile: UserRequestModel, redirect?: string }>) {
 
          state.isUpdatingProfile = true;
 
@@ -110,7 +111,7 @@ export const slice = createSlice({
       },
 
 
-      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceDetailModel[] }>) {
+      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceModel[] }>) {
 
          state.isFetchingResources = false;
          state.resources = action.payload.resources;
@@ -124,28 +125,28 @@ export const slice = createSlice({
 
       },
 
-
-      listObjects(state, action: PayloadAction<{ endpoint: string }>) {
-
-         state.objects = undefined;
-         state.isFetchingObjects = true;
-
-      },
-
-
-      listObjectsSuccess(state, action: PayloadAction<{ objects: { uuid: string; name: string; }[] }>) {
-
-         state.isFetchingObjects = false;
-         state.objects = action.payload.objects;
-
-      },
-
-
-      listObjectsFailure(state, action: PayloadAction<void>) {
-
-         state.isFetchingObjects = false;
-
-      }
+      //
+      // listObjects(state, action: PayloadAction<{ endpoint: string }>) {
+      //
+      //    state.objects = undefined;
+      //    state.isFetchingObjects = true;
+      //
+      // },
+      //
+      //
+      // listObjectsSuccess(state, action: PayloadAction<{ objects: { uuid: string; name: string; }[] }>) {
+      //
+      //    state.isFetchingObjects = false;
+      //    state.objects = action.payload.objects;
+      //
+      // },
+      //
+      //
+      // listObjectsFailure(state, action: PayloadAction<void>) {
+      //
+      //    state.isFetchingObjects = false;
+      //
+      // }
 
 
    }
@@ -157,23 +158,23 @@ const selectState = createFeatureSelector<State>(slice.name);
 
 const profile = createSelector(selectState, state => state.profile);
 const resources = createSelector(selectState, state => state.resources);
-const objects = createSelector(selectState, state => state.objects);
+// const objects = createSelector(selectState, state => state.objects);
 
 const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
 const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
 const isFetchingResources = createSelector(selectState, state => state.isFetchingResources);
-const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
+// const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
 
 
 export const selectors = {
    selectState,
    profile,
    resources,
-   objects,
+   // objects,
    isFetchingProfile,
    isUpdatingProfile,
    isFetchingResources,
-   isFetchingObjects
+   // isFetchingObjects
 };
 
 

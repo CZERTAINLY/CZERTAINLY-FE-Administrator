@@ -1,7 +1,3 @@
-import { UserDetailDTO } from 'api/users';
-import { Observable } from 'rxjs';
-
-
 export interface ActionDTO {
    uuid: string;
    name: string;
@@ -48,18 +44,5 @@ export interface ProfileDetailDTO {
 
 
 export interface ResourceDetailDTO extends ResourceDTO {
-}
-
-
-export interface AuthApi {
-
-   profile(): Observable<UserDetailDTO>;
-
-   updateProfile(user: ProfileDetailDTO): Observable<UserDetailDTO>;
-
-   getAllResources(): Observable<ResourceDetailDTO[]>;
-
-   listObjects(endpoint: string): Observable<{ uuid: string, name: string }[]>;
-
 }
 
