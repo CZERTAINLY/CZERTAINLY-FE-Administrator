@@ -440,7 +440,7 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.raProfiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
 
                   mergeMap(
                      raProfile => of(
@@ -596,7 +596,7 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.raProfiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
 
                   map(
 

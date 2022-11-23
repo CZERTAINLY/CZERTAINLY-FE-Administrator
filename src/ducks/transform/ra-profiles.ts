@@ -1,44 +1,56 @@
-import { RaAuthorizedClientDTO, RaProfileDTO } from "api/profiles";
-import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models/ra-profiles";
-import { transformAttributeDTOToModel, transformAttributeModelToDTO } from "./attributes";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+import {
+   ComplianceProfileSimplifiedDto, ComplianceProfileSimplifiedModel,
+   RaProfileAcmeDetailResponseDto,
+   RaProfileAcmeDetailResponseModel,
+   RaProfileActivateAcmeRequestDto,
+   RaProfileActivateAcmeRequestModel,
+   RaProfileAddRequestDto,
+   RaProfileAddRequestModel,
+   RaProfileEditRequestDto,
+   RaProfileEditRequestModel,
+   RaProfileResponseDto,
+   RaProfileResponseModel
+} from "types/ra-profiles";
 
-export function transformRaProfileDtoToModel(raProfileDto: RaProfileDTO): RaProfileModel {
-
+export function transformRaProfileResponseDtoToModel(raResponse: RaProfileResponseDto): RaProfileResponseModel {
    return {
-      uuid: raProfileDto.uuid,
-      name: raProfileDto.name,
-      enabled: raProfileDto.enabled,
-      description: raProfileDto.description,
-      authorityInstanceUuid: raProfileDto.authorityInstanceUuid,
-      authorityInstanceName: raProfileDto.authorityInstanceName,
-      attributes: raProfileDto.attributes ? raProfileDto.attributes.map(attribute => transformAttributeDTOToModel(attribute)) : [],
-      enabledProtocols: raProfileDto.enabledProtocols,
-      complianceProfiles: raProfileDto?.complianceProfiles,
-   };
-
+      ...raResponse,
+      attributes: raResponse.attributes.map(transformAttributeResponseDtoToModel)
+   }
 }
 
-
-export function transformRaAuthorizedClientDtoToModel(raAuthorizedClientDto: RaAuthorizedClientDTO): RaAuthorizedClientModel {
-
+export function transformRaProfileActivateAcmeRequestModelToDto(raAcmeRequest: RaProfileActivateAcmeRequestModel): RaProfileActivateAcmeRequestDto {
    return {
-      uuid: raAuthorizedClientDto.uuid,
-      name: raAuthorizedClientDto.name,
-      enabled: raAuthorizedClientDto.enabled
-   };
-
+      ...raAcmeRequest,
+      issueCertificateAttributes: raAcmeRequest.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
+      revokeCertificateAttributes: raAcmeRequest.revokeCertificateAttributes.map(transformAttributeRequestModelToDto)
+   }
 }
 
-
-export function transformRaAcmeLinkDtoToModel(raAcmeLinkDto: RaAcmeLinkModel): RaAcmeLinkModel {
-
+export function transformRaProfileAcmeDetailResponseDtoToModel(raAcmeResponse: RaProfileAcmeDetailResponseDto): RaProfileAcmeDetailResponseModel {
    return {
-      uuid: raAcmeLinkDto.uuid,
-      name: raAcmeLinkDto.name,
-      directoryUrl: raAcmeLinkDto.directoryUrl,
-      issueCertificateAttributes: raAcmeLinkDto.issueCertificateAttributes?.map(attribute => transformAttributeModelToDTO(attribute)),
-      revokeCertificateAttributes: raAcmeLinkDto.revokeCertificateAttributes?.map(attribute => transformAttributeModelToDTO(attribute)),
-      acmeAvailable: raAcmeLinkDto.acmeAvailable
-   };
-
+      ...raAcmeResponse,
+      issueCertificateAttributes: raAcmeResponse.issueCertificateAttributes.map(transformAttributeResponseDtoToModel),
+      revokeCertificateAttributes: raAcmeResponse.revokeCertificateAttributes.map(transformAttributeResponseDtoToModel)
+   }
 }
+
+export function transformRaProfileAddRequestModelToDto(raAddReq: RaProfileAddRequestModel): RaProfileAddRequestDto {
+   return {
+      ...raAddReq,
+      attributes: raAddReq.attributes.map(transformAttributeRequestModelToDto)
+   }
+}
+
+export function transformRaProfileEditRequestModelToDto(raEditReq: RaProfileEditRequestModel): RaProfileEditRequestDto {
+   return {
+      ...raEditReq,
+      attributes: raEditReq.attributes.map(transformAttributeRequestModelToDto)
+   }
+}
+
+export function transformComplianceProfileSimplifiedDtoToModel(complianceProfile: ComplianceProfileSimplifiedDto): ComplianceProfileSimplifiedModel {
+   return { ...complianceProfile }
+}
+

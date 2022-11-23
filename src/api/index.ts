@@ -1,5 +1,4 @@
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
-import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
@@ -19,7 +18,7 @@ import {
    AuthorityManagementApi,
    CallbackApi,
    Configuration,
-   ConnectorManagementApi, EntityManagementApi, LocationManagementApi,
+   ConnectorManagementApi, EntityManagementApi, LocationManagementApi, RAProfileManagementApi,
    RoleManagementApi,
    UserManagementApi
 } from "types/openapi";
@@ -33,7 +32,7 @@ export interface ApiClients {
    users: UserManagementApi;
    roles: RoleManagementApi;
    auditLogs: AuditLogsApi;
-   profiles: ProfilesManagementApi;
+   raProfiles: RAProfileManagementApi;
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
    callback: CallbackApi;
@@ -57,7 +56,7 @@ export const backendClient: ApiClients = {
    roles: new RoleManagementApi(configuration),
    certificates: new CertificateInventoryBackend(fetchService),
    auditLogs: new AuditLogsBackend(fetchService),
-   profiles: new ProfilesManagementBackend(fetchService),
+   raProfiles: new RAProfileManagementApi(configuration),
    credentials: new CredentialManagementBackend(fetchService),
    authorities: new AuthorityManagementApi(configuration),
    entities: new EntityManagementApi(configuration),
@@ -80,7 +79,7 @@ export const mockClient: Partial<ApiClients> = {
    // roles: new RolesManagementMock(),
    certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
-   profiles: new ProfilesManagementMock(),
+   // profiles: new ProfilesManagementMock(),
    credentials: new CredentialManagementMock(),
    // authorities: new AuthorityManagementMock(),
    // entities: new EntityManagementMock(),

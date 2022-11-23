@@ -7,7 +7,7 @@ import { dbData } from "api/_mocks/db";
 import { randomDelay } from "utils/mock";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
-export class ProfilesManagementMock implements model.ProfilesManagementApi {
+export class ProfilesManagementMock {
 
 
    getRaProfilesList(): Observable<model.RaProfileDTO[]> {

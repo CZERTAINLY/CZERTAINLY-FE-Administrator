@@ -1,10 +1,15 @@
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { RaAcmeLinkModel, RaAuthorizedClientModel, RaProfileModel } from "models/ra-profiles";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { raComplianceProfileDTO } from "api/profiles";
+import { AttributeDescriptorModelNew } from "types/attributes";
+import {
+   ComplianceProfileSimplifiedModel,
+   RaProfileAcmeDetailResponseModel,
+   RaProfileActivateAcmeRequestModel,
+   RaProfileAddRequestModel,
+   RaProfileEditRequestModel,
+   RaProfileResponseModel
+} from "types/ra-profiles";
 
 export type State = {
 
@@ -13,23 +18,19 @@ export type State = {
    deleteErrorMessage: string;
    bulkDeleteErrorMessages: DeleteObjectErrorModel[];
 
-   raProfile?: RaProfileModel;
-   raProfiles: RaProfileModel[];
+   raProfile?: RaProfileResponseModel;
+   raProfiles: RaProfileResponseModel[];
 
-   authorizedClients?: string[];
-   attributes?: AttributeModel[];
+   acmeDetails?: RaProfileAcmeDetailResponseModel;
 
-   acmeDetails?: RaAcmeLinkModel;
-
-   issuanceAttributesDescriptors?: AttributeDescriptorModel[];
-   revocationAttributesDescriptors?: AttributeDescriptorModel[];
+   issuanceAttributesDescriptors?: AttributeDescriptorModelNew[];
+   revocationAttributesDescriptors?: AttributeDescriptorModelNew[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
-   isFetchingAuthorizedClients: boolean;
    isFetchingAttributes: boolean;
    isFetchingIssuanceAttributes: boolean;
-   isFetchinRevocationAttributes: boolean;
+   isFetchingRevocationAttributes: boolean;
 
    isFetchingAcmeDetails: boolean;
 
@@ -49,7 +50,7 @@ export type State = {
    isAssociatingComplianceProfile: boolean;
    isDissociatingComplianceProfile: boolean;
 
-   associatedComplianceProfiles: raComplianceProfileDTO[];
+   associatedComplianceProfiles: ComplianceProfileSimplifiedModel[];
 
 };
 
@@ -64,10 +65,9 @@ export const initialState: State = {
 
    isFetchingList: false,
    isFetchingDetail: false,
-   isFetchingAuthorizedClients: false,
    isFetchingAttributes: false,
    isFetchingIssuanceAttributes: false,
-   isFetchinRevocationAttributes: false,
+   isFetchingRevocationAttributes: false,
    isFetchingAcmeDetails: false,
    isFetchingAssociatedComplianceProfiles: false,
    isCreating: false,
@@ -146,7 +146,7 @@ export const slice = createSlice({
       },
 
 
-      listRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: RaProfileModel[] }>) => {
+      listRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: RaProfileResponseModel[] }>) => {
 
          state.raProfiles = action.payload.raProfiles;
          state.isFetchingList = false;
@@ -160,30 +160,6 @@ export const slice = createSlice({
 
       },
 
-
-      listAuthorizedClients: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
-
-         state.authorizedClients = undefined;
-         state.isFetchingAuthorizedClients = true;
-
-      },
-
-
-      listAuthorizedClientsSuccess: (state, action: PayloadAction<{ authorizedClientsUuids: RaAuthorizedClientModel[] }>) => {
-
-         state.authorizedClients = action.payload.authorizedClientsUuids.map(client => client.uuid);
-         state.isFetchingAuthorizedClients = false;
-
-      },
-
-
-      listAuthorizedClientsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isFetchingAuthorizedClients = false;
-
-      },
-
-
       getRaProfileDetail: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
          state.raProfile = undefined;
@@ -192,7 +168,7 @@ export const slice = createSlice({
       },
 
 
-      getRaProfileDetailSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel }>) => {
+      getRaProfileDetailSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel }>) => {
 
          state.isFetchingDetail = false;
          state.raProfile = action.payload.raProfile;
@@ -209,9 +185,7 @@ export const slice = createSlice({
 
       createRaProfile: (state, action: PayloadAction<{
          authorityInstanceUuid: string,
-         name: string,
-         description: string,
-         attributes: AttributeModel[]
+         raProfileAddRequest: RaProfileAddRequestModel
       }>) => {
 
          state.isCreating = true;
@@ -236,9 +210,7 @@ export const slice = createSlice({
       updateRaProfile: (state, action: PayloadAction<{
          profileUuid: string,
          authorityInstanceUuid: string,
-         description: string,
-         enabled: boolean,
-         attributes: AttributeModel[],
+         raProfileEditRequest: RaProfileEditRequestModel,
          redirect?: string
       }>) => {
 
@@ -247,7 +219,7 @@ export const slice = createSlice({
       },
 
 
-      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileModel, redirect?: string }>) => {
+      updateRaProfileSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel, redirect?: string }>) => {
 
          state.isUpdating = false;
          state.raProfile = action.payload.raProfile;
@@ -344,8 +316,7 @@ export const slice = createSlice({
          authorityUuid: string,
          uuid: string,
          acmeProfileUuid: string,
-         issueCertificateAttributes: AttributeModel[],
-         revokeCertificateAttributes: AttributeModel[]
+         raProfileActivateAcmeRequest: RaProfileActivateAcmeRequestModel
       }>) => {
 
          state.isActivatingAcme = true;
@@ -353,10 +324,10 @@ export const slice = createSlice({
       },
 
 
-      activateAcmeSuccess: (state, action: PayloadAction<{ raAcmelink: RaAcmeLinkModel }>) => {
+      activateAcmeSuccess: (state, action: PayloadAction<{ raProfileAcmeDetailResponse: RaProfileAcmeDetailResponseModel }>) => {
 
          state.isActivatingAcme = false;
-         state.acmeDetails = action.payload.raAcmelink;
+         state.acmeDetails = action.payload.raProfileAcmeDetailResponse;
 
       },
 
@@ -397,7 +368,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeDetailsSuccess: (state, action: PayloadAction<{ raAcmeLink: RaAcmeLinkModel }>) => {
+      getAcmeDetailsSuccess: (state, action: PayloadAction<{ raAcmeLink: RaProfileAcmeDetailResponseModel }>) => {
 
          state.isFetchingAcmeDetails = false;
          state.acmeDetails = action.payload.raAcmeLink;
@@ -506,7 +477,7 @@ export const slice = createSlice({
       },
 
 
-      listIssuanceAttributesDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+      listIssuanceAttributesDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModelNew[] }>) => {
 
          state.isFetchingIssuanceAttributes = false;
 
@@ -524,21 +495,21 @@ export const slice = createSlice({
 
       listRevocationAttributeDescriptors: (state, action: PayloadAction<{ authorityUuid: string, uuid: string }>) => {
 
-         state.isFetchinRevocationAttributes = true;
+         state.isFetchingRevocationAttributes = true;
 
       },
 
 
-      listRevocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+      listRevocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModelNew[] }>) => {
 
-         state.isFetchinRevocationAttributes = false;
+         state.isFetchingRevocationAttributes = false;
          state.revocationAttributesDescriptors = action.payload.attributesDescriptors;
 
       },
 
 
       listRevocationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-         state.isFetchinRevocationAttributes = false;
+         state.isFetchingRevocationAttributes = false;
       },
 
       checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
@@ -608,7 +579,7 @@ export const slice = createSlice({
       },
 
 
-      getComplianceProfilesForRaProfileSuccess: (state, action: PayloadAction<{ complianceProfiles: raComplianceProfileDTO[] }>) => {
+      getComplianceProfilesForRaProfileSuccess: (state, action: PayloadAction<{ complianceProfiles: ComplianceProfileSimplifiedModel[] }>) => {
 
          state.isFetchingAssociatedComplianceProfiles = false;
          state.associatedComplianceProfiles = action.payload.complianceProfiles;
@@ -634,18 +605,15 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 const raProfile = createSelector(state, (state: State) => state.raProfile);
 const raProfiles = createSelector(state, (state: State) => state.raProfiles);
 
-const authorizedClients = createSelector(state, (state: State) => state.authorizedClients);
-const attributes = createSelector(state, (state: State) => state.attributes);
 const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
 const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
 const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
-const isFetchingAuthorizedClients = createSelector(state, (state: State) => state.isFetchingAuthorizedClients);
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
 const isFetchingIssuanceAttributes = createSelector(state, (state: State) => state.isFetchingIssuanceAttributes);
-const isFetchingRevocationAttributes = createSelector(state, (state: State) => state.isFetchinRevocationAttributes);
+const isFetchingRevocationAttributes = createSelector(state, (state: State) => state.isFetchingRevocationAttributes);
 const isFetchingAcmeDetails = createSelector(state, (state: State) => state.isFetchingAcmeDetails);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
@@ -670,15 +638,12 @@ export const selectors = {
    raProfile,
    raProfiles,
 
-   authorizedClients,
-   attributes,
    acmeDetails,
    issuanceAttributes,
    revocationAttributes,
 
    isFetchingList,
    isFetchingDetail,
-   isFetchingAuthorizedClients,
    isFetchingAttributes,
    isFetchingIssuanceAttributes,
    isFetchingRevocationAttributes,
