@@ -1,5 +1,5 @@
 import { iif, of } from "rxjs";
-import { catchError, filter, map, switchMap, mergeMap } from "rxjs/operators";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
@@ -7,9 +7,10 @@ import { extractError } from "utils/net";
 import { slice } from "./entities";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transformEntityDtoToModel } from "./transform/entities";
-import { transformConnectorDTOToModel } from "./transform/connectors";
+import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { FunctionGroupCode } from "types/openapi";
+import { transformEntityRequestModelToDto, transformEntityResponseDtoToModel } from "./transform/entities";
 
 
 const listEntityProviders: AppEpic = (action$, state, deps) => {
@@ -20,11 +21,11 @@ const listEntityProviders: AppEpic = (action$, state, deps) => {
          slice.actions.listEntityProviders.match
       ),
       switchMap(
-         () => deps.apiClients.connectors.getConnectorsList("entityProvider").pipe(
+         () => deps.apiClients.connectors.listConnectors({ functionGroup: FunctionGroupCode.EntityProvider }).pipe(
 
             map(
                providers => slice.actions.listEntityProvidersSuccess({
-                  providers: providers.map(transformConnectorDTOToModel)
+                  providers: providers.map(transformConnectorResponseDtoToModel)
                })
             ),
 
@@ -49,15 +50,16 @@ const getEntityProviderAttributesDescriptors: AppEpic = (action$, state, deps) =
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAttributes(
-            action.payload.uuid,
-            "entityProvider",
-            action.payload.kind
+         action => deps.apiClients.connectors.getAttributes({
+                uuid: action.payload.uuid,
+                functionGroup: FunctionGroupCode.EntityProvider,
+                kind: action.payload.kind
+            }
          ).pipe(
 
             map(
                attributeDescriptors => slice.actions.getEntityProviderAttributesDescriptorsSuccess({
-                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
+                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -85,11 +87,11 @@ const listEntities: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.entities.listEntities().pipe(
+         () => deps.apiClients.entities.listEntityInstances().pipe(
 
             map(
                entities => slice.actions.listEntitiesSuccess(
-                  entities.map(transformEntityDtoToModel)
+                  entities.map(transformEntityResponseDtoToModel)
                )
             ),
 
@@ -119,10 +121,10 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.entities.getEntityDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.entities.getEntityInstance({ entityUuid: action.payload.uuid }).pipe(
 
             map(
-               entity => slice.actions.getEntityDetailSuccess({ entity: transformEntityDtoToModel(entity) })
+               entity => slice.actions.getEntityDetailSuccess({ entity: transformEntityResponseDtoToModel(entity) })
             ),
 
             catchError(
@@ -150,11 +152,7 @@ const addEntity: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.entities.addEntity(
-            action.payload.name,
-            action.payload.attributes.map(transformAttributeModelToDTO),
-            action.payload.connectorUuid,
-            action.payload.kind
+         action => deps.apiClients.entities.createEntityInstance({ entityInstanceRequestDto: transformEntityRequestModelToDto(action.payload) }
          ).pipe(
 
             mergeMap(
@@ -191,14 +189,15 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.entities.updateEntity(
-            action.payload.uuid,
-            action.payload.attributes.map(transformAttributeModelToDTO)
+         action => deps.apiClients.entities.editEntityInstance({
+                 entityUuid: action.payload.uuid,
+                 entityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto) }
+             }
          ).pipe(
 
             mergeMap(
                entity => of(
-                  slice.actions.updateEntitySuccess({ entity: transformEntityDtoToModel(entity) }),
+                  slice.actions.updateEntitySuccess({ entity: transformEntityResponseDtoToModel(entity) }),
                   appRedirectActions.redirect({ url: `../../detail/${entity.uuid}` })
                )
             ),
@@ -228,7 +227,7 @@ const deleteEntity: AppEpic = (action$, state$, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.entities.removeEntity(action.payload.uuid).pipe(
+         action => deps.apiClients.entities.deleteEntityInstance({ entityUuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => iif(
@@ -269,10 +268,10 @@ const listLocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.entities.listLocationAttributeDescriptors(action.payload.entityUuid).pipe(
+         action => deps.apiClients.entities.listLocationAttributes({ entityUuid: action.payload.entityUuid }).pipe(
 
             map(
-               descriptors => slice.actions.listLocationAttributeDescriptorsSuccess({ descriptors: descriptors.map(transformAttributeDescriptorDTOToModel) })
+               descriptors => slice.actions.listLocationAttributeDescriptorsSuccess({ descriptors: descriptors.map(transformAttributeDescriptorDtoToModel) })
             ),
 
             catchError(

@@ -21,7 +21,7 @@ export type AttributeResponseDto = ResponseAttributeDto;
 export type AttributeResponseModel = AttributeResponseDto;
 
 export type AttributeDescriptorDto = BaseAttributeDto;
-export type AttributeDescriptorModelNew = AttributeDescriptorDto;
+export type AttributeDescriptorModelNew = AttributeDescriptorDto; // TODO rename
 
 export type AttributeDescriptorCollectionDto = {
    [functionGroup: string]: {
@@ -29,6 +29,7 @@ export type AttributeDescriptorCollectionDto = {
    }
 }
 
+// TODO rename
 export type AttributeDescriptorCollectionModelNew = {
    [functionGroup: string]: {
       [kind: string]: AttributeDescriptorModelNew[];

@@ -1,7 +1,6 @@
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
 import { ProfilesManagementApi, ProfilesManagementBackend, ProfilesManagementMock } from "./profiles";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
-import { EntityManagementApi, EntityManagementBackend, EntityManagementMock } from "./entity";
 import { LocationManagementApi, LocationManagementBackend, LocationManagementMock } from "./location";
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
@@ -21,7 +20,7 @@ import {
    AuthorityManagementApi,
    CallbackApi,
    Configuration,
-   ConnectorManagementApi,
+   ConnectorManagementApi, EntityManagementApi,
    RoleManagementApi,
    UserManagementApi
 } from "types/openapi";
@@ -62,7 +61,7 @@ export const backendClient: ApiClients = {
    profiles: new ProfilesManagementBackend(fetchService),
    credentials: new CredentialManagementBackend(fetchService),
    authorities: new AuthorityManagementApi(configuration),
-   entities: new EntityManagementBackend(fetchService),
+   entities: new EntityManagementApi(configuration),
    locations: new LocationManagementBackend(fetchService),
    connectors: new ConnectorManagementApi(configuration),
    callback: new CallbackApi(configuration),
@@ -85,7 +84,7 @@ export const mockClient: Partial<ApiClients> = {
    profiles: new ProfilesManagementMock(),
    credentials: new CredentialManagementMock(),
    // authorities: new AuthorityManagementMock(),
-   entities: new EntityManagementMock(),
+   // entities: new EntityManagementMock(),
    locations: new LocationManagementMock(),
    // connectors: new ConnectorManagementMock(),
    dashboard: new DashboardManagementMock(),

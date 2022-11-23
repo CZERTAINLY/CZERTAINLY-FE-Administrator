@@ -10,7 +10,7 @@ import { HttpErrorResponse } from "utils/FetchHttpService";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 
-export class EntityManagementMock implements model.EntityManagementApi {
+export class EntityManagementMock {
 
 
    validateLocationAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void> {

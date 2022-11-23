@@ -1,5 +1,4 @@
-import { Observable } from "rxjs";
-import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
+import { AttributeDTO } from "api/_common/attributeDTO";
 
 
 export interface EntityDTO {
@@ -12,21 +11,3 @@ export interface EntityDTO {
    kind: string;
 }
 
-
-export interface EntityManagementApi {
-
-   validateLocationAttributes(uuid: string, attributes: AttributeDTO[]): Observable<void>;
-
-   listEntities(): Observable<EntityDTO[]>;
-
-   getEntityDetail(uuid: string): Observable<EntityDTO>;
-
-   addEntity(name: string, attributes: AttributeDTO[], connectorUuid: string, kind: string): Observable<{ uuid: string}>;
-
-   updateEntity(uuid: string, attributes: AttributeDTO[]): Observable<EntityDTO>;
-
-   removeEntity(uuid: string): Observable<void>;
-
-   listLocationAttributeDescriptors(uuid: string): Observable<AttributeDescriptorDTO[]>;
-
-}
