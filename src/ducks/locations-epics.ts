@@ -7,9 +7,13 @@ import { extractError } from "utils/net";
 import { slice } from "./locations";
 import { slice as certsSlice } from "./certificates";
 import { actions as appRedirectActions } from "./app-redirect";
-
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transformLocationDtoToModel } from "./transform/locations";
+import {
+   transformLocationAddRequestModelToDto,
+   transformLocationIssueRequestModelToDto,
+   transformLocationPushRequestModelToDto,
+   transformLocationResponseDtoToModel
+} from "./transform/locations";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 
 const listLocations: AppEpic = (action$, state, deps) => {
@@ -20,11 +24,11 @@ const listLocations: AppEpic = (action$, state, deps) => {
          slice.actions.listLocations.match
       ),
       switchMap(
-         () => deps.apiClients.locations.listLocations().pipe(
+         () => deps.apiClients.locations.listLocations({}).pipe(
 
             map(
                locations => slice.actions.listLocationsSuccess({
-                  locations: locations.map(transformLocationDtoToModel)
+                  locations: locations.map(transformLocationResponseDtoToModel)
                })
             ),
 
@@ -50,10 +54,10 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.getLocation({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             map(
-               location => slice.actions.getLocationDetailSuccess({ location: transformLocationDtoToModel(location) })
+               location => slice.actions.getLocationDetailSuccess({ location: transformLocationResponseDtoToModel(location) })
             ),
 
             catchError(
@@ -81,21 +85,16 @@ const addLocation: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.addLocation(
-            action.payload.entityUuid,
-            action.payload.name,
-            action.payload.description,
-            action.payload.attributes.map(transformAttributeModelToDTO),
-            action.payload.enabled
+         action => deps.apiClients.locations.addLocation({entityUuid: action.payload.entityUuid, addLocationRequestDto: transformLocationAddRequestModelToDto(action.payload.addLocationRequest) }
          ).pipe(
 
             switchMap(
 
-               obj => deps.apiClients.locations.getLocationDetail(action.payload.entityUuid, obj.uuid).pipe(
+               obj => deps.apiClients.locations.getLocation({ entityUuid: action.payload.entityUuid, locationUuid: obj.uuid }).pipe(
 
                   mergeMap(
                      location => of(
-                        slice.actions.addLocationSuccess({ location: transformLocationDtoToModel(location), entityUuid: action.payload.entityUuid }),
+                        slice.actions.addLocationSuccess({ location: transformLocationResponseDtoToModel(location), entityUuid: action.payload.entityUuid }),
                         appRedirectActions.redirect({ url: `../detail/${action.payload.entityUuid}/${location.uuid}` })
                      )
                   )
@@ -129,17 +128,12 @@ const editLocation: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.editLocation(
-            action.payload.uuid,
-            action.payload.entityUuid,
-            action.payload.description,
-            action.payload.attributes.map(transformAttributeModelToDTO),
-            action.payload.enabled
+         action => deps.apiClients.locations.editLocation({ locationUuid: action.payload.uuid, entityUuid: action.payload.entityUuid, editLocationRequestDto: action.payload.editLocationRequest }
          ).pipe(
 
             mergeMap(
                location => of(
-                  slice.actions.editLocationSuccess({ location: transformLocationDtoToModel(location) }),
+                  slice.actions.editLocationSuccess({ location: transformLocationResponseDtoToModel(location) }),
                   appRedirectActions.redirect({ url: `../../../detail/${action.payload.entityUuid}/${location.uuid}` })
                )
             ),
@@ -169,7 +163,7 @@ const deleteLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.deleteLocation(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.deleteLocation({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => iif(
@@ -209,7 +203,7 @@ const enableLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.enableLocation(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.enableLocation({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.enableLocationSuccess({ uuid: action.payload.uuid })
@@ -240,7 +234,7 @@ const disableLocation: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.disableLocation(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.disableLocation({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.disableLocationSuccess({ uuid: action.payload.uuid })
@@ -271,10 +265,10 @@ const getPushAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getPushAttributes(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.listPushAttributes({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             map(
-               attributes => slice.actions.getPushAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
+               attributes => slice.actions.getPushAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDtoToModel) })
             ),
 
             catchError(
@@ -302,10 +296,10 @@ const getCSRAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.getCSRAttributes(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.listCsrAttributes({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             map(
-               attributes => slice.actions.getCSRAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDTOToModel) })
+               attributes => slice.actions.getCSRAttributesSuccess({ attributes: attributes.map(transformAttributeDescriptorDtoToModel) })
             ),
 
             catchError(
@@ -333,16 +327,16 @@ const pushCertificate: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.pushCertificate(
-            action.payload.entityUuid,
-            action.payload.locationUuid,
-            action.payload.certificateUuid,
-            action.payload.pushAttributes.map(transformAttributeModelToDTO)
+         action => deps.apiClients.locations.pushCertificate({
+            entityUuid: action.payload.entityUuid,
+            locationUuid: action.payload.locationUuid,
+            certificateUuid: action.payload.certificateUuid,
+            pushToLocationRequestDto: transformLocationPushRequestModelToDto(action.payload.pushRequest)}
          ).pipe(
 
             mergeMap(
                location => of(
-                  slice.actions.pushCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
+                  slice.actions.pushCertificateSuccess({ location: transformLocationResponseDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
                   certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid })
                )
             ),
@@ -372,16 +366,11 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.issueCertificate(
-            action.payload.entityUuid,
-            action.payload.locationUuid,
-            action.payload.raProfileUuid,
-            action.payload.csrAttributes.map(transformAttributeModelToDTO),
-            action.payload.issueAttributes.map(transformAttributeModelToDTO)
+         action => deps.apiClients.locations.issueCertificate1({ locationUuid: action.payload.locationUuid, entityUuid: action.payload.entityUuid, issueToLocationRequestDto: transformLocationIssueRequestModelToDto(action.payload.issueRequest) }
          ).pipe(
 
             map(
-               location => slice.actions.issueCertificateSuccess({ location: transformLocationDtoToModel(location) })
+               location => slice.actions.issueCertificateSuccess({ location: transformLocationResponseDtoToModel(location) })
             ),
 
             catchError(
@@ -409,15 +398,12 @@ const autoRenewCertificate: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.autoRenewCertificate(
-            action.payload.entityUuid,
-            action.payload.locationUuid,
-            action.payload.certificateUuid
+         action => deps.apiClients.locations.renewCertificateInLocation({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.locationUuid, certificateUuid: action.payload.certificateUuid }
          ).pipe(
 
             mergeMap(
                location => of(
-                  slice.actions.autoRenewCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
+                  slice.actions.autoRenewCertificateSuccess({ location: transformLocationResponseDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
                   certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid })
                )
             ),
@@ -447,15 +433,16 @@ const removeCertificate: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.locations.removeCertificate(
-            action.payload.entityUuid,
-            action.payload.locationUuid,
-            action.payload.certificateUuid
+         action => deps.apiClients.locations.removeCertificate({
+                entityUuid: action.payload.entityUuid,
+                locationUuid: action.payload.locationUuid,
+                certificateUuid: action.payload.certificateUuid
+             }
          ).pipe(
 
             mergeMap(
                location => of(
-                  slice.actions.removeCertificateSuccess({ location: transformLocationDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
+                  slice.actions.removeCertificateSuccess({ location: transformLocationResponseDtoToModel(location), certificateUuid: action.payload.certificateUuid }),
                   certsSlice.actions.getCertificateHistory({ uuid: action.payload.certificateUuid })
                )
             ),
@@ -487,10 +474,10 @@ const syncLocation: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.syncLocation(action.payload.entityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.locations.updateLocationContent({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
 
             map(
-               location => slice.actions.syncLocationSuccess({ location: transformLocationDtoToModel(location) })
+               location => slice.actions.syncLocationSuccess({ location: transformLocationResponseDtoToModel(location) })
             ),
 
             catchError(

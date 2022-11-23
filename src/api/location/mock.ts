@@ -10,7 +10,7 @@ import { HttpErrorResponse } from "utils/FetchHttpService";
 import { AttributeDescriptorDTO, AttributeDTO } from "api/_common/attributeDTO";
 
 
-export class LocationManagementMock implements model.LocationManagementApi {
+export class LocationManagementMock {
 
 
    listLocations(enabled?: boolean): Observable<model.LocationDTO[]> {
