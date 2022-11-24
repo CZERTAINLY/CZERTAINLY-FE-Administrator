@@ -3,8 +3,6 @@ import { CredentialManagementApi, CredentialManagementBackend, CredentialManagem
 import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
 import { OperationsApi, OperationsBackend, OperationsMock } from "./operations";
-import { AcmeAccountManagementApi, AcmeAccountManagementBackend, AcmeAccountManagementMock } from "./acme-account";
-import { AcmeProfilesManagementApi, AcmeProfilesManagementBackend, AcmeProfilesManagementMock } from "./acme-profile";
 import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
 import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
 import {
@@ -14,6 +12,7 @@ import {
 } from "./compliance-profile";
 import { FetchHttpServiceImpl } from "utils/FetchHttpService";
 import {
+   ACMEAccountManagementApi, ACMEProfileManagementApi,
    AuthenticationManagementApi,
    AuthorityManagementApi,
    CallbackApi,
@@ -41,8 +40,8 @@ export interface ApiClients {
    entities: EntityManagementApi;
    locations: LocationManagementApi;
    certificates: CertificateInventoryApi;
-   acmeAccounts: AcmeAccountManagementApi;
-   acmeProfiles: AcmeProfilesManagementApi;
+   acmeAccounts: ACMEAccountManagementApi;
+   acmeProfiles: ACMEProfileManagementApi;
    groups: GroupManagementApi;
    operations: OperationsApi;
    discoveries: DiscoveryManagementApi;
@@ -64,8 +63,8 @@ export const backendClient: ApiClients = {
    connectors: new ConnectorManagementApi(configuration),
    callback: new CallbackApi(configuration),
    dashboard: new DashboardManagementBackend(fetchService),
-   acmeAccounts: new AcmeAccountManagementBackend(fetchService),
-   acmeProfiles: new AcmeProfilesManagementBackend(fetchService),
+   acmeAccounts: new ACMEAccountManagementApi(configuration),
+   acmeProfiles: new ACMEProfileManagementApi(configuration),
    groups: new GroupManagementBackend(fetchService),
    operations: new OperationsBackend(fetchService),
    discoveries: new DiscoveryManagementBackend(fetchService),
@@ -86,8 +85,8 @@ export const mockClient: Partial<ApiClients> = {
    // locations: new LocationManagementMock(),
    // connectors: new ConnectorManagementMock(),
    dashboard: new DashboardManagementMock(),
-   acmeAccounts: new AcmeAccountManagementMock(),
-   acmeProfiles: new AcmeProfilesManagementMock(),
+   // acmeAccounts: new AcmeAccountManagementMock(),
+   // acmeProfiles: new AcmeProfilesManagementMock(),
    groups: new GroupManagementMock(),
    operations: new OperationsMock(),
    discoveries: new DiscoveryManagementMock(),

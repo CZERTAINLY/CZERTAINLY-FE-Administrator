@@ -10,7 +10,7 @@ import { AttributeDTO } from "api/_common/attributeDTO";
 import { RaProfileDTO } from "api/profiles";
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 
-export class AcmeProfilesManagementMock implements model.AcmeProfilesManagementApi {
+export class AcmeProfilesManagementMock {
 
    bulkForceDeleteAcmeProfiles(uuids: string[]): Observable<void> {
 

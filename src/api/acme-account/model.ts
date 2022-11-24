@@ -31,14 +31,3 @@ export interface AcmeAccountDTO {
    acmeProfileName: string;
    acmeProfileUuid: string;
 }
-
-export interface AcmeAccountManagementApi {
-   enableAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void>;
-   disableAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void>;
-   bulkRevokeAcmeAccount(uuids: string[]): Observable<void>;
-   bulkEnableAcmeAccount(uuids: string[]): Observable<void>;
-   bulkDisableAcmeAccount(uuids: string[]): Observable<void>;
-   getAcmeAccountDetails(acmeProfileUuid: string, uuid: string): Observable<AcmeAccountDTO>;
-   revokeAcmeAccount(acmeProfileUuid: string, uuid: string): Observable<void>;
-   getAcmeAccountList(): Observable<AcmeAccountListItemDTO[]>;
-}

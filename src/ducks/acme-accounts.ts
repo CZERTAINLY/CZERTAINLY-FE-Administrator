@@ -1,14 +1,15 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { AcmeAccountListModel, AcmeAccountModel } from "models/acme-accounts";
+import { AcmeAccountListResponseModel, AcmeAccountResponseModel } from "types/acme-accounts";
+import { AcmeAccountListResponseDtoStatusEnum, AcmeAccountResponseDtoStatusEnum } from "types/openapi";
 
 
 export type State = {
 
    checkedRows: string[];
 
-   account?: AcmeAccountModel;
-   accounts: AcmeAccountListModel[];
+   account?: AcmeAccountResponseModel;
+   accounts: AcmeAccountListResponseModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -78,7 +79,7 @@ export const slice = createSlice({
       },
 
 
-      listAcmeAccountsSuccess: (state, action: PayloadAction<{ acmeAccounts: AcmeAccountListModel[] }>) => {
+      listAcmeAccountsSuccess: (state, action: PayloadAction<{ acmeAccounts: AcmeAccountListResponseModel[] }>) => {
 
          state.accounts = action.payload.acmeAccounts;
          state.isFetchingList = false;
@@ -100,7 +101,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeAccountSuccess: (state, action: PayloadAction<{ acmeAccount: AcmeAccountModel }>) => {
+      getAcmeAccountSuccess: (state, action: PayloadAction<{ acmeAccount: AcmeAccountResponseModel }>) => {
 
          state.account = action.payload.acmeAccount;
          state.isFetchingDetail = false;
@@ -128,12 +129,12 @@ export const slice = createSlice({
 
          const account = state.accounts.find(account => account.uuid === action.payload.uuid);
          if (account) {
-            account.status = "revoked";
+            account.status = AcmeAccountListResponseDtoStatusEnum.Revoked;
             account.enabled = false;
          }
 
          if (state.account?.uuid === action.payload.uuid) {
-            state.account.status = "revoked";
+            state.account.status = AcmeAccountResponseDtoStatusEnum.Revoked;
             state.account.enabled = false;
          }
 
@@ -216,7 +217,7 @@ export const slice = createSlice({
 
                const account = state.accounts.find(account => account.uuid === uuid);
                if (account) {
-                  account.status = "revoked";
+                  account.status = AcmeAccountListResponseDtoStatusEnum.Revoked;
                   account.enabled = false;
                }
 
@@ -225,7 +226,7 @@ export const slice = createSlice({
          );
 
          if (state.account && action.payload.uuids.includes(state.account?.uuid)) {
-            state.account.status = "revoked";
+            state.account.status = AcmeAccountResponseDtoStatusEnum.Revoked;
             state.account.enabled = false;
          }
 

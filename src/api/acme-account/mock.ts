@@ -6,7 +6,7 @@ import { dbData } from "api/_mocks/db";
 import { randomDelay } from "utils/mock";
 import * as model from "./model";
 
-export class AcmeAccountManagementMock implements model.AcmeAccountManagementApi {
+export class AcmeAccountManagementMock {
 
    getAcmeAccountList(): Observable<model.AcmeAccountListItemDTO[]> {
 
