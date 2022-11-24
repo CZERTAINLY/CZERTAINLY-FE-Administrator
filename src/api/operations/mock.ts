@@ -6,7 +6,7 @@ import { CertificateRevocationReason } from "types/certificate";
 import * as model from "./model";
 
 
-export class OperationsMock implements model.OperationsApi {
+export class OperationsMock {
 
    issueCertificate(
       raProfileUuid: string,

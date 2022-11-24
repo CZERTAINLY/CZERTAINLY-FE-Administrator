@@ -22,7 +22,7 @@ export function transformComplianceProfileDtoToModel(complianceProfileDto: Compl
       name: complianceProfileDto.name,
       description: complianceProfileDto.description,
       rules: JSON.parse(JSON.stringify(complianceProfileDto.rules)),
-      groups: JSON.parse(JSON.stringify(complianceProfileDto.groups)),
+      certificateGroups: JSON.parse(JSON.stringify(complianceProfileDto.groups)),
       raProfiles: JSON.parse(JSON.stringify(complianceProfileDto.raProfiles)),
    };
 
@@ -80,7 +80,7 @@ export function transformComplianceConnectorGroupDTOToModel(complianceGroupDto: 
    return {
       connectorName: complianceGroupDto.connectorName,
       connectorUuid: complianceGroupDto.connectorUuid,
-      groups: JSON.parse(JSON.stringify(complianceGroupDto.groups)),
+      certificateGroups: JSON.parse(JSON.stringify(complianceGroupDto.groups)),
       kind: complianceGroupDto.kind,
    };
 

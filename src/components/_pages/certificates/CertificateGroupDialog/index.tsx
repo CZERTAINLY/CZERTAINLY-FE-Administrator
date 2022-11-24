@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { actions } from "ducks/certificates";
-import { selectors as groupsSelectors, actions as groupsActions } from "ducks/groups";
+import { selectors as groupsSelectors, actions as groupsActions } from "ducks/certificateGroups";
 
 import Select, { SingleValue } from "react-select";
 
@@ -25,7 +25,7 @@ export default function CertificateGroupDialog({
 
    const dispatch = useDispatch();
 
-   const groups = useSelector(groupsSelectors.groups);
+   const groups = useSelector(groupsSelectors.certificateGroups);
 
    const isFetchingGroups = useSelector(groupsSelectors.isFetchingList);
 

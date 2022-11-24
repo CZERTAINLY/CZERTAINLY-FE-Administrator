@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import { actions, selectors } from "ducks/groups";
+import { actions, selectors } from "ducks/certificateGroups";
 
 import { Container } from "reactstrap";
 import Widget from "components/Widget";
@@ -17,7 +17,7 @@ export default function GroupList() {
    const navigate = useNavigate();
 
    const checkedRows = useSelector(selectors.checkedRows);
-   const groups = useSelector(selectors.groups);
+   const groups = useSelector(selectors.certificateGroups);
 
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);

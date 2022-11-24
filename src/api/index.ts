@@ -1,9 +1,6 @@
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
 import { CredentialManagementApi, CredentialManagementBackend, CredentialManagementMock } from "./credential";
-import { DashboardManagementApi, DashboardManagementBackend, DashboardManagementMock } from "./dashboard";
 import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
-import { OperationsApi, OperationsBackend, OperationsMock } from "./operations";
-import { GroupManagementApi, GroupManagementBackend, GroupManagementMock } from "./groups";
 import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
 import {
    ComplianceProfileManagementApi,
@@ -12,13 +9,20 @@ import {
 } from "./compliance-profile";
 import { FetchHttpServiceImpl } from "utils/FetchHttpService";
 import {
-   ACMEAccountManagementApi, ACMEProfileManagementApi,
+   ACMEAccountManagementApi,
+   ACMEProfileManagementApi,
    AuthenticationManagementApi,
    AuthorityManagementApi,
    CallbackApi,
+   CertificateGroupApi,
+   ClientOperationsV2Api,
    Configuration,
-   ConnectorManagementApi, EntityManagementApi, LocationManagementApi, RAProfileManagementApi,
+   ConnectorManagementApi,
+   EntityManagementApi,
+   LocationManagementApi,
+   RAProfileManagementApi,
    RoleManagementApi,
+   StatisticsDashboardApi,
    UserManagementApi
 } from "types/openapi";
 
@@ -35,15 +39,15 @@ export interface ApiClients {
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
    callback: CallbackApi;
-   dashboard: DashboardManagementApi;
+   statisticsDashboard: StatisticsDashboardApi;
    authorities: AuthorityManagementApi;
    entities: EntityManagementApi;
    locations: LocationManagementApi;
    certificates: CertificateInventoryApi;
    acmeAccounts: ACMEAccountManagementApi;
    acmeProfiles: ACMEProfileManagementApi;
-   groups: GroupManagementApi;
-   operations: OperationsApi;
+   certificateGroups: CertificateGroupApi;
+   clientOperations: ClientOperationsV2Api;
    discoveries: DiscoveryManagementApi;
    complianceProfile: ComplianceProfileManagementApi;
 }
@@ -62,11 +66,11 @@ export const backendClient: ApiClients = {
    locations: new LocationManagementApi(configuration),
    connectors: new ConnectorManagementApi(configuration),
    callback: new CallbackApi(configuration),
-   dashboard: new DashboardManagementBackend(fetchService),
+   statisticsDashboard: new StatisticsDashboardApi(configuration),
    acmeAccounts: new ACMEAccountManagementApi(configuration),
    acmeProfiles: new ACMEProfileManagementApi(configuration),
-   groups: new GroupManagementBackend(fetchService),
-   operations: new OperationsBackend(fetchService),
+   certificateGroups: new CertificateGroupApi(configuration),
+   clientOperations: new ClientOperationsV2Api(configuration),
    discoveries: new DiscoveryManagementBackend(fetchService),
    complianceProfile: new ComplianceProfileManagementBackend(fetchService),
 };
@@ -84,11 +88,11 @@ export const mockClient: Partial<ApiClients> = {
    // entities: new EntityManagementMock(),
    // locations: new LocationManagementMock(),
    // connectors: new ConnectorManagementMock(),
-   dashboard: new DashboardManagementMock(),
+   // statisticsDashboard: new DashboardManagementMock(),
    // acmeAccounts: new AcmeAccountManagementMock(),
    // acmeProfiles: new AcmeProfilesManagementMock(),
-   groups: new GroupManagementMock(),
-   operations: new OperationsMock(),
+   // groups: new GroupManagementMock(),
+   // operations: new OperationsMock(),
    discoveries: new DiscoveryManagementMock(),
    complianceProfile: new ComplianceProfileManagementMock(),
 };

@@ -49,7 +49,7 @@ export const dbCertificates: DbCertificateList = {
          name: "Hardware Security Module 1",
          description: "SRV1"
       },
-      group: {
+      certificateGroup: {
          uuid: "",
          name: "test group 1",
          description: "test group 1"
@@ -97,7 +97,7 @@ export const dbCertificates: DbCertificateList = {
          name: "Hardware Security Module 1",
          description: "SRV1"
       },
-      group: {
+      certificateGroup: {
          uuid: "",
          name: "test group 1",
          description: "test group 1"
@@ -144,7 +144,7 @@ export const dbCertificates: DbCertificateList = {
          name: "Hardware Security Module 1",
          description: "SRV1"
       },
-      group: {
+      certificateGroup: {
          uuid: "",
          name: "test group 1",
          description: "test group 1"
@@ -195,7 +195,7 @@ export const dbCertificates: DbCertificateList = {
          name: "Hardware Security Module 1",
          description: "SRV1"
       },
-      group: {
+      certificateGroup: {
          uuid: "",
          name: "test group 1",
          description: "test group 1"
@@ -245,7 +245,7 @@ export const dbCertificates: DbCertificateList = {
          name: "Hardware Security Module 1",
          description: "SRV1"
       },
-      group: {
+      certificateGroup: {
          uuid: "",
          name: "test group 1",
          description: "test group 1"
@@ -428,7 +428,7 @@ export const dbCertificates: DbCertificateList = {
          name: "Hardware Security Module 1",
          description: "SRV1"
       },
-      group: {
+      certificateGroup: {
          uuid: "",
          name: "test group 1",
          description: "test group 1"

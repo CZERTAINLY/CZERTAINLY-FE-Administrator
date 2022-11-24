@@ -1,13 +1,14 @@
 import { GroupModel } from "models";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
+import { CertificateGroupRequestModel } from "../types/certificateGroups";
 
 export type State = {
 
    checkedRows: string[];
 
-   group?: GroupModel;
-   groups: GroupModel[];
+   certificateGroup?: GroupModel;
+   certificateGroups: GroupModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -20,7 +21,7 @@ export type State = {
 
 export const initialState: State = {
    checkedRows: [],
-   groups: [],
+   certificateGroups: [],
    isFetchingList: false,
    isFetchingDetail: false,
    isCreating: false,
@@ -31,7 +32,7 @@ export const initialState: State = {
 
 export const slice = createSlice({
 
-   name: "groups",
+   name: "certificateGroups",
 
    initialState,
 
@@ -59,7 +60,7 @@ export const slice = createSlice({
 
       listGroups: (state, action: PayloadAction<void>) => {
 
-         state.groups = [];
+         state.certificateGroups = [];
          state.isFetchingList = true;
 
       },
@@ -67,7 +68,7 @@ export const slice = createSlice({
 
       listGroupsSuccess: (state, action: PayloadAction<{ groups: GroupModel[] }>) => {
 
-         state.groups = action.payload.groups;
+         state.certificateGroups = action.payload.groups;
          state.isFetchingList = false;
 
       },
@@ -82,7 +83,7 @@ export const slice = createSlice({
 
       getGroupDetail: (state, action: PayloadAction<{ uuid: string }>) => {
 
-         state.group = undefined;
+         state.certificateGroup = undefined;
          state.isFetchingDetail = true;
 
       },
@@ -90,7 +91,7 @@ export const slice = createSlice({
 
       getGroupDetailSuccess: (state, action: PayloadAction<{ group: GroupModel }>) => {
 
-         state.group = action.payload.group;
+         state.certificateGroup = action.payload.group;
          state.isFetchingDetail = false;
 
       },
@@ -102,7 +103,7 @@ export const slice = createSlice({
 
       },
 
-      createGroup: (state, action: PayloadAction<{ name: string, description?: string }>) => {
+      createGroup: (state, action: PayloadAction<CertificateGroupRequestModel>) => {
 
          state.isCreating = true;
 
@@ -123,7 +124,7 @@ export const slice = createSlice({
       },
 
 
-      updateGroup: (state, action: PayloadAction<{ groupUuid: string, name: string, description?: string }>) => {
+      updateGroup: (state, action: PayloadAction<{ groupUuid: string, editGroupRequest: CertificateGroupRequestModel }>) => {
 
          state.isUpdating = true;
 
@@ -133,7 +134,7 @@ export const slice = createSlice({
       updateGroupSuccess: (state, action: PayloadAction<{ group: GroupModel }>) => {
 
          state.isUpdating = false;
-         state.group = action.payload.group;
+         state.certificateGroup = action.payload.group;
 
       },
 
@@ -156,10 +157,10 @@ export const slice = createSlice({
 
          state.isDeleting = false;
 
-         const index = state.groups.findIndex(raProfile => raProfile.uuid === action.payload.uuid);
-         if (index !== -1) state.groups.splice(index, 1);
+         const index = state.certificateGroups.findIndex(raProfile => raProfile.uuid === action.payload.uuid);
+         if (index !== -1) state.certificateGroups.splice(index, 1);
 
-         if (state.group?.uuid === action.payload.uuid) state.group = undefined;
+         if (state.certificateGroup?.uuid === action.payload.uuid) state.certificateGroup = undefined;
 
       },
 
@@ -184,13 +185,13 @@ export const slice = createSlice({
          action.payload.uuids.forEach(
 
             uuid => {
-               const index = state.groups.findIndex(group => group.uuid === uuid);
-               if (index >= 0) state.groups.splice(index, 1);
+               const index = state.certificateGroups.findIndex(group => group.uuid === uuid);
+               if (index >= 0) state.certificateGroups.splice(index, 1);
             }
 
          );
 
-         if (state.group && action.payload.uuids.includes(state.group.uuid)) state.group = undefined;
+         if (state.certificateGroup && action.payload.uuids.includes(state.certificateGroup.uuid)) state.certificateGroup = undefined;
 
       },
 
@@ -209,8 +210,8 @@ const state = createFeatureSelector<State>(slice.name);
 
 const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
-const group = createSelector(state, (state: State) => state.group);
-const groups = createSelector(state, (state: State) => state.groups);
+const certificateGroup = createSelector(state, (state: State) => state.certificateGroup);
+const certificateGroups = createSelector(state, (state: State) => state.certificateGroups);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
@@ -225,8 +226,8 @@ export const selectors = {
 
    checkedRows,
 
-   group,
-   groups,
+   certificateGroup,
+   certificateGroups,
 
    isCreating,
    isFetchingList,

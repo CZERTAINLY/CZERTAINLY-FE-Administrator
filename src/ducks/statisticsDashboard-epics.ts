@@ -5,9 +5,8 @@ import { AppEpic } from 'ducks';
 
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformDashbaordDTOToModel } from './transform/dashboard';
-
-import { slice } from "./dashboard";
+import { slice } from "./statisticsDashboard";
+import { transformStatisticsDashboardDtoToModel } from "./transform/statisticsDashboard";
 
 
 const getDashboard: AppEpic = (action$, state, deps) => {
@@ -20,10 +19,10 @@ const getDashboard: AppEpic = (action$, state, deps) => {
 
       switchMap(
 
-         () => deps.apiClients.dashboard.getDashboardData().pipe(
+         () => deps.apiClients.statisticsDashboard.getStatistics().pipe(
 
             map(
-               dashboard => slice.actions.getDashboardSuccess({ dashboard: transformDashbaordDTOToModel(dashboard) })
+               dashboard => slice.actions.getDashboardSuccess({ statisticsDashboard: transformStatisticsDashboardDtoToModel(dashboard) })
             ),
 
             catchError(

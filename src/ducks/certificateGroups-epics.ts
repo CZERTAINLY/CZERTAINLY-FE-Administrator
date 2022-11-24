@@ -4,10 +4,13 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
 
-import { slice } from "./groups";
+import { slice } from "./certificateGroups";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformGroupDtoToModel } from "./transform/groups";
+import {
+    transformCertificateGroupRequestModelToDto,
+    transformCertificateGroupResponseDtoToModel
+} from "./transform/certificateGroups";
 
 
 const listGroups: AppEpic = (action$, state$, deps) => {
@@ -19,11 +22,11 @@ const listGroups: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.groups.getGroupsList().pipe(
+         () => deps.apiClients.certificateGroups.listGroups().pipe(
 
             map(
                list => slice.actions.listGroupsSuccess({
-                  groups: list.map(transformGroupDtoToModel)
+                  groups: list.map(transformCertificateGroupResponseDtoToModel)
                })
             ),
 
@@ -49,11 +52,11 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.groups.getGroupDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.certificateGroups.getGroup({ uuid: action.payload.uuid }).pipe(
 
             map(
                groupDto => slice.actions.getGroupDetailSuccess({
-                  group: transformGroupDtoToModel(groupDto)
+                  group: transformCertificateGroupResponseDtoToModel(groupDto)
                })
             ),
 
@@ -82,9 +85,7 @@ const createGroup: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.groups.createNewGroup(
-            action.payload.name,
-            action.payload.description
+         action => deps.apiClients.certificateGroups.createGroup({ groupRequestDto: transformCertificateGroupRequestModelToDto(action.payload) }
          ).pipe(
 
             mergeMap(
@@ -122,16 +123,13 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.groups.updateGroup(
-            action.payload.groupUuid,
-            action.payload.name,
-            action.payload.description || ""
+         action => deps.apiClients.certificateGroups.editGroup({ uuid: action.payload.groupUuid, groupRequestDto: transformCertificateGroupRequestModelToDto(action.payload.editGroupRequest) }
          ).pipe(
 
             mergeMap(
 
                groupDTO => of(
-                  slice.actions.updateGroupSuccess({ group: transformGroupDtoToModel(groupDTO) }),
+                  slice.actions.updateGroupSuccess({ group: transformCertificateGroupResponseDtoToModel(groupDTO) }),
                   appRedirectActions.redirect({ url: `../../detail/${groupDTO.uuid}` })
                )
 
@@ -164,7 +162,7 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.groups.deleteGroup(action.payload.uuid).pipe(
+         action => deps.apiClients.certificateGroups.deleteGroup({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
 
@@ -202,7 +200,7 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.groups.bulkDeleteGroup(action.payload.uuids).pipe(
+         action => deps.apiClients.certificateGroups.bulkDeleteGroup({ requestBody: action.payload.uuids }).pipe(
 
             map(
                errors => slice.actions.bulkDeleteGroupsSuccess({ uuids: action.payload.uuids })

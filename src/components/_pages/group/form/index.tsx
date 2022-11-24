@@ -6,7 +6,7 @@ import { Form, Field } from "react-final-form";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
 import { GroupModel } from "models";
-import { actions, selectors } from "ducks/groups";
+import { actions, selectors } from "ducks/certificateGroups";
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
 import ProgressButton from "components/ProgressButton";
@@ -28,7 +28,7 @@ export default function GroupForm() {
 
    const editMode = useMemo( () => !!id, [id] );
 
-   const groupSelector = useSelector(selectors.group);
+   const groupSelector = useSelector(selectors.certificateGroup);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isCreating = useSelector(selectors.isCreating);
    const isUpdating = useSelector(selectors.isUpdating);

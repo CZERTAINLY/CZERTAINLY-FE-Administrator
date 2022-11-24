@@ -10,7 +10,7 @@ import Select from "react-select";
 
 
 import { actions, selectors } from "ducks/certificates";
-import { actions as groupAction, selectors as groupSelectors } from "ducks/groups";
+import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
@@ -47,7 +47,7 @@ export default function CertificateDetail() {
 
    const certificate = useSelector(selectors.certificateDetail);
 
-   const groups = useSelector(groupSelectors.groups);
+   const groups = useSelector(groupSelectors.certificateGroups);
    const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
    const eventHistory = useSelector(selectors.certificateHistory);

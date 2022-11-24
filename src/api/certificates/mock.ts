@@ -94,7 +94,7 @@ export class CertificateInventoryMock implements model.CertificateInventoryApi {
                   subjectAlternativeNames: detail.subjectAlternativeNames,
                   status: detail.status,
                   entity: detail.entity,
-                  group: detail.group,
+                  certificateGroup: detail.group,
                   owner: detail.owner,
                   keyUsage: detail.keyUsage,
                   extendedKeyUsage: detail.extendedKeyUsage,

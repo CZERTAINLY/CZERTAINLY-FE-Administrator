@@ -74,7 +74,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
                   name,
                   description,
                   rules: [],
-                  groups: [],
+                  certificateGroups: [],
                   raProfiles: [],
 
                })
@@ -243,7 +243,7 @@ export class ComplianceProfileManagementMock implements model.ComplianceProfileM
                   connectorName: "Test",
                   connectorUuid,
                   kind,
-                  groups: [{
+                  certificateGroups: [{
                      uuid: groupUuid,
                      name: "Test",
                   }],

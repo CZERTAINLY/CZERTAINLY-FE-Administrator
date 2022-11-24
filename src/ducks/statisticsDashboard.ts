@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
-import { DashboardModal } from 'models/dashboard';
+import { StatisticsDashboardModel } from "../types/statisticsDashboard";
 
 
 export type State = {
    isFetching: boolean;
-   dashboard?: DashboardModal;
+   statisticsDashboard?: StatisticsDashboardModel;
 };
 
 
 export const initialState: State = {
    isFetching: false,
-   dashboard: undefined
+   statisticsDashboard: undefined
 };
 
 
 export const slice = createSlice({
 
-   name: "dashboard",
+   name: "statisticsDashboard",
 
    initialState,
 
@@ -26,15 +26,15 @@ export const slice = createSlice({
       getDashboard: (state, action: PayloadAction<void>) => {
 
          state.isFetching = true;
-         state.dashboard = undefined;
+         state.statisticsDashboard = undefined;
 
       },
 
 
-      getDashboardSuccess: (state, action: PayloadAction<{ dashboard: DashboardModal }>) => {
+      getDashboardSuccess: (state, action: PayloadAction<{ statisticsDashboard: StatisticsDashboardModel }>) => {
 
          state.isFetching = false;
-         state.dashboard = action.payload.dashboard;
+         state.statisticsDashboard = action.payload.statisticsDashboard;
 
       },
 
@@ -51,14 +51,14 @@ export const slice = createSlice({
 
 const selectState = createFeatureSelector<State>(slice.name);
 
-const dashboard = createSelector(selectState, state => state.dashboard);
+const statisticsDashboard = createSelector(selectState, state => state.statisticsDashboard);
 
 const isFetching = createSelector(selectState, state => state.isFetching);
 
 
 export const selectors = {
    selectState,
-   dashboard,
+   statisticsDashboard,
    isFetching
 };
 

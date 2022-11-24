@@ -102,12 +102,12 @@ export const dbComplianceProfiles: DbComplianceProfiles = {
                 ]
             }
         ],
-        "groups": [
+        "certificateGroups": [
             {
                 "connectorName": "COMP",
                 "connectorUuid": "6a4bceef-5eb4-4b35-b3c5-b66416be4d72",
                 "kind": "x509",
-                "groups": [
+                "certificateGroups": [
                     {
                         "uuid": "52350996-ddb2-11ec-9d64-0242ac120002",
                         "name": "Profile1"
@@ -148,7 +148,7 @@ export const dbComplianceProfiles: DbComplianceProfiles = {
                 ]
             }
         ],
-        "groups": [
+        "certificateGroups": [
         ],
         "raProfiles": [
         ]
@@ -549,7 +549,7 @@ export const dbComplianceGroups: DbComplianceGroup[] = [
         "connectorName": "COMP",
         "connectorUuid": "6a4bceef-5eb4-4b35-b3c5-b664a6be4d72",
         "kind": "x509",
-        "groups": [
+        "certificateGroups": [
             {
                 "uuid": "52350996-ddb2-11ec-9d64-0242ac120002",
                 "name": "Apple's CT Policy",

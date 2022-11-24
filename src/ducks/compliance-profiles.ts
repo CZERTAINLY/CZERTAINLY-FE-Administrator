@@ -47,7 +47,7 @@ export const initialState: State = {
    bulkDeleteErrorMessages: [],
 
    rules: [],
-   groups: [],
+   certificateGroups: [],
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -391,7 +391,7 @@ export const slice = createSlice({
                connectorUuid: action.payload.connectorUuid,
                kind: action.payload.kind,
                connectorName: action.payload.connectorName,
-               groups: [{
+               certificateGroups: [{
                   uuid: action.payload.groupUuid,
                   name: action.payload.groupName,
                   description: action.payload.description
@@ -413,7 +413,7 @@ export const slice = createSlice({
                   connectorUuid: action.payload.connectorUuid,
                   kind: action.payload.kind,
                   connectorName: action.payload.connectorName,
-                  groups: [{
+                  certificateGroups: [{
                      uuid: action.payload.groupUuid,
                      name: action.payload.groupName,
                      description: action.payload.description
@@ -637,7 +637,7 @@ export const selectors = {
    isBulkForceDeleting,
 
    rules,
-   groups
+   groups: certificateGroups
 
 };
 

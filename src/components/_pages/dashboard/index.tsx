@@ -3,7 +3,7 @@ import { Col, Container, Row } from "reactstrap";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "components/Spinner";
-import { actions, selectors } from "ducks/dashboard";
+import { actions, selectors } from "ducks/statisticsDashboard";
 import CountBadge from "./DashboardItem/CountBadge";
 import CertificateByGroupChart from "./DashboardItem/CertificateByGroup";
 import CertificateByRaProfileChart from "./DashboardItem/CertificateByRaProfiles";
@@ -15,7 +15,7 @@ import CertificateByStatusChart from "./DashboardItem/CertificateByStatus";
 import CertificateComplianceChart from "./DashboardItem/CertificateByComplianceStatus";
 
 function Dashboard() {
-   const dashboard = useSelector(selectors.dashboard);
+   const dashboard = useSelector(selectors.statisticsDashboard);
    const isFetching = useSelector(selectors.isFetching);
 
    const dispatch = useDispatch();

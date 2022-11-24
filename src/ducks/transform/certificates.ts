@@ -49,7 +49,7 @@ export function transformCertDTOToModel(certificate: CertificateDTO): Certificat
          description: certificate.entity.description
       } : undefined,
 
-      group: certificate.group ? {
+      certificateGroup: certificate.group ? {
          uuid: certificate.group.uuid,
          name: certificate.group.name,
          description: certificate.group.description
@@ -117,7 +117,7 @@ export function transformCertModelToDTO(certificate: CertificateModel): Certific
          description: certificate.entity.description
       } : undefined,
 
-      group: certificate.group ? {
+      certificateGroup: certificate.group ? {
          uuid: certificate.group.uuid,
          name: certificate.group.name,
          description: certificate.group.description

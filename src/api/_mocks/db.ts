@@ -176,7 +176,7 @@ export const dbData: DBData = {
    ],
 
 
-   groups: [
+   certificateGroups: [
       dbGroups["Group1"],
       dbGroups["Group2"],
       dbGroups["Group3"],
@@ -201,7 +201,7 @@ export const dbData: DBData = {
    ],
 
 
-   dashboard: dbDashboard,
+   statisticsDashboard: dbDashboard,
 
 
    complianceProfilesList: [

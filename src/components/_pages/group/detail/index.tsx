@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Container } from "reactstrap";
 
-import { actions, selectors } from "ducks/groups";
+import { actions, selectors } from "ducks/certificateGroups";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
@@ -19,7 +19,7 @@ export default function GroupDetail() {
 
    const { id } = useParams();
 
-   const group = useSelector(selectors.group);
+   const group = useSelector(selectors.certificateGroup);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);

@@ -1,5 +1,3 @@
-import { Observable } from "rxjs";
-
 export interface DashboardDTO {
   totalCertificates: number;
   totalGroups: number;
@@ -18,8 +16,4 @@ export interface DashboardDTO {
 
 export interface DashboardDict {
   [key: string]: number;
-}
-
-export interface DashboardManagementApi {
-  getDashboardData(): Observable<DashboardDTO>;
 }

@@ -9,7 +9,7 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDTOToCertificateModel } from "./transform/certificates";
 import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transformGroupDtoToModel } from "./transform/groups";
+import { transformGroupDtoToModel } from "./transform/certificateGroups";
 import { transformLocationDtoToModel } from "./transform/locations";
 
 
@@ -126,7 +126,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.issueCertificate(
+         action => deps.apiClients.clientOperations.issueCertificate(
             action.payload.raProfileUuid,
             action.payload.pkcs10,
             action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
@@ -165,7 +165,7 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.revokeCertificate(
+         action => deps.apiClients.clientOperations.revokeCertificate(
             action.payload.uuid,
             action.payload.raProfileUuid,
             action.payload.reason,
@@ -207,7 +207,7 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.renewCertificate(
+         action => deps.apiClients.clientOperations.renewCertificate(
             action.payload.uuid,
             action.payload.raProfileUuid,
             action.payload.pkcs10,
@@ -385,14 +385,14 @@ const updateGroup: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.groups.getGroupDetail(action.payload.groupUuid).pipe(
+               () => deps.apiClients.certificateGroups.getGroupDetail(action.payload.groupUuid).pipe(
 
                   mergeMap(
                      group => of(
                         slice.actions.updateGroupSuccess({
                            uuid: action.payload.uuid,
                            groupUuid: action.payload.groupUuid,
-                           group: transformGroupDtoToModel(group)
+                           certificateGroup: transformGroupDtoToModel(group)
                         }),
                         slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
                      )
@@ -538,13 +538,13 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
 
             switchMap(
 
-               () => deps.apiClients.groups.getGroupDetail(action.payload.groupUuid).pipe(
+               () => deps.apiClients.certificateGroups.getGroupDetail(action.payload.groupUuid).pipe(
 
                   map(
 
                      group => slice.actions.bulkUpdateGroupSuccess({
                         uuids: action.payload.uuids,
-                        group,
+                        group: certificateGroup,
                         inFilter: action.payload.inFilter,
                         allSelect: action.payload.allSelect,
                      })
@@ -783,7 +783,7 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.getIssuanceAttributes(
+         action => deps.apiClients.clientOperations.getIssuanceAttributes(
             action.payload.raProfileUuid,
             action.payload.authorityUuid,
          ).pipe(
@@ -822,7 +822,7 @@ const getRevocationAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.getRevocationAttributes(
+         action => deps.apiClients.clientOperations.getRevocationAttributes(
             action.payload.raProfileUuid,
             action.payload.authorityUuid,
          ).pipe(
