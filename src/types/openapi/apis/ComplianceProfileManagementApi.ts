@@ -18,6 +18,7 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
+    CertificateType,
     ComplianceGroupRequestDto,
     ComplianceGroupsListResponseDto,
     ComplianceProfileDto,
@@ -52,7 +53,7 @@ export interface BulkDeleteComplianceProfilesRequest {
     requestBody: Array<string>;
 }
 
-export interface CheckCompliance1Request {
+export interface CheckComplianceRequest {
     requestBody: Array<string>;
 }
 
@@ -89,7 +90,7 @@ export interface GetComplianceProfileRequest {
 export interface GetComplianceRulesRequest {
     complianceProvider?: string;
     kind?: string;
-    certificateType?: Array<GetComplianceRulesCertificateTypeEnum>;
+    certificateType?: Array<CertificateType>;
 }
 
 export interface RemoveGroupRequest {
@@ -193,10 +194,10 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     /**
      * Initiate Certificate Compliance Check
      */
-    checkCompliance1({ requestBody }: CheckCompliance1Request): Observable<void>
-    checkCompliance1({ requestBody }: CheckCompliance1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    checkCompliance1({ requestBody }: CheckCompliance1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'checkCompliance1');
+    checkCompliance({ requestBody }: CheckComplianceRequest): Observable<void>
+    checkCompliance({ requestBody }: CheckComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    checkCompliance({ requestBody }: CheckComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'checkCompliance');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -406,13 +407,4 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         }, opts?.responseOpts);
     };
 
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum GetComplianceRulesCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
 }

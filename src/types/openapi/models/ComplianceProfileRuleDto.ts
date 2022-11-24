@@ -12,6 +12,7 @@
  */
 
 import type {
+    CertificateType,
     ResponseAttributeDto,
 } from './';
 
@@ -63,11 +64,10 @@ export interface ComplianceProfileRuleDto {
      */
     groupUuid?: string;
     /**
-     * Certificate type for the rule
-     * @type {string}
+     * @type {CertificateType}
      * @memberof ComplianceProfileRuleDto
      */
-    certificateType: ComplianceProfileRuleDtoCertificateTypeEnum;
+    certificateType: CertificateType;
     /**
      * List of attributes for the rule
      * @type {Array<ResponseAttributeDto>}
@@ -87,13 +87,3 @@ export interface ComplianceProfileRuleDto {
      */
     complianceProfileName: string;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum ComplianceProfileRuleDtoCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
-}
-

@@ -13,7 +13,7 @@
 
 import type {
     MetadataResponseDto,
-    RequestAttributeDto,
+    ResponseAttributeDto,
 } from './';
 
 /**
@@ -48,16 +48,16 @@ export interface CertificateInLocationDto {
     metadata: Array<MetadataResponseDto>;
     /**
      * Applied push attributes
-     * @type {Array<RequestAttributeDto>}
+     * @type {Array<ResponseAttributeDto>}
      * @memberof CertificateInLocationDto
      */
-    pushAttributes?: Array<RequestAttributeDto>;
+    pushAttributes?: Array<ResponseAttributeDto>;
     /**
      * Applied issue attributes
-     * @type {Array<RequestAttributeDto>}
+     * @type {Array<ResponseAttributeDto>}
      * @memberof CertificateInLocationDto
      */
-    csrAttributes?: Array<RequestAttributeDto>;
+    csrAttributes?: Array<ResponseAttributeDto>;
     /**
      * If the Certificate in Location has associated private key
      * @type {boolean}

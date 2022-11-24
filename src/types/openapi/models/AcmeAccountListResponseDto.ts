@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    AccountStatus,
+} from './';
+
 /**
  * @export
  * @interface AcmeAccountListResponseDto
@@ -41,11 +45,10 @@ export interface AcmeAccountListResponseDto {
      */
     totalOrders: number;
     /**
-     * Status of the Account
-     * @type {string}
+     * @type {AccountStatus}
      * @memberof AcmeAccountListResponseDto
      */
-    status: AcmeAccountListResponseDtoStatusEnum;
+    status: AccountStatus;
     /**
      * Name of the RA Profile
      * @type {string}
@@ -65,14 +68,3 @@ export interface AcmeAccountListResponseDto {
      */
     acmeProfileUuid: string;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum AcmeAccountListResponseDtoStatusEnum {
-    Valid = 'valid',
-    Deactivated = 'deactivated',
-    Revoked = 'revoked'
-}
-

@@ -23,6 +23,7 @@ apis/StatisticsDashboardApi.ts
 apis/UserManagementApi.ts
 apis/index.ts
 index.ts
+models/AccountStatus.ts
 models/AcmeAccountListResponseDto.ts
 models/AcmeAccountResponseDto.ts
 models/AcmeProfileDto.ts
@@ -61,6 +62,7 @@ models/CertificateEventHistoryDto.ts
 models/CertificateInLocationDto.ts
 models/CertificateResponseDto.ts
 models/CertificateStatus.ts
+models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts
 models/CertificateValidationDto.ts
 models/ClientCertificateDataResponseDto.ts
@@ -82,6 +84,7 @@ models/ComplianceProviderSummaryDto.ts
 models/ComplianceRequestRulesDto.ts
 models/ComplianceRuleAdditionRequestDto.ts
 models/ComplianceRuleDeletionRequestDto.ts
+models/ComplianceRuleStatus.ts
 models/ComplianceRulesDto.ts
 models/ComplianceRulesListResponseDto.ts
 models/ComplianceRulesResponseDto.ts

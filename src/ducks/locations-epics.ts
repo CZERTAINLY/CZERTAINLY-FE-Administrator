@@ -366,7 +366,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.locations.issueCertificate1({ locationUuid: action.payload.locationUuid, entityUuid: action.payload.entityUuid, issueToLocationRequestDto: transformLocationIssueRequestModelToDto(action.payload.issueRequest) }
+         action => deps.apiClients.locations.issueCertificateToLocation({ locationUuid: action.payload.locationUuid, entityUuid: action.payload.entityUuid, issueToLocationRequestDto: transformLocationIssueRequestModelToDto(action.payload.issueRequest) }
          ).pipe(
 
             map(

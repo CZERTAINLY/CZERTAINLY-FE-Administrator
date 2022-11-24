@@ -12,6 +12,7 @@
  */
 
 import type {
+    ComplianceRuleStatus,
     ResponseAttributeDto,
 } from './';
 
@@ -40,11 +41,10 @@ export interface CertificateComplianceResultDto {
      */
     ruleDescription: string;
     /**
-     * Status of the rule
-     * @type {string}
+     * @type {ComplianceRuleStatus}
      * @memberof CertificateComplianceResultDto
      */
-    status: CertificateComplianceResultDtoStatusEnum;
+    status: ComplianceRuleStatus;
     /**
      * Attributes of the rule
      * @type {Array<ResponseAttributeDto>}
@@ -52,14 +52,3 @@ export interface CertificateComplianceResultDto {
      */
     attributes?: Array<ResponseAttributeDto>;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateComplianceResultDtoStatusEnum {
-    Ok = 'ok',
-    Nok = 'nok',
-    Na = 'na'
-}
-

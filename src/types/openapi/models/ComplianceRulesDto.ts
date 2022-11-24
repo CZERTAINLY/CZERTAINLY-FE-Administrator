@@ -12,6 +12,7 @@
  */
 
 import type {
+    CertificateType,
     RequestAttributeDto,
 } from './';
 
@@ -40,11 +41,10 @@ export interface ComplianceRulesDto {
      */
     description?: string;
     /**
-     * Certificate type for the rule
-     * @type {string}
+     * @type {CertificateType}
      * @memberof ComplianceRulesDto
      */
-    certificateType: ComplianceRulesDtoCertificateTypeEnum;
+    certificateType: CertificateType;
     /**
      * Attributes of the rule
      * @type {Array<RequestAttributeDto>}
@@ -52,13 +52,3 @@ export interface ComplianceRulesDto {
      */
     attributes?: Array<RequestAttributeDto>;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum ComplianceRulesDtoCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
-}
-

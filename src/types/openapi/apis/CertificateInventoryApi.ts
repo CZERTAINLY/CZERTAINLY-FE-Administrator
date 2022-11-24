@@ -46,7 +46,7 @@ export interface CheckRequest {
     uuid: string;
 }
 
-export interface CheckCompliance2Request {
+export interface CheckCertificatesComplianceRequest {
     certificateComplianceCheckDto: CertificateComplianceCheckDto;
 }
 
@@ -66,12 +66,12 @@ export interface GetCertificateValidationResultRequest {
     uuid: string;
 }
 
-export interface ListCertificatesRequest {
-    searchRequestDto: SearchRequestDto;
+export interface ListCertificateLocationsRequest {
+    certificateUuid: string;
 }
 
-export interface ListLocations1Request {
-    certificateUuid: string;
+export interface ListCertificatesRequest {
+    searchRequestDto: SearchRequestDto;
 }
 
 export interface UpdateCertificateObjectsRequest {
@@ -147,10 +147,10 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * Initiate Certificate Compliance Check
      */
-    checkCompliance2({ certificateComplianceCheckDto }: CheckCompliance2Request): Observable<void>
-    checkCompliance2({ certificateComplianceCheckDto }: CheckCompliance2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    checkCompliance2({ certificateComplianceCheckDto }: CheckCompliance2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(certificateComplianceCheckDto, 'certificateComplianceCheckDto', 'checkCompliance2');
+    checkCertificatesCompliance({ certificateComplianceCheckDto }: CheckCertificatesComplianceRequest): Observable<void>
+    checkCertificatesCompliance({ certificateComplianceCheckDto }: CheckCertificatesComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    checkCertificatesCompliance({ certificateComplianceCheckDto }: CheckCertificatesComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(certificateComplianceCheckDto, 'certificateComplianceCheckDto', 'checkCertificatesCompliance');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -233,6 +233,20 @@ export class CertificateInventoryApi extends BaseAPI {
     };
 
     /**
+     * List of available Locations for the Certificate
+     */
+    listCertificateLocations({ certificateUuid }: ListCertificateLocationsRequest): Observable<Array<LocationDto>>
+    listCertificateLocations({ certificateUuid }: ListCertificateLocationsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<LocationDto>>>
+    listCertificateLocations({ certificateUuid }: ListCertificateLocationsRequest, opts?: OperationOpts): Observable<Array<LocationDto> | AjaxResponse<Array<LocationDto>>> {
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'listCertificateLocations');
+
+        return this.request<Array<LocationDto>>({
+            url: '/v1/certificates/{certificateUuid}/locations'.replace('{certificateUuid}', encodeURI(certificateUuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * List Certificates
      */
     listCertificates({ searchRequestDto }: ListCertificatesRequest): Observable<CertificateResponseDto>
@@ -249,20 +263,6 @@ export class CertificateInventoryApi extends BaseAPI {
             method: 'POST',
             headers,
             body: searchRequestDto,
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * List of available Locations for the Certificate
-     */
-    listLocations1({ certificateUuid }: ListLocations1Request): Observable<Array<LocationDto>>
-    listLocations1({ certificateUuid }: ListLocations1Request, opts?: OperationOpts): Observable<AjaxResponse<Array<LocationDto>>>
-    listLocations1({ certificateUuid }: ListLocations1Request, opts?: OperationOpts): Observable<Array<LocationDto> | AjaxResponse<Array<LocationDto>>> {
-        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'listLocations1');
-
-        return this.request<Array<LocationDto>>({
-            url: '/v1/certificates/{certificateUuid}/locations'.replace('{certificateUuid}', encodeURI(certificateUuid)),
-            method: 'GET',
         }, opts?.responseOpts);
     };
 

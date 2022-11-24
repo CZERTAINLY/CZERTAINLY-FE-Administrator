@@ -14,6 +14,7 @@
 import type {
     CertificateComplianceResultDto,
     CertificateStatus,
+    CertificateType,
     ComplianceStatus,
     GroupDto,
     LocationDto,
@@ -163,11 +164,10 @@ export interface CertificateDto {
      */
     owner?: string;
     /**
-     * Certificate type
-     * @type {string}
+     * @type {CertificateType}
      * @memberof CertificateDto
      */
-    certificateType?: CertificateDtoCertificateTypeEnum;
+    certificateType?: CertificateType;
     /**
      * Serial number of the issuer
      * @type {string}
@@ -186,13 +186,3 @@ export interface CertificateDto {
      */
     complianceStatus?: ComplianceStatus;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateDtoCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
-}
-

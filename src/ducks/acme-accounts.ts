@@ -1,7 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 import { AcmeAccountListResponseModel, AcmeAccountResponseModel } from "types/acme-accounts";
-import { AcmeAccountListResponseDtoStatusEnum, AcmeAccountResponseDtoStatusEnum } from "types/openapi";
+import { AccountStatus } from "types/openapi";
 
 
 export type State = {
@@ -129,12 +129,12 @@ export const slice = createSlice({
 
          const account = state.accounts.find(account => account.uuid === action.payload.uuid);
          if (account) {
-            account.status = AcmeAccountListResponseDtoStatusEnum.Revoked;
+            account.status = AccountStatus.Revoked;
             account.enabled = false;
          }
 
          if (state.account?.uuid === action.payload.uuid) {
-            state.account.status = AcmeAccountResponseDtoStatusEnum.Revoked;
+            state.account.status = AccountStatus.Revoked;
             state.account.enabled = false;
          }
 
@@ -217,7 +217,7 @@ export const slice = createSlice({
 
                const account = state.accounts.find(account => account.uuid === uuid);
                if (account) {
-                  account.status = AcmeAccountListResponseDtoStatusEnum.Revoked;
+                  account.status = AccountStatus.Revoked;
                   account.enabled = false;
                }
 
@@ -226,7 +226,7 @@ export const slice = createSlice({
          );
 
          if (state.account && action.payload.uuids.includes(state.account?.uuid)) {
-            state.account.status = AcmeAccountResponseDtoStatusEnum.Revoked;
+            state.account.status = AccountStatus.Revoked;
             state.account.enabled = false;
          }
 

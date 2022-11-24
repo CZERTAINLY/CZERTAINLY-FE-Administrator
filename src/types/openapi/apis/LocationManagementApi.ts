@@ -58,7 +58,7 @@ export interface GetLocationRequest {
     locationUuid: string;
 }
 
-export interface IssueCertificate1Request {
+export interface IssueCertificateToLocationRequest {
     entityUuid: string;
     locationUuid: string;
     issueToLocationRequestDto: IssueToLocationRequestDto;
@@ -213,12 +213,12 @@ export class LocationManagementApi extends BaseAPI {
     /**
      * Issue Certificate to Location
      */
-    issueCertificate1({ entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificate1Request): Observable<LocationDto>
-    issueCertificate1({ entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificate1Request, opts?: OperationOpts): Observable<AjaxResponse<LocationDto>>
-    issueCertificate1({ entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificate1Request, opts?: OperationOpts): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'issueCertificate1');
-        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'issueCertificate1');
-        throwIfNullOrUndefined(issueToLocationRequestDto, 'issueToLocationRequestDto', 'issueCertificate1');
+    issueCertificateToLocation({ entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificateToLocationRequest): Observable<LocationDto>
+    issueCertificateToLocation({ entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificateToLocationRequest, opts?: OperationOpts): Observable<AjaxResponse<LocationDto>>
+    issueCertificateToLocation({ entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificateToLocationRequest, opts?: OperationOpts): Observable<LocationDto | AjaxResponse<LocationDto>> {
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'issueCertificateToLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'issueCertificateToLocation');
+        throwIfNullOrUndefined(issueToLocationRequestDto, 'issueToLocationRequestDto', 'issueCertificateToLocation');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',

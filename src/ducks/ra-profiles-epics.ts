@@ -57,7 +57,7 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.raProfiles.getRaProfile1({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
+         action => deps.apiClients.raProfiles.getRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                profileDto => slice.actions.getRaProfileDetailSuccess({
@@ -235,7 +235,7 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.raProfiles.deleteRaProfile1({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
+         action => deps.apiClients.raProfiles.deleteRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             mergeMap(
 
@@ -382,7 +382,7 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.raProfiles.listIssueCertificateAttributes1({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
+         action => deps.apiClients.raProfiles.listRaProfileIssueCertificateAttributes({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                issuanceAttributes => slice.actions.listIssuanceAttributesDescriptorsSuccess({
@@ -416,7 +416,7 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.raProfiles.listRevokeCertificateAttributes1({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
+         action => deps.apiClients.raProfiles.listRaProfileRevokeCertificateAttributes({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                revocationAttributes => slice.actions.listRevocationAttributeDescriptorsSuccess({
@@ -544,7 +544,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.raProfiles.checkCompliance({ requestBody: action.payload.uuids }
+         action => deps.apiClients.raProfiles.checkRaProfileCompliance({ requestBody: action.payload.uuids }
          ).pipe(
 
             map(
