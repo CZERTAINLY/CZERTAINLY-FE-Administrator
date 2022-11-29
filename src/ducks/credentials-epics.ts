@@ -6,11 +6,13 @@ import { extractError } from "utils/net";
 
 import { slice } from "./credentials";
 import { actions as appRedirectActions } from "./app-redirect";
-
-import { transformCredentialDtoToModel } from "./transform/credentials";
-import { transformConnectorDTOToModel } from "./transform/connectors";
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-
+import {
+    transformCredentialCreateRequestModelToDto, transformCredentialEditRequestModelToDto,
+    transformCredentialResponseDtoToModel
+} from "./transform/credentials";
+import { FunctionGroupCode } from "types/openapi";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 const listCredentials: AppEpic = (action$, state, deps) => {
 
@@ -21,11 +23,11 @@ const listCredentials: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.credentials.getCredentialsList().pipe(
+         () => deps.apiClients.credentials.listCredentials().pipe(
 
             map(
                credentials => slice.actions.listCredentialsSuccess({
-                  credentialList: credentials.map(transformCredentialDtoToModel)
+                  credentialList: credentials.map(transformCredentialResponseDtoToModel)
                })
             ),
 
@@ -54,11 +56,11 @@ const getCredentialDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.credentials.getCredentialDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.credentials.getCredential({ uuid: action.payload.uuid }).pipe(
 
             map(
                credential => slice.actions.getCredentialDetailSuccess({
-                  credetnial: transformCredentialDtoToModel(credential)
+                  credential: transformCredentialResponseDtoToModel(credential)
                })
             ),
 
@@ -86,11 +88,11 @@ const listCredentialProviders: AppEpic = (action$, state, deps) => {
          slice.actions.listCredentialProviders.match
       ),
       switchMap(
-         () => deps.apiClients.connectors.getConnectorsList("credentialProvider").pipe(
+         () => deps.apiClients.connectors.listConnectors({ functionGroup: FunctionGroupCode.CredentialProvider }).pipe(
 
             map(
                providers => slice.actions.listCredentialProvidersSuccess({
-                  connectors: providers.map(transformConnectorDTOToModel)
+                  connectors: providers.map(transformConnectorResponseDtoToModel)
                })
             ),
 
@@ -115,15 +117,12 @@ const getCredentialProviderAttributeDescriptors: AppEpic = (action$, state, deps
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAttributes(
-            action.payload.uuid,
-            "credentialProvider",
-            action.payload.kind
+         action => deps.apiClients.connectors.getAttributes({ uuid: action.payload.uuid, functionGroup: FunctionGroupCode.CredentialProvider, kind: action.payload.kind }
          ).pipe(
 
             map(
                attributeDescriptors => slice.actions.getCredentialProviderAttributesDescriptorsSuccess({
-                  credentialProviderAttributesDescriptors: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
+                  credentialProviderAttributesDescriptors: attributeDescriptors.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -151,11 +150,7 @@ const createCredential: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.credentials.createNewCredential(
-            action.payload.name,
-            action.payload.kind,
-            action.payload.connectorUuid,
-            action.payload.attributes
+         action => deps.apiClients.credentials.createCredential({ credentialRequestDto: transformCredentialCreateRequestModelToDto(action.payload) }
          ).pipe(
 
             mergeMap(
@@ -190,7 +185,7 @@ const deleteCredential: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.credentials.deleteCredential(action.payload.uuid).pipe(
+         action => deps.apiClients.credentials.deleteCredential({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -224,9 +219,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.credentials.updateCredential(
-            action.payload.uuid,
-            action.payload.attributes.map(transformAttributeModelToDTO)
+         action => deps.apiClients.credentials.editCredential({ uuid: action.payload.uuid, credentialUpdateRequestDto: transformCredentialEditRequestModelToDto(action.payload.credentialRequest) }
          ).pipe(
 
             mergeMap(
@@ -234,7 +227,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
                credential => of(
 
                   slice.actions.updateCredentialSuccess({
-                     credential: transformCredentialDtoToModel(credential)
+                     credential: transformCredentialResponseDtoToModel(credential)
                   }),
 
                   appRedirectActions.redirect({ url: "../../detail/" + credential.uuid })
@@ -267,45 +260,15 @@ const bulkDeleteCredential: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.credentials.bulkDeleteCredentials(action.payload.uuids).pipe(
+         action => deps.apiClients.credentials.bulkDeleteCredential({ requestBody: action.payload.uuids }).pipe(
 
             map(
-               errors => slice.actions.bulkDeleteCredentialsSuccess({ uuids: action.payload.uuids, errors })
+                () => slice.actions.bulkDeleteCredentialsSuccess({ uuids: action.payload.uuids })
             ),
 
             catchError(
                error => of(
                   slice.actions.bulkDeleteCredentialsFailure({ error: extractError(error, "Failed to update Credential") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to update Credential" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
-
-const bulkForceDeleteCredentials: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteCredentials.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.credentials.bulkForceDeleteCredentials(action.payload.uuids).pipe(
-            map(
-               () => slice.actions.bulkForceDeleteCredentialsSuccess({ uuids: action.payload.uuids })
-            ),
-
-            catchError(
-               error => of(
-                  slice.actions.bulkForceDeleteCredentialsFailure({ error: extractError(error, "Failed to update Credential") }),
                   appRedirectActions.fetchError({ error, message: "Failed to update Credential" })
                )
             )
@@ -328,7 +291,6 @@ const epics = [
    deleteCredential,
    updateCredential,
    bulkDeleteCredential,
-   bulkForceDeleteCredentials,
 ];
 
 export default epics;

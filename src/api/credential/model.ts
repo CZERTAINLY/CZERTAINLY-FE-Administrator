@@ -25,28 +25,3 @@ export interface CredentialProviderDTO {
    authAttributes: AttributeDTO[];
    authType: string;
 }
-
-
-export interface CredentialManagementApi {
-
-   enableCredential(uuid: string): Observable<void>;
-
-   disableCredential(uuid: string): Observable<void>;
-
-   getCredentialDetail(uuid: string): Observable<CredentialDTO>;
-
-   updateCredential(uuid: string, attributes: AttributeDTO[]): Observable<CredentialDTO>;
-
-   deleteCredential(uuid: string): Observable<DeleteObjectErrorDTO[]>;
-
-   getCredentialsList(): Observable<CredentialDTO[]>;
-
-   createNewCredential(name: string, kind: string, connectorUuid: string, attributes: AttributeDTO[]): Observable<{ uuid: string}>;
-
-   forceDeleteCredential(uuid: string | number): Observable<void>;
-
-   bulkForceDeleteCredentials(uuids: string[]): Observable<void>;
-
-   bulkDeleteCredentials(uuids: string[]): Observable<DeleteObjectErrorDTO[]>;
-
-}

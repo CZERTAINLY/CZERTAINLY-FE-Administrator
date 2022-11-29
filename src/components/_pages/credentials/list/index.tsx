@@ -23,13 +23,11 @@ function CredentialList() {
 
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
-   const isBulkDeleting = useSelector(selectors.isBulkDeleteing);
-   const isForceBulkDeleting = useSelector(selectors.isForceBulkDeleting);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
 
-   const isBusy = isFetching || isDeleting || isBulkDeleting || isForceBulkDeleting;
+   const isBusy = isFetching || isDeleting || isBulkDeleting;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-   const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
 
    useEffect(
@@ -40,16 +38,6 @@ function CredentialList() {
          dispatch(actions.listCredentials());
       },
       [dispatch]
-
-   );
-
-
-   useEffect(
-
-      () => {
-         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
-      },
-      [bulkDeleteErrorMessages]
 
    );
 
@@ -76,17 +64,6 @@ function CredentialList() {
    );
 
 
-   const onForceDeleteConfirmed = useCallback(
-
-      () => {
-         dispatch(actions.clearDeleteErrorMessages());
-         dispatch(actions.bulkForceDeleteCredentials({ uuids: checkedRows }));
-      },
-      [dispatch, checkedRows]
-
-   );
-
-
    const setCheckedRows = useCallback(
 
       (rows: (string | number)[]) => {
@@ -104,55 +81,6 @@ function CredentialList() {
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
       ],
       [checkedRows, onAddClick]
-
-   );
-
-
-   const forceDeleteBody = useMemo(
-
-      () => (
-
-         <div>
-
-            <div>Failed to delete {checkedRows.length > 1 ? "Credentials" : "a Credential"}. Please find the details below:</div>
-
-            <Table className="table-hover" size="sm">
-
-               <thead>
-
-                  <tr>
-
-                     <th>
-                        <b>Name</b>
-                     </th>
-
-                     <th>
-                        <b>Dependencies</b>
-                     </th>
-
-                  </tr>
-
-               </thead>
-
-               <tbody>
-
-                  {bulkDeleteErrorMessages?.map(
-                     message => (
-                        <tr>
-                           <td>{message.name}</td>
-                           <td>{message.message}</td>
-                        </tr>
-                     )
-                  )}
-
-               </tbody>
-
-            </Table >
-
-         </div>
-
-      ),
-      [bulkDeleteErrorMessages, checkedRows.length]
 
    );
 
@@ -261,17 +189,6 @@ function CredentialList() {
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-            ]}
-         />
-
-         <Dialog
-            isOpen={confirmForceDelete}
-            caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-            body={forceDeleteBody}
-            toggle={() => setConfirmForceDelete(false)}
-            buttons={[
-               { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-               { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
             ]}
          />
 

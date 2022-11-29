@@ -11,7 +11,7 @@ import * as model from "./model";
 import { AttributeDTO } from "api/_common/attributeDTO";
 
 
-export class CredentialManagementMock implements model.CredentialManagementApi {
+export class CredentialManagementMock {
 
    enableCredential(uuid: string): Observable<void> {
 
