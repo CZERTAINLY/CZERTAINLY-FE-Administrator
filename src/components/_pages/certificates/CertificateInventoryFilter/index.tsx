@@ -46,7 +46,7 @@ export default function CertificateInventoryFilter({
    const availableFilters = useSelector(selectors.availableCertificateFilters);
    const filters = useSelector(selectors.currentCertificateFilters);
 
-   const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailablFilters);
+   const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailableFilters);
 
    const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 

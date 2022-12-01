@@ -46,7 +46,7 @@ export default function CertificateList({
 
    const totalItems = useSelector(selectors.totalItems);
 
-   const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
+   const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailableFilters);
    const currentFilters = useSelector(selectors.currentCertificateFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
    const isIssuing = useSelector(selectors.isIssuing);
@@ -74,7 +74,7 @@ export default function CertificateList({
    const [updateEntity, setUpdateEntity] = useState<boolean>(false);
    const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
-   const isBusy = isFetchingAvailablFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
+   const isBusy = isFetchingAvailableFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
 
    useEffect(
 

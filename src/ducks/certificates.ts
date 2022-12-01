@@ -1,13 +1,20 @@
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateListQueryFilterModel, CertificateListQueryModel, CertificateModel, CertificateValidationResultModel } from "models/certificate";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { CertificateRAProfileModel } from "models/certificate";
-import { GroupModel } from "models/groups";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { CertificateRevocationReason } from "types/certificate";
-import { LocationModel } from "models/locations";
-import { CertificateBulkDeleteResultDTO } from "api/certificates";
+import {
+   CertificateBulkDeleteRequestModel, CertificateBulkDeleteResponseModel,
+   CertificateBulkObjectModel, CertificateComplianceCheckModel, CertificateHistoryModel,
+   CertificateObjectModel,
+   CertificateRenewRequestModel,
+   CertificateResponseModel,
+   CertificateRevocationReason, CertificateRevokeRequestModel, CertificateSearchFieldModel,
+   CertificateSearchFilterModel,
+   CertificateSearchRequestModel, CertificateSignRequestModel, CertificateUploadModel, CertificateValidationModel
+} from "types/certificate";
+import { CertificateGroupResponseModel } from "types/certificateGroups";
+import { RaProfileResponseModel } from "types/ra-profiles";
+import { AttributeDescriptorModelNew } from "types/attributes";
+import { LocationResponseModel } from "../types/locations";
+import { CertificateStatus } from "../types/openapi";
 
 
 export type State = {
@@ -18,21 +25,21 @@ export type State = {
 
    deleteErrorMessage: string;
 
-   lastQuery?: CertificateListQueryModel;
+   lastQuery?: CertificateSearchRequestModel;
 
-   availableFilters: AvailableCertificateFilterModel[];
-   currentFilters: CertificateListQueryFilterModel[];
+   availableFilters: CertificateSearchFieldModel[];
+   currentFilters: CertificateSearchFilterModel[];
 
-   certificates: CertificateModel[];
+   certificates: CertificateResponseModel[];
    totalPages: number;
    totalItems: number;
 
-   certificateDetail?: CertificateModel;
-   certificateHistory?: CertificateEventHistoryModel[];
-   certificateLocations?: LocationModel[];
-   issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
-   revocationAttributes: AttributeDescriptorModel[];
-   validationResult: CertificateValidationResultModel;
+   certificateDetail?: CertificateResponseModel;
+   certificateHistory?: CertificateHistoryModel[];
+   certificateLocations?: LocationResponseModel[];
+   issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModelNew[] };
+   revocationAttributes: AttributeDescriptorModelNew[];
+   validationResult: { [key: string]: CertificateValidationModel };
 
    isFetchingAvailableFilters: boolean;
 
@@ -173,23 +180,23 @@ export const slice = createSlice({
       },
 
 
-      setCurrentFilters: (state, action: PayloadAction<{ currentFilters: CertificateListQueryFilterModel[] }>) => {
+      setCurrentFilters: (state, action: PayloadAction<{ currentFilters: CertificateSearchFilterModel[] }>) => {
          state.currentFilters = action.payload.currentFilters;
 
       },
 
 
-      listCertificates: (state, action: PayloadAction<{ query: CertificateListQueryModel }>) => {
+      listCertificates: (state, action: PayloadAction<CertificateSearchRequestModel>) => {
 
          state.certificates = [];
          state.isFetchingList = true;
-         state.lastQuery = action.payload.query;
+         state.lastQuery = action.payload;
 
       },
 
 
       listCertificatesSuccess: (state, action: PayloadAction<{
-         certificateList: CertificateModel[],
+         certificateList: CertificateResponseModel[],
          totalPages: number,
          totalItems: number
       }>) => {
@@ -217,7 +224,7 @@ export const slice = createSlice({
       },
 
 
-      getCertificateDetailSuccess: (state, action: PayloadAction<{ certificate: CertificateModel }>) => {
+      getCertificateDetailSuccess: (state, action: PayloadAction<{ certificate: CertificateResponseModel }>) => {
 
          state.isFetchingDetail = false;
          state.certificateDetail = action.payload.certificate;
@@ -240,7 +247,7 @@ export const slice = createSlice({
       },
 
 
-      getCertificateValidationResultSuccess: (state, action: PayloadAction<CertificateValidationResultModel>) => {
+      getCertificateValidationResultSuccess: (state, action: PayloadAction<{ [key: string]: CertificateValidationModel }>) => {
 
          state.isFetchingValidationResult = false;
          state.validationResult = action.payload;
@@ -256,10 +263,9 @@ export const slice = createSlice({
 
 
       issueCertificate: (state, action: PayloadAction<{
+         authorityUuid: string;
          raProfileUuid: string;
-         pkcs10: string;
-         attributes: AttributeModel[],
-         authorityUuid: string
+         signRequest: CertificateSignRequestModel;
       }>) => {
 
          state.isIssuing = true;
@@ -285,11 +291,10 @@ export const slice = createSlice({
 
 
       revokeCertificate: (state, action: PayloadAction<{
-         uuid: string,
-         raProfileUuid: string,
-         reason: CertificateRevocationReason,
-         attributes: AttributeModel[],
          authorityUuid: string
+         raProfileUuid: string,
+         uuid: string,
+         revokeRequest: CertificateRevokeRequestModel,
        }>) => {
 
          state.isRevoking = true;
@@ -305,7 +310,7 @@ export const slice = createSlice({
 
          if (cerificateIndex >= 0) state.certificates.splice(cerificateIndex, 1);
 
-         if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.status = "revoked";
+         if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.status = CertificateStatus.Revoked;
 
       },
 
@@ -318,10 +323,10 @@ export const slice = createSlice({
 
 
       renewCertificate: (state, action: PayloadAction<{
-         uuid: string;
-         raProfileUuid: string;
-         pkcs10: string;
          authorityUuid: string
+         raProfileUuid: string;
+         uuid: string;
+         renewRequest: CertificateRenewRequestModel
       }>) => {
 
          state.isRenewing = true;
@@ -352,7 +357,7 @@ export const slice = createSlice({
       },
 
 
-      getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: AvailableCertificateFilterModel[] }>) => {
+      getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: CertificateSearchFieldModel[] }>) => {
 
          state.isFetchingAvailableFilters = false;
          state.availableFilters = action.payload.availableCertificateFilters;
@@ -375,7 +380,7 @@ export const slice = createSlice({
       },
 
 
-      getCertificateHistorySuccess: (state, action: PayloadAction<{ certificateHistory: CertificateEventHistoryModel[] }>) => {
+      getCertificateHistorySuccess: (state, action: PayloadAction<{ certificateHistory: CertificateHistoryModel[] }>) => {
 
          state.isFetchingHistory = false;
          state.certificateHistory = action.payload.certificateHistory;
@@ -398,7 +403,7 @@ export const slice = createSlice({
       },
 
 
-      listCertificateLocationsSuccess: (state, action: PayloadAction<{ certificateLocations: LocationModel[] }>) => {
+      listCertificateLocationsSuccess: (state, action: PayloadAction<{ certificateLocations: LocationResponseModel[] }>) => {
 
          state.isFetchingLocations = false;
          state.certificateLocations = action.payload.certificateLocations;
@@ -442,14 +447,14 @@ export const slice = createSlice({
       },
 
 
-      updateGroup: (state, action: PayloadAction<{ uuid: string, groupUuid: string }>) => {
+      updateGroup: (state, action: PayloadAction<{ uuid: string, updateGroupRequest: CertificateObjectModel }>) => {
 
          state.isUpdatingGroup = true;
 
       },
 
 
-      updateGroupSuccess: (state, action: PayloadAction<{ uuid: string, groupUuid: string, group: GroupModel }>) => {
+      updateGroupSuccess: (state, action: PayloadAction<{ uuid: string, groupUuid: string, group: CertificateGroupResponseModel }>) => {
 
          state.isUpdatingGroup = false;
 
@@ -469,14 +474,14 @@ export const slice = createSlice({
       },
 
 
-      updateRaProfile: (state, action: PayloadAction<{ uuid: string, authorityUuid: string, raProfileUuid: string }>) => {
+      updateRaProfile: (state, action: PayloadAction<{ uuid: string, authorityUuid: string, updateRaProfileRequest: CertificateObjectModel }>) => {
 
          state.isUpdatingRaProfile = true;
 
       },
 
 
-      updateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuid: string, raProfile: CertificateRAProfileModel }>) => {
+      updateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuid: string, raProfile: RaProfileResponseModel }>) => {
 
          state.isUpdatingRaProfile = false;
 
@@ -496,7 +501,7 @@ export const slice = createSlice({
       },
 
 
-      updateOwner: (state, action: PayloadAction<{ uuid: string, owner: string }>) => {
+      updateOwner: (state, action: PayloadAction<{ uuid: string, updateOwnerRequest: CertificateObjectModel }>) => {
 
          state.isUpdatingOwner = true;
 
@@ -523,14 +528,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateGroup: (state, action: PayloadAction<{ uuids: string[], groupUuid: string, inFilter: any, allSelect: boolean }>) => {
+      bulkUpdateGroup: (state, action: PayloadAction<CertificateBulkObjectModel>) => {
 
          state.isBulkUpdatingGroup = true;
 
       },
 
 
-      bulkUpdateGroupSuccess: (state, action: PayloadAction<{ uuids: string[], group: GroupModel, inFilter: any, allSelect: boolean }>) => {
+      bulkUpdateGroupSuccess: (state, action: PayloadAction<{ uuids: string[], group: CertificateGroupResponseModel }>) => {
 
          state.isBulkUpdatingGroup = false;
 
@@ -558,14 +563,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateRaProfile: (state, action: PayloadAction<{ uuids: string[], authorityUuid: string, raProfileUuid: string, inFilter: any, allSelect: boolean }>) => {
+      bulkUpdateRaProfile: (state, action: PayloadAction<{ authorityUuid: string, raProfileRequest: CertificateBulkObjectModel }>) => {
 
          state.isBulkUpdatingRaProfile = true;
 
       },
 
 
-      bulkUpdateRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[], raProfile: CertificateRAProfileModel, inFilter: any, allSelect: boolean }>) => {
+      bulkUpdateRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[], raProfile: RaProfileResponseModel }>) => {
 
          state.isBulkUpdatingRaProfile = false;
 
@@ -593,14 +598,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateOwner: (state, action: PayloadAction<{ uuids: string[], owner: string, inFilter: any, allSelect: boolean}>) => {
+      bulkUpdateOwner: (state, action: PayloadAction<CertificateBulkObjectModel>) => {
 
          state.isBulkUpdatingOwner = true;
 
       },
 
 
-      bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[], owner: string, inFilter: any, allSelect: boolean }>) => {
+      bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[], owner: string }>) => {
 
          state.isBulkUpdatingOwner = false;
 
@@ -628,7 +633,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDelete: (state, action: PayloadAction<{ uuids: string[], inFilter: any, allSelect: boolean  }>) => {
+      bulkDelete: (state, action: PayloadAction<CertificateBulkDeleteRequestModel>) => {
 
          state.deleteErrorMessage = "";
          state.isBulkDeleting = true;
@@ -636,7 +641,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteSuccess: (state, action: PayloadAction<{ uuids: string[], inFilter: any, allSelect: boolean, response: CertificateBulkDeleteResultDTO  }>) => {
+      bulkDeleteSuccess: (state, action: PayloadAction<{ response: CertificateBulkDeleteResponseModel  }>) => {
 
          state.isBulkDeleting = false;
 
@@ -651,14 +656,14 @@ export const slice = createSlice({
       },
 
 
-      uploadCertificate: (state, action: PayloadAction<{ certificate: string }>) => {
+      uploadCertificate: (state, action: PayloadAction<CertificateUploadModel>) => {
 
          state.isUploading = true;
 
       },
 
 
-      uploadCertificateSuccess: (state, action: PayloadAction<{ uuid: string, certificate: CertificateModel }>) => {
+      uploadCertificateSuccess: (state, action: PayloadAction<{ uuid: string, certificate: CertificateResponseModel }>) => {
 
          state.isUploading = false;
          state.forceRefreshList = true;
@@ -681,7 +686,7 @@ export const slice = createSlice({
       },
 
 
-      getIssuanceAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, issuanceAttributes: AttributeDescriptorModel[] }>) => {
+      getIssuanceAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, issuanceAttributes: AttributeDescriptorModelNew[] }>) => {
 
          state.isFetchingIssuanceAttributes = false;
          state.issuanceAttributes[action.payload.raProfileUuid] = action.payload.issuanceAttributes;
@@ -703,7 +708,7 @@ export const slice = createSlice({
          },
 
 
-      getRevocationAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, revocationAttributes: AttributeDescriptorModel[] }>) => {
+      getRevocationAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, revocationAttributes: AttributeDescriptorModelNew[] }>) => {
 
          state.isFetchingRevocationAttributes = false;
          state.revocationAttributes = action.payload.revocationAttributes;
@@ -717,7 +722,7 @@ export const slice = createSlice({
 
       },
 
-      checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      checkCompliance: (state, action: PayloadAction<CertificateComplianceCheckModel>) => {
 
          state.isCheckingCompliance = true;
       },
@@ -759,7 +764,7 @@ const certificateLocations = createSelector(state, state => state.certificateLoc
 const issuanceAttributes = createSelector(state, state => state.issuanceAttributes);
 const revocationAttributes = createSelector(state, state => state.revocationAttributes);
 
-const isFetchingAvailablFilters = createSelector(state, state => state.isFetchingAvailableFilters);
+const isFetchingAvailableFilters = createSelector(state, state => state.isFetchingAvailableFilters);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
@@ -805,7 +810,7 @@ export const selectors = {
    certificateLocations,
    issuanceAttributes,
    revocationAttributes,
-   isFetchingAvailablFilters,
+   isFetchingAvailableFilters,
    isFetchingList,
    isFetchingDetail,
    isFetchingHistory,

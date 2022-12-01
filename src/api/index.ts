@@ -1,5 +1,4 @@
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
-import { CertificateInventoryApi, CertificateInventoryBackend, CertificateInventoryMock } from "./certificates";
 import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
 import {
    ComplianceProfileManagementApi,
@@ -13,7 +12,7 @@ import {
    AuthenticationManagementApi,
    AuthorityManagementApi,
    CallbackApi,
-   CertificateGroupApi,
+   CertificateGroupApi, CertificateInventoryApi,
    ClientOperationsV2Api,
    Configuration,
    ConnectorManagementApi, CredentialManagementApi,
@@ -56,7 +55,7 @@ export const backendClient: ApiClients = {
    auth: new AuthenticationManagementApi(configuration),
    users: new UserManagementApi(configuration),
    roles: new RoleManagementApi(configuration),
-   certificates: new CertificateInventoryBackend(fetchService),
+   certificates: new CertificateInventoryApi(configuration),
    auditLogs: new AuditLogsBackend(fetchService),
    raProfiles: new RAProfileManagementApi(configuration),
    credentials: new CredentialManagementApi(configuration),
@@ -79,7 +78,7 @@ export const mockClient: Partial<ApiClients> = {
    // auth: new AuthMock(),
    // users: new UserManagementMock(),
    // roles: new RolesManagementMock(),
-   certificates: new CertificateInventoryMock(),
+   // certificates: new CertificateInventoryMock(),
    auditLogs: new AuditLogsMock(),
    // profiles: new ProfilesManagementMock(),
    // credentials: new CredentialManagementMock(),

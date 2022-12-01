@@ -8,7 +8,7 @@ import { dbData } from "api/_mocks/db";
 import { randomDelay } from "utils/mock";
 import { LocationDTO } from "api/location";
 
-export class CertificateInventoryMock implements model.CertificateInventoryApi {
+export class CertificateInventoryMock {
 
    getCertificateValidationResult(uuid: string): Observable<model.CertificateValidationResultDTO> {
       return of(
