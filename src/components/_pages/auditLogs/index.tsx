@@ -4,7 +4,7 @@ import { Button, Container } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { actions as auditLogActions, selectors } from "ducks/audit";
+import { actions as auditLogActions, selectors } from "ducks/auditLogs";
 
 import AuditLogsFilters, { FormValues, } from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";

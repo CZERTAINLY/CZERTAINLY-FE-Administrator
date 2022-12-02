@@ -313,7 +313,7 @@ export const slice = createSlice({
 
                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
                   found = true;
-                  connector.rules.push({
+                  connector.rules?.push({
                      uuid: action.payload.rule.uuid,
                      name: action.payload.rule.name,
                      description: action.payload.rule.description,

@@ -21,7 +21,7 @@ import { initialState as initialComplianceProfilesState, slice as initialComplia
 import { initialState as initialCredentialsState, slice as initialCredentialsSlice } from "./credentials";
 import { initialState as initialEntitiesState, slice as initialEntitiesSlice } from "./entities";
 import { initialState as initialLocationsState, slice as initialLocationsSlice } from "./locations";
-import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./audit";
+import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./auditLogs";
 
 import authEpics from "./auth-epics";
 import appRedirectEpics from "./app-redirect-epics";
@@ -41,7 +41,7 @@ import complianceProfilesEpics from "./compliance-profiles-epics";
 import credentialsEpics from "./credentials-epics";
 import entitiesEpics from "./entities-epics";
 import locationsEpics from "./locations-epics";
-import auditLogsEpics from "./audit-epics";
+import auditLogsEpics from "./auditLogs-epics";
 
 
 export interface EpicDependencies {

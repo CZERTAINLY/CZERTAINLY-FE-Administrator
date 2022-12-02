@@ -3,9 +3,13 @@ import { catchError, filter, map, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
 
-import * as slice from "./audit";
-import { transformAuditLogDTOToModel } from "./transform/auditlog";
+import * as slice from "./auditLogs";
 import { actions as appRedirectActions } from "./app-redirect";
+import {
+    transformAuditLogDtoToModel,
+    transformAuditLogFilterModelToDto,
+    transformPageableModelToDto
+} from "./transform/auditLogs";
 
 
 const listLogs: AppEpic = (action$, state, deps) => {
@@ -17,19 +21,19 @@ const listLogs: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auditLogs.getLogs(
-            action.payload.page,
-            action.payload.size,
-            action.payload.filters
+         action => deps.apiClients.auditLogs.listAuditLogs({ pageable: transformPageableModelToDto({ page: action.payload.page, size: action.payload.size }), filter: action.payload.filters ? transformAuditLogFilterModelToDto(action.payload.filters) : {} }
          ).pipe(
 
             map(
-               pagedAuditLog => slice.actions.listLogsSuccess({
-                  data: pagedAuditLog.items.map(transformAuditLogDTOToModel),
-                  page: pagedAuditLog.page,
-                  size: pagedAuditLog.size,
-                  total: pagedAuditLog.totalPages
-               })
+               pagedAuditLog => {
+                   const auditLogModel = transformAuditLogDtoToModel(pagedAuditLog);
+                   return slice.actions.listLogsSuccess({
+                       data: auditLogModel.items,
+                       page: auditLogModel.page,
+                       size: auditLogModel.size,
+                       total: auditLogModel.totalPages
+                   })
+               }
             ),
 
             catchError(
@@ -55,7 +59,7 @@ const listObjects: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auditLogs.getObjects().pipe(
+         action => deps.apiClients.auditLogs.listObjects().pipe(
 
             map(
                objectList => slice.actions.listObjectsSuccess({ objectList })
@@ -84,7 +88,7 @@ const listOperations: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auditLogs.getOperations().pipe(
+         action => deps.apiClients.auditLogs.listOperations().pipe(
 
             map(
                operationList => slice.actions.listOperationsSuccess({ operationList })
@@ -113,7 +117,7 @@ const listStatuses: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auditLogs.getStatuses().pipe(
+         action => deps.apiClients.auditLogs.listOperationStatuses().pipe(
 
             map(
                statusList => slice.actions.listStatusesSuccess({ statusList })
@@ -142,7 +146,8 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auditLogs.purgeLogs(action.payload.queryString).pipe(
+         action => deps.apiClients.auditLogs.purgeAuditLogs({ pageable: transformPageableModelToDto({ page: action.payload.page, size: action.payload.size }), filter: action.payload.filters ? transformAuditLogFilterModelToDto(action.payload.filters) : {} }
+         ).pipe(
 
             map(
                () => slice.actions.listLogs({ page: 0, size: 10, filters: action.payload.filters })

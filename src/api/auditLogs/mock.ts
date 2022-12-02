@@ -7,7 +7,7 @@ import { randomDelay } from "utils/mock";
 import * as model from "./model";
 
 
-export class AuditLogsMock implements model.AuditLogsApi {
+export class AuditLogsMock {
 
 
    getObjects(): Observable<string[]> {

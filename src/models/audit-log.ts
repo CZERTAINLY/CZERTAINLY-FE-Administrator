@@ -1,4 +1,4 @@
-import { AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from "types/auditlog";
+import { AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from "types/auditLogs";
 
 export interface AuditLogModel {
    id: number;

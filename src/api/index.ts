@@ -1,8 +1,6 @@
-import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
-import { FetchHttpServiceImpl } from "utils/FetchHttpService";
 import {
    ACMEAccountManagementApi,
-   ACMEProfileManagementApi,
+   ACMEProfileManagementApi, AuditLogApi,
    AuthenticationManagementApi,
    AuthorityManagementApi,
    CallbackApi,
@@ -19,14 +17,13 @@ import {
 } from "types/openapi";
 
 
-const fetchService = new FetchHttpServiceImpl((window as any).__ENV__.API_URL);
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
 
 export interface ApiClients {
    auth: AuthenticationManagementApi;
    users: UserManagementApi;
    roles: RoleManagementApi;
-   auditLogs: AuditLogsApi;
+   auditLogs: AuditLogApi;
    raProfiles: RAProfileManagementApi;
    credentials: CredentialManagementApi;
    connectors: ConnectorManagementApi;
@@ -50,7 +47,7 @@ export const backendClient: ApiClients = {
    users: new UserManagementApi(configuration),
    roles: new RoleManagementApi(configuration),
    certificates: new CertificateInventoryApi(configuration),
-   auditLogs: new AuditLogsBackend(fetchService),
+   auditLogs: new AuditLogApi(configuration),
    raProfiles: new RAProfileManagementApi(configuration),
    credentials: new CredentialManagementApi(configuration),
    authorities: new AuthorityManagementApi(configuration),
@@ -73,7 +70,7 @@ export const mockClient: Partial<ApiClients> = {
    // users: new UserManagementMock(),
    // roles: new RolesManagementMock(),
    // certificates: new CertificateInventoryMock(),
-   auditLogs: new AuditLogsMock(),
+   // auditLogs: new AuditLogsMock(),
    // profiles: new ProfilesManagementMock(),
    // credentials: new CredentialManagementMock(),
    // authorities: new AuthorityManagementMock(),

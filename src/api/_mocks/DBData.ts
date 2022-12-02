@@ -11,7 +11,7 @@ import { DbCredential } from "./db-credentials";
 import { DbRaProfile } from "./db-ra-profiles";
 import { DbDiscovery } from "./db-discoveries";
 
-import { AuditLogOperation, AuditLogOperationStatus } from "types/auditlog";
+import { AuditLogOperation, AuditLogOperationStatus } from "types/auditLogs";
 import { GroupDTO } from "api/groups";
 import { DashboardDTO } from "api/dashboard";
 import { DbComplianceGroup, DbComplianceProfile, DbComplianceProfileList, DbComplianceRule } from "./db-compliance-profiles";
