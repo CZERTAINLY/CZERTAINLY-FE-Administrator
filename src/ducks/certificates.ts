@@ -1,20 +1,27 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-   CertificateBulkDeleteRequestModel, CertificateBulkDeleteResponseModel,
-   CertificateBulkObjectModel, CertificateComplianceCheckModel, CertificateHistoryModel,
+   CertificateBulkDeleteRequestModel,
+   CertificateBulkDeleteResponseModel,
+   CertificateBulkObjectModel,
+   CertificateComplianceCheckModel,
+   CertificateHistoryModel,
    CertificateObjectModel,
    CertificateRenewRequestModel,
    CertificateResponseModel,
-   CertificateRevocationReason, CertificateRevokeRequestModel, CertificateSearchFieldModel,
+   CertificateRevokeRequestModel,
+   CertificateSearchFieldModel,
    CertificateSearchFilterModel,
-   CertificateSearchRequestModel, CertificateSignRequestModel, CertificateUploadModel, CertificateValidationModel
+   CertificateSearchRequestModel,
+   CertificateSignRequestModel,
+   CertificateUploadModel,
+   CertificateValidationModel
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { AttributeDescriptorModelNew } from "types/attributes";
-import { LocationResponseModel } from "../types/locations";
-import { CertificateStatus } from "../types/openapi";
+import { LocationResponseModel } from "types/locations";
+import { CertificateStatus } from "types/openapi";
 
 
 export type State = {

@@ -1,10 +1,5 @@
 import { AuditLogsApi, AuditLogsBackend, AuditLogsMock } from "./auditLogs";
 import { DiscoveryManagementApi, DiscoveryManagementBackend, DiscoveryManagementMock } from "./discovery";
-import {
-   ComplianceProfileManagementApi,
-   ComplianceProfileManagementBackend,
-   ComplianceProfileManagementMock
-} from "./compliance-profile";
 import { FetchHttpServiceImpl } from "utils/FetchHttpService";
 import {
    ACMEAccountManagementApi,
@@ -13,7 +8,7 @@ import {
    AuthorityManagementApi,
    CallbackApi,
    CertificateGroupApi, CertificateInventoryApi,
-   ClientOperationsV2Api,
+   ClientOperationsV2Api, ComplianceProfileManagementApi,
    Configuration,
    ConnectorManagementApi, CredentialManagementApi,
    EntityManagementApi,
@@ -70,7 +65,7 @@ export const backendClient: ApiClients = {
    certificateGroups: new CertificateGroupApi(configuration),
    clientOperations: new ClientOperationsV2Api(configuration),
    discoveries: new DiscoveryManagementBackend(fetchService),
-   complianceProfile: new ComplianceProfileManagementBackend(fetchService),
+   complianceProfile: new ComplianceProfileManagementApi(configuration),
 };
 
 
@@ -92,5 +87,5 @@ export const mockClient: Partial<ApiClients> = {
    // groups: new GroupManagementMock(),
    // operations: new OperationsMock(),
    discoveries: new DiscoveryManagementMock(),
-   complianceProfile: new ComplianceProfileManagementMock(),
+   // complianceProfile: new ComplianceProfileManagementMock(),
 };

@@ -10,7 +10,7 @@ import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO";
 import { CertificateType } from "types/certificate";
 import { ComplianceRuleDTO } from "./model";
 
-export class ComplianceProfileManagementMock implements model.ComplianceProfileManagementApi {
+export class ComplianceProfileManagementMock {
    getComplianceProfileList(): Observable<model.ComplianceProfileListItemDTO[]> {
       return of(
          null

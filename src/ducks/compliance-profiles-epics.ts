@@ -7,14 +7,18 @@ import { extractError } from "utils/net";
 import { slice } from "./compliance-profiles";
 import { actions as appRedirectActions } from "./app-redirect";
 import { actions as alertActions } from "./alerts";
-
 import {
-   transformComplianceConnectorGroupDTOToModel,
-   transformComplianceConnectorRuleDTOToModel,
-   transformComplianceProfileDtoToModel,
-   transformComplianceProfileListDtoToModel,
-   transformComplianceRuleDTOToModel
+    transformComplianceProfileGroupListResponseDtoToModel,
+    transformComplianceProfileGroupRequestModelToDto,
+    transformComplianceProfileListModelToDto,
+    transformComplianceProfileRequestModelToDto,
+    transformComplianceProfileResponseDtoToModel,
+    transformComplianceProfileRuleAddRequestModelToDto,
+    transformComplianceProfileRuleAddResponseDtoToModel,
+    transformComplianceProfileRuleDeleteRequestModelToDto,
+    transformComplianceProfileRuleListResponseDtoToModel
 } from "./transform/compliance-profiles";
+import { RaProfileSimplifiedModel } from "../types/certificate";
 
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
@@ -26,11 +30,11 @@ const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.complianceProfile.getComplianceProfileList().pipe(
+         () => deps.apiClients.complianceProfile.listComplianceProfiles().pipe(
 
             map(
                complianceProfiles => slice.actions.listComplianceProfilesSuccess(
-                  { complianceProfileList: complianceProfiles.map(transformComplianceProfileListDtoToModel) }
+                  { complianceProfileList: complianceProfiles.map(transformComplianceProfileListModelToDto) }
                )
             ),
 
@@ -61,10 +65,10 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getComplianceProfileDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.complianceProfile.getComplianceProfile({ uuid: action.payload.uuid }).pipe(
 
             map(
-               detail => slice.actions.getComplianceProfileSuccess({ complianceProfile: transformComplianceProfileDtoToModel(detail) })
+               detail => slice.actions.getComplianceProfileSuccess({ complianceProfile: transformComplianceProfileResponseDtoToModel(detail) })
             ),
 
             catchError(
@@ -93,9 +97,7 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.complianceProfile.createComplianceProfile(
-            action.payload.name,
-            action.payload.description
+         action => deps.apiClients.complianceProfile.createComplianceProfile({ complianceProfileRequestDto: transformComplianceProfileRequestModelToDto(action.payload) }
          ).pipe(
 
             mergeMap(
@@ -130,7 +132,7 @@ const deleteComplianceProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.deleteComplianceProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.complianceProfile.deleteComplianceProfile({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -165,7 +167,7 @@ const bulkDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.complianceProfile.bulkDeleteComplianceProfiles(action.payload.uuids).pipe(
+         action => deps.apiClients.complianceProfile.bulkDeleteComplianceProfiles({ requestBody: action.payload.uuids }).pipe(
 
             map(
                errors => slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors })
@@ -197,7 +199,7 @@ const bulkForceDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.bulkForceDeleteComplianceProfiles(action.payload.uuids).pipe(
+         action => deps.apiClients.complianceProfile.forceDeleteComplianceProfiles({ requestBody: action.payload.uuids }).pipe(
 
             mergeMap(
 
@@ -241,21 +243,19 @@ const addRule: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.addRuleToComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.ruleUuid,
-            action.payload.attributes
+         action => deps.apiClients.complianceProfile.addRule({ uuid: action.payload.uuid, complianceRuleAdditionRequestDto: transformComplianceProfileRuleAddRequestModelToDto(action.payload.addRequest) }
          ).pipe(
 
             map(
-               rule => slice.actions.addRuleSuccess({
-                  connectorUuid: action.payload.connectorUuid,
-                  connectorName: action.payload.connectorName,
-                  kind: action.payload.kind,
-                  rule: transformComplianceRuleDTOToModel(rule)
-               })
+               rule => {
+                   const ruleModel = transformComplianceProfileRuleAddResponseDtoToModel(rule);
+                   return slice.actions.addRuleSuccess({
+                       connectorUuid: action.payload.addRequest.connectorUuid,
+                       connectorName: ruleModel.connectorName,
+                       kind: action.payload.addRequest.kind,
+                       rule: ruleModel
+                   })
+               }
             ),
 
             catchError(
@@ -282,11 +282,7 @@ const addGroup: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.addGroupToComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.groupUuid,
+         action => deps.apiClients.complianceProfile.addGroup({ uuid: action.payload.uuid, complianceGroupRequestDto: transformComplianceProfileGroupRequestModelToDto(action.payload.addRequest) }
          ).pipe(
 
             map(
@@ -325,15 +321,11 @@ const deleteRule: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.deleteRuleFromComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.ruleUuid
+         action => deps.apiClients.complianceProfile.removeRule({ uuid: action.payload.uuid, complianceRuleDeletionRequestDto: transformComplianceProfileRuleDeleteRequestModelToDto(action.payload.deleteRequest) }
          ).pipe(
 
             map(
-               () => slice.actions.deleteRuleSuccess({ connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, ruleUuid: action.payload.ruleUuid })
+               () => slice.actions.deleteRuleSuccess({ connectorUuid: action.payload.deleteRequest.connectorUuid, kind: action.payload.deleteRequest.kind, ruleUuid: action.payload.deleteRequest.ruleUuid })
             ),
             catchError(
                error => of(
@@ -359,15 +351,11 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.deleteGroupFromComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.groupUuid
+         action => deps.apiClients.complianceProfile.removeGroup({ uuid: action.payload.uuid, complianceGroupRequestDto: transformComplianceProfileGroupRequestModelToDto(action.payload.deleteRequest) }
          ).pipe(
 
             map(
-               () => slice.actions.deleteGroupSuccess({ connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, groupUuid: action.payload.groupUuid })
+               () => slice.actions.deleteGroupSuccess({ connectorUuid: action.payload.deleteRequest.connectorUuid, kind: action.payload.deleteRequest.kind, groupUuid: action.payload.deleteRequest.groupUuid })
             ),
 
             catchError(
@@ -394,9 +382,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.associateComplianceProfileToRaProfile(
-            action.payload.uuid,
-            action.payload.raProfileUuids.map((raProfile) => (raProfile.uuid))
+         action => deps.apiClients.complianceProfile.associateProfiles({ uuid: action.payload.uuid, raProfileAssociationRequestDto: { raProfileUuids: action.payload.raProfileUuids.map((raProfile: RaProfileSimplifiedModel) => (raProfile.uuid)) }}
          ).pipe(
 
             map(
@@ -427,9 +413,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.dissociateComplianceProfileFromRaProfile(
-            action.payload.uuid,
-            action.payload.raProfileUuids
+         action => deps.apiClients.complianceProfile.disassociateProfiles({ uuid: action.payload.uuid, raProfileAssociationRequestDto: { raProfileUuids: action.payload.raProfileUuids } }
          ).pipe(
 
             map(
@@ -460,8 +444,7 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getAssociatedRaProfiles(
-            action.payload.uuid
+         action => deps.apiClients.complianceProfile.getAssociatedRAProfiles({ uuid: action.payload.uuid }
          ).pipe(
 
             map(
@@ -492,11 +475,11 @@ const getRules: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getComplianceProfileRules()
+         action => deps.apiClients.complianceProfile.getComplianceRules({})
             .pipe(
 
                map(
-                  (rules) => slice.actions.listComplianceRulesSuccess(rules.map(transformComplianceConnectorRuleDTOToModel))
+                  (rules) => slice.actions.listComplianceRulesSuccess(rules.map(transformComplianceProfileRuleListResponseDtoToModel))
                ),
 
                catchError(
@@ -523,11 +506,11 @@ const getGroups: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getComplianceProfileGroups()
+         action => deps.apiClients.complianceProfile.getComplianceGroups({})
             .pipe(
 
                map(
-                  (groups) => slice.actions.listComplianceGroupsSuccess(groups.map(transformComplianceConnectorGroupDTOToModel))
+                  (groups) => slice.actions.listComplianceGroupsSuccess(groups.map(transformComplianceProfileGroupListResponseDtoToModel))
                ),
 
                catchError(
@@ -554,8 +537,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.checkCompliance(
-            action.payload.uuids
+         action => deps.apiClients.complianceProfile.checkCompliance({ requestBody: action.payload.uuids }
          ).pipe(
 
             mergeMap(
