@@ -1,5 +1,5 @@
 import { Badge } from "reactstrap";
-import { Status } from "types/discovery";
+import { Status } from "types/discoveries";
 
 interface Props {
    status: Status | undefined;

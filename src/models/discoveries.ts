@@ -1,4 +1,4 @@
-import { Status } from "types/discovery";
+import { Status } from "types/discoveries";
 import { AttributeModel } from "./attributes/AttributeModel";
 import { CertificateModel } from "./certificate";
 

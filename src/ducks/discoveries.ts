@@ -1,22 +1,19 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { DiscoveryModel } from "models/discoveries";
-import { ConnectorModel } from "models/connectors";
-
-import { AttributeDescriptorModel } from "../models/attributes/AttributeDescriptorModel";
+import { DiscoveryRequestModel, DiscoveryResponseModel } from "types/discoveries";
+import { ConnectorResponseModel } from "types/connectors";
+import { AttributeDescriptorModelNew } from "types/attributes";
 
 
 export type State = {
 
    checkedRows: string[];
 
-   discovery?: DiscoveryModel;
-   discoveries: DiscoveryModel[];
+   discovery?: DiscoveryResponseModel;
+   discoveries: DiscoveryResponseModel[];
 
-   discoveryProviders?: ConnectorModel[];
-   discoveryProviderAttributeDescriptors?: AttributeDescriptorModel[];
+   discoveryProviders?: ConnectorResponseModel[];
+   discoveryProviderAttributeDescriptors?: AttributeDescriptorModelNew[];
 
    isFetchingDiscoveryProviders: boolean;
    isFetchingDiscoveryProviderAttributeDescriptors: boolean;
@@ -93,7 +90,7 @@ export const slice = createSlice({
       },
 
 
-      listDiscoveryProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorModel[] }>) => {
+      listDiscoveryProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorResponseModel[] }>) => {
 
          state.discoveryProviders = action.payload.connectors;
          state.isFetchingDiscoveryProviders = false;
@@ -116,7 +113,7 @@ export const slice = createSlice({
       },
 
 
-      getDiscoveryProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
+      getDiscoveryProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModelNew[] }>) => {
 
          state.discoveryProviderAttributeDescriptors = action.payload.attributeDescriptor;
          state.isFetchingDiscoveryProviderAttributeDescriptors = false;
@@ -139,7 +136,7 @@ export const slice = createSlice({
       },
 
 
-      listDiscoveriesSuccess: (state, action: PayloadAction<{ discoveryList: DiscoveryModel[] }>) => {
+      listDiscoveriesSuccess: (state, action: PayloadAction<{ discoveryList: DiscoveryResponseModel[] }>) => {
 
          state.discoveries = action.payload.discoveryList;
          state.isFetchingList = false;
@@ -162,7 +159,7 @@ export const slice = createSlice({
       },
 
 
-      getDiscoveryDetailSuccess: (state, action: PayloadAction<{ discovery: DiscoveryModel }>) => {
+      getDiscoveryDetailSuccess: (state, action: PayloadAction<{ discovery: DiscoveryResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -186,12 +183,7 @@ export const slice = createSlice({
       },
 
 
-      createDiscovery: (state, action: PayloadAction<{
-         name: string,
-         connectorUuid: string,
-         attributes: AttributeModel[],
-         kind: string,
-      }>) => {
+      createDiscovery: (state, action: PayloadAction<DiscoveryRequestModel>) => {
 
          state.isCreating = true;
 

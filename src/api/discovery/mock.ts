@@ -7,7 +7,7 @@ import * as model from "./model";
 import { HttpErrorResponse } from "utils/FetchHttpService";
 import { ConnectorDTO } from "api/connectors";
 
-export class DiscoveryManagementMock implements model.DiscoveryManagementApi {
+export class DiscoveryManagementMock {
   createNewDiscovery(
     name: string,
     kind: string,
