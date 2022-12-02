@@ -53,8 +53,8 @@ export class AuditLogApi extends BaseAPI {
         throwIfNullOrUndefined(pageable, 'pageable', 'exportAuditLogs');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'filter': filter,
-            'pageable': pageable,
+            ...filter,
+            ...pageable,
         };
 
         return this.request<Blob>({
@@ -75,8 +75,8 @@ export class AuditLogApi extends BaseAPI {
         throwIfNullOrUndefined(pageable, 'pageable', 'listAuditLogs');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'filter': filter,
-            'pageable': pageable,
+            ...filter,
+            ...pageable,
         };
 
         return this.request<AuditLogResponseDto>({
@@ -132,8 +132,8 @@ export class AuditLogApi extends BaseAPI {
         throwIfNullOrUndefined(pageable, 'pageable', 'purgeAuditLogs');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'filter': filter,
-            'pageable': pageable,
+            ...filter,
+            ...pageable,
         };
 
         return this.request<void>({

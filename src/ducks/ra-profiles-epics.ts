@@ -575,10 +575,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
          slice.actions.associateRaProfile.match
       ),
       switchMap(
-//TODO fix with compliance API finished
-         action => deps.apiClients.complianceProfile.associateComplianceProfileToRaProfile(
-            action.payload.complianceProfileUuid,
-            [action.payload.uuid]
+         action => deps.apiClients.complianceProfile.associateProfiles({ uuid: action.payload.complianceProfileUuid, raProfileAssociationRequestDto: { raProfileUuids: [action.payload.uuid] } }
          ).pipe(
 
             map(
@@ -613,10 +610,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
          slice.actions.dissociateRaProfile.match
       ),
       switchMap(
-//TODO fix with compliance API finished
-         action => deps.apiClients.complianceProfile.dissociateComplianceProfileFromRaProfile(
-            action.payload.complianceProfileUuid,
-            [action.payload.uuid]
+         action => deps.apiClients.complianceProfile.disassociateProfiles({ uuid: action.payload.complianceProfileUuid, raProfileAssociationRequestDto: { raProfileUuids: [action.payload.uuid] } }
          ).pipe(
 
             map(
