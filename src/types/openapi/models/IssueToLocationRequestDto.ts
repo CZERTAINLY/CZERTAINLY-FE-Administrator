@@ -38,4 +38,10 @@ export interface IssueToLocationRequestDto {
      * @memberof IssueToLocationRequestDto
      */
     issueAttributes: Array<RequestAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof IssueToLocationRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

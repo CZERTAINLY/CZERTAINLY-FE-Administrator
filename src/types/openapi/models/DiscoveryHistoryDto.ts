@@ -95,6 +95,12 @@ export interface DiscoveryHistoryDto {
      */
     attributes: Array<ResponseAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof DiscoveryHistoryDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
+    /**
      * Metadata of the Discovery
      * @type {Array<MetadataResponseDto>}
      * @memberof DiscoveryHistoryDto

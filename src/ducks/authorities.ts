@@ -256,7 +256,7 @@ export const slice = createSlice({
       },
 
 
-      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[] }>) => {
+      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[], customAttributes: AttributeRequestModel[] }>) => {
 
          state.isUpdating = true;
 

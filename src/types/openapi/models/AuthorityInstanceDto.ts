@@ -39,6 +39,12 @@ export interface AuthorityInstanceDto {
      */
     attributes: Array<ResponseAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof AuthorityInstanceDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
+    /**
      * Status of Authority instance
      * @type {string}
      * @memberof AuthorityInstanceDto

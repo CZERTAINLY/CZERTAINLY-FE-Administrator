@@ -19,6 +19,7 @@ import type {
     GroupDto,
     LocationDto,
     MetadataResponseDto,
+    ResponseAttributeDto,
     SimplifiedRaProfileDto,
 } from './';
 
@@ -185,4 +186,10 @@ export interface CertificateDto {
      * @memberof CertificateDto
      */
     complianceStatus?: ComplianceStatus;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CertificateDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
 }

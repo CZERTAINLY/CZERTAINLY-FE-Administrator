@@ -46,6 +46,12 @@ export interface CredentialDto {
      */
     attributes: Array<ResponseAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CredentialDto
+     */
+    customAttributes: Array<ResponseAttributeDto>;
+    /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof CredentialDto

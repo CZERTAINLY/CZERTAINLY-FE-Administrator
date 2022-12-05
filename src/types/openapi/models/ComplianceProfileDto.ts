@@ -14,6 +14,7 @@
 import type {
     ComplianceConnectorAndGroupsDto,
     ComplianceConnectorAndRulesDto,
+    ResponseAttributeDto,
     SimplifiedRaProfileDto,
 } from './';
 
@@ -58,4 +59,10 @@ export interface ComplianceProfileDto {
      * @memberof ComplianceProfileDto
      */
     raProfiles?: Array<SimplifiedRaProfileDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof ComplianceProfileDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
 }

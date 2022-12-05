@@ -11,17 +11,22 @@ import {
     SubjectPermissionsModel
 } from "types/roles";
 import { transformUserResponseDtoToModel } from "./users";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
 
 export function transformRoleDetailDtoToModel(role: RoleDetailDto): RoleDetailModel {
    return {
       ...role,
-      users: role.users.map(user => transformUserResponseDtoToModel(user))
+      users: role.users.map(user => transformUserResponseDtoToModel(user)),
+      customAttributes: role.customAttributes?.map(transformAttributeResponseDtoToModel)
    };
 }
 
 export function transformRoleRequestModelToDto(role: RoleRequestModel): RoleRequestDto {
-    return { ...role };
+    return {
+        ...role,
+        customAttributes: role.customAttributes?.map(transformAttributeRequestModelToDto)
+    };
 }
 
 export function transformObjectPermissionsResponseDtoToModel(objectPermissions: ObjectPermissionsResponseDto): ObjectPermissionsResponseModel {

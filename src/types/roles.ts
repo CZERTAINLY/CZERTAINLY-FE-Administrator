@@ -3,17 +3,19 @@ import {
     ObjectPermissionsRequestDto as ObjectPermissionsRequestDtoOpenApi,
     ResourcePermissionsDto,
     ResourcePermissionsRequestDto as ResourcePermissionsRequestDtoOpenApi,
-    RoleDetailDto as RoleDetailDtoOpenApi, RolePermissionsRequestDto,
-    SubjectPermissionsDto as SubjectPermissionsDtoOpenApi,
+    RoleDetailDto as RoleDetailDtoOpenApi,
+    RolePermissionsRequestDto,
     RoleRequestDto as RoleRequestDtoOpenApi,
+    SubjectPermissionsDto as SubjectPermissionsDtoOpenApi,
 } from "./openapi";
 import { UserResponseModel } from "./users";
+import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 
 export type RoleDetailDto = RoleDetailDtoOpenApi;
-export type RoleDetailModel = Omit<RoleDetailDto, "users"> & { users: Array<UserResponseModel> };
+export type RoleDetailModel = Omit<RoleDetailDto, "users | customAttributes"> & { users: Array<UserResponseModel>, customAttributes?: Array<AttributeResponseModel> };
 
 export type RoleRequestDto = RoleRequestDtoOpenApi;
-export type RoleRequestModel = RoleRequestDto;
+export type RoleRequestModel = Omit<RoleRequestDto, "customAttributes"> & { customAttributes?: Array<AttributeRequestModel> };
 
 export type ObjectPermissionsRequestDto = ObjectPermissionsRequestDtoOpenApi;
 export type ObjectPermissionsRequestModel = ObjectPermissionsRequestDto;

@@ -84,7 +84,8 @@ export function transformComplianceProfileResponseDtoToModel(profile: Compliance
         ...profile,
         rules: profile.rules.map(transformComplianceProfileResponseRuleDtoToModel),
         groups: profile.groups.map(transformComplianceProfileResponseGroupDtoToModel),
-        raProfiles: profile.raProfiles?.map(transformRaProfileSimplifiedDtoToModel)
+        raProfiles: profile.raProfiles?.map(transformRaProfileSimplifiedDtoToModel),
+        customAttributes: profile.customAttributes?.map(transformAttributeResponseDtoToModel)
     }
 }
 
@@ -105,7 +106,8 @@ export function transformComplianceProfileRequestRuleModel(rule: ComplianceProfi
 export function transformComplianceProfileRequestModelToDto(profile: ComplianceProfileRequestModel): ComplianceProfileRequestDto {
     return {
         ...profile,
-        rules: profile.rules?.map(transformComplianceProfileRequestRuleModel)
+        rules: profile.rules?.map(transformComplianceProfileRequestRuleModel),
+        customAttributes: profile.customAttributes?.map(transformAttributeRequestModelToDto)
     }
 }
 

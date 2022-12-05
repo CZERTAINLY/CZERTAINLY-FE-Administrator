@@ -128,4 +128,10 @@ export interface AcmeProfileDto {
      * @memberof AcmeProfileDto
      */
     revokeCertificateAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof AcmeProfileDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
 }

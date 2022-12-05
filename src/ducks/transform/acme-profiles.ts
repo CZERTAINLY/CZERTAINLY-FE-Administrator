@@ -21,6 +21,7 @@ export function transformAcmeProfileResponseDtoToModel(acme: AcmeProfileResponse
         raProfile: acme.raProfile ? transformRaProfileResponseDtoToModel(acme.raProfile) : undefined,
         issueCertificateAttributes: acme.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         revokeCertificateAttributes: acme.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+        customAttributes: acme.customAttributes?.map(transformAttributeResponseDtoToModel)
     };
 }
 
@@ -29,6 +30,7 @@ export function transformAcmeProfileEditRequestModelToDto(acme: AcmeProfileEditR
         ...acme,
         issueCertificateAttributes: acme.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
         revokeCertificateAttributes: acme.revokeCertificateAttributes.map(transformAttributeRequestModelToDto),
+        customAttributes: acme.customAttributes?.map(transformAttributeRequestModelToDto),
     };
 }
 
@@ -37,5 +39,6 @@ export function transformAcmeProfileAddRequestModelToDto(acme: AcmeProfileAddReq
         ...acme,
         issueCertificateAttributes: acme.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
         revokeCertificateAttributes: acme.revokeCertificateAttributes.map(transformAttributeRequestModelToDto),
+        customAttributes: acme.customAttributes?.map(transformAttributeRequestModelToDto),
     };
 }

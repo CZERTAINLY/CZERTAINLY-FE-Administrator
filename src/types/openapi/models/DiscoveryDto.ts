@@ -33,6 +33,12 @@ export interface DiscoveryDto {
      */
     attributes: Array<RequestAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof DiscoveryDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
+    /**
      * Discovery Provider UUID
      * @type {string}
      * @memberof DiscoveryDto

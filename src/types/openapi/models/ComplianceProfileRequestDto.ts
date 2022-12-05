@@ -13,6 +13,7 @@
 
 import type {
     ComplianceProfileRulesRequestDto,
+    RequestAttributeDto,
 } from './';
 
 /**
@@ -38,4 +39,10 @@ export interface ComplianceProfileRequestDto {
      * @memberof ComplianceProfileRequestDto
      */
     rules?: Array<ComplianceProfileRulesRequestDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ComplianceProfileRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

@@ -11,20 +11,23 @@ import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToMod
 export function transformCredentialResponseDtoToModel(credential: CredentialResponseDto): CredentialResponseModel {
    return {
       ...credential,
-      attributes: credential.attributes.map(transformAttributeResponseDtoToModel)
+      attributes: credential.attributes.map(transformAttributeResponseDtoToModel),
+      customAttributes: credential.customAttributes.map(transformAttributeResponseDtoToModel)
    }
 }
 
 export function transformCredentialCreateRequestModelToDto(credential: CredentialCreateRequestModel): CredentialCreateRequestDto {
    return {
       ...credential,
-      attributes: credential.attributes.map(transformAttributeRequestModelToDto)
+      attributes: credential.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: credential.customAttributes.map(transformAttributeRequestModelToDto)
    }
 }
 
 export function transformCredentialEditRequestModelToDto(credential: CredentialEditRequestModel): CredentialEditRequestDto {
    return {
       ...credential,
-      attributes: credential.attributes.map(transformAttributeRequestModelToDto)
+      attributes: credential.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: credential.customAttributes.map(transformAttributeRequestModelToDto),
    }
 }

@@ -112,12 +112,13 @@ export type CertificateComplianceResponseDto = CertificateComplianceResultDto;
 export type CertificateComplianceResponseModel = Omit<CertificateComplianceResponseDto, "attributes"> & { attributes?: Array<AttributeResponseModel> };
 
 export type CertificateResponseDto = CertificateDto;
-export type CertificateResponseModel = Omit<CertificateResponseDto, "metadata | raProfile | locations | group | nonCompliantRules"> & {
+export type CertificateResponseModel = Omit<CertificateResponseDto, "metadata | raProfile | locations | group | nonCompliantRules | customAttributes"> & {
     metadata?: Array<MetadataModel>,
     raProfile?: RaProfileSimplifiedModel,
     locations?: Array<LocationResponseModel>,
     group?: CertificateGroupResponseModel,
-    nonCompliantRules?: Array<CertificateComplianceResponseModel>
+    nonCompliantRules?: Array<CertificateComplianceResponseModel>,
+    customAttributes?: Array<AttributeResponseModel>,
 }
 
 export type CertificateListResponseDto = CertificateResponseDtoOpenApi;
@@ -127,7 +128,7 @@ export type CertificateValidationDto = CertificateValidationDtoOpenApi;
 export type CertificateValidationModel = CertificateValidationDto;
 
 export type CertificateSignRequestDto = ClientCertificateSignRequestDto;
-export type CertificateSignRequestModel = Omit<CertificateSignRequestDto, "attributes"> & { attributes: Array<AttributeRequestModel> };
+export type CertificateSignRequestModel = Omit<CertificateSignRequestDto, "attributes | customAttributes"> & { attributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel> };
 
 export type CertificateRevokeRequestDto = ClientCertificateRevocationDto;
 export type CertificateRevokeRequestModel = Omit<CertificateRevokeRequestDto, "attributes"> & { attributes: Array<AttributeRequestModel> };

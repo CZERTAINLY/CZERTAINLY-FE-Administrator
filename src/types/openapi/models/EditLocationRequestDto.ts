@@ -33,6 +33,12 @@ export interface EditLocationRequestDto {
      */
     attributes: Array<RequestAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof EditLocationRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
+    /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof EditLocationRequestDto

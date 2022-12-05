@@ -33,6 +33,12 @@ export interface AuthorityInstanceRequestDto {
      */
     attributes: Array<RequestAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof AuthorityInstanceRequestDto
+     */
+    customAttributes: Array<RequestAttributeDto>;
+    /**
      * UUID of Authority provider
      * @type {string}
      * @memberof AuthorityInstanceRequestDto

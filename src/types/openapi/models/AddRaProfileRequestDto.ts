@@ -39,6 +39,12 @@ export interface AddRaProfileRequestDto {
      */
     attributes: Array<RequestAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof AddRaProfileRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
+    /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof AddRaProfileRequestDto

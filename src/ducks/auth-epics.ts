@@ -6,7 +6,7 @@ import { AppEpic } from 'ducks';
 import { actions as appRedirectActions } from "./app-redirect";
 
 import * as slice from './auth';
-import { transformResourceDtoToModel } from './transform/auth';
+import { transformResourceDtoToModel, transformUserUpdateRequestModelToDto } from './transform/auth';
 
 
 const getProfile: AppEpic = (action$, state$, deps) => {
@@ -53,7 +53,7 @@ const updateProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auth.updateUserProfile({ updateUserRequestDto: action.payload.profile }).pipe(
+         action => deps.apiClients.auth.updateUserProfile({ updateUserRequestDto: transformUserUpdateRequestModelToDto(action.payload.profile) }).pipe(
 
             map(
                profile => slice.actions.updateProfileSuccess({ profile, redirect: action.payload.redirect })

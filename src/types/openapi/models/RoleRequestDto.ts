@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    RequestAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface RoleRequestDto
@@ -28,4 +32,10 @@ export interface RoleRequestDto {
      * @memberof RoleRequestDto
      */
     description?: string;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof RoleRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

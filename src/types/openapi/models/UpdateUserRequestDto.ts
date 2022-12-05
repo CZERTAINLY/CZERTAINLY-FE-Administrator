@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    RequestAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface UpdateUserRequestDto
@@ -52,4 +56,10 @@ export interface UpdateUserRequestDto {
      * @memberof UpdateUserRequestDto
      */
     certificateUuid?: string;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof UpdateUserRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

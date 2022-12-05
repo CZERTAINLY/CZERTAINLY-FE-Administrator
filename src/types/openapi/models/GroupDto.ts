@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    ResponseAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface GroupDto
@@ -34,4 +38,10 @@ export interface GroupDto {
      * @memberof GroupDto
      */
     description?: string;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof GroupDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
 }

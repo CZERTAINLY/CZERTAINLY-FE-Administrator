@@ -26,4 +26,10 @@ export interface EntityInstanceUpdateRequestDto {
      * @memberof EntityInstanceUpdateRequestDto
      */
     attributes: Array<RequestAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof EntityInstanceUpdateRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

@@ -98,4 +98,10 @@ export interface AcmeProfileRequestDto {
      * @memberof AcmeProfileRequestDto
      */
     requireTermsOfService?: boolean;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof AcmeProfileRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

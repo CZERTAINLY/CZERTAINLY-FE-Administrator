@@ -63,4 +63,10 @@ export interface ConnectorDto {
      * @memberof ConnectorDto
      */
     status: ConnectorStatus;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof ConnectorDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
 }

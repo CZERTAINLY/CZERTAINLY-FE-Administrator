@@ -4,13 +4,15 @@ import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToMod
 export function transformEntityResponseDtoToModel(entity: EntityResponseDto): EntityResponseModel {
    return {
       ...entity,
-      attributes: entity.attributes.map(transformAttributeResponseDtoToModel)
+      attributes: entity.attributes.map(transformAttributeResponseDtoToModel),
+      customAttributes: entity.customAttributes?.map(transformAttributeResponseDtoToModel)
    };
 }
 
 export function transformEntityRequestModelToDto(entity: EntityRequestModel): EntityRequestDto {
    return {
       ...entity,
-      attributes: entity.attributes.map(transformAttributeRequestModelToDto)
+      attributes: entity.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: entity.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }

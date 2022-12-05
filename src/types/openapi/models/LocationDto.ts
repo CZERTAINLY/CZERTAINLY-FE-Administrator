@@ -59,6 +59,12 @@ export interface LocationDto {
      */
     attributes: Array<ResponseAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof LocationDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
+    /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof LocationDto

@@ -7,7 +7,7 @@ import { extractError } from "utils/net";
 import { slice } from "./authorities";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformAuthorityResponseDtoToModel } from "./transform/authorities";
+import { transformAuthorityRequestModelToDto, transformAuthorityResponseDtoToModel } from "./transform/authorities";
 import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { FunctionGroupCode } from "types/openapi";
@@ -187,12 +187,7 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.authorities.createAuthorityInstance({ authorityInstanceRequestDto : {
-                 name: action.payload.name,
-                 attributes: action.payload.attributes.map(transformAttributeRequestModelToDto),
-                 connectorUuid: action.payload.connectorUuid,
-                 kind: action.payload.kind
-             }
+         action => deps.apiClients.authorities.createAuthorityInstance({ authorityInstanceRequestDto : transformAuthorityRequestModelToDto(action.payload)
          }
          ).pipe(
 
@@ -231,7 +226,7 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.editAuthorityInstance({
                  uuid: action.payload.uuid,
-                 authorityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto) },
+                 authorityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto), customAttributes: action.payload.customAttributes.map(transformAttributeRequestModelToDto) },
              },
          ).pipe(
 

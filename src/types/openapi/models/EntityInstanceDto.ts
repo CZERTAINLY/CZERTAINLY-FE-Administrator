@@ -39,6 +39,12 @@ export interface EntityInstanceDto {
      */
     attributes: Array<ResponseAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof EntityInstanceDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
+    /**
      * Status of Entity instance
      * @type {string}
      * @memberof EntityInstanceDto

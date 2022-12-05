@@ -45,6 +45,7 @@ export function transformLocationResponseDtoToModel(location: LocationResponseDt
       attributes: location.attributes.map(transformAttributeResponseDtoToModel),
       certificates: location.certificates.map(transformLocationCertificateDtoToModel),
       metadata: location.metadata?.map(transformMetadataDtoToModel),
+      customAttributes: location.customAttributes?.map(transformAttributeResponseDtoToModel),
    };
 }
 
@@ -52,7 +53,8 @@ export function transformLocationResponseDtoToModel(location: LocationResponseDt
 export function transformLocationAddRequestModelToDto(addReq: LocationAddRequestModel): LocationAddRequestDto {
    return {
       ...addReq,
-      attributes: addReq.attributes.map(transformAttributeRequestModelToDto)
+      attributes: addReq.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: addReq.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }
 
@@ -60,7 +62,8 @@ export function transformLocationAddRequestModelToDto(addReq: LocationAddRequest
 export function transformLocationEditRequestModelToDto(editReq: LocationEditRequestModel): LocationEditRequestDto {
    return {
       ...editReq,
-      attributes: editReq.attributes.map(transformAttributeRequestModelToDto)
+      attributes: editReq.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: editReq.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }
 
@@ -77,6 +80,7 @@ export function transformLocationIssueRequestModelToDto(issueReq: LocationIssueR
    return {
       ...issueReq,
       csrAttributes: issueReq.csrAttributes.map(transformAttributeRequestModelToDto),
-      issueAttributes: issueReq.issueAttributes.map(transformAttributeRequestModelToDto)
+      issueAttributes: issueReq.issueAttributes.map(transformAttributeRequestModelToDto),
+      customAttributes: issueReq.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }

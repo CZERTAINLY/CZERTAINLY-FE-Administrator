@@ -26,4 +26,10 @@ export interface CredentialUpdateRequestDto {
      * @memberof CredentialUpdateRequestDto
      */
     attributes: Array<RequestAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof CredentialUpdateRequestDto
+     */
+    customAttributes: Array<RequestAttributeDto>;
 }

@@ -191,7 +191,7 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.entities.editEntityInstance({
                  entityUuid: action.payload.uuid,
-                 entityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto) }
+                 entityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto), customAttributes: action.payload.customAttributes?.map(transformAttributeRequestModelToDto) }
              }
          ).pipe(
 

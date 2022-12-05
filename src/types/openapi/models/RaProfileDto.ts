@@ -57,6 +57,12 @@ export interface RaProfileDto {
      */
     attributes: Array<ResponseAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof RaProfileDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
+    /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof RaProfileDto

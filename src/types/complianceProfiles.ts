@@ -41,7 +41,7 @@ export type ComplianceProfileResponseGroupDto = ComplianceConnectorAndGroupsDto;
 export type ComplianceProfileResponseGroupModel = Omit<ComplianceProfileResponseGroupDto, "groups"> & { groups?: Array<ComplianceProfileResponseGroupGroupModel> };
 //-
 export type ComplianceProfileResponseDto = ComplianceProfileDto;
-export type ComplianceProfileResponseModel = Omit<ComplianceProfileResponseDto, "rules | groups | raProfiles"> & { rules: Array<ComplianceProfileResponseRuleModel>, groups: Array<ComplianceProfileResponseGroupModel>, raProfiles?: Array<RaProfileSimplifiedModel> };
+export type ComplianceProfileResponseModel = Omit<ComplianceProfileResponseDto, "rules | groups | raProfiles | customAttributes"> & { rules: Array<ComplianceProfileResponseRuleModel>, groups: Array<ComplianceProfileResponseGroupModel>, raProfiles?: Array<RaProfileSimplifiedModel>, customAttributes?: Array<AttributeResponseModel> };
 //---
 
 export type ComplianceProfileRequestRuleRuleDto = ComplianceRequestRulesDto;
@@ -51,7 +51,7 @@ export type ComplianceProfileRequestRuleDto = ComplianceProfileRulesRequestDto;
 export type ComplianceProfileRequestRuleModel = Omit<ComplianceProfileRequestRuleDto, "rules"> & { rules?: Array<ComplianceProfileRequestRuleRuleModel> };
 
 export type ComplianceProfileRequestDto = ComplianceProfileRequestDtoOpenApi;
-export type ComplianceProfileRequestModel = Omit<ComplianceProfileRequestDto, "rules"> & { rules?: Array<ComplianceProfileRequestRuleModel> }
+export type ComplianceProfileRequestModel = Omit<ComplianceProfileRequestDto, "rules | customAttributes"> & { rules?: Array<ComplianceProfileRequestRuleModel>, customAttributes?: Array<AttributeRequestModel> }
 //---
 
 export type ComplianceProfileRuleAddRequestDto = ComplianceRuleAdditionRequestDto;

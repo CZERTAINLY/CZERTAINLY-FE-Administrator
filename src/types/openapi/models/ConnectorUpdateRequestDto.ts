@@ -38,4 +38,10 @@ export interface ConnectorUpdateRequestDto {
      * @memberof ConnectorUpdateRequestDto
      */
     authAttributes?: Array<RequestAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ConnectorUpdateRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

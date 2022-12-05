@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    RequestAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface GroupRequestDto
@@ -28,4 +32,10 @@ export interface GroupRequestDto {
      * @memberof GroupRequestDto
      */
     description?: string;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof GroupRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

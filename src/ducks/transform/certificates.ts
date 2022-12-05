@@ -67,7 +67,8 @@ export function transformCertificateResponseDtoToModel(certificate: CertificateR
       raProfile: certificate.raProfile ? transformRaProfileSimplifiedDtoToModel(certificate.raProfile) : undefined,
       locations: certificate.locations?.map(transformLocationResponseDtoToModel),
       group: certificate.group ? transformCertificateGroupResponseDtoToModel(certificate.group) : undefined,
-      nonCompliantRules: certificate.nonCompliantRules?.map(transformCertificateComplianceResponseDtoToModel)
+      nonCompliantRules: certificate.nonCompliantRules?.map(transformCertificateComplianceResponseDtoToModel),
+      customAttributes: certificate.customAttributes?.map(transformAttributeResponseDtoToModel)
    };
 }
 
@@ -81,7 +82,8 @@ export function transformCertificateListResponseDtoToModel(certificates: Certifi
 export function transformCertificateSignRequestModelToDto(signRequest: CertificateSignRequestModel): CertificateSignRequestDto {
    return {
       ...signRequest,
-      attributes: signRequest.attributes.map(transformAttributeRequestModelToDto)
+      attributes: signRequest.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: signRequest.customAttributes?.map(transformAttributeRequestModelToDto)
    };
 }
 

@@ -8,7 +8,11 @@ import { slice } from "./connectors";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
-import { transformConnectorResponseDtoToModel, transformFunctionGroupDtoToModel, } from "./transform/connectors";
+import {
+    transformConnectorRequestModelToDto,
+    transformConnectorResponseDtoToModel, transformConnectorUpdateRequestModelToDto,
+    transformFunctionGroupDtoToModel,
+} from "./transform/connectors";
 
 import {
     transformAttributeDescriptorCollectionDtoToModel,
@@ -191,10 +195,7 @@ const createConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-          action => deps.apiClients.connectors.createConnector({ connectorRequestDto : {
-                  ...action.payload,
-                  authAttributes: action.payload.authAttributes?.map(transformAttributeRequestModelToDto)
-              }
+          action => deps.apiClients.connectors.createConnector({ connectorRequestDto : transformConnectorRequestModelToDto(action.payload)
           }).pipe(
 
             switchMap(
@@ -247,10 +248,7 @@ const updateConnector: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.connectors.editConnector({
              uuid: action.payload.uuid,
-             connectorUpdateRequestDto: {
-                 ...action.payload.connectorUpdateRequest,
-                 authAttributes: action.payload.connectorUpdateRequest.authAttributes?.map(transformAttributeRequestModelToDto),
-             }
+             connectorUpdateRequestDto: transformConnectorUpdateRequestModelToDto(action.payload.connectorUpdateRequest)
          }).pipe(
 
             mergeMap(

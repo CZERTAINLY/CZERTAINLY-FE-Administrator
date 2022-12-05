@@ -12,6 +12,7 @@
  */
 
 import type {
+    ResponseAttributeDto,
     RoleDto,
     UserCertificateDto,
 } from './';
@@ -80,4 +81,10 @@ export interface UserDetailDto {
      * @memberof UserDetailDto
      */
     roles: Array<RoleDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof UserDetailDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
 }

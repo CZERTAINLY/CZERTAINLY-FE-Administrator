@@ -8,7 +8,11 @@ import { slice } from "./users";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from "./transform/users";
-import { transformRoleResponseDtoToModel, transformUserDetailDtoToModel } from "./transform/auth";
+import {
+    transformRoleResponseDtoToModel,
+    transformUserDetailDtoToModel,
+    transformUserUpdateRequestModelToDto
+} from "./transform/auth";
 
 
 const list: AppEpic = (action$, state, deps) => {
@@ -138,7 +142,7 @@ const update: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.updateUser({ userUuid: action.payload.uuid, updateUserRequestDto:action.payload.updateUserRequest }
+         action => deps.apiClients.users.updateUser({ userUuid: action.payload.uuid, updateUserRequestDto: transformUserUpdateRequestModelToDto(action.payload.updateUserRequest) }
          ).pipe(
 
             switchMap(

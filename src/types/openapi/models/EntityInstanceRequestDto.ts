@@ -33,6 +33,12 @@ export interface EntityInstanceRequestDto {
      */
     attributes: Array<RequestAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof EntityInstanceRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
+    /**
      * UUID of Entity Provider
      * @type {string}
      * @memberof EntityInstanceRequestDto

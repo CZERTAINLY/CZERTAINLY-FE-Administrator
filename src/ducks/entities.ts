@@ -224,7 +224,7 @@ export const slice = createSlice({
       },
 
 
-      updateEntity: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[] }>) => {
+      updateEntity: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[], customAttributes?: AttributeRequestModel[] }>) => {
 
          state.isUpdating = true;
 

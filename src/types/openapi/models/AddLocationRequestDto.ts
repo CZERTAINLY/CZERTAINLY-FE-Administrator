@@ -39,6 +39,12 @@ export interface AddLocationRequestDto {
      */
     attributes: Array<RequestAttributeDto>;
     /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof AddLocationRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
+    /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof AddLocationRequestDto

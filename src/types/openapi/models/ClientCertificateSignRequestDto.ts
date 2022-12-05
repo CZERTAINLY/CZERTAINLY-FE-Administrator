@@ -32,4 +32,10 @@ export interface ClientCertificateSignRequestDto {
      * @memberof ClientCertificateSignRequestDto
      */
     attributes: Array<RequestAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

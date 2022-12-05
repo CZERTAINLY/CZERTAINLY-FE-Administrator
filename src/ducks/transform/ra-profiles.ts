@@ -16,7 +16,8 @@ import {
 export function transformRaProfileResponseDtoToModel(raResponse: RaProfileResponseDto): RaProfileResponseModel {
    return {
       ...raResponse,
-      attributes: raResponse.attributes.map(transformAttributeResponseDtoToModel)
+      attributes: raResponse.attributes.map(transformAttributeResponseDtoToModel),
+      customAttributes: raResponse.customAttributes?.map(transformAttributeResponseDtoToModel)
    }
 }
 
@@ -39,14 +40,16 @@ export function transformRaProfileAcmeDetailResponseDtoToModel(raAcmeResponse: R
 export function transformRaProfileAddRequestModelToDto(raAddReq: RaProfileAddRequestModel): RaProfileAddRequestDto {
    return {
       ...raAddReq,
-      attributes: raAddReq.attributes.map(transformAttributeRequestModelToDto)
+      attributes: raAddReq.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: raAddReq.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }
 
 export function transformRaProfileEditRequestModelToDto(raEditReq: RaProfileEditRequestModel): RaProfileEditRequestDto {
    return {
       ...raEditReq,
-      attributes: raEditReq.attributes.map(transformAttributeRequestModelToDto)
+      attributes: raEditReq.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: raEditReq.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }
 
