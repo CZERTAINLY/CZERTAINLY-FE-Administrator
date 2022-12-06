@@ -1,7 +1,10 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { useCallback, useMemo } from "react";
 import { AttributeResponseModel } from "types/attributes";
-import { AttributeContentType, BaseAttributeContent, CredentialAttributeContent } from "types/openapi";
+import {
+    AttributeContentType,
+    BaseAttributeContent,
+} from "types/openapi";
 
 
 export interface Props {
@@ -26,27 +29,24 @@ export default function AttributeViewer({
                   case AttributeContentType.Boolean:
                       return content.data ? "true" : "false"
                   case AttributeContentType.Credential:
-                      return (content as CredentialAttributeContent).data.uuid;
+                  case AttributeContentType.Object:
+                  case AttributeContentType.File:
+                      return content.reference;
+                  case AttributeContentType.Time:
                   case AttributeContentType.Date:
                   case AttributeContentType.Datetime:
-                  case AttributeContentType.Time:
                   case AttributeContentType.Float:
                   case AttributeContentType.Integer:
-                  case AttributeContentType.Object:
                   case AttributeContentType.String:
                   case AttributeContentType.Text:
                       return content.data.toString();
                   case AttributeContentType.Secret:
                       return "*****";
-                  case AttributeContentType.File:
-                      return content.data.toString().length > 40 ? content.data.toString().substring(0, 40) + "..." : content.data.toString()
               }
-              return undefined
+              return undefined;
           };
 
-         return mapping
-             ? attribute.content.map(mapping).join(", ")
-             : "Unknown data type";
+         return attribute.content.map(content => mapping(content) ?? "Unknown data type").join(", ");
       },
       []
 
