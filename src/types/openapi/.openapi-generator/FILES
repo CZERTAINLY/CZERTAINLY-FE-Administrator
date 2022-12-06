@@ -13,8 +13,10 @@ apis/ConnectorAuthenticationApi.ts
 apis/ConnectorManagementApi.ts
 apis/ConnectorRegistrationApi.ts
 apis/CredentialManagementApi.ts
+apis/CustomAttributesApi.ts
 apis/DiscoveryManagementApi.ts
 apis/EntityManagementApi.ts
+apis/GlobalMetadataApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
 apis/RAProfileManagementApi.ts
@@ -39,6 +41,7 @@ models/AttributeCallback.ts
 models/AttributeCallbackMapping.ts
 models/AttributeConstraintType.ts
 models/AttributeContentType.ts
+models/AttributeDefinitionDto.ts
 models/AttributeType.ts
 models/AttributeValueTarget.ts
 models/AuditLogDto.ts
@@ -92,6 +95,8 @@ models/ComplianceStatus.ts
 models/ConnectDto.ts
 models/ConnectRequestDto.ts
 models/ConnectorDto.ts
+models/ConnectorMetadataPromotionRequestDto.ts
+models/ConnectorMetadataResponseDto.ts
 models/ConnectorRequestDto.ts
 models/ConnectorStatus.ts
 models/ConnectorUpdateRequestDto.ts
@@ -99,6 +104,9 @@ models/CredentialAttributeContent.ts
 models/CredentialDto.ts
 models/CredentialRequestDto.ts
 models/CredentialUpdateRequestDto.ts
+models/CustomAttributeCreateRequestDto.ts
+models/CustomAttributeDefinitionDetailDto.ts
+models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts
 models/DataAttributeProperties.ts
 models/DateAttributeContent.ts
@@ -121,6 +129,9 @@ models/FileAttributeContentData.ts
 models/FloatAttributeContent.ts
 models/FunctionGroupCode.ts
 models/FunctionGroupDto.ts
+models/GlobalMetadataCreateRequestDto.ts
+models/GlobalMetadataDefinitionDetailDto.ts
+models/GlobalMetadataUpdateRequestDto.ts
 models/GroupAttribute.ts
 models/GroupDto.ts
 models/GroupRequestDto.ts
@@ -136,6 +147,7 @@ models/MetadataResponseDto.ts
 models/MimeType.ts
 models/MultipleCertificateObjectUpdateDto.ts
 models/NameAndIdDto.ts
+models/NameAndUuidDto.ts
 models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
@@ -150,6 +162,7 @@ models/RegexpAttributeConstraint.ts
 models/RemoveCertificateDto.ts
 models/RequestAttributeCallback.ts
 models/RequestAttributeDto.ts
+models/Resource.ts
 models/ResourceDetailDto.ts
 models/ResourcePermissionsDto.ts
 models/ResourcePermissionsRequestDto.ts

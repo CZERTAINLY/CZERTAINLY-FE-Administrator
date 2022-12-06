@@ -15,6 +15,7 @@ import type {
     AttributeContentType,
     AttributeType,
     BaseAttributeContent,
+    NameAndUuidDto,
 } from './';
 
 /**
@@ -64,9 +65,9 @@ export interface ResponseMetadataDto {
      */
     sourceObjectType?: string;
     /**
-     * Source Object UUID
-     * @type {string}
+     * Source Objects
+     * @type {Array<NameAndUuidDto>}
      * @memberof ResponseMetadataDto
      */
-    sourceObjectUuid?: string;
+    sourceObjects?: Array<NameAndUuidDto>;
 }

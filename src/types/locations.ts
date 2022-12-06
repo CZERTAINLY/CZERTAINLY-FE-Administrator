@@ -4,7 +4,7 @@ import {
     EditLocationRequestDto,
     IssueToLocationRequestDto,
     LocationDto,
-    MetadataResponseDto,
+    MetadataResponseDto, NameAndUuidDto as NameAndUuidDtoOpenApi,
     PushToLocationRequestDto,
     ResponseMetadataDto
 } from "./openapi";
@@ -22,8 +22,11 @@ export type LocationPushRequestModel = Omit<LocationPushRequestDto, "attributes"
 export type LocationIssueRequestDto = IssueToLocationRequestDto;
 export type LocationIssueRequestModel = Omit<LocationIssueRequestDto, "csrAttributes | issueAttributes | customAttributes"> & { csrAttributes: Array<AttributeRequestModel>, issueAttributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel> }
 
+export type NameAndUuidDto = NameAndUuidDtoOpenApi;
+export type NameAndUuidModel = NameAndUuidDto;
+
 export type MetadataItemDto = ResponseMetadataDto;
-export type MetadataItemModel = MetadataItemDto;
+export type MetadataItemModel = Omit<MetadataItemDto, "sourceObjects"> & { sourceObjects?: Array<NameAndUuidModel> };
 
 export type MetadataDto = MetadataResponseDto;
 export type MetadataModel = Omit<MetadataDto, "items"> & { items: Array<MetadataItemModel> };

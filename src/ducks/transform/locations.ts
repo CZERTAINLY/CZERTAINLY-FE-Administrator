@@ -10,13 +10,18 @@ import {
    MetadataDto,
    MetadataItemDto,
    MetadataItemModel,
-   MetadataModel
+   MetadataModel, NameAndUuidDto, NameAndUuidModel
 } from "types/locations";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
+export function transformNameAndUuidDtoToModel(name: NameAndUuidDto): NameAndUuidModel {
+   return { ...name };
+}
+
 export function transformMetadataItemDtoToModel(metadataItem: MetadataItemDto): MetadataItemModel {
    return {
-      ...metadataItem
+      ...metadataItem,
+      sourceObjects: metadataItem.sourceObjects?.map(transformNameAndUuidDtoToModel)
    }
 }
 
