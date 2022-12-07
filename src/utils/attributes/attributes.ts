@@ -1,5 +1,5 @@
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
+import { AttributeDescriptorModelNew, AttributeRequestModel, isDataAttribute } from "types/attributes";
+import { AttributeContentType } from "types/openapi";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
    name: "Name",
@@ -12,13 +12,14 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
 };
 
 
-export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModel[] | undefined, values: Record<string, any>): AttributeModel[] {
+export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModelNew[] | undefined, values: Record<string, any>): AttributeRequestModel[] {
 
    if (!descriptors || !values[`__attributes__${id}__`]) return [];
 
    const attributes = values[`__attributes__${id}__`];
 
-   const attrs: AttributeModel[] = [];
+   const attrs: AttributeRequestModel[] = [];
+
 
    for (const attribute in attributes) {
 
@@ -37,151 +38,153 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
       let content: any;
 
-      switch (descriptor.type) {
+      if (isDataAttribute(descriptor)) {
+
+         switch (descriptor.contentType) {
 
 
-         case "BOOLEAN":
+            case AttributeContentType.Boolean:
 
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
+               content = {value: attributes[attribute]};
 
-            break;
-
-
-         case "INTEGER":
-
-            if (descriptor.list) {
-               if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => parseInt(lv.value));
-               else
-                  content = { value: parseInt(attributes[attribute].value.value) }
-            } else {
-               content = { value: parseInt(attributes[attribute]) };
-            }
-
-            break;
+               break;
 
 
-         case "FLOAT":
-            if (descriptor.list) {
-               if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => parseFloat(lv.value));
-               else
-                  content = { value: parseFloat(attributes[attribute].value.value) }
-            } else {
-               content = { value: parseFloat(attributes[attribute]) };
-            }
-            break;
+            case AttributeContentType.Integer:
 
-
-         case "STRING":
-
-            if (descriptor.list) {
-               if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => lv.value);
-               else
-                  content = { value: attributes[attribute].value.value };
-            } else {
-               content = { value: attributes[attribute] };
-            }
-
-            break;
-
-
-         case "TEXT":
-
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
-
-            break;
-
-         case "DATE":
-
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: new Date(attributes[attribute]).toISOString() };
-
-            break;
-
-
-         case "TIME":
-
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
-
-            break;
-
-
-         case "DATETIME":
-
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: new Date(attributes[attribute]).toISOString()};
-
-            break;
-
-
-         case "FILE":
-
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = attributes[attribute];
-
-            break;
-
-
-         case "SECRET":
-
-            if (descriptor.list || descriptor.multiSelect) continue;
-            content = { value: attributes[attribute] };
-
-            break;
-
-
-         case "CREDENTIAL":
-
-            if (descriptor.list) {
-               if (Array.isArray(attributes[attribute]))
-                  content = attributes[attribute].map((lv: any) => lv.value);
-               else
-                  content = attributes[attribute].value;
-            } else {
-               content = attributes[attribute];
-            }
-
-            break;
-
-
-         case "JSON":
-
-            if (descriptor.list) {
-               if (Array.isArray(attributes[attribute])) {
-                  content = attributes[attribute].map((lv: any) => lv.value);
+               if (descriptor.properties.list) {
+                  if (Array.isArray(attributes[attribute]))
+                     content = attributes[attribute].map((lv: any) => parseInt(lv.value));
+                  else
+                     content = {value: parseInt(attributes[attribute].value.value)}
+               } else {
+                  content = {value: parseInt(attributes[attribute])};
                }
-               else
-                  content = attributes[attribute].value;
-            } else {
+
+               break;
+
+
+            case AttributeContentType.Float:
+               if (descriptor.properties.list) {
+                  if (Array.isArray(attributes[attribute]))
+                     content = attributes[attribute].map((lv: any) => parseFloat(lv.value));
+                  else
+                     content = {value: parseFloat(attributes[attribute].value.value)}
+               } else {
+                  content = {value: parseFloat(attributes[attribute])};
+               }
+               break;
+
+
+            case AttributeContentType.String:
+
+               if (descriptor.properties.list) {
+                  if (Array.isArray(attributes[attribute]))
+                     content = attributes[attribute].map((lv: any) => lv.value);
+                  else
+                     content = {value: attributes[attribute].value.value};
+               } else {
+                  content = {value: attributes[attribute]};
+               }
+
+               break;
+
+
+            case AttributeContentType.Text:
+
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
+               content = {value: attributes[attribute]};
+
+               break;
+
+            case AttributeContentType.Date:
+
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
+               content = {value: new Date(attributes[attribute]).toISOString()};
+
+               break;
+
+
+            case AttributeContentType.Time:
+
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
+               content = {value: attributes[attribute]};
+
+               break;
+
+
+            case AttributeContentType.Datetime:
+
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
+               content = {value: new Date(attributes[attribute]).toISOString()};
+
+               break;
+
+
+            case AttributeContentType.File:
+
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
                content = attributes[attribute];
-            }
 
-            break;
+               break;
 
 
-         default:
+            case AttributeContentType.Secret:
 
-            continue;
+               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
+               content = {value: attributes[attribute]};
 
+               break;
+
+
+            case AttributeContentType.Credential:
+
+               if (descriptor.properties.list) {
+                  if (Array.isArray(attributes[attribute]))
+                     content = attributes[attribute].map((lv: any) => lv.value);
+                  else
+                     content = attributes[attribute].value;
+               } else {
+                  content = attributes[attribute];
+               }
+
+               break;
+
+
+            case AttributeContentType.Object:
+
+               if (descriptor.properties.list) {
+                  if (Array.isArray(attributes[attribute])) {
+                     content = attributes[attribute].map((lv: any) => lv.value);
+                  } else
+                     content = attributes[attribute].value;
+               } else {
+                  content = attributes[attribute];
+               }
+
+               break;
+
+
+            default:
+
+               continue;
+
+         }
+
+         if (content === undefined || !content.value === undefined) continue;
+
+         const attr: AttributeRequestModel = {
+            name: attributeName,
+            /*type: descriptor.type,
+            label: descriptor.label,*/
+            content: Array.isArray(content) ? content : [content],
+         }
+
+         if (attributeUuid) attr.uuid = attributeUuid;
+
+         attrs.push(attr);
       }
-
-      if (content === undefined || !content.value === undefined) continue;
-
-      const attr: AttributeModel = {
-         name: attributeName,
-         /*type: descriptor.type,
-         label: descriptor.label,*/
-         content: content,
-      }
-
-      if (attributeUuid) attr.uuid = attributeUuid;
-
-      attrs.push(attr);
 
    }
 

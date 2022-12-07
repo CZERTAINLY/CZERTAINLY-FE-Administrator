@@ -7,8 +7,6 @@ import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, In
 
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
-import { LocationModel } from "models/locations";
-
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
 
@@ -19,6 +17,7 @@ import Select from "react-select/";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { LocationResponseModel } from "types/locations";
 
 
 interface FormValues {
@@ -52,7 +51,7 @@ export default function EntityForm() {
 
    const [init, setInit] = useState(true);
 
-   const [location, setLocation] = useState<LocationModel>();
+   const [location, setLocation] = useState<LocationResponseModel>();
 
    const isBusy = useMemo(
       () => isFetchingLocationDetail || isCreating || isUpdating || isFetchingEntities || isFetchingLocationAttributeDescriptors,
@@ -121,20 +120,24 @@ export default function EntityForm() {
 
             dispatch(locationActions.editLocation({
                uuid: id!,
-               description: values.description || "",
-               enabled: location!.enabled,
                entityUuid: values.entity!.value,
-               attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
+                editLocationRequest: {
+                   description: values.description || "",
+                   enabled: location!.enabled,
+                   attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
+                }
             }));
 
          } else {
 
             dispatch(locationActions.addLocation({
-               name: values.name!,
-               description: values.description || "",
-               enabled: true,
-               entityUuid: values.entity!.value,
-               attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
+                entityUuid: values.entity!.value,
+                addLocationRequest: {
+                    name: values.name!,
+                    description: values.description || "",
+                    enabled: true,
+                    attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
+                },
             }));
 
          }
