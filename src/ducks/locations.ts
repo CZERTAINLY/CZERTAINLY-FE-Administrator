@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { AttributeDescriptorModelNew } from "types/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
 import {
    LocationAddRequestModel,
    LocationEditRequestModel,
@@ -17,8 +17,8 @@ export type State = {
    location?: LocationResponseModel;
    locations: LocationResponseModel[];
 
-   pushAttributeDescriptors?: AttributeDescriptorModelNew[];
-   csrAttributeDescriptors?: AttributeDescriptorModelNew[];
+   pushAttributeDescriptors?: AttributeDescriptorModel[];
+   csrAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -314,7 +314,7 @@ export const slice = createSlice({
       },
 
 
-      getPushAttributesSuccess: (state, action: PayloadAction<{ attributes: AttributeDescriptorModelNew[] }>) => {
+      getPushAttributesSuccess: (state, action: PayloadAction<{ attributes: AttributeDescriptorModel[] }>) => {
 
          state.pushAttributeDescriptors = action.payload.attributes;
          state.isFetchingPushAttributeDescriptors = false;
@@ -336,7 +336,7 @@ export const slice = createSlice({
       },
 
 
-      getCSRAttributesSuccess: (state, action: PayloadAction<{ attributes: AttributeDescriptorModelNew[] }>) => {
+      getCSRAttributesSuccess: (state, action: PayloadAction<{ attributes: AttributeDescriptorModel[] }>) => {
 
          state.csrAttributeDescriptors = action.payload.attributes;
          state.isFetchingCSRAttributeDescriptors = false;

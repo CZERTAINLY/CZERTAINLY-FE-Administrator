@@ -1,42 +1,54 @@
 import {
-   AttributeCallback, AttributeCallbackMapping,
-   AttributeType, BaseAttributeConstraint,
+   AttributeCallback,
+   AttributeCallbackMapping,
+   AttributeType,
+   BaseAttributeConstraint,
    BaseAttributeContent,
    BaseAttributeDto,
    BooleanAttributeContent,
    CredentialAttributeContent,
-   CredentialDto,
-   DataAttribute, DataAttributeProperties,
-   DateAttributeContent, DateTimeAttributeConstraint, DateTimeAttributeConstraintData,
+   DataAttribute,
+   DataAttributeProperties,
+   DateAttributeContent,
+   DateTimeAttributeConstraint,
+   DateTimeAttributeConstraintData,
    DateTimeAttributeContent,
    FileAttributeContent,
    FileAttributeContentData,
-   FloatAttributeContent, GroupAttribute, InfoAttribute, InfoAttributeProperties,
-   IntegerAttributeContent, LocalTime,
+   FloatAttributeContent,
+   GroupAttribute,
+   InfoAttribute,
+   InfoAttributeProperties,
+   IntegerAttributeContent,
+   LocalTime,
    MimeType,
-   ObjectAttributeContent, RangeAttributeConstraint, RangeAttributeConstraintData, RegexpAttributeConstraint,
+   ObjectAttributeContent,
+   RangeAttributeConstraint,
+   RangeAttributeConstraintData,
+   RegexpAttributeConstraint,
    RequestAttributeDto,
    ResponseAttributeDto,
    SecretAttributeContent,
    SecretAttributeContentData,
    StringAttributeContent,
-   TextAttributeContent, TimeAttributeContent
+   TextAttributeContent,
+   TimeAttributeContent
 } from "./openapi";
 import { CredentialResponseModel } from "./credentials";
 
-//TODO remove
-export type AttributeCallbackMappingTarget_AttributeCallbackModel = "pathVariable" | "requestParameter" | "body";
-
-//TODO remove
-export type AttributeListValue = {
-   id: number;
-   name: string;
-}
-//TODO remove
-export type AttributeValue = string | number | boolean | AttributeListValue;
-
-//TODO remove
-// export type AttributeType = "BOOLEAN" | "INTEGER" | "FLOAT" | "STRING" | "TEXT" | "DATE" | "TIME" | "DATETIME" | "FILE" | "SECRET" | "CREDENTIAL" | "JSON";
+// //TODO remove
+// export type AttributeCallbackMappingTarget_AttributeCallbackModel = "pathVariable" | "requestParameter" | "body";
+//
+// //TODO remove
+// export type AttributeListValue = {
+//    id: number;
+//    name: string;
+// }
+// //TODO remove
+// export type AttributeValue = string | number | boolean | AttributeListValue;
+//
+// //TODO remove
+// // export type AttributeType = "BOOLEAN" | "INTEGER" | "FLOAT" | "STRING" | "TEXT" | "DATE" | "TIME" | "DATETIME" | "FILE" | "SECRET" | "CREDENTIAL" | "JSON";
 
 export type BooleanAttributeContentDto = BooleanAttributeContent;
 export type BooleanAttributeContentModel = BooleanAttributeContentDto;
@@ -126,7 +138,7 @@ export type DataAttributeDto = DataAttribute;
 export type DataAttributeModel = Omit<DataAttributeDto, "content | properties | constraints | attributeCallback"> & { content?: Array<BaseAttributeContentModel>, properties: DataAttributePropertiesModel, constraints?: Array<BaseAttributeConstraintModel>, attributeCallback?: AttributeCallbackModel };
 
 export type GroupAttributeDto = GroupAttribute;
-export type GroupAttributeModel = Omit<GroupAttributeDto, "content | attributeCallback"> & { content?: Array<AttributeDescriptorModelNew>, attributeCallback?: AttributeCallbackModel };
+export type GroupAttributeModel = Omit<GroupAttributeDto, "content | attributeCallback"> & { content?: Array<AttributeDescriptorModel>, attributeCallback?: AttributeCallbackModel };
 
 export type InfoAttributePropertiesDto = InfoAttributeProperties;
 export type InfoAttributePropertiesModel = InfoAttributePropertiesDto;
@@ -135,7 +147,7 @@ export type InfoAttributeDto = InfoAttribute;
 export type InfoAttributeModel = Omit<InfoAttributeDto, "content | properties"> & { content: Array<BaseAttributeContentModel>, properties: InfoAttributePropertiesModel };
 
 export type AttributeDescriptorDto = BaseAttributeDto;
-export type AttributeDescriptorModelNew = DataAttributeModel | GroupAttributeModel | InfoAttributeModel; // TODO rename
+export type AttributeDescriptorModel = DataAttributeModel | GroupAttributeModel | InfoAttributeModel; // TODO rename
 
 export type AttributeDescriptorCollectionDto = {
    [functionGroup: string]: {
@@ -144,12 +156,12 @@ export type AttributeDescriptorCollectionDto = {
 }
 
 // TODO rename
-export type AttributeDescriptorCollectionModelNew = {
+export type AttributeDescriptorCollectionModel = {
    [functionGroup: string]: {
-      [kind: string]: AttributeDescriptorModelNew[];
+      [kind: string]: AttributeDescriptorModel[];
    }
 }
 
-export const isDataAttributeModel = (attribute: AttributeDescriptorModelNew): attribute is DataAttributeModel => {
+export const isDataAttributeModel = (attribute: AttributeDescriptorModel): attribute is DataAttributeModel => {
    return attribute.type === AttributeType.Data;
 }

@@ -7,7 +7,7 @@ import {
    CredentialResponseModel
 } from "types/credentials";
 import { ConnectorResponseModel } from "types/connectors";
-import { AttributeDescriptorModelNew } from "types/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 export type State = {
@@ -21,7 +21,7 @@ export type State = {
    credentials: CredentialResponseModel[];
 
    credentialProviders?: ConnectorResponseModel[];
-   credentialProviderAttributeDescriptors?: AttributeDescriptorModelNew[];
+   credentialProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingCredentialProviders: boolean;
    isFetchingCredentialProviderAttributeDescriptors: boolean;
@@ -126,7 +126,7 @@ export const slice = createSlice({
       },
 
 
-      getCredentialProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ credentialProviderAttributesDescriptors: AttributeDescriptorModelNew[] }>) => {
+      getCredentialProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ credentialProviderAttributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingCredentialProviderAttributeDescriptors = false;
          state.credentialProviderAttributeDescriptors = action.payload.credentialProviderAttributesDescriptors;

@@ -1,5 +1,5 @@
 import { CertificateType } from "types/certificate";
-import { AttributeDescriptorModel } from "./attributes/AttributeDescriptorModel";
+import { AttributeDescriptorModel } from "../types/attributes";
 
 export interface ComplianceProfileListItemModel {
    name: string;

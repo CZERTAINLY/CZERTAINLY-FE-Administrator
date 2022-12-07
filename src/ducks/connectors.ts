@@ -11,7 +11,7 @@ import {
 } from "types/connectors";
 
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeDescriptorCollectionModelNew, AttributeDescriptorModelNew } from "types/attributes";
+import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from "types/attributes";
 import { ConnectorStatus, FunctionGroupCode } from "types/openapi";
 
 
@@ -21,7 +21,7 @@ export type State = {
 
    connector?: ConnectorResponseModel;
    connectorHealth?: HealthModel;
-   connectorAttributes?: AttributeDescriptorCollectionModelNew;
+   connectorAttributes?: AttributeDescriptorCollectionModel;
    connectorConnectionDetails?: FunctionGroupModel[];
    connectors: ConnectorResponseModel[];
 
@@ -205,7 +205,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAttributeDescriptorsSuccess: (state, action: PayloadAction<{ functionGroup: string, kind: string, attributes: AttributeDescriptorModelNew[] }>) => {
+      getConnectorAttributeDescriptorsSuccess: (state, action: PayloadAction<{ functionGroup: string, kind: string, attributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingAllAttributes = false;
          state.connectorAttributes = state.connectorAttributes || {};
@@ -230,7 +230,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAllAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptorCollection: AttributeDescriptorCollectionModelNew }>) => {
+      getConnectorAllAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptorCollection: AttributeDescriptorCollectionModel }>) => {
 
          state.isFetchingAllAttributes = false;
          state.connectorAttributes = action.payload.attributeDescriptorCollection;

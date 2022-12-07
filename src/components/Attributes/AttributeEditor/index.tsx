@@ -13,7 +13,7 @@ import {
 } from "types/openapi";
 import {
     AttributeCallbackMappingModel,
-    AttributeDescriptorModelNew,
+    AttributeDescriptorModel,
     AttributeResponseModel, DataAttributeModel, FileAttributeContentModel,
     isDataAttributeModel
 } from "types/attributes";
@@ -26,7 +26,7 @@ const emptyAttributes: AttributeResponseModel[] = [];
 
 interface Props {
    id: string;
-   attributeDescriptors: AttributeDescriptorModelNew[];
+   attributeDescriptors: AttributeDescriptorModel[];
    attributes?: AttributeResponseModel[];
    authorityUuid?: string;
    connectorUuid?: string;
@@ -56,7 +56,7 @@ export default function AttributeEditor({
    const callbackData = useSelector(connectorSelectors.callbackData);
 
    // used to check if descritors have changed
-   const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModelNew[]>();
+   const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModel[]>();
 
    // used to check if attributes have changed
    const [prevAttributes, setPrevAttributes] = useState<AttributeResponseModel[]>();
@@ -148,7 +148,7 @@ export default function AttributeEditor({
     */
    const getCurrentFromMappingValue = useCallback(
 
-      (descriptor: AttributeDescriptorModelNew, mapping: AttributeCallbackMappingModel): any => {
+      (descriptor: AttributeDescriptorModel, mapping: AttributeCallbackMappingModel): any => {
 
          const attributeFromValue = getAttributeValue(attributes, mapping.from);
 
@@ -178,7 +178,7 @@ export default function AttributeEditor({
     */
    const buildCallbackMappings = useCallback(
 
-      (descriptor: AttributeDescriptorModelNew): CallbackAttributeModel | undefined => {
+      (descriptor: AttributeDescriptorModel): CallbackAttributeModel | undefined => {
 
          let hasUndefinedMapping = false;
 

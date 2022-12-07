@@ -2,7 +2,7 @@ import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DiscoveryRequestModel, DiscoveryResponseModel } from "types/discoveries";
 import { ConnectorResponseModel } from "types/connectors";
-import { AttributeDescriptorModelNew } from "types/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 export type State = {
@@ -13,7 +13,7 @@ export type State = {
    discoveries: DiscoveryResponseModel[];
 
    discoveryProviders?: ConnectorResponseModel[];
-   discoveryProviderAttributeDescriptors?: AttributeDescriptorModelNew[];
+   discoveryProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingDiscoveryProviders: boolean;
    isFetchingDiscoveryProviderAttributeDescriptors: boolean;
@@ -113,7 +113,7 @@ export const slice = createSlice({
       },
 
 
-      getDiscoveryProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModelNew[] }>) => {
+      getDiscoveryProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
 
          state.discoveryProviderAttributeDescriptors = action.payload.attributeDescriptor;
          state.isFetchingDiscoveryProviderAttributeDescriptors = false;

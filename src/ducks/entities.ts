@@ -1,7 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 import { EntityRequestModel, EntityResponseModel } from "types/entities";
-import { AttributeDescriptorModelNew, AttributeRequestModel } from "types/attributes";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 
 
@@ -12,10 +12,10 @@ export type State = {
    entity?: EntityResponseModel;
    entities: EntityResponseModel[];
 
-   locationAttributeDescriptors?: AttributeDescriptorModelNew[];
+   locationAttributeDescriptors?: AttributeDescriptorModel[];
 
    entityProviders?: ConnectorResponseModel[];
-   entityProviderAttributeDescriptors?: AttributeDescriptorModelNew[];
+   entityProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingEntityProviders: boolean;
    isFetchingEntityProviderAttributeDescriptors: boolean;
@@ -115,7 +115,7 @@ export const slice = createSlice({
       },
 
 
-      getEntityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModelNew[] }>) => {
+      getEntityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
 
          state.entityProviderAttributeDescriptors = action.payload.attributeDescriptor;
          state.isFetchingEntityProviderAttributeDescriptors = false;
@@ -252,7 +252,7 @@ export const slice = createSlice({
       },
 
 
-      listLocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModelNew[] }>) => {
+      listLocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ descriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingLocationAttributeDescriptors = false;
          state.locationAttributeDescriptors = action.payload.descriptors;

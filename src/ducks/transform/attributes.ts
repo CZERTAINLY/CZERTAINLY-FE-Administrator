@@ -1,9 +1,9 @@
 import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from "types/connectors";
 import {
    AttributeDescriptorCollectionDto,
-   AttributeDescriptorCollectionModelNew,
+   AttributeDescriptorCollectionModel,
    AttributeDescriptorDto,
-   AttributeDescriptorModelNew,
+   AttributeDescriptorModel,
    AttributeRequestDto,
    AttributeRequestModel,
    AttributeResponseDto,
@@ -28,15 +28,15 @@ export function transformAttributeRequestModelToDto(attributeRequest: AttributeR
 
 }
 
-export function transformAttributeDescriptorDtoToModel(attributeDescriptor: AttributeDescriptorDto): AttributeDescriptorModelNew {
+export function transformAttributeDescriptorDtoToModel(attributeDescriptor: AttributeDescriptorDto): AttributeDescriptorModel {
       return ({
          ...attributeDescriptor,
          content: attributeDescriptor.content ? JSON.parse(JSON.stringify(attributeDescriptor.content)) : undefined
       })
 }
 
-export function transformAttributeDescriptorCollectionDtoToModel(collection: AttributeDescriptorCollectionDto): AttributeDescriptorCollectionModelNew {
-   const result: AttributeDescriptorCollectionModelNew = {};
+export function transformAttributeDescriptorCollectionDtoToModel(collection: AttributeDescriptorCollectionDto): AttributeDescriptorCollectionModel {
+   const result: AttributeDescriptorCollectionModel = {};
 
    for (const functionGroup in collection) {
       result[functionGroup] = {};

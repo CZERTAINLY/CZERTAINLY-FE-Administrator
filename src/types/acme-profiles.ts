@@ -1,7 +1,8 @@
 import {
     AcmeProfileDto,
-    AcmeProfileEditRequestDto as AcmeProfileEditRequestDtoOpenApi, AcmeProfileListDto,
-    AcmeProfileRequestDto, RequestAttributeDto, ResponseAttributeDto,
+    AcmeProfileEditRequestDto as AcmeProfileEditRequestDtoOpenApi,
+    AcmeProfileListDto,
+    AcmeProfileRequestDto,
 } from "./openapi";
 import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import { RaProfileResponseModel } from "./ra-profiles";

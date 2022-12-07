@@ -12,14 +12,13 @@ import { actions, selectors } from "ducks/connectors";
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
 
-import { ConnectorHealthModel, FunctionGroupModel } from "models/connectors";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
 import Dialog from "components/Dialog";
+import { FunctionGroupModel, HealthModel } from "types/connectors";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 
@@ -359,7 +358,7 @@ export default function ConnectorDetail() {
    )
 
 
-   const healthBody = (parts?: ConnectorHealthModel[]) => {
+   const healthBody = (parts?: HealthModel[]) => {
 
       if (!parts) return <></>;
 

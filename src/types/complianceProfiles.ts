@@ -18,7 +18,7 @@ import {
     ComplianceRulesListResponseDto,
     ComplianceRulesResponseDto
 } from "./openapi";
-import { AttributeDescriptorModelNew, AttributeRequestModel, AttributeResponseModel } from "./attributes";
+import { AttributeDescriptorModel, AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import { RaProfileSimplifiedModel } from "./certificate";
 
 export type ComplianceProfileListRuleDto = ComplianceProviderSummaryDto;
@@ -72,7 +72,7 @@ export type ComplianceProfileRuleDeleteRequestModel = ComplianceProfileRuleDelet
 
 //---
 export type ComplianceProfileRuleListResponseRuleDto = ComplianceRulesResponseDto;
-export type ComplianceProfileRuleListResponseRuleModel = Omit<ComplianceProfileRuleListResponseRuleDto, "attributes"> & { attributes?: Array<AttributeDescriptorModelNew> };
+export type ComplianceProfileRuleListResponseRuleModel = Omit<ComplianceProfileRuleListResponseRuleDto, "attributes"> & { attributes?: Array<AttributeDescriptorModel> };
 
 export type ComplianceProfileRuleListResponseDto = ComplianceRulesListResponseDto;
 export type ComplianceProfileRuleListResponseModel = Omit<ComplianceProfileRuleListResponseDto, "rules"> & { rules: Array<ComplianceProfileRuleListResponseRuleModel> };

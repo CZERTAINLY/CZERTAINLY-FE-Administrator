@@ -1,4 +1,4 @@
-import { AttributeDescriptorModelNew, AttributeRequestModel, isDataAttributeModel } from "types/attributes";
+import { AttributeDescriptorModel, AttributeRequestModel, isDataAttributeModel } from "types/attributes";
 import { AttributeContentType } from "types/openapi";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -12,7 +12,7 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
 };
 
 
-export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModelNew[] | undefined, values: Record<string, any>): AttributeRequestModel[] {
+export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModel[] | undefined, values: Record<string, any>): AttributeRequestModel[] {
 
    if (!descriptors || !values[`__attributes__${id}__`]) return [];
 

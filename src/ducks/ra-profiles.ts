@@ -1,7 +1,7 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeDescriptorModelNew } from "types/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
 import {
    ComplianceProfileSimplifiedModel,
    RaProfileAcmeDetailResponseModel,
@@ -23,8 +23,8 @@ export type State = {
 
    acmeDetails?: RaProfileAcmeDetailResponseModel;
 
-   issuanceAttributesDescriptors?: AttributeDescriptorModelNew[];
-   revocationAttributesDescriptors?: AttributeDescriptorModelNew[];
+   issuanceAttributesDescriptors?: AttributeDescriptorModel[];
+   revocationAttributesDescriptors?: AttributeDescriptorModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -477,7 +477,7 @@ export const slice = createSlice({
       },
 
 
-      listIssuanceAttributesDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModelNew[] }>) => {
+      listIssuanceAttributesDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingIssuanceAttributes = false;
 
@@ -500,7 +500,7 @@ export const slice = createSlice({
       },
 
 
-      listRevocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModelNew[] }>) => {
+      listRevocationAttributeDescriptorsSuccess: (state, action: PayloadAction<{ uuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingRevocationAttributes = false;
          state.revocationAttributesDescriptors = action.payload.attributesDescriptors;

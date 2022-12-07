@@ -3,7 +3,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
 import { AuthorityRequestModel, AuthorityResponseModel } from "types/authorities";
-import { AttributeDescriptorModelNew, AttributeRequestModel } from "types/attributes";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 
 
@@ -18,8 +18,8 @@ export type State = {
    authorities: AuthorityResponseModel[];
 
    authorityProviders?: ConnectorResponseModel[];
-   authorityProviderAttributeDescriptors?: AttributeDescriptorModelNew[];
-   raProfileAttributeDescriptors?: AttributeDescriptorModelNew[];
+   authorityProviderAttributeDescriptors?: AttributeDescriptorModel[];
+   raProfileAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingAuthorityProviders: boolean;
    isFetchingAuthorityProviderAttributeDescriptors: boolean;
@@ -143,7 +143,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModelNew[] }>) => {
+      getAuthorityProviderAttributesDescriptorsSuccess: (state, action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>) => {
 
          state.authorityProviderAttributeDescriptors = action.payload.attributeDescriptor;
          state.isFetchingAuthorityProviderAttributeDescriptors = false;
@@ -165,7 +165,7 @@ export const slice = createSlice({
       },
 
 
-      getRAProfilesAttributesDescriptorsSuccess: (state, action: PayloadAction<{ authorityUuid: string, attributesDescriptors: AttributeDescriptorModelNew[] }>) => {
+      getRAProfilesAttributesDescriptorsSuccess: (state, action: PayloadAction<{ authorityUuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingRAProfilesAttributesDescriptors = false;
          state.raProfileAttributeDescriptors = action.payload.attributesDescriptors;

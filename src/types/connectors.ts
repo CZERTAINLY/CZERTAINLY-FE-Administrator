@@ -13,10 +13,10 @@ import {
 } from "./openapi";
 import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 
-export type AuthType = "none" | "basic" | "certificate" | "apiKey" | "jwt";
-
-export type Status = "waitingForApproval" | "registered" | "connected" | "unavailable" | "misconfigured" | "failed" | "offline";
-
+// export type AuthType = "none" | "basic" | "certificate" | "apiKey" | "jwt";
+//
+// export type Status = "waitingForApproval" | "registered" | "connected" | "unavailable" | "misconfigured" | "failed" | "offline";
+//
 export type EndpointDto = EndpointDtoOpenApi;
 export type EndpointModel = EndpointDto;
 

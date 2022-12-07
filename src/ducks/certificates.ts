@@ -19,7 +19,7 @@ import {
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { RaProfileResponseModel } from "types/ra-profiles";
-import { AttributeDescriptorModelNew } from "types/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
 import { LocationResponseModel } from "types/locations";
 import { CertificateStatus } from "types/openapi";
 
@@ -44,8 +44,8 @@ export type State = {
    certificateDetail?: CertificateResponseModel;
    certificateHistory?: CertificateHistoryModel[];
    certificateLocations?: LocationResponseModel[];
-   issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModelNew[] };
-   revocationAttributes: AttributeDescriptorModelNew[];
+   issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
+   revocationAttributes: AttributeDescriptorModel[];
    validationResult: { [key: string]: CertificateValidationModel };
 
    isFetchingAvailableFilters: boolean;
@@ -693,7 +693,7 @@ export const slice = createSlice({
       },
 
 
-      getIssuanceAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, issuanceAttributes: AttributeDescriptorModelNew[] }>) => {
+      getIssuanceAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, issuanceAttributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingIssuanceAttributes = false;
          state.issuanceAttributes[action.payload.raProfileUuid] = action.payload.issuanceAttributes;
@@ -715,7 +715,7 @@ export const slice = createSlice({
          },
 
 
-      getRevocationAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, revocationAttributes: AttributeDescriptorModelNew[] }>) => {
+      getRevocationAttributesSuccess: (state, action: PayloadAction<{ raProfileUuid: string, revocationAttributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingRevocationAttributes = false;
          state.revocationAttributes = action.payload.revocationAttributes;
