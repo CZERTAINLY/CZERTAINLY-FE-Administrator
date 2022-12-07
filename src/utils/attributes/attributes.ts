@@ -1,4 +1,4 @@
-import { AttributeDescriptorModelNew, AttributeRequestModel, isDataAttribute } from "types/attributes";
+import { AttributeDescriptorModelNew, AttributeRequestModel, isDataAttributeModel } from "types/attributes";
 import { AttributeContentType } from "types/openapi";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -38,12 +38,15 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
       let content: any;
 
-      if (isDataAttribute(descriptor)) {
+      if (isDataAttributeModel(descriptor)) {
 
          switch (descriptor.contentType) {
 
 
             case AttributeContentType.Boolean:
+            case AttributeContentType.Text:
+            case AttributeContentType.Time:
+            case AttributeContentType.Secret:
 
                if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
                content = {value: attributes[attribute]};
@@ -90,37 +93,13 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
                break;
 
-
-            case AttributeContentType.Text:
-
-               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-               content = {value: attributes[attribute]};
-
-               break;
-
             case AttributeContentType.Date:
-
-               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-               content = {value: new Date(attributes[attribute]).toISOString()};
-
-               break;
-
-
-            case AttributeContentType.Time:
-
-               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-               content = {value: attributes[attribute]};
-
-               break;
-
-
             case AttributeContentType.Datetime:
 
                if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
                content = {value: new Date(attributes[attribute]).toISOString()};
 
                break;
-
 
             case AttributeContentType.File:
 
@@ -130,15 +109,8 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
                break;
 
 
-            case AttributeContentType.Secret:
-
-               if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-               content = {value: attributes[attribute]};
-
-               break;
-
-
             case AttributeContentType.Credential:
+            case AttributeContentType.Object:
 
                if (descriptor.properties.list) {
                   if (Array.isArray(attributes[attribute]))
@@ -150,21 +122,6 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
                }
 
                break;
-
-
-            case AttributeContentType.Object:
-
-               if (descriptor.properties.list) {
-                  if (Array.isArray(attributes[attribute])) {
-                     content = attributes[attribute].map((lv: any) => lv.value);
-                  } else
-                     content = attributes[attribute].value;
-               } else {
-                  content = attributes[attribute];
-               }
-
-               break;
-
 
             default:
 

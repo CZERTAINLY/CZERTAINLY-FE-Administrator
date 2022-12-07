@@ -8,13 +8,15 @@ import { CallbackAttributeModel } from "types/connectors";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Attribute } from "./Attribute";
 import {
-    AttributeCallbackMapping,
     AttributeContentType,
-    DataAttribute,
-    FileAttributeContent,
     FunctionGroupCode
 } from "types/openapi";
-import { AttributeDescriptorModelNew, AttributeResponseModel, isDataAttribute } from "types/attributes";
+import {
+    AttributeCallbackMappingModel,
+    AttributeDescriptorModelNew,
+    AttributeResponseModel, DataAttributeModel, FileAttributeContentModel,
+    isDataAttributeModel
+} from "types/attributes";
 
 
 // same empty array is used to prevent re-rendering of the component
@@ -146,7 +148,7 @@ export default function AttributeEditor({
     */
    const getCurrentFromMappingValue = useCallback(
 
-      (descriptor: AttributeDescriptorModelNew, mapping: AttributeCallbackMapping): any => {
+      (descriptor: AttributeDescriptorModelNew, mapping: AttributeCallbackMappingModel): any => {
 
          const attributeFromValue = getAttributeValue(attributes, mapping.from);
 
@@ -188,7 +190,7 @@ export default function AttributeEditor({
             body: {}
          };
 
-        if (isDataAttribute(descriptor)) {
+        if (isDataAttributeModel(descriptor)) {
 
             descriptor.attributeCallback?.mappings.forEach(
                 mapping => {
@@ -217,17 +219,17 @@ export default function AttributeEditor({
    /**
     * Groups attributes for rendering according to the attribute descriptor group property
     */
-   const groupedAttributesDescriptors: { [key: string]: DataAttribute[] } = useMemo(
+   const groupedAttributesDescriptors: { [key: string]: DataAttributeModel[] } = useMemo(
 
       () => {
 
-         const grouped: { [key: string]: DataAttribute[] } = {};
+         const grouped: { [key: string]: DataAttributeModel[] } = {};
 
          attributeDescriptors.forEach(
 
             descriptor => {
 
-                if (isDataAttribute(descriptor)) {
+                if (isDataAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || "__";
                     grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
                 }
@@ -277,7 +279,7 @@ export default function AttributeEditor({
          attributeDescriptors.forEach(
 
             descriptor => {
-                if (isDataAttribute(descriptor)) {
+                if (isDataAttributeModel(descriptor)) {
 
                     const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
@@ -340,15 +342,15 @@ export default function AttributeEditor({
 
                         if (attribute?.content) {
 
-                            form.mutators.setAttribute(`${formAttributeName}.value`, (attribute.content as FileAttributeContent[])[0].reference);
-                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (attribute.content as FileAttributeContent[])[0].data.mimeType.type || "unknown");
-                            form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContent[])[0].data.fileName || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.value`, (attribute.content as FileAttributeContentModel[])[0].reference);
+                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
 
                         } else if (descriptor.content) {
 
-                            form.mutators.setAttribute(`${formAttributeName}.value`, (descriptor.content as FileAttributeContent[])[0].reference);
-                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (descriptor.content as FileAttributeContent[])[0].data.mimeType.type || "unknown");
-                            form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContent[])[0].data.fileName || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.value`, (descriptor.content as FileAttributeContentModel[])[0].reference);
+                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
 
                         }
 
@@ -466,7 +468,7 @@ export default function AttributeEditor({
          attributeDescriptors.forEach(
 
             descriptor => {
-                if (isDataAttribute(descriptor)) {
+                if (isDataAttributeModel(descriptor)) {
 
                    // list all 'from' mappings (get attribute names from the descriptor)
                    const fromNames: string[] = [];

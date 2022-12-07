@@ -1,9 +1,8 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { useCallback, useMemo } from "react";
-import { AttributeResponseModel } from "types/attributes";
+import { AttributeResponseModel, BaseAttributeContentModel } from "types/attributes";
 import {
     AttributeContentType,
-    BaseAttributeContent,
 } from "types/openapi";
 
 
@@ -24,7 +23,7 @@ export default function AttributeViewer({
 
          if (!attribute.content) return "Not set";
 
-          const mapping = function (content: BaseAttributeContent): string | undefined {
+          const mapping = function (content: BaseAttributeContentModel): string | undefined {
               switch (attribute.contentType) {
                   case AttributeContentType.Boolean:
                       return content.data ? "true" : "false"

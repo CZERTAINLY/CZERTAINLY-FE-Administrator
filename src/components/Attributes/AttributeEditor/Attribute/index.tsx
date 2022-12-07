@@ -10,15 +10,14 @@ import { composeValidators, validateFloat, validateInteger, validatePattern, val
 import {
     AttributeConstraintType,
     AttributeContentType,
-    DataAttribute,
-    RegexpAttributeConstraint
 } from "types/openapi";
 import { InputType } from "reactstrap/types/lib/Input";
+import { DataAttributeModel, RegexpAttributeConstraintModel } from "types/attributes";
 
 
 interface Props {
    name: string;
-   descriptor: DataAttribute | undefined;
+   descriptor: DataAttributeModel | undefined;
    options?: { label: string, value: any }[];
 }
 
@@ -138,7 +137,7 @@ export function Attribute({
       if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
       const regexValidator = descriptor.constraints?.find(c => c.type === AttributeConstraintType.RegExp);
         if (regexValidator) {
-            validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraint).data ?? "")));
+            validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
         }
 
       const composed = composeValidators.apply(undefined, validators);
@@ -148,7 +147,7 @@ export function Attribute({
    };
 
 
-   const createSelect = (descriptor: DataAttribute): JSX.Element => {
+   const createSelect = (descriptor: DataAttributeModel): JSX.Element => {
 
       return (
 
@@ -202,7 +201,7 @@ export function Attribute({
 
 
 
-   const createFile = (descriptor: DataAttribute): JSX.Element => {
+   const createFile = (descriptor: DataAttributeModel): JSX.Element => {
 
       return (
 
@@ -330,7 +329,7 @@ export function Attribute({
    };
 
 
-   const createInput = (descriptor: DataAttribute): JSX.Element => {
+   const createInput = (descriptor: DataAttributeModel): JSX.Element => {
 
       return (
 
@@ -386,7 +385,7 @@ export function Attribute({
    };
 
 
-   const createField = (descriptor: DataAttribute): JSX.Element => {
+   const createField = (descriptor: DataAttributeModel): JSX.Element => {
 
       if (descriptor.properties.list) return createSelect(descriptor);
       if (descriptor.contentType === AttributeContentType.File) return createFile(descriptor);
