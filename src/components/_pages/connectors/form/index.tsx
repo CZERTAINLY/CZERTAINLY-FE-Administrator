@@ -432,7 +432,7 @@ export default function ConnectorForm() {
 
                                        <td>Connector Status</td>
                                        <td>
-                                          <InventoryStatusBadge status={connectionDetails.length > 0 ? "connected" : "failed"} />
+                                          <InventoryStatusBadge status={connectionDetails.length > 0 ? ConnectorStatus.Connected : ConnectorStatus.Failed} />
                                        </td>
 
                                     </tr>

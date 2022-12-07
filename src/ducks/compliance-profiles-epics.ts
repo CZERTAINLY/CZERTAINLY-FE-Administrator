@@ -18,7 +18,7 @@ import {
     transformComplianceProfileRuleDeleteRequestModelToDto,
     transformComplianceProfileRuleListResponseDtoToModel
 } from "./transform/compliance-profiles";
-import { RaProfileSimplifiedModel } from "../types/certificate";
+import { RaProfileSimplifiedModel } from "types/certificate";
 
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {

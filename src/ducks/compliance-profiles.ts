@@ -302,8 +302,9 @@ export const slice = createSlice({
                   uuid: action.payload.rule.uuid,
                   name: action.payload.rule.name,
                   description: action.payload.rule.description,
-                  groupUuid: action.payload.rule.groupUuid,
-                  attributes: action.payload.rule.attributes
+                  // groupUuid: action.payload.rule.groupUuid,
+                  attributes: action.payload.rule.attributes,
+                  certificateType: action.payload.rule.certificateType
                }]
             }]
 
@@ -317,8 +318,9 @@ export const slice = createSlice({
                      uuid: action.payload.rule.uuid,
                      name: action.payload.rule.name,
                      description: action.payload.rule.description,
-                     groupUuid: action.payload.rule.groupUuid,
-                     attributes: action.payload.rule.attributes
+                     // groupUuid: action.payload.rule.groupUuid,
+                     attributes: action.payload.rule.attributes,
+                     certificateType: action.payload.rule.certificateType
                   });
                }
 
@@ -334,8 +336,9 @@ export const slice = createSlice({
                      uuid: action.payload.rule.uuid,
                      name: action.payload.rule.name,
                      description: action.payload.rule.description,
-                     groupUuid: action.payload.rule.groupUuid,
-                     attributes: action.payload.rule.attributes
+                     // groupUuid: action.payload.rule.groupUuid,
+                     attributes: action.payload.rule.attributes,
+                     certificateType: action.payload.rule.certificateType
                   }]
                });
 

@@ -13,7 +13,7 @@
 
 import type {
     CertificateType,
-    RequestAttributeDto,
+    ResponseAttributeDto,
 } from './';
 
 /**
@@ -47,8 +47,8 @@ export interface ComplianceRulesDto {
     certificateType: CertificateType;
     /**
      * Attributes of the rule
-     * @type {Array<RequestAttributeDto>}
+     * @type {Array<ResponseAttributeDto>}
      * @memberof ComplianceRulesDto
      */
-    attributes?: Array<RequestAttributeDto>;
+    attributes?: Array<ResponseAttributeDto>;
 }
