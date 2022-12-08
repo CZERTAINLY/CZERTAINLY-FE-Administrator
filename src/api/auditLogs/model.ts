@@ -1,8 +1,6 @@
-import { Observable } from 'rxjs';
 import { AuditLogOperation, AuditLogOperationStatus, AuditLogSourceTarget } from 'types/auditLogs';
 
 import { PagedDataDTO } from "../_common/pagedDataDTO";
-import { FormValues } from "components/_pages/auditLogs/AuditLogsFilters";
 
 export interface AuditLogDTO {
    id: number;
