@@ -2,8 +2,8 @@ import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { useCallback, useMemo } from "react";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { AttributeDescriptorModel, isDataAttributeModel } from "../../../types/attributes";
-import { AttributeConstraintType } from "../../../types/openapi";
+import { AttributeDescriptorModel, isDataAttributeModel } from "types/attributes";
+import { AttributeConstraintType } from "types/openapi";
 
 interface Props {
    attributeDescriptors: AttributeDescriptorModel[];
@@ -81,7 +81,7 @@ export default function AttributeDescriptorViewer({
                              { id: "desc", columns: [<b>Description</b>, attributeDescriptor.description || "Not set"] },
                              { id: "label", columns: [<b>Label</b>, attributeDescriptor.properties.label] },
                              { id: "group", columns: [<b>Group</b>, attributeDescriptor.properties.group || "Not set"] },
-                             { id: "type", columns: [<b>Type</b>, attributeDescriptor.type] },
+                             { id: "type", columns: [<b>Type</b>, attributeDescriptor.contentType] },
                              { id: "required", columns: [<b>Required</b>, attributeDescriptor.properties.required ? "Yes" : "No"] },
                              { id: "readOnly", columns: [<b>Read Only</b>, attributeDescriptor.properties.readOnly ? "Yes" : "No"] },
                              { id: "list", columns: [<b>List</b>, attributeDescriptor.properties.list ? "Yes" : "No"] },

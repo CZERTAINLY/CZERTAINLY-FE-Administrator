@@ -224,7 +224,7 @@ export default function LocationDetail() {
 
          selectedCerts.forEach(
             certUuid => {
-               dispatch(actions.pushCertificate({ entityUuid: location.entityInstanceUuid, locationUuid: location.uuid, certificateUuid: certUuid, pushAttributes: attrs }));
+               dispatch(actions.pushCertificate({ entityUuid: location.entityInstanceUuid, locationUuid: location.uuid, certificateUuid: certUuid, pushRequest: { attributes: attrs }}));
             }
          )
 
@@ -246,9 +246,11 @@ export default function LocationDetail() {
          dispatch(actions.issueCertificate({
             entityUuid: location.entityInstanceUuid,
             locationUuid: location.uuid,
-            raProfileUuid: values.raProfile.value.split(":#")[0],
-            csrAttributes: csrAttrs,
-            issueAttributes: issueAttrs
+             issueRequest: {
+                 raProfileUuid: values.raProfile.value.split(":#")[0],
+                 csrAttributes: csrAttrs,
+                 issueAttributes: issueAttrs
+             }
          }));
          setIssueDialog(false);
 
@@ -440,9 +442,9 @@ export default function LocationDetail() {
                cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                !cert.metadata ? "" :
-                  Object.keys(cert.metadata).length === 0 ? "" :
+                  cert.metadata.length === 0 ? "" :
                      <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
-                        {Object.keys(cert.metadata).map(key => (cert.metadata[key].toString())).join(", ")}
+                        {cert.metadata.map(cert => cert.toString()).join(", ")}
                      </div>,
 
                !cert.csrAttributes ? "" :
@@ -460,9 +462,9 @@ export default function LocationDetail() {
                <></>,
                <></>,
 
-               !cert.metadata ? "" : Object.keys(cert.metadata).length === 0 ? "" : <CustomTable
+               !cert.metadata ? "" : cert.metadata.length === 0 ? "" : <CustomTable
                   headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
-                  data={Object.keys(cert.metadata).map(key => ({ id: key, columns: [key, cert.metadata[key].toString()] }))}
+                  data={cert.metadata.map(cert => ({ id: cert.connectorName, columns: [cert.connectorName, cert.connectorUuid] }))}
                />,
 
                !cert.csrAttributes ? "" : cert.csrAttributes.length === 0 ? "" : <CustomTable

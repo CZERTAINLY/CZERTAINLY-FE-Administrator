@@ -1,4 +1,9 @@
-import { AttributeDescriptorModel, AttributeRequestModel, isDataAttributeModel } from "types/attributes";
+import {
+   AttributeDescriptorModel,
+   AttributeRequestModel,
+   BaseAttributeContentModel,
+   isDataAttributeModel
+} from "types/attributes";
 import { AttributeContentType } from "types/openapi";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -11,6 +16,34 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
    entityProvider: "Entity Provider"
 };
 
+export const getAttributeContent = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {
+
+   if (!content) return "Not set";
+
+   const mapping = (content: BaseAttributeContentModel): string | undefined => {
+      switch (contentType) {
+         case AttributeContentType.Boolean:
+            return content.data ? "true" : "false"
+         case AttributeContentType.Credential:
+         case AttributeContentType.Object:
+         case AttributeContentType.File:
+            return content.reference;
+         case AttributeContentType.Time:
+         case AttributeContentType.Date:
+         case AttributeContentType.Datetime:
+         case AttributeContentType.Float:
+         case AttributeContentType.Integer:
+         case AttributeContentType.String:
+         case AttributeContentType.Text:
+            return content.data.toString();
+         case AttributeContentType.Secret:
+            return "*****";
+      }
+      return undefined;
+   };
+
+   return content.map(content => mapping(content) ?? "Unknown data type").join(", ");
+}
 
 export function collectFormAttributes(id: string, descriptors: AttributeDescriptorModel[] | undefined, values: Record<string, any>): AttributeRequestModel[] {
 

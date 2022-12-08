@@ -7,8 +7,6 @@ import Select from "react-select";
 
 import { actions, selectors } from "ducks/compliance-profiles";
 
-import { ComplianceGroupsModel, ComplianceRaProfileModel, ComplianceRuleModel } from "models";
-
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
@@ -18,6 +16,12 @@ import StatusBadge from "components/StatusBadge";
 import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 import AssociateRaProfileDialogBody from "../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody";
 import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";
+import {
+    ComplianceProfileGroupListResponseGroupModel,
+    ComplianceProfileResponseGroupGroupModel,
+    ComplianceProfileResponseRuleRuleModel,
+    ComplianceProfileRuleListResponseRuleModel
+} from "types/complianceProfiles";
 
 
 export default function ComplianceProfileDetail() {
@@ -46,7 +50,7 @@ export default function ComplianceProfileDetail() {
 
    const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
-   const [groupRuleMapping, setGroupRuleMapping] = useState<any>();
+   const [groupRuleMapping, setGroupRuleMapping] = useState<{[key: string]: ComplianceProfileRuleListResponseRuleModel[] }>();
 
    const [currentGroupUuidForDisplay, setCurrentGroupUuidForDisplay] = useState<string>();
 
@@ -76,7 +80,7 @@ export default function ComplianceProfileDetail() {
 
          if (!id) return;
 
-         let groupRuleMapping: any = {};
+         let groupRuleMapping: {[key: string]: ComplianceProfileRuleListResponseRuleModel[] } = {};
 
          for (let connector of rules) {
 
@@ -112,15 +116,19 @@ export default function ComplianceProfileDetail() {
          let alreadyAssociatedGroupUuidsLcl: string[] = [];
 
          for (let connector of profile?.rules || []) {
-            for (let rule of connector.rules) {
-               alreadyAssociatedRuleUuidsLcl.push(rule.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
-            }
+             if (connector.rules) {
+                 for (let rule of connector.rules) {
+                     alreadyAssociatedRuleUuidsLcl.push(rule.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
+                 }
+             }
          }
 
          for (let connector of profile?.groups || []) {
-            for (let group of connector.groups) {
-               alreadyAssociatedGroupUuidsLcl.push(group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
-            }
+             if (connector.groups) {
+                 for (let group of connector.groups) {
+                     alreadyAssociatedGroupUuidsLcl.push(group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
+                 }
+             }
          }
 
          setAlreadyAssociatedRuleUuids(alreadyAssociatedRuleUuidsLcl);
@@ -177,11 +185,13 @@ export default function ComplianceProfileDetail() {
 
    const onAddRule = useCallback(
 
-      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRuleModel, attributes?: any) => {
+      (connectorUuid: string, kind: string, rule: ComplianceProfileRuleListResponseRuleModel, attributes?: any) => {
 
          if (!profile) return;
 
-         dispatch(actions.addRule({ uuid: profile.uuid, connectorName: connectorName, connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid, description: rule.description, ruleName: rule.name, groupUuid: rule.groupUuid, attributes: attributes }));
+         dispatch(actions.addRule({ uuid: profile.uuid, addRequest: {
+             connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid, attributes: attributes
+         }}));
 
       },
       [profile, dispatch]
@@ -191,11 +201,11 @@ export default function ComplianceProfileDetail() {
 
    const onAddGroup = useCallback(
 
-      (connectorUuid: string, connectorName: string, kind: string, group: ComplianceGroupsModel) => {
+      (connectorUuid: string, connectorName: string, kind: string, group: ComplianceProfileGroupListResponseGroupModel) => {
 
          if (!profile) return;
 
-         dispatch(actions.addGroup({ uuid: profile.uuid, connectorName: connectorName, connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid, groupName: group.name, description: group.description || "" }));
+         dispatch(actions.addGroup({ uuid: profile.uuid, connectorName: connectorName, connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid, groupName: group.name, description: group.description || "" , addRequest: { groupUuid: group.uuid, connectorUuid: connectorUuid, kind: kind }}));
 
       },
       [profile, dispatch]
@@ -205,11 +215,11 @@ export default function ComplianceProfileDetail() {
 
    const onDeleteRule = useCallback(
 
-      (connectorUuid: string, kind: string, rule: ComplianceRuleModel, attributes?: any) => {
+      (connectorUuid: string, kind: string, rule: ComplianceProfileResponseRuleRuleModel) => {
 
          if (!profile) return;
 
-         dispatch(actions.deleteRule({ uuid: profile.uuid, connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid }));
+         dispatch(actions.deleteRule({ uuid: profile.uuid, deleteRequest: { connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid }}));
 
       },
       [profile, dispatch]
@@ -219,11 +229,11 @@ export default function ComplianceProfileDetail() {
 
    const onDeleteGroup = useCallback(
 
-      (connectorUuid: string, kind: string, group: ComplianceGroupsModel) => {
+      (connectorUuid: string, kind: string, group: ComplianceProfileResponseGroupGroupModel) => {
 
          if (!profile) return;
 
-         dispatch(actions.deleteGroup({ uuid: profile.uuid, connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid }));
+         dispatch(actions.deleteGroup({ uuid: profile.uuid, deleteRequest: { connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid }}));
       },
       [profile, dispatch]
 
@@ -281,7 +291,7 @@ export default function ComplianceProfileDetail() {
 
    const onAddRuleWithAttributes = useCallback(
 
-      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRuleModel) => {
+      (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceProfileRuleListResponseRuleModel) => {
 
          setAddAttributeRuleDetails({
             connectorUuid: connectorUuid,
@@ -418,10 +428,9 @@ export default function ComplianceProfileDetail() {
 
    );
 
-
    const getRuleMoreData = useCallback(
 
-      (rule: ComplianceRuleModel, connectorName: string, kind: string) => {
+      (rule: ComplianceProfileRuleListResponseRuleModel, connectorName: string, kind: string) => {
 
          return [
             {
@@ -454,7 +463,7 @@ export default function ComplianceProfileDetail() {
             },
             {
                id: "attributes",
-               columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <></>]
+               columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer descriptorAttributes={rule.attributes} /> : <></>]
             }
          ]
 
@@ -462,6 +471,51 @@ export default function ComplianceProfileDetail() {
       []
 
    );
+
+
+    const getRuleMoreDataRule = useCallback(
+
+        (rule: ComplianceProfileResponseRuleRuleModel, connectorName: string, kind: string) => {
+
+            return [
+                {
+                    id: "connectorName",
+                    columns: ["Connector Name", connectorName]
+                },
+                {
+                    id: "connectorKind",
+                    columns: ["Kind", kind]
+                },
+                {
+                    id: "uuid",
+                    columns: ["UUID", rule.uuid]
+                },
+                {
+                    id: "name",
+                    columns: ["Name", rule.name]
+                },
+                {
+                    id: "description",
+                    columns: ["Description", rule.description || ""]
+                },
+                {
+                    id: "groupUuid",
+                    columns: ["Group UUID", ""]
+                },
+                {
+                    id: "certificateType",
+                    columns: ["Certificate Type", rule.certificateType || ""]
+                },
+                {
+                    id: "attributes",
+                    columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <></>]
+                }
+            ]
+
+        },
+        []
+
+    );
 
    const ruleHeader: TableHeader[] = useMemo(
 
@@ -491,7 +545,7 @@ export default function ComplianceProfileDetail() {
          let data: TableDataRow[] = [];
          let dataSplit = currentGroupUuidForDisplay.split(":#")
 
-         for (const rule of groupRuleMapping[currentGroupUuidForDisplay || ""] || []) {
+         for (const rule of (groupRuleMapping && groupRuleMapping[currentGroupUuidForDisplay || ""]) ?? []) {
 
             data.push({
                id: `${rule.uuid}-${dataSplit[1]}`,
@@ -537,9 +591,9 @@ export default function ComplianceProfileDetail() {
 
    const raProfileData: TableDataRow[] = useMemo(
 
-      () => !profile ? [] : profile.raProfiles.map(
+      () => (!profile || !profile.raProfiles) ? [] : profile.raProfiles.map(
 
-         (raProfile: ComplianceRaProfileModel) => ({
+         (raProfile) => ({
 
             id: raProfile.uuid,
             columns: [
@@ -572,7 +626,7 @@ export default function ComplianceProfileDetail() {
 
    const getGroupMoreData = useCallback(
 
-      (group: ComplianceGroupsModel, connectorName: string, kind: string) => {
+      (group: ComplianceProfileResponseGroupGroupModel, connectorName: string, kind: string) => {
 
          return [
             {
@@ -616,70 +670,74 @@ export default function ComplianceProfileDetail() {
 
             for (const connector of profile.groups) {
 
-               for (const group of connector.groups) {
+                if (connector.groups && connector.connectorUuid && connector.kind && connector.connectorName)
+                {
+                    for (const group of connector.groups) {
 
-                  const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                        const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
 
-                  data.push({
+                        data.push({
 
-                     id: `${group.uuid}-${connector.connectorUuid}`,
+                            id: `${group.uuid}-${connector.connectorUuid}`,
 
-                     columns: [
+                            columns: [
 
-                        <Badge color="secondary">Group</Badge>,
+                                <Badge color="secondary">Group</Badge>,
 
-                        <div>
+                                <div>
 
-                           <Button
-                              className="btn btn-link p-0"
-                              color="white"
-                              title="Remove"
-                              onClick={
-                                 () => {
-                                    onDeleteGroup(connector.connectorUuid, connector.kind, group);
-                                 }
-                              }
+                                    <Button
+                                        className="btn btn-link p-0"
+                                        color="white"
+                                        title="Remove"
+                                        onClick={
+                                            () => {
+                                                onDeleteGroup(connector.connectorUuid!, connector.kind!, group);
+                                            }
+                                        }
 
-                           >
-                              <i className="fa fa-times" style={{ color: "red" }} />
+                                    >
+                                        <i className="fa fa-times" style={{color: "red"}}/>
 
-                           </Button>
+                                    </Button>
 
-                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-                           <Button
-                              className="btn btn-link p-0"
-                              color="white"
-                              title="Edit"
-                              onClick={
-                                 () => {
-                                    setCurrentGroupUuidForDisplay(keyString)
-                                 }
-                              }
-                           >
-                              <i className="fa fa-info" style={{ color: "auto" }} />
+                                    <Button
+                                        className="btn btn-link p-0"
+                                        color="white"
+                                        title="Edit"
+                                        onClick={
+                                            () => {
+                                                setCurrentGroupUuidForDisplay(keyString)
+                                            }
+                                        }
+                                    >
+                                        <i className="fa fa-info" style={{color: "auto"}}/>
 
-                           </Button>
+                                    </Button>
 
-                        </div>,
+                                </div>,
 
-                        group.name,
+                                group.name,
 
-                     ],
+                            ],
 
-                     detailColumns: [
+                            detailColumns: [
 
-                        <></>,
+                                <></>,
 
-                        <></>,
+                                <></>,
 
-                        <></>,
+                                <></>,
 
-                        <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                     ]
+                                <CustomTable data={getGroupMoreData(group, connector.connectorName!, connector.kind)}
+                                             headers={detailHeaders}/>,
+                            ]
 
-                  });
-               }
+                        });
+                    }
+                }
             }
          }
 
@@ -687,97 +745,104 @@ export default function ComplianceProfileDetail() {
 
             for (const connector of profile.rules) {
 
-               for (const rule of connector.rules) {
+                if (connector.rules && connector.connectorUuid && connector.kind && connector.connectorName)
+                {
+                    for (const rule of connector.rules) {
 
-                  data.push({
+                        data.push({
 
-                     id: `${rule.uuid}-${connector.connectorUuid}`,
+                            id: `${rule.uuid}-${connector.connectorUuid}`,
 
-                     columns: [
+                            columns: [
 
-                        <Badge color="secondary">Rule</Badge>,
+                                <Badge color="secondary">Rule</Badge>,
 
-                        <>
-                           <Button
-                              className="btn btn-link p-0"
-                              color="white"
-                              title="Remove"
-                              onClick={
-                                 () => {
-                                    onDeleteRule(connector.connectorUuid, connector.kind, rule);
-                                 }
-                              }
-                           >
-                              <i className="fa fa-times" style={{ color: "red" }} />
+                                <>
+                                    <Button
+                                        className="btn btn-link p-0"
+                                        color="white"
+                                        title="Remove"
+                                        onClick={
+                                            () => {
+                                                onDeleteRule(connector.connectorUuid!, connector.kind!, rule);
+                                            }
+                                        }
+                                    >
+                                        <i className="fa fa-times" style={{color: "red"}}/>
 
-                           </Button>
-                        </>
-                        ,
-                        rule.description || rule.name,
+                                    </Button>
+                                </>
+                                ,
+                                rule.description || rule.name,
 
-                     ],
+                            ],
 
-                     detailColumns: [
-                        <></>,
-                        <></>,
-                        <></>,
-                        <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                     ]
+                            detailColumns: [
+                                <></>,
+                                <></>,
+                                <></>,
+                                <CustomTable data={getRuleMoreDataRule(rule, connector.connectorName, connector.kind)}
+                                             headers={detailHeaders}/>,
+                            ]
 
-                  });
+                        });
 
-               }
+                    }
+                }
 
             }
 
 
             for (const connector of profile.groups) {
 
-               for (const group of connector.groups) {
+                if (connector.groups && connector.connectorName && connector.kind) {
+                    for (const group of connector.groups) {
 
-                  const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                        const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
 
-                  if (!groupRuleMapping) continue;
+                        if (!groupRuleMapping) continue;
 
-                  for (const rule of groupRuleMapping[keyString] || []) {
+                        for (const rule of groupRuleMapping[keyString] || []) {
 
-                     data.push({
+                            data.push({
 
-                        id: `${rule.uuid}-${connector.connectorUuid}`,
+                                id: `${rule.uuid}-${connector.connectorUuid}`,
 
-                        columns: [
+                                columns: [
 
-                           <Badge color="secondary">Rule</Badge>,
+                                    <Badge color="secondary">Rule</Badge>,
 
-                           <>
-                              <Button
-                                 className="btn btn-link p-0"
-                                 color="white"
-                                 title={`Rule is part of the group '${group.name}' and cannot be removed separately`}
-                              >
+                                    <>
+                                        <Button
+                                            className="btn btn-link p-0"
+                                            color="white"
+                                            title={`Rule is part of the group '${group.name}' and cannot be removed separately`}
+                                        >
 
-                                 <i className="fa fa-times" style={{ color: "grey" }} />
+                                            <i className="fa fa-times" style={{color: "grey"}}/>
 
-                              </Button>
+                                        </Button>
 
-                           </>,
+                                    </>,
 
-                           rule.description || rule.name,
+                                    rule.description || rule.name,
 
-                        ],
+                                ],
 
-                        detailColumns: [
-                           <></>,
-                           <></>,
-                           <></>,
-                           <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
+                                detailColumns: [
+                                    <></>,
+                                    <></>,
+                                    <></>,
+                                    <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)}
+                                                 headers={detailHeaders}/>,
 
-                        ]
-                     });
+                                ]
+                            });
 
-                  }
+                        }
 
-               }
+                    }
+                }
 
             }
 
@@ -875,7 +940,7 @@ export default function ComplianceProfileDetail() {
                               onClick={() => {
                                  rule.attributes ?
                                     onAddRuleWithAttributes(connector.connectorUuid, connector.connectorName, connector.kind, rule)
-                                    : onAddRule(connector.connectorUuid, connector.connectorName, connector.kind, rule)
+                                    : onAddRule(connector.connectorUuid, connector.kind, rule)
                               }
                               }
                            >
@@ -1049,7 +1114,7 @@ export default function ComplianceProfileDetail() {
                visible: addRaProfile,
                onClose: () => setAddRaProfile(false),
                complianceProfileUuid: profile?.uuid,
-               availableRaProfileUuids: profile?.raProfiles.map(e => e.uuid)
+               availableRaProfileUuids: profile?.raProfiles?.map(e => e.uuid)
             })}
             toggle={() => setAddRaProfile(false)}
             buttons={[]}

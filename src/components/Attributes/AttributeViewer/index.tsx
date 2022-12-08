@@ -1,9 +1,7 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { useCallback, useMemo } from "react";
-import { AttributeResponseModel, BaseAttributeContentModel } from "types/attributes";
-import {
-    AttributeContentType,
-} from "types/openapi";
+import { AttributeResponseModel } from "types/attributes";
+import { getAttributeContent } from "utils/attributes/attributes";
 
 
 export interface Props {
@@ -17,39 +15,7 @@ export default function AttributeViewer({
    hasHeader = true
 }: Props) {
 
-   const getAttributeContent = useCallback(
-
-      (attribute: AttributeResponseModel) => {
-
-         if (!attribute.content) return "Not set";
-
-          const mapping = function (content: BaseAttributeContentModel): string | undefined {
-              switch (attribute.contentType) {
-                  case AttributeContentType.Boolean:
-                      return content.data ? "true" : "false"
-                  case AttributeContentType.Credential:
-                  case AttributeContentType.Object:
-                  case AttributeContentType.File:
-                      return content.reference;
-                  case AttributeContentType.Time:
-                  case AttributeContentType.Date:
-                  case AttributeContentType.Datetime:
-                  case AttributeContentType.Float:
-                  case AttributeContentType.Integer:
-                  case AttributeContentType.String:
-                  case AttributeContentType.Text:
-                      return content.data.toString();
-                  case AttributeContentType.Secret:
-                      return "*****";
-              }
-              return undefined;
-          };
-
-         return attribute.content.map(content => mapping(content) ?? "Unknown data type").join(", ");
-      },
-      []
-
-   );
+   const getContent = useCallback(getAttributeContent,[]);
 
 
    const tableHeaders: TableHeader[] = useMemo(
@@ -87,14 +53,14 @@ export default function AttributeViewer({
                id: attribute.uuid || "",
                columns: [
                   attribute.label || "",
-                  attribute.type || "",
-                  getAttributeContent(attribute)
+                  attribute.contentType || "",
+                   getContent(attribute.contentType, attribute.content)
                ]
             })
          }
 
       ),
-      [attributes, getAttributeContent]
+      [attributes, getContent]
    );
 
 
