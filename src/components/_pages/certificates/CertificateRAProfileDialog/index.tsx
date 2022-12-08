@@ -44,7 +44,7 @@ export default function CertificateGroupDialog({
 
       () => {
          if (!selectedRaProfile) return;
-         dispatch(actions.bulkUpdateRaProfile({ uuids, raProfileUuid: selectedRaProfile.value.split(":#")[0], authorityUuid: selectedRaProfile.value.split(":#")[1], inFilter: [], allSelect: false }));
+         dispatch(actions.bulkUpdateRaProfile({ raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.value.split(":#")[0], filters: []}, authorityUuid: selectedRaProfile.value.split(":#")[1] }));
          onUpdate();
       },
       [dispatch, onUpdate, selectedRaProfile, uuids]

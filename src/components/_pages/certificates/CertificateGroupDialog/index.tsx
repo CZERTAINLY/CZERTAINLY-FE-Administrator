@@ -44,7 +44,7 @@ export default function CertificateGroupDialog({
 
       () => {
          if (!selectedGroup) return;
-         dispatch(actions.bulkUpdateGroup({ uuids, groupUuid: selectedGroup.value, inFilter: [], allSelect: false }));
+         dispatch(actions.bulkUpdateGroup({ certificateUuids: uuids, groupUuid: selectedGroup.value, filters: [] }));
          onUpdate();
       },
       [dispatch, onUpdate, selectedGroup, uuids]

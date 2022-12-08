@@ -39,7 +39,7 @@ export default function CertificateOwnerDialog({
 
       () => {
          if (!owner) return;
-         dispatch(actions.bulkUpdateOwner({ uuids, owner, inFilter: [], allSelect: false }));
+         dispatch(actions.bulkUpdateOwner({ certificateUuids: uuids, owner, filters: [] }));
          onUpdate();
       },
       [dispatch, onUpdate, owner, uuids]

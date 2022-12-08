@@ -14,6 +14,7 @@ interface CertificateComplianceIcon {
    };
 }
 
+//TODO replace with CertificateStatus?
 const certificateIcon: CertificateComplianceIcon = {
 
    ok: {

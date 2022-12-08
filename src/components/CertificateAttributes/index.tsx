@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
-import { CertificateModel } from "models";
 import { dateFormatter } from "utils/dateUtil";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { CertificateResponseModel } from "types/certificate";
 
 interface Props {
-   certificate?: CertificateModel;
+   certificate?: CertificateResponseModel;
 }
 
 function CertificateAttributes({ certificate }: Props) {

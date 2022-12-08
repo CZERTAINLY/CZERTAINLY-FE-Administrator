@@ -126,9 +126,11 @@ export default function CertificateForm() {
 
          dispatch(certificateActions.issueCertificate({
             raProfileUuid: values.raProfile.value.uuid,
-            pkcs10: values.file,
             authorityUuid: values.raProfile.value.authorityInstanceUuid,
-            attributes,
+             signRequest: {
+                 pkcs10: values.file,
+                 attributes,
+             }
             
          }));
 

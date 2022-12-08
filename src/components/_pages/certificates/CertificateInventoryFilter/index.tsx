@@ -8,32 +8,36 @@ import { selectors, actions } from "ducks/certificates"
 import Select, { MultiValue, SingleValue } from "react-select";
 
 import Widget from "components/Widget";
-import { CertificateListQueryFilterModel } from "models/certificate";
 import Dialog from "components/Dialog";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
-import { CertificateFilterCondition } from "types/certificate";
+import { CertificateSearchFilterModel } from "types/certificate";
+import {
+    SearchFieldDataDtoFieldEnum,
+    SearchFieldDataDtoTypeEnum,
+    SearchFilterRequestDtoConditionEnum
+} from "types/openapi";
 
-const empty: CertificateListQueryFilterModel[] = [];
+const empty: CertificateSearchFilterModel[] = [];
 
-const noValue: { [condition in CertificateFilterCondition]: boolean } = {
-   "EQUALS": false,
-   "NOT_EQUALS": false,
-   "GREATER": false,
-   "LESSER": false,
-   "CONTAINS": false,
-   "NOT_CONTAINS": false,
-   "STARTS_WITH": false,
-   "ENDS_WITH": false,
-   "EMPTY": true,
-   "NOT_EMPTY": true,
-   "SUCCESS": true,
-   "FAILED": true,
-   "UNKNOWN": true,
-   "NOT_CHECKED": true
+const noValue: { [condition in SearchFilterRequestDtoConditionEnum]: boolean } = {
+   [SearchFilterRequestDtoConditionEnum.Equals]: false,
+   [SearchFilterRequestDtoConditionEnum.NotEquals]: false,
+   [SearchFilterRequestDtoConditionEnum.Greater]: false,
+   [SearchFilterRequestDtoConditionEnum.Lesser]: false,
+   [SearchFilterRequestDtoConditionEnum.Contains]: false,
+   [SearchFilterRequestDtoConditionEnum.NotContains]: false,
+   [SearchFilterRequestDtoConditionEnum.StartsWith]: false,
+   [SearchFilterRequestDtoConditionEnum.EndsWith]: false,
+   [SearchFilterRequestDtoConditionEnum.Empty]: true,
+   [SearchFilterRequestDtoConditionEnum.NotEmpty]: true,
+   [SearchFilterRequestDtoConditionEnum.Success]: true,
+   [SearchFilterRequestDtoConditionEnum.Failed]: true,
+   [SearchFilterRequestDtoConditionEnum.Unknown]: true,
+   [SearchFilterRequestDtoConditionEnum.NotChecked]: true
 }
 
 interface Props {
-   onFiltersChanged: (filters: CertificateListQueryFilterModel[]) => void;
+   onFiltersChanged: (filters: CertificateSearchFilterModel[]) => void;
 }
 
 
@@ -52,9 +56,9 @@ export default function CertificateInventoryFilter({
 
    const [confirmClear, setConfirmClear] = useState(false);
 
-   const [filterField, setFilterField] = useState<SingleValue<{ label: string, value: string }> | undefined>(undefined);
-   const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string, value: CertificateFilterCondition }> | undefined>(undefined);
-   const [filterValue, setFilterValue] = useState<string | SingleValue<string | string[] | { label: string, value: string }> | MultiValue<string | string[] | { label: string, value: string }> | undefined>(undefined);
+   const [filterField, setFilterField] = useState<SingleValue<{ label: string, value: SearchFieldDataDtoFieldEnum }> | undefined>(undefined);
+   const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string, value: SearchFilterRequestDtoConditionEnum }> | undefined>(undefined);
+   const [filterValue, setFilterValue] = useState<object | SingleValue<object | object[] | { label: string, value: object }> | MultiValue<object | object[] | { label: string, value: object }> | undefined>(undefined);
 
 
    useEffect(
@@ -97,12 +101,12 @@ export default function CertificateInventoryFilter({
          setFilterField({ label: field.label, value: field.field });
          setFilterCondition({ label: filters[selectedFilter].condition, value: filters[selectedFilter].condition });
 
-         if (field.type === "string") {
+         if (field.type === SearchFieldDataDtoTypeEnum.String) {
             setFilterValue(filters[selectedFilter].value);
             return;
          }
 
-         if (field.type === "date") {
+         if (field.type === SearchFieldDataDtoTypeEnum.Date) {
             setFilterValue(filters[selectedFilter].value);
             return;
          }
@@ -113,7 +117,7 @@ export default function CertificateInventoryFilter({
          }
 
          if (Array.isArray(filters[selectedFilter].value)) {
-            setFilterValue(filters[selectedFilter].value.map((v: string) => ({ label: v, value: v })));
+            setFilterValue((filters[selectedFilter].value as Array<object>).map((v: object) => ({ label: v, value: v })));
          }
 
       },
@@ -267,8 +271,8 @@ export default function CertificateInventoryFilter({
                                     <Input
                                        id="value"
                                        type={currentFieldData?.type === "date" ? "date" : "text"}
-                                       value={filterValue as string || ""}
-                                       onChange={(e) => { setFilterValue(e.target.value) }}
+                                       value={filterValue?.toString() || ""}
+                                       onChange={(e) => { setFilterValue(JSON.parse(e.target.value)) }}
                                        placeholder="Enter filter value"
                                        disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                                     />
