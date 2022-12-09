@@ -6,7 +6,11 @@ import { extractError } from "utils/net";
 
 import { slice } from "./discoveries";
 import { actions as appRedirectActions } from "./app-redirect";
-import { transformDiscoveryRequestModelToDto, transformDiscoveryResponseDtoToModel } from "./transform/discoveries";
+import {
+    transformDiscoveryRequestModelToDto,
+    transformDiscoveryResponseDetailDtoToModel,
+    transformDiscoveryResponseDtoToModel
+} from "./transform/discoveries";
 import { FunctionGroupCode } from "../types/openapi";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
@@ -58,7 +62,7 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.discoveries.getDiscovery({ uuid: action.payload.uuid }).pipe(
 
             map(
-               discoveryDto => slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDtoToModel(discoveryDto) })
+               discoveryDto => slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDetailDtoToModel(discoveryDto) })
             ),
 
             catchError(

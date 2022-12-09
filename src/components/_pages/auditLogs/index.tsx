@@ -115,10 +115,10 @@ function AuditLogs() {
 
         () => {
 
-            dispatch(auditLogActions.purgeLogs({queryString, filters}));
+            dispatch(auditLogActions.purgeLogs({ page: page - 1, size: pageSize, filters }));
 
         },
-        [dispatch, queryString, filters]
+        [dispatch, page, pageSize, filters]
 
     );
 

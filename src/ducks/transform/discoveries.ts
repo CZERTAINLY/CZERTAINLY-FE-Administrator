@@ -1,6 +1,10 @@
 import {
    DiscoveryCertificateResponseDto,
-   DiscoveryCertificateResponseModel, DiscoveryRequestDto, DiscoveryRequestModel,
+   DiscoveryCertificateResponseModel,
+   DiscoveryRequestDto,
+   DiscoveryRequestModel,
+   DiscoveryResponseDetailDto,
+   DiscoveryResponseDetailModel,
    DiscoveryResponseDto,
    DiscoveryResponseModel
 } from "types/discoveries";
@@ -12,6 +16,10 @@ export function transformDiscoveryCertificateResponseDtoToModel(certificate: Dis
 }
 
 export function transformDiscoveryResponseDtoToModel(discovery: DiscoveryResponseDto): DiscoveryResponseModel {
+   return { ...discovery }
+}
+
+export function transformDiscoveryResponseDetailDtoToModel(discovery: DiscoveryResponseDetailDto): DiscoveryResponseDetailModel {
    return {
       ...discovery,
       certificate: discovery.certificate.map(transformDiscoveryCertificateResponseDtoToModel),

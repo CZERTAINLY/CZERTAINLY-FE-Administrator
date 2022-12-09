@@ -11,17 +11,21 @@
  * Do not edit the class manually.
  */
 
+import type {
+    SearchCondition,
+    SearchableFields,
+} from './';
+
 /**
  * @export
  * @interface SearchFieldDataDto
  */
 export interface SearchFieldDataDto {
     /**
-     * Field to search
-     * @type {string}
+     * @type {SearchableFields}
      * @memberof SearchFieldDataDto
      */
-    field: SearchFieldDataDtoFieldEnum;
+    field: SearchableFields;
     /**
      * Label for the field
      * @type {string}
@@ -36,10 +40,10 @@ export interface SearchFieldDataDto {
     type: SearchFieldDataDtoTypeEnum;
     /**
      * List of available conditions for the field
-     * @type {Array<string>}
+     * @type {Array<SearchCondition>}
      * @memberof SearchFieldDataDto
      */
-    conditions: Array<SearchFieldDataDtoConditionsEnum>;
+    conditions: Array<SearchCondition>;
     /**
      * Available values for the field
      * @type {object}
@@ -58,61 +62,10 @@ export interface SearchFieldDataDto {
  * @export
  * @enum {string}
  */
-export enum SearchFieldDataDtoFieldEnum {
-    CommonName = 'commonName',
-    SerialNumber = 'serialNumber',
-    RaProfile = 'raProfile',
-    Entity = 'entity',
-    Status = 'status',
-    ComplianceStatus = 'complianceStatus',
-    Group = 'group',
-    Owner = 'owner',
-    IssuerCommonName = 'issuerCommonName',
-    SignatureAlgorithm = 'signatureAlgorithm',
-    Fingerprint = 'fingerprint',
-    NotAfter = 'notAfter',
-    NotBefore = 'notBefore',
-    PublicKeyAlgorithm = 'publicKeyAlgorithm',
-    KeySize = 'keySize',
-    KeyUsage = 'keyUsage',
-    BasicConstraints = 'basicConstraints',
-    Meta = 'meta',
-    SubjectAlternativeNames = 'subjectAlternativeNames',
-    SubjectDn = 'subjectDn',
-    IssuerDn = 'issuerDn',
-    IssuerSerialNumber = 'issuerSerialNumber',
-    OcspValidation = 'ocspValidation',
-    CrlValidation = 'crlValidation',
-    SignatureValidation = 'signatureValidation'
-}
-/**
- * @export
- * @enum {string}
- */
 export enum SearchFieldDataDtoTypeEnum {
     String = 'string',
     Number = 'number',
     List = 'list',
     Date = 'date'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum SearchFieldDataDtoConditionsEnum {
-    Equals = 'EQUALS',
-    NotEquals = 'NOT_EQUALS',
-    Greater = 'GREATER',
-    Lesser = 'LESSER',
-    Contains = 'CONTAINS',
-    NotContains = 'NOT_CONTAINS',
-    StartsWith = 'STARTS_WITH',
-    EndsWith = 'ENDS_WITH',
-    Empty = 'EMPTY',
-    NotEmpty = 'NOT_EMPTY',
-    Success = 'SUCCESS',
-    Failed = 'FAILED',
-    Unknown = 'UNKNOWN',
-    NotChecked = 'NOT_CHECKED'
 }
 

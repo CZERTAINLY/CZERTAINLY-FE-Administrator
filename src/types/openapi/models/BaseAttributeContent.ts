@@ -19,7 +19,6 @@ import type {
     FileAttributeContent,
     FloatAttributeContent,
     IntegerAttributeContent,
-    LocalTime,
     ObjectAttributeContent,
     SecretAttributeContent,
     StringAttributeContent,

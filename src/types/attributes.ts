@@ -20,7 +20,6 @@ import {
    InfoAttribute,
    InfoAttributeProperties,
    IntegerAttributeContent,
-   LocalTime,
    MimeType,
    ObjectAttributeContent,
    RangeAttributeConstraint,
@@ -92,11 +91,8 @@ export type StringAttributeContentModel = StringAttributeContentDto;
 export type TextAttributeContentDto = TextAttributeContent;
 export type TextAttributeContentModel = TextAttributeContentDto;
 
-export type LocalTimeDto = LocalTime;
-export type LocalTimeModel = LocalTimeDto;
-
 export type TimeAttributeContentDto = TimeAttributeContent;
-export type TimeAttributeContentModel = Omit<TimeAttributeContentDto, "data"> & { data: LocalTimeModel };
+export type TimeAttributeContentModel = TimeAttributeContentDto;
 
 export type BaseAttributeContentDto = BaseAttributeContent;
 export type BaseAttributeContentModel = BooleanAttributeContentModel | CredentialAttributeContentModel | DateAttributeContentModel | DateTimeAttributeContentModel | FileAttributeContentModel | FloatAttributeContentModel | IntegerAttributeContentModel | ObjectAttributeContentModel | SecretAttributeContentModel | StringAttributeContentModel | TextAttributeContentModel | TimeAttributeContentModel;
@@ -147,7 +143,7 @@ export type InfoAttributeDto = InfoAttribute;
 export type InfoAttributeModel = Omit<InfoAttributeDto, "content | properties"> & { content: Array<BaseAttributeContentModel>, properties: InfoAttributePropertiesModel };
 
 export type AttributeDescriptorDto = BaseAttributeDto;
-export type AttributeDescriptorModel = DataAttributeModel | GroupAttributeModel | InfoAttributeModel; // TODO rename
+export type AttributeDescriptorModel = DataAttributeModel | GroupAttributeModel | InfoAttributeModel;
 
 export type AttributeDescriptorCollectionDto = {
    [functionGroup: string]: {
@@ -155,7 +151,6 @@ export type AttributeDescriptorCollectionDto = {
    }
 }
 
-// TODO rename
 export type AttributeDescriptorCollectionModel = {
    [functionGroup: string]: {
       [kind: string]: AttributeDescriptorModel[];

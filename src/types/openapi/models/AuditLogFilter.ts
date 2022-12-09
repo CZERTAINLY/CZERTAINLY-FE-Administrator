@@ -21,49 +21,49 @@ export interface AuditLogFilter {
      * @type {string}
      * @memberof AuditLogFilter
      */
-    author: string;
+    author?: string;
     /**
      * Start time of the filter
      * @type {string}
      * @memberof AuditLogFilter
      */
-    createdFrom: string;
+    createdFrom?: string;
     /**
      * End time of the filter
      * @type {string}
      * @memberof AuditLogFilter
      */
-    createdTo: string;
+    createdTo?: string;
     /**
      * Status of the filter
      * @type {string}
      * @memberof AuditLogFilter
      */
-    operationStatus: AuditLogFilterOperationStatusEnum;
+    operationStatus?: AuditLogFilterOperationStatusEnum;
     /**
      * Module triggered the action
      * @type {string}
      * @memberof AuditLogFilter
      */
-    origination: AuditLogFilterOriginationEnum;
+    origination?: AuditLogFilterOriginationEnum;
     /**
      * Module affected by the action
      * @type {string}
      * @memberof AuditLogFilter
      */
-    affected: AuditLogFilterAffectedEnum;
+    affected?: AuditLogFilterAffectedEnum;
     /**
      * Identifier of the object created
      * @type {string}
      * @memberof AuditLogFilter
      */
-    objectIdentifier: string;
+    objectIdentifier?: string;
     /**
      * Type of the operation
      * @type {string}
      * @memberof AuditLogFilter
      */
-    operation: AuditLogFilterOperationEnum;
+    operation?: AuditLogFilterOperationEnum;
 }
 
 /**

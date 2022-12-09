@@ -13,7 +13,7 @@
 
 import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
+import { BaseAPI } from '../runtime';
 import type { OperationOpts, HttpQuery } from '../runtime';
 import type {
     AuditLogFilter,
@@ -24,18 +24,18 @@ import type {
 } from '../models';
 
 export interface ExportAuditLogsRequest {
-    filter: AuditLogFilter;
-    pageable: Pageable;
+    filter?: AuditLogFilter;
+    pageable?: Pageable;
 }
 
 export interface ListAuditLogsRequest {
-    filter: AuditLogFilter;
-    pageable: Pageable;
+    filter?: AuditLogFilter;
+    pageable?: Pageable;
 }
 
 export interface PurgeAuditLogsRequest {
-    filter: AuditLogFilter;
-    pageable: Pageable;
+    filter?: AuditLogFilter;
+    pageable?: Pageable;
 }
 
 /**
@@ -49,13 +49,11 @@ export class AuditLogApi extends BaseAPI {
     exportAuditLogs({ filter, pageable }: ExportAuditLogsRequest): Observable<Blob>
     exportAuditLogs({ filter, pageable }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<Blob>>
     exportAuditLogs({ filter, pageable }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<Blob | AjaxResponse<Blob>> {
-        throwIfNullOrUndefined(filter, 'filter', 'exportAuditLogs');
-        throwIfNullOrUndefined(pageable, 'pageable', 'exportAuditLogs');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            ...filter,
-            ...pageable,
-        };
+        const query: HttpQuery = {};
+
+        if (filter != null) { Object.assign(query, filter); }
+        if (pageable != null) { Object.assign(query, pageable); }
 
         return this.request<Blob>({
             url: '/v1/auditLogs/export',
@@ -71,13 +69,11 @@ export class AuditLogApi extends BaseAPI {
     listAuditLogs({ filter, pageable }: ListAuditLogsRequest): Observable<AuditLogResponseDto>
     listAuditLogs({ filter, pageable }: ListAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<AuditLogResponseDto>>
     listAuditLogs({ filter, pageable }: ListAuditLogsRequest, opts?: OperationOpts): Observable<AuditLogResponseDto | AjaxResponse<AuditLogResponseDto>> {
-        throwIfNullOrUndefined(filter, 'filter', 'listAuditLogs');
-        throwIfNullOrUndefined(pageable, 'pageable', 'listAuditLogs');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            ...filter,
-            ...pageable,
-        };
+        const query: HttpQuery = {};
+
+        if (filter != null) { Object.assign(query, filter); }
+        if (pageable != null) { Object.assign(query, pageable); }
 
         return this.request<AuditLogResponseDto>({
             url: '/v1/auditLogs',
@@ -128,13 +124,11 @@ export class AuditLogApi extends BaseAPI {
     purgeAuditLogs({ filter, pageable }: PurgeAuditLogsRequest): Observable<void>
     purgeAuditLogs({ filter, pageable }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     purgeAuditLogs({ filter, pageable }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(filter, 'filter', 'purgeAuditLogs');
-        throwIfNullOrUndefined(pageable, 'pageable', 'purgeAuditLogs');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            ...filter,
-            ...pageable,
-        };
+        const query: HttpQuery = {};
+
+        if (filter != null) { Object.assign(query, filter); }
+        if (pageable != null) { Object.assign(query, pageable); }
 
         return this.request<void>({
             url: '/v1/auditLogs/purge',

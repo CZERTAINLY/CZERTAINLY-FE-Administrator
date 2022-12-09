@@ -18,6 +18,7 @@ import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     DiscoveryDto,
+    DiscoveryHistoryDetailDto,
     DiscoveryHistoryDto,
     ErrorMessageDto,
     UuidDto,
@@ -101,12 +102,12 @@ export class DiscoveryManagementApi extends BaseAPI {
     /**
      * Discovery Details
      */
-    getDiscovery({ uuid }: GetDiscoveryRequest): Observable<DiscoveryHistoryDto>
-    getDiscovery({ uuid }: GetDiscoveryRequest, opts?: OperationOpts): Observable<AjaxResponse<DiscoveryHistoryDto>>
-    getDiscovery({ uuid }: GetDiscoveryRequest, opts?: OperationOpts): Observable<DiscoveryHistoryDto | AjaxResponse<DiscoveryHistoryDto>> {
+    getDiscovery({ uuid }: GetDiscoveryRequest): Observable<DiscoveryHistoryDetailDto>
+    getDiscovery({ uuid }: GetDiscoveryRequest, opts?: OperationOpts): Observable<AjaxResponse<DiscoveryHistoryDetailDto>>
+    getDiscovery({ uuid }: GetDiscoveryRequest, opts?: OperationOpts): Observable<DiscoveryHistoryDetailDto | AjaxResponse<DiscoveryHistoryDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getDiscovery');
 
-        return this.request<DiscoveryHistoryDto>({
+        return this.request<DiscoveryHistoryDetailDto>({
             url: '/v1/discoveries/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'GET',
         }, opts?.responseOpts);

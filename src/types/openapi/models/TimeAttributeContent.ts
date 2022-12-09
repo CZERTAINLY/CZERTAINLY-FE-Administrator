@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    LocalTime,
-} from './';
-
 /**
  * @export
  * @interface TimeAttributeContent
@@ -27,8 +23,9 @@ export interface TimeAttributeContent {
      */
     reference?: string;
     /**
-     * @type {LocalTime}
+     * Time attribute value in format HH:mm:ss
+     * @type {string}
      * @memberof TimeAttributeContent
      */
-    data: LocalTime;
+    data: string;
 }

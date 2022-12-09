@@ -12,28 +12,28 @@ import Dialog from "components/Dialog";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { CertificateSearchFilterModel } from "types/certificate";
 import {
-    SearchFieldDataDtoFieldEnum,
+    SearchableFields,
+    SearchCondition,
     SearchFieldDataDtoTypeEnum,
-    SearchFilterRequestDtoConditionEnum
 } from "types/openapi";
 
 const empty: CertificateSearchFilterModel[] = [];
 
-const noValue: { [condition in SearchFilterRequestDtoConditionEnum]: boolean } = {
-   [SearchFilterRequestDtoConditionEnum.Equals]: false,
-   [SearchFilterRequestDtoConditionEnum.NotEquals]: false,
-   [SearchFilterRequestDtoConditionEnum.Greater]: false,
-   [SearchFilterRequestDtoConditionEnum.Lesser]: false,
-   [SearchFilterRequestDtoConditionEnum.Contains]: false,
-   [SearchFilterRequestDtoConditionEnum.NotContains]: false,
-   [SearchFilterRequestDtoConditionEnum.StartsWith]: false,
-   [SearchFilterRequestDtoConditionEnum.EndsWith]: false,
-   [SearchFilterRequestDtoConditionEnum.Empty]: true,
-   [SearchFilterRequestDtoConditionEnum.NotEmpty]: true,
-   [SearchFilterRequestDtoConditionEnum.Success]: true,
-   [SearchFilterRequestDtoConditionEnum.Failed]: true,
-   [SearchFilterRequestDtoConditionEnum.Unknown]: true,
-   [SearchFilterRequestDtoConditionEnum.NotChecked]: true
+const noValue: { [condition in SearchCondition]: boolean } = {
+   [SearchCondition.Equals]: false,
+   [SearchCondition.NotEquals]: false,
+   [SearchCondition.Greater]: false,
+   [SearchCondition.Lesser]: false,
+   [SearchCondition.Contains]: false,
+   [SearchCondition.NotContains]: false,
+   [SearchCondition.StartsWith]: false,
+   [SearchCondition.EndsWith]: false,
+   [SearchCondition.Empty]: true,
+   [SearchCondition.NotEmpty]: true,
+   [SearchCondition.Success]: true,
+   [SearchCondition.Failed]: true,
+   [SearchCondition.Unknown]: true,
+   [SearchCondition.NotChecked]: true
 }
 
 interface Props {
@@ -56,8 +56,8 @@ export default function CertificateInventoryFilter({
 
    const [confirmClear, setConfirmClear] = useState(false);
 
-   const [filterField, setFilterField] = useState<SingleValue<{ label: string, value: SearchFieldDataDtoFieldEnum }> | undefined>(undefined);
-   const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string, value: SearchFilterRequestDtoConditionEnum }> | undefined>(undefined);
+   const [filterField, setFilterField] = useState<SingleValue<{ label: string, value: SearchableFields }> | undefined>(undefined);
+   const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string, value: SearchCondition }> | undefined>(undefined);
    const [filterValue, setFilterValue] = useState<object | SingleValue<object | object[] | { label: string, value: object }> | MultiValue<object | object[] | { label: string, value: object }> | undefined>(undefined);
 
 

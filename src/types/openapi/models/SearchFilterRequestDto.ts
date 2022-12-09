@@ -11,6 +11,11 @@
  * Do not edit the class manually.
  */
 
+import type {
+    SearchCondition,
+    SearchableFields,
+} from './';
+
 /**
  * Certificate filter input
  * @export
@@ -18,17 +23,15 @@
  */
 export interface SearchFilterRequestDto {
     /**
-     * Field to search
-     * @type {string}
+     * @type {SearchableFields}
      * @memberof SearchFilterRequestDto
      */
-    field: SearchFilterRequestDtoFieldEnum;
+    field: SearchableFields;
     /**
-     * Condition for the search
-     * @type {string}
+     * @type {SearchCondition}
      * @memberof SearchFilterRequestDto
      */
-    condition: SearchFilterRequestDtoConditionEnum;
+    condition: SearchCondition;
     /**
      * Value to match
      * @type {object}
@@ -36,56 +39,3 @@ export interface SearchFilterRequestDto {
      */
     value?: object;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum SearchFilterRequestDtoFieldEnum {
-    CommonName = 'commonName',
-    SerialNumber = 'serialNumber',
-    RaProfile = 'raProfile',
-    Entity = 'entity',
-    Status = 'status',
-    ComplianceStatus = 'complianceStatus',
-    Group = 'group',
-    Owner = 'owner',
-    IssuerCommonName = 'issuerCommonName',
-    SignatureAlgorithm = 'signatureAlgorithm',
-    Fingerprint = 'fingerprint',
-    NotAfter = 'notAfter',
-    NotBefore = 'notBefore',
-    PublicKeyAlgorithm = 'publicKeyAlgorithm',
-    KeySize = 'keySize',
-    KeyUsage = 'keyUsage',
-    BasicConstraints = 'basicConstraints',
-    Meta = 'meta',
-    SubjectAlternativeNames = 'subjectAlternativeNames',
-    SubjectDn = 'subjectDn',
-    IssuerDn = 'issuerDn',
-    IssuerSerialNumber = 'issuerSerialNumber',
-    OcspValidation = 'ocspValidation',
-    CrlValidation = 'crlValidation',
-    SignatureValidation = 'signatureValidation'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum SearchFilterRequestDtoConditionEnum {
-    Equals = 'EQUALS',
-    NotEquals = 'NOT_EQUALS',
-    Greater = 'GREATER',
-    Lesser = 'LESSER',
-    Contains = 'CONTAINS',
-    NotContains = 'NOT_CONTAINS',
-    StartsWith = 'STARTS_WITH',
-    EndsWith = 'ENDS_WITH',
-    Empty = 'EMPTY',
-    NotEmpty = 'NOT_EMPTY',
-    Success = 'SUCCESS',
-    Failed = 'FAILED',
-    Unknown = 'UNKNOWN',
-    NotChecked = 'NOT_CHECKED'
-}
-

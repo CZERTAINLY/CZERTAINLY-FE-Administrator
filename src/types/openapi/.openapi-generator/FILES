@@ -115,6 +115,7 @@ models/DateTimeAttributeConstraintData.ts
 models/DateTimeAttributeContent.ts
 models/DiscoveryCertificatesDto.ts
 models/DiscoveryDto.ts
+models/DiscoveryHistoryDetailDto.ts
 models/DiscoveryHistoryDto.ts
 models/DiscoveryStatus.ts
 models/EditLocationRequestDto.ts
@@ -141,7 +142,6 @@ models/InfoAttribute.ts
 models/InfoAttributeProperties.ts
 models/IntegerAttributeContent.ts
 models/IssueToLocationRequestDto.ts
-models/LocalTime.ts
 models/LocationDto.ts
 models/MetadataResponseDto.ts
 models/MimeType.ts
@@ -172,9 +172,11 @@ models/RoleDetailDto.ts
 models/RoleDto.ts
 models/RolePermissionsRequestDto.ts
 models/RoleRequestDto.ts
+models/SearchCondition.ts
 models/SearchFieldDataDto.ts
 models/SearchFilterRequestDto.ts
 models/SearchRequestDto.ts
+models/SearchableFields.ts
 models/SecretAttributeContent.ts
 models/SecretAttributeContentData.ts
 models/SimplifiedComplianceProfileDto.ts

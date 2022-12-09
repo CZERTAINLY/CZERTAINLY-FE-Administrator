@@ -1,6 +1,6 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DiscoveryRequestModel, DiscoveryResponseModel } from "types/discoveries";
+import { DiscoveryRequestModel, DiscoveryResponseDetailModel, DiscoveryResponseModel } from "types/discoveries";
 import { ConnectorResponseModel } from "types/connectors";
 import { AttributeDescriptorModel } from "types/attributes";
 
@@ -9,7 +9,7 @@ export type State = {
 
    checkedRows: string[];
 
-   discovery?: DiscoveryResponseModel;
+   discovery?: DiscoveryResponseDetailModel;
    discoveries: DiscoveryResponseModel[];
 
    discoveryProviders?: ConnectorResponseModel[];
@@ -159,7 +159,7 @@ export const slice = createSlice({
       },
 
 
-      getDiscoveryDetailSuccess: (state, action: PayloadAction<{ discovery: DiscoveryResponseModel }>) => {
+      getDiscoveryDetailSuccess: (state, action: PayloadAction<{ discovery: DiscoveryResponseDetailModel }>) => {
 
          state.isFetchingDetail = false;
 

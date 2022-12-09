@@ -23,7 +23,7 @@ export interface DateTimeAttributeContent {
      */
     reference?: string;
     /**
-     * DateTime attribute value
+     * DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
      * @type {string}
      * @memberof DateTimeAttributeContent
      */

@@ -12,10 +12,7 @@
  */
 
 import type {
-    DiscoveryCertificatesDto,
     DiscoveryStatus,
-    MetadataResponseDto,
-    ResponseAttributeDto,
 } from './';
 
 /**
@@ -47,12 +44,6 @@ export interface DiscoveryHistoryDto {
      */
     status: DiscoveryStatus;
     /**
-     * Failure/Success Messages
-     * @type {string}
-     * @memberof DiscoveryHistoryDto
-     */
-    message?: string;
-    /**
      * Date and time when Discovery started
      * @type {string}
      * @memberof DiscoveryHistoryDto
@@ -82,28 +73,4 @@ export interface DiscoveryHistoryDto {
      * @memberof DiscoveryHistoryDto
      */
     connectorName: string;
-    /**
-     * List of Discovered Certificates
-     * @type {Array<DiscoveryCertificatesDto>}
-     * @memberof DiscoveryHistoryDto
-     */
-    certificate: Array<DiscoveryCertificatesDto>;
-    /**
-     * List of Discovery Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof DiscoveryHistoryDto
-     */
-    attributes: Array<ResponseAttributeDto>;
-    /**
-     * List of Custom Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof DiscoveryHistoryDto
-     */
-    customAttributes?: Array<ResponseAttributeDto>;
-    /**
-     * Metadata of the Discovery
-     * @type {Array<MetadataResponseDto>}
-     * @memberof DiscoveryHistoryDto
-     */
-    metadata?: Array<MetadataResponseDto>;
 }

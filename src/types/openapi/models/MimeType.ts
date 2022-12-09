@@ -33,6 +33,11 @@ export interface MimeType {
      */
     parameters?: { [key: string]: string; };
     /**
+     * @type {string}
+     * @memberof MimeType
+     */
+    charset?: string;
+    /**
      * @type {boolean}
      * @memberof MimeType
      */
@@ -41,15 +46,10 @@ export interface MimeType {
      * @type {boolean}
      * @memberof MimeType
      */
-    wildcardSubtype?: boolean;
+    concrete?: boolean;
     /**
      * @type {boolean}
      * @memberof MimeType
      */
-    concrete?: boolean;
-    /**
-     * @type {string}
-     * @memberof MimeType
-     */
-    charset?: string;
+    wildcardSubtype?: boolean;
 }
