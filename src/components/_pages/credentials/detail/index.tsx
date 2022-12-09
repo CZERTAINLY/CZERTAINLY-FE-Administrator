@@ -22,7 +22,6 @@ function CredentialDetail() {
 
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
-   const isForceBulkDeleting = useSelector(selectors.isForceBulkDeleting);
 
    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
@@ -153,7 +152,7 @@ function CredentialDetail() {
 
       <Container className="themed-container" fluid>
 
-         <Widget title={detailsTitle} busy={isFetching || isDeleting || isForceBulkDeleting}>
+         <Widget title={detailsTitle} busy={isFetching || isDeleting}>
 
             <br />
 

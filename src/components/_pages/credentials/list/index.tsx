@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { Badge, Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/credentials";
 
@@ -18,8 +18,6 @@ function CredentialList() {
 
    const checkedRows = useSelector(selectors.checkedRows);
    const credentials = useSelector(selectors.credentials);
-
-   const bulkDeleteErrorMessages = useSelector(selectors.bulkDeleteErrorMessages);
 
    const isFetching = useSelector(selectors.isFetchingList);
    const isDeleting = useSelector(selectors.isDeleting);
@@ -137,7 +135,7 @@ function CredentialList() {
    );
 
 
-   const credenitalsData: TableDataRow[] = useMemo(
+   const credentialsData: TableDataRow[] = useMemo(
 
       () => credentials.map(
 
@@ -172,7 +170,7 @@ function CredentialList() {
 
             <CustomTable
                headers={credentialRowHeaders}
-               data={credenitalsData}
+               data={credentialsData}
                onCheckedRowsChanged={setCheckedRows}
                hasCheckboxes={true}
                hasPagination={true}
