@@ -7,5 +7,4 @@ export * from "./discoveries";
 export * from "./ra-profiles";
 export * from "./credentials";
 export * from "./compliance-profiles";
-export * from "./dashboard";
 export * from "./connectors";

@@ -2,7 +2,7 @@ import React from "react";
 import Widget from "components/Widget";
 import ReactApexChart from "react-apexcharts";
 import { getLabels, getValues } from "utils/dashboard";
-import { DashboardDict } from "api/dashboard";
+import { DashboardDict } from "types/statisticsDashboard";
 
 interface Props {
    data?: DashboardDict;
