@@ -2,15 +2,17 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
 
 import {
+   BulkActionModel,
    CallbackConnectorModel,
    CallbackRaProfileModel,
    ConnectorRequestModel,
    ConnectorResponseModel,
    ConnectorUpdateRequestModel,
-   ConnectRequestModel, FunctionGroupModel, HealthModel
+   ConnectRequestModel,
+   FunctionGroupModel,
+   HealthModel
 } from "types/connectors";
 
-import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from "types/attributes";
 import { ConnectorStatus, FunctionGroupCode } from "types/openapi";
 
@@ -28,7 +30,7 @@ export type State = {
    callbackData: { [key: string]: any }
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -378,7 +380,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
 

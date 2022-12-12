@@ -1,6 +1,5 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import { AttributeDescriptorModel } from "types/attributes";
 import {
    ComplianceProfileSimplifiedModel,
@@ -10,13 +9,14 @@ import {
    RaProfileEditRequestModel,
    RaProfileResponseModel
 } from "types/ra-profiles";
+import { BulkActionModel } from "types/connectors";
 
 export type State = {
 
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    raProfile?: RaProfileResponseModel;
    raProfiles: RaProfileResponseModel[];

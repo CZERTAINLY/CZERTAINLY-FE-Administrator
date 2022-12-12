@@ -1,10 +1,9 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import { AuthorityRequestModel, AuthorityResponseModel } from "types/authorities";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
-import { ConnectorResponseModel } from "types/connectors";
+import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
 
 
 export type State = {
@@ -12,7 +11,7 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    authority?: AuthorityResponseModel;
    authorities: AuthorityResponseModel[];
@@ -324,7 +323,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAuthoritySuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteAuthoritySuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
 

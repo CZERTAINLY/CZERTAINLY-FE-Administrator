@@ -1,6 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import {
    ComplianceProfileGroupListResponseModel,
    ComplianceProfileGroupRequestModel,
@@ -12,6 +11,7 @@ import {
    ComplianceProfileRuleDeleteRequestModel, ComplianceProfileRuleListResponseModel
 } from "types/complianceProfiles";
 import { RaProfileSimplifiedModel } from "types/certificate";
+import { BulkActionModel } from "types/connectors";
 
 
 export type State = {
@@ -19,7 +19,7 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    complianceProfile?: ComplianceProfileResponseModel;
    complianceProfiles: ComplianceProfileListModel[];
@@ -218,7 +218,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteComplianceProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteComplianceProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
          if (action.payload.errors?.length > 0) {

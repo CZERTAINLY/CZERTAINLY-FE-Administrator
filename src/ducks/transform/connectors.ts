@@ -1,4 +1,5 @@
 import {
+   BulkActionDto, BulkActionModel,
    ConnectorRequestDto,
    ConnectorRequestModel,
    ConnectorResponseDto,
@@ -10,6 +11,9 @@ import {
 } from "types/connectors";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
+export function transformBulkActionDtoToModel(error: BulkActionDto): BulkActionModel {
+   return { ...error };
+}
 
 export function transformEndpointDtoToModel(endPoint: EndpointDto): EndpointModel {
    return {...endPoint}

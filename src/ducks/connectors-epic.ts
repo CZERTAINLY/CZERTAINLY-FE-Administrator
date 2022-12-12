@@ -7,8 +7,8 @@ import { extractError } from "utils/net";
 import { slice } from "./connectors";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
 import {
+    transformBulkActionDtoToModel,
     transformConnectorRequestModelToDto,
     transformConnectorResponseDtoToModel, transformConnectorUpdateRequestModelToDto,
     transformFunctionGroupDtoToModel,
@@ -318,7 +318,7 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
             map(
                errors => slice.actions.bulkDeleteConnectorsSuccess({
                   uuids: action.payload.uuids,
-                  errors: errors.map(transformDeleteObjectErrorDtoToModel)
+                  errors: errors.map(transformBulkActionDtoToModel)
                })
             ),
 

@@ -1,12 +1,11 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import {
    CredentialCreateRequestModel,
    CredentialEditRequestModel,
    CredentialResponseModel
 } from "types/credentials";
-import { ConnectorResponseModel } from "types/connectors";
+import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
 import { AttributeDescriptorModel } from "types/attributes";
 
 
@@ -15,7 +14,7 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    credential?: CredentialResponseModel;
    credentials: CredentialResponseModel[];

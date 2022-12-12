@@ -1,11 +1,11 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import {
    AcmeProfileAddRequestModel, AcmeProfileEditRequestModel,
    AcmeProfileListResponseModel,
    AcmeProfileResponseModel
 } from "types/acme-profiles";
+import { BulkActionModel } from "types/connectors";
 
 
 export type State = {
@@ -13,7 +13,7 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    acmeProfile?: AcmeProfileResponseModel;
    acmeProfiles: AcmeProfileListResponseModel[];
@@ -293,7 +293,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
          if (action.payload.errors?.length > 0) {

@@ -1,4 +1,5 @@
 import {
+    BulkActionMessageDto,
     CallbackRequest,
     ConnectDto,
     ConnectorDto,
@@ -13,10 +14,9 @@ import {
 } from "./openapi";
 import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 
-// export type AuthType = "none" | "basic" | "certificate" | "apiKey" | "jwt";
-//
-// export type Status = "waitingForApproval" | "registered" | "connected" | "unavailable" | "misconfigured" | "failed" | "offline";
-//
+export type BulkActionDto = BulkActionMessageDto;
+export type BulkActionModel = BulkActionDto;
+
 export type EndpointDto = EndpointDtoOpenApi;
 export type EndpointModel = EndpointDto;
 
