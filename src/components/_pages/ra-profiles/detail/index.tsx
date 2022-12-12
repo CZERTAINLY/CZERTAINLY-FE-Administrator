@@ -578,7 +578,7 @@ export default function RaProfileDetail() {
          <Dialog
             isOpen={associateComplianceProfile}
             caption="Associate Compliance Profile"
-            body={AssociateComplianceProfileDialogBody({ visible: associateComplianceProfile, onClose: () => setAssociateComplianceProfile(false), raProfile: raProfile, availableComplianceProfileUuids: raProfile?.complianceProfiles?.map(e => e.uuid) })}
+            body={AssociateComplianceProfileDialogBody({ visible: associateComplianceProfile, onClose: () => setAssociateComplianceProfile(false), raProfile: raProfile, availableComplianceProfileUuids: associatedComplianceProfiles.map(e => e.uuid) })}
             toggle={() => setAssociateComplianceProfile(false)}
             buttons={[]}
          />
