@@ -2,13 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Form, Field } from "react-final-form";
+import { Field, Form } from "react-final-form";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
-import { ConnectorModel } from "models/connectors";
-import { EntityModel } from "models/entities";
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 import { actions as alertActions } from "ducks/alerts";
 import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
@@ -21,6 +18,9 @@ import Select from "react-select/";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { EntityResponseModel } from "types/entities";
+import { ConnectorResponseModel } from "types/connectors";
+import { FunctionGroupCode } from "types/openapi";
 
 
 interface FormValues {
@@ -49,8 +49,8 @@ export default function EntityForm() {
    const isCreating = useSelector(entitySelectors.isCreating);
    const isUpdating = useSelector(entitySelectors.isUpdating);
 
-   const [entity, setEntity] = useState<EntityModel>();
-   const [entityProvider, setEntityProvider] = useState<ConnectorModel>();
+   const [entity, setEntity] = useState<EntityResponseModel>();
+   const [entityProvider, setEntityProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
       () => isFetchingEntityDetail || isFetchingEntityProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
@@ -393,7 +393,7 @@ export default function EntityForm() {
                            attributeDescriptors={entityProviderAttributeDescriptors}
                            attributes={entity?.attributes}
                            connectorUuid={entityProvider.uuid}
-                           functionGroupCode={"entityProvider"}
+                           functionGroupCode={FunctionGroupCode.EntityProvider}
                            kind={values.storeKind.value}
                         />
                      </>
