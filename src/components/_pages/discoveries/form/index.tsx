@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Form, Field } from "react-final-form";
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
-import { ConnectorModel } from "models/connectors";
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
 import { actions as connectorActions } from "ducks/connectors";
@@ -19,6 +17,8 @@ import Select from "react-select";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { ConnectorResponseModel } from "types/connectors";
+import { FunctionGroupCode } from "types/openapi";
 
 
 interface FormValues {
@@ -44,7 +44,7 @@ export default function DiscoveryForm() {
 
    const [init, setInit] = useState(true);
 
-   const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorModel>();
+   const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
       () => isFetchingDiscoveryDetail || isFetchingDiscoveryProviders || isCreating || isFetchingAttributeDescriptors,
@@ -246,7 +246,7 @@ export default function DiscoveryForm() {
                            id="discovery"
                            attributeDescriptors={discoveryProviderAttributeDescriptors}
                            connectorUuid={discoveryProvider.uuid}
-                           functionGroupCode={"discoveryProvider"}
+                           functionGroupCode={FunctionGroupCode.DiscoveryProvider}
                            kind={values.storeKind.value}
                         />
                      </>

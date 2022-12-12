@@ -157,11 +157,11 @@ export default function DiscoveryDetail() {
 
    const metaData: TableDataRow[] = useMemo(
 
-      () => !discovery ? [] : Object.entries(discovery.meta).map(function([key, value]) {
+      () => !discovery || !discovery.metadata ? [] : discovery.metadata.map(m => {
          return (
             {
-               id: key,
-               columns: [key, value.toString()],
+               id: m.connectorUuid,
+               columns: [m.connectorUuid, m.connectorName],
             }
          )
       }
