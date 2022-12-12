@@ -17,12 +17,9 @@ const fetchError: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action =>
-
-            action.payload.error.status === 401 ?
-               EMPTY
-               :
-               of(alertActions.error(extractError(action.payload.error, action.payload.message)))
+         action => action.payload.error instanceof Error || action.payload.error.status !== 401 ?
+                of(alertActions.error(extractError(action.payload.error, action.payload.message)))
+                : EMPTY
 
       )
 

@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 import { Buffer } from "buffer";
 
 import JSZip from "jszip";
-import { CertificateResponseModel } from "../types/certificate";
+import { CertificateResponseModel } from "types/certificate";
 
 
 
