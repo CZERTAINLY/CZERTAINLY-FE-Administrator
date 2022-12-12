@@ -52,7 +52,7 @@ export default function UserProfileForm() {
                   description: values.description || undefined,
                   firstName: values.firstName || undefined,
                   lastName: values.lastName || undefined,
-                  email: values.email || undefined,
+                  email: values.email,
                }
             })
          );

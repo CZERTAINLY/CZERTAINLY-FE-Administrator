@@ -13,8 +13,6 @@ import { actions as userActions, selectors as userSelectors } from "ducks/users"
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 
-import { UserDetailModel, CertificateModel } from "models";
-
 import { emptyCertificate } from "utils/certificate";
 import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
 
@@ -22,6 +20,8 @@ import CertificateAttributes from "components/CertificateAttributes";
 import Dialog from "components/Dialog";
 import CertificateUploadDialog from "components/_pages/certificates/CertificateUploadDialog";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { CertificateResponseModel } from "types/certificate";
+import { UserDetailModel } from "types/auth";
 
 
 interface FormValues {
@@ -60,7 +60,7 @@ function UserForm() {
    const isCreatingUser = useSelector(userSelectors.isCreating);
    const isUpdatingUser = useSelector(userSelectors.isUpdating);
 
-   const [loadedCerts, setLoadedCerts] = useState<CertificateModel[]>([]);
+   const [loadedCerts, setLoadedCerts] = useState<CertificateResponseModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
    const [user, setUser] = useState<UserDetailModel>();
 
@@ -85,7 +85,7 @@ function UserForm() {
    const [selectedCertificate, setSelectedCertificate] = useState<{ label: string, value: string }>();
 
    const [certUploadDialog, setCertUploadDialog] = useState(false);
-   const [certToUpload, setCertToUpload] = useState<CertificateModel>();
+   const [certToUpload, setCertToUpload] = useState<CertificateResponseModel>();
 
 
    /* Load first page of certificates & all roles available */
@@ -100,11 +100,9 @@ function UserForm() {
 
          dispatch(
             certActions.listCertificates({
-               query: {
-                  itemsPerPage: 100,
-                  pageNumber: 1,
-                  filters: [],
-               }
+              itemsPerPage: 100,
+              pageNumber: 1,
+              filters: [],
             })
          );
 
@@ -248,13 +246,15 @@ function UserForm() {
             dispatch(
                userActions.update({
                   uuid: user!.uuid,
-                  description: values.description,
-                  firstName: values.firstName || undefined,
-                  lastName: values.lastName || undefined,
-                  email: values.email || undefined,
-                  certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
-                  certificate: values.inputType.value === "upload" ? certToUpload : undefined,
-                  roles: userRoles
+                   roles: userRoles,
+                   updateUserRequest: {
+                       description: values.description,
+                       firstName: values.firstName || undefined,
+                       lastName: values.lastName || undefined,
+                       email: values.email,
+                       certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
+                       certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                   }
                })
             );
 
@@ -262,15 +262,17 @@ function UserForm() {
 
             dispatch(
                userActions.create({
-                  username: values.username,
-                  description: values.description,
-                  firstName: values.firstName || undefined,
-                  lastName: values.lastName || undefined,
-                  email: values.email || undefined,
-                  enabled: values.enabled,
-                  certificate: values.inputType.value === "upload" ? certToUpload : undefined,
-                  certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
-                  roles: userRoles
+                  roles: userRoles,
+                   userAddRequest: {
+                       username: values.username,
+                       description: values.description,
+                       firstName: values.firstName || undefined,
+                       lastName: values.lastName || undefined,
+                       email: values.email || undefined,
+                       enabled: values.enabled,
+                       certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                       certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
+                   }
                })
             );
 
@@ -301,11 +303,9 @@ function UserForm() {
 
          dispatch(
             certActions.listCertificates({
-               query: {
-                  itemsPerPage: 100,
-                  pageNumber: currentPage,
-                  filters: [],
-               }
+              itemsPerPage: 100,
+              pageNumber: currentPage,
+              filters: [],
             })
          );
 
