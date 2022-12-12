@@ -5,12 +5,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Form, Field } from "react-final-form";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
-import { GroupModel } from "models";
 import { actions, selectors } from "ducks/certificateGroups";
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
+import { CertificateGroupResponseModel } from "types/certificateGroups";
 
 
 interface FormValues {
@@ -33,7 +33,7 @@ export default function GroupForm() {
    const isCreating = useSelector(selectors.isCreating);
    const isUpdating = useSelector(selectors.isUpdating);
 
-   const [group, setGroup] = useState<GroupModel>();
+   const [group, setGroup] = useState<CertificateGroupResponseModel>();
 
 
    const isBusy = useMemo(
@@ -47,7 +47,7 @@ export default function GroupForm() {
       (values: FormValues) => {
 
          if (editMode) {
-            dispatch(actions.updateGroup({ groupUuid: id!, name: values.name, description: values.description }));
+            dispatch(actions.updateGroup({ groupUuid: id!, editGroupRequest: { name: values.name, description: values.description }}));
          } else {
             dispatch(actions.createGroup({ name: values.name, description: values.description }));
          }

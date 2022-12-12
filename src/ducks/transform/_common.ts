@@ -1,5 +1,5 @@
 import { DeleteObjectErrorDTO } from "api/_common/deleteObjectErrorDTO"
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel"
+import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel"
 
 export function transformDeleteObjectErrorDtoToModel(error: DeleteObjectErrorDTO): DeleteObjectErrorModel {
 

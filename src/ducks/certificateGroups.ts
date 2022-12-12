@@ -1,14 +1,13 @@
-import { GroupModel } from "models";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { CertificateGroupRequestModel } from "../types/certificateGroups";
+import { CertificateGroupRequestModel, CertificateGroupResponseModel } from "types/certificateGroups";
 
 export type State = {
 
    checkedRows: string[];
 
-   certificateGroup?: GroupModel;
-   certificateGroups: GroupModel[];
+   certificateGroup?: CertificateGroupResponseModel;
+   certificateGroups: CertificateGroupResponseModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -66,7 +65,7 @@ export const slice = createSlice({
       },
 
 
-      listGroupsSuccess: (state, action: PayloadAction<{ groups: GroupModel[] }>) => {
+      listGroupsSuccess: (state, action: PayloadAction<{ groups: CertificateGroupResponseModel[] }>) => {
 
          state.certificateGroups = action.payload.groups;
          state.isFetchingList = false;
@@ -89,7 +88,7 @@ export const slice = createSlice({
       },
 
 
-      getGroupDetailSuccess: (state, action: PayloadAction<{ group: GroupModel }>) => {
+      getGroupDetailSuccess: (state, action: PayloadAction<{ group: CertificateGroupResponseModel }>) => {
 
          state.certificateGroup = action.payload.group;
          state.isFetchingDetail = false;
@@ -131,7 +130,7 @@ export const slice = createSlice({
       },
 
 
-      updateGroupSuccess: (state, action: PayloadAction<{ group: GroupModel }>) => {
+      updateGroupSuccess: (state, action: PayloadAction<{ group: CertificateGroupResponseModel }>) => {
 
          state.isUpdating = false;
          state.certificateGroup = action.payload.group;

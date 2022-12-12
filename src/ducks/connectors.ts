@@ -10,7 +10,7 @@ import {
    ConnectRequestModel, FunctionGroupModel, HealthModel
 } from "types/connectors";
 
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from "types/attributes";
 import { ConnectorStatus, FunctionGroupCode } from "types/openapi";
 

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MessageModel } from "models";
+import { MessageModel } from "types/alerts";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector } from 'reselect';
 import { store } from "index"

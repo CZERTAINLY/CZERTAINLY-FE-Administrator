@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import { DeleteObjectErrorModel } from "types/deleteObjectErrorModel";
 import {
    ComplianceProfileGroupListResponseModel,
    ComplianceProfileGroupRequestModel,
