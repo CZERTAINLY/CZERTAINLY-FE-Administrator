@@ -13,15 +13,21 @@
 
 import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
+    NameAndUuidDto,
+    Resource,
     ResourceDetailDto,
     UpdateUserRequestDto,
     UserDetailDto,
 } from '../models';
+
+export interface GetObjectsForResourceRequest {
+    resourceName: Resource;
+}
 
 export interface UpdateUserProfileRequest {
     updateUserRequestDto: UpdateUserRequestDto;
@@ -40,6 +46,20 @@ export class AuthenticationManagementApi extends BaseAPI {
     getAllResources(opts?: OperationOpts): Observable<Array<ResourceDetailDto> | AjaxResponse<Array<ResourceDetailDto>>> {
         return this.request<Array<ResourceDetailDto>>({
             url: '/v1/auth/resources',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get List of objects for Object Access
+     */
+    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest): Observable<Array<NameAndUuidDto>>
+    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<NameAndUuidDto>>>
+    getObjectsForResource({ resourceName }: GetObjectsForResourceRequest, opts?: OperationOpts): Observable<Array<NameAndUuidDto> | AjaxResponse<Array<NameAndUuidDto>>> {
+        throwIfNullOrUndefined(resourceName, 'resourceName', 'getObjectsForResource');
+
+        return this.request<Array<NameAndUuidDto>>({
+            url: '/v1/auth/resources/{resourceName}/objects'.replace('{resourceName}', encodeURI(resourceName)),
             method: 'GET',
         }, opts?.responseOpts);
     };

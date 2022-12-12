@@ -12,6 +12,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { SubjectPermissionsModel } from "types/roles";
 import { ResourceModel } from "types/auth";
+import { Resource } from "types/openapi";
 
 interface Props {
    resources?: ResourceModel[]
@@ -75,7 +76,7 @@ function RolePermissionsEditor({
       (resource: ResourceModel) => {
 
          setObjectsToAdd([]);
-         if (resource.listObjectsEndpoint) dispatch(authActions.listObjects({ endpoint: resource.listObjectsEndpoint }));
+         if (resource.listObjectsEndpoint) dispatch(authActions.getObjectsForResource({ resource: resource.name as Resource }));
          setCurrentResource(resource);
 
       },

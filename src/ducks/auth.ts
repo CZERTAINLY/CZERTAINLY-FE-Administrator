@@ -1,12 +1,14 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
 import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
+import { NameAndUuidModel } from "types/locations";
+import { Resource } from "types/openapi";
 
 export type State = {
 
    profile?: UserDetailModel;
    resources?: ResourceModel[];
-   objects?: { uuid: string; name: string; }[];
+   objects?: NameAndUuidModel[];
 
    isFetchingProfile: boolean;
    isUpdatingProfile: boolean;
@@ -121,28 +123,28 @@ export const slice = createSlice({
 
       },
 
-      //
-      // listObjects(state, action: PayloadAction<{ endpoint: string }>) {
-      //
-      //    state.objects = undefined;
-      //    state.isFetchingObjects = true;
-      //
-      // },
-      //
-      //
-      // listObjectsSuccess(state, action: PayloadAction<{ objects: { uuid: string; name: string; }[] }>) {
-      //
-      //    state.isFetchingObjects = false;
-      //    state.objects = action.payload.objects;
-      //
-      // },
-      //
-      //
-      // listObjectsFailure(state, action: PayloadAction<void>) {
-      //
-      //    state.isFetchingObjects = false;
-      //
-      // }
+
+      getObjectsForResource(state, action: PayloadAction<{ resource: Resource }>) {
+
+         state.objects = undefined;
+         state.isFetchingObjects = true;
+
+      },
+
+
+      getObjectsForResourceSuccess(state, action: PayloadAction<{ objects: NameAndUuidModel[] }>) {
+
+         state.isFetchingObjects = false;
+         state.objects = action.payload.objects;
+
+      },
+
+
+      getObjectsForResourceFailure(state, action: PayloadAction<void>) {
+
+         state.isFetchingObjects = false;
+
+      }
 
 
    }
@@ -154,23 +156,23 @@ const selectState = createFeatureSelector<State>(slice.name);
 
 const profile = createSelector(selectState, state => state.profile);
 const resources = createSelector(selectState, state => state.resources);
-// const objects = createSelector(selectState, state => state.objects);
+const objects = createSelector(selectState, state => state.objects);
 
 const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
 const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
 const isFetchingResources = createSelector(selectState, state => state.isFetchingResources);
-// const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
+const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
 
 
 export const selectors = {
    selectState,
    profile,
    resources,
-   // objects,
+   objects,
    isFetchingProfile,
    isUpdatingProfile,
    isFetchingResources,
-   // isFetchingObjects
+   isFetchingObjects
 };
 
 

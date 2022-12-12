@@ -68,7 +68,7 @@ export default function AddRuleWithAttributesDialogBody({
          onClose();
 
       },
-      [dispatch, complianceProfileUuid, connectorUuid, connectorName, kind, ruleUuid, ruleName, ruleDescription, groupUuid, attributes, onClose]
+      [dispatch, complianceProfileUuid, connectorUuid, kind, ruleUuid, attributes, onClose]
 
    )
 

@@ -130,39 +130,39 @@ const getResources: AppEpic = (action$, state$, deps) => {
    );
 
 };
-//
-//
-// const listObjects: AppEpic = (action$, state$, deps) => {
-//
-//    return action$.pipe(
-//
-//       filter(
-//          slice.actions.listObjects.match
-//       ),
-//       switchMap(
-//
-//          action => deps.apiClients.auth.listObjects(action.payload.endpoint).pipe(
-//
-//             map(
-//                objects => slice.actions.listObjectsSuccess({ objects })
-//             ),
-//
-//             catchError(
-//
-//                err => of(
-//                   slice.actions.listObjectsFailure(),
-//                   appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get objects list" })
-//                )
-//
-//             )
-//
-//          )
-//
-//       )
-//
-//    );
-//
-// };
+
+
+const getObjectsForResource: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getObjectsForResource.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.auth.getObjectsForResource({ resourceName: action.payload.resource }).pipe(
+
+            map(
+               objects => slice.actions.getObjectsForResourceSuccess({ objects })
+            ),
+
+            catchError(
+
+               err => of(
+                  slice.actions.getObjectsForResourceFailure(),
+                  appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get objects list" })
+               )
+
+            )
+
+         )
+
+      )
+
+   );
+
+};
 
 
 export const epics = [
@@ -170,7 +170,7 @@ export const epics = [
    getResources,
    updateProfile,
    updateProfileSuccess,
-   // listObjects,
+   getObjectsForResource,
 ];
 
 

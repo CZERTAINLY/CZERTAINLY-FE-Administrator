@@ -972,7 +972,7 @@ export default function ComplianceProfileDetail() {
          return data;
 
       },
-      [profile, selectionFilter, objectFilter, getGroupMoreData, detailHeaders, onDeleteGroup, getRuleMoreData, onDeleteRule, groupRuleMapping, groups, alreadyAssociatedGroupUuids, onAddGroup, rules, alreadyAssociatedRuleUuids, onAddRuleWithAttributes, onAddRule]
+      [profile, selectionFilter, objectFilter, getGroupMoreData, detailHeaders, onDeleteGroup, getRuleMoreDataRule, onDeleteRule, groupRuleMapping, getRuleMoreData, groups, alreadyAssociatedGroupUuids, onAddGroup, rules, alreadyAssociatedRuleUuids, onAddRuleWithAttributes, onAddRule]
 
    );
 

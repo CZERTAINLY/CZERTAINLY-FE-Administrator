@@ -64,7 +64,7 @@ export default function ComplianceRuleAttributeViewer({
           );
           return result;
       },
-      [attributes, getContent]
+      [attributes, descriptorAttributes, getContent]
    );
 
 
