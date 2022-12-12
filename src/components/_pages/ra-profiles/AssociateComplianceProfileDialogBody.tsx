@@ -12,13 +12,11 @@ import Spinner from "components/Spinner";
 
 import { actions, selectors } from "ducks/compliance-profiles";
 import { actions as raActions } from "ducks/ra-profiles";
-
-import { RaProfileModel } from "models";
-
+import { RaProfileResponseModel } from "types/ra-profiles";
 
 
 interface Props {
-   raProfile?: RaProfileModel;
+   raProfile?: RaProfileResponseModel;
    availableComplianceProfileUuids?: string[];
    visible: boolean;
    onClose: () => void;

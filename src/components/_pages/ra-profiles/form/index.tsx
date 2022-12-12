@@ -10,8 +10,6 @@ import Select from "react-select";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import { RaProfileModel } from "models/ra-profiles";
-
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import { actions as authoritiesActions, selectors as authoritiesSelectors } from "ducks/authorities";
 import { actions as connectorActions } from "ducks/connectors";
@@ -21,6 +19,7 @@ import { composeValidators, validateAlphaNumeric, validateRequired } from "utils
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { RaProfileResponseModel } from "types/ra-profiles";
 
 
 interface FormValues {
@@ -50,7 +49,7 @@ export default function RaProfileForm() {
    const isCreating = useSelector(raProfilesSelectors.isCreating);
    const isUpdating = useSelector(raProfilesSelectors.isUpdating);
 
-   const [raProfile, setRaProfile] = useState<RaProfileModel>();
+   const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
 
 
    const isBusy = useMemo(
@@ -125,10 +124,12 @@ export default function RaProfileForm() {
                raProfilesActions.updateRaProfile({
                   profileUuid: id!,
                   authorityInstanceUuid: values.authority!.value,
-                  enabled: raProfile!.enabled,
-                  description: values.description,
-                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values),
-                  redirect: `../../../detail/${values.authority!.value}/${id}`
+                  redirect: `../../../detail/${values.authority!.value}/${id}`,
+                   raProfileEditRequest: {
+                       enabled: raProfile!.enabled,
+                       description: values.description,
+                       attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values),
+                   }
                })
             );
 
@@ -136,10 +137,12 @@ export default function RaProfileForm() {
 
             dispatch(
                raProfilesActions.createRaProfile({
-                  name: values.name,
-                  description: values.description,
                   authorityInstanceUuid: values.authority!.value,
-                  attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+                   raProfileAddRequest: {
+                       name: values.name,
+                       description: values.description,
+                       attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+                   }
                })
             );
 
