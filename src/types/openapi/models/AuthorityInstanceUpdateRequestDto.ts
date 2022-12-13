@@ -31,5 +31,5 @@ export interface AuthorityInstanceUpdateRequestDto {
      * @type {Array<RequestAttributeDto>}
      * @memberof AuthorityInstanceUpdateRequestDto
      */
-    customAttributes: Array<RequestAttributeDto>;
+    customAttributes?: Array<RequestAttributeDto>;
 }

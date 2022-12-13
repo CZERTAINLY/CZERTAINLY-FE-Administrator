@@ -43,7 +43,7 @@ export interface CredentialRequestDto {
      * @type {Array<RequestAttributeDto>}
      * @memberof CredentialRequestDto
      */
-    customAttributes: Array<RequestAttributeDto>;
+    customAttributes?: Array<RequestAttributeDto>;
     /**
      * UUID of Credential provider Connector
      * @type {string}

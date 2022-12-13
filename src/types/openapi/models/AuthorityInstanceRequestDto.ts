@@ -37,7 +37,7 @@ export interface AuthorityInstanceRequestDto {
      * @type {Array<RequestAttributeDto>}
      * @memberof AuthorityInstanceRequestDto
      */
-    customAttributes: Array<RequestAttributeDto>;
+    customAttributes?: Array<RequestAttributeDto>;
     /**
      * UUID of Authority provider
      * @type {string}

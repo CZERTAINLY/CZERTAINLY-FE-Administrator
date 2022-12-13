@@ -2,7 +2,7 @@ import {
    AuthorityRequestDto,
    AuthorityRequestModel,
    AuthorityResponseDto,
-   AuthorityResponseModel
+   AuthorityResponseModel, AuthorityUpdateRequestDto, AuthorityUpdateRequestModel
 } from "types/authorities";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
@@ -20,6 +20,15 @@ export function transformAuthorityRequestModelToDto(authority: AuthorityRequestM
    return {
       ...authority,
       attributes: authority.attributes.map(transformAttributeRequestModelToDto),
-      customAttributes: authority.customAttributes.map(transformAttributeRequestModelToDto)
+      customAttributes: authority.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
+}
+
+
+export function transformAuthorityUpdateRequestModelToDto(authority: AuthorityUpdateRequestModel): AuthorityUpdateRequestDto {
+   return {
+      ...authority,
+      attributes: authority.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: authority.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }

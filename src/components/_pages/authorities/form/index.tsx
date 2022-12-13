@@ -178,8 +178,9 @@ export default function AuthorityForm() {
 
             dispatch(authorityActions.updateAuthority({
                uuid: id!,
-               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values),
-                customAttributes: []
+               updateAuthority: {
+                   attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+               }
             }));
 
          } else {
@@ -189,7 +190,6 @@ export default function AuthorityForm() {
                connectorUuid: values.authorityProvider!.value,
                kind: values.storeKind?.value!,
                attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values),
-                customAttributes: []
             }));
 
          }

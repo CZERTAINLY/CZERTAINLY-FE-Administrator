@@ -7,8 +7,12 @@ import { extractError } from "utils/net";
 import { slice } from "./authorities";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformAuthorityRequestModelToDto, transformAuthorityResponseDtoToModel } from "./transform/authorities";
-import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
+import {
+    transformAuthorityRequestModelToDto,
+    transformAuthorityResponseDtoToModel,
+    transformAuthorityUpdateRequestModelToDto
+} from "./transform/authorities";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { FunctionGroupCode } from "types/openapi";
 
@@ -226,7 +230,7 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.editAuthorityInstance({
                  uuid: action.payload.uuid,
-                 authorityInstanceUpdateRequestDto: { attributes: action.payload.attributes.map(transformAttributeRequestModelToDto), customAttributes: action.payload.customAttributes.map(transformAttributeRequestModelToDto) },
+                 authorityInstanceUpdateRequestDto: transformAuthorityUpdateRequestModelToDto(action.payload.updateAuthority),
              },
          ).pipe(
 

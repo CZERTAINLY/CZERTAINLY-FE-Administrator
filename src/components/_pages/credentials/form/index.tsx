@@ -143,7 +143,6 @@ export default function CredentialForm() {
                uuid: id!,
                 credentialRequest: {
                    attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values),
-                    customAttributes: []
                 }
             }));
 
@@ -154,7 +153,6 @@ export default function CredentialForm() {
                connectorUuid: values.credentialProvider!.value,
                kind: values.storeKind?.value!,
                attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values),
-                customAttributes: []
             }));
 
          }

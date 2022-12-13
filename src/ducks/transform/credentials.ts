@@ -12,7 +12,7 @@ export function transformCredentialResponseDtoToModel(credential: CredentialResp
    return {
       ...credential,
       attributes: credential.attributes.map(transformAttributeResponseDtoToModel),
-      customAttributes: credential.customAttributes.map(transformAttributeResponseDtoToModel)
+      customAttributes: credential.customAttributes?.map(transformAttributeResponseDtoToModel)
    }
 }
 
@@ -20,7 +20,7 @@ export function transformCredentialCreateRequestModelToDto(credential: Credentia
    return {
       ...credential,
       attributes: credential.attributes.map(transformAttributeRequestModelToDto),
-      customAttributes: credential.customAttributes.map(transformAttributeRequestModelToDto)
+      customAttributes: credential.customAttributes?.map(transformAttributeRequestModelToDto)
    }
 }
 
@@ -28,6 +28,6 @@ export function transformCredentialEditRequestModelToDto(credential: CredentialE
    return {
       ...credential,
       attributes: credential.attributes.map(transformAttributeRequestModelToDto),
-      customAttributes: credential.customAttributes.map(transformAttributeRequestModelToDto),
+      customAttributes: credential.customAttributes?.map(transformAttributeRequestModelToDto),
    }
 }

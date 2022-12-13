@@ -1,8 +1,8 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { AuthorityRequestModel, AuthorityResponseModel } from "types/authorities";
-import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { AuthorityRequestModel, AuthorityResponseModel, AuthorityUpdateRequestModel } from "types/authorities";
+import { AttributeDescriptorModel } from "types/attributes";
 import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
 
 
@@ -255,7 +255,7 @@ export const slice = createSlice({
       },
 
 
-      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[], customAttributes: AttributeRequestModel[] }>) => {
+      updateAuthority: (state, action: PayloadAction<{ uuid: string, updateAuthority: AuthorityUpdateRequestModel }>) => {
 
          state.isUpdating = true;
 

@@ -31,5 +31,5 @@ export interface CredentialUpdateRequestDto {
      * @type {Array<RequestAttributeDto>}
      * @memberof CredentialUpdateRequestDto
      */
-    customAttributes: Array<RequestAttributeDto>;
+    customAttributes?: Array<RequestAttributeDto>;
 }
