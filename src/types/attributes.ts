@@ -35,20 +35,6 @@ import {
 } from "./openapi";
 import { CredentialResponseModel } from "./credentials";
 
-// //TODO remove
-// export type AttributeCallbackMappingTarget_AttributeCallbackModel = "pathVariable" | "requestParameter" | "body";
-//
-// //TODO remove
-// export type AttributeListValue = {
-//    id: number;
-//    name: string;
-// }
-// //TODO remove
-// export type AttributeValue = string | number | boolean | AttributeListValue;
-//
-// //TODO remove
-// // export type AttributeType = "BOOLEAN" | "INTEGER" | "FLOAT" | "STRING" | "TEXT" | "DATE" | "TIME" | "DATETIME" | "FILE" | "SECRET" | "CREDENTIAL" | "JSON";
-
 export type BooleanAttributeContentDto = BooleanAttributeContent;
 export type BooleanAttributeContentModel = BooleanAttributeContentDto;
 

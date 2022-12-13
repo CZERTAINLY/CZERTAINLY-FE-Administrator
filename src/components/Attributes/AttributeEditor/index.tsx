@@ -556,16 +556,16 @@ export default function AttributeEditor({
             if (Array.isArray(callbackData[callbackId])) {
                // multiple effects can modify opts during single render call
                // eslint-disable-next-line react-hooks/exhaustive-deps
-               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) };
+               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.reference ?? value.data.toString(), value })) };
                setOptions({ ...options, ...opts });
                continue;
             }
 
-            // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
-            if (callbackData[callbackId].value) {
-               form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
-               continue;
-            }
+            // // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
+            // if (callbackData[callbackId].value) {
+            //    form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
+            //    continue;
+            // }
 
          }
 
