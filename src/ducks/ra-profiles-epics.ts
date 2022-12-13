@@ -7,10 +7,15 @@ import { extractError } from "utils/net";
 import { slice } from "./ra-profiles";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformRaAcmeLinkDtoToModel, transformRaAuthorizedClientDtoToModel, transformRaProfileDtoToModel } from "./transform/ra-profiles";
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transfromRaAcmeLinkDtoToModel } from "./transform/acme-profiles";
-import { transformRaComplianceProfileDtoToModel } from "./transform/compliance-profiles";
+import {
+    transformComplianceProfileSimplifiedDtoToModel,
+    transformRaProfileAcmeDetailResponseDtoToModel,
+    transformRaProfileActivateAcmeRequestModelToDto,
+    transformRaProfileAddRequestModelToDto,
+    transformRaProfileEditRequestModelToDto,
+    transformRaProfileResponseDtoToModel
+} from "./transform/ra-profiles";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
@@ -22,11 +27,11 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.profiles.getRaProfilesList().pipe(
+         () => deps.apiClients.raProfiles.listRaProfiles({}).pipe(
 
             map(
                list => slice.actions.listRaProfilesSuccess({
-                  raProfiles: list.map(transformRaProfileDtoToModel)
+                  raProfiles: list.map(transformRaProfileResponseDtoToModel)
                })
             ),
 
@@ -52,11 +57,11 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.getRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                profileDto => slice.actions.getRaProfileDetailSuccess({
-                  raProfile: transformRaProfileDtoToModel(profileDto)
+                  raProfile: transformRaProfileResponseDtoToModel(profileDto)
                })
             ),
 
@@ -75,37 +80,6 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
 }
 
 
-const listAuthorizedClients: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listAuthorizedClients.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.profiles.getAuthorizedClients(action.payload.authorityUuid, action.payload.uuid).pipe(
-
-            map(
-               clients => slice.actions.listAuthorizedClientsSuccess({
-                  authorizedClientsUuids: clients.map(transformRaAuthorizedClientDtoToModel)
-               })
-            ),
-
-            catchError(
-               err => of(
-                  slice.actions.listAuthorizedClientsFailure({ error: extractError(err, "Failed to get list of authorized clients") }),
-                  appRedirectActions.fetchError({ error: err, message: "Failed to get list of authorized clients" })
-               )
-            )
-         )
-
-      )
-
-   );
-}
-
-
 const createRaProfile: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -116,11 +90,7 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.createRaProfile(
-            action.payload.authorityInstanceUuid,
-            action.payload.name,
-            action.payload.attributes.map(transformAttributeModelToDTO),
-            action.payload.description
+         action => deps.apiClients.raProfiles.createRaProfile({ authorityUuid: action.payload.authorityInstanceUuid, addRaProfileRequestDto: transformRaProfileAddRequestModelToDto(action.payload.raProfileAddRequest) }
          ).pipe(
 
             mergeMap(
@@ -153,23 +123,18 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.updateRaProfile(
-            action.payload.profileUuid,
-            action.payload.authorityInstanceUuid,
-            action.payload.attributes.map(transformAttributeModelToDTO),
-            action.payload.enabled,
-            action.payload.description
+         action => deps.apiClients.raProfiles.editRaProfile({ raProfileUuid: action.payload.profileUuid, authorityUuid: action.payload.authorityInstanceUuid, editRaProfileRequestDto: transformRaProfileEditRequestModelToDto(action.payload.raProfileEditRequest) }
          ).pipe(
 
             mergeMap(
 
-               raProfileDTO => iif(
+               raProfileDto => iif(
 
                   () => !!action.payload.redirect,
                   of(
 
                      slice.actions.updateRaProfileSuccess({
-                        raProfile: transformRaProfileDtoToModel(raProfileDTO),
+                        raProfile: transformRaProfileResponseDtoToModel(raProfileDto),
                         redirect: action.payload.redirect
                      }),
 
@@ -178,7 +143,7 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
                   ),
                   of(
                      slice.actions.updateRaProfileSuccess({
-                        raProfile: transformRaProfileDtoToModel(raProfileDTO),
+                        raProfile: transformRaProfileResponseDtoToModel(raProfileDto),
                         redirect: action.payload.redirect
                      })
                   )
@@ -209,7 +174,7 @@ const enableRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.enableRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.enableRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.enableRaProfileSuccess({ uuid: action.payload.uuid })
@@ -240,7 +205,7 @@ const disableRaProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.disableRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.disableRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.disableRaProfileSuccess({ uuid: action.payload.uuid })
@@ -270,7 +235,7 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.deleteRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.deleteRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             mergeMap(
 
@@ -313,17 +278,17 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.activateAcme(
-            action.payload.authorityUuid,
-            action.payload.uuid,
-            action.payload.acmeProfileUuid,
-            action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
-            action.payload.revokeCertificateAttributes.map(transformAttributeModelToDTO),
+         action => deps.apiClients.raProfiles.activateAcmeForRaProfile({
+                    authorityUuid: action.payload.authorityUuid,
+                    raProfileUuid: action.payload.uuid,
+                    acmeProfileUuid: action.payload.acmeProfileUuid,
+                    activateAcmeForRaProfileRequestDto: transformRaProfileActivateAcmeRequestModelToDto(action.payload.raProfileActivateAcmeRequest)
+                }
          ).pipe(
 
             map(
-               raAcmeLink => slice.actions.activateAcmeSuccess({
-                  raAcmelink: transformRaAcmeLinkDtoToModel(raAcmeLink)
+                raProfileAcmeDetailResponse => slice.actions.activateAcmeSuccess({
+                  raProfileAcmeDetailResponse: transformRaProfileAcmeDetailResponseDtoToModel( raProfileAcmeDetailResponse)
                })
             ),
 
@@ -352,7 +317,7 @@ const deactivateAcme: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.deactivateAcme(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.deactivateAcmeForRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.deactivateAcmeSuccess({ uuid: action.payload.uuid })
@@ -383,11 +348,11 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getRaAcmeProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.getAcmeForRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                acmeDetails => slice.actions.getAcmeDetailsSuccess({
-                  raAcmeLink: transfromRaAcmeLinkDtoToModel(acmeDetails)
+                  raAcmeLink: transformRaProfileAcmeDetailResponseDtoToModel(acmeDetails)
                })
             ),
 
@@ -417,12 +382,12 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getIssueAttributes(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.listRaProfileIssueCertificateAttributes({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                issuanceAttributes => slice.actions.listIssuanceAttributesDescriptorsSuccess({
                   uuid: action.payload.uuid,
-                  attributesDescriptors: issuanceAttributes.map(transformAttributeDescriptorDTOToModel)
+                  attributesDescriptors: issuanceAttributes.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -451,12 +416,12 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.getRevocationAttributes(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.listRaProfileRevokeCertificateAttributes({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                revocationAttributes => slice.actions.listRevocationAttributeDescriptorsSuccess({
                   uuid: action.payload.uuid,
-                  attributesDescriptors: revocationAttributes.map(transformAttributeDescriptorDTOToModel)
+                  attributesDescriptors: revocationAttributes.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -486,7 +451,7 @@ const bulkEnableProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.bulkEnableRaProfile(action.payload.uuids).pipe(
+         action => deps.apiClients.raProfiles.bulkEnableRaProfile({ requestBody: action.payload.uuids }).pipe(
 
             map(
                () => slice.actions.bulkEnableRaProfilesSuccess({ uuids: action.payload.uuids })
@@ -518,7 +483,7 @@ const bulkDisableProfiles: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.profiles.bulkDisableRaProfile(action.payload.uuids).pipe(
+         action => deps.apiClients.raProfiles.bulkDisableRaProfile({ requestBody: action.payload.uuids }).pipe(
 
             map(
                () => slice.actions.bulkDisableRaProfilesSuccess({ uuids: action.payload.uuids })
@@ -549,7 +514,7 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.bulkDeleteRaProfile(action.payload.uuids).pipe(
+         action => deps.apiClients.raProfiles.bulkDeleteRaProfile({ requestBody: action.payload.uuids }).pipe(
 
             map(
                errors => slice.actions.bulkDeleteRaProfilesSuccess({ uuids: action.payload.uuids })
@@ -579,8 +544,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.checkCompliance(
-            action.payload.uuids
+         action => deps.apiClients.raProfiles.checkRaProfileCompliance({ requestBody: action.payload.uuids }
          ).pipe(
 
             map(
@@ -611,10 +575,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
          slice.actions.associateRaProfile.match
       ),
       switchMap(
-
-         action => deps.apiClients.complianceProfile.associateComplianceProfileToRaProfile(
-            action.payload.complianceProfileUuid,
-            [action.payload.uuid]
+         action => deps.apiClients.complianceProfile.associateProfiles({ uuid: action.payload.complianceProfileUuid, raProfileAssociationRequestDto: { raProfileUuids: [action.payload.uuid] } }
          ).pipe(
 
             map(
@@ -649,10 +610,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
          slice.actions.dissociateRaProfile.match
       ),
       switchMap(
-
-         action => deps.apiClients.complianceProfile.dissociateComplianceProfileFromRaProfile(
-            action.payload.complianceProfileUuid,
-            [action.payload.uuid]
+         action => deps.apiClients.complianceProfile.disassociateProfiles({ uuid: action.payload.complianceProfileUuid, raProfileAssociationRequestDto: { raProfileUuids: [action.payload.uuid] } }
          ).pipe(
 
             map(
@@ -683,11 +641,11 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.profiles.getComplianceProfilesForRaProfile(action.payload.authorityUuid, action.payload.uuid).pipe(
+         action => deps.apiClients.raProfiles.getAssociatedComplianceProfiles({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid }).pipe(
 
             map(
                profileDto => slice.actions.getComplianceProfilesForRaProfileSuccess({
-                  complianceProfiles: profileDto.map(transformRaComplianceProfileDtoToModel)
+                  complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel)
                })
             ),
 
@@ -708,7 +666,6 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
 
 const epics = [
    listRaProfiles,
-   listAuthorizedClients,
    getRaProfileDetail,
    createRaProfile,
    updateRaProfile,

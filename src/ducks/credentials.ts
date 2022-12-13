@@ -1,10 +1,12 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CredentialModel } from "models/credentials";
-import { ConnectorModel } from "models/connectors";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
+import {
+   CredentialCreateRequestModel,
+   CredentialEditRequestModel,
+   CredentialResponseModel
+} from "types/credentials";
+import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 export type State = {
@@ -12,12 +14,12 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
-   credential?: CredentialModel;
-   credentials: CredentialModel[];
+   credential?: CredentialResponseModel;
+   credentials: CredentialResponseModel[];
 
-   credentialProviders?: ConnectorModel[];
+   credentialProviders?: ConnectorResponseModel[];
    credentialProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingCredentialProviders: boolean;
@@ -28,8 +30,7 @@ export type State = {
    isCreating: boolean;
    isDeleting: boolean;
    isUpdating: boolean;
-   isBulkDeleteing: boolean;
-   isForceBulkDeleting: boolean;
+   isBulkDeleting: boolean;
 
 };
 
@@ -51,8 +52,7 @@ export const initialState: State = {
    isCreating: false,
    isDeleting: false,
    isUpdating: false,
-   isBulkDeleteing: false,
-   isForceBulkDeleting: false,
+   isBulkDeleting: false,
 
 };
 
@@ -101,7 +101,7 @@ export const slice = createSlice({
       },
 
 
-      listCredentialProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorModel[] }>) => {
+      listCredentialProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorResponseModel[] }>) => {
 
          state.isFetchingCredentialProviders = false;
          state.credentialProviders = action.payload.connectors;
@@ -150,7 +150,7 @@ export const slice = createSlice({
       },
 
 
-      listCredentialsSuccess: (state, action: PayloadAction<{ credentialList: CredentialModel[] }>) => {
+      listCredentialsSuccess: (state, action: PayloadAction<{ credentialList: CredentialResponseModel[] }>) => {
 
          state.credentials = action.payload.credentialList;
          state.isFetchingList = false;
@@ -173,9 +173,9 @@ export const slice = createSlice({
       },
 
 
-      getCredentialDetailSuccess: (state, action: PayloadAction<{ credetnial: CredentialModel }>) => {
+      getCredentialDetailSuccess: (state, action: PayloadAction<{ credential: CredentialResponseModel }>) => {
 
-         state.credential = action.payload.credetnial;
+         state.credential = action.payload.credential;
          state.isFetchingDetail = false;
 
       },
@@ -188,12 +188,7 @@ export const slice = createSlice({
       },
 
 
-      createCredential: (state, action: PayloadAction<{
-         name: string,
-         kind: string,
-         connectorUuid: string,
-         attributes: any
-      }>) => {
+      createCredential: (state, action: PayloadAction<CredentialCreateRequestModel>) => {
 
          state.isCreating = true;
 
@@ -214,14 +209,14 @@ export const slice = createSlice({
       },
 
 
-      updateCredential: (state, action: PayloadAction<{ uuid: string, attributes: AttributeModel[] }>) => {
+      updateCredential: (state, action: PayloadAction<{ uuid: string, credentialRequest: CredentialEditRequestModel }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      updateCredentialSuccess: (state, action: PayloadAction<{ credential: CredentialModel }>) => {
+      updateCredentialSuccess: (state, action: PayloadAction<{ credential: CredentialResponseModel }>) => {
 
          state.isUpdating = false;
 
@@ -276,19 +271,14 @@ export const slice = createSlice({
       bulkDeleteCredentials: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.bulkDeleteErrorMessages = [];
-         state.isBulkDeleteing = true;
+         state.isBulkDeleting = true;
 
       },
 
 
-      bulkDeleteCredentialsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteCredentialsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
-         state.isBulkDeleteing = false;
-
-         if (action.payload.errors?.length > 0) {
-            state.bulkDeleteErrorMessages = action.payload.errors;
-            return;
-         }
+         state.isBulkDeleting = false;
 
          action.payload.uuids.forEach(
 
@@ -306,42 +296,9 @@ export const slice = createSlice({
 
       bulkDeleteCredentialsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isBulkDeleteing = false;
+         state.isBulkDeleting = false;
 
       },
-
-
-      bulkForceDeleteCredentials: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isForceBulkDeleting = true;
-
-      },
-
-
-      bulkForceDeleteCredentialsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isForceBulkDeleting = false;
-
-         action.payload.uuids.forEach(
-
-            uuid => {
-               const index = state.credentials.findIndex(credential => credential.uuid === uuid);
-               if (index >= 0) state.credentials.splice(index, 1);
-            }
-
-         );
-
-         if (state.credential && action.payload.uuids.includes(state.credential.uuid)) state.credential = undefined;
-
-      },
-
-
-      bulkForceDeleteCredentialsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isForceBulkDeleting = false;
-
-      },
-
 
    }
 
@@ -368,8 +325,7 @@ const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
 const isCreating = createSelector(state, state => state.isCreating);
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isUpdating = createSelector(state, state => state.isUpdating);
-const isBulkDeleteing = createSelector(state, state => state.isBulkDeleteing);
-const isForceBulkDeleting = createSelector(state, state => state.isForceBulkDeleting);
+const isBulkDeleting = createSelector(state, state => state.isBulkDeleting);
 
 
 export const selectors = {
@@ -395,8 +351,7 @@ export const selectors = {
    isCreating,
    isDeleting,
    isUpdating,
-   isBulkDeleteing,
-   isForceBulkDeleting
+   isBulkDeleting,
 
 }
 

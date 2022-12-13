@@ -212,7 +212,7 @@ export default function AdministratorsList() {
    );
 
 
-   const acmeProfilesnTableHeader: TableHeader[] = useMemo(
+   const acmeProfilesTableHeader: TableHeader[] = useMemo(
 
       () => [
          {
@@ -290,7 +290,7 @@ export default function AdministratorsList() {
 
             <br />
             <CustomTable
-               headers={acmeProfilesnTableHeader}
+               headers={acmeProfilesTableHeader}
                data={acmeProfilesTableData}
                onCheckedRowsChanged={setCheckedRows}
                canSearch={true}

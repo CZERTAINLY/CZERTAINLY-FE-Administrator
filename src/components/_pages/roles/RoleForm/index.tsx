@@ -53,8 +53,10 @@ function RoleForm() {
 
                rolesActions.update({
                   uuid: id!,
-                  name: values.name,
-                  description: values.description,
+                   roleRequest: {
+                       name: values.name,
+                       description: values.description,
+                   }
                })
 
             );

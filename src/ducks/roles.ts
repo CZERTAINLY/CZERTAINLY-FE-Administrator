@@ -1,7 +1,8 @@
-import { RoleModel, RoleDetailModel, SubjectPermissionsModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserDTO } from "api/users";
+import { RoleDetailModel, RolePermissionsModel, RoleRequestModel, SubjectPermissionsModel } from "types/roles";
+import { RoleResponseModel } from "types/auth";
+import { UserResponseModel } from "types/users";
 
 
 export type State = {
@@ -18,7 +19,7 @@ export type State = {
       permissions: SubjectPermissionsModel;
    };
 
-   roles: RoleModel[];
+   roles: RoleResponseModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -105,7 +106,7 @@ export const slice = createSlice({
       },
 
 
-      listSuccess: (state, action: PayloadAction<{ roles: RoleModel[] }>) => {
+      listSuccess: (state, action: PayloadAction<{ roles: RoleResponseModel[] }>) => {
 
          state.roles = action.payload.roles;
          state.isFetchingList = false;
@@ -143,7 +144,7 @@ export const slice = createSlice({
       },
 
 
-      create: (state, action: PayloadAction<{ name: string, description?: string }>) => {
+      create: (state, action: PayloadAction<RoleRequestModel>) => {
 
          state.isCreating = true;
 
@@ -165,7 +166,7 @@ export const slice = createSlice({
       },
 
 
-      update: (state, action: PayloadAction<{ uuid: string, name: string, description?: string }>) => {
+      update: (state, action: PayloadAction<{ uuid: string, roleRequest: RoleRequestModel }>) => {
 
          state.isUpdating = true;
 
@@ -228,7 +229,7 @@ export const slice = createSlice({
       },
 
 
-      getUsersSuccess: (state, action: PayloadAction<{ uuid: string, users: UserDTO[] }>) => {
+      getUsersSuccess: (state, action: PayloadAction<{ uuid: string, users: UserResponseModel[] }>) => {
 
          if (state.role && state.role.uuid === action.payload.uuid) {
             state.role.users = action.payload.users;
@@ -298,7 +299,7 @@ export const slice = createSlice({
       },
 
 
-      updatePermissions: (state, action: PayloadAction<{ uuid: string, permissions: SubjectPermissionsModel }>) => {
+      updatePermissions: (state, action: PayloadAction<{ uuid: string, permissions: RolePermissionsModel }>) => {
 
          state.isUpdatingPermissions = true;
 

@@ -1,33 +1,23 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { AttributeModel } from "models/attributes/AttributeModel";
 import { useCallback, useMemo } from "react";
+import { AttributeDescriptorModel, AttributeResponseModel, isDataAttributeModel } from "types/attributes";
+import { getAttributeContent } from "utils/attributes/attributes";
 
 
 export interface Props {
-   attributes: AttributeModel[] | undefined;
+   attributes?: AttributeResponseModel[];
+   descriptorAttributes?: AttributeDescriptorModel[];
    hasHeader?: boolean
 }
 
 
 export default function ComplianceRuleAttributeViewer({
    attributes = [],
+   descriptorAttributes = [],
    hasHeader = true
 }: Props) {
 
-   const getAttributeContent = useCallback(
-
-      (attribute: AttributeModel) => {
-
-
-         return Array.isArray(attribute.content) ?
-            attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-            :
-            attribute?.content?.value ? attribute?.content?.value as string : "Not set";
-
-      },
-      []
-
-   );
+   const getContent = useCallback(getAttributeContent,[]);
 
 
    const tableHeaders: TableHeader[] = useMemo(
@@ -35,7 +25,7 @@ export default function ComplianceRuleAttributeViewer({
       () => [
          {
             id: "name",
-            content: "name",
+            content: "Name",
             sortable: true,
             width: "20%",
          },
@@ -52,20 +42,29 @@ export default function ComplianceRuleAttributeViewer({
 
    const tableData: TableDataRow[] = useMemo(
 
-      () => attributes.map(
-
-         attribute => {
-            return ({
-               id: attribute.uuid || attribute.name,
-               columns: [
-                  attribute.name || "",
-                  getAttributeContent(attribute)
-               ]
-            })
-         }
-
-      ),
-      [attributes, getAttributeContent]
+      () => {
+          const result: TableDataRow[] = [];
+          result.concat(
+              attributes.map(attribute => ({
+                      id: attribute.uuid || attribute.name,
+                      columns: [
+                          attribute.name || "",
+                          getContent(attribute.contentType, attribute.content)
+                      ]
+                  })
+              ),
+              descriptorAttributes.filter(isDataAttributeModel).map(attribute => ({
+                      id: attribute.uuid || attribute.name,
+                      columns: [
+                          attribute.name || "",
+                          getContent(attribute.contentType, attribute.content)
+                      ]
+                  })
+              )
+          );
+          return result;
+      },
+      [attributes, descriptorAttributes, getContent]
    );
 
 

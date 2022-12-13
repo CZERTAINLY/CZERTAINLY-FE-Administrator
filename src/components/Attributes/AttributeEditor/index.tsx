@@ -1,30 +1,33 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useForm, useFormState } from "react-final-form";
 
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { AttributeDescriptorCallbackMappingModel } from "models/attributes/AttributeDescriptorCallbackMappingModel";
-
-import { selectors as connectorSelectors, actions as connectorActions } from "ducks/connectors";
+import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
 
 import Widget from "components/Widget";
-import { FunctionGroupCode } from "types/connectors";
+import { CallbackAttributeModel } from "types/connectors";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
 import { Attribute } from "./Attribute";
-import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
+import {
+    AttributeContentType,
+    FunctionGroupCode
+} from "types/openapi";
+import {
+    AttributeCallbackMappingModel,
+    AttributeDescriptorModel,
+    AttributeResponseModel, DataAttributeModel, FileAttributeContentModel,
+    isDataAttributeModel
+} from "types/attributes";
 
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
-const emptyAttributes: AttributeModel[] = [];
+const emptyAttributes: AttributeResponseModel[] = [];
 
 
 interface Props {
    id: string;
    attributeDescriptors: AttributeDescriptorModel[];
-   attributes?: AttributeModel[];
+   attributes?: AttributeResponseModel[];
    authorityUuid?: string;
    connectorUuid?: string;
    functionGroupCode?: FunctionGroupCode;
@@ -56,7 +59,7 @@ export default function AttributeEditor({
    const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModel[]>();
 
    // used to check if attributes have changed
-   const [prevAttributes, setPrevAttributes] = useState<AttributeModel[]>();
+   const [prevAttributes, setPrevAttributes] = useState<AttributeResponseModel[]>();
 
    // options for selects
    const [options, setOptions] = useState<{ [attributeName: string]: { label: string, value: any }[] }>({});
@@ -124,7 +127,7 @@ export default function AttributeEditor({
     */
    const getAttributeValue = useCallback(
 
-      (attributes: AttributeModel[], path: string | undefined): any => {
+      (attributes: AttributeResponseModel[], path: string | undefined): any => {
 
          if (!path) return undefined;
 
@@ -145,7 +148,7 @@ export default function AttributeEditor({
     */
    const getCurrentFromMappingValue = useCallback(
 
-      (descriptor: AttributeDescriptorModel, mapping: AttributeDescriptorCallbackMappingModel): any => {
+      (descriptor: AttributeDescriptorModel, mapping: AttributeCallbackMappingModel): any => {
 
          const attributeFromValue = getAttributeValue(attributes, mapping.from);
 
@@ -175,34 +178,35 @@ export default function AttributeEditor({
     */
    const buildCallbackMappings = useCallback(
 
-      (descriptor: AttributeDescriptorModel): AttributeCallbackDataModel | undefined => {
+      (descriptor: AttributeDescriptorModel): CallbackAttributeModel | undefined => {
 
          let hasUndefinedMapping = false;
 
-         const data: AttributeCallbackDataModel = {
+         const data: CallbackAttributeModel = {
             uuid: "",
             name: "",
             pathVariable: {},
-            queryParameter: {},
+            requestParameter: {},
             body: {}
          };
 
-         descriptor.callback?.mappings.forEach(
+        if (isDataAttributeModel(descriptor)) {
 
-            mapping => {
+            descriptor.attributeCallback?.mappings.forEach(
+                mapping => {
 
-               mapping.targets.forEach(
-                  target => {
-                     let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
-                     if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
-                     if (value === undefined) hasUndefinedMapping = true;
-                     data[target][mapping.to] = value;
-                  }
-               )
+                    mapping.targets.forEach(
+                        target => {
+                            let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
+                            if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
+                            if (value === undefined) hasUndefinedMapping = true;
+                            data[target]![mapping.to] = value;
+                        }
+                    )
 
-            }
-
-         );
+                }
+            );
+        }
 
          return hasUndefinedMapping ? undefined : data;
 
@@ -215,18 +219,20 @@ export default function AttributeEditor({
    /**
     * Groups attributes for rendering according to the attribute descriptor group property
     */
-   const groupedAttributesDescriptors: { [key: string]: AttributeDescriptorModel[] } = useMemo(
+   const groupedAttributesDescriptors: { [key: string]: DataAttributeModel[] } = useMemo(
 
       () => {
 
-         const grouped: { [key: string]: AttributeDescriptorModel[] } = {};
+         const grouped: { [key: string]: DataAttributeModel[] } = {};
 
          attributeDescriptors.forEach(
 
             descriptor => {
 
-               const groupName = descriptor.group || "__";
-               grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
+                if (isDataAttributeModel(descriptor)) {
+                    const groupName = descriptor.properties.group || "__";
+                    grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
+                }
 
             }
 
@@ -273,119 +279,131 @@ export default function AttributeEditor({
          attributeDescriptors.forEach(
 
             descriptor => {
+                if (isDataAttributeModel(descriptor)) {
 
-               const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+                    const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
-               const attribute = attributes.find(a => a.name === descriptor.name);
-
-
-               // Build "static" options from the descriptor
-
-               if (descriptor.list && Array.isArray(descriptor.content)) {
-
-                  newOptions = { ...newOptions, [formAttributeName]: descriptor.content.map(data => ({ label: data.value as string, value: data })) };
-
-               }
+                    const attribute = attributes.find(a => a.name === descriptor.name);
 
 
-               // Perform initial callbacks based on "static" mappings
+                    // Build "static" options from the descriptor
 
-               if (descriptor.callback) {
+                    if (descriptor.properties.list && Array.isArray(descriptor.content)) {
 
-                  let mappings = buildCallbackMappings(descriptor);
+                        newOptions = {
+                            ...newOptions,
+                            [formAttributeName]: descriptor.content.map(data => ({
+                                label: data.reference ?? data.data.toString(),
+                                value: data
+                            }))
+                        };
 
-                  if (mappings) {
-
-                     mappings.name = descriptor.name;
-                     mappings.uuid = descriptor.uuid;
-
-                     const url = authorityUuid
-                        ?
-                        `${authorityUuid}/callback`
-                        :
-                        `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                        ;
-
-                     dispatch(
-
-                        connectorActions.callback({
-                           callbackId: formAttributeName,
-                           url,
-                           callbackData: mappings
-                        })
-
-                     );
-
-                  }
-
-               }
-
-               // Set initial values from the attribute
-
-               if (descriptor.type === "FILE") {
-
-                  if (attribute?.content) {
-
-                     form.mutators.setAttribute(`${formAttributeName}.value`, (attribute.content as FileAttributeContentModel).value);
-                     form.mutators.setAttribute(`${formAttributeName}.contentType`, (attribute.content as FileAttributeContentModel).contentType || "unknown");
-                     form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel).fileName || "unknown");
-
-                  } else if (descriptor.content) {
-
-                     form.mutators.setAttribute(`${formAttributeName}.value`, (descriptor.content as FileAttributeContentModel).value);
-                     form.mutators.setAttribute(`${formAttributeName}.contentType`, (descriptor.content as FileAttributeContentModel).contentType || "unknown");
-                     form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel).fileName || "unknown");
-
-                  }
-
-                  return;
-
-               }
+                    }
 
 
-               let formAttributeValue = undefined;
+                    // Perform initial callbacks based on "static" mappings
 
-               if (descriptor.list && descriptor.multiSelect) {
+                    if (descriptor.attributeCallback) {
 
-                  if (Array.isArray(attribute?.content)) {
+                        let mappings = buildCallbackMappings(descriptor);
 
-                     formAttributeValue = attribute!.content.map(content => ({ label: content.value, value: content }))
+                        if (mappings) {
 
-                  } else if (attribute?.content) {
+                            mappings.name = descriptor.name;
+                            mappings.uuid = descriptor.uuid;
 
-                     formAttributeValue = [{ label: attribute!.content.value, value: attribute!.content }]
+                            dispatch(authorityUuid
+                                ? connectorActions.callbackRaProfile({
+                                    callbackId: formAttributeName,
+                                    callbackRaProfile: {
+                                        authorityUuid: authorityUuid,
+                                        requestAttributeCallback: mappings
+                                    }
+                                })
+                                :
+                                connectorActions.callbackConnector({
+                                    callbackId: formAttributeName,
+                                    callbackConnector: {
+                                        uuid: connectorUuid!,
+                                        kind: kind!,
+                                        functionGroup: functionGroupCode!,
+                                        requestAttributeCallback: mappings
+                                    }
+                                })
+                            );
+
+                        }
+
+                    }
+
+                    // Set initial values from the attribute
+
+                    if (descriptor.contentType === AttributeContentType.File) {
+
+                        if (attribute?.content) {
+
+                            form.mutators.setAttribute(`${formAttributeName}.value`, (attribute.content as FileAttributeContentModel[])[0].reference);
+                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
+
+                        } else if (descriptor.content) {
+
+                            form.mutators.setAttribute(`${formAttributeName}.value`, (descriptor.content as FileAttributeContentModel[])[0].reference);
+                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
+
+                        }
+
+                        return;
+
+                    }
 
 
-                  } else {
+                    let formAttributeValue = undefined;
 
-                     formAttributeValue = undefined;
+                    if (descriptor.properties.list && descriptor.properties.multiSelect) {
 
-                  }
+                        if (Array.isArray(attribute?.content)) {
 
-               } else if (descriptor.list) {
+                            formAttributeValue = attribute!.content.map(content => ({
+                                label: content.reference ?? content.data.toString(),
+                                value: content
+                            }))
 
-                  if (attribute?.content) {
+                        } else {
 
-                     formAttributeValue = { label: (attribute.content as AttributeContentModel).value, value: attribute.content }
+                            formAttributeValue = undefined;
 
-                  } else {
+                        }
 
-                     formAttributeValue = undefined;
+                    } else if (descriptor.properties.list) {
 
-                  }
+                        if (attribute?.content) {
 
-               } else if (attribute?.content) {
+                            formAttributeValue = {
+                                label: attribute.content[0].reference ?? attribute.content[0].data.toString(),
+                                value: attribute.content
+                            }
 
-                  formAttributeValue = (attribute?.content as AttributeContentModel).value;
+                        } else {
 
-               } else if (descriptor.content) {
+                            formAttributeValue = undefined;
 
-                  formAttributeValue = (descriptor.content as AttributeContentModel).value;
+                        }
 
-               }
+                    } else if (attribute?.content) {
 
-               form.mutators.setAttribute(formAttributeName, formAttributeValue);
+                        formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data.toString();
 
+                    } else if (descriptor.content) {
+
+                        formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data.toString();
+
+                    }
+
+                    form.mutators.setAttribute(formAttributeName, formAttributeValue);
+
+                }
             }
 
          )
@@ -450,60 +468,66 @@ export default function AttributeEditor({
          attributeDescriptors.forEach(
 
             descriptor => {
+                if (isDataAttributeModel(descriptor)) {
 
-               // list all 'from' mappings (get attribute names from the descriptor)
-               const fromNames: string[] = [];
+                   // list all 'from' mappings (get attribute names from the descriptor)
+                   const fromNames: string[] = [];
 
-               descriptor.callback?.mappings?.forEach(
-                  mapping => {
-                     if (mapping.from) fromNames.push(mapping.from);
-                  }
-               )
+                   descriptor.attributeCallback?.mappings?.forEach(
+                      mapping => {
+                         if (mapping.from) fromNames.push(mapping.from);
+                      }
+                   )
 
-               // check if any of the changed attributes is in the 'from' list
-               for (const fromName in fromNames) {
+                   // check if any of the changed attributes is in the 'from' list
+                   for (const fromName in fromNames) {
 
-                  const attributeName = fromNames[fromName].includes(".") ? fromNames[fromName].split(".")[0] : fromNames[fromName];
+                      const attributeName = fromNames[fromName].includes(".") ? fromNames[fromName].split(".")[0] : fromNames[fromName];
 
-                  // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
+                      // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
 
-                  if (changedAttributes[attributeName]) {
+                      if (changedAttributes[attributeName]) {
 
-                     let mappings = buildCallbackMappings(descriptor);
+                         let mappings = buildCallbackMappings(descriptor);
 
-                     if (mappings) {
+                         if (mappings) {
 
-                        const formAttributeName = `__attributes__${id}__.${descriptor.name}`
+                            const formAttributeName = `__attributes__${id}__.${descriptor.name}`
 
-                        mappings.name = descriptor.name;
-                        mappings.uuid = descriptor.uuid;
+                            mappings.name = descriptor.name;
+                            mappings.uuid = descriptor.uuid;
 
-                        const url = authorityUuid
-                           ?
-                           `${authorityUuid}/callback`
-                           :
-                           `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                           ;
 
-                        form.mutators.setAttribute(formAttributeName, undefined);
+                             dispatch(authorityUuid
+                                 ? connectorActions.callbackRaProfile({
+                                     callbackId: formAttributeName,
+                                     callbackRaProfile: {
+                                         authorityUuid: authorityUuid,
+                                         requestAttributeCallback: mappings
+                                     }
+                                 })
+                                 :
+                                 connectorActions.callbackConnector({
+                                     callbackId: formAttributeName,
+                                     callbackConnector: {
+                                         uuid: connectorUuid!,
+                                         kind: kind!,
+                                         functionGroup: functionGroupCode!,
+                                         requestAttributeCallback: mappings
+                                     }
+                                 })
+                             );
 
-                        dispatch(
+                             form.mutators.setAttribute(formAttributeName, undefined);
 
-                           connectorActions.callback({
-                              callbackId: formAttributeName,
-                              url,
-                              callbackData: mappings
-                           })
+                         }
 
-                        );
+                      }
 
-                     }
+                   }
 
-                  }
-
-               }
-
-            }
+                }
+          }
          )
 
       },
@@ -532,16 +556,16 @@ export default function AttributeEditor({
             if (Array.isArray(callbackData[callbackId])) {
                // multiple effects can modify opts during single render call
                // eslint-disable-next-line react-hooks/exhaustive-deps
-               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) };
+               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.reference ?? value.data.toString(), value })) };
                setOptions({ ...options, ...opts });
                continue;
             }
 
-            // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
-            if (callbackData[callbackId].value) {
-               form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
-               continue;
-            }
+            // // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
+            // if (callbackData[callbackId].value) {
+            //    form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
+            //    continue;
+            // }
 
          }
 

@@ -1,59 +1,44 @@
-import { AcmeProfileDTO, AcmeProfileListItemDTO } from "api/acme-profile";
-import { RaAcmeLinkDTO } from "api/profiles";
-import { AcmeProfileListItemModel, AcmeProfileModel } from "models/acme-profiles";
-import { RaAcmeLinkModel } from "models/ra-profiles";
-import { transformAttributeDTOToModel } from "./attributes";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+import {
+    AcmeProfileAddRequestDto,
+    AcmeProfileAddRequestModel,
+    AcmeProfileEditRequestDto,
+    AcmeProfileEditRequestModel,
+    AcmeProfileListResponseDto,
+    AcmeProfileListResponseModel,
+    AcmeProfileResponseDto,
+    AcmeProfileResponseModel
+} from "types/acme-profiles";
+import { transformRaProfileResponseDtoToModel } from "./ra-profiles";
 
-export function transformAcmeProfileListDtoToModel(acmeProfileDto: AcmeProfileListItemDTO): AcmeProfileListItemModel {
-
-   return {
-      uuid: acmeProfileDto.uuid,
-      name: acmeProfileDto.name,
-      enabled: acmeProfileDto.enabled,
-      description: acmeProfileDto.description,
-      raProfileName: acmeProfileDto.raProfileName,
-      raProfileUuid: acmeProfileDto.raProfileUuid,
-      directoryUrl: acmeProfileDto.directoryUrl,
-   };
-
+export function transformAcmeProfileListResponseDtoToModel(acme: AcmeProfileListResponseDto): AcmeProfileListResponseModel {
+    return { ...acme };
 }
 
-
-export function transformAcmeProfileDtoToModel(acmeProfileDto: AcmeProfileDTO): AcmeProfileModel {
-
-   return {
-      uuid: acmeProfileDto.uuid,
-      name: acmeProfileDto.name,
-      enabled: acmeProfileDto.enabled,
-      description: acmeProfileDto.description,
-      termsOfServiceUrl: acmeProfileDto.termsOfServiceUrl,
-      websiteUrl: acmeProfileDto.websiteUrl,
-      dnsResolverIp: acmeProfileDto.dnsResolverIp,
-      dnsResolverPort: acmeProfileDto.dnsResolverPort,
-      raProfile: acmeProfileDto.raProfile,
-      retryInterval: acmeProfileDto.retryInterval,
-      termsOfServiceChangeDisable: acmeProfileDto.termsOfServiceChangeDisable,
-      validity: acmeProfileDto.validity,
-      directoryUrl: acmeProfileDto.directoryUrl,
-      termsOfServiceChangeUrl: acmeProfileDto.termsOfServiceChangeUrl,
-      requireContact: acmeProfileDto.requireContact,
-      requireTermsOfService: acmeProfileDto.requireTermsOfService,
-      issueCertificateAttributes: acmeProfileDto.issueCertificateAttributes,
-      revokeCertificateAttributes: acmeProfileDto.revokeCertificateAttributes,
-   };
-
+export function transformAcmeProfileResponseDtoToModel(acme: AcmeProfileResponseDto): AcmeProfileResponseModel {
+    return {
+        ...acme,
+        raProfile: acme.raProfile ? transformRaProfileResponseDtoToModel(acme.raProfile) : undefined,
+        issueCertificateAttributes: acme.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+        revokeCertificateAttributes: acme.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+        customAttributes: acme.customAttributes?.map(transformAttributeResponseDtoToModel)
+    };
 }
 
+export function transformAcmeProfileEditRequestModelToDto(acme: AcmeProfileEditRequestModel): AcmeProfileEditRequestDto {
+    return {
+        ...acme,
+        issueCertificateAttributes: acme.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
+        revokeCertificateAttributes: acme.revokeCertificateAttributes.map(transformAttributeRequestModelToDto),
+        customAttributes: acme.customAttributes?.map(transformAttributeRequestModelToDto),
+    };
+}
 
-export function transfromRaAcmeLinkDtoToModel(raAcmeLinkDto: RaAcmeLinkDTO): RaAcmeLinkModel {
-
-   return {
-      uuid: raAcmeLinkDto.uuid,
-      name: raAcmeLinkDto.name,
-      directoryUrl: raAcmeLinkDto.directoryUrl,
-      issueCertificateAttributes: raAcmeLinkDto.issueCertificateAttributes?.map(attribute => transformAttributeDTOToModel(attribute)),
-      revokeCertificateAttributes: raAcmeLinkDto.revokeCertificateAttributes?.map(attribute => transformAttributeDTOToModel(attribute)),
-      acmeAvailable: raAcmeLinkDto.acmeAvailable,
-   };
-
+export function transformAcmeProfileAddRequestModelToDto(acme: AcmeProfileAddRequestModel): AcmeProfileAddRequestDto {
+    return {
+        ...acme,
+        issueCertificateAttributes: acme.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
+        revokeCertificateAttributes: acme.revokeCertificateAttributes.map(transformAttributeRequestModelToDto),
+        customAttributes: acme.customAttributes?.map(transformAttributeRequestModelToDto),
+    };
 }

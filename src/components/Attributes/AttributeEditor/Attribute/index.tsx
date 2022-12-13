@@ -1,20 +1,23 @@
 import { useCallback } from "react";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
 import { Field, useForm } from "react-final-form";
 
-import { Input, FormFeedback, FormText, Label, FormGroup } from "reactstrap";
-import { InputType } from "reactstrap/types/lib/Input";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 
-import { AttributeType } from "types/attributes";
 
 import Select from "react-select";
 
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
+import {
+    AttributeConstraintType,
+    AttributeContentType,
+} from "types/openapi";
+import { InputType } from "reactstrap/types/lib/Input";
+import { DataAttributeModel, RegexpAttributeConstraintModel } from "types/attributes";
 
 
 interface Props {
    name: string;
-   descriptor: AttributeDescriptorModel | undefined;
+   descriptor: DataAttributeModel | undefined;
    options?: { label: string, value: any }[];
 }
 
@@ -99,30 +102,43 @@ export function Attribute({
    if (!descriptor) return <></>;
 
 
-   const type: { [type in AttributeType]: InputType } = {
-      "BOOLEAN": "checkbox",     // not list
-      "INTEGER": "number",       // possibly list
-      "FLOAT": "number",         // possibly list
-      "STRING": "text",          // possibly list
-      "TEXT": "textarea",        // not list
-      "DATE": "date",            // not list
-      "TIME": "time",            // not list
-      "DATETIME": "datetime-local",        // not list
-      "FILE": "file",            // not list
-      "SECRET": "password",      // not list
-      "CREDENTIAL": "text",      // list only
-      "JSON": "text"             // list only
-   }
-
+   const getFormType = (type: AttributeContentType): InputType => {
+       switch (type) {
+           case AttributeContentType.Boolean:
+               return "checkbox";
+           case AttributeContentType.Integer:
+           case AttributeContentType.Float:
+               return "number";
+           case AttributeContentType.String:
+           case AttributeContentType.Credential:
+           case AttributeContentType.Object:
+               return "text";
+           case AttributeContentType.Text:
+               return "textarea";
+           case AttributeContentType.Date:
+               return "date";
+           case AttributeContentType.Time:
+               return "time";
+           case AttributeContentType.Datetime:
+               return "datetime-local";
+           case AttributeContentType.File:
+               return "file";
+           case AttributeContentType.Secret:
+               return "password";
+       }
+    }
 
    const buildValidators: any = () => {
 
       const validators: any[] = [];
 
-      if (descriptor.required) validators.push(validateRequired());
-      if (descriptor.type === "INTEGER") validators.push(validateInteger());
-      if (descriptor.type === "FLOAT") validators.push(validateFloat());
-      if (descriptor.validationRegex) validators.push(validatePattern(descriptor.validationRegex));
+      if (descriptor.properties.required) validators.push(validateRequired());
+      if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
+      if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
+      const regexValidator = descriptor.constraints?.find(c => c.type === AttributeConstraintType.RegExp);
+        if (regexValidator) {
+            validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
+        }
 
       const composed = composeValidators.apply(undefined, validators);
 
@@ -131,19 +147,19 @@ export function Attribute({
    };
 
 
-   const createSelect = (descriptor: AttributeDescriptorModel): JSX.Element => {
+   const createSelect = (descriptor: DataAttributeModel): JSX.Element => {
 
       return (
 
-         <Field name={name} validate={buildValidators()} type={type[descriptor.type]}>
+         <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
 
             {({ input, meta }) => (
 
                <>
 
                   {
-                     descriptor.visible ? (
-                        <Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
+                     descriptor.properties.visible ? (
+                        <Label for={name}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
                      ) : <></>
                   }
 
@@ -152,18 +168,18 @@ export function Attribute({
                      maxMenuHeight={140}
                      menuPlacement="auto"
                      options={options}
-                     placeholder={`Select ${descriptor.label}`}
+                     placeholder={`Select ${descriptor.properties.label}`}
                      styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                     isDisabled={descriptor.readOnly}
-                     isMulti={descriptor.multiSelect}
-                     isClearable={!descriptor.required}
+                     isDisabled={descriptor.properties.readOnly}
+                     isMulti={descriptor.properties.multiSelect}
+                     isClearable={!descriptor.properties.required}
                   />
 
                   {
-                     descriptor.visible ? (
+                     descriptor.properties.visible ? (
 
                         <>
-                           <FormText color={descriptor.required ? "dark" : undefined} style={{ marginTop: "0.2em" }}>{descriptor.description}</FormText>
+                           <FormText color={descriptor.properties.required ? "dark" : undefined} style={{ marginTop: "0.2em" }}>{descriptor.description}</FormText>
 
                            <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
                         </>
@@ -185,19 +201,19 @@ export function Attribute({
 
 
 
-   const createFile = (descriptor: AttributeDescriptorModel): JSX.Element => {
+   const createFile = (descriptor: DataAttributeModel): JSX.Element => {
 
       return (
 
          <>
 
             {
-               descriptor.visible ? (
-                  <Label for={`${name}.value`}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
+               descriptor.properties.visible ? (
+                  <Label for={`${name}.value`}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
                ) : <></>
             }
 
-            {!descriptor.visible ? <></> : (
+            {!descriptor.properties.visible ? <></> : (
 
                <div className="border border-light rounded mb-0" style={{ display: "flex", flexWrap: "wrap", padding: "1em", borderStyle: "dashed !important" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
 
@@ -205,7 +221,7 @@ export function Attribute({
 
                      <Label for={`${name}-value`}>File content</Label>
 
-                     <Field name={`${name}.value`} validate={buildValidators()} type={type[descriptor.type]}>
+                     <Field name={`${name}.value`} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
 
                         {({ input, meta }) => (
 
@@ -216,8 +232,8 @@ export function Attribute({
                                  id={`${name}-value`}
                                  valid={!meta.error && meta.touched}
                                  invalid={!!meta.error && meta.touched}
-                                 type={descriptor.visible ? "text" : "hidden"}
-                                 placeholder={`Select or drag & drop ${descriptor.label} File`}
+                                 type={descriptor.properties.visible ? "text" : "hidden"}
+                                 placeholder={`Select or drag & drop ${descriptor.properties.label} File`}
                                  readOnly={true}
                               />
 
@@ -230,7 +246,7 @@ export function Attribute({
 
                      </Field>
 
-                     <FormText color={descriptor.required ? "dark" : undefined}>{descriptor.description}</FormText>
+                     <FormText color={descriptor.properties.required ? "dark" : undefined}>{descriptor.description}</FormText>
 
                   </div>
 
@@ -248,7 +264,7 @@ export function Attribute({
                            <Input
                               {...input}
                               id={`${name}-contentType`}
-                              type={descriptor.visible ? "text" : "hidden"}
+                              type={descriptor.properties.visible ? "text" : "hidden"}
                               placeholder="File not selected"
                               disabled={true}
                               style={{ textAlign: "center" }}
@@ -273,7 +289,7 @@ export function Attribute({
                            <Input
                               {...input}
                               id={`${name}-fileName`}
-                              type={descriptor.visible ? "text" : "hidden"}
+                              type={descriptor.properties.visible ? "text" : "hidden"}
                               placeholder="File not selected"
                               disabled={true}
                               style={{ textAlign: "center" }}
@@ -313,19 +329,19 @@ export function Attribute({
    };
 
 
-   const createInput = (descriptor: AttributeDescriptorModel): JSX.Element => {
+   const createInput = (descriptor: DataAttributeModel): JSX.Element => {
 
       return (
 
-         <Field name={name} validate={buildValidators()} type={type[descriptor.type]}>
+         <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
 
             {({ input, meta }) => (
 
                <>
 
                   {
-                     descriptor.visible && descriptor.type !== "BOOLEAN" ? (
-                        <Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label>
+                     descriptor.properties.visible && descriptor.contentType !== AttributeContentType.Boolean ? (
+                        <Label for={name}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
                      ) : <></>
                   }
 
@@ -334,22 +350,22 @@ export function Attribute({
                      id={name}
                      valid={!meta.error && meta.touched}
                      invalid={!!meta.error && meta.touched}
-                     type={descriptor.visible ? type[descriptor.type] : "hidden"}
-                     placeholder={`Enter ${descriptor.label}`}
-                     disabled={descriptor.readOnly}
+                     type={descriptor.properties.visible ? getFormType(descriptor.contentType) : "hidden"}
+                     placeholder={`Enter ${descriptor.properties.label}`}
+                     disabled={descriptor.properties.readOnly}
                   />
 
                   {
-                     descriptor.visible && descriptor.type === "BOOLEAN" ? (
-                        <>&nbsp;<Label for={name}>{descriptor.label}{descriptor.required ? " *" : ""}</Label></>
+                     descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (
+                        <>&nbsp;<Label for={name}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label></>
                      ) : <></>
                   }
 
                   {
-                     descriptor.visible ? (
+                     descriptor.properties.visible ? (
 
                         <>
-                           <FormText color={descriptor.required ? "dark" : undefined} style={{ marginTop: descriptor.type === "BOOLEAN" ? "-0.8em" : "0.2em" }}>{descriptor.description}</FormText>
+                           <FormText color={descriptor.properties.required ? "dark" : undefined} style={{ marginTop: descriptor.contentType === AttributeContentType.Boolean ? "-0.8em" : "0.2em" }}>{descriptor.description}</FormText>
 
                            <FormFeedback>{meta.error}</FormFeedback>
                         </>
@@ -369,10 +385,10 @@ export function Attribute({
    };
 
 
-   const createField = (descriptor: AttributeDescriptorModel): JSX.Element => {
+   const createField = (descriptor: DataAttributeModel): JSX.Element => {
 
-      if (descriptor.list) return createSelect(descriptor);
-      if (descriptor.type === "FILE") return createFile(descriptor);
+      if (descriptor.properties.list) return createSelect(descriptor);
+      if (descriptor.contentType === AttributeContentType.File) return createFile(descriptor);
       return createInput(descriptor);
 
    };

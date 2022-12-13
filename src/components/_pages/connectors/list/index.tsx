@@ -11,8 +11,8 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
-import { FunctionGroupModel } from "models/connectors";
 import { inventoryStatus } from "utils/connector";
+import { FunctionGroupModel } from "types/connectors";
 
 export default function ConnectorList() {
 

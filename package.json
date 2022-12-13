@@ -4,6 +4,7 @@
    "homepage": "/administrator",
    "private": true,
    "dependencies": {
+      "@openapitools/openapi-generator-cli": "^2.5.2",
       "@reduxjs/toolkit": "^1.8.6",
       "@testing-library/jest-dom": "^5.16.5",
       "@testing-library/react": "^13.4.0",
@@ -40,7 +41,8 @@
       "start": "react-scripts start",
       "build": "react-scripts build",
       "test": "react-scripts test",
-      "eject": "react-scripts eject"
+      "eject": "react-scripts eject",
+      "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-local"
    },
    "eslintConfig": {
       "extends": [

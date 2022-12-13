@@ -2,13 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Form, Field } from "react-final-form";
+import { Field, Form } from "react-final-form";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
-import { ConnectorModel } from "models/connectors";
-import { AuthorityModel } from "models/authorities";
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 import { actions as alertActions } from "ducks/alerts";
 import { actions as authorityActions, selectors as authoritySelectors } from "ducks/authorities";
@@ -21,6 +18,9 @@ import Select, { SingleValue } from "react-select/";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { AuthorityResponseModel } from "types/authorities";
+import { ConnectorResponseModel } from "types/connectors";
+import { FunctionGroupCode } from "types/openapi";
 
 
 interface FormValues {
@@ -51,8 +51,8 @@ export default function AuthorityForm() {
    const isUpdating = useSelector(authoritySelectors.isUpdating);
 
 
-   const [authority, setAuthority] = useState<AuthorityModel>();
-   const [authorityProvider, setAuthorityProvider] = useState<ConnectorModel>();
+   const [authority, setAuthority] = useState<AuthorityResponseModel>();
+   const [authorityProvider, setAuthorityProvider] = useState<ConnectorResponseModel>();
 
 
    const isBusy = useMemo(
@@ -178,7 +178,9 @@ export default function AuthorityForm() {
 
             dispatch(authorityActions.updateAuthority({
                uuid: id!,
-               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+               updateAuthority: {
+                   attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+               }
             }));
 
          } else {
@@ -187,7 +189,7 @@ export default function AuthorityForm() {
                name: values.name!,
                connectorUuid: values.authorityProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values),
             }));
 
          }
@@ -417,7 +419,7 @@ export default function AuthorityForm() {
                            attributeDescriptors={authorityProviderAttributeDescriptors}
                            attributes={authority?.attributes}
                            connectorUuid={authorityProvider.uuid}
-                           functionGroupCode={"authorityProvider"}
+                           functionGroupCode={FunctionGroupCode.AuthorityProvider}
                            kind={values.storeKind.value}
                         />
                      </>

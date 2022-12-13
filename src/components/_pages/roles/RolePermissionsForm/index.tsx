@@ -12,7 +12,7 @@ import { actions as authActions, selectors as authSelectors } from "ducks/auth";
 
 
 import RolePermissionsEditor from "../RolePermissionsEdior";
-import { SubjectPermissionsModel } from "models";
+import { SubjectPermissionsModel } from "types/roles";
 
 
 function RoleForm() {

@@ -1,34 +1,34 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Field } from "react-final-form";
+import { Field, Form } from "react-final-form";
 
 import Select from "react-select";
 import {
-   Badge,
-   Button,
-   ButtonGroup,
-   Container,
-   Form as BootstrapForm,
-   FormFeedback,
-   FormGroup,
-   Input,
-   Label,
-   Table
+    Badge,
+    Button,
+    ButtonGroup,
+    Container,
+    Form as BootstrapForm,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label,
+    Table
 } from "reactstrap";
 
-import { ConnectorModel, EndpointModel } from "models/connectors";
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-import { AuthType } from "types/connectors";
 
-import { validateRequired, composeValidators, validateAlphaNumeric, validateUrl } from "utils/validators";
+import { composeValidators, validateAlphaNumeric, validateRequired, validateUrl } from "utils/validators";
 
 import ProgressButton from "components/ProgressButton";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Widget from "components/Widget";
 import InventoryStatusBadge from "../ConnectorStatus";
+import { AuthType, ConnectorStatus } from "types/openapi";
+import { ConnectorResponseModel, EndpointModel } from "types/connectors";
 
 
 interface FormValues {
@@ -52,15 +52,15 @@ export default function ConnectorForm() {
       () => [
          {
             label: "No Auth",
-            value: "none",
+            value: AuthType.None,
          },
          {
             label: "Basic Auth",
-            value: "basic",
+            value: AuthType.Basic,
          },
          {
             label: "Client Cert",
-            value: "certificate",
+            value: AuthType.Certificate,
          },
       ],
       []
@@ -77,7 +77,7 @@ export default function ConnectorForm() {
    const connectorSelector = useSelector(connectorSelectors.connector);
    const connectionDetails = useSelector(connectorSelectors.connectorConnectionDetails);
 
-   const [connector, setConnector] = useState<ConnectorModel>();
+   const [connector, setConnector] = useState<ConnectorResponseModel>();
 
    const [selectedAuthType, setSelectedAuthType] = useState<{ label: string, value: AuthType }>(
       editMode ? optionsForAuth.find(opt => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0]
@@ -114,8 +114,8 @@ export default function ConnectorForm() {
                uuid: "",
                name: "",
                url: "",
-               authType: "none",
-               status: "unavailable",
+               authType: AuthType.None,
+               status: ConnectorStatus.Offline,
                functionGroups: [],
             });
 
@@ -137,9 +137,11 @@ export default function ConnectorForm() {
 
             dispatch(connectorActions.updateConnector({
                uuid: connector?.uuid,
+             connectorUpdateRequest: {
                url: values.url,
                authType: selectedAuthType.value,
                // authAttributes: []
+             }
             }))
 
          } else {
@@ -430,7 +432,7 @@ export default function ConnectorForm() {
 
                                        <td>Connector Status</td>
                                        <td>
-                                          <InventoryStatusBadge status={connectionDetails.length > 0 ? "connected" : "failed"} />
+                                          <InventoryStatusBadge status={connectionDetails.length > 0 ? ConnectorStatus.Connected : ConnectorStatus.Failed} />
                                        </td>
 
                                     </tr>

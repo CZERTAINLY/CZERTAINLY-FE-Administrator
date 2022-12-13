@@ -1,30 +1,51 @@
-import { ResourceDetailDTO } from "api/auth/model";
-import { ResourceDetailModel, ResourceModel } from "models/auth";
+import {
+   ActionDto,
+   ActionModel,
+   ResourceDto,
+   ResourceModel,
+   RoleResponseDto,
+   RoleResponseModel,
+   UserCertificateDto,
+   UserCertificateModel,
+   UserDetailDto,
+   UserDetailModel,
+   UserUpdateRequestDto,
+   UserUpdateRequestModel
+} from "types/auth";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
-
-export function transformResourceDTOToModel(resource: ResourceDetailDTO): ResourceModel {
-
+export function transformResourceDtoToModel(resource: ResourceDto): ResourceModel {
    return {
-      uuid: resource.uuid,
-      name: resource.name,
-      displayName: resource.displayName,
-      listObjectsEndpoint: resource.listObjectsEndpoint,
-      objectAccess: resource.objectAccess,
+      ...resource,
+      actions: resource.actions.map(transformActionDtoToModel),
    };
-
 }
 
-export function transformResourceDetailDTOToModel(resource: ResourceDetailDTO): ResourceDetailModel {
+export function transformActionDtoToModel(action: ActionDto): ActionModel {
+   return { ...action };
+}
+
+export function transformUserDetailDtoToModel(user: UserDetailDto): UserDetailModel {
 
    return {
-      ...transformResourceDTOToModel(resource),
-      actions: resource.actions.map(
-         action => ({
-            uuid: action.uuid,
-            name: action.name,
-            displayName: action.displayName,
-         })
-      ),
-   };
+      ...user,
+      certificate: user.certificate ? transformUserCertificateDtoToModel(user.certificate) : undefined,
+      roles: user.roles.map(role => transformRoleResponseDtoToModel(role)),
+      customAttributes: user.customAttributes?.map(transformAttributeResponseDtoToModel)
+   }
+}
 
+export function transformUserCertificateDtoToModel(certificate: UserCertificateDto): UserCertificateModel{
+   return { ...certificate };
+}
+
+export function transformRoleResponseDtoToModel(role: RoleResponseDto): RoleResponseModel {
+   return { ...role };
+}
+
+export function transformUserUpdateRequestModelToDto(user: UserUpdateRequestModel): UserUpdateRequestDto {
+   return {
+      ...user,
+      customAttributes: user.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
 }

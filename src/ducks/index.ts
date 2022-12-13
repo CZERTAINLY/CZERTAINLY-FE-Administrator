@@ -6,8 +6,8 @@ import { ApiClients } from "api";
 import { initialState as initialAlertsState, slice as alertsSlice } from "./alerts";
 import { initialState as initialAppRedirectState, slice as appRedirectSlice } from "./app-redirect";
 import { initialState as initialAuthState, slice as authSlice } from "./auth";
-import { initialState as initialDashboardState, slice as dashboardSlice } from "./dashboard";
-import { initialState as initialGroupsState, slice as groupsSlice } from "./groups";
+import { initialState as initialDashboardState, slice as dashboardSlice } from "./statisticsDashboard";
+import { initialState as initialGroupsState, slice as groupsSlice } from "./certificateGroups";
 import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
 import { initialState as initialDiscoveriesState, slice as discoveriesSlice } from "./discoveries";
 import { initialState as initialUsersState, slice as usersSlice } from "./users";
@@ -21,13 +21,13 @@ import { initialState as initialComplianceProfilesState, slice as initialComplia
 import { initialState as initialCredentialsState, slice as initialCredentialsSlice } from "./credentials";
 import { initialState as initialEntitiesState, slice as initialEntitiesSlice } from "./entities";
 import { initialState as initialLocationsState, slice as initialLocationsSlice } from "./locations";
-import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./audit";
+import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./auditLogs";
 
 import authEpics from "./auth-epics";
 import appRedirectEpics from "./app-redirect-epics";
 import startupEpics from "./startup-epics";
-import dashboardEpics from "./dashboard-epics";
-import groupsEpics from "./groups-epics";
+import dashboardEpics from "./statisticsDashboard-epics";
+import groupsEpics from "./certificateGroups-epics";
 import connectorsEpics from "./connectors-epic";
 import discoveriesEpics from "./discoveries-epics";
 import usersEpics from "./users-epics";
@@ -41,7 +41,7 @@ import complianceProfilesEpics from "./compliance-profiles-epics";
 import credentialsEpics from "./credentials-epics";
 import entitiesEpics from "./entities-epics";
 import locationsEpics from "./locations-epics";
-import auditLogsEpics from "./audit-epics";
+import auditLogsEpics from "./auditLogs-epics";
 
 
 export interface EpicDependencies {

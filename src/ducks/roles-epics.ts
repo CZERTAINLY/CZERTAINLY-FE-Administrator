@@ -7,8 +7,13 @@ import { extractError } from "utils/net";
 import * as slice from "./roles";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformRoleDetailDTOToModel, transformRoleDTOToModel, transformSubjectPermissionsDTOToModel } from "./transform/roles";
-import { transformUserDTOToModel } from "./transform/users";
+import {
+    transformRoleDetailDtoToModel,
+    transformRoleRequestModelToDto,
+    transformSubjectPermissionsDtoToModel,
+} from "./transform/roles";
+import { transformUserResponseDtoToModel } from "./transform/users";
+import { transformRoleResponseDtoToModel } from "./transform/auth";
 
 
 const list: AppEpic = (action$, state, deps) => {
@@ -20,10 +25,10 @@ const list: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.roles.list().pipe(
+         () => deps.apiClients.roles.listRoles().pipe(
 
             map(
-               list => slice.actions.listSuccess({ roles: list.map(role => transformRoleDTOToModel(role)) })
+               list => slice.actions.listSuccess({ roles: list.map(role => transformRoleResponseDtoToModel(role)) })
             ),
 
             catchError(
@@ -51,10 +56,10 @@ const getDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.getDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.roles.getRole({ roleUuid: action.payload.uuid }).pipe(
 
             map(
-               role => slice.actions.getDetailSuccess({ role: transformRoleDetailDTOToModel(role) })
+               role => slice.actions.getDetailSuccess({ role: transformRoleDetailDtoToModel(role) })
             ),
 
             catchError(
@@ -82,11 +87,11 @@ const create: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.create(action.payload.name, action.payload.description).pipe(
+         action => deps.apiClients.roles.createRole({ roleRequestDto: transformRoleRequestModelToDto(action.payload) }).pipe(
 
             mergeMap(
                role => of(
-                  slice.actions.createSuccess({ role: transformRoleDetailDTOToModel(role) }),
+                  slice.actions.createSuccess({ role: transformRoleDetailDtoToModel(role) }),
                   appRedirectActions.redirect({ url: `../detail/${role.uuid}` }),
 
                )
@@ -117,15 +122,12 @@ const update: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.update(
-            action.payload.uuid,
-            action.payload.name,
-            action.payload.description
+         action => deps.apiClients.roles.updateRole({ roleUuid: action.payload.uuid, roleRequestDto: action.payload.roleRequest }
          ).pipe(
 
             mergeMap(
                role => of(
-                  slice.actions.updateSuccess({ role: transformRoleDetailDTOToModel(role) }),
+                  slice.actions.updateSuccess({ role: transformRoleDetailDtoToModel(role) }),
                   appRedirectActions.redirect({ url: `../../detail/${role.uuid}` }),
                )
             ),
@@ -155,7 +157,7 @@ const deleteRole: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.roles.delete(action.payload.uuid).pipe(
+         action => deps.apiClients.roles.deleteRole({ roleUuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => iif(
@@ -196,12 +198,12 @@ const getUsers: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.getUsers(action.payload.uuid).pipe(
+         action => deps.apiClients.roles.getRoleUsers({ roleUuid: action.payload.uuid }).pipe(
 
             map(
                users => slice.actions.getUsersSuccess({
                   uuid: action.payload.uuid,
-                  users: users.map(transformUserDTOToModel)
+                  users: users.map(transformUserResponseDtoToModel)
                })
             ),
 
@@ -230,11 +232,11 @@ const updateUsers: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.updateUsers(action.payload.uuid, action.payload.users).pipe(
+         action => deps.apiClients.roles.updateUsers({ roleUuid: action.payload.uuid, requestBody: action.payload.users }).pipe(
 
             mergeMap(
                role => of(
-                  slice.actions.updateUsersSuccess({ role: transformRoleDetailDTOToModel(role) }),
+                  slice.actions.updateUsersSuccess({ role: transformRoleDetailDtoToModel(role) }),
                   appRedirectActions.goBack()
                )
             ),
@@ -264,12 +266,12 @@ const getPermissions: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.getPermissions(action.payload.uuid).pipe(
+         action => deps.apiClients.roles.getRolePermissions({ roleUuid: action.payload.uuid }).pipe(
 
             map(
                permissions => slice.actions.getPermissionsSuccess({
                   uuid: action.payload.uuid,
-                  permissions: transformSubjectPermissionsDTOToModel(permissions)
+                  permissions: transformSubjectPermissionsDtoToModel(permissions)
                })
             ),
 
@@ -298,16 +300,14 @@ const updatePermissions: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.roles.updatePermissions(
-            action.payload.uuid,
-            action.payload.permissions
+         action => deps.apiClients.roles.savePermissions({ roleUuid: action.payload.uuid, rolePermissionsRequestDto: action.payload.permissions }
          ).pipe(
 
             mergeMap(
                permissions => of(
                   slice.actions.updatePermissionsSuccess({
                      uuid: action.payload.uuid,
-                     permissions: transformSubjectPermissionsDTOToModel(permissions)
+                     permissions: transformSubjectPermissionsDtoToModel(permissions)
                   }),
                   appRedirectActions.goBack()
                )

@@ -6,8 +6,6 @@ import { Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButt
 
 import { actions, selectors } from "ducks/certificates";
 
-import { CertificateListQueryFilterModel } from "models";
-
 import { dateFormatter } from "utils/dateUtil";
 import { downloadFileZip } from "utils/download";
 
@@ -22,7 +20,8 @@ import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateInventoryFilter from "../CertificateInventoryFilter";
 import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
-import CertificateStatusIcon from "../CertificateStatusIcon";
+import { CertificateSearchFilterModel } from "types/certificate";
+import CertificateStatus from "../CertificateStatus";
 
 
 interface Props {
@@ -46,7 +45,7 @@ export default function CertificateList({
 
    const totalItems = useSelector(selectors.totalItems);
 
-   const isFetchingAvailablFilters = useSelector(selectors.isFetchingAvailablFilters);
+   const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailableFilters);
    const currentFilters = useSelector(selectors.currentCertificateFilters);
    const isFetchingList = useSelector(selectors.isFetchingList);
    const isIssuing = useSelector(selectors.isIssuing);
@@ -65,7 +64,7 @@ export default function CertificateList({
    const [pageSize, setPageSize] = useState(10);
    const [pageNumber, setPageNumber] = useState(1);
 
-   const [filters, setFilters] = useState<CertificateListQueryFilterModel[]>();
+   const [filters, setFilters] = useState<CertificateSearchFilterModel[]>();
 
    const [upload, setUpload] = useState<boolean>(false);
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -74,7 +73,7 @@ export default function CertificateList({
    const [updateEntity, setUpdateEntity] = useState<boolean>(false);
    const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
-   const isBusy = isFetchingAvailablFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
+   const isBusy = isFetchingAvailableFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
 
    useEffect(
 
@@ -102,7 +101,7 @@ export default function CertificateList({
 
       () => {
          if (!filters) return;
-         dispatch(actions.listCertificates({ query: { filters, itemsPerPage: pageSize, pageNumber } }));
+         dispatch(actions.listCertificates({ itemsPerPage: pageSize, pageNumber, filters }));
          dispatch(actions.setForceRefreshList({ forceRefreshList: false }));
          dispatch(actions.setCheckedRows({checkedRows: []}));
       },
@@ -122,7 +121,7 @@ export default function CertificateList({
 
    const onFiltersChanged = useCallback(
 
-      (fltrs: CertificateListQueryFilterModel[]) => { if (fltrs !== filters) setFilters(fltrs); setPageNumber(1); },
+      (fltrs: CertificateSearchFilterModel[]) => { if (fltrs !== filters) setFilters(fltrs); setPageNumber(1); },
       [filters]
 
    );
@@ -178,7 +177,7 @@ export default function CertificateList({
 
          if (checkedRows.length === 0) return;
 
-         dispatch(actions.bulkDelete({ uuids: checkedRows, allSelect: false, inFilter: filters }));
+         dispatch(actions.bulkDelete({ uuids: checkedRows, filters }));
          setConfirmDelete(false);
 
       },
@@ -298,12 +297,6 @@ export default function CertificateList({
             width: "15%"
          },
          {
-            content: "Entity",
-            //sortable: true,
-            id: "entity",
-            width: "15%"
-         },
-         {
             content: "Group",
             //sortable: true,
             id: "group",
@@ -362,7 +355,7 @@ export default function CertificateList({
 
                columns: [
 
-                  <CertificateStatusIcon status={certificate.status} />,
+                  <CertificateStatus status={certificate.status} asIcon={true} />,
 
                   <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
 
@@ -371,8 +364,6 @@ export default function CertificateList({
                   <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>,
 
                   <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>,
-
-                  certificate.entity?.name || "Unassigned",
 
                   certificate.group?.name || "Unassigned",
 

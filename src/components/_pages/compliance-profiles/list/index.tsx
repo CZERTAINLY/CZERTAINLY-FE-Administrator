@@ -3,14 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container, Table } from "reactstrap";
 
-import { ComplianceListItemRuleDTO } from "api/compliance-profile";
-
 import { actions, selectors } from "ducks/compliance-profiles";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { ComplianceProfileListRuleModel } from "types/complianceProfiles";
 
 export default function AdministratorsList() {
 
@@ -133,7 +132,7 @@ export default function AdministratorsList() {
 
    const getComplianceItems = useCallback(
 
-      (complianceItems: ComplianceListItemRuleDTO[], lookingFor: string) => {
+      (complianceItems: ComplianceProfileListRuleModel[], lookingFor: string) => {
 
          if (lookingFor === "groups") {
 

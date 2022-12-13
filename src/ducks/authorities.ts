@@ -1,12 +1,9 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { AuthorityModel } from "models/authorities";
-import { ConnectorModel } from "models/connectors";
-
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeDescriptorModel } from "../models/attributes/AttributeDescriptorModel";
+import { AuthorityRequestModel, AuthorityResponseModel, AuthorityUpdateRequestModel } from "types/authorities";
+import { AttributeDescriptorModel } from "types/attributes";
+import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
 
 
 export type State = {
@@ -14,12 +11,12 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
-   authority?: AuthorityModel;
-   authorities: AuthorityModel[];
+   authority?: AuthorityResponseModel;
+   authorities: AuthorityResponseModel[];
 
-   authorityProviders?: ConnectorModel[];
+   authorityProviders?: ConnectorResponseModel[];
    authorityProviderAttributeDescriptors?: AttributeDescriptorModel[];
    raProfileAttributeDescriptors?: AttributeDescriptorModel[];
 
@@ -122,7 +119,7 @@ export const slice = createSlice({
       },
 
 
-      listAuthorityProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorModel[] }>) => {
+      listAuthorityProvidersSuccess: (state, action: PayloadAction<{ connectors: ConnectorResponseModel[] }>) => {
 
          state.authorityProviders = action.payload.connectors;
          state.isFetchingAuthorityProviders = false;
@@ -190,7 +187,7 @@ export const slice = createSlice({
       },
 
 
-      listAuthoritiesSuccess: (state, action: PayloadAction<{ authorityList: AuthorityModel[] }>) => {
+      listAuthoritiesSuccess: (state, action: PayloadAction<{ authorityList: AuthorityResponseModel[] }>) => {
 
          state.authorities = action.payload.authorityList;
          state.isFetchingList = false;
@@ -213,7 +210,7 @@ export const slice = createSlice({
       },
 
 
-      getAuthorityDetailSuccess: (state, action: PayloadAction<{ authority: AuthorityModel }>) => {
+      getAuthorityDetailSuccess: (state, action: PayloadAction<{ authority: AuthorityResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -237,12 +234,7 @@ export const slice = createSlice({
       },
 
 
-      createAuthority: (state, action: PayloadAction<{
-         name: string,
-         connectorUuid: string,
-         attributes: AttributeModel[],
-         kind: string,
-      }>) => {
+      createAuthority: (state, action: PayloadAction<AuthorityRequestModel>) => {
 
          state.isCreating = true;
 
@@ -263,14 +255,14 @@ export const slice = createSlice({
       },
 
 
-      updateAuthority: (state, action: PayloadAction<{ uuid: string, attributes: AttributeModel[] }>) => {
+      updateAuthority: (state, action: PayloadAction<{ uuid: string, updateAuthority: AuthorityUpdateRequestModel }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      updateAuthoritySuccess: (state, action: PayloadAction<{ authority: AuthorityModel }>) => {
+      updateAuthoritySuccess: (state, action: PayloadAction<{ authority: AuthorityResponseModel }>) => {
 
          state.isUpdating = false;
 
@@ -331,7 +323,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAuthoritySuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteAuthoritySuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
 

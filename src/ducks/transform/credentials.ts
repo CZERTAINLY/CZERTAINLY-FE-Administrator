@@ -1,16 +1,33 @@
-import { CredentialDTO } from "api/credential"
-import { CredentialModel } from "models/credentials"
+import {
+   CredentialCreateRequestDto,
+   CredentialCreateRequestModel,
+   CredentialEditRequestDto,
+   CredentialEditRequestModel,
+   CredentialResponseDto,
+   CredentialResponseModel
+} from "types/credentials";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
-export function transformCredentialDtoToModel(credentialDto: CredentialDTO): CredentialModel {
-
+export function transformCredentialResponseDtoToModel(credential: CredentialResponseDto): CredentialResponseModel {
    return {
-      uuid: credentialDto.uuid,
-      name: credentialDto.name,
-      kind: credentialDto.kind,
-      attributes: credentialDto.attributes,
-      enabled: credentialDto.enabled,
-      connectorUuid: credentialDto.connectorUuid,
-      connectorName: credentialDto.connectorName
+      ...credential,
+      attributes: credential.attributes.map(transformAttributeResponseDtoToModel),
+      customAttributes: credential.customAttributes?.map(transformAttributeResponseDtoToModel)
    }
+}
 
+export function transformCredentialCreateRequestModelToDto(credential: CredentialCreateRequestModel): CredentialCreateRequestDto {
+   return {
+      ...credential,
+      attributes: credential.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: credential.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
+}
+
+export function transformCredentialEditRequestModelToDto(credential: CredentialEditRequestModel): CredentialEditRequestDto {
+   return {
+      ...credential,
+      attributes: credential.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: credential.customAttributes?.map(transformAttributeRequestModelToDto),
+   }
 }

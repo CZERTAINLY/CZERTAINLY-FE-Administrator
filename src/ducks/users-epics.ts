@@ -7,9 +7,12 @@ import { extractError } from "utils/net";
 import { slice } from "./users";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformCertModelToDTO } from "./transform/certificates";
-import { transformUserDetailDTOToModel, transformUserDTOToModel } from "./transform/users";
-import { transformRoleDTOToModel } from "./transform/roles";
+import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from "./transform/users";
+import {
+    transformRoleResponseDtoToModel,
+    transformUserDetailDtoToModel,
+    transformUserUpdateRequestModelToDto
+} from "./transform/auth";
 
 
 const list: AppEpic = (action$, state, deps) => {
@@ -21,11 +24,11 @@ const list: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.users.list().pipe(
+         () => deps.apiClients.users.listUsers().pipe(
 
             map(
                list => slice.actions.listSuccess({
-                  users: list.map(transformUserDTOToModel)
+                  users: list.map(transformUserResponseDtoToModel)
                })
             ),
 
@@ -52,11 +55,11 @@ const getDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.detail(action.payload.uuid).pipe(
+         action => deps.apiClients.users.getUser({ userUuid: action.payload.uuid }).pipe(
 
             map(
                detail => slice.actions.getDetailSuccess({
-                  user: transformUserDetailDTOToModel(detail)
+                  user: transformUserDetailDtoToModel(detail)
                })
             ),
 
@@ -86,28 +89,21 @@ const create: AppEpic = (action$, state, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.users.create(
-            action.payload.username,
-            action.payload.description,
-            action.payload.firstName,
-            action.payload.lastName,
-            action.payload.email,
-            action.payload.enabled,
-            action.payload.certificateUuid,
-            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
-         ).pipe(
+         action => deps.apiClients.users.createUser({ addUserRequestDto: transformUserAddRequestModelToDto(action.payload.userAddRequest) }
+            ).pipe(
 
             switchMap(
 
-               user => deps.apiClients.users.updateRoles(
-                  user.uuid,
-                  action.payload.roles || []
+               user => deps.apiClients.users.updateRoles({
+                   userUuid: user.uuid,
+                   requestBody: action.payload.roles || []
+                   },
                ).pipe(
 
                   mergeMap(
-                     userDetailDTO => of(
-                        slice.actions.createSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) }),
-                        appRedirectActions.redirect({ url: `../detail/${userDetailDTO.uuid}` })
+                     userDetailDto => of(
+                        slice.actions.createSuccess({ user: transformUserDetailDtoToModel(userDetailDto) }),
+                        appRedirectActions.redirect({ url: `../detail/${userDetailDto.uuid}` })
                      )
                   ),
 
@@ -146,24 +142,17 @@ const update: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.update(
-            action.payload.uuid,
-            action.payload.description,
-            action.payload.firstName,
-            action.payload.lastName,
-            action.payload.email,
-            action.payload.certificateUuid,
-            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
+         action => deps.apiClients.users.updateUser({ userUuid: action.payload.uuid, updateUserRequestDto: transformUserUpdateRequestModelToDto(action.payload.updateUserRequest) }
          ).pipe(
 
             switchMap(
 
-               userDetailDTO => deps.apiClients.users.updateRoles(userDetailDTO.uuid, action.payload.roles || []).pipe(
+               userDetailDto => deps.apiClients.users.updateRoles({ userUuid: userDetailDto.uuid, requestBody: action.payload.roles || [] }).pipe(
 
                   mergeMap(
                      () => of(
-                        slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) }),
-                        appRedirectActions.redirect({ url: `../../detail/${userDetailDTO.uuid}` })
+                        slice.actions.updateSuccess({ user: transformUserDetailDtoToModel(userDetailDto) }),
+                        appRedirectActions.redirect({ url: `../../detail/${userDetailDto.uuid}` })
                      )
                   ),
 
@@ -203,7 +192,7 @@ const deleteUser: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.users.delete(action.payload.uuid).pipe(
+         action => deps.apiClients.users.deleteUser({ userUuid: action.payload.uuid }).pipe(
 
             mergeMap(
 
@@ -247,7 +236,7 @@ const enable: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.users.enable(action.payload.uuid).pipe(
+         action => deps.apiClients.users.enableUser({ userUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.enableSuccess({ uuid: action.payload.uuid })
@@ -278,7 +267,7 @@ const disable: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.users.disable(action.payload.uuid).pipe(
+         action => deps.apiClients.users.disableUser({ userUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.disableSuccess({ uuid: action.payload.uuid })
@@ -309,10 +298,10 @@ const getRoles: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.getRoles(action.payload.uuid).pipe(
+         action => deps.apiClients.users.getUserRoles({ userUuid: action.payload.uuid }).pipe(
 
             map(
-               roles => slice.actions.getRolesSuccess({ uuid: action.payload.uuid, roles: roles.map(transformRoleDTOToModel) })
+               roles => slice.actions.getRolesSuccess({ uuid: action.payload.uuid, roles: roles.map(transformRoleResponseDtoToModel) })
             ),
 
             catchError(
@@ -340,10 +329,10 @@ const updateRoles: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.updateRoles(action.payload.uuid, action.payload.roles).pipe(
+         action => deps.apiClients.users.updateRoles({ userUuid: action.payload.uuid, requestBody: action.payload.roles }).pipe(
 
             map(
-               user => slice.actions.updateRolesSuccess({ user: transformUserDetailDTOToModel(user) })
+               user => slice.actions.updateRolesSuccess({ user: transformUserDetailDtoToModel(user) })
             ),
 
             catchError(
@@ -371,10 +360,10 @@ const addRole: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.addRole(action.payload.uuid, action.payload.roleUuid).pipe(
+         action => deps.apiClients.users.addRole({ userUuid: action.payload.uuid, roleUuid: action.payload.roleUuid }).pipe(
 
             map(
-               user => slice.actions.addRoleSuccess({ user: transformUserDetailDTOToModel(user) })
+               user => slice.actions.addRoleSuccess({ user: transformUserDetailDtoToModel(user) })
             ),
 
             catchError(
@@ -402,10 +391,10 @@ const removeRole: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.removeRole(action.payload.uuid, action.payload.roleUuid).pipe(
+         action => deps.apiClients.users.removeRole({ userUuid: action.payload.uuid, roleUuid: action.payload.roleUuid }).pipe(
 
             map(
-               user => slice.actions.removeRoleSuccess({ user: transformUserDetailDTOToModel(user) })
+               user => slice.actions.removeRoleSuccess({ user: transformUserDetailDtoToModel(user) })
             ),
 
             catchError(

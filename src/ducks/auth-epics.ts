@@ -6,7 +6,7 @@ import { AppEpic } from 'ducks';
 import { actions as appRedirectActions } from "./app-redirect";
 
 import * as slice from './auth';
-import { transformResourceDetailDTOToModel } from './transform/auth';
+import { transformResourceDtoToModel, transformUserUpdateRequestModelToDto } from './transform/auth';
 
 
 const getProfile: AppEpic = (action$, state$, deps) => {
@@ -53,7 +53,7 @@ const updateProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.auth.updateProfile(action.payload.profile).pipe(
+         action => deps.apiClients.auth.updateUserProfile({ updateUserRequestDto: transformUserUpdateRequestModelToDto(action.payload.profile) }).pipe(
 
             map(
                profile => slice.actions.updateProfileSuccess({ profile, redirect: action.payload.redirect })
@@ -112,7 +112,7 @@ const getResources: AppEpic = (action$, state$, deps) => {
          () => deps.apiClients.auth.getAllResources().pipe(
 
             map(
-               resources => slice.actions.getResourcesSuccess({ resources: resources.map(resource => transformResourceDetailDTOToModel(resource)) })
+               resources => slice.actions.getResourcesSuccess({ resources: resources.map(resource => transformResourceDtoToModel(resource)) })
             ),
 
             catchError(
@@ -132,25 +132,25 @@ const getResources: AppEpic = (action$, state$, deps) => {
 };
 
 
-const listObjects: AppEpic = (action$, state$, deps) => {
+const getObjectsForResource: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.listObjects.match
+         slice.actions.getObjectsForResource.match
       ),
       switchMap(
 
-         action => deps.apiClients.auth.listObjects(action.payload.endpoint).pipe(
+         action => deps.apiClients.auth.getObjectsForResource({ resourceName: action.payload.resource }).pipe(
 
             map(
-               objects => slice.actions.listObjectsSuccess({ objects })
+               objects => slice.actions.getObjectsForResourceSuccess({ objects })
             ),
 
             catchError(
 
                err => of(
-                  slice.actions.listObjectsFailure(),
+                  slice.actions.getObjectsForResourceFailure(),
                   appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get objects list" })
                )
 
@@ -170,7 +170,7 @@ export const epics = [
    getResources,
    updateProfile,
    updateProfileSuccess,
-   listObjects,
+   getObjectsForResource,
 ];
 
 

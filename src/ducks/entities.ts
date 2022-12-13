@@ -1,21 +1,20 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { ConnectorModel } from "models/connectors";
-import { EntityModel } from "models/entities";
 import { createFeatureSelector } from "utils/ducks";
+import { EntityRequestModel, EntityResponseModel } from "types/entities";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { ConnectorResponseModel } from "types/connectors";
 
 
 export type State = {
 
    checkedRows: string[];
 
-   entity?: EntityModel;
-   entities: EntityModel[];
+   entity?: EntityResponseModel;
+   entities: EntityResponseModel[];
 
    locationAttributeDescriptors?: AttributeDescriptorModel[];
 
-   entityProviders?: ConnectorModel[];
+   entityProviders?: ConnectorResponseModel[];
    entityProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
    isFetchingEntityProviders: boolean;
@@ -93,7 +92,7 @@ export const slice = createSlice({
       },
 
 
-      listEntityProvidersSuccess: (state, action: PayloadAction<{ providers: ConnectorModel[] }>) => {
+      listEntityProvidersSuccess: (state, action: PayloadAction<{ providers: ConnectorResponseModel[] }>) => {
 
          state.isFetchingEntityProviders = false;
          state.entityProviders = action.payload.providers;
@@ -139,7 +138,7 @@ export const slice = createSlice({
       },
 
 
-      listEntitiesSuccess: (state, action: PayloadAction<EntityModel[]>) => {
+      listEntitiesSuccess: (state, action: PayloadAction<EntityResponseModel[]>) => {
 
          state.entities = action.payload;
          state.isFetchingList = false;
@@ -162,7 +161,7 @@ export const slice = createSlice({
       },
 
 
-      getEntityDetailSuccess: (state, action: PayloadAction<{ entity: EntityModel }>) => {
+      getEntityDetailSuccess: (state, action: PayloadAction<{ entity: EntityResponseModel }>) => {
 
          state.entity = action.payload.entity;
          state.isFetchingDetail = false;
@@ -177,12 +176,7 @@ export const slice = createSlice({
       },
 
 
-      addEntity: (state, action: PayloadAction<{
-         name: string,
-         attributes: AttributeModel[],
-         connectorUuid: string,
-         kind: string
-      }>) => {
+      addEntity: (state, action: PayloadAction<EntityRequestModel>) => {
 
          state.isCreating = true;
 
@@ -215,7 +209,7 @@ export const slice = createSlice({
          const index = state.checkedRows.findIndex((uuid: string) => uuid === action.payload.uuid);
          state.checkedRows.splice(index, 1);
 
-         const index1 = state.entities.findIndex((entity: EntityModel) => entity.uuid === action.payload.uuid);
+         const index1 = state.entities.findIndex((entity: EntityResponseModel) => entity.uuid === action.payload.uuid);
          state.entities.splice(index1, 1);
 
          state.isDeleting = false;
@@ -230,14 +224,14 @@ export const slice = createSlice({
       },
 
 
-      updateEntity: (state, action: PayloadAction<{ uuid: string, attributes: AttributeModel[] }>) => {
+      updateEntity: (state, action: PayloadAction<{ uuid: string, attributes: AttributeRequestModel[], customAttributes?: AttributeRequestModel[] }>) => {
 
          state.isUpdating = true;
 
       },
 
 
-      updateEntitySuccess: (state, action: PayloadAction<{ entity: EntityModel }>) => {
+      updateEntitySuccess: (state, action: PayloadAction<{ entity: EntityResponseModel }>) => {
 
          state.isUpdating = false;
 

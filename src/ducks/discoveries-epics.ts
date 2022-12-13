@@ -6,11 +6,14 @@ import { extractError } from "utils/net";
 
 import { slice } from "./discoveries";
 import { actions as appRedirectActions } from "./app-redirect";
-
-import { transformDiscoveryDTOToModel } from "./transform/discoveries";
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transformConnectorDTOToModel } from "./transform/connectors";
-
+import {
+    transformDiscoveryRequestModelToDto,
+    transformDiscoveryResponseDetailDtoToModel,
+    transformDiscoveryResponseDtoToModel
+} from "./transform/discoveries";
+import { FunctionGroupCode } from "../types/openapi";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
 
@@ -19,12 +22,12 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
       filter(slice.actions.listDiscoveries.match),
       switchMap(
 
-         () => deps.apiClients.discoveries.getDiscoveryList().pipe(
+         () => deps.apiClients.discoveries.listDiscoveries().pipe(
 
             map(
 
                discoveries => slice.actions.listDiscoveriesSuccess({
-                  discoveryList: discoveries.map(transformDiscoveryDTOToModel)
+                  discoveryList: discoveries.map(transformDiscoveryResponseDtoToModel)
                })
 
             ),
@@ -56,10 +59,10 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.discoveries.getDiscoveryDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.discoveries.getDiscovery({ uuid: action.payload.uuid }).pipe(
 
             map(
-               discoveryDto => slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryDTOToModel(discoveryDto) })
+               discoveryDto => slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDetailDtoToModel(discoveryDto) })
             ),
 
             catchError(
@@ -86,11 +89,11 @@ const listDiscoveryProviders: AppEpic = (action$, state, deps) => {
          slice.actions.listDiscoveryProviders.match
       ),
       switchMap(
-         () => deps.apiClients.connectors.getConnectorsList("discoveryProvider").pipe(
+         () => deps.apiClients.connectors.listConnectors({ functionGroup: FunctionGroupCode.DiscoveryProvider }).pipe(
 
             map(
                providers => slice.actions.listDiscoveryProvidersSuccess({
-                  connectors: providers.map(transformConnectorDTOToModel)
+                  connectors: providers.map(transformConnectorResponseDtoToModel)
                })
             ),
 
@@ -119,15 +122,16 @@ const getDiscoveryProviderAttributesDescriptors: AppEpic = (action$, state, deps
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAttributes(
-            action.payload.uuid,
-            "discoveryProvider",
-            action.payload.kind
+         action => deps.apiClients.connectors.getAttributes({
+                 uuid: action.payload.uuid,
+                 functionGroup: FunctionGroupCode.DiscoveryProvider,
+                 kind: action.payload.kind
+             }
          ).pipe(
 
             map(
                attributeDescriptors => slice.actions.getDiscoveryProviderAttributesDescriptorsSuccess({
-                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDTOToModel)
+                  attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -155,11 +159,7 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.discoveries.createNewDiscovery(
-            action.payload.name,
-            action.payload.kind,
-            action.payload.connectorUuid,
-            action.payload.attributes.map(transformAttributeModelToDTO),
+         action => deps.apiClients.discoveries.createDiscovery({ discoveryDto: transformDiscoveryRequestModelToDto(action.payload) }
          ).pipe(
 
             mergeMap(
@@ -194,7 +194,7 @@ const deleteDiscovery: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.discoveries.deleteDiscovery(action.payload.uuid).pipe(
+         action => deps.apiClients.discoveries.deleteDiscovery({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -228,7 +228,7 @@ const bulkDeleteDiscovery: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.discoveries.bulkDeleteDiscovery(action.payload.uuids).pipe(
+         action => deps.apiClients.discoveries.bulkDeleteDiscovery({ requestBody: action.payload.uuids }).pipe(
 
             map(
                () => slice.actions.bulkDeleteDiscoverySuccess({ uuids: action.payload.uuids })

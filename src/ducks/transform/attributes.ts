@@ -1,108 +1,62 @@
-import { AttributeDescriptorDTO, AttributeDTO, AttributeDescriptorCollectionDTO } from "api/_common/attributeDTO";
-import { AttributeCallbackDataDTO, ConnectorHealthDTO } from "api/connectors";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeDescriptorCollectionModel } from "models/attributes/AttributeDescriptorCollectionModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { ConnectorHealthModel, ConnectorHealthPartModel } from "models/connectors";
-import { FunctionGroupCode } from "types/connectors";
-import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
+import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from "types/connectors";
+import {
+   AttributeDescriptorCollectionDto,
+   AttributeDescriptorCollectionModel,
+   AttributeDescriptorDto,
+   AttributeDescriptorModel,
+   AttributeRequestDto,
+   AttributeRequestModel,
+   AttributeResponseDto,
+   AttributeResponseModel
+} from "types/attributes";
 
-
-export function transformAttributeDTOToModel(attribute: AttributeDTO): AttributeModel {
+export function transformAttributeResponseDtoToModel(attribute: AttributeResponseDto): AttributeResponseModel {
 
    return {
-      uuid: attribute.uuid,
-      name: attribute.name,
-      label: attribute.label,
-      type: attribute.type,
+      ...attribute,
       content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined
    }
 
 }
 
-
-export function transformAttributeModelToDTO(attribute: AttributeModel): AttributeDTO {
+export function transformAttributeRequestModelToDto(attributeRequest: AttributeRequestModel): AttributeRequestDto {
 
    return {
-      uuid: attribute.uuid,
-      name: attribute.name,
-      label: attribute.label,
-      type: attribute.type,
-      content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined
+      ...attributeRequest,
+      content: JSON.parse(JSON.stringify(attributeRequest.content))
    }
 
 }
 
-
-export function transformAttributeDescriptorDTOToModel(attributeDescriptor: AttributeDescriptorDTO): AttributeDescriptorModel {
-
-   return {
-      uuid: attributeDescriptor.uuid,
-      name: attributeDescriptor.name,
-      group: attributeDescriptor.group,
-      type: attributeDescriptor.type,
-      label: attributeDescriptor.label,
-      required: attributeDescriptor.required,
-      readOnly: attributeDescriptor.readOnly,
-      visible: attributeDescriptor.visible,
-      list: attributeDescriptor.list,
-      multiSelect: attributeDescriptor.multiSelect,
-      description: attributeDescriptor.description,
-      validationRegex: attributeDescriptor.validationRegex ? new RegExp(attributeDescriptor.validationRegex) : undefined,
-      callback: !attributeDescriptor.attributeCallback ? undefined : {
-         callbackContext: attributeDescriptor.attributeCallback.callbackContext,
-         callbackMethod: attributeDescriptor.attributeCallback.callbackMethod,
-         mappings: attributeDescriptor.attributeCallback.mappings.map(
-            mapping => ({
-               from: mapping.from ? mapping.from : undefined,
-               attributeType: mapping.attributeType ? mapping.attributeType : undefined,
-               to: mapping.to,
-               targets: mapping.targets,
-               value: mapping.value
-            })
-         )
-      },
-      content: !attributeDescriptor.content ? undefined : JSON.parse(JSON.stringify(attributeDescriptor.content))
-   }
-
+export function transformAttributeDescriptorDtoToModel(attributeDescriptor: AttributeDescriptorDto): AttributeDescriptorModel {
+      return ({
+         ...attributeDescriptor,
+         content: attributeDescriptor.content ? JSON.parse(JSON.stringify(attributeDescriptor.content)) : undefined
+      })
 }
 
-
-export function transfromAttributeDescriptorCollectionDTOToModel(collection: AttributeDescriptorCollectionDTO): AttributeDescriptorCollectionModel {
-
+export function transformAttributeDescriptorCollectionDtoToModel(collection: AttributeDescriptorCollectionDto): AttributeDescriptorCollectionModel {
    const result: AttributeDescriptorCollectionModel = {};
 
-   for (const key in collection) {
+   for (const functionGroup in collection) {
+      result[functionGroup] = {};
 
-      const functionFroup = key as FunctionGroupCode;
-
-      result[functionFroup] = {};
-
-      for (const kind in collection[functionFroup]) {
-
-         result[functionFroup]![kind] = collection[functionFroup]![kind].map(
-            attrDesc => transformAttributeDescriptorDTOToModel(attrDesc)
+      for (const kind in collection[functionGroup]) {
+         result[functionGroup]![kind] = collection[functionGroup]![kind].map(
+            attrDesc => transformAttributeDescriptorDtoToModel(attrDesc)
          )
-
       }
-
    }
-
    return result;
-
 }
 
-
-export function transformConnectorHealthDTOToModel(health: ConnectorHealthDTO): ConnectorHealthModel {
-
-   const parts: ConnectorHealthPartModel | undefined = health.parts ? {} : undefined;
+export function transformHealthDtoToModel(health: HealthDto): HealthModel {
+   const parts: { [key: string]: HealthModel; } | undefined = health.parts ? {} : undefined;
 
    if (parts) {
-
       for (const key in health.parts) {
-         parts[key] = transformConnectorHealthDTOToModel(health.parts[key])
+         parts[key] = transformHealthDtoToModel(health.parts[key])
       }
-
    }
 
    return {
@@ -113,15 +67,6 @@ export function transformConnectorHealthDTOToModel(health: ConnectorHealthDTO): 
 
 }
 
-
-export function transformAttributeCallbackDataModelToDto(attributeCallbackData: AttributeCallbackDataModel): AttributeCallbackDataDTO {
-
-   return {
-      uuid: attributeCallbackData.uuid,
-      name: attributeCallbackData.name,
-      pathVariables: attributeCallbackData.pathVariable,
-      queryParameters: attributeCallbackData.queryParameter,
-      requestBody: attributeCallbackData.body
-   };
-
+export function transformCallbackAttributeModelToDto(callbackAttribute: CallbackAttributeModel): CallbackAttributeDto {
+   return {...callbackAttribute};
 }

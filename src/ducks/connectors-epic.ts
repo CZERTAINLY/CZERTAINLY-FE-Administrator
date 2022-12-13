@@ -7,15 +7,19 @@ import { extractError } from "utils/net";
 import { slice } from "./connectors";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformDeleteObjectErrorDtoToModel } from "./transform/_common";
-import { transformConnectorDTOToModel, transformFunctionGroupDTOtoModel } from "./transform/connectors";
+import {
+    transformBulkActionDtoToModel,
+    transformConnectorRequestModelToDto,
+    transformConnectorResponseDtoToModel, transformConnectorUpdateRequestModelToDto,
+    transformFunctionGroupDtoToModel,
+} from "./transform/connectors";
 
 import {
-   transformAttributeCallbackDataModelToDto,
-   transformAttributeDescriptorDTOToModel,
-   transformAttributeModelToDTO,
-   transformConnectorHealthDTOToModel,
-   transfromAttributeDescriptorCollectionDTOToModel
+    transformAttributeDescriptorCollectionDtoToModel,
+    transformAttributeDescriptorDtoToModel,
+    transformAttributeRequestModelToDto,
+    transformCallbackAttributeModelToDto,
+    transformHealthDtoToModel,
 } from "./transform/attributes";
 
 
@@ -28,11 +32,11 @@ const listConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.connectors.getConnectorsList().pipe(
+         () => deps.apiClients.connectors.listConnectors({}).pipe(
 
             map(
                list => slice.actions.listConnectorsSuccess({
-                  connectorList: list.map(transformConnectorDTOToModel)
+                  connectorList: list.map(transformConnectorResponseDtoToModel)
                }),
             ),
 
@@ -61,10 +65,10 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.connectors.getConnector({ uuid: action.payload.uuid }).pipe(
 
             map(
-               detail => slice.actions.getConnectorDetailSuccess({ connector: transformConnectorDTOToModel(detail) })
+               detail => slice.actions.getConnectorDetailSuccess({ connector: transformConnectorResponseDtoToModel(detail) })
             ),
             catchError(
                error => of(
@@ -91,17 +95,18 @@ const getConnectorAttributesDescriptors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAttributes(
-            action.payload.uuid,
-            action.payload.functionGroup,
-            action.payload.kind
+         action => deps.apiClients.connectors.getAttributes({
+                 uuid: action.payload.uuid,
+                 functionGroup: action.payload.functionGroup,
+                 kind: action.payload.kind
+             }
          ).pipe(
 
             map(
                attrs => slice.actions.getConnectorAttributeDescriptorsSuccess({
                   functionGroup: action.payload.functionGroup,
                   kind: action.payload.kind,
-                  attributes: attrs.map(transformAttributeDescriptorDTOToModel)
+                  attributes: attrs.map(transformAttributeDescriptorDtoToModel)
                })
             ),
 
@@ -129,11 +134,11 @@ const getConnectorAllAttributesDescriptors: AppEpic = (action$, state, deps) => 
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorAllAttributes(action.payload.uuid).pipe(
+         action => deps.apiClients.connectors.getAttributesAll({ uuid: action.payload.uuid }).pipe(
 
             map(
                descColl => slice.actions.getConnectorAllAttributesDescriptorsSuccess({
-                  attributeDescriptorCollection: transfromAttributeDescriptorCollectionDTOToModel(descColl)
+                  attributeDescriptorCollection: transformAttributeDescriptorCollectionDtoToModel(descColl)
                })
             ),
 
@@ -160,10 +165,10 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.getConnectorHealth(action.payload.uuid).pipe(
+         action => deps.apiClients.connectors.checkHealth({ uuid: action.payload.uuid }).pipe(
 
             map(
-               health => slice.actions.getConnectorHealthSuccess({ health: transformConnectorHealthDTOToModel(health) })
+               health => slice.actions.getConnectorHealthSuccess({ health: transformHealthDtoToModel(health) })
             ),
 
             catchError(
@@ -190,21 +195,17 @@ const createConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.createNewConnector(
-            action.payload.name,
-            action.payload.url,
-            action.payload.authType,
-            action.payload.authAttributes?.map(transformAttributeModelToDTO)
-         ).pipe(
+          action => deps.apiClients.connectors.createConnector({ connectorRequestDto : transformConnectorRequestModelToDto(action.payload)
+          }).pipe(
 
             switchMap(
 
-               obj => deps.apiClients.connectors.getConnectorDetail(obj.uuid).pipe(
+               obj => deps.apiClients.connectors.getConnector({ uuid: obj.uuid }).pipe(
 
                   mergeMap(
                      connector => of(
                         slice.actions.createConnectorSuccess({
-                           connector: transformConnectorDTOToModel(connector)
+                           connector: transformConnectorResponseDtoToModel(connector)
                         }),
                         appRedirectActions.redirect({ url: `./detail/${connector.uuid}` })
                      )
@@ -245,16 +246,14 @@ const updateConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.updateConnector(
-            action.payload.uuid,
-            action.payload.url,
-            action.payload.authType,
-            action.payload.authAttributes?.map(transformAttributeModelToDTO)
-         ).pipe(
+         action => deps.apiClients.connectors.editConnector({
+             uuid: action.payload.uuid,
+             connectorUpdateRequestDto: transformConnectorUpdateRequestModelToDto(action.payload.connectorUpdateRequest)
+         }).pipe(
 
             mergeMap(
                connector => of(
-                  slice.actions.updateConnectorSuccess({ connector: transformConnectorDTOToModel(connector) }),
+                  slice.actions.updateConnectorSuccess({ connector: transformConnectorResponseDtoToModel(connector) }),
                   appRedirectActions.redirect({ url: `../../detail/${connector.uuid}` })
                )
             ),
@@ -283,7 +282,7 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.deleteConnector(action.payload.uuid).pipe(
+         action => deps.apiClients.connectors.deleteConnector({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid }),
@@ -314,12 +313,12 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkDeleteConnectors(action.payload.uuids).pipe(
+         action => deps.apiClients.connectors.bulkDeleteConnector({ requestBody: action.payload.uuids }).pipe(
 
             map(
                errors => slice.actions.bulkDeleteConnectorsSuccess({
                   uuids: action.payload.uuids,
-                  errors: errors.map(transformDeleteObjectErrorDtoToModel)
+                  errors: errors.map(transformBulkActionDtoToModel)
                })
             ),
 
@@ -347,16 +346,15 @@ const connectConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.connectToConnector(
-            action.payload.url,
-            action.payload.authType,
-            action.payload.authAttributes?.map(transformAttributeModelToDTO),
-            action.payload.uuid
+         action => deps.apiClients.connectors.connect({ connectRequestDto: {
+                 ...action.payload,
+                 authAttributes: action.payload.authAttributes?.map(transformAttributeRequestModelToDto)
+             }}
          ).pipe(
 
             map(
                connection => slice.actions.connectConnectorSuccess({
-                  connectionDetails: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
+                  connectionDetails: connection.map(connection => transformFunctionGroupDtoToModel(connection.functionGroup))
                })
             ),
 
@@ -384,13 +382,13 @@ const reconnectConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.reconnectConnector(action.payload.uuid).pipe(
+         action => deps.apiClients.connectors.reconnect({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                connection => of(
                   slice.actions.reconnectConnectorSuccess({
                      uuid: action.payload.uuid,
-                     functionGroups: connection.map(connection => transformFunctionGroupDTOtoModel(connection.functionGroup))
+                     functionGroups: connection.map(connection => transformFunctionGroupDtoToModel(connection.functionGroup))
                   }),
                   slice.actions.getConnectorHealth({ uuid: action.payload.uuid })
                )
@@ -420,7 +418,7 @@ const bulkReconnectConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkReconnectConnectors(action.payload.uuids).pipe(
+         action => deps.apiClients.connectors.bulkReconnect({ requestBody: action.payload.uuids }).pipe(
 
             map(
                () => slice.actions.bulkReconnectConnectorsSuccess({ uuids: action.payload.uuids })
@@ -450,7 +448,7 @@ const authorizeConnector: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.authorizeConnector(action.payload.uuid).pipe(
+         action => deps.apiClients.connectors.approve({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -484,7 +482,7 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkAuthorizeConnectors(action.payload.uuids).pipe(
+         action => deps.apiClients.connectors.bulkApprove({ requestBody: action.payload.uuids }).pipe(
 
             mergeMap(
                () => of(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }),
@@ -515,7 +513,7 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkForceDeleteConnectors(action.payload.uuids).pipe(
+         action => deps.apiClients.connectors.bulkDeleteConnector({ requestBody: action.payload.uuids }).pipe(
 
             mergeMap(
 
@@ -550,20 +548,19 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
 }
 
 
-const callback: AppEpic = (action$, state, deps) => {
+const callbackConnector: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
       filter(
-         slice.actions.callback.match
+         slice.actions.callbackConnector.match
       ),
       mergeMap(
 
-         action => deps.apiClients.connectors.callback(
-
-            action.payload.url,
-            transformAttributeCallbackDataModelToDto(action.payload.callbackData)
-
+         action => deps.apiClients.callback.callback({
+                 ...action.payload.callbackConnector,
+                 requestAttributeCallback: transformCallbackAttributeModelToDto(action.payload.callbackConnector.requestAttributeCallback)
+             }
          ).pipe(
 
             map(
@@ -594,6 +591,49 @@ const callback: AppEpic = (action$, state, deps) => {
 
 }
 
+const callbackRaProfile: AppEpic = (action$, state, deps) => {
+
+    return action$.pipe(
+
+        filter(
+            slice.actions.callbackRaProfile.match
+        ),
+        mergeMap(
+
+            action => deps.apiClients.callback.raProfileCallback({
+                    ...action.payload.callbackRaProfile,
+                    requestAttributeCallback: transformCallbackAttributeModelToDto(action.payload.callbackRaProfile.requestAttributeCallback)
+                }
+            ).pipe(
+
+                map(
+                    data => {
+                        return slice.actions.callbackSuccess({ callbackId: action.payload.callbackId, data })
+                    }
+                ),
+
+                catchError(
+                    error => of(
+                        slice.actions.callbackFailure({ callbackId: action.payload.callbackId }),
+                        appRedirectActions.fetchError({ error, message: "RA profile callback failure" })
+                    )
+                )
+
+            )
+
+        ),
+
+        catchError(
+            error => of(
+                slice.actions.callbackFailure({ callbackId: "" }),
+                appRedirectActions.fetchError({ error, message: "Failed to perform RA profile callback" })
+            )
+        )
+
+    )
+
+}
+
 const epics = [
    listConnectors,
    getConnectorDetail,
@@ -610,7 +650,8 @@ const epics = [
    authorizeConnector,
    bulkAuthorizeConnectors,
    bulkForceDeleteConnectors,
-   callback,
+   callbackConnector,
+   callbackRaProfile,
 ];
 
 

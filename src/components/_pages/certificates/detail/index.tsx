@@ -4,13 +4,27 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
-import { Form as BootstrapForm, Badge, Button, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Input, Label, Row, UncontrolledButtonDropdown, ButtonGroup } from "reactstrap";
+import {
+    Badge,
+    Button,
+    ButtonGroup,
+    Col,
+    Container,
+    DropdownItem,
+    DropdownMenu,
+    DropdownToggle,
+    Form as BootstrapForm,
+    Input,
+    Label,
+    Row,
+    UncontrolledButtonDropdown
+} from "reactstrap";
 import { Form } from "react-final-form";
 import Select from "react-select";
 
 
 import { actions, selectors } from "ducks/certificates";
-import { actions as groupAction, selectors as groupSelectors } from "ducks/groups";
+import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
@@ -18,8 +32,6 @@ import { dateFormatter } from "utils/dateUtil";
 import { downloadFile, formatPEM } from "utils/certificate";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
-
-import { CertificateRevocationReason } from "types/certificate";
 
 import Widget from "components/Widget";
 import Dialog from "components/Dialog";
@@ -30,13 +42,10 @@ import ProgressButton from "components/ProgressButton";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
-import CertificateValidationStatus from "../CertificateValidationStatus";
 import CertificateStatus from "../CertificateStatus";
 import CertificateRenewDialog from "../CertificateRenewDialog";
-import CertificateEventStatus from "../CertificateHistoryStatus";
-import CertificateComplianceStatus from "../CertificateComplianceStatus";
 import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
-import { AttributeModel } from "models/attributes/AttributeModel";
+import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus } from "types/openapi";
 
 
 export default function CertificateDetail() {
@@ -47,7 +56,7 @@ export default function CertificateDetail() {
 
    const certificate = useSelector(selectors.certificateDetail);
 
-   const groups = useSelector(groupSelectors.groups);
+   const groups = useSelector(groupSelectors.certificateGroups);
    const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
    const eventHistory = useSelector(selectors.certificateHistory);
@@ -84,7 +93,7 @@ export default function CertificateDetail() {
    const [owner, setOwner] = useState<string>();
    const [raProfile, setRaProfile] = useState<string>();
    const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
-   const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
+   const [revokeReason, setRevokeReason] = useState<ClientCertificateRevocationDtoReasonEnum>();
 
    const [locationsCheckedRows, setLocationCheckedRows] = useState<string[]>([]);
    const [selectLocationsCheckedRows, setSelectLocationCheckedRows] = useState<string[]>([]);
@@ -287,7 +296,7 @@ export default function CertificateDetail() {
 
          if (!certificate?.uuid) return;
 
-         dispatch(actions.checkCompliance({ uuids: [certificate.uuid] }));
+         dispatch(actions.checkCompliance({ certificateUuids: [certificate.uuid] }));
       },
       [dispatch, certificate?.uuid]
 
@@ -300,7 +309,7 @@ export default function CertificateDetail() {
 
          if (!certificate || !group) return;
 
-         dispatch(actions.updateGroup({ uuid: certificate.uuid, groupUuid: group }));
+         dispatch(actions.updateGroup({ uuid: certificate.uuid, updateGroupRequest: { groupUuid: group }}));
          setUpdateGroup(false);
 
       },
@@ -315,7 +324,7 @@ export default function CertificateDetail() {
 
          if (!certificate || !owner) return;
 
-         dispatch(actions.updateOwner({ uuid: certificate.uuid, owner: owner }));
+         dispatch(actions.updateOwner({ uuid: certificate.uuid, updateOwnerRequest: { owner: owner }}));
          setUpdateOwner(false);
 
       },
@@ -330,7 +339,7 @@ export default function CertificateDetail() {
 
          if (!certificate || !raProfile) return;
 
-         dispatch(actions.updateRaProfile({ uuid: certificate.uuid, raProfileUuid: raProfile, authorityUuid: raProfileAuthorityUuid || "" }));
+         dispatch(actions.updateRaProfile({ uuid: certificate.uuid, updateRaProfileRequest: { raProfileUuid: raProfile }, authorityUuid: raProfileAuthorityUuid || "" }));
          setUpdateRaProfile(false);
 
       },
@@ -346,7 +355,7 @@ export default function CertificateDetail() {
 
          if (!certificate) return;
 
-         dispatch(actions.revokeCertificate({ uuid: certificate.uuid, reason: revokeReason || 'UNSPECIFIED', attributes: [], raProfileUuid: certificate.raProfile?.uuid || "", authorityUuid: certificate.raProfile?.authorityInstanceUuid || "" }));
+         dispatch(actions.revokeCertificate({ uuid: certificate.uuid, revokeRequest: { reason: revokeReason || ClientCertificateRevocationDtoReasonEnum.Unspecified, attributes: [] }, raProfileUuid: certificate.raProfile?.uuid || "", authorityUuid: certificate.raProfile?.authorityInstanceUuid || "" }));
          setRevoke(false);
 
       },
@@ -363,7 +372,7 @@ export default function CertificateDetail() {
          if (data.fileContent) {
 
             try {
-               dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", pkcs10: data.fileContent, raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
+               dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", renewRequest: { pkcs10: data.fileContent }, raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
             } catch (error) {
             }
          }
@@ -378,7 +387,7 @@ export default function CertificateDetail() {
 
    const onAddCertToLocations = useCallback(
 
-      (values: { locationAttributes: AttributeModel[] } ) => {
+      (values: { locationAttributes: Record<string, any> } ) => {
 
          setAddCertToLocation(false);
 
@@ -386,10 +395,12 @@ export default function CertificateDetail() {
 
          dispatch(
             locationActions.pushCertificate({
-               certificateUuid: certificate.uuid,
-               locationUuid: selectLocationsCheckedRows[0],
-               entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]],
-               pushAttributes: collectFormAttributes("locationAttributes", locationAttributeDescriptors, values)
+                certificateUuid: certificate.uuid,
+                locationUuid: selectLocationsCheckedRows[0],
+                entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]],
+                pushRequest: {
+                    attributes: collectFormAttributes("locationAttributes", locationAttributeDescriptors, values)
+                }
             })
          );
 
@@ -601,7 +612,7 @@ export default function CertificateDetail() {
                menuPlacement="auto"
                options={options}
                placeholder={`Select Revocation Reason`}
-               onChange={(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
+               onChange={(event: any) => setRevokeReason(event?.value as ClientCertificateRevocationDtoReasonEnum)}
             />
 
          </div>
@@ -757,7 +768,7 @@ export default function CertificateDetail() {
 
                history.event,
 
-               <CertificateEventStatus status={history.status} />,
+               <CertificateStatus status={history.status} />,
 
                <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
 
@@ -791,7 +802,7 @@ export default function CertificateDetail() {
          (history) => history.uuid === currentInfoId
       );
 
-      for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation)) {
+      for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
 
          returnList.push(
             <tr>
@@ -803,7 +814,7 @@ export default function CertificateDetail() {
                         wordBreak: "break-all",
                      }}
                   >
-                     {value as string}
+                     {JSON.stringify(value)}
                   </p>
                </td>
             </tr>
@@ -879,7 +890,7 @@ export default function CertificateDetail() {
       () => !certificate ? [] : (certificate.nonCompliantRules || []).map(
          e => ({
             id: e.ruleDescription,
-            columns: [<CertificateComplianceStatus status={e.status} />, e.ruleDescription],
+            columns: [<CertificateStatus status={e.status} />, e.ruleDescription],
             detailColumns: !e.attributes ? undefined : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false} />]
 
          })
@@ -889,14 +900,12 @@ export default function CertificateDetail() {
 
    const metaData: TableDataRow[] = useMemo(
 
-      () => !certificate ? [] : Object.entries(certificate.meta || {}).map(function ([key, value]) {
-         return (
+      () => !certificate || !certificate.metadata? [] : certificate.metadata.map(m => (
             {
-               id: key,
-               columns: [key, value?.toString()],
+               id: m.connectorName,
+               columns: [m.connectorName, m.connectorUuid],
             }
          )
-      }
       ),
       [certificate]
    )
@@ -971,7 +980,7 @@ export default function CertificateDetail() {
       () => {
          let sanList: TableDataRow[] = [];
          for (let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
-            if (value && value.length > 0) {
+            if (value && Array.isArray(value) && value.length > 0) {
                sanList.push({
                   id: key,
                   columns: [key, value.join(", ")],
@@ -992,9 +1001,9 @@ export default function CertificateDetail() {
                id: key,
                columns: [
                   key,
-                  <CertificateValidationStatus status={value.status} />,
+                  <CertificateStatus status={value.status} />,
                   <div style={{ wordBreak: "break-all" }}>
-                     {value.message.split("\n").map((str: string) => (
+                     {value.message?.split("\n").map((str: string) => (
                         <div key={str}>
                            {str}
                            <br />
@@ -1057,7 +1066,7 @@ export default function CertificateDetail() {
          },
          {
             id: "complianceStatus",
-            columns: ["Compliance Status", <CertificateComplianceStatus status={certificate.complianceStatus || "na"} />]
+            columns: ["Compliance Status", <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na} />]
          },
          {
             id: "fingerprint",

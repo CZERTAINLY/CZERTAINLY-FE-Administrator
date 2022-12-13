@@ -6,10 +6,10 @@ import { extractError } from "utils/net";
 
 import { slice } from "./acme-profiles";
 import { actions as appRedirectActions } from "./app-redirect";
-
-import { transformAcmeProfileDtoToModel, transformAcmeProfileListDtoToModel } from "./transform/acme-profiles";
-import { transformAttributeModelToDTO } from "./transform/attributes";
-
+import {
+    transformAcmeProfileAddRequestModelToDto, transformAcmeProfileEditRequestModelToDto,
+    transformAcmeProfileListResponseDtoToModel, transformAcmeProfileResponseDtoToModel
+} from "./transform/acme-profiles";
 
 const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
 
@@ -20,11 +20,11 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.acmeProfiles.getAcmeProfilesList().pipe(
+         () => deps.apiClients.acmeProfiles.listAcmeProfiles().pipe(
 
             map(
                acmeProfiles => slice.actions.listAcmeProfilesSuccess(
-                  { acmeProfileList: acmeProfiles.map(transformAcmeProfileListDtoToModel) }
+                  { acmeProfileList: acmeProfiles.map(transformAcmeProfileListResponseDtoToModel) }
                )
             ),
 
@@ -54,10 +54,10 @@ const getAcmeProfileDetail: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.getAcmeProfileDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeProfiles.getAcmeProfile({ uuid: action.payload.uuid }).pipe(
 
             map(
-               detail => slice.actions.getAcmeProfileSuccess({ acmeProfile: transformAcmeProfileDtoToModel(detail) })
+               detail => slice.actions.getAcmeProfileSuccess({ acmeProfile: transformAcmeProfileResponseDtoToModel(detail) })
             ),
 
             catchError(
@@ -86,20 +86,7 @@ const createAcmeProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.createAcmeProfile(
-            action.payload.name,
-            action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
-            action.payload.revokeCertificateAttributes.map(transformAttributeModelToDTO),
-            action.payload.description,
-            action.payload.termsOfServiceUrl,
-            action.payload.websiteUrl,
-            action.payload.dnsResolverIp,
-            action.payload.dnsResolverPort,
-            action.payload.raProfileUuid,
-            action.payload.retryInterval,
-            action.payload.validity,
-            action.payload.requireContact,
-            action.payload.requireTermsOfService
+         action => deps.apiClients.acmeProfiles.createAcmeProfile({ acmeProfileRequestDto: transformAcmeProfileAddRequestModelToDto(action.payload) }
          ).pipe(
 
             mergeMap(
@@ -136,28 +123,12 @@ const updateAcmeProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.updateAcmeProfile(
-            action.payload.uuid,
-            action.payload.issueCertificateAttributes.map(transformAttributeModelToDTO),
-            action.payload.revokeCertificateAttributes.map(transformAttributeModelToDTO),
-            action.payload.description,
-            action.payload.termsOfServiceUrl,
-            action.payload.websiteUrl,
-            action.payload.dnsResolverIp,
-            action.payload.dnsResolverPort,
-            action.payload.raProfileUuid,
-            action.payload.retryInterval,
-            action.payload.termsOfServiceChangeDisable,
-            action.payload.termsOfServiceChangeUrl,
-            action.payload.validity,
-            action.payload.requireContact,
-            action.payload.requireTermsOfService
-
+         action => deps.apiClients.acmeProfiles.editAcmeProfile({ uuid: action.payload.uuid, acmeProfileEditRequestDto: transformAcmeProfileEditRequestModelToDto(action.payload.updateAcmeRequest) }
          ).pipe(
 
             mergeMap(
                acmeProfile => of(
-                  slice.actions.updateAcmeProfileSuccess({ acmeProfile: transformAcmeProfileDtoToModel(acmeProfile) }),
+                  slice.actions.updateAcmeProfileSuccess({ acmeProfile: transformAcmeProfileResponseDtoToModel(acmeProfile) }),
                   appRedirectActions.redirect({ url: `../../detail/${acmeProfile.uuid}` })
                )
             ),
@@ -187,7 +158,7 @@ const deleteAcmeProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.deleteAcmeProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeProfiles.deleteAcmeProfile({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -221,7 +192,7 @@ const enableAcmeProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.enableAcmeProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeProfiles.enableAcmeProfile({ uuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.enableAcmeProfileSuccess({ uuid: action.payload.uuid })
@@ -251,7 +222,7 @@ const disableAcmeProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.disableAcmeProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.acmeProfiles.disableAcmeProfile({ uuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.disableAcmeProfileSuccess({ uuid: action.payload.uuid })
@@ -283,7 +254,7 @@ const bulkDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.bulkDeleteAcmeProfiles(action.payload.uuids).pipe(
+         action => deps.apiClients.acmeProfiles.bulkDeleteAcmeProfile({ requestBody: action.payload.uuids }).pipe(
 
             map(
                errors => slice.actions.bulkDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, errors })
@@ -315,7 +286,7 @@ const bulkForceDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.bulkForceDeleteAcmeProfiles(action.payload.uuids).pipe(
+         action => deps.apiClients.acmeProfiles.forceDeleteACMEProfiles({ requestBody: action.payload.uuids }).pipe(
 
             mergeMap(
 
@@ -359,7 +330,7 @@ const bulkEnableAcmeProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.bulkEnableAcmeProfile(action.payload.uuids).pipe(
+         action => deps.apiClients.acmeProfiles.bulkEnableAcmeProfile({ requestBody: action.payload.uuids }).pipe(
 
             map(
                () => slice.actions.bulkEnableAcmeProfilesSuccess({ uuids: action.payload.uuids })
@@ -390,7 +361,7 @@ const bulkDisableAcmeProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.acmeProfiles.bulkDisableAcmeProfile(action.payload.uuids).pipe(
+         action => deps.apiClients.acmeProfiles.bulkDisableAcmeProfile({ requestBody: action.payload.uuids }).pipe(
 
             map(
                () => slice.actions.bulkDisableAcmeProfilesSuccess({ uuids: action.payload.uuids })

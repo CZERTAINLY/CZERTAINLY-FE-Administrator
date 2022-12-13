@@ -1,4 +1,4 @@
-import { DashboardDict } from "models/dashboard";
+import { DashboardDict } from "types/statisticsDashboard";
 
 
 export function getLabels(data: DashboardDict) {

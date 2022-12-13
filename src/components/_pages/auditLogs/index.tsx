@@ -4,15 +4,16 @@ import { Button, Container } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { actions as auditLogActions, selectors } from "ducks/audit";
+import { actions as auditLogActions, selectors } from "ducks/auditLogs";
 
-import AuditLogsFilters, { FormValues, } from "./AuditLogsFilters";
+import AuditLogsFilters from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
 import Widget from "components/Widget";
 
 import styles from "./auditLogs.module.scss";
 import { dateFormatter } from "utils/dateUtil";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { AuditLogFilterModel } from "types/auditLogs";
 
 const defaultPageSize = 10;
 
@@ -38,7 +39,7 @@ function AuditLogs() {
    const [page, setPage] = useState(1);
    const [pageSize, setPageSize] = useState(defaultPageSize);
 
-   const [filters, setFilters] = useState<FormValues>({});
+   const [filters, setFilters] = useState<AuditLogFilterModel>({});
 
 
    useEffect(
@@ -69,7 +70,7 @@ function AuditLogs() {
 
    const onFiltersChanged = useCallback(
 
-      (filters: FormValues) => {
+      (filters: AuditLogFilterModel) => {
 
          const filterValues = Object.entries(filters).reduce(
             (acc, [key, value]) =>
@@ -114,10 +115,10 @@ function AuditLogs() {
 
         () => {
 
-            dispatch(auditLogActions.purgeLogs({queryString, filters}));
+            dispatch(auditLogActions.purgeLogs({ page: page - 1, size: pageSize, filters }));
 
         },
-        [dispatch, queryString, filters]
+        [dispatch, page, pageSize, filters]
 
     );
 

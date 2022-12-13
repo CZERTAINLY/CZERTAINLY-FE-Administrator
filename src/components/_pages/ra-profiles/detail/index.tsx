@@ -15,7 +15,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import ProgressButton from "components/ProgressButton";
 
-import AcmeProtocolActiovationDialogBody from "../AcmeProtocolActiovationDialogBody";
+import AcmeProtocolActivationDialogBody from "../AcmeProtocolActivationDialogBody";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
 
 
@@ -578,7 +578,7 @@ export default function RaProfileDetail() {
          <Dialog
             isOpen={associateComplianceProfile}
             caption="Associate Compliance Profile"
-            body={AssociateComplianceProfileDialogBody({ visible: associateComplianceProfile, onClose: () => setAssociateComplianceProfile(false), raProfile: raProfile, availableComplianceProfileUuids: raProfile?.complianceProfiles?.map(e => e.uuid) })}
+            body={AssociateComplianceProfileDialogBody({ visible: associateComplianceProfile, onClose: () => setAssociateComplianceProfile(false), raProfile: raProfile, availableComplianceProfileUuids: associatedComplianceProfiles.map(e => e.uuid) })}
             toggle={() => setAssociateComplianceProfile(false)}
             buttons={[]}
          />
@@ -597,7 +597,7 @@ export default function RaProfileDetail() {
          <Dialog
             isOpen={activateAcmeDialog}
             caption="Activate ACME protocol"
-            body={AcmeProtocolActiovationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid, authorityInstanceUuid: raProfile?.authorityInstanceUuid })}
+            body={AcmeProtocolActivationDialogBody({ visible: activateAcmeDialog, onClose: () => setActivateAcmeDialog(false), raProfileUuid: raProfile?.uuid, authorityInstanceUuid: raProfile?.authorityInstanceUuid })}
             toggle={() => setActivateAcmeDialog(false)}
             buttons={[]}
          />

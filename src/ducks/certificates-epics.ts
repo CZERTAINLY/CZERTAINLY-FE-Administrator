@@ -7,11 +7,23 @@ import { extractError } from "utils/net";
 import * as slice from "./certificates";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformAvailableCertificateFilterDTOToModel, transformCertDTOToModel, transformCertificateHistoryDTOToModel, transformRaProfileDTOToCertificateModel } from "./transform/certificates";
-import { transformAttributeDescriptorDTOToModel, transformAttributeModelToDTO } from "./transform/attributes";
-import { transformGroupDtoToModel } from "./transform/groups";
-import { transformLocationDtoToModel } from "./transform/locations";
-
+import {
+    transformCertificateBulkDeleteRequestModelToDto, transformCertificateBulkDeleteResponseDtoToModel,
+    transformCertificateBulkObjectModelToDto, transformCertificateComplianceCheckModelToDto,
+    transformCertificateHistoryDtoToModel,
+    transformCertificateListResponseDtoToModel,
+    transformCertificateObjectModelToDto,
+    transformCertificateRenewRequestModelToDto,
+    transformCertificateResponseDtoToModel,
+    transformCertificateRevokeRequestModelToDto,
+    transformCertificateSearchFieldDtoToModel,
+    transformCertificateSearchRequestModelToDto,
+    transformCertificateSignRequestModelToDto, transformCertificateUploadModelToDto,
+} from "./transform/certificates";
+import { transformLocationResponseDtoToModel } from "./transform/locations";
+import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
+import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
 
@@ -24,18 +36,18 @@ const listCertificates: AppEpic = (action$, state, deps) => {
 
          action => {
 
-            return deps.apiClients.certificates.getCertificatesList(
-               action.payload.query.itemsPerPage,
-               action.payload.query.pageNumber,
-               action.payload.query.filters
+            return deps.apiClients.certificates.listCertificates({ searchRequestDto: transformCertificateSearchRequestModelToDto(action.payload) }
             ).pipe(
 
                map(
-                  list => slice.actions.listCertificatesSuccess({
-                     certificateList: list.certificates.map(transformCertDTOToModel),
-                     totalItems: list.totalItems,
-                     totalPages: list.totalPages,
-                  })
+                  list => {
+                      const certificateList = transformCertificateListResponseDtoToModel(list);
+                      return slice.actions.listCertificatesSuccess({
+                          certificateList: certificateList.certificates,
+                          totalItems: certificateList.totalItems,
+                          totalPages: certificateList.totalPages,
+                      })
+                  }
                ),
 
                catchError(
@@ -64,10 +76,10 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.getCertificateDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.certificates.getCertificate({ uuid: action.payload.uuid }).pipe(
 
             map(
-               certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertDTOToModel(certificate) })
+               certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertificateResponseDtoToModel(certificate) })
             ),
 
             catchError(
@@ -95,7 +107,7 @@ const getCertificateValidationResult: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.getCertificateValidationResult(action.payload.uuid).pipe(
+         action => deps.apiClients.certificates.getCertificateValidationResult({ uuid: action.payload.uuid }).pipe(
 
             map(
                result => slice.actions.getCertificateValidationResultSuccess(result)
@@ -126,11 +138,11 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.issueCertificate(
-            action.payload.raProfileUuid,
-            action.payload.pkcs10,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
-            action.payload.authorityUuid
+         action => deps.apiClients.clientOperations.issueCertificate({
+             authorityUuid: action.payload.authorityUuid,
+             raProfileUuid: action.payload.raProfileUuid,
+             clientCertificateSignRequestDto: transformCertificateSignRequestModelToDto(action.payload.signRequest)
+         }
          ).pipe(
 
             mergeMap(
@@ -165,12 +177,12 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.revokeCertificate(
-            action.payload.uuid,
-            action.payload.raProfileUuid,
-            action.payload.reason,
-            action.payload.attributes.map(attribute => transformAttributeModelToDTO(attribute)),
-            action.payload.authorityUuid
+         action => deps.apiClients.clientOperations.revokeCertificate({
+             authorityUuid: action.payload.authorityUuid,
+             raProfileUuid: action.payload.raProfileUuid,
+             certificateUuid: action.payload.uuid,
+             clientCertificateRevocationDto: transformCertificateRevokeRequestModelToDto(action.payload.revokeRequest)
+         }
          ).pipe(
 
             mergeMap(
@@ -207,11 +219,12 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.renewCertificate(
-            action.payload.uuid,
-            action.payload.raProfileUuid,
-            action.payload.pkcs10,
-            action.payload.authorityUuid,
+         action => deps.apiClients.clientOperations.renewCertificate({
+                 authorityUuid: action.payload.authorityUuid,
+                 raProfileUuid: action.payload.raProfileUuid,
+                 certificateUuid: action.payload.uuid,
+                 clientCertificateRenewRequestDto: transformCertificateRenewRequestModelToDto(action.payload.renewRequest),
+             }
          ).pipe(
 
             mergeMap(
@@ -246,11 +259,11 @@ const getAvailableCertificateFilters: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.getAvailableCertificateFilters().pipe(
+         action => deps.apiClients.certificates.getSearchableFieldInformation().pipe(
 
             map(
                filters => slice.actions.getAvailableCertificateFiltersSuccess({
-                  availableCertificateFilters: filters.map(filter => transformAvailableCertificateFilterDTOToModel(filter))
+                  availableCertificateFilters: filters.map(filter => transformCertificateSearchFieldDtoToModel(filter))
                })
             ),
 
@@ -279,11 +292,11 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.getCertificateHistory(action.payload.uuid).pipe(
+         action => deps.apiClients.certificates.getCertificateEventHistory({ uuid: action.payload.uuid }).pipe(
 
             map(
                records => slice.actions.getCertificateHistorySuccess({
-                  certificateHistory: records.map(record => transformCertificateHistoryDTOToModel(record))
+                  certificateHistory: records.map(record => transformCertificateHistoryDtoToModel(record))
                })
             ),
 
@@ -312,11 +325,11 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.listLocations(action.payload.uuid).pipe(
+         action => deps.apiClients.certificates.listCertificateLocations({ certificateUuid: action.payload.uuid }).pipe(
 
             map(
                locations => slice.actions.listCertificateLocationsSuccess({
-                  certificateLocations: locations.map(location => transformLocationDtoToModel(location))
+                  certificateLocations: locations.map(location => transformLocationResponseDtoToModel(location))
                })
             ),
 
@@ -345,7 +358,7 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.deleteCertificate(action.payload.uuid).pipe(
+         action => deps.apiClients.certificates.deleteCertificate({ uuid: action.payload.uuid }).pipe(
 
             mergeMap(
                () => of(
@@ -378,21 +391,19 @@ const updateGroup: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.updateGroup(
-            action.payload.uuid,
-            action.payload.groupUuid,
+         action => deps.apiClients.certificates.updateCertificateObjects({ uuid: action.payload.uuid, certificateUpdateObjectsDto: transformCertificateObjectModelToDto(action.payload.updateGroupRequest) }
          ).pipe(
 
             switchMap(
 
-               () => deps.apiClients.groups.getGroupDetail(action.payload.groupUuid).pipe(
+               () => deps.apiClients.certificateGroups.getGroup({ uuid: action.payload.updateGroupRequest.groupUuid! }).pipe(
 
                   mergeMap(
                      group => of(
                         slice.actions.updateGroupSuccess({
                            uuid: action.payload.uuid,
-                           groupUuid: action.payload.groupUuid,
-                           group: transformGroupDtoToModel(group)
+                           groupUuid: action.payload.updateGroupRequest.groupUuid!,
+                           group: transformCertificateGroupResponseDtoToModel(group)
                         }),
                         slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
                      )
@@ -433,21 +444,22 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.updateRaProfile(
-            action.payload.uuid,
-            action.payload.raProfileUuid,
+         action => deps.apiClients.certificates.updateCertificateObjects({
+                 uuid: action.payload.uuid,
+                 certificateUpdateObjectsDto: transformCertificateObjectModelToDto(action.payload.updateRaProfileRequest),
+             }
          ).pipe(
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.raProfiles.getRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.updateRaProfileRequest.raProfileUuid! }).pipe(
 
                   mergeMap(
                      raProfile => of(
                         slice.actions.updateRaProfileSuccess({
                            uuid: action.payload.uuid,
-                           raProfileUuid: action.payload.raProfileUuid,
-                           raProfile: transformRaProfileDTOToCertificateModel(raProfile)
+                           raProfileUuid: action.payload.updateRaProfileRequest.raProfileUuid!,
+                           raProfile: transformRaProfileResponseDtoToModel(raProfile)
                         }),
                         slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
                      )
@@ -489,16 +501,17 @@ const updateOwner: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.updateOwner(
-            action.payload.uuid,
-            action.payload.owner,
+         action => deps.apiClients.certificates.updateCertificateObjects({
+                 uuid: action.payload.uuid,
+                 certificateUpdateObjectsDto: action.payload.updateOwnerRequest
+             }
          ).pipe(
 
             mergeMap(
                () => of(
                   slice.actions.updateOwnerSuccess({
                      uuid: action.payload.uuid,
-                     owner: action.payload.owner
+                     owner: action.payload.updateOwnerRequest.owner!
                   }),
                   slice.actions.getCertificateHistory({ uuid: action.payload.uuid })
                )
@@ -529,24 +542,18 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.bulkUpdateGroup(
-            action.payload.uuids,
-            action.payload.groupUuid,
-            action.payload.inFilter,
-            action.payload.allSelect,
+         action => deps.apiClients.certificates.bulkUpdateCertificateObjects({ multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload) }
          ).pipe(
 
             switchMap(
 
-               () => deps.apiClients.groups.getGroupDetail(action.payload.groupUuid).pipe(
+               () => deps.apiClients.certificateGroups.getGroup({ uuid: action.payload.groupUuid! }).pipe(
 
                   map(
 
                      group => slice.actions.bulkUpdateGroupSuccess({
-                        uuids: action.payload.uuids,
-                        group,
-                        inFilter: action.payload.inFilter,
-                        allSelect: action.payload.allSelect,
+                        uuids: action.payload.certificateUuids!,
+                        group: group,
                      })
 
                   ),
@@ -587,24 +594,18 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.bulkUpdateRaProfile(
-            action.payload.uuids,
-            action.payload.raProfileUuid,
-            action.payload.inFilter,
-            action.payload.allSelect,
+         action => deps.apiClients.certificates.bulkUpdateCertificateObjects({ multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload.raProfileRequest) }
          ).pipe(
 
             switchMap(
 
-               () => deps.apiClients.profiles.getRaProfileDetail(action.payload.authorityUuid, action.payload.raProfileUuid).pipe(
+               () => deps.apiClients.raProfiles.getRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.raProfileRequest.raProfileUuid! }).pipe(
 
                   map(
 
                      raProfile => slice.actions.bulkUpdateRaProfileSuccess({
-                        uuids: action.payload.uuids,
+                        uuids: action.payload.raProfileRequest.certificateUuids!,
                         raProfile,
-                        inFilter: action.payload.inFilter,
-                        allSelect: action.payload.allSelect,
                      })
 
                   ),
@@ -645,20 +646,14 @@ const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.bulkUpdateOwner(
-            action.payload.uuids,
-            action.payload.owner,
-            action.payload.inFilter,
-            action.payload.allSelect,
+         action => deps.apiClients.certificates.bulkUpdateCertificateObjects({ multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload) }
          ).pipe(
 
             map(
 
                () => slice.actions.bulkUpdateOwnerSuccess({
-                  uuids: action.payload.uuids,
-                  owner: action.payload.owner,
-                  inFilter: action.payload.inFilter,
-                  allSelect: action.payload.allSelect,
+                  uuids: action.payload.certificateUuids!,
+                  owner: action.payload.owner!,
                }),
 
             ),
@@ -688,19 +683,13 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.bulkDeleteCertificate(
-            action.payload.uuids,
-            action.payload.inFilter,
-            action.payload.allSelect,
+         action => deps.apiClients.certificates.bulkDeleteCertificate({ removeCertificateDto: transformCertificateBulkDeleteRequestModelToDto(action.payload) }
          ).pipe(
 
             map(
 
                (result) => slice.actions.bulkDeleteSuccess({
-                  uuids: action.payload.uuids,
-                  inFilter: action.payload.inFilter,
-                  allSelect: action.payload.allSelect,
-                  response: result,
+                  response: transformCertificateBulkDeleteResponseDtoToModel(result),
                }),
 
             ),
@@ -730,19 +719,18 @@ const uploadCertificate: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.uploadCertificate(
-            action.payload.certificate
+         action => deps.apiClients.certificates.upload({ uploadCertificateRequestDto: transformCertificateUploadModelToDto(action.payload) }
          ).pipe(
 
             switchMap(
 
-               obj => deps.apiClients.certificates.getCertificateDetail(obj.uuid).pipe(
+               obj => deps.apiClients.certificates.getCertificate({ uuid: obj.uuid }).pipe(
 
                   map(
 
                      certificate => slice.actions.uploadCertificateSuccess({
                         uuid: obj.uuid,
-                        certificate,
+                        certificate: transformCertificateResponseDtoToModel(certificate),
                      })
 
                   ),
@@ -783,16 +771,14 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.getIssuanceAttributes(
-            action.payload.raProfileUuid,
-            action.payload.authorityUuid,
+         action => deps.apiClients.clientOperations.listIssueCertificateAttributes({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.raProfileUuid }
          ).pipe(
 
             map(
 
                attributes => slice.actions.getIssuanceAttributesSuccess({
                   raProfileUuid: action.payload.raProfileUuid,
-                  issuanceAttributes: attributes.map(attribute => transformAttributeDescriptorDTOToModel(attribute)),
+                  issuanceAttributes: attributes.map(attribute => transformAttributeDescriptorDtoToModel(attribute)),
                }),
 
             ),
@@ -822,16 +808,14 @@ const getRevocationAttributes: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.operations.getRevocationAttributes(
-            action.payload.raProfileUuid,
-            action.payload.authorityUuid,
+         action => deps.apiClients.clientOperations.listRevokeCertificateAttributes({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.raProfileUuid }
          ).pipe(
 
             map(
 
                attributes => slice.actions.getRevocationAttributesSuccess({
                   raProfileUuid: action.payload.raProfileUuid,
-                  revocationAttributes: attributes.map(attribute => transformAttributeDescriptorDTOToModel(attribute)),
+                  revocationAttributes: attributes.map(attribute => transformAttributeDescriptorDtoToModel(attribute)),
                }),
 
             ),
@@ -861,8 +845,7 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.checkCompliance(
-            action.payload.uuids
+         action => deps.apiClients.certificates.checkCertificatesCompliance({ certificateComplianceCheckDto: transformCertificateComplianceCheckModelToDto(action.payload) }
          ).pipe(
 
             map(

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup } from 'reactstrap';
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
 import { Field, Form } from "react-final-form";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
@@ -9,9 +9,8 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 
-import { actions} from "ducks/compliance-profiles";
-import { AttributeModel } from 'models/attributes/AttributeModel';
-import { AttributeDescriptorModel } from 'models/attributes/AttributeDescriptorModel';
+import { actions } from "ducks/compliance-profiles";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface Props {
@@ -51,19 +50,25 @@ export default function AddRuleWithAttributesDialogBody({
          if (!complianceProfileUuid) return;
          if (!connectorUuid) return;
 
-         const attribs: AttributeModel[] = attributes && attributes.length > 0
+         const attribs = attributes && attributes.length > 0
             ?
             collectFormAttributes("attributes", attributes, values) || []
             :
             []
             ;
 
-         dispatch(actions.addRule({ uuid: complianceProfileUuid, connectorName: connectorName, connectorUuid: connectorUuid, kind: kind, ruleUuid: ruleUuid, description: ruleDescription, ruleName: ruleName, groupUuid: groupUuid, attributes: attribs }));
+         dispatch(actions.addRule({ uuid: complianceProfileUuid, addRequest: {
+               connectorUuid: connectorUuid,
+               kind: kind,
+               ruleUuid: ruleUuid,
+               attributes: attribs
+            }
+         }));
 
          onClose();
 
       },
-      [dispatch, complianceProfileUuid, connectorUuid, connectorName, kind, ruleUuid, ruleName, ruleDescription, groupUuid, attributes, onClose]
+      [dispatch, complianceProfileUuid, connectorUuid, kind, ruleUuid, attributes, onClose]
 
    )
 

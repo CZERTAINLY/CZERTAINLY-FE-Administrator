@@ -9,9 +9,6 @@ import Select from "react-select";
 
 import { validateRequired, composeValidators, validateAlphaNumeric, validateCustomIp, validateInteger, validateCustomUrl } from "utils/validators";
 
-import { AcmeProfileModel } from "models/acme-profiles";
-import { RaProfileModel } from "models/ra-profiles";
-
 import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from "ducks/acme-profiles";
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
@@ -21,6 +18,8 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { AcmeProfileResponseModel } from "types/acme-profiles";
+import { RaProfileResponseModel } from "types/ra-profiles";
 
 
 
@@ -62,8 +61,8 @@ export default function RaProfileForm() {
    const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
    const isFetchingRevocationAttributes = useSelector(raProfileSelectors.isFetchingRevocationAttributes);
 
-   const [acmeProfile, setAcmeProfile] = useState<AcmeProfileModel>();
-   const [raProfile, setRaProfile] = useState<RaProfileModel>();
+   const [acmeProfile, setAcmeProfile] = useState<AcmeProfileResponseModel>();
+   const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
 
 
    const isBusy = useMemo(
@@ -125,20 +124,22 @@ export default function RaProfileForm() {
 
             dispatch(acmeProfileActions.updateAcmeProfile({
                uuid: id!,
-               description: values.description,
-               dnsResolverIp: values.dnsIpAddress,
-               dnsResolverPort: values.dnsPort,
-               retryInterval: parseInt(values.retryInterval),
-               validity: parseInt(values.orderValidity),
-               termsOfServiceUrl: values.termsUrl,
-               websiteUrl: values.webSite,
-               termsOfServiceChangeUrl: values.termsChangeUrl,
-               termsOfServiceChangeDisable: values.disableOrders,
-               requireTermsOfService: values.requireAgreement,
-               requireContact: values.requireContact,
-               raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-               issueCertificateAttributes: collectFormAttributes("issuanceAttributes", raProfileIssuanceAttrDescs, values),
-               revokeCertificateAttributes: collectFormAttributes("revocationAttributes", raProfileRevocationAttrDescs, values)
+                updateAcmeRequest: {
+                    description: values.description,
+                    dnsResolverIp: values.dnsIpAddress,
+                    dnsResolverPort: values.dnsPort,
+                    retryInterval: parseInt(values.retryInterval),
+                    validity: parseInt(values.orderValidity),
+                    termsOfServiceUrl: values.termsUrl,
+                    websiteUrl: values.webSite,
+                    termsOfServiceChangeUrl: values.termsChangeUrl,
+                    termsOfServiceChangeDisable: values.disableOrders,
+                    requireTermsOfService: values.requireAgreement,
+                    requireContact: values.requireContact,
+                    raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
+                    issueCertificateAttributes: collectFormAttributes("issuanceAttributes", raProfileIssuanceAttrDescs, values),
+                    revokeCertificateAttributes: collectFormAttributes("revocationAttributes", raProfileRevocationAttrDescs, values)
+                }
             }));
 
          } else {
@@ -152,8 +153,6 @@ export default function RaProfileForm() {
                validity: parseInt(values.orderValidity),
                termsOfServiceUrl: values.termsUrl,
                websiteUrl: values.webSite,
-               termsOfServiceChangeUrl: values.termsChangeUrl,
-               termsOfServiceChangeDisable: values.disableOrders,
                requireTermsOfService: values.requireAgreement,
                requireContact: values.requireContact,
                raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",

@@ -12,24 +12,14 @@ import {
 } from 'reactstrap';
 
 import styles from './auditLogsFilters.module.scss';
-
-export interface FormValues {
-   affected?: string;
-   author?: string;
-   createdFrom?: string;
-   createdTo?: string;
-   objectIdentifier?: string;
-   operation?: string;
-   operationStatus?: string;
-   origination?: string;
-}
+import { AuditLogFilterModel } from "types/auditLogs";
 
 interface Props {
    operations: string[];
    operationStates: string[];
    objects: string[];
    onClear?: () => void;
-   onFilters?: (filters: FormValues) => void;
+   onFilters?: (filters: AuditLogFilterModel) => void;
 }
 
 const dateCalculator = createDecorator(
@@ -37,7 +27,7 @@ const dateCalculator = createDecorator(
       field: 'createdFrom',
       updates: {
          createdTo: (createdFromValue: string | undefined, allValues) => {
-            const dateTo = (allValues as FormValues).createdTo;
+            const dateTo = (allValues as AuditLogFilterModel).createdTo;
             if (!createdFromValue) {
                return undefined;
             } else if (!dateTo || new Date(dateTo).valueOf() < new Date(createdFromValue).valueOf()) {
@@ -52,7 +42,7 @@ const dateCalculator = createDecorator(
       field: 'createdTo',
       updates: {
          createdFrom: (createdToValue: string | undefined, allValues) => {
-            const dateFrom = (allValues as FormValues).createdFrom;
+            const dateFrom = (allValues as AuditLogFilterModel).createdFrom;
             if (!createdToValue) {
                return undefined;
             } else if (!dateFrom || new Date(dateFrom).valueOf() > new Date(createdToValue).valueOf()) {
@@ -69,14 +59,14 @@ const normalizeAllValue = (value?: string) => value === '- All -' ? undefined : 
 
 function AuditLogsFilters({ objects, operationStates, operations, onClear, onFilters }: Props) {
    const submitCallback = useCallback(
-      (values: FormValues) => {
+      (values: AuditLogFilterModel) => {
          if (onFilters) {
             onFilters(values);
          }
       },
       [onFilters],
    );
-   const clearCallback = (form: FormApi) => {
+   const clearCallback = (form: FormApi<AuditLogFilterModel>) => {
       form.reset();
       if (onClear) {
          onClear();

@@ -1,8 +1,11 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { AcmeProfileListItemModel, AcmeProfileModel } from "models/acme-profiles";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
+import {
+   AcmeProfileAddRequestModel, AcmeProfileEditRequestModel,
+   AcmeProfileListResponseModel,
+   AcmeProfileResponseModel
+} from "types/acme-profiles";
+import { BulkActionModel } from "types/connectors";
 
 
 export type State = {
@@ -10,10 +13,10 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
-   acmeProfile?: AcmeProfileModel;
-   acmeProfiles: AcmeProfileListItemModel[];
+   acmeProfile?: AcmeProfileResponseModel;
+   acmeProfiles: AcmeProfileListResponseModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -97,7 +100,7 @@ export const slice = createSlice({
       },
 
 
-      listAcmeProfilesSuccess: (state, action: PayloadAction<{ acmeProfileList: AcmeProfileListItemModel[] }>) => {
+      listAcmeProfilesSuccess: (state, action: PayloadAction<{ acmeProfileList: AcmeProfileListResponseModel[] }>) => {
 
          state.acmeProfiles = action.payload.acmeProfileList;
          state.isFetchingList = false;
@@ -119,7 +122,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileModel }>) => {
+      getAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -144,23 +147,7 @@ export const slice = createSlice({
       },
 
 
-      createAcmeProfile: (state, action: PayloadAction<{
-         name: string,
-         description: string,
-         termsOfServiceUrl: string,
-         dnsResolverIp: string,
-         dnsResolverPort: string,
-         raProfileUuid: string | undefined,
-         websiteUrl: string,
-         retryInterval: number,
-         termsOfServiceChangeDisable: boolean,
-         validity: number,
-         issueCertificateAttributes: AttributeModel[],
-         revokeCertificateAttributes: AttributeModel[],
-         requireContact: boolean,
-         requireTermsOfService: boolean,
-         termsOfServiceChangeUrl: string
-      }>) => {
+      createAcmeProfile: (state, action: PayloadAction<AcmeProfileAddRequestModel>) => {
 
          state.isCreating = true;
 
@@ -183,20 +170,7 @@ export const slice = createSlice({
 
       updateAcmeProfile: (state, action: PayloadAction<{
          uuid: string,
-         description: string,
-         termsOfServiceUrl: string,
-         dnsResolverIp: string,
-         dnsResolverPort: string,
-         raProfileUuid: string | undefined,
-         websiteUrl: string,
-         retryInterval: number,
-         termsOfServiceChangeDisable: boolean,
-         validity: number,
-         issueCertificateAttributes: AttributeModel[],
-         revokeCertificateAttributes: AttributeModel[],
-         requireContact: boolean,
-         requireTermsOfService: boolean,
-         termsOfServiceChangeUrl: string
+         updateAcmeRequest: AcmeProfileEditRequestModel
       }>) => {
 
          state.isUpdating = true;
@@ -204,7 +178,7 @@ export const slice = createSlice({
       },
 
 
-      updateAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileModel }>) => {
+      updateAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileResponseModel }>) => {
 
          state.isUpdating = false;
 
@@ -319,7 +293,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
          if (action.payload.errors?.length > 0) {

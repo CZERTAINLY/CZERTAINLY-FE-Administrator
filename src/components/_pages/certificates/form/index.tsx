@@ -16,14 +16,14 @@ import ProgressButton from "components/ProgressButton";
 import Select, { SingleValue } from "react-select";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
-import { RaProfileModel } from "models/ra-profiles";
 import { FormApi } from "final-form";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { useNavigate } from "react-router-dom";
+import { RaProfileResponseModel } from "types/ra-profiles";
 
 
 interface FormValues {
-   raProfile: SingleValue<{ label: string; value: RaProfileModel }> | null;
+   raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
    pkcs10: File | null;
    fileName: string;
    contentType: string;
@@ -126,9 +126,11 @@ export default function CertificateForm() {
 
          dispatch(certificateActions.issueCertificate({
             raProfileUuid: values.raProfile.value.uuid,
-            pkcs10: values.file,
             authorityUuid: values.raProfile.value.authorityInstanceUuid,
-            attributes,
+             signRequest: {
+                 pkcs10: values.file,
+                 attributes,
+             }
             
          }));
 
@@ -140,7 +142,7 @@ export default function CertificateForm() {
 
    const onRaProfileChange = useCallback(
 
-      (event: SingleValue<{ label: string; value: RaProfileModel }>) => {
+      (event: SingleValue<{ label: string; value: RaProfileResponseModel }>) => {
 
          if (!event) return;
          dispatch(certificateActions.getIssuanceAttributes({ raProfileUuid: event.value.uuid, authorityUuid: event.value.authorityInstanceUuid }));

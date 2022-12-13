@@ -1,12 +1,12 @@
 import CertificateAttributes from "components/CertificateAttributes";
-import { CertificateModel } from "models";
 import { useCallback, useState } from "react";
 import { Button, ButtonGroup, Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 import { getCertificateInformation } from "utils/certificate";
+import { CertificateResponseModel } from "types/certificate";
 
 interface Props {
    onCancel: () => void;
-   onUpload: (data: { fileContent: string, fileName: string, contentType: string, certificate: CertificateModel }) => void;
+   onUpload: (data: { fileContent: string, fileName: string, contentType: string, certificate: CertificateResponseModel }) => void;
    okButtonTitle?: string;
 }
 
@@ -22,7 +22,7 @@ export default function CertificateUploadDialog({
 
    const [error, setError] = useState<string>("");
 
-   const [certificate, setCertificate] = useState<CertificateModel | undefined>();
+   const [certificate, setCertificate] = useState<CertificateResponseModel | undefined>();
 
 
    const onFileLoaded = useCallback(
@@ -49,7 +49,7 @@ export default function CertificateUploadDialog({
             return;
          }
 
-         let crt: CertificateModel | undefined = undefined;
+         let crt: CertificateResponseModel | undefined = undefined;
 
          try {
             crt = getCertificateInformation(b64decoded);

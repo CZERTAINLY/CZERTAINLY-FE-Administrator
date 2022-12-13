@@ -4,16 +4,18 @@ import { Input } from "reactstrap";
 
 import style from "./style.module.scss";
 
-import { ResourceDetailModel, SubjectPermissionsModel } from "models";
 import { actions as authActions, selectors as authSelectors } from "ducks/auth";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { SubjectPermissionsModel } from "types/roles";
+import { ResourceModel } from "types/auth";
+import { Resource } from "types/openapi";
 
 interface Props {
-   resources?: ResourceDetailModel[]
+   resources?: ResourceModel[]
    permissions?: SubjectPermissionsModel;
    disabled?: boolean;
    onPermissionsChanged?: (permissions: SubjectPermissionsModel) => void;
@@ -31,7 +33,7 @@ function RolePermissionsEditor({
    const objects = useSelector(authSelectors.objects);
    const isFetchingObjects = useSelector(authSelectors.isFetchingObjects);
 
-   const [currentResource, setCurrentResource] = useState<ResourceDetailModel>();
+   const [currentResource, setCurrentResource] = useState<ResourceModel>();
 
    const [selectedObjects, setSelectedObjects] = useState<string[]>([]);
    const [objectsToAdd, setObjectsToAdd] = useState<string[]>([]);
@@ -44,7 +46,7 @@ function RolePermissionsEditor({
 
    const getPermissions = useCallback(
 
-      (resource: ResourceDetailModel) => {
+      (resource: ResourceModel) => {
 
          if (permissions.allowAllResources) return "All actions allowed";
 
@@ -71,10 +73,10 @@ function RolePermissionsEditor({
 
    const onResourceSelected = useCallback(
 
-      (resource: ResourceDetailModel) => {
+      (resource: ResourceModel) => {
 
          setObjectsToAdd([]);
-         if (resource.listObjectsEndpoint) dispatch(authActions.listObjects({ endpoint: resource.listObjectsEndpoint }));
+         if (resource.listObjectsEndpoint) dispatch(authActions.getObjectsForResource({ resource: resource.name as Resource }));
          setCurrentResource(resource);
 
       },
@@ -85,7 +87,7 @@ function RolePermissionsEditor({
 
    const allowAllActions = useCallback(
 
-      (resource: ResourceDetailModel, enable: boolean) => {
+      (resource: ResourceModel, enable: boolean) => {
 
          const newPermissions: SubjectPermissionsModel = clonePerms();
 
@@ -112,7 +114,7 @@ function RolePermissionsEditor({
 
    const allowAction = useCallback(
 
-      (resource: ResourceDetailModel, action: string, enable: boolean) => {
+      (resource: ResourceModel, action: string, enable: boolean) => {
 
          const newPermissions: SubjectPermissionsModel = clonePerms();
 
@@ -491,6 +493,7 @@ function RolePermissionsEditor({
                name: currentResource?.name || "",
                allowAllActions: false,
                actions: [],
+               objects: []
             };
 
             newPermissions.resources.push(perms);

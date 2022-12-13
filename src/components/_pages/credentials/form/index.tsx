@@ -7,9 +7,6 @@ import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, In
 
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
-import { CredentialModel } from "models/credentials";
-import { ConnectorModel } from "models/connectors";
-
 import { actions, selectors } from "ducks/credentials";
 import { actions as connectorsActions } from "ducks/connectors";
 
@@ -20,6 +17,8 @@ import Select from "react-select/";
 import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
+import { CredentialResponseModel } from "types/credentials";
+import { ConnectorResponseModel } from "types/connectors";
 
 
 interface FormValues {
@@ -48,8 +47,8 @@ export default function CredentialForm() {
    const isCreating = useSelector(selectors.isCreating);
    const isUpdating = useSelector(selectors.isUpdating);
 
-   const [credential, setCredential] = useState<CredentialModel>();
-   const [credentialProvider, setCredentialProvider] = useState<ConnectorModel>();
+   const [credential, setCredential] = useState<CredentialResponseModel>();
+   const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
       () => isFetchingCredentialDetail || isFetchingCredentialProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
@@ -142,7 +141,9 @@ export default function CredentialForm() {
 
             dispatch(actions.updateCredential({
                uuid: id!,
-               attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values)
+                credentialRequest: {
+                   attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values),
+                }
             }));
 
          } else {
@@ -151,7 +152,7 @@ export default function CredentialForm() {
                name: values.name!,
                connectorUuid: values.credentialProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values)
+               attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values),
             }));
 
          }
