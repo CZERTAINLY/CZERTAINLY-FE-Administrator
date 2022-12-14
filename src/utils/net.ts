@@ -1,10 +1,10 @@
-import { AjaxResponse } from "rxjs/ajax";
+import { AjaxError } from "rxjs/ajax";
 
-export function extractError<T>(err: AjaxResponse<T> | Error, headline: string): string {
+export function extractError(err: Error, headline: string): string {
    if (!err) return headline;
 
-   if (err instanceof Error) return `${headline}: ${err.message}`;
+   if (err instanceof AjaxError) return `${headline}: ${err.status}: ${err.message}`;
    if (err instanceof Event) return `${headline}: Network connection failure`;
 
-   return `${headline}. ${err.status}`;
+   return `${headline}. ${err.message}`;
 }
