@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
-import { AjaxResponse } from "rxjs/ajax";
+import { AjaxError } from "rxjs/ajax";
 
 export type State = {
 
@@ -63,13 +63,10 @@ export const slice = createSlice({
       },
 
 
-      fetchError: (state, action: PayloadAction<{ error: AjaxResponse<unknown> | Error, message: string }>) => {
-         if (action.payload.error instanceof Error) return;
-
-         if (action.payload.error.status === 401) {
+      fetchError: (state, action: PayloadAction<{ error: Error, message: string }>) => {
+         if (action.payload.error instanceof AjaxError && action.payload.error.status === 401) {
             state.unauthorized = true;
          }
-
       }
 
 

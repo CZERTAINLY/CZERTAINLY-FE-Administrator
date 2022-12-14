@@ -6,6 +6,7 @@ import { AppEpic } from 'ducks';
 import { slice } from "./app-redirect";
 import { actions as alertActions } from "./alerts";
 import { extractError } from 'utils/net';
+import { AjaxError } from "rxjs/ajax";
 
 
 const fetchError: AppEpic = (action$, state$, deps) => {
@@ -17,9 +18,9 @@ const fetchError: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => action.payload.error instanceof Error || action.payload.error.status !== 401 ?
-                of(alertActions.error(extractError(action.payload.error, action.payload.message)))
-                : EMPTY
+         action => (action.payload.error instanceof AjaxError && action.payload.error.status === 401) ?
+                EMPTY
+                : of(alertActions.error(extractError(action.payload.error, action.payload.message)))
 
       )
 
