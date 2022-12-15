@@ -40,9 +40,9 @@ export function Attribute({
          const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
          const fileContent = fileInfo.split(",")[1];
 
-         form.mutators.setAttribute(`${name}.value`, fileContent);
+         form.mutators.setAttribute(`${name}.content`, fileContent);
          form.mutators.setAttribute(`${name}.fileName`, fileName);
-         form.mutators.setAttribute(`${name}.contentType`, contentType);
+         form.mutators.setAttribute(`${name}.mimeType.type`, contentType);
 
       },
       [form.mutators, name]
@@ -209,7 +209,7 @@ export function Attribute({
 
             {
                descriptor.properties.visible ? (
-                  <Label for={`${name}.value`}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
+                  <Label for={`${name}.content`}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
                ) : <></>
             }
 
@@ -219,9 +219,9 @@ export function Attribute({
 
                   <div style={{ flexGrow: 1 }}>
 
-                     <Label for={`${name}-value`}>File content</Label>
+                     <Label for={`${name}-content`}>File content</Label>
 
-                     <Field name={`${name}.value`} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+                     <Field name={`${name}.content`} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
 
                         {({ input, meta }) => (
 
@@ -229,7 +229,7 @@ export function Attribute({
 
                               <Input
                                  {...input}
-                                 id={`${name}-value`}
+                                 id={`${name}-content`}
                                  valid={!meta.error && meta.touched}
                                  invalid={!!meta.error && meta.touched}
                                  type={descriptor.properties.visible ? "text" : "hidden"}
@@ -255,15 +255,15 @@ export function Attribute({
 
                   <div style={{ width: "13rem" }}>
 
-                     <Label for={`${name}-contentType`}>Content type</Label>
+                     <Label for={`${name}-mimeType.type`}>Content type</Label>
 
-                     <Field name={`${name}.contentType`}>
+                     <Field name={`${name}.mimeType.type`}>
 
                         {({ input, meta }) => (
 
                            <Input
                               {...input}
-                              id={`${name}-contentType`}
+                              id={`${name}-mimeType.type`}
                               type={descriptor.properties.visible ? "text" : "hidden"}
                               placeholder="File not selected"
                               disabled={true}

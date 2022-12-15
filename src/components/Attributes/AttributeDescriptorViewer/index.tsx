@@ -1,5 +1,5 @@
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
-import { useCallback, useMemo } from "react";
+import { attributeFieldNameTransform, getAttributeContent } from "utils/attributes/attributes";
+import { useMemo } from "react";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { AttributeDescriptorModel, isDataAttributeModel } from "types/attributes";
@@ -12,24 +12,6 @@ interface Props {
 export default function AttributeDescriptorViewer({
    attributeDescriptors,
 }: Props) {
-
-
-   const getAttributeValues = useCallback(
-
-      (attributeDescriptor: AttributeDescriptorModel) => {
-
-         if (!attributeDescriptor.content) return "";
-         if (!isDataAttributeModel(attributeDescriptor)) return "";
-
-        return attributeDescriptor.content.map(
-           content => content.reference ?? content.data
-        ).join(", ");
-
-      },
-      []
-
-   );
-
 
    const headers: TableHeader[] = useMemo(
 
@@ -67,7 +49,7 @@ export default function AttributeDescriptorViewer({
                  columns: [
                      attributeDescriptor.properties.label || attributeFieldNameTransform[attributeDescriptor.name] || attributeDescriptor.name,
                      attributeDescriptor.properties.required ? "Yes" : "No",
-                     getAttributeValues(attributeDescriptor).toString(),
+                     getAttributeContent(attributeDescriptor.contentType, attributeDescriptor.content),
                      //getAttributeDetail(attributeDescriptor)
                  ],
                  detailColumns: [
@@ -85,12 +67,10 @@ export default function AttributeDescriptorViewer({
                              { id: "required", columns: [<b>Required</b>, attributeDescriptor.properties.required ? "Yes" : "No"] },
                              { id: "readOnly", columns: [<b>Read Only</b>, attributeDescriptor.properties.readOnly ? "Yes" : "No"] },
                              { id: "list", columns: [<b>List</b>, attributeDescriptor.properties.list ? "Yes" : "No"] },
-                             { id: "muliValue", columns: [<b>Multiple Values</b>, attributeDescriptor.properties.multiSelect ? "Yes" : "No"] },
+                             { id: "multiValue", columns: [<b>Multiple Values</b>, attributeDescriptor.properties.multiSelect ? "Yes" : "No"] },
                              { id: "validationRegex", columns: [<b>Validation Regex</b>, regex?.data ? regex.data.toString() : "Not set"] },
                              {
-                                 id: "defaults", columns: [<b>Defaults</b>, attributeDescriptor.content
-                                     ? attributeDescriptor.content.map(content => content.reference ?? content.data.toString()).join(", ")
-                                     : "Not set"
+                                 id: "defaults", columns: [<b>Defaults</b>, getAttributeContent(attributeDescriptor.contentType, attributeDescriptor.content)
                                  ]
                              },
                          ]}
@@ -102,7 +82,7 @@ export default function AttributeDescriptorViewer({
          }
 
       ),
-      [attributeDescriptors, getAttributeValues]
+      [attributeDescriptors]
    );
 
 
