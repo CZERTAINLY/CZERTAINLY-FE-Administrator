@@ -7,14 +7,13 @@ import Widget from "components/Widget";
 import { CallbackAttributeModel } from "types/connectors";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Attribute } from "./Attribute";
-import {
-    AttributeContentType,
-    FunctionGroupCode
-} from "types/openapi";
+import { AttributeContentType, FunctionGroupCode } from "types/openapi";
 import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
-    AttributeResponseModel, DataAttributeModel, FileAttributeContentModel,
+    AttributeResponseModel,
+    DataAttributeModel,
+    FileAttributeContentModel,
     isDataAttributeModel
 } from "types/attributes";
 
@@ -148,7 +147,7 @@ export default function AttributeEditor({
     */
    const getCurrentFromMappingValue = useCallback(
 
-      (descriptor: AttributeDescriptorModel, mapping: AttributeCallbackMappingModel): any => {
+      (mapping: AttributeCallbackMappingModel): any => {
 
          const attributeFromValue = getAttributeValue(attributes, mapping.from);
 
@@ -160,7 +159,7 @@ export default function AttributeEditor({
          const formMappingPath = mapping.from ? mapping.from.includes(".") ? "value." + mapping.from.split(".").slice(1).join(".") : "value" : "value";
          const currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
 
-         const depDescriptor = attributeDescriptors.find(d => d.name === mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : "");
+         const depDescriptor = attributeDescriptors.find(d => d.name === (mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : ""));
          const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
 
          return currentContent || attributeFromValue || depDescriptorValue;
@@ -195,11 +194,12 @@ export default function AttributeEditor({
             descriptor.attributeCallback?.mappings.forEach(
                 mapping => {
 
+                    let value = mapping.value || getCurrentFromMappingValue(mapping);
+                    if (typeof value === "object" && (value.hasOwnProperty("reference") || value.hasOwnProperty("data"))) value = value.reference ?? value.data;
+                    if (value === undefined) hasUndefinedMapping = true;
+
                     mapping.targets.forEach(
                         target => {
-                            let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
-                            if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
-                            if (value === undefined) hasUndefinedMapping = true;
                             data[target]![mapping.to] = value;
                         }
                     )
@@ -342,15 +342,15 @@ export default function AttributeEditor({
 
                         if (attribute?.content) {
 
-                            form.mutators.setAttribute(`${formAttributeName}.value`, (attribute.content as FileAttributeContentModel[])[0].reference);
-                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.content`, (attribute.content as FileAttributeContentModel[])[0].reference);
                             form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.mimeType.type`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
 
                         } else if (descriptor.content) {
 
-                            form.mutators.setAttribute(`${formAttributeName}.value`, (descriptor.content as FileAttributeContentModel[])[0].reference);
-                            form.mutators.setAttribute(`${formAttributeName}.contentType`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.content`, (descriptor.content as FileAttributeContentModel[])[0].reference);
                             form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
+                            form.mutators.setAttribute(`${formAttributeName}.mimeType.type`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
 
                         }
 
@@ -382,7 +382,7 @@ export default function AttributeEditor({
 
                             formAttributeValue = {
                                 label: attribute.content[0].reference ?? attribute.content[0].data.toString(),
-                                value: attribute.content
+                                value: attribute.content[0]
                             }
 
                         } else {
