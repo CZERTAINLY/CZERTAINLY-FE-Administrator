@@ -45,7 +45,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
    return content.map(content => mapping(content) ?? "Unknown data type").join(", ");
 }
 
-const getAttributeValue = (contentType: AttributeContentType, item: any) => {
+const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
    if (contentType === AttributeContentType.Datetime || contentType === AttributeContentType.Date) {
       return item.value ? new Date(item.value).toISOString() : {data: new Date(item).toISOString()};
    }
@@ -80,9 +80,9 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
       if (isDataAttributeModel(descriptor)) {
             if (Array.isArray(attributes[attribute])) {
-               content = attributes[attribute].map((i: any) => getAttributeValue(descriptor.contentType, i));
+               content = attributes[attribute].map((i: any) => getAttributeFormValue(descriptor.contentType, i));
             } else {
-               content = getAttributeValue(descriptor.contentType, attributes[attribute]);
+               content = getAttributeFormValue(descriptor.contentType, attributes[attribute]);
             }
          //
          // switch (descriptor.contentType) {

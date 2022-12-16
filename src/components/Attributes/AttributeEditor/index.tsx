@@ -13,8 +13,8 @@ import {
     AttributeDescriptorModel,
     AttributeResponseModel,
     DataAttributeModel,
-    FileAttributeContentModel,
-    isDataAttributeModel
+    FileAttributeContentModel, InfoAttributeModel,
+    isDataAttributeModel, isInfoAttributeModel
 } from "types/attributes";
 
 
@@ -219,17 +219,17 @@ export default function AttributeEditor({
    /**
     * Groups attributes for rendering according to the attribute descriptor group property
     */
-   const groupedAttributesDescriptors: { [key: string]: DataAttributeModel[] } = useMemo(
+   const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel)[] } = useMemo(
 
       () => {
 
-         const grouped: { [key: string]: DataAttributeModel[] } = {};
+         const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel)[] } = {};
 
          attributeDescriptors.forEach(
 
             descriptor => {
 
-                if (isDataAttributeModel(descriptor)) {
+                if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || "__";
                     grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
                 }
@@ -556,7 +556,9 @@ export default function AttributeEditor({
             if (Array.isArray(callbackData[callbackId])) {
                // multiple effects can modify opts during single render call
                // eslint-disable-next-line react-hooks/exhaustive-deps
+               console.log(opts);
                opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.reference ?? value.data.toString(), value })) };
+               console.log(options);
                setOptions({ ...options, ...opts });
                continue;
             }

@@ -1,23 +1,27 @@
 import { useCallback } from "react";
 import { Field, useForm } from "react-final-form";
 
-import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
-
+import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 
 import Select from "react-select";
 
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
-import {
-    AttributeConstraintType,
-    AttributeContentType,
-} from "types/openapi";
+import { AttributeConstraintType, AttributeContentType, } from "types/openapi";
 import { InputType } from "reactstrap/types/lib/Input";
-import { DataAttributeModel, RegexpAttributeConstraintModel } from "types/attributes";
-
+import {
+    DataAttributeModel,
+    InfoAttributeModel,
+    isDataAttributeModel,
+    RegexpAttributeConstraintModel
+} from "types/attributes";
+import { getAttributeContent } from "utils/attributes/attributes";
+import { marked } from "marked";
+import parse from 'html-react-parser';
+import * as DOMPurify from 'dompurify';
 
 interface Props {
    name: string;
-   descriptor: DataAttributeModel | undefined;
+   descriptor: DataAttributeModel | InfoAttributeModel | undefined;
    options?: { label: string, value: any }[];
 }
 
@@ -132,13 +136,15 @@ export function Attribute({
 
       const validators: any[] = [];
 
-      if (descriptor.properties.required) validators.push(validateRequired());
-      if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
-      if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
-      const regexValidator = descriptor.constraints?.find(c => c.type === AttributeConstraintType.RegExp);
-        if (regexValidator) {
-            validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
-        }
+      if (isDataAttributeModel(descriptor)) {
+          if (descriptor.properties.required) validators.push(validateRequired());
+          if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
+          if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
+          const regexValidator = descriptor.constraints?.find(c => c.type === AttributeConstraintType.RegExp);
+          if (regexValidator) {
+              validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
+          }
+      }
 
       const composed = composeValidators.apply(undefined, validators);
 
@@ -393,11 +399,22 @@ export function Attribute({
 
    };
 
+   const createInfo = (descriptor: InfoAttributeModel): JSX.Element => {
+       return (<Card color="default">
+           <CardHeader>
+               {descriptor.properties.label}
+           </CardHeader>
+           <CardBody>
+               {parse(DOMPurify.sanitize(marked.parse(getAttributeContent(descriptor.contentType, descriptor.content))))}
+           </CardBody>
+       </Card>);
+   };
+
 
    return (
 
       <FormGroup>
-         {createField(descriptor)}
+         {isDataAttributeModel(descriptor) ? createField(descriptor) : createInfo(descriptor)}
       </FormGroup>
 
    )

@@ -146,3 +146,7 @@ export type AttributeDescriptorCollectionModel = {
 export const isDataAttributeModel = (attribute: AttributeDescriptorModel): attribute is DataAttributeModel => {
    return attribute.type === AttributeType.Data;
 }
+
+export const isInfoAttributeModel = (attribute: AttributeDescriptorModel): attribute is InfoAttributeModel => {
+   return attribute.type === AttributeType.Info;
+}
