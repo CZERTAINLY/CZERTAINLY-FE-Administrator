@@ -57,13 +57,13 @@ export default function DiscoveryForm() {
 
          if (init) {
              dispatch(discoveryActions.resetState());
+             setInit(false);
              dispatch(connectorActions.clearCallbackData());
              dispatch(discoveryActions.listDiscoveryProviders());
-             setInit(false);
          }
 
       },
-      [dispatch, discoverySelector, discoveryProviders, isFetchingDiscoveryProviders, init]
+      [dispatch, discoverySelector, discoveryProviders, init]
 
    );
 
