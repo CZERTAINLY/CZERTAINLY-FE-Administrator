@@ -63,7 +63,7 @@ export default function DiscoveryForm() {
          }
 
       },
-      [dispatch, discoverySelector, discoveryProviders, init]
+      [dispatch, init]
 
    );
 

@@ -556,9 +556,7 @@ export default function AttributeEditor({
             if (Array.isArray(callbackData[callbackId])) {
                // multiple effects can modify opts during single render call
                // eslint-disable-next-line react-hooks/exhaustive-deps
-               console.log(opts);
                opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.reference ?? value.data.toString(), value })) };
-               console.log(options);
                setOptions({ ...options, ...opts });
                continue;
             }
