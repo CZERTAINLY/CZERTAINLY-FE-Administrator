@@ -150,3 +150,11 @@ export const isDataAttributeModel = (attribute: AttributeDescriptorModel): attri
 export const isInfoAttributeModel = (attribute: AttributeDescriptorModel): attribute is InfoAttributeModel => {
    return attribute.type === AttributeType.Info;
 }
+
+export const isGroupAttributeModel = (attribute: AttributeDescriptorModel): attribute is GroupAttributeModel => {
+   return attribute.type === AttributeType.Group;
+}
+
+export const isAttributeDescriptorModel = (attribute: object): attribute is AttributeDescriptorModel => {
+   return ((attribute as AttributeDescriptorModel).name !== undefined) && ((attribute as AttributeDescriptorModel).uuid !== undefined) && ((attribute as AttributeDescriptorModel).type !== undefined);
+}
