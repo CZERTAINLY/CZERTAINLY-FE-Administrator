@@ -19,6 +19,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode } from "types/openapi";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface FormValues {
@@ -33,7 +34,6 @@ export default function DiscoveryForm() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
-   const discoverySelector = useSelector(discoverySelectors.discovery);
    const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
    const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
 
@@ -43,6 +43,7 @@ export default function DiscoveryForm() {
    const isCreating = useSelector(discoverySelectors.isCreating);
 
    const [init, setInit] = useState(true);
+   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
@@ -73,6 +74,8 @@ export default function DiscoveryForm() {
       (event: { value: string }) => {
 
          dispatch(discoveryActions.clearDiscoveryProviderAttributeDescriptors());
+         dispatch(connectorActions.clearCallbackData());
+         setGroupAttributesCallbackAttributes([]);
 
          if (!event.value || !discoveryProviders) return;
          const provider = discoveryProviders.find(p => p.uuid === event.value);
@@ -91,6 +94,8 @@ export default function DiscoveryForm() {
       (event: { value: string }) => {
 
          if (!event.value || !discoveryProvider) return;
+         dispatch(connectorActions.clearCallbackData());
+         setGroupAttributesCallbackAttributes([]);
          dispatch(discoveryActions.getDiscoveryProviderAttributesDescriptors({ uuid: discoveryProvider.uuid, kind: event.value }));
 
       },
@@ -106,11 +111,11 @@ export default function DiscoveryForm() {
             name: values.name!,
             connectorUuid: values.discoveryProvider!.value,
             kind: values.storeKind?.value!,
-            attributes: collectFormAttributes("discovery", discoveryProviderAttributeDescriptors, values)
+            attributes: collectFormAttributes("discovery", [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
          }));
 
       },
-      [dispatch, discoveryProviderAttributeDescriptors]
+      [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes]
    );
 
 
@@ -248,6 +253,8 @@ export default function DiscoveryForm() {
                            connectorUuid={discoveryProvider.uuid}
                            functionGroupCode={FunctionGroupCode.DiscoveryProvider}
                            kind={values.storeKind.value}
+                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                         />
                      </>
 
