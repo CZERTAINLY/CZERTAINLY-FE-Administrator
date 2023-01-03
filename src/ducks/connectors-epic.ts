@@ -173,8 +173,7 @@ const getConnectorHealth: AppEpic = (action$, state, deps) => {
 
             catchError(
                error => of(
-                  slice.actions.getConnectorHealthFailure(),
-                  appRedirectActions.fetchError({ error, message: "Failed to get connector health" })
+                  slice.actions.getConnectorHealthFailure()
                )
             )
 

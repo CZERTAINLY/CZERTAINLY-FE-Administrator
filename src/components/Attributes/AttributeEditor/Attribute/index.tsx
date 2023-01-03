@@ -371,7 +371,7 @@ export function Attribute({
                      descriptor.properties.visible ? (
 
                         <>
-                           <FormText color={descriptor.properties.required ? "dark" : undefined} style={{ marginTop: descriptor.contentType === AttributeContentType.Boolean ? "-0.8em" : "0.2em" }}>{descriptor.description}</FormText>
+                           <FormText color={descriptor.properties.required ? "dark" : undefined} style={ descriptor.contentType === AttributeContentType.Boolean ? { display: "block", marginTop: "-0.8em" } : { marginTop: "0.2em" }}>{descriptor.description}</FormText>
 
                            <FormFeedback>{meta.error}</FormFeedback>
                         </>
