@@ -272,7 +272,7 @@ export default function CertificateInventoryFilter({
                                        id="value"
                                        type={currentFieldData?.type === "date" ? "date" : "text"}
                                        value={filterValue?.toString() || ""}
-                                       onChange={(e) => { setFilterValue(JSON.parse(e.target.value)) }}
+                                       onChange={(e) => { setFilterValue(JSON.parse(JSON.stringify(e.target.value))) }}
                                        placeholder="Enter filter value"
                                        disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                                     />
