@@ -20,6 +20,7 @@ import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import { RaProfileResponseModel } from "types/ra-profiles";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface FormValues {
@@ -49,7 +50,9 @@ export default function RaProfileForm() {
    const isCreating = useSelector(raProfilesSelectors.isCreating);
    const isUpdating = useSelector(raProfilesSelectors.isUpdating);
 
-   const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
 
 
    const isBusy = useMemo(
@@ -93,6 +96,8 @@ export default function RaProfileForm() {
 
       (authorityUuid: string, form: FormApi<FormValues>) => {
 
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
          form.mutators.clearAttributes();
          if (raProfile) setRaProfile({ ...raProfile, attributes: [] });
          dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
@@ -128,7 +133,7 @@ export default function RaProfileForm() {
                    raProfileEditRequest: {
                        enabled: raProfile!.enabled,
                        description: values.description,
-                       attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values),
+                       attributes: collectFormAttributes("ra-profile", [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
                    }
                })
             );
@@ -141,7 +146,7 @@ export default function RaProfileForm() {
                    raProfileAddRequest: {
                        name: values.name,
                        description: values.description,
-                       attributes: collectFormAttributes("ra-profile", raProfileAttributeDescriptors, values)
+                       attributes: collectFormAttributes("ra-profile", [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
                    }
                })
             );
@@ -149,7 +154,7 @@ export default function RaProfileForm() {
          }
 
       },
-      [dispatch, editMode, id, raProfile, raProfileAttributeDescriptors]
+      [dispatch, editMode, id, raProfile, raProfileAttributeDescriptors, groupAttributesCallbackAttributes]
 
    );
 
@@ -281,6 +286,8 @@ export default function RaProfileForm() {
                         authorityUuid={raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value}
                         attributeDescriptors={raProfileAttributeDescriptors}
                         attributes={raProfile?.attributes}
+                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                      />
                   )}
 

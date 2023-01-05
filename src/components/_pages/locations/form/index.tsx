@@ -18,6 +18,8 @@ import Widget from "components/Widget";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import { LocationResponseModel } from "types/locations";
+import { AttributeDescriptorModel } from "types/attributes";
+import { actions as connectorActions } from "../../../../ducks/connectors";
 
 
 interface FormValues {
@@ -27,7 +29,7 @@ interface FormValues {
 }
 
 
-export default function EntityForm() {
+export default function LocationForm() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -48,6 +50,7 @@ export default function EntityForm() {
    const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
    const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
 
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const [init, setInit] = useState(true);
 
@@ -104,6 +107,8 @@ export default function EntityForm() {
       (event: { value: string }) => {
 
          if (!event.value) return;
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
          dispatch(entityActions.listLocationAttributeDescriptors({ entityUuid: event.value }));
 
       },
@@ -124,7 +129,7 @@ export default function EntityForm() {
                 editLocationRequest: {
                    description: values.description || "",
                    enabled: location!.enabled,
-                   attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
+                   attributes: collectFormAttributes("location", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
                 }
             }));
 
@@ -136,14 +141,14 @@ export default function EntityForm() {
                     name: values.name!,
                     description: values.description || "",
                     enabled: true,
-                    attributes: collectFormAttributes("location", locationAttributeDescriptors, values),
+                    attributes: collectFormAttributes("location", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
                 },
             }));
 
          }
 
       },
-      [dispatch, editMode, location, locationAttributeDescriptors, id]
+      [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes]
 
    );
 
@@ -296,6 +301,8 @@ export default function EntityForm() {
                            id="location"
                            attributeDescriptors={locationAttributeDescriptors}
                            attributes={location?.attributes}
+                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                         />
                      </>
 

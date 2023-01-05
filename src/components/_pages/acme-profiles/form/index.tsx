@@ -11,6 +11,7 @@ import { validateRequired, composeValidators, validateAlphaNumeric, validateCust
 
 import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from "ducks/acme-profiles";
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { actions as connectorActions } from "ducks/connectors";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -20,6 +21,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import { AcmeProfileResponseModel } from "types/acme-profiles";
 import { RaProfileResponseModel } from "types/ra-profiles";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 
@@ -39,7 +41,7 @@ interface FormValues {
    raProfile: { value: string; label: string } | undefined;
 }
 
-export default function RaProfileForm() {
+export default function AcmeProfileForm() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -60,6 +62,9 @@ export default function RaProfileForm() {
    const isFetchingRaProfilesList = useSelector(raProfileSelectors.isFetchingList);
    const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
    const isFetchingRevocationAttributes = useSelector(raProfileSelectors.isFetchingRevocationAttributes);
+
+    const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const [acmeProfile, setAcmeProfile] = useState<AcmeProfileResponseModel>();
    const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
@@ -137,8 +142,8 @@ export default function RaProfileForm() {
                     requireTermsOfService: values.requireAgreement,
                     requireContact: values.requireContact,
                     raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-                    issueCertificateAttributes: collectFormAttributes("issuanceAttributes", raProfileIssuanceAttrDescs, values),
-                    revokeCertificateAttributes: collectFormAttributes("revocationAttributes", raProfileRevocationAttrDescs, values)
+                    issueCertificateAttributes: collectFormAttributes("issuanceAttributes", [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes], values),
+                    revokeCertificateAttributes: collectFormAttributes("revocationAttributes", [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes], values)
                 }
             }));
 
@@ -156,13 +161,13 @@ export default function RaProfileForm() {
                requireTermsOfService: values.requireAgreement,
                requireContact: values.requireContact,
                raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-               issueCertificateAttributes: collectFormAttributes("issuanceAttributes", raProfileIssuanceAttrDescs, values),
-               revokeCertificateAttributes: collectFormAttributes("revocationAttributes", raProfileRevocationAttrDescs, values)
+               issueCertificateAttributes: collectFormAttributes("issuanceAttributes", [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes], values),
+               revokeCertificateAttributes: collectFormAttributes("revocationAttributes", [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes], values)
             }));
 
          }
       },
-      [dispatch, editMode, id, raProfileIssuanceAttrDescs, raProfileRevocationAttrDescs]
+      [dispatch, editMode, id, raProfileIssuanceAttrDescs, raProfileRevocationAttrDescs, issueGroupAttributesCallbackAttributes, revokeGroupAttributesCallbackAttributes]
 
    );
 
@@ -180,6 +185,10 @@ export default function RaProfileForm() {
    const onRaProfileChange = useCallback(
 
       (form: FormApi<FormValues>, value: string) => {
+
+          dispatch(connectorActions.clearCallbackData());
+          setIssueGroupAttributesCallbackAttributes([]);
+          setRevokeGroupAttributesCallbackAttributes([]);
 
          if (!value) {
             setRaProfile(undefined);
@@ -664,6 +673,8 @@ export default function RaProfileForm() {
                               id="issuanceAttributes"
                               attributeDescriptors={raProfileIssuanceAttrDescs}
                               attributes={acmeProfile?.issueCertificateAttributes}
+                              groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                              setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
                            />
 
                         </FormGroup>
@@ -680,7 +691,9 @@ export default function RaProfileForm() {
                            <AttributeEditor
                               id="revocationAttributes"
                               attributeDescriptors={raProfileRevocationAttrDescs}
-                              attributes={acmeProfile?.issueCertificateAttributes}
+                              attributes={acmeProfile?.revokeCertificateAttributes}
+                              groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
+                              setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
                            />
 
 

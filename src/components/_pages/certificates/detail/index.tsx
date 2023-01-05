@@ -21,12 +21,13 @@ import {
 } from "reactstrap";
 import { Form } from "react-final-form";
 import Select from "react-select";
-
+import { AttributeDescriptorModel } from "types/attributes";
 
 import { actions, selectors } from "ducks/certificates";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { actions as connectorActions } from "ducks/connectors";
 
 import { dateFormatter } from "utils/dateUtil";
 import { downloadFile, formatPEM } from "utils/certificate";
@@ -65,6 +66,8 @@ export default function CertificateDetail() {
    const validationResult = useSelector(selectors.validationResult);
 
    const locations = useSelector(locationSelectors.locations);
+
+   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
    const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
@@ -214,6 +217,9 @@ export default function CertificateDetail() {
    useEffect(
 
       () => {
+
+         dispatch(connectorActions.clearCallbackData());
+         setGroupAttributesCallbackAttributes([]);
 
          selectLocationsCheckedRows.length === 0 ?
 
@@ -399,13 +405,13 @@ export default function CertificateDetail() {
                 locationUuid: selectLocationsCheckedRows[0],
                 entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]],
                 pushRequest: {
-                    attributes: collectFormAttributes("locationAttributes", locationAttributeDescriptors, values)
+                    attributes: collectFormAttributes("locationAttributes", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
                 }
             })
          );
 
       },
-      [selectLocationsCheckedRows, certificate, dispatch, locationAttributeDescriptors, locationToEntityMap]
+      [selectLocationsCheckedRows, certificate, dispatch, locationAttributeDescriptors, locationToEntityMap, groupAttributesCallbackAttributes]
 
    );
 
@@ -1479,6 +1485,8 @@ export default function CertificateDetail() {
                                  <AttributeEditor
                                     id="locationAttributes"
                                     attributeDescriptors={locationAttributeDescriptors}
+                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                                  />
 
                               </>

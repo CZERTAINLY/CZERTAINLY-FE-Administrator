@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Form, Field } from "react-final-form";
 import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row, } from "reactstrap";
 
@@ -20,7 +20,7 @@ import { FormApi } from "final-form";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { useNavigate } from "react-router-dom";
 import { RaProfileResponseModel } from "types/ra-profiles";
-
+import { AttributeDescriptorModel } from "types/attributes";
 
 interface FormValues {
    raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
@@ -39,6 +39,8 @@ export default function CertificateForm() {
    const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
 
    const issuingCertificate = useSelector(certificateSelectors.isIssuing);
+
+   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    useEffect(() => {
 
@@ -122,7 +124,7 @@ export default function CertificateForm() {
 
          if (!values.raProfile) return;
 
-         const attributes = collectFormAttributes("issuance_attributes", issuanceAttributeDescriptors[values.raProfile.value.uuid], values);
+         const attributes = collectFormAttributes("issuance_attributes", [...(issuanceAttributeDescriptors[values.raProfile.value.uuid] ?? []), ...groupAttributesCallbackAttributes], values);
 
          dispatch(certificateActions.issueCertificate({
             raProfileUuid: values.raProfile.value.uuid,
@@ -135,7 +137,7 @@ export default function CertificateForm() {
          }));
 
       },
-      [dispatch, issuanceAttributeDescriptors]
+      [dispatch, issuanceAttributeDescriptors, groupAttributesCallbackAttributes]
 
    );
 
@@ -145,6 +147,8 @@ export default function CertificateForm() {
       (event: SingleValue<{ label: string; value: RaProfileResponseModel }>) => {
 
          if (!event) return;
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
          dispatch(certificateActions.getIssuanceAttributes({ raProfileUuid: event.value.uuid, authorityUuid: event.value.authorityInstanceUuid }));
 
          /*setRaProfUuid(event?.value || "");
@@ -343,6 +347,8 @@ export default function CertificateForm() {
                               id="issuance_attributes"
                               attributeDescriptors={issuanceAttributeDescriptors[values.raProfile.value.uuid] || []}
                               authorityUuid={values.raProfile.value.authorityInstanceUuid}
+                              groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                              setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                            />
 
 
