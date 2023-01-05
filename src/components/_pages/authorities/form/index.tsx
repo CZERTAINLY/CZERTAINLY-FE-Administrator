@@ -21,6 +21,7 @@ import ProgressButton from "components/ProgressButton";
 import { AuthorityResponseModel } from "types/authorities";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode } from "types/openapi";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface FormValues {
@@ -50,6 +51,7 @@ export default function AuthorityForm() {
    const isCreating = useSelector(authoritySelectors.isCreating);
    const isUpdating = useSelector(authoritySelectors.isUpdating);
 
+   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const [authority, setAuthority] = useState<AuthorityResponseModel>();
    const [authorityProvider, setAuthorityProvider] = useState<ConnectorResponseModel>();
@@ -141,6 +143,8 @@ export default function AuthorityForm() {
          if (!event) return;
 
          dispatch(authorityActions.clearAuthorityProviderAttributeDescriptors());
+         dispatch(connectorActions.clearCallbackData());
+         setGroupAttributesCallbackAttributes([]);
 
          if (!event.value || !authorityProviders) return;
          const provider = authorityProviders.find(p => p.uuid === event.value);
@@ -162,6 +166,9 @@ export default function AuthorityForm() {
       }>) => {
 
          if (!event || !event.value || !authorityProvider) return;
+
+         dispatch(connectorActions.clearCallbackData());
+         setGroupAttributesCallbackAttributes([]);
          dispatch(authorityActions.getAuthorityProviderAttributesDescriptors({ uuid: authorityProvider.uuid, kind: event.value }));
 
       },
@@ -179,7 +186,7 @@ export default function AuthorityForm() {
             dispatch(authorityActions.updateAuthority({
                uuid: id!,
                updateAuthority: {
-                   attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values)
+                   attributes: collectFormAttributes("authority", [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
                }
             }));
 
@@ -189,13 +196,13 @@ export default function AuthorityForm() {
                name: values.name!,
                connectorUuid: values.authorityProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("authority", authorityProviderAttributeDescriptors, values),
+               attributes: collectFormAttributes("authority", [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
             }));
 
          }
 
       },
-      [editMode, dispatch, id, authorityProviderAttributeDescriptors]
+      [editMode, dispatch, id, authorityProviderAttributeDescriptors, groupAttributesCallbackAttributes]
    );
 
 
@@ -421,6 +428,8 @@ export default function AuthorityForm() {
                            connectorUuid={authorityProvider.uuid}
                            functionGroupCode={FunctionGroupCode.AuthorityProvider}
                            kind={values.storeKind.value}
+                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                         />
                      </>
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup } from 'reactstrap';
 import { Field, Form } from "react-final-form";
@@ -15,6 +15,7 @@ import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } fr
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { AttributeRequestModel } from "types/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface Props {
@@ -39,7 +40,10 @@ export default function AcmeProtocolActivationDialogBody({
    const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
    const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
 
-   const isFetchingAcmeProfiles = useSelector(acmeProfilesSelectors.isFetchingList);
+    const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const isFetchingAcmeProfiles = useSelector(acmeProfilesSelectors.isFetchingList);
    const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
    const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
 
@@ -88,14 +92,14 @@ export default function AcmeProtocolActivationDialogBody({
 
          const issuanceAttribs: AttributeRequestModel[] = issuanceAttributes && issuanceAttributes.length > 0
             ?
-            collectFormAttributes("issuanceAttributes", issuanceAttributes, values) || []
+            collectFormAttributes("issuanceAttributes", [...(issuanceAttributes ?? []), ...issueGroupAttributesCallbackAttributes], values) || []
             :
             []
             ;
 
          const revocationAttribs: AttributeRequestModel[] = revocationAttributes && revocationAttributes.length > 0
             ?
-            collectFormAttributes("revocationAttributes", revocationAttributes, values) || []
+            collectFormAttributes("revocationAttributes", [...(revocationAttributes ?? []), ...revokeGroupAttributesCallbackAttributes], values) || []
             : []
             ;
 
@@ -112,7 +116,7 @@ export default function AcmeProtocolActivationDialogBody({
          onClose();
 
       },
-      [dispatch, issuanceAttributes, onClose, raProfileUuid, revocationAttributes, authorityInstanceUuid]
+      [dispatch, issuanceAttributes, onClose, raProfileUuid, revocationAttributes, authorityInstanceUuid, issueGroupAttributesCallbackAttributes, revokeGroupAttributesCallbackAttributes]
 
    )
 
@@ -166,6 +170,8 @@ export default function AcmeProtocolActivationDialogBody({
                               <AttributeEditor
                                  id="issuanceAttributes"
                                  attributeDescriptors={issuanceAttributes}
+                                 groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                 setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
                               />
 
                            </FormGroup>
@@ -190,6 +196,8 @@ export default function AcmeProtocolActivationDialogBody({
                               <AttributeEditor
                                  id="revocationAttributes"
                                  attributeDescriptors={revocationAttributes}
+                                 groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
+                                 setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
                               />
 
                            </FormGroup>

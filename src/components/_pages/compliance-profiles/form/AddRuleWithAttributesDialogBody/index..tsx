@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
@@ -42,6 +42,7 @@ export default function AddRuleWithAttributesDialogBody({
 }: Props) {
 
    const dispatch = useDispatch();
+   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const onSubmit = useCallback(
 
@@ -52,7 +53,7 @@ export default function AddRuleWithAttributesDialogBody({
 
          const attribs = attributes && attributes.length > 0
             ?
-            collectFormAttributes("attributes", attributes, values) || []
+            collectFormAttributes("attributes", [...(attributes ?? []), ...groupAttributesCallbackAttributes], values) || []
             :
             []
             ;
@@ -68,7 +69,7 @@ export default function AddRuleWithAttributesDialogBody({
          onClose();
 
       },
-      [dispatch, complianceProfileUuid, connectorUuid, kind, ruleUuid, attributes, onClose]
+      [dispatch, complianceProfileUuid, connectorUuid, kind, ruleUuid, attributes, onClose, groupAttributesCallbackAttributes]
 
    )
 
@@ -96,6 +97,8 @@ export default function AddRuleWithAttributesDialogBody({
                               <AttributeEditor
                                  id="attributes"
                                  attributeDescriptors={attributes}
+                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                               />
 
                            </FormGroup>

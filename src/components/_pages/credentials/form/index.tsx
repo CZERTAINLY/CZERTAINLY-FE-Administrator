@@ -8,7 +8,7 @@ import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, In
 import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
 
 import { actions, selectors } from "ducks/credentials";
-import { actions as connectorsActions } from "ducks/connectors";
+import { actions as connectorActions, actions as connectorsActions } from "ducks/connectors";
 
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { mutators } from "utils/attributes/attributeEditorMutators";
@@ -19,6 +19,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import { CredentialResponseModel } from "types/credentials";
 import { ConnectorResponseModel } from "types/connectors";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface FormValues {
@@ -46,6 +47,8 @@ export default function CredentialForm() {
    const isFetchingAttributeDescriptors = useSelector(selectors.isFetchingCredentialProviderAttributeDescriptors);
    const isCreating = useSelector(selectors.isCreating);
    const isUpdating = useSelector(selectors.isUpdating);
+
+   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    const [credential, setCredential] = useState<CredentialResponseModel>();
    const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
@@ -109,7 +112,9 @@ export default function CredentialForm() {
       (event: { label: string, value: string }) => {
 
          if (!event.value || !credentialProviders) return;
-         const provider = credentialProviders.find(p => p.uuid === event.value);
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
+          const provider = credentialProviders.find(p => p.uuid === event.value);
 
          if (!provider) return;
          setCredentialProvider(provider);
@@ -125,6 +130,8 @@ export default function CredentialForm() {
       (event: { label: string, value: string }) => {
 
          if (!event.value || !credentialProvider) return;
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
          dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialProvider.uuid, kind: event.value }));
 
       },
@@ -142,7 +149,7 @@ export default function CredentialForm() {
             dispatch(actions.updateCredential({
                uuid: id!,
                 credentialRequest: {
-                   attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values),
+                   attributes: collectFormAttributes("credential", [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
                 }
             }));
 
@@ -152,13 +159,13 @@ export default function CredentialForm() {
                name: values.name!,
                connectorUuid: values.credentialProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("credential", credentialProviderAttributeDescriptors, values),
+               attributes: collectFormAttributes("credential", [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
             }));
 
          }
 
       },
-      [editMode, dispatch, id, credentialProviderAttributeDescriptors]
+      [editMode, dispatch, id, credentialProviderAttributeDescriptors, groupAttributesCallbackAttributes]
    );
 
 
@@ -391,6 +398,8 @@ export default function CredentialForm() {
                            id="credential"
                            attributeDescriptors={credentialProviderAttributeDescriptors}
                            attributes={credential?.attributes}
+                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                         />
                      </>
 

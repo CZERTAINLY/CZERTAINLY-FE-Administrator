@@ -24,6 +24,7 @@ import CertificateList from "components/_pages/certificates/list";
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import Select from "react-select";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 export default function LocationDetail() {
@@ -52,7 +53,11 @@ export default function LocationDetail() {
    const isFetchingRaProfiles = useSelector(raSelectors.isFetchingList);
    const isFetchingIssuanceAttributes = useSelector(raSelectors.isFetchingIssuanceAttributes);
 
-   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [pushGroupAttributesCallbackAttributes, setPushGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [csrGroupAttributesCallbackAttributes, setCsrGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
    const [confirmRemoveDialog, setConfirmRemoveDialog] = useState<boolean>(false);
    const [issueDialog, setIssueDialog] = useState<boolean>(false);
@@ -220,7 +225,7 @@ export default function LocationDetail() {
 
          if (selectedCerts.length === 0 || !location) return;
 
-         const attrs = collectFormAttributes("pushAttributes", pushAttributeDescriptors, values);
+         const attrs = collectFormAttributes("pushAttributes", [...(pushAttributeDescriptors ?? []), ...pushGroupAttributesCallbackAttributes], values);
 
          selectedCerts.forEach(
             certUuid => {
@@ -229,7 +234,7 @@ export default function LocationDetail() {
          )
 
       },
-      [dispatch, location, pushAttributeDescriptors, selectedCerts]
+      [dispatch, location, pushAttributeDescriptors, selectedCerts, pushGroupAttributesCallbackAttributes]
 
    )
 
@@ -240,8 +245,8 @@ export default function LocationDetail() {
 
          if (!location) return;
 
-         const issueAttrs = collectFormAttributes("issueAttributes", issuanceAttributeDescriptors, values);
-         const csrAttrs = collectFormAttributes("csrAttributes", csrAttributeDescriptors, values);
+         const issueAttrs = collectFormAttributes("issueAttributes", [...(issuanceAttributeDescriptors ?? []), ...issueGroupAttributesCallbackAttributes], values);
+         const csrAttrs = collectFormAttributes("csrAttributes", [...(csrAttributeDescriptors ?? []), ...csrGroupAttributesCallbackAttributes], values);
 
          dispatch(actions.issueCertificate({
             entityUuid: location.entityInstanceUuid,
@@ -255,7 +260,7 @@ export default function LocationDetail() {
          setIssueDialog(false);
 
       },
-      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location]
+      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, issueGroupAttributesCallbackAttributes, csrGroupAttributesCallbackAttributes]
 
    )
 
@@ -589,6 +594,8 @@ export default function LocationDetail() {
                            <AttributeEditor
                               id="pushAttributes"
                               attributeDescriptors={pushAttributeDescriptors!}
+                              groupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
+                              setGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
                            />
 
                            <div style={{ textAlign: "right" }}>
@@ -680,6 +687,8 @@ export default function LocationDetail() {
                                  <AttributeEditor
                                     id="csrAttributes"
                                     attributeDescriptors={csrAttributeDescriptors}
+                                    groupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
+                                    setGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
                                  />
                               )}
 
@@ -694,6 +703,8 @@ export default function LocationDetail() {
                                  <AttributeEditor
                                     id="issueAttributes"
                                     attributeDescriptors={issuanceAttributeDescriptors}
+                                    groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                    setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
                                  />
                               )}
 

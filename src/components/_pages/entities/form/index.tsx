@@ -21,6 +21,7 @@ import ProgressButton from "components/ProgressButton";
 import { EntityResponseModel } from "types/entities";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode } from "types/openapi";
+import { AttributeDescriptorModel } from "types/attributes";
 
 
 interface FormValues {
@@ -49,7 +50,9 @@ export default function EntityForm() {
    const isCreating = useSelector(entitySelectors.isCreating);
    const isUpdating = useSelector(entitySelectors.isUpdating);
 
-   const [entity, setEntity] = useState<EntityResponseModel>();
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const [entity, setEntity] = useState<EntityResponseModel>();
    const [entityProvider, setEntityProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
@@ -118,6 +121,8 @@ export default function EntityForm() {
       (event: { value: string }) => {
 
          dispatch(entityActions.clearEntityProviderAttributeDescriptors());
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
 
          if (!event.value || !entityProviders) return;
          const provider = entityProviders.find(p => p.uuid === event.value);
@@ -136,6 +141,8 @@ export default function EntityForm() {
       (event: { value: string }) => {
 
          if (!event.value || !entityProvider) return;
+          dispatch(connectorActions.clearCallbackData());
+          setGroupAttributesCallbackAttributes([]);
          dispatch(entityActions.getEntityProviderAttributesDescriptors({ uuid: entityProvider.uuid, kind: event.value }));
 
       },
@@ -152,7 +159,7 @@ export default function EntityForm() {
 
             dispatch(entityActions.updateEntity({
                uuid: id!,
-               attributes: collectFormAttributes("entity", entityProviderAttributeDescriptors, values)
+               attributes: collectFormAttributes("entity", [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
             }));
 
          } else {
@@ -161,13 +168,13 @@ export default function EntityForm() {
                name: values.name!,
                connectorUuid: values.entityProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("entity", entityProviderAttributeDescriptors, values)
+               attributes: collectFormAttributes("entity", [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
             }));
 
          }
 
       },
-      [editMode, dispatch, id, entityProviderAttributeDescriptors]
+      [editMode, dispatch, id, entityProviderAttributeDescriptors, groupAttributesCallbackAttributes]
    );
 
 
@@ -395,6 +402,8 @@ export default function EntityForm() {
                            connectorUuid={entityProvider.uuid}
                            functionGroupCode={FunctionGroupCode.EntityProvider}
                            kind={values.storeKind.value}
+                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                         />
                      </>
 
