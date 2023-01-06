@@ -12,7 +12,7 @@ import Widget from "components/Widget";
 import Dialog from "components/Dialog";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer from "components/Attributes/AttributeViewer";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import DiscoveryStatus from "../DiscoveryStatus";
 
 export default function DiscoveryDetail() {
@@ -155,21 +155,6 @@ export default function DiscoveryDetail() {
 
    );
 
-   const metaData: TableDataRow[] = useMemo(
-
-      () => !discovery || !discovery.metadata ? [] : discovery.metadata.map(m => {
-         return (
-            {
-               id: m.connectorUuid,
-               columns: [m.connectorUuid, m.connectorName],
-            }
-         )
-      }
-      ),
-      [discovery]
-   )
-
-
    const certificateData: TableDataRow[] = useMemo(
 
       () => !discovery?.certificate ? [] : discovery.certificate.map(function(r:any) {
@@ -270,11 +255,7 @@ export default function DiscoveryDetail() {
             <Col>
                <Widget title={metaTitle}>
                   <br />
-                  <Label>Metadata</Label>
-                  <CustomTable
-                     headers={detailHeaders}
-                     data={metaData}
-                  />
+                  <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
                </Widget>
             </Col>
          </Row>
