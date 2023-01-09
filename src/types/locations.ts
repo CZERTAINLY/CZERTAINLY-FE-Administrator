@@ -4,7 +4,8 @@ import {
     EditLocationRequestDto,
     IssueToLocationRequestDto,
     LocationDto,
-    MetadataResponseDto, NameAndUuidDto as NameAndUuidDtoOpenApi,
+    MetadataResponseDto,
+    NameAndUuidDto as NameAndUuidDtoOpenApi,
     PushToLocationRequestDto,
     ResponseMetadataDto
 } from "./openapi";

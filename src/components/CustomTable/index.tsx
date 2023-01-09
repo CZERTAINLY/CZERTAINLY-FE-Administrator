@@ -520,7 +520,7 @@ function CustomTable({
 
             <Fragment key={row.id}>
 
-               <tr key={`tr${row.id}`} {...(hasCheckboxes || hasDetails ? { onClick: (e) => { onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
+               <tr key={`tr${row.id}`} {...(hasCheckboxes || hasDetails ? { onClick: (e) => { e.stopPropagation(); e.preventDefault(); onRowToggleSelection(e, row.id, hasCheckboxes) } } : {})} data-id={row.id} >
 
                   {!hasDetails ? (<></>) : !row.detailColumns || row.detailColumns.length === 0 ? <td></td> : <td id="show-detail-more-column" key="show-detail-more-column">
                      {expandedRow === row.id ? <i className="fa fa-caret-up" data-expander="true" /> : <i className="fa fa-caret-down" data-expander="true" />}

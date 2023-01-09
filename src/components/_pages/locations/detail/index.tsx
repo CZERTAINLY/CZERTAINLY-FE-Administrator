@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { Form as BootstrapForm, Button, Label, ButtonGroup, Container, FormGroup, Badge } from 'reactstrap';
+import { Badge, Button, ButtonGroup, Container, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
 import { Field, Form } from "react-final-form";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 
 import { actions, selectors } from "ducks/locations";
 import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
@@ -17,7 +17,7 @@ import Widget from "components/Widget";
 import Dialog from "components/Dialog";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer from "components/Attributes/AttributeViewer";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import StatusBadge from "components/StatusBadge";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import CertificateList from "components/_pages/certificates/list";
@@ -411,20 +411,24 @@ export default function LocationDetail() {
             id: "cn",
             content: "Common Name",
             sortable: true,
+            width: "15%"
          },
          {
             id: "pk",
             align: "center",
             content: "Private Key",
             sortable: true,
+            width: "5%"
          },
          {
             id: "metadata",
             content: "Metadata",
+            width: "40%"
          },
          {
             id: "CSR Detail",
             content: "CSR Detail",
+            width: "35%"
          },
 
       ],
@@ -434,55 +438,35 @@ export default function LocationDetail() {
 
 
    const certData: TableDataRow[] = useMemo(
-
       () => !location ? [] : location.certificates.map(
          cert => ({
-
             id: cert.certificateUuid,
-
             columns: [
-
                <Link to={`../../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
-
                cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
-               !cert.metadata ? "" :
-                  cert.metadata.length === 0 ? "" :
-                     <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
-                        {cert.metadata.map(cert => cert.toString()).join(", ")}
-                     </div>,
+                !cert.metadata || (cert.metadata.length === 0) ? "" :
+                    <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                        {cert.metadata.map(atr => atr.connectorName + " (" + atr.items.length + ")").join(", ")}
+                    </div>,
 
-               !cert.csrAttributes ? "" :
-                  cert.csrAttributes.length === 0 ? "" :
-                     <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
-                        {cert.csrAttributes.map(atr => atr.content ? (atr.content as any).value : "").join(", ")}
-                     </div>,
-
+               !cert.csrAttributes || (cert.csrAttributes.length === 0) ? "" :
+                 <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                    {cert.csrAttributes.map(atr => getAttributeContent(atr.contentType, atr.content) ?? "").join(", ")}
+                 </div>,
             ],
 
             detailColumns: [
-
                <></>,
                <></>,
                <></>,
                <></>,
-
-               !cert.metadata ? "" : cert.metadata.length === 0 ? "" : <CustomTable
-                  headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
-                  data={cert.metadata.map(cert => ({ id: cert.connectorName, columns: [cert.connectorName, cert.connectorUuid] }))}
-               />,
-
-               !cert.csrAttributes ? "" : cert.csrAttributes.length === 0 ? "" : <CustomTable
-                  headers={[{ id: "name", content: "Name" }, { id: "value", content: "Value" }]}
-                  data={cert.csrAttributes.map(atr => ({ id: atr.name, columns: [atr.label || atr.name, atr.content ? (atr.content as any).value : ""] }))}
-               />
-
+                <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />,
+                <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />,
             ]
-
          })
       ),
       [location]
-
    );
 
 

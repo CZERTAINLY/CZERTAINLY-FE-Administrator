@@ -47,6 +47,7 @@ import CertificateStatus from "../CertificateStatus";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus } from "types/openapi";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 
 
 export default function CertificateDetail() {
@@ -904,18 +905,6 @@ export default function CertificateDetail() {
       [certificate]
    )
 
-   const metaData: TableDataRow[] = useMemo(
-
-      () => !certificate || !certificate.metadata? [] : certificate.metadata.map(m => (
-            {
-               id: m.connectorName,
-               columns: [m.connectorName, m.connectorUuid],
-            }
-         )
-      ),
-      [certificate]
-   )
-
    const propertiesData: TableDataRow[] = useMemo(
 
       () => !certificate ? [] : [
@@ -1329,10 +1318,7 @@ export default function CertificateDetail() {
 
                <Widget title={metaTitle}>
                   <br />
-                  <CustomTable
-                     headers={detailHeaders}
-                     data={metaData}
-                  />
+                   <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata}/>
                </Widget>
 
             </Col>
