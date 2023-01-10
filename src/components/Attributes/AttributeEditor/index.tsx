@@ -394,11 +394,11 @@ export default function AttributeEditor({
 
                         } else if (attribute?.content) {
 
-                            formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data.toString();
+                            formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
 
                         } else if (descriptor.content) {
 
-                            formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data.toString();
+                            formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
 
                         }
 
