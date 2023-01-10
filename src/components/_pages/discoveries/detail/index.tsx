@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Col, Container, Label, Row } from "reactstrap";
@@ -157,12 +157,11 @@ export default function DiscoveryDetail() {
 
    const certificateData: TableDataRow[] = useMemo(
 
-      () => !discovery?.certificate ? [] : discovery.certificate.map(function(r:any) {
-         return (
+      () => !discovery?.certificate ? [] : discovery.certificate.map(r => (
             {
                id: r.serialNumber + r.fingerprint,
                columns: [
-                  r.commonName,
+                  r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
                   r.serialNumber,
                   <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notAfter)}</span>,
                   <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notBefore)}</span>,
@@ -171,7 +170,6 @@ export default function DiscoveryDetail() {
                ],
             }
          )
-      }
       ),
       [discovery?.certificate]
    )

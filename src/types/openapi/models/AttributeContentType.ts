@@ -12,7 +12,7 @@
  */
 
 /**
- * Content Type of the Attribute
+ * Type of the attribute content. 
  * @export
  * @enum {string}
  */

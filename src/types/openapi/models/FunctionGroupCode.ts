@@ -22,6 +22,7 @@ export enum FunctionGroupCode {
     AuthorityProvider = 'authorityProvider',
     DiscoveryProvider = 'discoveryProvider',
     EntityProvider = 'entityProvider',
-    ComplianceProvider = 'complianceProvider'
+    ComplianceProvider = 'complianceProvider',
+    CryptographyProvider = 'cryptographyProvider'
 }
 

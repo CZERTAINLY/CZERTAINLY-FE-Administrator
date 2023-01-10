@@ -24,18 +24,18 @@ import type {
 } from '../models';
 
 export interface ExportAuditLogsRequest {
-    filter?: AuditLogFilter;
-    pageable?: Pageable;
+    filter: AuditLogFilter;
+    pageable: Pageable;
 }
 
 export interface ListAuditLogsRequest {
-    filter?: AuditLogFilter;
-    pageable?: Pageable;
+    filter: AuditLogFilter;
+    pageable: Pageable;
 }
 
 export interface PurgeAuditLogsRequest {
-    filter?: AuditLogFilter;
-    pageable?: Pageable;
+    filter: AuditLogFilter;
+    pageable: Pageable;
 }
 
 /**

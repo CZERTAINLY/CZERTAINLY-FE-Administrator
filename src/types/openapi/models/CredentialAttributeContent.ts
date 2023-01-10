@@ -12,7 +12,7 @@
  */
 
 import type {
-    CredentialDto,
+    CredentialAttributeContentData,
 } from './';
 
 /**
@@ -27,8 +27,8 @@ export interface CredentialAttributeContent {
      */
     reference?: string;
     /**
-     * @type {CredentialDto}
+     * @type {CredentialAttributeContentData}
      * @memberof CredentialAttributeContent
      */
-    data: CredentialDto;
+    data: CredentialAttributeContentData;
 }

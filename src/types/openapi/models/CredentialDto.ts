@@ -16,7 +16,6 @@ import type {
 } from './';
 
 /**
- * Credential attribute content data
  * @export
  * @interface CredentialDto
  */

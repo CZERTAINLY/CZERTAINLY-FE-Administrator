@@ -12,7 +12,7 @@
  */
 
 /**
- * Type of the Attribute
+ * Type of the attribute. It is optional and must be set only if special behaviour is needed.
  * @export
  * @enum {string}
  */

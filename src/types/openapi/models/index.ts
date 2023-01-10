@@ -74,6 +74,7 @@ export * from './ConnectorRequestDto';
 export * from './ConnectorStatus';
 export * from './ConnectorUpdateRequestDto';
 export * from './CredentialAttributeContent';
+export * from './CredentialAttributeContentData';
 export * from './CredentialDto';
 export * from './CredentialRequestDto';
 export * from './CredentialUpdateRequestDto';
