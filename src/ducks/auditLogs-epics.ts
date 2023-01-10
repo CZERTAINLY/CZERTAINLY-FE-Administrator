@@ -1,5 +1,5 @@
 import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
 
@@ -149,8 +149,10 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.auditLogs.purgeAuditLogs({ pageable: transformPageableModelToDto({ page: action.payload.page, size: action.payload.size }), filter: action.payload.filters ? transformAuditLogFilterModelToDto(action.payload.filters) : {} }
          ).pipe(
 
-            map(
-               () => slice.actions.listLogs({ page: 0, size: 10, filters: action.payload.filters })
+            mergeMap(
+               () => of(
+                   slice.actions.purgeLogsSuccess(),
+                   slice.actions.listLogs({ page: 0, size: 10, filters: action.payload.filters }))
             ),
 
             catchError(
