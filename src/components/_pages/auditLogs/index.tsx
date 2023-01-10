@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Button, Container } from "reactstrap";
+import { Button, ButtonGroup, Container } from "reactstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -14,6 +14,7 @@ import styles from "./auditLogs.module.scss";
 import { dateFormatter } from "utils/dateUtil";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import { AuditLogFilterModel } from "types/auditLogs";
+import { Link } from "react-router-dom";
 
 const defaultPageSize = 10;
 
@@ -133,13 +134,10 @@ function AuditLogs() {
             </h5>
 
              <div>
-                 <a
-                     href={`/api/v1/logs/export?${queryString}`}
-                     className={styles.exportButton}
-                 >
-                     Export
-                 </a>
-                 <Button className={styles.exportButton} type="submit" color="primary" size="sm" onClick={() => purgeCallback()}>Purge</Button>
+                 <ButtonGroup>
+                    <Link to={`/api/v1/auditLogs/export?${queryString}`}><Button color={"default"}>Export</Button></Link>
+                    <Button type="submit" color="primary" onClick={() => purgeCallback()}>Purge</Button>
+                 </ButtonGroup>
              </div>
 
          </div>

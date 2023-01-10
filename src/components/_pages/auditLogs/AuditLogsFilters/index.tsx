@@ -184,8 +184,8 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
             </div>
             <div className="d-flex justify-content-end">
                <ButtonGroup>
-                  <Button type="reset" color="default" size="sm" onClick={() => clearCallback(form)}>Clear Filters</Button>
-                  <Button type="submit" color="primary" size="sm">Apply Filters</Button>
+                  <Button type="reset" color="default" onClick={() => clearCallback(form)}>Clear Filters</Button>
+                  <Button type="submit" color="primary">Apply Filters</Button>
                </ButtonGroup>
             </div>
          </BootstrapForm>
