@@ -7,6 +7,7 @@ import {
    BaseAttributeDto,
    BooleanAttributeContent,
    CredentialAttributeContent,
+   CredentialAttributeContentData,
    DataAttribute,
    DataAttributeProperties,
    DateAttributeContent,
@@ -33,13 +34,15 @@ import {
    TextAttributeContent,
    TimeAttributeContent
 } from "./openapi";
-import { CredentialResponseModel } from "./credentials";
 
 export type BooleanAttributeContentDto = BooleanAttributeContent;
 export type BooleanAttributeContentModel = BooleanAttributeContentDto;
 
+export type CredentialAttributeContentDataDto = CredentialAttributeContentData;
+export type CredentialAttributeContentDataModel = Omit<CredentialAttributeContentDataDto, "attributes"> & { attributes: Array<DataAttributeModel> };
+
 export type CredentialAttributeContentDto = CredentialAttributeContent;
-export type CredentialAttributeContentModel = Omit<CredentialAttributeContentDto, "data"> & { data: CredentialResponseModel };
+export type CredentialAttributeContentModel = Omit<CredentialAttributeContentDto, "data"> & { data: CredentialAttributeContentDataModel };
 
 export type DateAttributeContentDto = DateAttributeContent;
 export type DateAttributeContentModel = DateAttributeContentDto;

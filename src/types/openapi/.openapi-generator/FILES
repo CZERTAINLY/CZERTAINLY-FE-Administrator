@@ -101,6 +101,7 @@ models/ConnectorRequestDto.ts
 models/ConnectorStatus.ts
 models/ConnectorUpdateRequestDto.ts
 models/CredentialAttributeContent.ts
+models/CredentialAttributeContentData.ts
 models/CredentialDto.ts
 models/CredentialRequestDto.ts
 models/CredentialUpdateRequestDto.ts

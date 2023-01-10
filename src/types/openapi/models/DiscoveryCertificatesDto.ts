@@ -24,6 +24,12 @@ export interface DiscoveryCertificatesDto {
      */
     uuid: string;
     /**
+     * UUID of the Certificate in Certificate inventory
+     * @type {string}
+     * @memberof DiscoveryCertificatesDto
+     */
+    inventoryUuid?: string;
+    /**
      * Certificate common name
      * @type {string}
      * @memberof DiscoveryCertificatesDto
