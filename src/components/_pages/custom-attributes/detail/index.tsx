@@ -21,6 +21,8 @@ export default function CustomAttributeDetail() {
 
     const customAttribute = useSelector(selectors.customAttribute);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const isEnabling = useSelector(selectors.isEnabling);
+    const isDisabling = useSelector(selectors.isDisabling);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -54,6 +56,12 @@ export default function CustomAttributeDetail() {
                 icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => {
                     onEditClick();
                 },
+            },
+            {
+                icon: customAttribute?.enabled ? "disable" : "enable",
+                disabled: !customAttribute || isEnabling || isDisabling,
+                tooltip: customAttribute?.enabled ? "Disable" : "Enable",
+                onClick: () => customAttribute?.enabled ? dispatch(actions.disableCustomAttribute(customAttribute?.uuid)) : (customAttribute ? dispatch(actions.enableCustomAttribute(customAttribute?.uuid)) : {}),
             },
             {
                 icon: "trash", disabled: false, tooltip: "Delete", onClick: () => {
@@ -155,7 +163,7 @@ export default function CustomAttributeDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingDetail}>
+            <Widget title={detailsTitle} busy={isFetchingDetail || isEnabling || isDisabling}>
                 <CustomTable
                     headers={detailHeaders}
                     data={detailData}

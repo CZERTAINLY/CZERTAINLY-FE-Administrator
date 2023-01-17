@@ -197,6 +197,48 @@ const bulkDisableCustomAttributes: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const enableCustomAttribute: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.enableCustomAttribute.match,
+        ),
+        switchMap(
+            action => deps.apiClients.customAttributes.enableCustomAttribute({uuid: action.payload}).pipe(
+                map(
+                    errors => slice.actions.enableCustomAttributeSuccess(action.payload),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.enableCustomAttributeFailure({error: extractError(err, "Failed to enable custom attribute")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to enable custom attribute"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const disableCustomAttribute: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.disableCustomAttribute.match,
+        ),
+        switchMap(
+            action => deps.apiClients.customAttributes.disableCustomAttribute({uuid: action.payload}).pipe(
+                map(
+                    errors => slice.actions.disableCustomAttributeSuccess(action.payload),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.disableCustomAttributeFailure({error: extractError(err, "Failed to disable custom attribute")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to disable custom attribute"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCustomAttributes,
     createCustomAttribute,
@@ -205,7 +247,9 @@ const epics = [
     deleteCustomAttribute,
     bulkDeleteCustomAttributes,
     bulkEnableCustomAttributes,
+    enableCustomAttribute,
     bulkDisableCustomAttributes,
+    disableCustomAttribute,
 ];
 
 export default epics;

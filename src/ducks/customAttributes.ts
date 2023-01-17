@@ -19,7 +19,9 @@ export type State = {
     isDeleting: boolean;
     isBulkDeleting: boolean;
     isBulkEnabling: boolean;
+    isEnabling: boolean;
     isBulkDisabling: boolean;
+    isDisabling: boolean;
     isUpdating: boolean;
 };
 
@@ -32,7 +34,9 @@ export const initialState: State = {
     isDeleting: false,
     isBulkDeleting: false,
     isBulkEnabling: false,
+    isEnabling: false,
     isBulkDisabling: false,
+    isDisabling: false,
     isUpdating: false,
 };
 
@@ -105,7 +109,9 @@ export const slice = createSlice({
             state.isDeleting = false;
             const index = state.customAttributes.findIndex(attr => attr.uuid === action.payload);
             if (index !== -1) state.customAttributes.splice(index, 1);
-            if (state.customAttribute?.uuid === action.payload) state.customAttribute = undefined;
+            if (state.customAttribute?.uuid === action.payload) {
+                state.customAttribute = undefined;
+            }
         },
 
         deleteCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -121,10 +127,14 @@ export const slice = createSlice({
             action.payload.forEach(
                 uuid => {
                     const index = state.customAttributes.findIndex(attr => attr.uuid === uuid);
-                    if (index >= 0) state.customAttributes.splice(index, 1);
+                    if (index >= 0) {
+                        state.customAttributes.splice(index, 1);
+                    }
                 },
             );
-            if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) state.customAttribute = undefined;
+            if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) {
+                state.customAttribute = undefined;
+            }
             state.checkedRows = [];
         },
 
@@ -144,7 +154,9 @@ export const slice = createSlice({
                     attribute.enabled = true;
                 }
             })
-            if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) state.customAttribute.enabled = true;
+            if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) {
+                state.customAttribute.enabled = true;
+            }
         },
 
         bulkEnableCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -163,11 +175,51 @@ export const slice = createSlice({
                     attribute.enabled = false;
                 }
             })
-            if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) state.customAttribute.enabled = false;
+            if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) {
+                state.customAttribute.enabled = false;
+            }
         },
 
         bulkDisableCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkDisabling = false;
+        },
+
+        enableCustomAttribute: (state, action: PayloadAction<string>) => {
+            state.isEnabling = true;
+        },
+
+        enableCustomAttributeSuccess: (state, action: PayloadAction<string>) => {
+            state.isEnabling = false;
+            const attribute = state.customAttributes.find(a => a.uuid === action.payload)
+            if (attribute) {
+                attribute.enabled = true;
+            }
+            if (state.customAttribute && state.customAttribute.uuid === action.payload) {
+                state.customAttribute.enabled = true;
+            }
+        },
+
+        enableCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEnabling = false;
+        },
+
+        disableCustomAttribute: (state, action: PayloadAction<string>) => {
+            state.isDisabling = true;
+        },
+
+        disableCustomAttributeSuccess: (state, action: PayloadAction<string>) => {
+            state.isDisabling = false;
+            const attribute = state.customAttributes.find(a => a.uuid === action.payload)
+            if (attribute) {
+                attribute.enabled = false;
+            }
+            if (state.customAttribute && state.customAttribute.uuid === action.payload) {
+                state.customAttribute.enabled = false;
+            }
+        },
+
+        disableCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDisabling = false;
         },
     },
 });
@@ -185,7 +237,9 @@ const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
 const isBulkEnabling = createSelector(state, (state: State) => state.isBulkEnabling);
+const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
+const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
 
 export const selectors = {
@@ -203,7 +257,9 @@ export const selectors = {
     isDeleting,
     isBulkDeleting,
     isBulkEnabling,
+    isEnabling,
     isBulkDisabling,
+    isDisabling,
     isUpdating,
 };
 
