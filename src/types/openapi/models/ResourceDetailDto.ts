@@ -13,6 +13,7 @@
 
 import type {
     ActionDto,
+    Resource,
 } from './';
 
 /**
@@ -27,11 +28,10 @@ export interface ResourceDetailDto {
      */
     uuid: string;
     /**
-     * Object Name
-     * @type {string}
+     * @type {Resource}
      * @memberof ResourceDetailDto
      */
-    name: string;
+    name: Resource;
     /**
      * Resource label
      * @type {string}

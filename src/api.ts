@@ -7,7 +7,7 @@ import {
    CertificateGroupApi, CertificateInventoryApi,
    ClientOperationsV2Api, ComplianceProfileManagementApi,
    Configuration,
-   ConnectorManagementApi, CredentialManagementApi, DiscoveryManagementApi,
+   ConnectorManagementApi, CredentialManagementApi, CustomAttributesApi, DiscoveryManagementApi,
    EntityManagementApi,
    LocationManagementApi,
    RAProfileManagementApi,
@@ -39,6 +39,7 @@ export interface ApiClients {
    clientOperations: ClientOperationsV2Api;
    discoveries: DiscoveryManagementApi;
    complianceProfile: ComplianceProfileManagementApi;
+   customAttributes: CustomAttributesApi;
 }
 
 
@@ -62,4 +63,5 @@ export const backendClient: ApiClients = {
    clientOperations: new ClientOperationsV2Api(configuration),
    discoveries: new DiscoveryManagementApi(configuration),
    complianceProfile: new ComplianceProfileManagementApi(configuration),
+   customAttributes: new CustomAttributesApi(configuration),
 };

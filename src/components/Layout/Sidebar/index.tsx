@@ -66,8 +66,16 @@ export default function Sidebar() {
                   ]}
                />
 
+                <LinksGroup
+                    _key="settings"
+                    header="Settings"
+                    childrenLinks={[
+                        { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
+                    ]}
+                />
 
-               <LinksGroup _key="/audit" header="Audit Logs" headerLink="/audit" />
+
+                <LinksGroup _key="/audit" header="Audit Logs" headerLink="/audit" />
                <LinksGroup _key="/about" header="About" headerLink="/about" />
 
             </ul>

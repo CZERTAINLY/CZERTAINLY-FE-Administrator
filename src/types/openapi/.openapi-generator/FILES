@@ -105,8 +105,10 @@ models/CredentialAttributeContentData.ts
 models/CredentialDto.ts
 models/CredentialRequestDto.ts
 models/CredentialUpdateRequestDto.ts
+models/CustomAttribute.ts
 models/CustomAttributeCreateRequestDto.ts
 models/CustomAttributeDefinitionDetailDto.ts
+models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts
 models/DataAttributeProperties.ts
@@ -144,6 +146,8 @@ models/InfoAttributeProperties.ts
 models/IntegerAttributeContent.ts
 models/IssueToLocationRequestDto.ts
 models/LocationDto.ts
+models/MetadataAttribute.ts
+models/MetadataAttributeProperties.ts
 models/MetadataResponseDto.ts
 models/MimeType.ts
 models/MultipleCertificateObjectUpdateDto.ts
