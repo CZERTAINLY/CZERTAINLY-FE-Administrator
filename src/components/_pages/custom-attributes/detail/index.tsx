@@ -29,9 +29,11 @@ export default function CustomAttributeDetail() {
     useEffect(
         () => {
             if (!id) return;
-            dispatch(actions.getCustomAttribute(id));
+            if (!customAttribute || (id !== customAttribute.uuid)) {
+                dispatch(actions.getCustomAttribute(id));
+            }
         },
-        [dispatch, id],
+        [dispatch, customAttribute, id],
     );
 
     const onEditClick = useCallback(
