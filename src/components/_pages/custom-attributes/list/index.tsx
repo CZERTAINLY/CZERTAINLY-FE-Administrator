@@ -1,5 +1,6 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
@@ -58,9 +59,9 @@ export default function CustomAttributesList() {
 
     const buttons: WidgetButtonProps[] = useMemo(() => [
         {icon: "plus", disabled: false, tooltip: "Create", onClick: onAddClick},
-        {icon: "enable", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => dispatch(actions.bulkEnableCustomAttributes(checkedRows))},
-        {icon: "disable", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => dispatch(actions.bulkDisableCustomAttributes(checkedRows))},
         {icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true)},
+        {icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => dispatch(actions.bulkEnableCustomAttributes(checkedRows))},
+        {icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => dispatch(actions.bulkDisableCustomAttributes(checkedRows))},
     ], [checkedRows, onAddClick, dispatch]);
 
     const title = useMemo(
@@ -88,8 +89,8 @@ export default function CustomAttributesList() {
                 width: "20%",
             },
             {
-                id: "enabled",
-                content: "Enabled",
+                id: "status",
+                content: "Status",
                 sortable: true,
                 width: "5%",
             },
@@ -115,8 +116,7 @@ export default function CustomAttributesList() {
                 id: customAttribute.uuid,
                 columns: [
                     <Link to={`./detail/${customAttribute.uuid}`}>{customAttribute.name}</Link>,
-                    <i title={customAttribute.enabled ? "yes" : "no"}
-                       className={`fa fa-circle text-${customAttribute.enabled ? "success" : "danger"}`}/>,
+                    <StatusBadge enabled={customAttribute.enabled} />,
                     customAttribute.contentType,
                     customAttribute.description,
                 ],

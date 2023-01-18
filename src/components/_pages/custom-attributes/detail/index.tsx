@@ -1,16 +1,16 @@
-import BooleanIcon from "components/BooleanIcon";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import Dialog from "components/Dialog";
+import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/customAttributes";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Container } from "reactstrap";
+import { Badge, Container } from "reactstrap";
 import { getAttributeContent } from "utils/attributes/attributes";
 
 export default function CustomAttributeDetail() {
@@ -58,18 +58,18 @@ export default function CustomAttributeDetail() {
                 },
             },
             {
-                icon: customAttribute?.enabled ? "disable" : "enable",
-                disabled: !customAttribute || isEnabling || isDisabling,
-                tooltip: customAttribute?.enabled ? "Disable" : "Enable",
-                onClick: () => customAttribute?.enabled ? dispatch(actions.disableCustomAttribute(customAttribute?.uuid)) : (customAttribute ? dispatch(actions.enableCustomAttribute(customAttribute?.uuid)) : {}),
-            },
-            {
                 icon: "trash", disabled: false, tooltip: "Delete", onClick: () => {
                     setConfirmDelete(true);
                 },
             },
+            {
+                icon: customAttribute?.enabled ? "times" : "check",
+                disabled: !customAttribute || isEnabling || isDisabling,
+                tooltip: customAttribute?.enabled ? "Disable" : "Enable",
+                onClick: () => customAttribute?.enabled ? dispatch(actions.disableCustomAttribute(customAttribute?.uuid)) : (customAttribute ? dispatch(actions.enableCustomAttribute(customAttribute?.uuid)) : {}),
+            },
         ],
-        [onEditClick],
+        [onEditClick, customAttribute, dispatch, isDisabling, isEnabling],
     );
 
     const detailsTitle = useMemo(
@@ -135,27 +135,27 @@ export default function CustomAttributeDetail() {
             },
             {
                 id: "enabled",
-                columns: ["Enabled", <BooleanIcon enabled={customAttribute.enabled}/>],
+                columns: ["Enabled", <StatusBadge enabled={customAttribute.enabled}/>],
             },
             {
                 id: "visible",
-                columns: ["Visible", <BooleanIcon enabled={customAttribute.visible}/>],
+                columns: ["Visible", customAttribute.visible ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>],
             },
             {
                 id: "required",
-                columns: ["Required", <BooleanIcon enabled={customAttribute.required}/>],
+                columns: ["Required", customAttribute.required ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>],
             },
             {
                 id: "readOnly",
-                columns: ["Read Only", <BooleanIcon enabled={customAttribute.readOnly}/>],
+                columns: ["Read Only", customAttribute.readOnly ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>],
             },
             {
                 id: "list",
-                columns: ["List", <BooleanIcon enabled={customAttribute.list}/>],
+                columns: ["List", customAttribute.list ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>],
             },
             {
                 id: "multiSelect",
-                columns: ["Multi Select", <BooleanIcon enabled={customAttribute.multiSelect}/>],
+                columns: ["Multi Select", customAttribute.multiSelect ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>],
             },
         ],
         [customAttribute],

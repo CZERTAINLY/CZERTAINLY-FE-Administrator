@@ -2,7 +2,7 @@ import React from "react";
 import { Button, ButtonProps } from "reactstrap";
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock" | "enable" | "disable";
+   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock";
    id?: string;
    tooltip?: any;
    disabled: boolean;
@@ -37,8 +37,6 @@ const colors = {
    "minus": "red",
    "gavel": "auto",
    "lock": "auto",
-   "enable": "auto",
-   "disable": "auto",
 };
 
 
@@ -63,8 +61,6 @@ const classNames = {
    "minus": "fa fa-minus",
    "gavel": "fa fa-gavel",
    "lock": "fa fa-lock",
-   "enable": "fa fa-circle text-success",
-   "disable": "fa fa-circle text-danger",
 }
 
 
