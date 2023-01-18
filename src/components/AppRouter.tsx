@@ -75,6 +75,11 @@ import LocationDetail from "./_pages/locations/detail";
 import LocationEdit from "./_pages/locations/form";
 import AuditLogs from "./_pages/auditLogs";
 
+import CustomAttributesList from "./_pages/custom-attributes/list";
+import CustomAttributesDetail from "./_pages/custom-attributes/detail";
+import CustomAttributesEdit from "./_pages/custom-attributes/form";
+
+
 export default function AppRouter() {
 
    const profile = useSelector(selectors.profile);
@@ -178,6 +183,13 @@ export default function AppRouter() {
                <Route path="/userprofile/edit" element={<UserProfileEdit />} />
 
                <Route path="/audit" element={<AuditLogs />} />
+
+               <Route path="/customattributes" element={<CustomAttributesList />} />
+               <Route path="/customattributes/list" element={<Navigate to="/customattributes" />} />
+               <Route path="/customattributes/detail/:id" element={<CustomAttributesDetail />} />
+               <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
+               <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
+
             </Route >
 
             {

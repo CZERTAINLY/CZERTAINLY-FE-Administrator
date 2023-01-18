@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, ButtonProps } from "reactstrap";
 
-
 export interface WidgetButtonProps {
    icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock";
    id?: string;
@@ -37,7 +36,7 @@ const colors = {
    "info": "auto",
    "minus": "red",
    "gavel": "auto",
-   "lock": "auto"
+   "lock": "auto",
 };
 
 
@@ -61,7 +60,7 @@ const classNames = {
    "info": "fa fa-info-circle",
    "minus": "fa fa-minus",
    "gavel": "fa fa-gavel",
-   "lock": "fa fa-lock"
+   "lock": "fa fa-lock",
 }
 
 

@@ -1,3 +1,4 @@
+import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import {
     BulkActionMessageDto,
     CallbackRequest,
@@ -9,10 +10,9 @@ import {
     EndpointDto as EndpointDtoOpenApi,
     FunctionGroupDto as FunctionGroupDtoOpenApi,
     HealthDto as HealthDtoOpenApi,
-    RaProfileCallbackRequest,
     RequestAttributeCallback,
+    ResourceCallbackRequest,
 } from "./openapi";
-import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 
 export type BulkActionDto = BulkActionMessageDto;
 export type BulkActionModel = BulkActionDto;
@@ -47,5 +47,5 @@ export type CallbackAttributeModel = CallbackAttributeDto;
 export type CallbackConnectorDto = CallbackRequest;
 export type CallbackConnectorModel = Omit<CallbackConnectorDto, "requestAttributeCallback"> & { requestAttributeCallback: CallbackAttributeModel };
 
-export type CallbackRaProfileDto = RaProfileCallbackRequest;
-export type CallbackRaProfileModel = Omit<CallbackRaProfileDto, "requestAttributeCallback"> & { requestAttributeCallback: CallbackAttributeModel };
+export type CallbackResourceDto = ResourceCallbackRequest;
+export type CallbackResourceModel = Omit<CallbackResourceDto, "requestAttributeCallback"> & { requestAttributeCallback: CallbackAttributeModel };

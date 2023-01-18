@@ -8,6 +8,8 @@ import {
    BooleanAttributeContent,
    CredentialAttributeContent,
    CredentialAttributeContentData,
+   CustomAttribute,
+   CustomAttributeProperties,
    DataAttribute,
    DataAttributeProperties,
    DateAttributeContent,
@@ -21,6 +23,8 @@ import {
    InfoAttribute,
    InfoAttributeProperties,
    IntegerAttributeContent,
+   MetadataAttribute,
+   MetadataAttributeProperties,
    MimeType,
    ObjectAttributeContent,
    RangeAttributeConstraint,
@@ -32,7 +36,7 @@ import {
    SecretAttributeContentData,
    StringAttributeContent,
    TextAttributeContent,
-   TimeAttributeContent
+   TimeAttributeContent,
 } from "./openapi";
 
 export type BooleanAttributeContentDto = BooleanAttributeContent;
@@ -131,8 +135,20 @@ export type InfoAttributePropertiesModel = InfoAttributePropertiesDto;
 export type InfoAttributeDto = InfoAttribute;
 export type InfoAttributeModel = Omit<InfoAttributeDto, "content | properties"> & { content: Array<BaseAttributeContentModel>, properties: InfoAttributePropertiesModel };
 
+export type CustomAttributePropertiesDto = CustomAttributeProperties;
+export type CustomAttributePropertiesModel = CustomAttributePropertiesDto;
+
+export type CustomAttributeDto = CustomAttribute;
+export type CustomAttributeModel = Omit<CustomAttributeDto, "content | properties"> & { content: Array<BaseAttributeContentModel>, properties: CustomAttributePropertiesModel };
+
+export type MetadataAttributePropertiesDto = MetadataAttributeProperties;
+export type MetadataAttributePropertiesModel = MetadataAttributePropertiesDto;
+
+export type MetadataAttributeDto = MetadataAttribute;
+export type MetadataAttributeModel = Omit<MetadataAttributeDto, "content | properties"> & { content: Array<BaseAttributeContentModel>, properties: MetadataAttributePropertiesModel };
+
 export type AttributeDescriptorDto = BaseAttributeDto;
-export type AttributeDescriptorModel = DataAttributeModel | GroupAttributeModel | InfoAttributeModel;
+export type AttributeDescriptorModel = DataAttributeModel | GroupAttributeModel | InfoAttributeModel | CustomAttributeModel | MetadataAttributeModel;
 
 export type AttributeDescriptorCollectionDto = {
    [functionGroup: string]: {

@@ -47,7 +47,7 @@ export interface GetGroupRequest {
 /**
  * no description
  */
-export class CertificateGroupApi extends BaseAPI {
+export class CertificateKeyGroupApi extends BaseAPI {
 
     /**
      * Delete multiple Groups
@@ -62,7 +62,7 @@ export class CertificateGroupApi extends BaseAPI {
         };
 
         return this.request<void>({
-            url: '/v1/certificateGroups',
+            url: '/v1/groups',
             method: 'DELETE',
             headers,
             body: requestBody,
@@ -82,7 +82,7 @@ export class CertificateGroupApi extends BaseAPI {
         };
 
         return this.request<UuidDto>({
-            url: '/v1/certificateGroups',
+            url: '/v1/groups',
             method: 'POST',
             headers,
             body: groupRequestDto,
@@ -98,7 +98,7 @@ export class CertificateGroupApi extends BaseAPI {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteGroup');
 
         return this.request<void>({
-            url: '/v1/certificateGroups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            url: '/v1/groups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'DELETE',
         }, opts?.responseOpts);
     };
@@ -117,7 +117,7 @@ export class CertificateGroupApi extends BaseAPI {
         };
 
         return this.request<GroupDto>({
-            url: '/v1/certificateGroups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            url: '/v1/groups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'PUT',
             headers,
             body: groupRequestDto,
@@ -133,7 +133,7 @@ export class CertificateGroupApi extends BaseAPI {
         throwIfNullOrUndefined(uuid, 'uuid', 'getGroup');
 
         return this.request<GroupDto>({
-            url: '/v1/certificateGroups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            url: '/v1/groups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'GET',
         }, opts?.responseOpts);
     };
@@ -145,7 +145,7 @@ export class CertificateGroupApi extends BaseAPI {
     listGroups(opts?: OperationOpts): Observable<AjaxResponse<Array<GroupDto>>>
     listGroups(opts?: OperationOpts): Observable<Array<GroupDto> | AjaxResponse<Array<GroupDto>>> {
         return this.request<Array<GroupDto>>({
-            url: '/v1/certificateGroups',
+            url: '/v1/groups',
             method: 'GET',
         }, opts?.responseOpts);
     };

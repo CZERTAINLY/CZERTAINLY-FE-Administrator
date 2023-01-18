@@ -1,21 +1,26 @@
 import {
    ACMEAccountManagementApi,
-   ACMEProfileManagementApi, AuditLogApi,
+   ACMEProfileManagementApi,
+   AuditLogApi,
    AuthenticationManagementApi,
    AuthorityManagementApi,
    CallbackApi,
-   CertificateGroupApi, CertificateInventoryApi,
-   ClientOperationsV2Api, ComplianceProfileManagementApi,
+   CertificateInventoryApi,
+   CertificateKeyGroupApi,
+   ClientOperationsV2Api,
+   ComplianceProfileManagementApi,
    Configuration,
-   ConnectorManagementApi, CredentialManagementApi, DiscoveryManagementApi,
+   ConnectorManagementApi,
+   CredentialManagementApi,
+   CustomAttributesApi,
+   DiscoveryManagementApi,
    EntityManagementApi,
    LocationManagementApi,
    RAProfileManagementApi,
    RoleManagementApi,
    StatisticsDashboardApi,
-   UserManagementApi
+   UserManagementApi,
 } from "types/openapi";
-
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
 
@@ -35,10 +40,11 @@ export interface ApiClients {
    certificates: CertificateInventoryApi;
    acmeAccounts: ACMEAccountManagementApi;
    acmeProfiles: ACMEProfileManagementApi;
-   certificateGroups: CertificateGroupApi;
+   certificateGroups: CertificateKeyGroupApi;
    clientOperations: ClientOperationsV2Api;
    discoveries: DiscoveryManagementApi;
    complianceProfile: ComplianceProfileManagementApi;
+   customAttributes: CustomAttributesApi;
 }
 
 
@@ -58,8 +64,9 @@ export const backendClient: ApiClients = {
    statisticsDashboard: new StatisticsDashboardApi(configuration),
    acmeAccounts: new ACMEAccountManagementApi(configuration),
    acmeProfiles: new ACMEProfileManagementApi(configuration),
-   certificateGroups: new CertificateGroupApi(configuration),
+   certificateGroups: new CertificateKeyGroupApi(configuration),
    clientOperations: new ClientOperationsV2Api(configuration),
    discoveries: new DiscoveryManagementApi(configuration),
    complianceProfile: new ComplianceProfileManagementApi(configuration),
+   customAttributes: new CustomAttributesApi(configuration),
 };

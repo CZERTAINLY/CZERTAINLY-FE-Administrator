@@ -16,10 +16,13 @@ import type {
     AttributeContentType,
     AttributeType,
     BaseAttributeConstraint,
+    BaseAttributeContent,
+    CustomAttribute,
+    CustomAttributeProperties,
     DataAttribute,
     GroupAttribute,
     InfoAttribute,
-    InfoAttributeProperties,
+    MetadataAttribute,
 } from './';
 
 /**
@@ -27,4 +30,4 @@ import type {
  * Base Attribute definition
  * @export
  */
-export type BaseAttributeDto = DataAttribute | GroupAttribute | InfoAttribute;
+export type BaseAttributeDto = CustomAttribute | DataAttribute | GroupAttribute | InfoAttribute | MetadataAttribute;

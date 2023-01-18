@@ -117,7 +117,11 @@ export enum AuditLogDtoOriginationEnum {
     ComplianceProfile = 'COMPLIANCE_PROFILE',
     ComplianceRule = 'COMPLIANCE_RULE',
     ComplianceGroup = 'COMPLIANCE_GROUP',
-    Localhost = 'LOCALHOST'
+    Localhost = 'LOCALHOST',
+    TokenProfile = 'TOKEN_PROFILE',
+    TokenInstance = 'TOKEN_INSTANCE',
+    CryptographicKey = 'CRYPTOGRAPHIC_KEY',
+    CryptographicOperations = 'CRYPTOGRAPHIC_OPERATIONS'
 }
 /**
  * @export
@@ -150,7 +154,11 @@ export enum AuditLogDtoAffectedEnum {
     ComplianceProfile = 'COMPLIANCE_PROFILE',
     ComplianceRule = 'COMPLIANCE_RULE',
     ComplianceGroup = 'COMPLIANCE_GROUP',
-    Localhost = 'LOCALHOST'
+    Localhost = 'LOCALHOST',
+    TokenProfile = 'TOKEN_PROFILE',
+    TokenInstance = 'TOKEN_INSTANCE',
+    CryptographicKey = 'CRYPTOGRAPHIC_KEY',
+    CryptographicOperations = 'CRYPTOGRAPHIC_OPERATIONS'
 }
 /**
  * @export
@@ -174,6 +182,10 @@ export enum AuditLogDtoOperationEnum {
     Callback = 'CALLBACK',
     Connect = 'CONNECT',
     ForceDelete = 'FORCE_DELETE',
+    Encrypt = 'ENCRYPT',
+    Decrypt = 'DECRYPT',
+    Sign = 'SIGN',
+    Verify = 'VERIFY',
     Approve = 'APPROVE'
 }
 

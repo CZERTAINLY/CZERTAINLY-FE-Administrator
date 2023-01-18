@@ -1,13 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useForm, useFormState } from "react-final-form";
+import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-
-import Widget from "components/Widget";
-import { CallbackAttributeModel } from "types/connectors";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Attribute } from "./Attribute";
-import { AttributeContentType, FunctionGroupCode } from "types/openapi";
+import { useForm, useFormState } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
 import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
@@ -18,9 +14,11 @@ import {
     isAttributeDescriptorModel,
     isDataAttributeModel,
     isGroupAttributeModel,
-    isInfoAttributeModel
+    isInfoAttributeModel,
 } from "types/attributes";
-
+import { CallbackAttributeModel } from "types/connectors";
+import { AttributeContentType, FunctionGroupCode, Resource } from "types/openapi";
+import { Attribute } from "./Attribute";
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -235,10 +233,11 @@ export default function AttributeEditor({
             mappings.uuid = descriptor.uuid;
 
             dispatch(authorityUuid
-                ? connectorActions.callbackRaProfile({
+                ? connectorActions.callbackResource({
                     callbackId: formAttributeName,
-                    callbackRaProfile: {
-                        authorityUuid: authorityUuid,
+                    callbackResource: {
+                        parentObjectUuid: authorityUuid,
+                        resource: Resource.RaProfiles,
                         requestAttributeCallback: mappings
                     }
                 })

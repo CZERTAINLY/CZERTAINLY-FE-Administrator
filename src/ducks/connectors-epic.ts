@@ -1,18 +1,10 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
-
-import { slice } from "./connectors";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import {
-    transformBulkActionDtoToModel,
-    transformConnectorRequestModelToDto,
-    transformConnectorResponseDtoToModel, transformConnectorUpdateRequestModelToDto,
-    transformFunctionGroupDtoToModel,
-} from "./transform/connectors";
+import { slice } from "./connectors";
 
 import {
     transformAttributeDescriptorCollectionDtoToModel,
@@ -22,6 +14,13 @@ import {
     transformHealthDtoToModel,
 } from "./transform/attributes";
 
+import {
+    transformBulkActionDtoToModel,
+    transformConnectorRequestModelToDto,
+    transformConnectorResponseDtoToModel,
+    transformConnectorUpdateRequestModelToDto,
+    transformFunctionGroupDtoToModel,
+} from "./transform/connectors";
 
 const listConnectors: AppEpic = (action$, state, deps) => {
 
@@ -590,18 +589,18 @@ const callbackConnector: AppEpic = (action$, state, deps) => {
 
 }
 
-const callbackRaProfile: AppEpic = (action$, state, deps) => {
+const callbackResource: AppEpic = (action$, state, deps) => {
 
     return action$.pipe(
 
         filter(
-            slice.actions.callbackRaProfile.match
+            slice.actions.callbackResource.match
         ),
         mergeMap(
 
-            action => deps.apiClients.callback.raProfileCallback({
-                    ...action.payload.callbackRaProfile,
-                    requestAttributeCallback: transformCallbackAttributeModelToDto(action.payload.callbackRaProfile.requestAttributeCallback)
+            action => deps.apiClients.callback.resourceCallback({
+                    ...action.payload.callbackResource,
+                    requestAttributeCallback: transformCallbackAttributeModelToDto(action.payload.callbackResource.requestAttributeCallback)
                 }
             ).pipe(
 
@@ -614,7 +613,7 @@ const callbackRaProfile: AppEpic = (action$, state, deps) => {
                 catchError(
                     error => of(
                         slice.actions.callbackFailure({ callbackId: action.payload.callbackId }),
-                        appRedirectActions.fetchError({ error, message: "RA profile callback failure" })
+                        appRedirectActions.fetchError({ error, message: "Resource callback failure" })
                     )
                 )
 
@@ -625,7 +624,7 @@ const callbackRaProfile: AppEpic = (action$, state, deps) => {
         catchError(
             error => of(
                 slice.actions.callbackFailure({ callbackId: "" }),
-                appRedirectActions.fetchError({ error, message: "Failed to perform RA profile callback" })
+                appRedirectActions.fetchError({ error, message: "Failed to perform resource callback" })
             )
         )
 
@@ -650,7 +649,7 @@ const epics = [
    bulkAuthorizeConnectors,
    bulkForceDeleteConnectors,
    callbackConnector,
-   callbackRaProfile,
+   callbackResource,
 ];
 
 

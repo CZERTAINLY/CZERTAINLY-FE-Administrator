@@ -18,7 +18,7 @@ import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AttributeDefinitionDto,
     AuthenticationServiceExceptionDto,
-    BaseAttributeDto,
+    CustomAttribute,
     CustomAttributeCreateRequestDto,
     CustomAttributeDefinitionDetailDto,
     CustomAttributeUpdateRequestDto,
@@ -238,12 +238,12 @@ export class CustomAttributesApi extends BaseAPI {
     /**
      * Get Custom Attributes for a resource
      */
-    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest): Observable<Array<BaseAttributeDto>>
-    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest): Observable<Array<CustomAttribute>>
+    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CustomAttribute>>>
+    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest, opts?: OperationOpts): Observable<Array<CustomAttribute> | AjaxResponse<Array<CustomAttribute>>> {
         throwIfNullOrUndefined(resource, 'resource', 'getResourceCustomAttributes');
 
-        return this.request<Array<BaseAttributeDto>>({
+        return this.request<Array<CustomAttribute>>({
             url: '/v1/attributes/custom/resources/{resource}'.replace('{resource}', encodeURI(resource)),
             method: 'GET',
         }, opts?.responseOpts);

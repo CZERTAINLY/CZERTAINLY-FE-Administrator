@@ -1,18 +1,17 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Input } from "reactstrap";
-
-import style from "./style.module.scss";
-
-import { actions as authActions, selectors as authSelectors } from "ducks/auth";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { SubjectPermissionsModel } from "types/roles";
+
+import { actions as authActions, selectors as authSelectors } from "ducks/auth";
+import React, { useCallback, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Input } from "reactstrap";
 import { ResourceModel } from "types/auth";
-import { Resource } from "types/openapi";
+import { SubjectPermissionsModel } from "types/roles";
+
+import style from "./style.module.scss";
 
 interface Props {
    resources?: ResourceModel[]
@@ -76,7 +75,7 @@ function RolePermissionsEditor({
       (resource: ResourceModel) => {
 
          setObjectsToAdd([]);
-         if (resource.listObjectsEndpoint) dispatch(authActions.getObjectsForResource({ resource: resource.name as Resource }));
+         if (resource.listObjectsEndpoint) dispatch(authActions.getObjectsForResource({ resource: resource.name }));
          setCurrentResource(resource);
 
       },

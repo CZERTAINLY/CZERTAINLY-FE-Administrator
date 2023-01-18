@@ -12,7 +12,7 @@
  */
 
 /**
- * List of resources which are allowed to use the Custom Attribute
+ * List of resource to be associated with the custom attribute
  * @export
  * @enum {string}
  */
@@ -29,11 +29,14 @@ export enum Resource {
     Authorities = 'authorities',
     RaProfiles = 'raProfiles',
     Certificates = 'certificates',
-    CertificateGroups = 'certificateGroups',
+    Groups = 'groups',
     ComplianceProfiles = 'complianceProfiles',
     Discoveries = 'discoveries',
     Entities = 'entities',
     Locations = 'locations',
+    TokenProfiles = 'tokenProfiles',
+    Tokens = 'tokens',
+    Keys = 'keys',
     Attributes = 'attributes'
 }
 

@@ -11,74 +11,52 @@
  * Do not edit the class manually.
  */
 
-import type {
-    BaseAttributeContent,
-    Resource,
-} from './';
-
 /**
+ * Properties of the Attributes
  * @export
- * @interface CustomAttributeUpdateRequestDto
+ * @interface CustomAttributeProperties
  */
-export interface CustomAttributeUpdateRequestDto {
-    /**
-     * Attribute description
-     * @type {string}
-     * @memberof CustomAttributeUpdateRequestDto
-     */
-    description: string;
+export interface CustomAttributeProperties {
     /**
      * Friendly name of the the Attribute
      * @type {string}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
     label: string;
     /**
      * Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user.
      * @type {boolean}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
-    visible?: boolean;
+    visible: boolean;
     /**
      * Group of the Attribute, used for the logical grouping of the Attribute
      * @type {string}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
     group?: string;
     /**
      * Boolean determining if the Attribute is required. If true, the Attribute must be provided.
      * @type {boolean}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
-    required?: boolean;
+    required: boolean;
     /**
      * Boolean determining if the Attribute is read only. If true, the Attribute content cannot be changed.
      * @type {boolean}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
-    readOnly?: boolean;
+    readOnly: boolean;
     /**
      * Boolean determining if the Attribute contains list of values in the content
      * @type {boolean}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
-    list?: boolean;
+    list: boolean;
     /**
      * Boolean determining if the Attribute can have multiple values
      * @type {boolean}
-     * @memberof CustomAttributeUpdateRequestDto
+     * @memberof CustomAttributeProperties
      */
-    multiSelect?: boolean;
-    /**
-     * Predefined content for the attribute if needed. The content of the Attribute must satisfy the type
-     * @type {Array<BaseAttributeContent>}
-     * @memberof CustomAttributeUpdateRequestDto
-     */
-    content?: Array<BaseAttributeContent>;
-    /**
-     * List of resource to be associated with the custom attribute
-     * @type {Array<Resource>}
-     * @memberof CustomAttributeUpdateRequestDto
-     */
-    resources?: Array<Resource>;
+    multiSelect: boolean;
 }
