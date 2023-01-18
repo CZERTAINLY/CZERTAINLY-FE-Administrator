@@ -5,8 +5,8 @@ apis/AuditLogApi.ts
 apis/AuthenticationManagementApi.ts
 apis/AuthorityManagementApi.ts
 apis/CallbackApi.ts
-apis/CertificateGroupApi.ts
 apis/CertificateInventoryApi.ts
+apis/CertificateKeyGroupApi.ts
 apis/ClientOperationsV2Api.ts
 apis/ComplianceProfileManagementApi.ts
 apis/ConnectorAuthenticationApi.ts

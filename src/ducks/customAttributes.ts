@@ -6,15 +6,18 @@ import {
     CustomAttributeUpdateRequestModel,
 } from "types/customAttributes";
 import { createFeatureSelector } from "utils/ducks";
+import { Resource } from "../types/openapi";
 
 export type State = {
     checkedRows: string[];
 
     customAttribute?: CustomAttributeDetailResponseModel;
     customAttributes: CustomAttributeResponseModel[];
+    resources: Resource[];
 
     isFetchingList: boolean;
     isFetchingDetail: boolean;
+    isFetchingResources: boolean;
     isCreating: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
@@ -28,8 +31,10 @@ export type State = {
 export const initialState: State = {
     checkedRows: [],
     customAttributes: [],
+    resources: [],
     isFetchingList: false,
     isFetchingDetail: false,
+    isFetchingResources: false,
     isCreating: false,
     isDeleting: false,
     isBulkDeleting: false,
@@ -60,6 +65,20 @@ export const slice = createSlice({
 
         listCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingList = false;
+        },
+
+        listResources: (state, action: PayloadAction<void>) => {
+            state.resources = [];
+            state.isFetchingResources = true;
+        },
+
+        listResourcesSuccess: (state, action: PayloadAction<Resource[]>) => {
+            state.resources = action.payload;
+            state.isFetchingResources = false;
+        },
+
+        listResourcesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingResources = false;
         },
 
         createCustomAttribute: (state, action: PayloadAction<CustomAttributeCreateRequestModel>) => {
@@ -230,9 +249,11 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
 const customAttribute = createSelector(state, (state: State) => state.customAttribute);
 const customAttributes = createSelector(state, (state: State) => state.customAttributes);
+const resources = createSelector(state, (state: State) => state.resources);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
+const isFetchingResources = createSelector(state, (state: State) => state.isFetchingResources);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
@@ -250,10 +271,12 @@ export const selectors = {
 
     customAttribute,
     customAttributes,
+    resources,
 
     isCreating,
     isFetchingList,
     isFetchingDetail,
+    isFetchingResources,
     isDeleting,
     isBulkDeleting,
     isBulkEnabling,

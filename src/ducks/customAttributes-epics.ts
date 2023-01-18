@@ -36,6 +36,28 @@ const listCustomAttributes: AppEpic = (action$, state$, deps) => {
 
 };
 
+const listResources: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.listResources.match,
+        ),
+        switchMap(
+            () => deps.apiClients.customAttributes.getResources().pipe(
+                map(
+                    list => slice.actions.listResourcesSuccess(list),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.listResourcesFailure({error: extractError(err, "Failed to get list of resources")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to get list of resources"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+
+};
+
 const createCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(
@@ -241,6 +263,7 @@ const disableCustomAttribute: AppEpic = (action$, state$, deps) => {
 
 const epics = [
     listCustomAttributes,
+    listResources,
     createCustomAttribute,
     updateCustomAttribute,
     getCustomAttribute,

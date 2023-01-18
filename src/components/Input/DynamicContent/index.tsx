@@ -80,7 +80,7 @@ export default function DynamicContent({editable, isList}: Props) {
                             placeholder="Content Type"
                             disabled={!editable}
                             onChange={(e) => {
-                                form.change("contentType", e.target.value);
+                                input.onChange(e);
                                 form.change("content", []);
                             }}
                         >

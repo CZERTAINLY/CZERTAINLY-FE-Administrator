@@ -18,6 +18,7 @@ import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     ErrorMessageDto,
     RequestAttributeCallback,
+    Resource,
 } from '../models';
 
 export interface CallbackRequest {
@@ -27,8 +28,9 @@ export interface CallbackRequest {
     requestAttributeCallback: RequestAttributeCallback;
 }
 
-export interface RaProfileCallbackRequest {
-    authorityUuid: string;
+export interface ResourceCallbackRequest {
+    resource: Resource;
+    parentObjectUuid: string;
     requestAttributeCallback: RequestAttributeCallback;
 }
 
@@ -62,21 +64,22 @@ export class CallbackApi extends BaseAPI {
     };
 
     /**
-     * API to trigger the Callback for RA Profile.
-     * RA Profile Callback API
+     * API to trigger the Callback for resource.
+     * Resource Callback API
      */
-    raProfileCallback({ authorityUuid, requestAttributeCallback }: RaProfileCallbackRequest): Observable<object>
-    raProfileCallback({ authorityUuid, requestAttributeCallback }: RaProfileCallbackRequest, opts?: OperationOpts): Observable<AjaxResponse<object>>
-    raProfileCallback({ authorityUuid, requestAttributeCallback }: RaProfileCallbackRequest, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'raProfileCallback');
-        throwIfNullOrUndefined(requestAttributeCallback, 'requestAttributeCallback', 'raProfileCallback');
+    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest): Observable<object>
+    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest, opts?: OperationOpts): Observable<AjaxResponse<object>>
+    resourceCallback({ resource, parentObjectUuid, requestAttributeCallback }: ResourceCallbackRequest, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
+        throwIfNullOrUndefined(resource, 'resource', 'resourceCallback');
+        throwIfNullOrUndefined(parentObjectUuid, 'parentObjectUuid', 'resourceCallback');
+        throwIfNullOrUndefined(requestAttributeCallback, 'requestAttributeCallback', 'resourceCallback');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
         return this.request<object>({
-            url: '/v1/{authorityUuid}/callback'.replace('{authorityUuid}', encodeURI(authorityUuid)),
+            url: '/v1/{resource}/{parentObjectUuid}/callback'.replace('{resource}', encodeURI(resource)).replace('{parentObjectUuid}', encodeURI(parentObjectUuid)),
             method: 'POST',
             headers,
             body: requestAttributeCallback,

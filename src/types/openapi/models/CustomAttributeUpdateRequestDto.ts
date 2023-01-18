@@ -13,6 +13,7 @@
 
 import type {
     BaseAttributeContent,
+    Resource,
 } from './';
 
 /**
@@ -74,4 +75,10 @@ export interface CustomAttributeUpdateRequestDto {
      * @memberof CustomAttributeUpdateRequestDto
      */
     content?: Array<BaseAttributeContent>;
+    /**
+     * List of resource to be associated with the custom attribute
+     * @type {Array<Resource>}
+     * @memberof CustomAttributeUpdateRequestDto
+     */
+    resources?: Array<Resource>;
 }

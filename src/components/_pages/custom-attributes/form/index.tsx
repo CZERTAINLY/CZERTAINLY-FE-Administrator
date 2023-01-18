@@ -6,11 +6,11 @@ import Widget from "components/Widget";
 
 import { actions, selectors } from "ducks/customAttributes";
 import React, { useCallback, useEffect, useMemo } from "react";
-
-import { Form } from "react-final-form";
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, ButtonGroup, Form as BootstrapForm } from "reactstrap";
+import Select from "react-select";
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from "types/customAttributes";
 import { AttributeContentType } from "types/openapi";
 import { validateAlphaNumeric, validateRequired } from "utils/validators";
@@ -23,32 +23,37 @@ export default function CustomAttributeForm() {
     const editMode = useMemo(() => !!id, [id]);
 
     const customAttributeDetail = useSelector(selectors.customAttribute);
+    const resources = useSelector(selectors.resources);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const isFetchingResources = useSelector(selectors.isFetchingResources);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
 
     const isBusy = useMemo(
-        () => isFetchingDetail || isCreating || isUpdating,
-        [isCreating, isFetchingDetail, isUpdating],
+        () => isFetchingDetail || isCreating || isUpdating || isFetchingResources,
+        [isCreating, isFetchingDetail, isUpdating, isFetchingResources],
     );
 
-    const defaultValuesCreate: CustomAttributeCreateRequestModel = useMemo(
+    type FormValues = Omit<CustomAttributeCreateRequestModel, "resources"> & { resources?: Array<{label: string, value: string}>};
+    const defaultValuesCreate: FormValues = useMemo(
         () => ({
             name: "",
             label: "",
             description: "",
             contentType: AttributeContentType.Text,
+            group: "",
             list: false,
             multiSelect: false,
             visible: true,
             required: false,
             readOnly: false,
+            resources: [],
             content: undefined,
         }),
         [],
     );
-    const defaultValuesUpdate: CustomAttributeUpdateRequestModel = useMemo(
-        () => (customAttributeDetail ? {...customAttributeDetail} : defaultValuesCreate),
+    const defaultValuesUpdate: FormValues = useMemo(
+        () => (customAttributeDetail ? {...customAttributeDetail, resources: customAttributeDetail.resources?.map(r => ({label: r, value: r}))} : defaultValuesCreate),
         [customAttributeDetail, defaultValuesCreate],
     );
 
@@ -62,6 +67,7 @@ export default function CustomAttributeForm() {
     );
 
     useEffect(() => {
+        dispatch(actions.listResources());
         if (editMode && id !== customAttributeDetail?.uuid) {
             dispatch(actions.getCustomAttribute(id!));
         }
@@ -69,8 +75,15 @@ export default function CustomAttributeForm() {
 
     return (
         <Widget title={editMode ? "Edit Custom Attribute" : "Add Custom Attribute"} busy={isBusy}>
-            <Form initialValues={editMode ? defaultValuesUpdate : defaultValuesCreate}
-                  onSubmit={editMode ? onSubmitUpdate : onSubmitCreate}>
+            <Form<FormValues> initialValues={editMode ? defaultValuesUpdate : defaultValuesCreate}
+                  onSubmit={(values) => {
+                      const valuesToSubmit = {...values, resources: values.resources?.map((r: any) => r.value)};
+                      if (editMode) {
+                          onSubmitUpdate(valuesToSubmit)
+                      } else {
+                          onSubmitCreate(valuesToSubmit)
+                      }
+                  }}>
                 {({handleSubmit, pristine, submitting, valid, values, form}) => (
                     <BootstrapForm onSubmit={handleSubmit}>
 
@@ -79,9 +92,24 @@ export default function CustomAttributeForm() {
                         <TextField label={"Description"} id={"description"} validators={[validateRequired(), validateAlphaNumeric()]}/>
                         <TextField label={"Group"} id={"group"} validators={[validateAlphaNumeric()]}/>
 
-                        <CheckboxField label={"Visible"} id={"visible"} />
-                        <CheckboxField label={"Required"} id={"required"} />
-                        <CheckboxField label={"Read Only"} id={"readOnly"} />
+                        <Field name="resources" type={"text"}>
+                            {({input}) => (
+                                <FormGroup>
+                                    <Label for="resources">Resources</Label>
+                                    <Select
+                                        {...input}
+                                        id="resources"
+                                        placeholder="Resources"
+                                        options={resources.map(r => ({label: r, value: r}))}
+                                        isMulti={true}
+                                        isClearable={true}/>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        <CheckboxField label={"Visible"} id={"visible"}/>
+                        <CheckboxField label={"Required"} id={"required"}/>
+                        <CheckboxField label={"Read Only"} id={"readOnly"}/>
                         <CheckboxField label={"List"} id={"list"} onChange={(value) => !value ? form.change("multiSelect", false) : false}/>
                         <CheckboxField label={"Multi Select"} id={"multiSelect"} disabled={!values["list"]}/>
 

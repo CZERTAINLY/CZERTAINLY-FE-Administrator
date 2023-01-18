@@ -1,21 +1,20 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
+
+import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from "types/attributes";
 
 import {
    BulkActionModel,
    CallbackConnectorModel,
-   CallbackRaProfileModel,
+   CallbackResourceModel,
    ConnectorRequestModel,
    ConnectorResponseModel,
    ConnectorUpdateRequestModel,
    ConnectRequestModel,
    FunctionGroupModel,
-   HealthModel
+   HealthModel,
 } from "types/connectors";
-
-import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from "types/attributes";
 import { ConnectorStatus, FunctionGroupCode } from "types/openapi";
-
+import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
 
@@ -561,19 +560,6 @@ export const slice = createSlice({
 
       },
 
-
-      // callback: (state, action: PayloadAction<{
-      //    callbackId: string,
-      //    url: string,
-      //    callbackData: AttributeCallbackDataModel,
-      // }>) => {
-      //
-      //    if (state.callbackData[action.payload.callbackId]) state.callbackData[action.payload.callbackId] = undefined;
-      //
-      //    state.isRunningCallback[action.payload.callbackId] = true;
-      //
-      // },
-
       callbackConnector: (state, action: PayloadAction<{
          callbackId: string,
          callbackConnector: CallbackConnectorModel
@@ -585,9 +571,9 @@ export const slice = createSlice({
 
       },
 
-      callbackRaProfile: (state, action: PayloadAction<{
+      callbackResource: (state, action: PayloadAction<{
          callbackId: string,
-         callbackRaProfile: CallbackRaProfileModel
+         callbackResource: CallbackResourceModel
       }>) => {
 
          if (state.callbackData[action.payload.callbackId]) state.callbackData[action.payload.callbackId] = undefined;
