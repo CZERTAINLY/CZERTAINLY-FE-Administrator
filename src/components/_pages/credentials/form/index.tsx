@@ -1,26 +1,28 @@
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import ProgressButton from "components/ProgressButton";
+import Widget from "components/Widget";
+import { actions as connectorActions, actions as connectorsActions } from "ducks/connectors";
+
+import { actions, selectors } from "ducks/credentials";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Form, Field } from "react-final-form";
+import Select from "react-select/";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
-import { actions, selectors } from "ducks/credentials";
-import { actions as connectorActions, actions as connectorsActions } from "ducks/connectors";
-
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { AttributeDescriptorModel } from "types/attributes";
+import { ConnectorResponseModel } from "types/connectors";
+import { CredentialResponseModel } from "types/credentials";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 
-import Select from "react-select/";
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { CredentialResponseModel } from "types/credentials";
-import { ConnectorResponseModel } from "types/connectors";
-import { AttributeDescriptorModel } from "types/attributes";
+import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string | undefined;
@@ -41,6 +43,8 @@ export default function CredentialForm() {
    const credentialSelector = useSelector(selectors.credential);
    const credentialProviders = useSelector(selectors.credentialProviders);
    const credentialProviderAttributeDescriptors = useSelector(selectors.credentialProviderAttributeDescriptors);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
    const isFetchingCredentialDetail = useSelector(selectors.isFetchingDetail);
    const isFetchingCredentialProviders = useSelector(selectors.isFetchingCredentialProviders);
@@ -54,14 +58,15 @@ export default function CredentialForm() {
    const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
-      () => isFetchingCredentialDetail || isFetchingCredentialProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
-      [isFetchingCredentialDetail, isFetchingCredentialProviders, isCreating, isUpdating, isFetchingAttributeDescriptors]
+      () => isFetchingCredentialDetail || isFetchingCredentialProviders || isCreating || isUpdating || isFetchingAttributeDescriptors || isFetchingResourceCustomAttributes,
+      [isFetchingCredentialDetail, isFetchingCredentialProviders, isCreating, isUpdating, isFetchingAttributeDescriptors, isFetchingResourceCustomAttributes]
    );
 
    useEffect(
       () => {
          dispatch(actions.listCredentialProviders());
          dispatch(connectorsActions.clearCallbackData());
+         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Credentials));
 
          if (editMode) dispatch(actions.getCredentialDetail({ uuid: id! }));
       },
@@ -150,6 +155,7 @@ export default function CredentialForm() {
                uuid: id!,
                 credentialRequest: {
                    attributes: collectFormAttributes("credential", [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                   customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values)
                 }
             }));
 
@@ -160,12 +166,13 @@ export default function CredentialForm() {
                connectorUuid: values.credentialProvider!.value,
                kind: values.storeKind?.value!,
                attributes: collectFormAttributes("credential", [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+               customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values)
             }));
 
          }
 
       },
-      [editMode, dispatch, id, credentialProviderAttributeDescriptors, groupAttributesCallbackAttributes]
+      [editMode, dispatch, id, credentialProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes]
    );
 
 
@@ -386,24 +393,34 @@ export default function CredentialForm() {
 
                   ) : null}
 
-                  {credentialProvider && values.storeKind && credentialProviderAttributeDescriptors && credentialProviderAttributeDescriptors.length > 0 ? (
-
                      <>
                         <hr />
                         <h6>Credential Attributes</h6>
-                        <hr />
+                         <hr />
+                         <TabLayout tabs={[
+                             {
+                                 title: "Connector Attributes",
+                                 content: credentialProvider && values.storeKind && credentialProviderAttributeDescriptors && credentialProviderAttributeDescriptors.length > 0 ? (
+                                     <AttributeEditor
+                                         id="credential"
+                                         attributeDescriptors={credentialProviderAttributeDescriptors}
+                                         attributes={credential?.attributes}
+                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                     />
+                                 ): <></>
+                             },
+                             {
+                                 title: "Custom Attributes",
+                                 content: <AttributeEditor
+                                     id="customCredential"
+                                     attributeDescriptors={resourceCustomAttributes}
+                                 />
+                             }
+                         ]} />
 
 
-                        <AttributeEditor
-                           id="credential"
-                           attributeDescriptors={credentialProviderAttributeDescriptors}
-                           attributes={credential?.attributes}
-                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                        />
                      </>
-
-                  ) : null}
 
                   {
 

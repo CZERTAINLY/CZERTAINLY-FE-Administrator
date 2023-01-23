@@ -12,6 +12,7 @@ import {
     FileAttributeContentModel,
     InfoAttributeModel,
     isAttributeDescriptorModel,
+    isCustomAttributeModel,
     isDataAttributeModel,
     isGroupAttributeModel,
     isInfoAttributeModel,
@@ -265,7 +266,7 @@ export default function AttributeEditor({
 
           [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach(
             descriptor => {
-                if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor)) {
+                if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || "__";
                     grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
                 }
@@ -283,11 +284,11 @@ export default function AttributeEditor({
    useEffect(
       () => {
          // variables are passed just to prevent linting error, they are unused in the clearAttributes function
-         form.mutators.clearAttributes(attributeDescriptors, attributes);
+         form.mutators.clearAttributes(id, attributeDescriptors, attributes);
          // setGroupAttributesCallbackAttributes(emptyGroupAttributesCallbackAttributes);
          dispatch(connectorActions.clearCallbackData());
       },
-      [attributeDescriptors, attributes, dispatch, form.mutators]
+      [attributeDescriptors, attributes, dispatch, form.mutators, id]
    );
 
 
@@ -316,7 +317,7 @@ export default function AttributeEditor({
           descriptorsToLoad.forEach(
 
             descriptor => {
-                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
 
                     const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
@@ -324,7 +325,7 @@ export default function AttributeEditor({
 
 
                     // Build "static" options from the descriptor
-                    if (isDataAttributeModel(descriptor) && descriptor.properties.list && Array.isArray(descriptor.content)) {
+                    if ((isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) && descriptor.properties.list && Array.isArray(descriptor.content)) {
 
                         newOptions = {
                             ...newOptions,
@@ -335,17 +336,18 @@ export default function AttributeEditor({
                         };
                     }
 
-
-                    // Perform initial callbacks based on "static" mappings
-                    if (descriptor.attributeCallback) {
-                        let mappings = buildCallbackMappings(descriptor);
-                        if (mappings) {
-                            executeCallback(mappings, descriptor, formAttributeName);
+                    if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                        // Perform initial callbacks based on "static" mappings
+                        if (descriptor.attributeCallback) {
+                            let mappings = buildCallbackMappings(descriptor);
+                            if (mappings) {
+                                executeCallback(mappings, descriptor, formAttributeName);
+                            }
                         }
                     }
 
                     // Set initial values from the attribute
-                    if (isDataAttributeModel(descriptor)) {
+                    if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                         if (descriptor.contentType === AttributeContentType.File) {
                             if (attribute?.content) {
                                 form.mutators.setAttribute(`${formAttributeName}.content`, (attribute.content as FileAttributeContentModel[])[0].reference);
@@ -414,7 +416,7 @@ export default function AttributeEditor({
          opts = { ...opts, ...newOptions };
          setOptions({ ...options, ...opts });
       },
-      [id, attributeDescriptors, groupAttributesCallbackAttributes, attributes, form.mutators, options, dispatch, authorityUuid, connectorUuid, functionGroupCode, kind, prevDescriptors, prevAttributes, prevGroupDescriptors, buildCallbackMappings]
+      [id, attributeDescriptors, groupAttributesCallbackAttributes, attributes, form.mutators, options, dispatch, prevDescriptors, prevAttributes, prevGroupDescriptors, buildCallbackMappings]
 
    )
 
@@ -484,7 +486,7 @@ export default function AttributeEditor({
           }
          )
       },
-      [attributeDescriptors, groupAttributesCallbackAttributes, authorityUuid, buildCallbackMappings, connectorUuid, dispatch, form.mutators, formState.values, functionGroupCode, id, isRunningCb, kind, previousFormValues, executeCallback]
+      [attributeDescriptors, groupAttributesCallbackAttributes, buildCallbackMappings, dispatch, form.mutators, formState.values, id, isRunningCb, previousFormValues, executeCallback]
 
    );
 

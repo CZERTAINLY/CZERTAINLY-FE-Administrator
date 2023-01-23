@@ -1,28 +1,32 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import CertificateUploadDialog from "components/_pages/certificates/CertificateUploadDialog";
 
-import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
-import { Form, Field } from "react-final-form";
-import Select from "react-select";
-
-import Widget from "components/Widget";
+import CertificateAttributes from "components/CertificateAttributes";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 
-import { actions as userActions, selectors as userSelectors } from "ducks/users";
+import Widget from "components/Widget";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 
-import { emptyCertificate } from "utils/certificate";
-import { validateRequired, composeValidators, validateAlphaNumeric, validateEmail } from "utils/validators";
+import { actions as userActions, selectors as userSelectors } from "ducks/users";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
 
-import CertificateAttributes from "components/CertificateAttributes";
-import Dialog from "components/Dialog";
-import CertificateUploadDialog from "components/_pages/certificates/CertificateUploadDialog";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { CertificateResponseModel } from "types/certificate";
+import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { UserDetailModel } from "types/auth";
+import { CertificateResponseModel } from "types/certificate";
 
+import { emptyCertificate } from "utils/certificate";
+import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "../../../../utils/attributes/attributes";
+import AttributeEditor from "../../../Attributes/AttributeEditor";
 
 interface FormValues {
    username: string;
@@ -51,7 +55,10 @@ function UserForm() {
    const certificates = useSelector(certSelectors.certificates);
    const certificateDetail = useSelector(certSelectors.certificateDetail);
 
-   const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
+
+    const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
    const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
    const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
@@ -68,7 +75,7 @@ function UserForm() {
 
    const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
 
-   const optionsForInput = useMemo(
+   const optionsForInput: {label: string, value: "upload" | "select"}[] = useMemo(
       () => [
          {
             label: "Upload a new Certificate",
@@ -97,6 +104,7 @@ function UserForm() {
          dispatch(certActions.resetState());
          dispatch(rolesActions.resetState());
          dispatch(userActions.resetState());
+          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Users));
 
          dispatch(
             certActions.listCertificates({
@@ -254,6 +262,7 @@ function UserForm() {
                        email: values.email,
                        certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
                        certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                       customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values)
                    }
                })
             );
@@ -272,6 +281,7 @@ function UserForm() {
                        enabled: values.enabled,
                        certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
                        certificateUuid: values.inputType.value === "select" ? values.certificate ? values.certificate.value : undefined : undefined,
+                       customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values)
                    }
                })
             );
@@ -280,7 +290,7 @@ function UserForm() {
 
       },
 
-      [user, certToUpload, dispatch, editMode, userRoles]
+      [user, certToUpload, dispatch, editMode, userRoles, resourceCustomAttributes]
 
    )
 
@@ -468,7 +478,7 @@ function UserForm() {
 
       <>
 
-         <Form onSubmit={onSubmit} initialValues={defaultValues}>
+         <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
 
             {({ handleSubmit, pristine, submitting, values, valid }) => (
 
@@ -476,7 +486,7 @@ function UserForm() {
 
                   <Widget
                      title={title}
-                     busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles || isUpdatingUser || isCreatingUser}
+                     busy={isFetchingUserDetail || isFetchingCertsList || isFetchingCertDetail || isFetchingRoles || isUpdatingUser || isCreatingUser || isFetchingResourceCustomAttributes}
                   >
 
 
@@ -689,6 +699,11 @@ function UserForm() {
 
                      )}
 
+                     <br />
+                      <AttributeEditor
+                          id="customUser"
+                          attributeDescriptors={resourceCustomAttributes}
+                      />
                      <br />
 
                      <p>Assigned User Roles</p>

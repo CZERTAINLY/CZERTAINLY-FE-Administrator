@@ -1,17 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-
-import { Form, Field } from "react-final-form";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { actions, selectors } from "ducks/certificateGroups";
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
+import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
-import { CertificateGroupResponseModel } from "types/certificateGroups";
 
+import { actions, selectors } from "ducks/certificateGroups";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { CertificateGroupResponseModel } from "types/certificateGroups";
+import { Resource } from "types/openapi";
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes/attributes";
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 interface FormValues {
    name: string;
@@ -29,6 +32,8 @@ export default function GroupForm() {
    const editMode = useMemo( () => !!id, [id] );
 
    const groupSelector = useSelector(selectors.certificateGroup);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
    const isFetchingDetail = useSelector(selectors.isFetchingDetail);
    const isCreating = useSelector(selectors.isCreating);
    const isUpdating = useSelector(selectors.isUpdating);
@@ -37,8 +42,8 @@ export default function GroupForm() {
 
 
    const isBusy = useMemo(
-      () => isFetchingDetail || isCreating || isUpdating,
-      [isCreating, isFetchingDetail, isUpdating]
+      () => isFetchingDetail || isCreating || isUpdating || isFetchingResourceCustomAttributes,
+      [isCreating, isFetchingDetail, isUpdating, isFetchingResourceCustomAttributes]
    );
 
 
@@ -47,13 +52,13 @@ export default function GroupForm() {
       (values: FormValues) => {
 
          if (editMode) {
-            dispatch(actions.updateGroup({ groupUuid: id!, editGroupRequest: { name: values.name, description: values.description }}));
+            dispatch(actions.updateGroup({ groupUuid: id!, editGroupRequest: { name: values.name, description: values.description, customAttributes: collectFormAttributes("customGroup", resourceCustomAttributes, values) }}));
          } else {
-            dispatch(actions.createGroup({ name: values.name, description: values.description }));
+            dispatch(actions.createGroup({ name: values.name, description: values.description, customAttributes: collectFormAttributes("customGroup", resourceCustomAttributes, values) }));
          }
 
       },
-      [dispatch, editMode, id]
+      [dispatch, editMode, id, resourceCustomAttributes]
 
    );
 
@@ -72,6 +77,7 @@ export default function GroupForm() {
 
       () => {
 
+          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Groups));
          if (editMode && groupSelector && groupSelector.uuid !== group?.uuid) {
 
             setGroup(groupSelector);
@@ -106,7 +112,7 @@ export default function GroupForm() {
 
       <Widget title={title} busy={isBusy}>
 
-         <Form initialValues={defaultValues} onSubmit={onSubmit} >
+         <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
 
             {({ handleSubmit, pristine, submitting, valid, form }) => (
 
@@ -162,7 +168,17 @@ export default function GroupForm() {
 
                   </Field>
 
-                  <div className="d-flex justify-content-end">
+                   <>
+                       <hr />
+                       <h6>Group Attributes</h6>
+                       <hr />
+                       <AttributeEditor
+                           id="customGroup"
+                           attributeDescriptors={resourceCustomAttributes}
+                       />
+                   </>
+
+                   <div className="d-flex justify-content-end">
 
                      <ButtonGroup>
 

@@ -1,9 +1,4 @@
-import {
-   AttributeDescriptorModel,
-   AttributeRequestModel,
-   BaseAttributeContentModel,
-   isDataAttributeModel
-} from "types/attributes";
+import { AttributeDescriptorModel, AttributeRequestModel, BaseAttributeContentModel, isCustomAttributeModel, isDataAttributeModel } from "types/attributes";
 import { AttributeContentType } from "types/openapi";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -78,7 +73,7 @@ export function collectFormAttributes(id: string, descriptors: AttributeDescript
 
       let content: any;
 
-      if (isDataAttributeModel(descriptor)) {
+      if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
             if (Array.isArray(attributes[attribute])) {
                content = attributes[attribute].map((i: any) => getAttributeFormValue(descriptor.contentType, i));
             } else {

@@ -1,17 +1,20 @@
+import ProgressButton from "components/ProgressButton";
+
+import Widget from "components/Widget";
+
+import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { Form, Field } from "react-final-form";
-
-import Widget from "components/Widget";
-import ProgressButton from "components/ProgressButton";
-
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "../../../../utils/attributes/attributes";
+import AttributeEditor from "../../../Attributes/AttributeEditor";
 
 interface FormValues {
    name: string;
@@ -30,11 +33,14 @@ function RoleForm() {
 
    const roleSelector = useSelector(rolesSelectors.role);
    const isFetchingRoleDetail = useSelector(rolesSelectors.isFetchingDetail);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
 
    useEffect(
 
       () => {
+         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Roles));
 
          if (editMode) dispatch(rolesActions.getDetail({ uuid: id! }));
 
@@ -56,6 +62,7 @@ function RoleForm() {
                    roleRequest: {
                        name: values.name,
                        description: values.description,
+                       customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values)
                    }
                })
 
@@ -69,6 +76,7 @@ function RoleForm() {
                rolesActions.create({
                   name: values.name,
                   description: values.description,
+                  customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values)
                })
 
             )
@@ -77,7 +85,7 @@ function RoleForm() {
 
       },
 
-      [dispatch, editMode, id]
+      [dispatch, editMode, id, resourceCustomAttributes]
 
    )
 
@@ -120,9 +128,9 @@ function RoleForm() {
 
       <>
 
-         <Widget title={title} busy={isFetchingRoleDetail}>
+         <Widget title={title} busy={isFetchingRoleDetail || isFetchingResourceCustomAttributes}>
 
-            <Form onSubmit={onSubmit} initialValues={defaultValues}>
+            <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
 
                {({ handleSubmit, pristine, submitting, values, valid }) => (
 
@@ -176,6 +184,11 @@ function RoleForm() {
                         )}
 
                      </Field>
+
+                      <AttributeEditor
+                          id="customRole"
+                          attributeDescriptors={resourceCustomAttributes}
+                      />
 
                      <div className="d-flex justify-content-end">
 

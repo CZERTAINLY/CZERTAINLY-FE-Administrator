@@ -1,18 +1,18 @@
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/discoveries";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 
 import { Col, Container, Label, Row } from "reactstrap";
 
-import { actions, selectors } from "ducks/discoveries";
-
 import { dateFormatter } from "utils/dateUtil";
-
-import Widget from "components/Widget";
-import Dialog from "components/Dialog";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import DiscoveryStatus from "../DiscoveryStatus";
 
 export default function DiscoveryDetail() {
@@ -248,7 +248,10 @@ export default function DiscoveryDetail() {
                   <br />
                   <Label>Discovery Attributes</Label>
                   <AttributeViewer attributes={discovery?.attributes} />
-               </Widget>
+                    <br />
+                    <Label>Custom Attributes</Label>
+                    <AttributeViewer attributes={discovery?.customAttributes} />
+                </Widget>
             </Col>
             <Col>
                <Widget title={metaTitle}>

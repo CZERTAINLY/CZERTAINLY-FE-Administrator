@@ -139,7 +139,7 @@ export type CustomAttributePropertiesDto = CustomAttributeProperties;
 export type CustomAttributePropertiesModel = CustomAttributePropertiesDto;
 
 export type CustomAttributeDto = CustomAttribute;
-export type CustomAttributeModel = Omit<CustomAttributeDto, "content | properties"> & { content: Array<BaseAttributeContentModel>, properties: CustomAttributePropertiesModel };
+export type CustomAttributeModel = Omit<CustomAttributeDto, "content | properties"> & { content?: Array<BaseAttributeContentModel>, properties: CustomAttributePropertiesModel };
 
 export type MetadataAttributePropertiesDto = MetadataAttributeProperties;
 export type MetadataAttributePropertiesModel = MetadataAttributePropertiesDto;
@@ -172,6 +172,10 @@ export const isInfoAttributeModel = (attribute: AttributeDescriptorModel): attri
 
 export const isGroupAttributeModel = (attribute: AttributeDescriptorModel): attribute is GroupAttributeModel => {
    return attribute.type === AttributeType.Group;
+}
+
+export const isCustomAttributeModel = (attribute: AttributeDescriptorModel): attribute is CustomAttributeModel => {
+   return attribute.type === AttributeType.Custom;
 }
 
 export const isAttributeDescriptorModel = (attribute: object): attribute is AttributeDescriptorModel => {

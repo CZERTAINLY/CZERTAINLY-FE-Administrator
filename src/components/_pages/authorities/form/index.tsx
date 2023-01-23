@@ -1,28 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-
-import { Field, Form } from "react-final-form";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import TabLayout from "components/Layout/TabLayout";
+import ProgressButton from "components/ProgressButton";
+import Widget from "components/Widget";
 
 import { actions as alertActions } from "ducks/alerts";
 import { actions as authorityActions, selectors as authoritySelectors } from "ducks/authorities";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
+import Select, { SingleValue } from "react-select/";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { AttributeDescriptorModel } from "types/attributes";
+import { AuthorityResponseModel } from "types/authorities";
+import { ConnectorResponseModel } from "types/connectors";
+import { FunctionGroupCode, Resource } from "types/openapi";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import Select, { SingleValue } from "react-select/";
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { AuthorityResponseModel } from "types/authorities";
-import { ConnectorResponseModel } from "types/connectors";
-import { FunctionGroupCode } from "types/openapi";
-import { AttributeDescriptorModel } from "types/attributes";
-
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 interface FormValues {
    name: string | undefined;
@@ -44,10 +45,12 @@ export default function AuthorityForm() {
    const authoritySelector = useSelector(authoritySelectors.authority);
    const authorityProviders = useSelector(authoritySelectors.authorityProviders);
    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
    const isFetchingAuthorityDetail = useSelector(authoritySelectors.isFetchingDetail);
    const isFetchingAuthorityProviders = useSelector(authoritySelectors.isFetchingAuthorityProviders);
    const isFetchingAttributeDescriptors = useSelector(authoritySelectors.isFetchingAuthorityProviderAttributeDescriptors);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
    const isCreating = useSelector(authoritySelectors.isCreating);
    const isUpdating = useSelector(authoritySelectors.isUpdating);
 
@@ -59,7 +62,7 @@ export default function AuthorityForm() {
 
    const isBusy = useMemo(
       () => isFetchingAuthorityDetail || isFetchingAuthorityProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
-      [isFetchingAuthorityDetail, isFetchingAuthorityProviders, isCreating, isUpdating, isFetchingAttributeDescriptors]
+      [isFetchingAuthorityDetail, isFetchingAuthorityProviders, isCreating, isUpdating, isFetchingAttributeDescriptors, isFetchingResourceCustomAttributes]
    );
 
 
@@ -70,6 +73,7 @@ export default function AuthorityForm() {
          dispatch(authorityActions.resetState());
          dispatch(connectorActions.clearCallbackData());
          dispatch(authorityActions.listAuthorityProviders());
+          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Authorities));
 
       },
       [dispatch]
@@ -186,7 +190,8 @@ export default function AuthorityForm() {
             dispatch(authorityActions.updateAuthority({
                uuid: id!,
                updateAuthority: {
-                   attributes: collectFormAttributes("authority", [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
+                   attributes: collectFormAttributes("authority", [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                   customAttributes: collectFormAttributes("customAuthority", resourceCustomAttributes, values),
                }
             }));
 
@@ -197,12 +202,13 @@ export default function AuthorityForm() {
                connectorUuid: values.authorityProvider!.value,
                kind: values.storeKind?.value!,
                attributes: collectFormAttributes("authority", [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                customAttributes: collectFormAttributes("customAuthority", resourceCustomAttributes, values),
             }));
 
          }
 
       },
-      [editMode, dispatch, id, authorityProviderAttributeDescriptors, groupAttributesCallbackAttributes]
+      [editMode, dispatch, id, authorityProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes]
    );
 
 
@@ -320,7 +326,7 @@ export default function AuthorityForm() {
                                  menuPlacement="auto"
                                  options={optionsForAuthorityProviders}
                                  placeholder="Select Authority Provider"
-                                 onChange={(event) => { onAuthorityProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
+                                 onChange={(event) => { onAuthorityProviderChange(event); form.mutators.clearAttributes("authority"); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
                                  styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                               />
 
@@ -414,26 +420,36 @@ export default function AuthorityForm() {
 
                   ) : null}
 
-                  {authorityProvider && values.storeKind && authorityProviderAttributeDescriptors && authorityProviderAttributeDescriptors.length > 0 ? (
-
                      <>
                         <hr />
                         <h6>Authority Attributes</h6>
                         <hr />
 
-                        <AttributeEditor
-                           id="authority"
-                           attributeDescriptors={authorityProviderAttributeDescriptors}
-                           attributes={authority?.attributes}
-                           connectorUuid={authorityProvider.uuid}
-                           functionGroupCode={FunctionGroupCode.AuthorityProvider}
-                           kind={values.storeKind.value}
-                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                        />
+                         <TabLayout tabs={[
+                             {
+                                 title: "Connector Attributes",
+                                 content: authorityProvider && values.storeKind && authorityProviderAttributeDescriptors && authorityProviderAttributeDescriptors.length > 0 ? (
+                                     <AttributeEditor
+                                         id="authority"
+                                         attributeDescriptors={authorityProviderAttributeDescriptors}
+                                         attributes={authority?.attributes}
+                                         connectorUuid={authorityProvider.uuid}
+                                         functionGroupCode={FunctionGroupCode.AuthorityProvider}
+                                         kind={values.storeKind.value}
+                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                     />
+                                 ): <></>
+                             },
+                             {
+                                 title: "Custom Attributes",
+                                 content: <AttributeEditor
+                                     id="customAuthority"
+                                     attributeDescriptors={resourceCustomAttributes}
+                                 />
+                             }
+                         ]} />
                      </>
-
-                  ) : null}
 
                   {
 

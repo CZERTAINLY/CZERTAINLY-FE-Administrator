@@ -1,18 +1,21 @@
-import { useCallback, useMemo, } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-import { Form, Field } from "react-final-form";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { actions, selectors } from "ducks/compliance-profiles";
-
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
+import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
-import ProgressButton from "components/ProgressButton";
-import { useNavigate } from "react-router-dom";
 
+import { actions, selectors } from "ducks/compliance-profiles";
+import React, { useCallback, useEffect, useMemo } from "react";
+
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import { collectFormAttributes } from "../../../../utils/attributes/attributes";
+import AttributeEditor from "../../../Attributes/AttributeEditor";
 
 interface FormValues {
    name: string;
@@ -26,19 +29,24 @@ function ComplianceProfileForm() {
 
 
    const isCreating = useSelector(selectors.isCreating);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
+    useEffect(() => {
+            dispatch(customAttributesActions.listResourceCustomAttributes(Resource.ComplianceProfiles));
+        }, [dispatch]);
 
    const isBusy = useMemo(
-      () => isCreating,
-      [isCreating]
+      () => isCreating || isFetchingResourceCustomAttributes,
+      [isCreating, isFetchingResourceCustomAttributes]
    );
 
 
    const onSubmit = useCallback(
       (values: FormValues) => {
-            dispatch(actions.createComplianceProfile({ name: values.name, description: values.description }));
+            dispatch(actions.createComplianceProfile({ name: values.name, description: values.description, customAttributes: collectFormAttributes("customCompliance", resourceCustomAttributes, values) }));
       },
-      [dispatch]
+      [dispatch, resourceCustomAttributes]
    );
 
 
@@ -119,7 +127,17 @@ function ComplianceProfileForm() {
 
                   </Field>
 
-                  <div className="d-flex justify-content-end">
+                   <>
+                       <hr />
+                       <h6>Compliance Profile Attributes</h6>
+                       <hr />
+                       <AttributeEditor
+                           id="customCompliance"
+                           attributeDescriptors={resourceCustomAttributes}
+                       />
+                   </>
+
+                   <div className="d-flex justify-content-end">
 
                      <ButtonGroup>
 

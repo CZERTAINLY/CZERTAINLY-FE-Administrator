@@ -1,35 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Field, Form } from "react-final-form";
-
-import Select from "react-select";
-import {
-    Badge,
-    Button,
-    ButtonGroup,
-    Container,
-    Form as BootstrapForm,
-    FormFeedback,
-    FormGroup,
-    Input,
-    Label,
-    Table
-} from "reactstrap";
-
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
-
-import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-
-import { composeValidators, validateAlphaNumeric, validateRequired, validateUrl } from "utils/validators";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import ProgressButton from "components/ProgressButton";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Widget from "components/Widget";
-import InventoryStatusBadge from "../ConnectorStatus";
-import { AuthType, ConnectorStatus } from "types/openapi";
-import { ConnectorResponseModel, EndpointModel } from "types/connectors";
 
+import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
+import Select from "react-select";
+import { Badge, Button, ButtonGroup, Container, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
+import { ConnectorResponseModel, EndpointModel } from "types/connectors";
+import { AuthType, ConnectorStatus, Resource } from "types/openapi";
+
+import { attributeFieldNameTransform, collectFormAttributes } from "utils/attributes/attributes";
+
+import { composeValidators, validateAlphaNumeric, validateRequired, validateUrl } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
+import AttributeEditor from "../../../Attributes/AttributeEditor";
+import InventoryStatusBadge from "../ConnectorStatus";
 
 interface FormValues {
    uuid: string;
@@ -67,6 +58,8 @@ export default function ConnectorForm() {
 
    );
 
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    // const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
    const isFetching = useSelector(connectorSelectors.isFetchingDetail);
    // const isCreating = useSelector(connectorSelectors.isCreating);
@@ -92,6 +85,7 @@ export default function ConnectorForm() {
    useEffect(
 
       () => {
+          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Connectors));
 
          if (id && (!connectorSelector || connectorSelector.uuid !== id) && !isFetching) {
             dispatch(connectorActions.getConnectorDetail({ uuid: id }));
@@ -140,6 +134,7 @@ export default function ConnectorForm() {
              connectorUpdateRequest: {
                url: values.url,
                authType: selectedAuthType.value,
+               customAttributes: collectFormAttributes("customConnector", resourceCustomAttributes, values)
                // authAttributes: []
              }
             }))
@@ -150,13 +145,14 @@ export default function ConnectorForm() {
                name: values.name,
                url: values.url,
                authType: selectedAuthType.value,
+               customAttributes: collectFormAttributes("customConnector", resourceCustomAttributes, values)
                // authAttributes: []
             }))
 
          }
 
       },
-      [editMode, connector, selectedAuthType.value, dispatch]
+      [editMode, connector, selectedAuthType.value, dispatch, resourceCustomAttributes]
 
    );
 
@@ -248,7 +244,7 @@ export default function ConnectorForm() {
       <Container className="themed-container" fluid>
          <div>
 
-            <Form onSubmit={onSubmit} initialValues={defaultValues}>
+            <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
 
                {({ handleSubmit, pristine, submitting, values }) => (
 
@@ -395,7 +391,17 @@ export default function ConnectorForm() {
                            ) : null
                         }
 
-                        <div className="d-flex justify-content-end">
+                         <>
+                             <hr />
+                             <h6>Connector Attributes</h6>
+                             <hr />
+                             <AttributeEditor
+                                 id="customConnector"
+                                 attributeDescriptors={resourceCustomAttributes}
+                             />
+                         </>
+
+                         <div className="d-flex justify-content-end">
 
                            <ButtonGroup>
 

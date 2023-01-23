@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
-
-import { actions, selectors } from "ducks/users";
-import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
-
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import CertificateAttributes from "components/CertificateAttributes";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
-import CertificateAttributes from "components/CertificateAttributes";
 
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
+
+import { actions, selectors } from "ducks/users";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { Badge, Container, Label } from "reactstrap";
+import AttributeViewer from "../../../Attributes/AttributeViewer";
 
 export default function UserDetail() {
 
@@ -240,6 +240,11 @@ export default function UserDetail() {
             <CertificateAttributes certificate={certificate} />
          </Widget>
 
+          <Widget title="Attributes">
+              <br />
+              <Label>Custom Attributes</Label>
+              <AttributeViewer attributes={user?.customAttributes} />
+          </Widget>
 
          <Dialog
             isOpen={confirmDelete}
