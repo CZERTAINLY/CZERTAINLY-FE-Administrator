@@ -3,13 +3,18 @@ export const composeValidators = (...validators: any[]) => (value: string) =>
 
 export const validateRequired = () => (value: any) => value ? undefined : "Required Field";
 
+const getValueFromObject = (value: any) => {
+    if (typeof value === "object" && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
+        return value["value"]["data"];
+    } else {
+        return value;
+    }
+}
+
 export const validatePattern = (pattern: RegExp, message?: string) =>
    (value: any) => {
-      let validationInput = value;
-      if (typeof value === "object" && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
-         validationInput = value["value"]["value"];
-      }
-      return !validationInput || pattern.test(validationInput)
+      const validationInput = getValueFromObject(value);
+      return ((Array.isArray(value) && value.reduce((prev, curr) => prev && pattern.test(getValueFromObject(curr)), true)) || !validationInput || pattern.test(validationInput))
          ? undefined
          : message || `Value must conform to ${pattern}`;
    }
