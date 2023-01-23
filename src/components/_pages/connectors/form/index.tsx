@@ -398,6 +398,7 @@ export default function ConnectorForm() {
                              <AttributeEditor
                                  id="customConnector"
                                  attributeDescriptors={resourceCustomAttributes}
+                                 attributes={connector?.customAttributes}
                              />
                          </>
 

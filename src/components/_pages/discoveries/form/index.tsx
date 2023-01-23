@@ -270,6 +270,7 @@ export default function DiscoveryForm() {
                                  content: <AttributeEditor
                                      id="customDiscovery"
                                      attributeDescriptors={resourceCustomAttributes}
+                                     attributes={discoveryProvider?.customAttributes}
                                  />
                              }
                          ]} />

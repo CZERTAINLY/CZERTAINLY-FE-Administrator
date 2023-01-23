@@ -704,6 +704,7 @@ export default function AcmeProfileForm() {
                               content: <AttributeEditor
                                   id="customAcmeProfile"
                                   attributeDescriptors={resourceCustomAttributes}
+                                  attributes={acmeProfile?.customAttributes}
                               />
                           }
                           ]}/>

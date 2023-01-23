@@ -188,6 +188,7 @@ function RoleForm() {
                       <AttributeEditor
                           id="customRole"
                           attributeDescriptors={resourceCustomAttributes}
+                          attributes={roleSelector?.customAttributes}
                       />
 
                      <div className="d-flex justify-content-end">

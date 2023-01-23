@@ -703,6 +703,7 @@ function UserForm() {
                       <AttributeEditor
                           id="customUser"
                           attributeDescriptors={resourceCustomAttributes}
+                          attributes={user?.customAttributes}
                       />
                      <br />
 

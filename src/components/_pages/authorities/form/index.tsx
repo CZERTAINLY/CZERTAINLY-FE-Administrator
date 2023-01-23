@@ -446,6 +446,7 @@ export default function AuthorityForm() {
                                  content: <AttributeEditor
                                      id="customAuthority"
                                      attributeDescriptors={resourceCustomAttributes}
+                                     attributes={authority?.customAttributes}
                                  />
                              }
                          ]} />

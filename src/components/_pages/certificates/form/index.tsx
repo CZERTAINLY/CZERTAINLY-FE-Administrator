@@ -368,6 +368,7 @@ export default function CertificateForm() {
                                     content: <AttributeEditor
                                         id="customCertificate"
                                         attributeDescriptors={resourceCustomAttributes}
+                                        attributes={values.raProfile.value.customAttributes}
                                     />
                                 }
                             ]} />

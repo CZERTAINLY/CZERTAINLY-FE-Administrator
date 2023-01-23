@@ -307,6 +307,7 @@ export default function RaProfileForm() {
                            content: <AttributeEditor
                                id="customRaProfile"
                                attributeDescriptors={resourceCustomAttributes}
+                               attributes={raProfile?.customAttributes}
                            />
                        }
                    ]} />

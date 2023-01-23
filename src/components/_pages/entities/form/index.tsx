@@ -419,6 +419,7 @@ export default function EntityForm() {
                                  content: <AttributeEditor
                                      id="customEntity"
                                      attributeDescriptors={resourceCustomAttributes}
+                                     attributes={entity?.customAttributes}
                                  />
                              }
                          ]} />

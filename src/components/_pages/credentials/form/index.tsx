@@ -415,6 +415,7 @@ export default function CredentialForm() {
                                  content: <AttributeEditor
                                      id="customCredential"
                                      attributeDescriptors={resourceCustomAttributes}
+                                     attributes={credential?.customAttributes}
                                  />
                              }
                          ]} />

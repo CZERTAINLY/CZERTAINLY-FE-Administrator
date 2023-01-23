@@ -175,6 +175,7 @@ export default function GroupForm() {
                        <AttributeEditor
                            id="customGroup"
                            attributeDescriptors={resourceCustomAttributes}
+                           attributes={group?.customAttributes}
                        />
                    </>
 

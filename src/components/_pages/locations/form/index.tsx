@@ -321,6 +321,7 @@ export default function LocationForm() {
                                  content: <AttributeEditor
                                      id="customLocation"
                                      attributeDescriptors={resourceCustomAttributes}
+                                     attributes={location?.customAttributes}
                                  />
                              }
                          ]} />
