@@ -1,26 +1,25 @@
+import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/connectors";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Select from "react-select";
 import { Badge, Col, Container, Row, Table } from "reactstrap";
-
-import styles from "./connectorDetails.module.scss";
-
-import { actions, selectors } from "ducks/connectors";
+import { AttributeDescriptorModel } from "types/attributes";
+import { FunctionGroupModel, HealthModel } from "types/connectors";
 
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
+import AttributeViewer from "../../../Attributes/AttributeViewer";
 
-import Widget from "components/Widget";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
-import Dialog from "components/Dialog";
-import { FunctionGroupModel, HealthModel } from "types/connectors";
-import { AttributeDescriptorModel } from "types/attributes";
-
-
+import styles from "./connectorDetails.module.scss";
 
 export default function ConnectorDetail() {
 
@@ -557,6 +556,12 @@ export default function ConnectorDetail() {
                </Widget>
 
                &nbsp;
+
+                <Widget title="Custom Attributes">
+                    <br />
+                    <AttributeViewer attributes={connector?.customAttributes} />
+                </Widget>
+
 
             </Widget>
 

@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Container } from "reactstrap";
+import AttributeViewer from "components/Attributes/AttributeViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/credentials";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import Dialog from "components/Dialog";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { Container, Label } from "reactstrap";
 
 function CredentialDetail() {
 
@@ -171,9 +171,11 @@ function CredentialDetail() {
                <Widget title="Credential Attributes">
 
                   <br />
-
                   <AttributeViewer attributes={credential?.attributes} />
 
+                   <br />
+                   <Label>Custom Attributes</Label>
+                   <AttributeViewer attributes={credential?.customAttributes} />
                </Widget>
             )
 

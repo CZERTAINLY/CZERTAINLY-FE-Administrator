@@ -6,6 +6,7 @@ import { extractError } from "utils/net";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./customAttributes";
+import { transformCustomAttributeDtoToModel } from "./transform/attributes";
 
 import {
     transformCustomAttributeCreateRequestModelToDto,
@@ -50,6 +51,28 @@ const listResources: AppEpic = (action$, state$, deps) => {
                     err => of(
                         slice.actions.listResourcesFailure({error: extractError(err, "Failed to get list of resources")}),
                         appRedirectActions.fetchError({error: err, message: "Failed to get list of resources"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+
+};
+
+const listResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.listResourceCustomAttributes.match,
+        ),
+        switchMap(
+            action => deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
+                map(
+                    list => slice.actions.listResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel)),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.listResourceCustomAttributesFailure({error: extractError(err, "Failed to get Resource Custom Attributes list")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to get Resource Custom Attributes list"}),
                     ),
                 ),
             ),
@@ -264,6 +287,7 @@ const disableCustomAttribute: AppEpic = (action$, state$, deps) => {
 const epics = [
     listCustomAttributes,
     listResources,
+    listResourceCustomAttributes,
     createCustomAttribute,
     updateCustomAttribute,
     getCustomAttribute,

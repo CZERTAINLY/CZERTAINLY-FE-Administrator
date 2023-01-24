@@ -1,23 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import { useNavigate } from "react-router";
-
-import { Container, Label, Row, Col } from "reactstrap";
-
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
+import AttributeViewer from "components/Attributes/AttributeViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+import ProgressButton from "components/ProgressButton";
+import StatusBadge from "components/StatusBadge";
 
 import Widget from "components/Widget";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import ProgressButton from "components/ProgressButton";
+
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { Link, useParams } from "react-router-dom";
+
+import { Col, Container, Label, Row } from "reactstrap";
 
 import AcmeProtocolActivationDialogBody from "../AcmeProtocolActivationDialogBody";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
-
 
 export default function RaProfileDetail() {
 
@@ -536,6 +535,9 @@ export default function RaProfileDetail() {
                         </>
                      )
                   }
+                   <br />
+                   <Label>Custom Attributes</Label>
+                   <AttributeViewer attributes={raProfile?.customAttributes} />
 
                </Widget>
 

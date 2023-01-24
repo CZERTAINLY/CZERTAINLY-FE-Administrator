@@ -1,27 +1,29 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import ProgressButton from "components/ProgressButton";
+
+import Widget from "components/Widget";
+import { actions as authoritiesActions, selectors as authoritiesSelectors } from "ducks/authorities";
+import { actions as connectorActions } from "ducks/connectors";
+
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
+import { FormApi } from "final-form";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { FormApi } from "final-form";
-import { Form, Field } from "react-final-form";
+import Select from "react-select";
 
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import Select from "react-select";
+import { AttributeDescriptorModel } from "types/attributes";
+import { RaProfileResponseModel } from "types/ra-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-import { actions as authoritiesActions, selectors as authoritiesSelectors } from "ducks/authorities";
-import { actions as connectorActions } from "ducks/connectors";
-
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
-
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { AttributeDescriptorModel } from "types/attributes";
-
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string;
@@ -43,6 +45,8 @@ export default function RaProfileForm() {
 
    const authorities = useSelector(authoritiesSelectors.authorities);
    const raProfileAttributeDescriptors = useSelector(authoritiesSelectors.raProfileAttributeDescriptors);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
    const isFetchingAuthorityRAProfileAttributes = useSelector(authoritiesSelectors.isFetchingRAProfilesAttributesDescriptors);
 
@@ -56,8 +60,8 @@ export default function RaProfileForm() {
 
 
    const isBusy = useMemo(
-      () => isFetchingDetail || isCreating || isUpdating || isFetchingAuthorityRAProfileAttributes,
-      [isCreating, isFetchingDetail, isUpdating, isFetchingAuthorityRAProfileAttributes]
+      () => isFetchingDetail || isCreating || isUpdating || isFetchingAuthorityRAProfileAttributes || isFetchingResourceCustomAttributes,
+      [isCreating, isFetchingDetail, isUpdating, isFetchingAuthorityRAProfileAttributes, isFetchingResourceCustomAttributes]
    );
 
 
@@ -80,6 +84,7 @@ export default function RaProfileForm() {
 
       () => {
 
+         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.RaProfiles));
          if (editMode && raProfileSelector && raProfileSelector.uuid !== raProfile?.uuid) {
 
             setRaProfile(raProfileSelector);
@@ -98,7 +103,7 @@ export default function RaProfileForm() {
 
           dispatch(connectorActions.clearCallbackData());
           setGroupAttributesCallbackAttributes([]);
-         form.mutators.clearAttributes();
+         form.mutators.clearAttributes("ra-profile");
          if (raProfile) setRaProfile({ ...raProfile, attributes: [] });
          dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
          dispatch(authoritiesActions.getRAProfilesAttributesDescriptors({ authorityUuid }));
@@ -134,6 +139,8 @@ export default function RaProfileForm() {
                        enabled: raProfile!.enabled,
                        description: values.description,
                        attributes: collectFormAttributes("ra-profile", [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                       customAttributes: collectFormAttributes("customRaProfile", resourceCustomAttributes, values),
+
                    }
                })
             );
@@ -146,7 +153,8 @@ export default function RaProfileForm() {
                    raProfileAddRequest: {
                        name: values.name,
                        description: values.description,
-                       attributes: collectFormAttributes("ra-profile", [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
+                       attributes: collectFormAttributes("ra-profile", [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                       customAttributes: collectFormAttributes("customRaProfile", resourceCustomAttributes, values),
                    }
                })
             );
@@ -154,7 +162,7 @@ export default function RaProfileForm() {
          }
 
       },
-      [dispatch, editMode, id, raProfile, raProfileAttributeDescriptors, groupAttributesCallbackAttributes]
+      [dispatch, editMode, id, raProfile, raProfileAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes]
 
    );
 
@@ -280,16 +288,29 @@ export default function RaProfileForm() {
                   </Field>
 
 
-                  {!raProfileAttributeDescriptors ? <></> : (
-                     <AttributeEditor
-                        id="ra-profile"
-                        authorityUuid={raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value}
-                        attributeDescriptors={raProfileAttributeDescriptors}
-                        attributes={raProfile?.attributes}
-                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                     />
-                  )}
+                   <hr />
+                   <TabLayout tabs={[
+                       {
+                           title: "Connector Attributes",
+                           content: !raProfileAttributeDescriptors ? <></> : (
+                               <AttributeEditor
+                                   id="ra-profile"
+                                   authorityUuid={raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value}
+                                   attributeDescriptors={raProfileAttributeDescriptors}
+                                   attributes={raProfile?.attributes}
+                                   groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                   setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                               />)
+                       },
+                       {
+                           title: "Custom Attributes",
+                           content: <AttributeEditor
+                               id="customRaProfile"
+                               attributeDescriptors={resourceCustomAttributes}
+                               attributes={raProfile?.customAttributes}
+                           />
+                       }
+                   ]} />
 
                   <div className="d-flex justify-content-end">
 

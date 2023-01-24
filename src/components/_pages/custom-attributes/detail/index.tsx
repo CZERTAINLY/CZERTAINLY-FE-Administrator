@@ -81,7 +81,7 @@ export default function CustomAttributeDetail() {
                     <WidgetButtons buttons={buttons}/>
                 </div>
                 <h5>
-                    Group <span className="fw-semi-bold">Details</span>
+                    Custom Attribute <span className="fw-semi-bold">Details</span>
                 </h5>
             </div>
         ), [buttons],

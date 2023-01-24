@@ -1,26 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Form, Field } from "react-final-form";
-import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row, } from "reactstrap";
-
-import { useDispatch, useSelector } from "react-redux";
-
-import { validateRequired } from "utils/validators";
-import { mutators } from "utils/attributes/attributeEditorMutators";
-
-import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
-import { actions as raProfileActions, selectors as raProfileSelectors, } from "ducks/ra-profiles";
-import { actions as connectorActions } from "ducks/connectors";
+import AttributeEditor from "components/Attributes/AttributeEditor";
 
 import ProgressButton from "components/ProgressButton";
+import Widget from "components/Widget";
+
+import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
+import { actions as connectorActions } from "ducks/connectors";
+import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { FormApi } from "final-form";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
+
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import Select, { SingleValue } from "react-select";
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import { FormApi } from "final-form";
-import { collectFormAttributes } from "utils/attributes/attributes";
-import { useNavigate } from "react-router-dom";
-import { RaProfileResponseModel } from "types/ra-profiles";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
+import { RaProfileResponseModel } from "types/ra-profiles";
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes/attributes";
+
+import { validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
@@ -37,6 +40,8 @@ export default function CertificateForm() {
 
    const raProfiles = useSelector(raProfileSelectors.raProfiles);
    const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
    const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
@@ -44,6 +49,7 @@ export default function CertificateForm() {
 
    useEffect(() => {
 
+       dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
       dispatch(raProfileActions.listRaProfiles());
       dispatch(connectorActions.clearCallbackData());
 
@@ -132,12 +138,13 @@ export default function CertificateForm() {
              signRequest: {
                  pkcs10: values.file,
                  attributes,
-             }
-            
+                 customAttributes: collectFormAttributes("customCertificate", resourceCustomAttributes, values),
+             },
+
          }));
 
       },
-      [dispatch, issuanceAttributeDescriptors, groupAttributesCallbackAttributes]
+      [dispatch, issuanceAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes]
 
    );
 
@@ -201,7 +208,7 @@ export default function CertificateForm() {
 
    return (
 
-      <Widget title={<h5>Add new <span className="fw-semi-bold">Certificate</span></h5>} busy={issuingCertificate}>
+      <Widget title={<h5>Add new <span className="fw-semi-bold">Certificate</span></h5>} busy={issuingCertificate || isFetchingResourceCustomAttributes}>
 
          <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }} >
 
@@ -343,13 +350,28 @@ export default function CertificateForm() {
 
                            </div>
 
-                           <AttributeEditor
-                              id="issuance_attributes"
-                              attributeDescriptors={issuanceAttributeDescriptors[values.raProfile.value.uuid] || []}
-                              authorityUuid={values.raProfile.value.authorityInstanceUuid}
-                              groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                              setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                           />
+                            <hr />
+                            <TabLayout tabs={[
+                                {
+                                    title: "Connector Attributes",
+                                    content:
+                                        <AttributeEditor
+                                            id="issuance_attributes"
+                                            attributeDescriptors={issuanceAttributeDescriptors[values.raProfile.value.uuid] || []}
+                                            authorityUuid={values.raProfile.value.authorityInstanceUuid}
+                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                        />
+                                },
+                                {
+                                    title: "Custom Attributes",
+                                    content: <AttributeEditor
+                                        id="customCertificate"
+                                        attributeDescriptors={resourceCustomAttributes}
+                                        attributes={values.raProfile.value.customAttributes}
+                                    />
+                                }
+                            ]} />
 
 
                         </>

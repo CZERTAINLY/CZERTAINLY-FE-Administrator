@@ -1,26 +1,27 @@
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import TabLayout from "components/Layout/TabLayout";
+import ProgressButton from "components/ProgressButton";
+import Widget from "components/Widget";
+import { actions as connectorActions } from "ducks/connectors";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+
+import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import Select from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
-
-import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
-import { actions as connectorActions } from "ducks/connectors";
+import { AttributeDescriptorModel } from "types/attributes";
+import { ConnectorResponseModel } from "types/connectors";
+import { FunctionGroupCode, Resource } from "types/openapi";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import Select from "react-select";
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { ConnectorResponseModel } from "types/connectors";
-import { FunctionGroupCode } from "types/openapi";
-import { AttributeDescriptorModel } from "types/attributes";
-
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 interface FormValues {
    name: string | undefined;
@@ -36,6 +37,8 @@ export default function DiscoveryForm() {
 
    const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
    const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
    const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
    const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
@@ -48,8 +51,8 @@ export default function DiscoveryForm() {
    const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
-      () => isFetchingDiscoveryDetail || isFetchingDiscoveryProviders || isCreating || isFetchingAttributeDescriptors,
-      [isFetchingDiscoveryDetail, isFetchingDiscoveryProviders, isCreating, isFetchingAttributeDescriptors]
+      () => isFetchingDiscoveryDetail || isFetchingDiscoveryProviders || isCreating || isFetchingAttributeDescriptors || isFetchingResourceCustomAttributes,
+      [isFetchingDiscoveryDetail, isFetchingDiscoveryProviders, isCreating, isFetchingAttributeDescriptors, isFetchingResourceCustomAttributes]
    );
 
    useEffect(
@@ -61,6 +64,7 @@ export default function DiscoveryForm() {
              setInit(false);
              dispatch(connectorActions.clearCallbackData());
              dispatch(discoveryActions.listDiscoveryProviders());
+             dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Discoveries));
          }
 
       },
@@ -111,11 +115,12 @@ export default function DiscoveryForm() {
             name: values.name!,
             connectorUuid: values.discoveryProvider!.value,
             kind: values.storeKind?.value!,
-            attributes: collectFormAttributes("discovery", [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
+            attributes: collectFormAttributes("discovery", [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+            customAttributes: collectFormAttributes("customDiscovery", resourceCustomAttributes, values),
          }));
 
       },
-      [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes]
+      [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes]
    );
 
 
@@ -204,7 +209,7 @@ export default function DiscoveryForm() {
                               menuPlacement="auto"
                               options={optionsForDiscoveryProviders}
                               placeholder="Select Discovery Provider"
-                              onChange={(event) => { onDiscoveryProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
+                              onChange={(event) => { onDiscoveryProviderChange(event); form.mutators.clearAttributes("discovery"); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
                               styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                            />
 
@@ -240,25 +245,36 @@ export default function DiscoveryForm() {
                      )}
                   </Field> : undefined}
 
-                  {discoveryProvider && values.storeKind && discoveryProviderAttributeDescriptors && discoveryProviderAttributeDescriptors.length > 0 ? (
 
                      <>
                         <hr />
                         <h6>Discovery Attributes</h6>
                         <hr />
-
-                        <AttributeEditor
-                           id="discovery"
-                           attributeDescriptors={discoveryProviderAttributeDescriptors}
-                           connectorUuid={discoveryProvider.uuid}
-                           functionGroupCode={FunctionGroupCode.DiscoveryProvider}
-                           kind={values.storeKind.value}
-                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                        />
+                         <TabLayout tabs={[
+                             {
+                                 title: "Connector Attributes",
+                                 content: discoveryProvider && values.storeKind && discoveryProviderAttributeDescriptors && discoveryProviderAttributeDescriptors.length > 0 ? (
+                                     <AttributeEditor
+                                         id="discovery"
+                                         attributeDescriptors={discoveryProviderAttributeDescriptors}
+                                         connectorUuid={discoveryProvider.uuid}
+                                         functionGroupCode={FunctionGroupCode.DiscoveryProvider}
+                                         kind={values.storeKind.value}
+                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                     />
+                                 ): <></>
+                             },
+                             {
+                                 title: "Custom Attributes",
+                                 content: <AttributeEditor
+                                     id="customDiscovery"
+                                     attributeDescriptors={resourceCustomAttributes}
+                                     attributes={discoveryProvider?.customAttributes}
+                                 />
+                             }
+                         ]} />
                      </>
-
-                  ) : null}
 
                   {
 

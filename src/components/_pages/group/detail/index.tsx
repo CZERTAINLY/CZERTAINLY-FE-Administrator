@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-
-import { Container } from "reactstrap";
-
-import { actions, selectors } from "ducks/certificateGroups";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
+import { actions, selectors } from "ducks/certificateGroups";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { Container, Label } from "reactstrap";
+import AttributeViewer from "../../../Attributes/AttributeViewer";
 
 export default function GroupDetail() {
 
@@ -150,6 +150,12 @@ export default function GroupDetail() {
             />
 
          </Widget>
+
+          <Widget title="Attributes">
+              <br />
+              <Label>Custom Attributes</Label>
+              <AttributeViewer attributes={group?.customAttributes} />
+          </Widget>
 
          <Dialog
             isOpen={confirmDelete}

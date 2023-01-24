@@ -1,26 +1,28 @@
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import ProgressButton from "components/ProgressButton";
+import Widget from "components/Widget";
+import { actions as connectorActions } from "ducks/connectors";
+import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
+
+import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Form, Field } from "react-final-form";
+import Select from "react-select/";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { validateRequired, composeValidators, validateAlphaNumeric } from "utils/validators";
-
-import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
-import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
+import { AttributeDescriptorModel } from "types/attributes";
+import { LocationResponseModel } from "types/locations";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import Select from "react-select/";
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { LocationResponseModel } from "types/locations";
-import { AttributeDescriptorModel } from "types/attributes";
-import { actions as connectorActions } from "../../../../ducks/connectors";
-
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { Resource } from "../../../../types/openapi";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string | undefined;
@@ -40,10 +42,12 @@ export default function LocationForm() {
 
    const entities = useSelector(entitySelectors.entities);
    const locationAttributeDescriptors = useSelector(entitySelectors.locationAttributeDescriptors);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
    const locationSelector = useSelector(locationSelectors.location);
 
    const isFetchingLocationDetail = useSelector(locationSelectors.isFetchingDetail);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
    const isCreating = useSelector(locationSelectors.isCreating);
    const isUpdating = useSelector(locationSelectors.isUpdating);
 
@@ -57,8 +61,8 @@ export default function LocationForm() {
    const [location, setLocation] = useState<LocationResponseModel>();
 
    const isBusy = useMemo(
-      () => isFetchingLocationDetail || isCreating || isUpdating || isFetchingEntities || isFetchingLocationAttributeDescriptors,
-      [isFetchingLocationDetail, isCreating, isUpdating, isFetchingEntities, isFetchingLocationAttributeDescriptors]
+      () => isFetchingLocationDetail || isCreating || isUpdating || isFetchingEntities || isFetchingLocationAttributeDescriptors || isFetchingResourceCustomAttributes,
+      [isFetchingLocationDetail, isCreating, isUpdating, isFetchingEntities, isFetchingLocationAttributeDescriptors, isFetchingResourceCustomAttributes]
    );
 
 
@@ -66,7 +70,9 @@ export default function LocationForm() {
 
       () => {
 
-         if (init) {
+          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Locations));
+
+          if (init) {
             dispatch(locationActions.resetState());
             dispatch(entityActions.resetState());
             dispatch(entityActions.listEntities());
@@ -130,6 +136,7 @@ export default function LocationForm() {
                    description: values.description || "",
                    enabled: location!.enabled,
                    attributes: collectFormAttributes("location", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                   customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
                 }
             }));
 
@@ -142,13 +149,14 @@ export default function LocationForm() {
                     description: values.description || "",
                     enabled: true,
                     attributes: collectFormAttributes("location", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                    customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
                 },
             }));
 
          }
 
       },
-      [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes]
+      [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes, resourceCustomAttributes]
 
    );
 
@@ -277,7 +285,7 @@ export default function LocationForm() {
                               menuPlacement="auto"
                               options={optionsForEntities}
                               placeholder="Select Entity"
-                              onChange={(event) => { onEntityChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
+                              onChange={(event) => { onEntityChange(event); form.mutators.clearAttributes("location"); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
                               styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                            />
 
@@ -290,23 +298,34 @@ export default function LocationForm() {
                   </Field>
 
 
-                  {values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
-
                      <>
                         <hr />
                         <h6>Location Attributes</h6>
                         <hr />
 
-                        <AttributeEditor
-                           id="location"
-                           attributeDescriptors={locationAttributeDescriptors}
-                           attributes={location?.attributes}
-                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                        />
+                         <TabLayout tabs={[
+                             {
+                                 title: "Connector Attributes",
+                                 content: values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
+                                     <AttributeEditor
+                                         id="location"
+                                         attributeDescriptors={locationAttributeDescriptors}
+                                         attributes={location?.attributes}
+                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                     />
+                                 ): <></>
+                             },
+                             {
+                                 title: "Custom Attributes",
+                                 content: <AttributeEditor
+                                     id="customLocation"
+                                     attributeDescriptors={resourceCustomAttributes}
+                                     attributes={location?.customAttributes}
+                                 />
+                             }
+                         ]} />
                      </>
-
-                  ) : null}
 
                   {
 

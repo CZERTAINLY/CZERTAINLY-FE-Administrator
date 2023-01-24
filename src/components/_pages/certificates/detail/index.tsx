@@ -1,8 +1,27 @@
 import { Buffer } from "buffer";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
+import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+import ProgressButton from "components/ProgressButton";
+import Spinner from "components/Spinner";
+import StatusBadge from "components/StatusBadge";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
+
+import { actions, selectors } from "ducks/certificates";
+import { actions as connectorActions } from "ducks/connectors";
+import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
+import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import Select from "react-select";
 
 import {
     Badge,
@@ -17,38 +36,18 @@ import {
     Input,
     Label,
     Row,
-    UncontrolledButtonDropdown
+    UncontrolledButtonDropdown,
 } from "reactstrap";
-import { Form } from "react-final-form";
-import Select from "react-select";
 import { AttributeDescriptorModel } from "types/attributes";
-
-import { actions, selectors } from "ducks/certificates";
-import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
-import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
-import { actions as connectorActions } from "ducks/connectors";
-
-import { dateFormatter } from "utils/dateUtil";
-import { downloadFile, formatPEM } from "utils/certificate";
+import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
+import { downloadFile, formatPEM } from "utils/certificate";
 
-import Widget from "components/Widget";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import Spinner from "components/Spinner";
-import ProgressButton from "components/ProgressButton";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { dateFormatter } from "utils/dateUtil";
+import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import CertificateStatus from "../CertificateStatus";
-import CertificateRenewDialog from "../CertificateRenewDialog";
-import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
-import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus } from "types/openapi";
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
-
 
 export default function CertificateDetail() {
 
@@ -1319,6 +1318,9 @@ export default function CertificateDetail() {
                <Widget title={metaTitle}>
                   <br />
                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata}/>
+               </Widget>
+               <Widget title={"Custom Attributes"}>
+                    <AttributeViewer attributes={certificate?.customAttributes} />
                </Widget>
 
             </Col>

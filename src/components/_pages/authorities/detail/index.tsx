@@ -1,15 +1,15 @@
+import AttributeViewer from "components/Attributes/AttributeViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/authorities";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
-
-import { actions, selectors } from "ducks/authorities";
-
-import Widget from "components/Widget";
-import Dialog from "components/Dialog";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer from "components/Attributes/AttributeViewer";
 
 export default function AuthorityDetail() {
 
@@ -192,8 +192,10 @@ export default function AuthorityDetail() {
 
             <br />
 
-            <Label>Certification Authority Attributes</Label>
-            <AttributeViewer attributes={authority?.attributes} />
+             <Label>Certification Authority Attributes</Label>
+             <AttributeViewer attributes={authority?.attributes} />
+             <Label>Custom Attributes</Label>
+             <AttributeViewer attributes={authority?.customAttributes} />
 
          </Widget>
 

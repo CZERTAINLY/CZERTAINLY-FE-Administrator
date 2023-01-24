@@ -1,28 +1,27 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-
-import { Badge, Button, Col, Container, Label, Row } from "reactstrap";
-import Select from "react-select";
-
-import { actions, selectors } from "ducks/compliance-profiles";
-
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 
-import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
-import AssociateRaProfileDialogBody from "../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody";
-import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/compliance-profiles";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import Select from "react-select";
+
+import { Badge, Button, Col, Container, Label, Row } from "reactstrap";
 import {
     ComplianceProfileGroupListResponseGroupModel,
     ComplianceProfileResponseGroupGroupModel,
     ComplianceProfileResponseRuleRuleModel,
-    ComplianceProfileRuleListResponseRuleModel
+    ComplianceProfileRuleListResponseRuleModel,
 } from "types/complianceProfiles";
-
+import AttributeViewer from "../../../Attributes/AttributeViewer";
+import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";
+import AssociateRaProfileDialogBody from "../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody";
 
 export default function ComplianceProfileDetail() {
 
@@ -1015,6 +1014,12 @@ export default function ComplianceProfileDetail() {
                      data={raProfileData}
                   />
                </Widget>
+
+                <Widget title="Attributes">
+                    <br />
+                    <Label>Custom Attributes</Label>
+                    <AttributeViewer attributes={profile?.customAttributes} />
+                </Widget>
             </Col>
          </Row>
 

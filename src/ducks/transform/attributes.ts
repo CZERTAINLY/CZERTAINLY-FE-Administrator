@@ -1,4 +1,3 @@
-import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from "types/connectors";
 import {
    AttributeDescriptorCollectionDto,
    AttributeDescriptorCollectionModel,
@@ -7,8 +6,11 @@ import {
    AttributeRequestDto,
    AttributeRequestModel,
    AttributeResponseDto,
-   AttributeResponseModel
+   AttributeResponseModel,
+   CustomAttributeDto,
+   CustomAttributeModel,
 } from "types/attributes";
+import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from "types/connectors";
 
 export function transformAttributeResponseDtoToModel(attribute: AttributeResponseDto): AttributeResponseModel {
 
@@ -26,6 +28,13 @@ export function transformAttributeRequestModelToDto(attributeRequest: AttributeR
       content: JSON.parse(JSON.stringify(attributeRequest.content))
    }
 
+}
+
+export function transformCustomAttributeDtoToModel(attribute: CustomAttributeDto): CustomAttributeModel {
+   return ({
+      ...attribute,
+      content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined
+   })
 }
 
 export function transformAttributeDescriptorDtoToModel(attributeDescriptor: AttributeDescriptorDto): AttributeDescriptorModel {

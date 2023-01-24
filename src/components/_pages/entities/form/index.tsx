@@ -1,28 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-
-import { Field, Form } from "react-final-form";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import ProgressButton from "components/ProgressButton";
+import Widget from "components/Widget";
 
 import { actions as alertActions } from "ducks/alerts";
-import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
+import Select from "react-select/";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { AttributeDescriptorModel } from "types/attributes";
+import { ConnectorResponseModel } from "types/connectors";
+import { EntityResponseModel } from "types/entities";
+import { FunctionGroupCode, Resource } from "types/openapi";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import Select from "react-select/";
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { EntityResponseModel } from "types/entities";
-import { ConnectorResponseModel } from "types/connectors";
-import { FunctionGroupCode } from "types/openapi";
-import { AttributeDescriptorModel } from "types/attributes";
-
+import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string | undefined;
@@ -43,7 +44,9 @@ export default function EntityForm() {
    const entitySelector = useSelector(entitySelectors.entity);
    const entityProviders = useSelector(entitySelectors.entityProviders);
    const entityProviderAttributeDescriptors = useSelector(entitySelectors.entityProviderAttributeDescriptors);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
    const isFetchingEntityDetail = useSelector(entitySelectors.isFetchingDetail);
    const isFetchingEntityProviders = useSelector(entitySelectors.isFetchingEntityProviders);
    const isFetchingAttributeDescriptors = useSelector(entitySelectors.isFetchingEntityProviderAttributeDescriptors);
@@ -56,8 +59,8 @@ export default function EntityForm() {
    const [entityProvider, setEntityProvider] = useState<ConnectorResponseModel>();
 
    const isBusy = useMemo(
-      () => isFetchingEntityDetail || isFetchingEntityProviders || isCreating || isUpdating || isFetchingAttributeDescriptors,
-      [isFetchingEntityDetail, isFetchingEntityProviders, isCreating, isUpdating, isFetchingAttributeDescriptors]
+      () => isFetchingEntityDetail || isFetchingEntityProviders || isCreating || isUpdating || isFetchingAttributeDescriptors || isFetchingResourceCustomAttributes,
+      [isFetchingEntityDetail, isFetchingEntityProviders, isCreating, isUpdating, isFetchingAttributeDescriptors, isFetchingResourceCustomAttributes]
    );
 
    useEffect(
@@ -66,6 +69,7 @@ export default function EntityForm() {
          dispatch(entityActions.resetState());
          dispatch(connectorActions.clearCallbackData());
          dispatch(entityActions.listEntityProviders());
+          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Entities));
 
          if (editMode) {
             dispatch(entityActions.getEntityDetail({ uuid: id! }));
@@ -159,7 +163,8 @@ export default function EntityForm() {
 
             dispatch(entityActions.updateEntity({
                uuid: id!,
-               attributes: collectFormAttributes("entity", [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
+               attributes: collectFormAttributes("entity", [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                customAttributes: collectFormAttributes("customEntity", resourceCustomAttributes, values),
             }));
 
          } else {
@@ -168,13 +173,14 @@ export default function EntityForm() {
                name: values.name!,
                connectorUuid: values.entityProvider!.value,
                kind: values.storeKind?.value!,
-               attributes: collectFormAttributes("entity", [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values)
+               attributes: collectFormAttributes("entity", [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                customAttributes: collectFormAttributes("customEntity", resourceCustomAttributes, values),
             }));
 
          }
 
       },
-      [editMode, dispatch, id, entityProviderAttributeDescriptors, groupAttributesCallbackAttributes]
+      [editMode, dispatch, id, entityProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes]
    );
 
 
@@ -294,7 +300,7 @@ export default function EntityForm() {
                                  menuPlacement="auto"
                                  options={optionsForEntityProviders}
                                  placeholder="Select Entity Provider"
-                                 onChange={(event) => { onEntityProviderChange(event); form.mutators.clearAttributes(); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
+                                 onChange={(event) => { onEntityProviderChange(event); form.mutators.clearAttributes("entity"); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
                                  styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                               />
 
@@ -388,26 +394,36 @@ export default function EntityForm() {
 
                   ) : null}
 
-                  {entityProvider && values.storeKind && entityProviderAttributeDescriptors && entityProviderAttributeDescriptors.length > 0 ? (
-
                      <>
                         <hr />
                         <h6>Entity Attributes</h6>
                         <hr />
-
-                        <AttributeEditor
-                           id="entity"
-                           attributeDescriptors={entityProviderAttributeDescriptors}
-                           attributes={entity?.attributes}
-                           connectorUuid={entityProvider.uuid}
-                           functionGroupCode={FunctionGroupCode.EntityProvider}
-                           kind={values.storeKind.value}
-                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                        />
+                         <TabLayout tabs={[
+                             {
+                                 title: "Connector Attributes",
+                                 content: entityProvider && values.storeKind && entityProviderAttributeDescriptors && entityProviderAttributeDescriptors.length > 0 ? (
+                                     <AttributeEditor
+                                         id="entity"
+                                         attributeDescriptors={entityProviderAttributeDescriptors}
+                                         attributes={entity?.attributes}
+                                         connectorUuid={entityProvider.uuid}
+                                         functionGroupCode={FunctionGroupCode.EntityProvider}
+                                         kind={values.storeKind.value}
+                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                     />
+                                 ): <></>
+                             },
+                             {
+                                 title: "Custom Attributes",
+                                 content: <AttributeEditor
+                                     id="customEntity"
+                                     attributeDescriptors={resourceCustomAttributes}
+                                     attributes={entity?.customAttributes}
+                                 />
+                             }
+                         ]} />
                      </>
-
-                  ) : null}
 
                   {
 

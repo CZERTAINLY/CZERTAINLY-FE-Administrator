@@ -1,29 +1,30 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import TabLayout from "components/Layout/TabLayout";
+import ProgressButton from "components/ProgressButton";
 
-import { FormApi } from "final-form";
-import { Form, Field } from "react-final-form";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row, Col } from "reactstrap";
-import Select from "react-select";
-
-import { validateRequired, composeValidators, validateAlphaNumeric, validateCustomIp, validateInteger, validateCustomUrl } from "utils/validators";
+import Widget from "components/Widget";
 
 import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from "ducks/acme-profiles";
-import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
+
+import { FormApi } from "final-form";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
+import { AcmeProfileResponseModel } from "types/acme-profiles";
+import { AttributeDescriptorModel } from "types/attributes";
+import { RaProfileResponseModel } from "types/ra-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import Widget from "components/Widget";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import { AcmeProfileResponseModel } from "types/acme-profiles";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { AttributeDescriptorModel } from "types/attributes";
-
-
+import { composeValidators, validateAlphaNumeric, validateCustomIp, validateCustomUrl, validateInteger, validateRequired } from "utils/validators";
+import { Resource } from "../../../../types/openapi";
 
 interface FormValues {
    name: string;
@@ -54,6 +55,7 @@ export default function AcmeProfileForm() {
    const raProfiles = useSelector(raProfileSelectors.raProfiles);
    const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
    const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
    const isFetchingDetail = useSelector(acmeProfileSelectors.isFetchingDetail);
    const isCreating = useSelector(acmeProfileSelectors.isCreating);
@@ -62,6 +64,7 @@ export default function AcmeProfileForm() {
    const isFetchingRaProfilesList = useSelector(raProfileSelectors.isFetchingList);
    const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
    const isFetchingRevocationAttributes = useSelector(raProfileSelectors.isFetchingRevocationAttributes);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
@@ -99,6 +102,7 @@ export default function AcmeProfileForm() {
    useEffect(
 
       () => {
+         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.AcmeProfiles));
          dispatch(raProfileActions.listRaProfiles());
       },
       [dispatch]
@@ -143,7 +147,8 @@ export default function AcmeProfileForm() {
                     requireContact: values.requireContact,
                     raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
                     issueCertificateAttributes: collectFormAttributes("issuanceAttributes", [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes], values),
-                    revokeCertificateAttributes: collectFormAttributes("revocationAttributes", [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes], values)
+                    revokeCertificateAttributes: collectFormAttributes("revocationAttributes", [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes], values),
+                    customAttributes: collectFormAttributes("customAcmeProfile", resourceCustomAttributes, values),
                 }
             }));
 
@@ -162,12 +167,13 @@ export default function AcmeProfileForm() {
                requireContact: values.requireContact,
                raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
                issueCertificateAttributes: collectFormAttributes("issuanceAttributes", [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes], values),
-               revokeCertificateAttributes: collectFormAttributes("revocationAttributes", [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes], values)
+               revokeCertificateAttributes: collectFormAttributes("revocationAttributes", [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes], values),
+               customAttributes: collectFormAttributes("customAcmeProfile", resourceCustomAttributes, values),
             }));
 
          }
       },
-      [dispatch, editMode, id, raProfileIssuanceAttrDescs, raProfileRevocationAttrDescs, issueGroupAttributesCallbackAttributes, revokeGroupAttributesCallbackAttributes]
+      [dispatch, editMode, id, raProfileIssuanceAttrDescs, raProfileRevocationAttrDescs, issueGroupAttributesCallbackAttributes, revokeGroupAttributesCallbackAttributes, resourceCustomAttributes]
 
    );
 
@@ -194,7 +200,8 @@ export default function AcmeProfileForm() {
             setRaProfile(undefined);
             dispatch(raProfileActions.clearIssuanceAttributesDescriptors());
             dispatch(raProfileActions.clearRevocationAttributesDescriptors());
-            form.mutators.clearAttributes();
+            form.mutators.clearAttributes("issuanceAttributes");
+            form.mutators.clearAttributes("revocationAttributes");
             return;
          }
 
@@ -633,7 +640,7 @@ export default function AcmeProfileForm() {
                   </Widget>
 
 
-                  <Widget title="RA Profile Configuration" busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingRevocationAttributes}>
+                  <Widget title="RA Profile Configuration" busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingRevocationAttributes || isFetchingResourceCustomAttributes}>
 
                      <Field name="raProfile">
 
@@ -663,43 +670,45 @@ export default function AcmeProfileForm() {
 
                      </Field>
 
-                     {!raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? <></> : (
-
-                        <FormGroup>
-
-                           <Label for="issuanceAttributes">Issuance Attributes</Label>
-
-                           <AttributeEditor
-                              id="issuanceAttributes"
-                              attributeDescriptors={raProfileIssuanceAttrDescs}
-                              attributes={acmeProfile?.issueCertificateAttributes}
-                              groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                              setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                           />
-
-                        </FormGroup>
-
-                     )}
-
-
-                     {!raProfile || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? <></> : (
-
-                        <FormGroup>
-
-                           <Label for="revocationAttributes">Revocation Attributes</Label>
-
-                           <AttributeEditor
-                              id="revocationAttributes"
-                              attributeDescriptors={raProfileRevocationAttrDescs}
-                              attributes={acmeProfile?.revokeCertificateAttributes}
-                              groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
-                              setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
-                           />
-
-
-                        </FormGroup>
-
-                     )}
+                      <TabLayout tabs={[
+                          {
+                              title: "Issuance Attributes",
+                              content: !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? <></> : (
+                                  <FormGroup>
+                                      <AttributeEditor
+                                          id="issuanceAttributes"
+                                          attributeDescriptors={raProfileIssuanceAttrDescs}
+                                          attributes={acmeProfile?.issueCertificateAttributes}
+                                          groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                          setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                      />
+                                  </FormGroup>
+                              )
+                          },
+                          {
+                              title: "Revocation Attributes",
+                              content: !raProfile || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? <></> : (
+                                  <FormGroup>
+                                      <AttributeEditor
+                                          id="revocationAttributes"
+                                          attributeDescriptors={raProfileRevocationAttrDescs}
+                                          attributes={acmeProfile?.revokeCertificateAttributes}
+                                          groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
+                                          setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
+                                      />
+                                  </FormGroup>
+                              )
+                          },
+                          {
+                              title: "Custom Attributes",
+                              content: <AttributeEditor
+                                  id="customAcmeProfile"
+                                  attributeDescriptors={resourceCustomAttributes}
+                                  attributes={acmeProfile?.customAttributes}
+                              />
+                          }
+                          ]}/>
+                     {}
 
                   </Widget>
 

@@ -1,31 +1,30 @@
+import CertificateList from "components/_pages/certificates/list";
+import AttributeEditor from "components/Attributes/AttributeEditor";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+import ProgressButton from "components/ProgressButton";
+import Spinner from "components/Spinner";
+import StatusBadge from "components/StatusBadge";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/locations";
+import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
 
-import { Badge, Button, ButtonGroup, Container, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
-import { Field, Form } from "react-final-form";
+import { Badge, Button, ButtonGroup, Container, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { AttributeDescriptorModel } from "types/attributes";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 
-import { actions, selectors } from "ducks/locations";
-import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
-
 import { validateRequired } from "utils/validators";
-
-import Widget from "components/Widget";
-import Dialog from "components/Dialog";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
-import StatusBadge from "components/StatusBadge";
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import CertificateList from "components/_pages/certificates/list";
-import ProgressButton from "components/ProgressButton";
-import Spinner from "components/Spinner";
-import Select from "react-select";
-import { AttributeDescriptorModel } from "types/attributes";
-
 
 export default function LocationDetail() {
 
@@ -491,6 +490,8 @@ export default function LocationDetail() {
 
             <Label>Location Attributes</Label>
             <AttributeViewer attributes={location?.attributes} />
+            <Label>Custom Attributes</Label>
+            <AttributeViewer attributes={location?.customAttributes} />
 
          </Widget>
 

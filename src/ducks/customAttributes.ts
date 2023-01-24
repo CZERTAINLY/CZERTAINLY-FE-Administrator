@@ -6,6 +6,7 @@ import {
     CustomAttributeUpdateRequestModel,
 } from "types/customAttributes";
 import { createFeatureSelector } from "utils/ducks";
+import { CustomAttributeModel } from "../types/attributes";
 import { Resource } from "../types/openapi";
 
 export type State = {
@@ -13,11 +14,13 @@ export type State = {
 
     customAttribute?: CustomAttributeDetailResponseModel;
     customAttributes: CustomAttributeResponseModel[];
+    resourceCustomAttributes: CustomAttributeModel[];
     resources: Resource[];
 
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingResources: boolean;
+    isFetchingResourceCustomAttributes: boolean;
     isCreating: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
@@ -31,10 +34,12 @@ export type State = {
 export const initialState: State = {
     checkedRows: [],
     customAttributes: [],
+    resourceCustomAttributes: [],
     resources: [],
     isFetchingList: false,
     isFetchingDetail: false,
     isFetchingResources: false,
+    isFetchingResourceCustomAttributes: false,
     isCreating: false,
     isDeleting: false,
     isBulkDeleting: false,
@@ -79,6 +84,20 @@ export const slice = createSlice({
 
         listResourcesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingResources = false;
+        },
+
+        listResourceCustomAttributes: (state, action: PayloadAction<Resource>) => {
+            state.resourceCustomAttributes = [];
+            state.isFetchingResourceCustomAttributes = true;
+        },
+
+        listResourceCustomAttributesSuccess: (state, action: PayloadAction<CustomAttributeModel[]>) => {
+            state.resourceCustomAttributes = action.payload;
+            state.isFetchingResourceCustomAttributes = false;
+        },
+
+        listResourceCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingResourceCustomAttributes = false;
         },
 
         createCustomAttribute: (state, action: PayloadAction<CustomAttributeCreateRequestModel>) => {
@@ -250,10 +269,12 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 const customAttribute = createSelector(state, (state: State) => state.customAttribute);
 const customAttributes = createSelector(state, (state: State) => state.customAttributes);
 const resources = createSelector(state, (state: State) => state.resources);
+const resourceCustomAttributes = createSelector(state, (state: State) => state.resourceCustomAttributes);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingResources = createSelector(state, (state: State) => state.isFetchingResources);
+const isFetchingResourceCustomAttributes = createSelector(state, (state: State) => state.isFetchingResourceCustomAttributes);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
@@ -272,11 +293,13 @@ export const selectors = {
     customAttribute,
     customAttributes,
     resources,
+    resourceCustomAttributes,
 
     isCreating,
     isFetchingList,
     isFetchingDetail,
     isFetchingResources,
+    isFetchingResourceCustomAttributes,
     isDeleting,
     isBulkDeleting,
     isBulkEnabling,

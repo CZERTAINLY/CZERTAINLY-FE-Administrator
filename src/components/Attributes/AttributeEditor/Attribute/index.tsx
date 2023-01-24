@@ -1,27 +1,29 @@
+import * as DOMPurify from "dompurify";
+import parse from "html-react-parser";
+import { marked } from "marked";
 import { useCallback } from "react";
 import { Field, useForm } from "react-final-form";
 
-import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
-
 import Select from "react-select";
 
-import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
-import { AttributeConstraintType, AttributeContentType, } from "types/openapi";
+import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
 import {
+    CustomAttributeModel,
     DataAttributeModel,
     InfoAttributeModel,
+    isCustomAttributeModel,
     isDataAttributeModel,
-    RegexpAttributeConstraintModel
+    RegexpAttributeConstraintModel,
 } from "types/attributes";
+import { AttributeConstraintType, AttributeContentType } from "types/openapi";
 import { getAttributeContent } from "utils/attributes/attributes";
-import { marked } from "marked";
-import parse from 'html-react-parser';
-import * as DOMPurify from 'dompurify';
+
+import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
 
 interface Props {
    name: string;
-   descriptor: DataAttributeModel | InfoAttributeModel | undefined;
+   descriptor: DataAttributeModel | InfoAttributeModel | CustomAttributeModel | undefined;
    options?: { label: string, value: any }[];
 }
 
@@ -136,13 +138,15 @@ export function Attribute({
 
       const validators: any[] = [];
 
-      if (isDataAttributeModel(descriptor)) {
+      if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
           if (descriptor.properties.required) validators.push(validateRequired());
           if (descriptor.contentType === AttributeContentType.Integer) validators.push(validateInteger());
           if (descriptor.contentType === AttributeContentType.Float) validators.push(validateFloat());
-          const regexValidator = descriptor.constraints?.find(c => c.type === AttributeConstraintType.RegExp);
-          if (regexValidator) {
-              validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
+          if (isDataAttributeModel(descriptor)) {
+              const regexValidator = descriptor.constraints?.find(c => c.type === AttributeConstraintType.RegExp);
+              if (regexValidator) {
+                  validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
+              }
           }
       }
 
@@ -153,7 +157,7 @@ export function Attribute({
    };
 
 
-   const createSelect = (descriptor: DataAttributeModel): JSX.Element => {
+   const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       return (
 
@@ -207,7 +211,7 @@ export function Attribute({
 
 
 
-   const createFile = (descriptor: DataAttributeModel): JSX.Element => {
+   const createFile = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       return (
 
@@ -335,7 +339,7 @@ export function Attribute({
    };
 
 
-   const createInput = (descriptor: DataAttributeModel): JSX.Element => {
+   const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       return (
 
@@ -391,7 +395,7 @@ export function Attribute({
    };
 
 
-   const createField = (descriptor: DataAttributeModel): JSX.Element => {
+   const createField = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       if (descriptor.properties.list) return createSelect(descriptor);
       if (descriptor.contentType === AttributeContentType.File) return createFile(descriptor);
@@ -414,7 +418,7 @@ export function Attribute({
    return (
 
       <FormGroup>
-         {isDataAttributeModel(descriptor) ? createField(descriptor) : createInfo(descriptor)}
+         {isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor) ? createField(descriptor) : createInfo(descriptor)}
       </FormGroup>
 
    )

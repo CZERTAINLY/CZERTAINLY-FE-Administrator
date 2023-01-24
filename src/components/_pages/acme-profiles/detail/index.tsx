@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col } from "reactstrap";
-
-import { actions, selectors } from "ducks/acme-profiles";
-
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import AttributeViewer from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
-import AttributeViewer from "components/Attributes/AttributeViewer";
 
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/acme-profiles";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { Col, Container, Row } from "reactstrap";
 
 export default function AdministratorDetail() {
 
@@ -344,7 +343,7 @@ export default function AdministratorDetail() {
                         data={raProfileDetailData}
                      />
 
-                     <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                     <Row xs="1" sm="1" md="3" lg="3" xl="3">
 
                         <Col>
 
@@ -382,6 +381,15 @@ export default function AdministratorDetail() {
 
                         </Col>
 
+                         <Col>
+                             {acmeProfile?.customAttributes && acmeProfile?.customAttributes.length > 0 &&
+                                 (<Widget title="List of Custom Attributes" busy={isBusy}>
+                                     <AttributeViewer
+                                         attributes={acmeProfile?.customAttributes}
+                                     />
+                                 </Widget>
+                                 )}
+                         </Col>
                      </Row>
 
                   </>
