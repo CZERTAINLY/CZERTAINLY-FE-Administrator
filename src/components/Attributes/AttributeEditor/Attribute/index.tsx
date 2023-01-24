@@ -157,7 +157,7 @@ export function Attribute({
    };
 
 
-   const createSelect = (descriptor: DataAttributeModel): JSX.Element => {
+   const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       return (
 
@@ -211,7 +211,7 @@ export function Attribute({
 
 
 
-   const createFile = (descriptor: DataAttributeModel): JSX.Element => {
+   const createFile = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       return (
 
@@ -339,7 +339,7 @@ export function Attribute({
    };
 
 
-   const createInput = (descriptor: DataAttributeModel): JSX.Element => {
+   const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       return (
 
@@ -395,7 +395,7 @@ export function Attribute({
    };
 
 
-   const createField = (descriptor: DataAttributeModel): JSX.Element => {
+   const createField = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
 
       if (descriptor.properties.list) return createSelect(descriptor);
       if (descriptor.contentType === AttributeContentType.File) return createFile(descriptor);

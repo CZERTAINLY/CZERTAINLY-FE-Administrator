@@ -69,7 +69,6 @@ export default function RaProfileForm() {
 
       () => {
 
-          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.RaProfiles));
          dispatch(authoritiesActions.listAuthorities());
          dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
          dispatch(connectorActions.clearCallbackData());
@@ -85,6 +84,7 @@ export default function RaProfileForm() {
 
       () => {
 
+         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.RaProfiles));
          if (editMode && raProfileSelector && raProfileSelector.uuid !== raProfile?.uuid) {
 
             setRaProfile(raProfileSelector);

@@ -156,7 +156,7 @@ export default function LocationForm() {
          }
 
       },
-      [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes]
+      [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes, resourceCustomAttributes]
 
    );
 

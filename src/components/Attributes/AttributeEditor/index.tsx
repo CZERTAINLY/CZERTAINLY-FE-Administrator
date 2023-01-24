@@ -8,6 +8,7 @@ import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
     AttributeResponseModel,
+    CustomAttributeModel,
     DataAttributeModel,
     FileAttributeContentModel,
     InfoAttributeModel,
@@ -259,10 +260,10 @@ export default function AttributeEditor({
    /**
     * Groups attributes for rendering according to the attribute descriptor group property
     */
-   const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel)[] } = useMemo(
+   const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = useMemo(
 
       () => {
-         const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel)[] } = {};
+         const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
 
           [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach(
             descriptor => {
@@ -547,7 +548,7 @@ export default function AttributeEditor({
 
          setPreviousCallbackData(callbackData);
       },
-      [callbackData, form.mutators, options, previousCallbackData]
+      [callbackData, options, previousCallbackData]
 
    )
 
