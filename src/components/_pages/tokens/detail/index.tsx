@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
+import { TokenInstanceStatus } from "types/openapi";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
 
 export default function TokenDetail() {
@@ -115,8 +116,8 @@ export default function TokenDetail() {
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "refresh", disabled: false, tooltip: "Update Status", onClick: () => { onReload() } },
-         { icon: "check", disabled: false, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
-         { icon: "times", disabled: false, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
+         { icon: "check", disabled: token?.status.status !== TokenInstanceStatus.Deactivated, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
+         { icon: "times", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
       ],
       [onEditClick, onReload]
 
