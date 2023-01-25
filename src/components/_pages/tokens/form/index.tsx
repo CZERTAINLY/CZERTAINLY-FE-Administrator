@@ -16,7 +16,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select, { SingleValue } from "react-select/";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { TokenDetailResponseDto, TokenResponseModel } from "types/tokens";
+import { TokenDetailResponseDto } from "types/tokens";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode, Resource } from "types/openapi";
 
@@ -271,7 +271,7 @@ export default function TokenForm() {
          // TODO update this to kind
          storeKind: editMode ? token ? { value: tokenDetail?.kind || "", label: tokenDetail?.kind || "" } : undefined : undefined,
       }),
-      [editMode, token]
+      [editMode, token, tokenDetail?.kind]
    );
 
 
