@@ -79,6 +79,10 @@ import CustomAttributesList from "./_pages/custom-attributes/list";
 import CustomAttributesDetail from "./_pages/custom-attributes/detail";
 import CustomAttributesEdit from "./_pages/custom-attributes/form";
 
+import TokenList from "./_pages/tokens/list";
+import TokenDetail from "./_pages/tokens/detail";
+import TokenEdit from "./_pages/tokens/form";
+
 
 export default function AppRouter() {
 
@@ -189,6 +193,12 @@ export default function AppRouter() {
                <Route path="/customattributes/detail/:id" element={<CustomAttributesDetail />} />
                <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
                <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
+
+               <Route path="/tokens" element={<TokenList />} />
+               <Route path="/tokens/list" element={<Navigate to="/tokens" />} />
+               <Route path="/tokens/detail/:id" element={<TokenDetail />} />
+               <Route path="/tokens/add" element={<TokenEdit />} />
+               <Route path="/tokens/edit/:id" element={<TokenEdit />} />
 
             </Route >
 

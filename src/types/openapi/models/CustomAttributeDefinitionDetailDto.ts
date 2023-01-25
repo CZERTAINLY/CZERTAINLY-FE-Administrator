@@ -14,7 +14,7 @@
 import type {
     AttributeContentType,
     AttributeType,
-    BaseAttributeContent,
+    BaseAttributeContentDto,
     Resource,
 } from './';
 
@@ -101,10 +101,10 @@ export interface CustomAttributeDefinitionDetailDto {
     multiSelect?: boolean;
     /**
      * Predefined content for the attribute if needed. The content of the Attribute must satisfy the type
-     * @type {Array<BaseAttributeContent>}
+     * @type {Array<BaseAttributeContentDto>}
      * @memberof CustomAttributeDefinitionDetailDto
      */
-    content?: Array<BaseAttributeContent>;
+    content?: Array<BaseAttributeContentDto>;
     /**
      * List of resources which are allowed to use the Custom Attribute
      * @type {Array<Resource>}

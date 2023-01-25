@@ -158,7 +158,7 @@ export default function CertificateList({
          if (data.fileContent) {
 
             try {
-               dispatch(actions.uploadCertificate({ certificate: data.fileContent }));
+               dispatch(actions.uploadCertificate({ certificate: data.fileContent, customAttributes: [] }));
             } catch (error) {
             }
          }

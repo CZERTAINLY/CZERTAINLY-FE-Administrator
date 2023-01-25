@@ -192,4 +192,28 @@ export interface CertificateDto {
      * @memberof CertificateDto
      */
     customAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * CSR for the certificate
+     * @type {string}
+     * @memberof CertificateDto
+     */
+    csr?: string;
+    /**
+     * Private Key Availability
+     * @type {boolean}
+     * @memberof CertificateDto
+     */
+    privateKeyAvailability: boolean;
+    /**
+     * CSR Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CertificateDto
+     */
+    csrAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * Signature Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CertificateDto
+     */
+    signatureAttributes?: Array<ResponseAttributeDto>;
 }

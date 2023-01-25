@@ -21,13 +21,37 @@ import type {
  */
 export interface ClientCertificateSignRequestDto {
     /**
+     * List of attributes to create CSR. Required if CSR is not provided
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    csrAttributes?: Array<RequestAttributeDto>;
+    /**
+     * List of attributes to sign the CSR
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    signatureAttributes?: Array<RequestAttributeDto>;
+    /**
      * Certificate sign request (PKCS#10) encoded as Base64 string
      * @type {string}
      * @memberof ClientCertificateSignRequestDto
      */
     pkcs10: string;
     /**
-     * List of Attributes to issue Certificate
+     * Token Profile UUID. Required if CSR is not uploaded
+     * @type {string}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    tokenProfileUuid?: string;
+    /**
+     * Key UUID. Required if CSR is not uploaded
+     * @type {string}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    keyUuid?: string;
+    /**
+     * List of RA Profile related Attributes to issue Certificate
      * @type {Array<RequestAttributeDto>}
      * @memberof ClientCertificateSignRequestDto
      */

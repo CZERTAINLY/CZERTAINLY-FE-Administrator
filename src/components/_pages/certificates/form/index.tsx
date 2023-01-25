@@ -358,7 +358,8 @@ export default function CertificateForm() {
                                         <AttributeEditor
                                             id="issuance_attributes"
                                             attributeDescriptors={issuanceAttributeDescriptors[values.raProfile.value.uuid] || []}
-                                            authorityUuid={values.raProfile.value.authorityInstanceUuid}
+                                            callbackParentUuid={values.raProfile.value.authorityInstanceUuid}
+                                            callbackResource={Resource.RaProfiles}
                                             groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                             setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                                         />

@@ -17,7 +17,7 @@ import type {
 } from './';
 
 /**
- * Function Group information of a connector
+ * List of Function Groups implemented by the Connector
  * @export
  * @interface FunctionGroupDto
  */

@@ -12,7 +12,7 @@
  */
 
 import type {
-    BaseAttributeContent,
+    BaseAttributeContentDto,
     Resource,
 } from './';
 
@@ -71,10 +71,10 @@ export interface CustomAttributeUpdateRequestDto {
     multiSelect?: boolean;
     /**
      * Predefined content for the attribute if needed. The content of the Attribute must satisfy the type
-     * @type {Array<BaseAttributeContent>}
+     * @type {Array<BaseAttributeContentDto>}
      * @memberof CustomAttributeUpdateRequestDto
      */
-    content?: Array<BaseAttributeContent>;
+    content?: Array<BaseAttributeContentDto>;
     /**
      * List of resource to be associated with the custom attribute
      * @type {Array<Resource>}

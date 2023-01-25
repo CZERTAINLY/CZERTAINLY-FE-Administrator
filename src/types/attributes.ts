@@ -3,7 +3,7 @@ import {
    AttributeCallbackMapping,
    AttributeType,
    BaseAttributeConstraint,
-   BaseAttributeContent,
+   BaseAttributeContentDto as BaseAttributeContent,
    BaseAttributeDto,
    BooleanAttributeContent,
    CredentialAttributeContent,

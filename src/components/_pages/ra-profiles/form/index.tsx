@@ -295,7 +295,8 @@ export default function RaProfileForm() {
                            content: !raProfileAttributeDescriptors ? <></> : (
                                <AttributeEditor
                                    id="ra-profile"
-                                   authorityUuid={raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value}
+                                   callbackParentUuid={raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value}
+                                   callbackResource={Resource.RaProfiles}
                                    attributeDescriptors={raProfileAttributeDescriptors}
                                    attributes={raProfile?.attributes}
                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}

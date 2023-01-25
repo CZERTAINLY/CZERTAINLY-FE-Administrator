@@ -14,7 +14,7 @@
 import type {
     AttributeContentType,
     AttributeType,
-    BaseAttributeContent,
+    BaseAttributeContentDto,
 } from './';
 
 /**
@@ -53,8 +53,8 @@ export interface ResponseAttributeDto {
     contentType: AttributeContentType;
     /**
      * Content of the Attribute
-     * @type {Array<BaseAttributeContent>}
+     * @type {Array<BaseAttributeContentDto>}
      * @memberof ResponseAttributeDto
      */
-    content?: Array<BaseAttributeContent>;
+    content?: Array<BaseAttributeContentDto>;
 }

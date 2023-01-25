@@ -51,6 +51,7 @@ export default function Sidebar() {
                   childrenLinks={[
                      { _key: "/credentials", name: "Credentials", link: "/credentials" },
                      { _key: "/authorities", name: "Authorities", link: "/authorities" },
+                     { _key: "/tokens", name: "Tokens", link: "/tokens" },
                      { _key: "/groups", name: "Groups", link: "/groups" },
                      { _key: "/entities", name: "Entities", link: "/entities" },
                      { _key: "/locations", name: "Locations", link: "/locations" },

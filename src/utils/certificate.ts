@@ -21,7 +21,8 @@ export const emptyCertificate: CertificateResponseModel = {
    fingerprint: "",
    certificateType: CertificateType.X509,
    issuerSerialNumber: "",
-   subjectAlternativeNames: {}
+   subjectAlternativeNames: {},
+   privateKeyAvailability: false,
 }
 
 export function certificatePEM2CertificateModel(pem: string): CertificateResponseModel {

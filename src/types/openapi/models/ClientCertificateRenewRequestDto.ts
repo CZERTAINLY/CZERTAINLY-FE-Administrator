@@ -11,21 +11,55 @@
  * Do not edit the class manually.
  */
 
+import type {
+    RequestAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface ClientCertificateRenewRequestDto
  */
 export interface ClientCertificateRenewRequestDto {
     /**
-     * Certificate sign request (PKCS#10) encoded as Base64 string
-     * @type {string}
-     * @memberof ClientCertificateRenewRequestDto
-     */
-    pkcs10: string;
-    /**
      * True to replace renewed certificate in the associated locations
      * @type {boolean}
      * @memberof ClientCertificateRenewRequestDto
      */
     replaceInLocations?: boolean;
+    /**
+     * Certificate sign request (PKCS#10) encoded as Base64 string. If not provided, CSR attributes will be used
+     * @type {string}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    pkcs10?: string;
+    /**
+     * Use existing CSR
+     * @type {boolean}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    useExistingCsr?: boolean;
+    /**
+     * Key UUID. Required to create new CSR. If not provided, Key from existing certificate will be used
+     * @type {string}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    keyUuid?: string;
+    /**
+     * Token Profile UUID. Required if new CSR is to be generated and key is changed
+     * @type {string}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    tokenProfileUuid?: string;
+    /**
+     * CSR Attributes. If not provided, existing attributes will be used to generate the new CSR
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    csrAttributes?: Array<RequestAttributeDto>;
+    /**
+     * Signature Attributes. If not provided, existing attributes will be used to generate the new CSR
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    signatureAttributes?: Array<RequestAttributeDto>;
 }
