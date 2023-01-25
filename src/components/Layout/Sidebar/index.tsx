@@ -41,6 +41,7 @@ export default function Sidebar() {
                   header="Profiles"
                   childrenLinks={[
                      { _key: "/raprofiles", name: "RA Profiles", link: "/raprofiles" },
+                     { _key: "/tokenprofiles", name: "Token Profiles", link: "/tokenprofiles" },
                      { _key: "/complianceprofiles", name: "Compliance Profiles", link: "/complianceprofiles" },
                   ]}
                />

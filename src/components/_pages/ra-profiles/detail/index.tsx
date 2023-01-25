@@ -566,7 +566,7 @@ export default function RaProfileDetail() {
 
          <Dialog
             isOpen={confirmDelete}
-            caption="Delete Client"
+            caption="Delete RA Profile"
             body="You are about to delete RA Profiles which may have existing
                   authorizations from clients. If you continue, these authorizations
                   will be deleted as well. Is this what you want to do?"
