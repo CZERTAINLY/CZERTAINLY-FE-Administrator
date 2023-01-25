@@ -34,10 +34,11 @@ interface Props {
    groupAttributesCallbackAttributes?: AttributeDescriptorModel[];
    setGroupAttributesCallbackAttributes?: Function;
    attributes?: AttributeResponseModel[];
-   authorityUuid?: string;
    connectorUuid?: string;
    functionGroupCode?: FunctionGroupCode;
    kind?: string;
+   callbackResource?: Resource;
+   callbackParentUuid?: string;
 }
 
 
@@ -45,10 +46,11 @@ export default function AttributeEditor({
    id,
    attributeDescriptors,
    attributes = emptyAttributes,
-   authorityUuid,
    connectorUuid,
    functionGroupCode,
    kind,
+   callbackResource,
+   callbackParentUuid,
    groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
    setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
 }: Props) {
@@ -237,13 +239,12 @@ export default function AttributeEditor({
         (mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
             mappings.name = descriptor.name;
             mappings.uuid = descriptor.uuid;
-
-            dispatch(authorityUuid
+            dispatch(callbackParentUuid && callbackResource
                 ? connectorActions.callbackResource({
                     callbackId: formAttributeName,
                     callbackResource: {
-                        parentObjectUuid: authorityUuid,
-                        resource: Resource.RaProfiles,
+                        parentObjectUuid: callbackParentUuid,
+                        resource: callbackResource,
                         requestAttributeCallback: mappings
                     }
                 })
@@ -258,7 +259,7 @@ export default function AttributeEditor({
                     }
                 })
             );
-        }, [authorityUuid, connectorUuid, dispatch, functionGroupCode, kind]
+        }, [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind]
     );
 
    /**

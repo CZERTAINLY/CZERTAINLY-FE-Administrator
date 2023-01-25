@@ -17,6 +17,7 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
+    BaseAttributeDto,
     BulkOperationResponse,
     CertificateComplianceCheckDto,
     CertificateDto,
@@ -216,6 +217,18 @@ export class CertificateInventoryApi extends BaseAPI {
 
         return this.request<{ [key: string]: CertificateValidationDto; }>({
             url: '/v1/certificates/{uuid}/validate'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get CSR Generation Attributes
+     */
+    getCsrGenerationAttributes(): Observable<Array<BaseAttributeDto>>
+    getCsrGenerationAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    getCsrGenerationAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/certificates/csr/attributes',
             method: 'GET',
         }, opts?.responseOpts);
     };

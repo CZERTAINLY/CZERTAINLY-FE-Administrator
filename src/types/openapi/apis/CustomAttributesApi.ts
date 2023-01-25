@@ -18,12 +18,14 @@ import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AttributeDefinitionDto,
     AuthenticationServiceExceptionDto,
+    BaseAttributeContentDto,
     CustomAttribute,
     CustomAttributeCreateRequestDto,
     CustomAttributeDefinitionDetailDto,
     CustomAttributeUpdateRequestDto,
     ErrorMessageDto,
     Resource,
+    ResponseAttributeDto,
     UuidDto,
 } from '../models';
 
@@ -41,6 +43,12 @@ export interface BulkEnableCustomAttributesRequest {
 
 export interface CreateCustomAttributeRequest {
     customAttributeCreateRequestDto: CustomAttributeCreateRequestDto;
+}
+
+export interface DeleteAttributeContentForResourceRequest {
+    resourceName: Resource;
+    objectUuid: string;
+    attributeUuid: string;
 }
 
 export interface DeleteCustomAttributeRequest {
@@ -66,6 +74,13 @@ export interface GetCustomAttributeRequest {
 
 export interface GetResourceCustomAttributesRequest {
     resource: Resource;
+}
+
+export interface UpdateAttributeContentForResourceRequest {
+    resourceName: Resource;
+    objectUuid: string;
+    attributeUuid: string;
+    baseAttributeContentDto: Array<BaseAttributeContentDto>;
 }
 
 export interface UpdateResourcesRequest {
@@ -155,6 +170,22 @@ export class CustomAttributesApi extends BaseAPI {
             method: 'POST',
             headers,
             body: customAttributeCreateRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Delete Value of a Custom Attribute for a Resource
+     */
+    deleteAttributeContentForResource({ resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest): Observable<Array<ResponseAttributeDto>>
+    deleteAttributeContentForResource({ resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResponseAttributeDto>>>
+    deleteAttributeContentForResource({ resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest, opts?: OperationOpts): Observable<Array<ResponseAttributeDto> | AjaxResponse<Array<ResponseAttributeDto>>> {
+        throwIfNullOrUndefined(resourceName, 'resourceName', 'deleteAttributeContentForResource');
+        throwIfNullOrUndefined(objectUuid, 'objectUuid', 'deleteAttributeContentForResource');
+        throwIfNullOrUndefined(attributeUuid, 'attributeUuid', 'deleteAttributeContentForResource');
+
+        return this.request<Array<ResponseAttributeDto>>({
+            url: '/v1/attributes/custom/resources/{resourceName}/objects/{objectUuid}/{attributeUuid}'.replace('{resourceName}', encodeURI(resourceName)).replace('{objectUuid}', encodeURI(objectUuid)).replace('{attributeUuid}', encodeURI(attributeUuid)),
+            method: 'DELETE',
         }, opts?.responseOpts);
     };
 
@@ -270,6 +301,29 @@ export class CustomAttributesApi extends BaseAPI {
         return this.request<Array<AttributeDefinitionDto>>({
             url: '/v1/attributes/custom',
             method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Update Value of a Custom Attribute for a Resource
+     */
+    updateAttributeContentForResource({ resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest): Observable<Array<ResponseAttributeDto>>
+    updateAttributeContentForResource({ resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResponseAttributeDto>>>
+    updateAttributeContentForResource({ resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest, opts?: OperationOpts): Observable<Array<ResponseAttributeDto> | AjaxResponse<Array<ResponseAttributeDto>>> {
+        throwIfNullOrUndefined(resourceName, 'resourceName', 'updateAttributeContentForResource');
+        throwIfNullOrUndefined(objectUuid, 'objectUuid', 'updateAttributeContentForResource');
+        throwIfNullOrUndefined(attributeUuid, 'attributeUuid', 'updateAttributeContentForResource');
+        throwIfNullOrUndefined(baseAttributeContentDto, 'baseAttributeContentDto', 'updateAttributeContentForResource');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<Array<ResponseAttributeDto>>({
+            url: '/v1/attributes/custom/resources/{resourceName}/objects/{objectUuid}/{attributeUuid}'.replace('{resourceName}', encodeURI(resourceName)).replace('{objectUuid}', encodeURI(objectUuid)).replace('{attributeUuid}', encodeURI(attributeUuid)),
+            method: 'PATCH',
+            headers,
+            body: baseAttributeContentDto,
         }, opts?.responseOpts);
     };
 

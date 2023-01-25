@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    RequestAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface UploadCertificateRequestDto
@@ -22,4 +26,10 @@ export interface UploadCertificateRequestDto {
      * @memberof UploadCertificateRequestDto
      */
     certificate: string;
+    /**
+     * Custom Attributes for the Certificate
+     * @type {Array<RequestAttributeDto>}
+     * @memberof UploadCertificateRequestDto
+     */
+    customAttributes: Array<RequestAttributeDto>;
 }

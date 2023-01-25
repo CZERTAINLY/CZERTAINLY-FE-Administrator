@@ -16,6 +16,7 @@ import type {
 } from './';
 
 /**
+ * Key Group
  * @export
  * @interface GroupDto
  */

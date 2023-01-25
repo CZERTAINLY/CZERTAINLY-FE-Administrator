@@ -43,6 +43,11 @@ export interface MimeType {
      */
     wildcardSubtype?: boolean;
     /**
+     * @type {string}
+     * @memberof MimeType
+     */
+    subtypeSuffix?: string;
+    /**
      * @type {boolean}
      * @memberof MimeType
      */

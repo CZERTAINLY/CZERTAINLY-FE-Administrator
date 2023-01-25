@@ -21,6 +21,7 @@ import {
    StatisticsDashboardApi,
    UserManagementApi,
 } from "types/openapi";
+import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
 
@@ -45,6 +46,7 @@ export interface ApiClients {
    discoveries: DiscoveryManagementApi;
    complianceProfile: ComplianceProfileManagementApi;
    customAttributes: CustomAttributesApi;
+   tokenInstances: TokenInstanceControllerApi;
 }
 
 
@@ -69,4 +71,5 @@ export const backendClient: ApiClients = {
    discoveries: new DiscoveryManagementApi(configuration),
    complianceProfile: new ComplianceProfileManagementApi(configuration),
    customAttributes: new CustomAttributesApi(configuration),
+   tokenInstances: new TokenInstanceControllerApi(configuration),
 };

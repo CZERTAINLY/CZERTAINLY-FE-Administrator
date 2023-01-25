@@ -16,7 +16,7 @@ import type {
     AttributeContentType,
     AttributeType,
     BaseAttributeConstraint,
-    BaseAttributeContent,
+    BaseAttributeContentDto,
     CustomAttribute,
     CustomAttributeProperties,
     DataAttribute,

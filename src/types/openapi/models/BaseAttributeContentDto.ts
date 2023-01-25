@@ -27,8 +27,8 @@ import type {
 } from './';
 
 /**
- * @type BaseAttributeContent
- * Content of the Attribute
+ * @type BaseAttributeContentDto
+ * Base Attribute content definition
  * @export
  */
-export type BaseAttributeContent = BooleanAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;
+export type BaseAttributeContentDto = BooleanAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;

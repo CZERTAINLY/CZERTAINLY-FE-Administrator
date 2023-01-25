@@ -1,0 +1,227 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { Badge, Container } from "reactstrap";
+
+import { actions, selectors } from "ducks/tokens";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+import TokenStatusBadge from "components/TokenStatusBadge";
+
+
+function TokenList() {
+
+   const dispatch = useDispatch();
+   const navigate = useNavigate();
+
+   const checkedRows = useSelector(selectors.checkedRows);
+   const tokens = useSelector(selectors.tokens);
+
+   const isFetching = useSelector(selectors.isFetchingList);
+   const isDeleting = useSelector(selectors.isDeleting);
+   const isUpdating = useSelector(selectors.isUpdating);
+   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+
+   const [confirmDelete, setConfirmDelete] = useState(false);
+
+   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
+
+
+   useEffect(
+
+      () => {
+         dispatch(actions.setCheckedRows({ checkedRows: [] }));
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.listTokens());
+
+      },
+      [dispatch]
+
+   );
+
+
+   const onAddClick = useCallback(
+
+      () => {
+
+         navigate("./add");
+
+      },
+      [navigate]
+
+   );
+
+
+   const setCheckedRows = useCallback(
+
+      (rows: (string | number)[]) => {
+
+         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+
+      },
+      [dispatch]
+
+   );
+
+
+   const onDeleteConfirmed = useCallback(
+
+      () => {
+
+         setConfirmDelete(false);
+         dispatch(actions.clearDeleteErrorMessages());
+         dispatch(actions.bulkDeleteToken({ uuids: checkedRows }));
+
+      },
+      [dispatch, checkedRows]
+
+   );
+
+
+   const buttons: WidgetButtonProps[] = useMemo(
+
+      () => [
+         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
+         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+      ],
+      [checkedRows, onAddClick]
+
+   );
+
+
+   const title = useMemo(
+
+      () => (
+
+         <div>
+
+            <div className="fa-pull-right mt-n-xs">
+               <WidgetButtons buttons={buttons} />
+            </div>
+
+            <h5 className="mt-0">
+               <span className="fw-semi-bold">Token Store</span>
+            </h5>
+
+         </div>
+
+      ),
+      [buttons]
+
+   );
+
+
+   const tokenRowHeader: TableHeader[] = useMemo(
+
+      () => [
+         {
+            content: "Name",
+            sortable: true,
+            sort: "asc",
+            id: "tokenName",
+            width: "auto",
+         },
+         {
+            content: "Cryptography Provider",
+            align: "center",
+            sortable: true,
+            id: "tokenProvider",
+            width: "15%",
+         },
+         {
+            content: "Kind",
+            align: "center",
+            sortable: true,
+            id: "kind",
+            width: "15%",
+         },
+         {
+            content: "Status",
+            align: "center",
+            sortable: true,
+            id: "status",
+            width: "15%",
+         },
+         {
+            content: "Token Profiles",
+            align: "center",
+            sortable: true,
+            id: "tokenProfiles",
+            width: "15%",
+         },
+      ],
+      []
+
+   );
+
+
+   const tokenList: TableDataRow[] = useMemo(
+
+      () => tokens.map(
+
+         token => ({
+
+            id: token.uuid,
+
+            columns: [
+
+               <Link to={`./detail/${token.uuid}`}>{token.name}</Link>,
+
+               <Badge color="primary" >{token.connectorName}</Badge>,
+
+               <Badge color="secondary" >{token.kind}</Badge>,
+
+               <TokenStatusBadge status={token.status}/>,
+
+               <>{token.tokenProfiles}</>,
+
+            ]
+
+         })
+
+      ),
+      [tokens]
+
+   );
+
+
+   return (
+
+      <Container className="themed-container" fluid>
+
+         <Widget title={title} busy={isBusy}>
+
+            <br />
+
+            <CustomTable
+               headers={tokenRowHeader}
+               data={tokenList}
+               onCheckedRowsChanged={setCheckedRows}
+               hasCheckboxes={true}
+               hasPagination={true}
+               canSearch={true}
+            />
+
+         </Widget>
+
+
+         <Dialog
+            isOpen={confirmDelete}
+            caption={`Delete ${checkedRows.length > 1 ? "Tokens" : "a Token"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "Tokens" : "a Token"}. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+      </Container>
+
+   );
+}
+
+export default TokenList;

@@ -16,7 +16,7 @@ import type {
     AttributeContentType,
     AttributeType,
     BaseAttributeConstraint,
-    BaseAttributeContent,
+    BaseAttributeContentDto,
     DataAttributeProperties,
 } from './';
 
@@ -49,7 +49,7 @@ export interface DataAttribute {
      * @type {Array<BaseAttributeContent>}
      * @memberof DataAttribute
      */
-    content?: Array<BaseAttributeContent>;
+    content?: Array<BaseAttributeContentDto>;
     /**
      * @type {AttributeType}
      * @memberof DataAttribute

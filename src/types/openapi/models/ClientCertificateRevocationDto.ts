@@ -25,13 +25,19 @@ export interface ClientCertificateRevocationDto {
      * @type {string}
      * @memberof ClientCertificateRevocationDto
      */
-    reason: ClientCertificateRevocationDtoReasonEnum;
+    reason?: ClientCertificateRevocationDtoReasonEnum;
     /**
      * List of Attributes to revoke Certificate
      * @type {Array<RequestAttributeDto>}
      * @memberof ClientCertificateRevocationDto
      */
     attributes: Array<RequestAttributeDto>;
+    /**
+     * Destroy Key upon successful revocation
+     * @type {boolean}
+     * @memberof ClientCertificateRevocationDto
+     */
+    destroyKey?: boolean;
 }
 
 /**

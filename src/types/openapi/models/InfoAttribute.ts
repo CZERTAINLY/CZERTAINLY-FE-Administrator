@@ -14,7 +14,7 @@
 import type {
     AttributeContentType,
     AttributeType,
-    BaseAttributeContent,
+    BaseAttributeContentDto,
     InfoAttributeProperties,
 } from './';
 
@@ -44,10 +44,10 @@ export interface InfoAttribute {
     description?: string;
     /**
      * Content of the Attribute
-     * @type {Array<BaseAttributeContent>}
+     * @type {Array<BaseAttributeContentDto>}
      * @memberof InfoAttribute
      */
-    content: Array<BaseAttributeContent>;
+    content: Array<BaseAttributeContentDto>;
     /**
      * @type {AttributeType}
      * @memberof InfoAttribute

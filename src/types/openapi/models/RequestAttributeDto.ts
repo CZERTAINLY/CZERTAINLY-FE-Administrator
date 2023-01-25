@@ -12,7 +12,7 @@
  */
 
 import type {
-    BaseAttributeContent,
+    BaseAttributeContentDto,
 } from './';
 
 /**
@@ -35,8 +35,8 @@ export interface RequestAttributeDto {
     name: string;
     /**
      * Content of the Attribute
-     * @type {Array<BaseAttributeContent>}
+     * @type {Array<BaseAttributeContentDto>}
      * @memberof RequestAttributeDto
      */
-    content: Array<BaseAttributeContent>;
+    content: Array<BaseAttributeContentDto>;
 }
