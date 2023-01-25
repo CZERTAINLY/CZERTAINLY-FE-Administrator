@@ -27,7 +27,7 @@ export function transformTokenDetailResponseDtoToModel(tokenResponseDto: TokenIn
       attributes: tokenResponseDto.attributes.map(transformAttributeResponseDtoToModel),
       customAttributes: tokenResponseDto.customAttributes?.map(transformAttributeResponseDtoToModel),
       metadata: tokenResponseDto.metadata?.map(transformMetadataDtoToModel),
-      status: transformTokenInstanceStatusModelToDto(tokenResponseDto.status)
+      status: transformTokenInstanceStatusDtoToModel(tokenResponseDto.status)
    }
 
 }
@@ -40,15 +40,15 @@ export function transformTokenRequestModelToDto(token: TokenRequestModel): Token
    }
 }
 
-export function transformTokenInstanceStatusModelToDto(status: TokenInstanceStatusResponseModel): TokenInstanceStatusDetailDto {
+export function transformTokenInstanceStatusDtoToModel(status: TokenInstanceStatusDetailDto):  TokenInstanceStatusResponseModel{
    return {
       ...status,
-      components: status.components ? transformTokenInstanceStatusComponentModelToDto(status.components) : undefined
+      components: status.components ? transformTokenInstanceStatusComponentDtoToModel(status.components) : undefined
    }
 }
 
 
-export function transformTokenInstanceStatusComponentModelToDto(components: TokenInstanceStatusComponentResponseModel): TokenInstanceStatusComponentResponseDto {
+export function transformTokenInstanceStatusComponentDtoToModel(components: TokenInstanceStatusComponentResponseDto): TokenInstanceStatusComponentResponseModel {
    return {
       ...components,
    }

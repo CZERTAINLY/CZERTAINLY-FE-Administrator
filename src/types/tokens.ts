@@ -2,7 +2,6 @@ import {
     TokenInstanceDetailDto,
     TokenInstanceDto, 
     TokenInstanceRequestDto, 
-    TokenInstanceStatus, 
     TokenInstanceStatusComponent, 
     TokenInstanceStatusDetailDto
 } from "./openapi";
@@ -25,4 +24,4 @@ export type TokenInstanceStatusComponentResponseDto = { [key: string]: TokenInst
 export type TokenInstanceStatusComponentResponseModel = TokenInstanceStatusComponentResponseDto;
 
 export type TokenDetailResponseDto = TokenInstanceDetailDto;
-export type TokenDetailResponseModel = Omit<TokenDetailResponseDto, "attributes | customAttributes | status | metadata"> & { attributes: Array<AttributeResponseModel>, customAttributes?: Array<AttributeResponseModel>, status?: TokenInstanceStatusResponseModel, metadata?: Array<MetadataModel> };
+export type TokenDetailResponseModel = Omit<TokenDetailResponseDto, "attributes | customAttributes | metadata"> & { attributes: Array<AttributeResponseModel>, customAttributes?: Array<AttributeResponseModel>, metadata?: Array<MetadataModel> };
