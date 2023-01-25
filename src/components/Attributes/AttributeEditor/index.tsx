@@ -109,7 +109,11 @@ export default function AttributeEditor({
                return undefined;
             }
 
-            currentObject = currentObject[pathPart];
+            if (Array.isArray(currentObject)) {
+                currentObject = currentObject[0][pathPart];
+            } else {
+                currentObject = currentObject[pathPart];
+            }
          }
 
          return currentObject;
@@ -440,7 +444,7 @@ export default function AttributeEditor({
 
          // get changed attributes and their current values
          for (const key in formState.values) {
-            if (key.startsWith("__attributes__")) {
+            if (key.startsWith(`__attributes__${id}__`)) {
                for (const attrKey in formState.values[key]) {
                   if (previousFormValues[key] === undefined || previousFormValues[key][attrKey] === undefined || previousFormValues[key][attrKey] !== formState.values[key][attrKey]) {
                      changedAttributes[attrKey] = {
@@ -477,9 +481,8 @@ export default function AttributeEditor({
 
                          if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`
-                             executeCallback(mappings, descriptor, formAttributeName);
-
                              form.mutators.setAttribute(formAttributeName, undefined);
+                             executeCallback(mappings, descriptor, formAttributeName);
                          }
                       }
                    }
