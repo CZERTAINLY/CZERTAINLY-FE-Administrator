@@ -1,8 +1,8 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { TokenActivationRequestModel, TokenDetailResponseModel, TokenRequestModel, TokenResponseModel } from "types/tokens";
-import { AttributeDescriptorModel } from "types/attributes";
+import { TokenDetailResponseModel, TokenRequestModel, TokenResponseModel } from "types/tokens";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 import { TokenInstanceStatus } from "types/openapi";
 
@@ -307,7 +307,7 @@ export const slice = createSlice({
 
       },
 
-      activateToken: (state, action: PayloadAction<{ uuid: string, request: TokenActivationRequestModel }>) => {
+      activateToken: (state, action: PayloadAction<{ uuid: string, request: Array<AttributeRequestModel> }>) => {
 
          state.isActivating = true;
 
