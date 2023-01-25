@@ -3,10 +3,7 @@ import {
    TokenDetailResponseModel,
    TokenRequestDto,
    TokenRequestModel,
-   TokenResponseDto,
-   TokenResponseModel, 
-   TokenUpdateRequestDto, 
-   TokenUpdateRequestModel
+   TokenResponseModel
 } from "types/tokens";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
@@ -23,22 +20,13 @@ export function transformTokenDetailResponseDtoToModel(tokenResponseDto: TokenIn
 
    return {
       ...tokenResponseDto,
-      attributes: tokenResponseDto.attributes ?? [],
+      attributes: tokenResponseDto.attributes.map(transformAttributeResponseDtoToModel),
       customAttributes: tokenResponseDto.customAttributes?.map(transformAttributeResponseDtoToModel)
    }
 
 }
 
 export function transformTokenRequestModelToDto(token: TokenRequestModel): TokenRequestDto {
-   return {
-      ...token,
-      attributes: token.attributes.map(transformAttributeRequestModelToDto),
-      customAttributes: token.customAttributes?.map(transformAttributeRequestModelToDto)
-   }
-}
-
-
-export function transformTokenUpdateRequestModelToDto(token: TokenUpdateRequestModel): TokenUpdateRequestDto {
    return {
       ...token,
       attributes: token.attributes.map(transformAttributeRequestModelToDto),

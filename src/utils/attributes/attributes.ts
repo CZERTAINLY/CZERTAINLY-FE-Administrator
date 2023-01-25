@@ -30,7 +30,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
          case AttributeContentType.Integer:
          case AttributeContentType.String:
          case AttributeContentType.Text:
-            return content?.data?.toString();
+            return content.data.toString();
          case AttributeContentType.Secret:
             return "*****";
       }

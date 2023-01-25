@@ -1,9 +1,9 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { TokenActivationRequestModel, TokenDetailResponseModel, TokenRequestModel, TokenResponseModel, TokenUpdateRequestModel } from "types/tokens";
+import { TokenActivationRequestModel, TokenDetailResponseModel, TokenRequestModel, TokenResponseModel } from "types/tokens";
 import { AttributeDescriptorModel } from "types/attributes";
-import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
+import { ConnectorResponseModel } from "types/connectors";
 import { TokenInstanceStatus } from "types/openapi";
 
 
@@ -263,7 +263,7 @@ export const slice = createSlice({
       },
 
 
-      updateToken: (state, action: PayloadAction<{ uuid: string, updateToken: TokenUpdateRequestModel }>) => {
+      updateToken: (state, action: PayloadAction<{ uuid: string, updateToken: TokenRequestModel }>) => {
 
          state.isUpdating = true;
 

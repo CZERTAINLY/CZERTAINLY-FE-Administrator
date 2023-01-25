@@ -34,7 +34,7 @@ export default function TokenDetail() {
 
    const isBusy = useMemo(
       () => isFetching || isDeleting || isActivating || isDeactivating || isReloading,
-      [isFetching, isDeleting]
+      [isFetching, isDeleting, isActivating, isDeactivating, isReloading]
    );
 
 
@@ -118,7 +118,7 @@ export default function TokenDetail() {
          { icon: "check", disabled: false, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
          { icon: "times", disabled: false, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
       ],
-      [onEditClick]
+      [onEditClick, onReload]
 
    );
 

@@ -1,4 +1,4 @@
-import { iif, of } from "rxjs";
+import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
@@ -11,7 +11,6 @@ import {
     transformTokenRequestModelToDto,
     transformTokenDetailResponseDtoToModel,
     transformTokenResponseDtoToModel,
-    transformTokenUpdateRequestModelToDto
 } from "./transform/tokens";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
@@ -265,7 +264,7 @@ const updateToken: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.tokenInstances.updateTokenInstance({
                  uuid: action.payload.uuid,
-                 tokenInstanceRequestDto: transformTokenUpdateRequestModelToDto(action.payload.updateToken),
+                 tokenInstanceRequestDto: transformTokenRequestModelToDto(action.payload.updateToken),
              },
          ).pipe(
 
