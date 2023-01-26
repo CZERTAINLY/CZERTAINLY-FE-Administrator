@@ -112,7 +112,11 @@ export default function AttributeEditor({
             }
 
             if (Array.isArray(currentObject)) {
-                currentObject = currentObject[0][pathPart];
+                if (currentObject.length > 0) {
+                    currentObject = currentObject[0][pathPart];
+                } else {
+                    return undefined;
+                }
             } else {
                 currentObject = currentObject[pathPart];
             }
@@ -215,7 +219,7 @@ export default function AttributeEditor({
                 mapping => {
 
                     let value = mapping.value || getCurrentFromMappingValue(mapping);
-                    if (typeof value === "object" && (value.hasOwnProperty("reference") || value.hasOwnProperty("data"))) value = value.reference ?? value.data;
+                    if (typeof value === "object" && value.hasOwnProperty("data")) value = value.data;
                     if (value === undefined) hasUndefinedMapping = true;
 
                     mapping.targets.forEach(
