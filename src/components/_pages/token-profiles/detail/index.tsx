@@ -40,6 +40,15 @@ export default function TokenProfileDetail() {
 
    const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
+   const KeyUsageMap = {
+      [KeyUsage.Sign]: "Signing",
+      [KeyUsage.Verify]: "Verifying",
+      [KeyUsage.Encrypt]: "Encrypting",
+      [KeyUsage.Decrypt]: "Decrypting",
+      [KeyUsage.Wrap]: "Wrapping Key",
+      [KeyUsage.Unwrap]: "Unwrapping Key",
+   }
+
 
    const isBusy = useMemo(
       () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage,
@@ -119,6 +128,12 @@ export default function TokenProfileDetail() {
       { value: KeyUsage.Unwrap, label: "Unwrapping Key" },
    ]
 
+   const existingUsages = () => {
+      if (!tokenProfile) return [];
+      return tokenProfile?.usages.map((usage) => {
+         return { value: usage, label: KeyUsageMap[usage] }
+      })
+   }
 
 
    const buttons: WidgetButtonProps[] = useMemo(
@@ -208,7 +223,7 @@ export default function TokenProfileDetail() {
          },
          {
             id: "Key Usages",
-            columns: ["Key Usages", tokenProfile.usages.map((usage) => <Badge key={usage} color="secondary" className="mr-xs">{usage}</Badge>)]
+            columns: ["Key Usages", tokenProfile.usages.map((usage) => <Badge key={usage} color="secondary" className="mr-xs">{KeyUsageMap[usage]}</Badge>)]
          }
 
       ],
@@ -228,6 +243,7 @@ export default function TokenProfileDetail() {
                               onChange={(e) => {
                                  setKeyUsages(e.map((item) => item.value));
                               }}
+                              defaultValue={existingUsages()}
                               isClearable={true}
                            />
             </div>
