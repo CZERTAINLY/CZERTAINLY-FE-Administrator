@@ -321,6 +321,12 @@ export default function CertificateList({
             width: "15%"
          },
          {
+            content: "Signature Algorithm",
+            //sortable: true,
+            id: "signatureAlgorithm",
+            width: "15%"
+         },
+         {
             content: "Public Key Algorithm",
             //sortable: true,
             id: "publicKeyAlgorithm",
@@ -374,6 +380,8 @@ export default function CertificateList({
                   certificate.serialNumber,
 
                   certificate.signatureAlgorithm,
+
+                  certificate.publicKeyAlgorithm,
 
                   certificate.issuerCommonName,
 

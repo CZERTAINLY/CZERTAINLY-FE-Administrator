@@ -153,14 +153,14 @@ const getTokenProfileAttributesDescriptors: AppEpic = (action$, state, deps) => 
    return action$.pipe(
 
       filter(
-         slice.actions.getTokensAttributesDescriptors.match
+         slice.actions.getTokenProfileAttributesDescriptors.match
       ),
       switchMap(
 
          action => deps.apiClients.tokenInstances.listTokenProfileAttributes({ uuid: action.payload.tokenUuid }).pipe(
 
             map(
-               descriptors => slice.actions.getTokensAttributesDescriptorsSuccess({
+               descriptors => slice.actions.getTokenProfileAttributesDescriptorsSuccess({
                   tokenUuid: action.payload.tokenUuid,
                   attributesDescriptors: descriptors.map(transformAttributeDescriptorDtoToModel)
                })
@@ -168,7 +168,7 @@ const getTokenProfileAttributesDescriptors: AppEpic = (action$, state, deps) => 
 
             catchError(
                err => of(
-                  slice.actions.getTokensAttributesDescriptorsFailure({ error: extractError(err, "Failed to get Token Profile Attribute Descriptor list") }),
+                  slice.actions.getTokenProfileAttributesDescriptorsFailure({ error: extractError(err, "Failed to get Token Profile Attribute Descriptor list") }),
                   appRedirectActions.fetchError({ error: err, message: "Failed to get Token Profile Attribute Descriptor list" })
                )
             )

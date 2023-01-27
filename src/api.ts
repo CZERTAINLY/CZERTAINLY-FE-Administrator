@@ -19,6 +19,7 @@ import {
    RAProfileManagementApi,
    RoleManagementApi,
    StatisticsDashboardApi,
+   TokenProfileManagementApi,
    UserManagementApi,
 } from "types/openapi";
 import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
@@ -47,6 +48,7 @@ export interface ApiClients {
    complianceProfile: ComplianceProfileManagementApi;
    customAttributes: CustomAttributesApi;
    tokenInstances: TokenInstanceControllerApi;
+   tokenProfiles: TokenProfileManagementApi;
 }
 
 
@@ -72,4 +74,5 @@ export const backendClient: ApiClients = {
    complianceProfile: new ComplianceProfileManagementApi(configuration),
    customAttributes: new CustomAttributesApi(configuration),
    tokenInstances: new TokenInstanceControllerApi(configuration),
+   tokenProfiles: new TokenProfileManagementApi(configuration),
 };

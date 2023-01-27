@@ -22,7 +22,7 @@ export type State = {
 
    isFetchingTokenProviders: boolean;
    isFetchingTokenProviderAttributeDescriptors: boolean;
-   isFetchingTokensAttributesDescriptors: boolean;
+   isFetchingTokenProfileAttributesDescriptors: boolean;
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -52,7 +52,7 @@ export const initialState: State = {
 
    isFetchingTokenProviders: false,
    isFetchingTokenProviderAttributeDescriptors: false,
-   isFetchingTokensAttributesDescriptors: false,
+   isFetchingTokenProfileAttributesDescriptors: false,
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -120,7 +120,7 @@ export const slice = createSlice({
       },
 
 
-      clearTokensAttributesDescriptors: (state, action: PayloadAction<void>) => {
+      clearTokenProfileAttributesDescriptors: (state, action: PayloadAction<void>) => {
 
          state.tokenProfileAttributeDescriptors = [];
 
@@ -173,24 +173,24 @@ export const slice = createSlice({
       },
 
 
-      getTokensAttributesDescriptors: (state, action: PayloadAction<{ tokenUuid: string }>) => {
+      getTokenProfileAttributesDescriptors: (state, action: PayloadAction<{ tokenUuid: string }>) => {
 
-         state.isFetchingTokensAttributesDescriptors = true;
+         state.isFetchingTokenProfileAttributesDescriptors = true;
 
       },
 
 
-      getTokensAttributesDescriptorsSuccess: (state, action: PayloadAction<{ tokenUuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
+      getTokenProfileAttributesDescriptorsSuccess: (state, action: PayloadAction<{ tokenUuid: string, attributesDescriptors: AttributeDescriptorModel[] }>) => {
 
-         state.isFetchingTokensAttributesDescriptors = false;
+         state.isFetchingTokenProfileAttributesDescriptors = false;
          state.tokenProfileAttributeDescriptors = action.payload.attributesDescriptors;
 
       },
 
 
-      getTokensAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getTokenProfileAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isFetchingTokensAttributesDescriptors = false;
+         state.isFetchingTokenProfileAttributesDescriptors = false;
 
       },
 
@@ -461,7 +461,7 @@ const tokenProfileAttributeDescriptors = createSelector(state, state => state.to
 
 const isFetchingTokenProviders = createSelector(state, state => state.isFetchingTokenProviders);
 const isFetchingTokenProviderAttributeDescriptors = createSelector(state, state => state.isFetchingTokenProviderAttributeDescriptors);
-const isFetchingTokensAttributesDescriptors = createSelector(state, state => state.isFetchingTokensAttributesDescriptors);
+const isFetchingTokenProfileAttributesDescriptors = createSelector(state, state => state.isFetchingTokenProfileAttributesDescriptors);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
@@ -493,7 +493,7 @@ export const selectors = {
 
    isFetchingTokenProviders,
    isFetchingTokenProviderAttributeDescriptors,
-   isFetchingTokensAttributesDescriptors,
+   isFetchingTokenProfileAttributesDescriptors,
 
    isFetchingList,
    isFetchingDetail,
