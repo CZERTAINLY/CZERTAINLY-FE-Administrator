@@ -51,10 +51,10 @@ export interface MimeType {
      * @type {boolean}
      * @memberof MimeType
      */
-    wildcardSubtype?: boolean;
+    wildcardType?: boolean;
     /**
      * @type {boolean}
      * @memberof MimeType
      */
-    wildcardType?: boolean;
+    wildcardSubtype?: boolean;
 }

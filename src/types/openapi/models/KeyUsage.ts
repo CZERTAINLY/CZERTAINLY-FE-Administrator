@@ -12,7 +12,7 @@
  */
 
 /**
- * Usages for the Keys assoiated to the profile
+ * Usages for the Key
  * @export
  * @enum {string}
  */
