@@ -2,7 +2,34 @@ import React from "react";
 import { Button, ButtonProps } from "reactstrap";
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock" | "refresh";
+   icon: "plus" | 
+         "trash" | 
+         "times" | 
+         "check" | 
+         "plug" | 
+         "pencil" | 
+         "cross-circle" | 
+         "upload" | 
+         "download" | 
+         "group" | 
+         "user" | 
+         "cubes" | 
+         "retweet" | 
+         "minus-square" | 
+         "info" | 
+         "gavel" | 
+         "push" | 
+         "sync" | 
+         "minus" | 
+         "lock" | 
+         "refresh" |
+         "handshake" |
+         "bomb" |
+         "search" |
+         "random" |
+         "sign" | 
+         "verify" |
+         "key";
    id?: string;
    tooltip?: any;
    disabled: boolean;
@@ -20,7 +47,7 @@ const colors = {
    "plus": "auto",
    "trash": "red",
    "times": "red",
-   "check": "auto",
+   "check": "green",
    "plug": "auto",
    "pencil": "auto",
    "cross-circle": "black",
@@ -38,6 +65,13 @@ const colors = {
    "gavel": "auto",
    "lock": "auto",
    "refresh": "auto",
+   "handshake": "red",
+   "bomb": "red",
+   "search": "auto",
+   "random": "auto",
+   "sign": "auto",
+   "verify": "green",
+   "key": "auto"
 };
 
 
@@ -63,6 +97,13 @@ const classNames = {
    "gavel": "fa fa-gavel",
    "lock": "fa fa-lock",
    "refresh": "fa fa-refresh",
+   "handshake": "fa fa-handshake-o",
+   "bomb": "fa fa-bomb",
+   "search": "fa fa-search",
+   "random": "fa fa-random",
+   "sign": "fas fa-file-signature",
+   "verify": "fa fa-check-square",
+   "key": "fa fa-key"
 }
 
 

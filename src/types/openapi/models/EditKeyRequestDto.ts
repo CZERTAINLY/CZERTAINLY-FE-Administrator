@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    RequestAttributeDto,
+} from './';
+
 /**
  * @export
  * @interface EditKeyRequestDto
@@ -46,4 +50,10 @@ export interface EditKeyRequestDto {
      * @memberof EditKeyRequestDto
      */
     groupUuid?: string;
+    /**
+     * List of Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof EditKeyRequestDto
+     */
+    customAttributes?: Array<RequestAttributeDto>;
 }

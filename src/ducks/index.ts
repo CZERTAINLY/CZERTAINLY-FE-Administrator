@@ -25,6 +25,8 @@ import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "
 import { initialState as initialCustomAttributesState, slice as customAttributesSlice } from "./customAttributes";
 import { initialState as initialTokenAttributesState, slice as tokenSlice } from "./tokens";
 import { initialState as initialTokenProfileAttributesState, slice as tokenProfileSlice } from "./token-profiles";
+import { initialState as initialCryptographicKeyAttributesState, slice as cryptographicKeySlice } from "./cryptographic-keys";
+import { initialState as initialCryptographicOperationsAttributesState, slice as cryptographicOperationsSlice } from "./cryptographic-operations";
 
 import authEpics from "./auth-epics";
 import appRedirectEpics from "./app-redirect-epics";
@@ -48,6 +50,8 @@ import auditLogsEpics from "./auditLogs-epics";
 import customAttributesEpics from "./customAttributes-epics";
 import tokenEpics from "./tokens-epics";
 import tokenProfileEpics from "./token-profiles-epics";
+import cryptographicKeyEpics from "./cryptographic-keys-epics";
+import cryptographicOperationsEpics from "./cryptographic-operations-epics";
 
 
 export interface EpicDependencies {
@@ -84,6 +88,8 @@ export const initialState = {
    [customAttributesSlice.name]: initialCustomAttributesState,
    [tokenSlice.name]: initialTokenAttributesState,
    [tokenProfileSlice.name]: initialTokenProfileAttributesState,
+   [cryptographicKeySlice.name]: initialCryptographicKeyAttributesState,
+   [cryptographicOperationsSlice.name]: initialCryptographicOperationsAttributesState,
 };
 
 
@@ -110,6 +116,8 @@ export const reducers = combineReducers<typeof initialState, any>({
    [customAttributesSlice.name]: customAttributesSlice.reducer,
    [tokenSlice.name]: tokenSlice.reducer,
    [tokenProfileSlice.name]: tokenProfileSlice.reducer,
+   [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,
+   [cryptographicOperationsSlice.name]: cryptographicOperationsSlice.reducer,
 });
 
 
@@ -136,4 +144,6 @@ export const epics = combineEpics(
    ...customAttributesEpics,
    ...tokenEpics,
    ...tokenProfileEpics,
+   ...cryptographicKeyEpics,
+   ...cryptographicOperationsEpics,
 );

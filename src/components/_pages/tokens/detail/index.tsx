@@ -119,7 +119,7 @@ export default function TokenDetail() {
          { icon: "check", disabled: token?.status.status !== TokenInstanceStatus.Deactivated, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
          { icon: "times", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
       ],
-      [onEditClick, onReload]
+      [onEditClick, onReload, token?.status.status ]
 
    );
 

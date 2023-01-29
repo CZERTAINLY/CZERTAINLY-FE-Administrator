@@ -33,26 +33,27 @@ export interface RaProfileAcmeDetailResponseDto {
      */
     name: string;
     /**
+     * ACME availability flag - true = yes; false = no
+     * @type {boolean}
+     * @memberof RaProfileAcmeDetailResponseDto
+     */
+    acmeAvailable: boolean;
+    /**
      * ACME Directory URL
      * @type {string}
      * @memberof RaProfileAcmeDetailResponseDto
      */
-    directoryUrl: string;
+    directoryUrl?: string;
     /**
      * List of Attributes to issue Certificate
      * @type {Array<ResponseAttributeDto>}
      * @memberof RaProfileAcmeDetailResponseDto
      */
-    issueCertificateAttributes: Array<ResponseAttributeDto>;
+    issueCertificateAttributes?: Array<ResponseAttributeDto>;
     /**
      * List of Attributes to revoke Certificate
      * @type {Array<ResponseAttributeDto>}
      * @memberof RaProfileAcmeDetailResponseDto
      */
-    revokeCertificateAttributes: Array<ResponseAttributeDto>;
-    /**
-     * @type {boolean}
-     * @memberof RaProfileAcmeDetailResponseDto
-     */
-    acmeAvailable?: boolean;
+    revokeCertificateAttributes?: Array<ResponseAttributeDto>;
 }

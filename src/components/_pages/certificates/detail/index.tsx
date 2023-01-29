@@ -909,7 +909,7 @@ export default function CertificateDetail() {
       () => !certificate ? [] : [
          {
             id: "uuid",
-            columns: ["UUID", certificate.uuid],
+            columns: ["UUID", certificate.uuid, ""],
          },
          {
             id: "owner",

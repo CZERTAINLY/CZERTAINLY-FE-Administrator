@@ -1,6 +1,5 @@
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
 import {
    TokenProfileAddRequestModel,
    TokenProfileDetailResponseModel,

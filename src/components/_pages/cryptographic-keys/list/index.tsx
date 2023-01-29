@@ -3,37 +3,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 
-import { actions, selectors } from "ducks/token-profiles";
+import { actions, selectors } from "ducks/cryptographic-keys";
 
-import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import Dialog from "components/Dialog";
-import TokenStatusBadge from "components/TokenStatusBadge";
 import { KeyUsage } from "types/openapi";
 import Select from "react-select";
+import { dateFormatter } from "utils/dateUtil";
 
-function TokenProfileList() {
+function CryptographicKeyList() {
 
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
    const checkedRows = useSelector(selectors.checkedRows);
-   const tokenProfiles = useSelector(selectors.tokenProfiles);
+   const cryptographicKeys = useSelector(selectors.cryptographicKeys);
 
    const isFetching = useSelector(selectors.isFetchingList);
-   const isDeleting = useSelector(selectors.isDeleting);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
-   const isUpdating = useSelector(selectors.isUpdating);
-   const isEnabling = useSelector(selectors.isEnabling);
    const isBulkEnabling = useSelector(selectors.isBulkEnabling);
    const isBulkDisabling = useSelector(selectors.isBulkDisabling);
    const isBulkUpdatingKeyUsage = useSelector(selectors.isBulkUpdatingKeyUsage);
+   const isBulkCompromising = useSelector(selectors.isBulkCompromising);
+   const isBulkDestroying = useSelector(selectors.isBulkDestroying);
 
-   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isBulkDisabling || isBulkUpdatingKeyUsage;
+
+   const isBusy = isFetching || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkUpdatingKeyUsage || isBulkCompromising || isBulkDestroying;
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+
+   const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
+
+   const [confirmDestroy, setConfirmDestroy] = useState<boolean>(false);
 
    const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
 
@@ -43,7 +46,8 @@ function TokenProfileList() {
    useEffect(() => {
 
       dispatch(actions.setCheckedRows({ checkedRows: [] }));
-      dispatch(actions.listTokenProfiles());
+      dispatch(actions.clearDeleteErrorMessages())
+      dispatch(actions.listCryptographicKeys());
 
    }, [dispatch]);
 
@@ -61,7 +65,7 @@ function TokenProfileList() {
    const onEnableClick = useCallback(
 
       () => {
-         dispatch(actions.bulkEnableTokenProfiles({ uuids: checkedRows }));
+         dispatch(actions.bulkEnableCryptographicKeys({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
 
@@ -71,7 +75,7 @@ function TokenProfileList() {
    const onDisableClick = useCallback(
 
       () => {
-         dispatch(actions.bulkDisableTokenProfiles({ uuids: checkedRows }));
+         dispatch(actions.bulkDisableCryptographicKeys({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
 
@@ -81,7 +85,7 @@ function TokenProfileList() {
    const onDeleteConfirmed = useCallback(
 
       () => {
-         dispatch(actions.bulkDeleteTokenProfiles({ uuids: checkedRows }));
+         dispatch(actions.bulkDeleteCryptographicKeys({ uuids: checkedRows }));
          setConfirmDelete(false);
       },
       [checkedRows, dispatch]
@@ -96,6 +100,26 @@ function TokenProfileList() {
          setKeyUsageUpdate(false);
       },
       [checkedRows, dispatch, keyUsages]
+
+   );
+
+   const onCompromise = useCallback(
+
+      () => {
+         dispatch(actions.bulkCompromiseCryptographicKeys({ uuids: checkedRows }));
+         setConfirmCompromise(false);
+      },
+      [checkedRows, dispatch]
+
+   );
+
+   const onDestroy = useCallback(
+
+      () => {
+         dispatch(actions.bulkDestroyCryptographicKeys({ uuids: checkedRows }));
+         setConfirmCompromise(false);
+      },
+      [checkedRows, dispatch]
 
    );
 
@@ -117,6 +141,8 @@ function TokenProfileList() {
          { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } },
          { icon: "key", disabled: checkedRows.length === 0, tooltip: "Update Key Usage", onClick: () => { setKeyUsageUpdate(true) } },
+         { icon: "handshake", disabled: checkedRows.length === 0, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
+         { icon: "bomb", disabled: checkedRows.length === 0, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
       ],
       [checkedRows, onAddClick, onEnableClick, onDisableClick, setKeyUsageUpdate]
    );
@@ -140,7 +166,7 @@ function TokenProfileList() {
             </div>
 
             <h5 className="mt-0">
-               List of <span className="fw-semi-bold">Token Profiles</span>
+               List of <span className="fw-semi-bold">Keys</span>
             </h5>
 
          </div>
@@ -169,7 +195,7 @@ function TokenProfileList() {
 
 
 
-   const tokenProfilesTableHeaders: TableHeader[] = useMemo(
+   const cryptographicKeysTableHeaders: TableHeader[] = useMemo(
 
       () => [
          {
@@ -183,27 +209,28 @@ function TokenProfileList() {
             id: "description",
             content: "Description",
             sortable: true,
+            width: "15%",
          },
          {
-            id: "token",
+            id: "creationTime",
             align: "center",
-            content: "Token",
+            content: "Creation Time",
             sortable: true,
             width: "15%",
          },
          {
-            id: "tokenStatus",
+            id: "tokenProfile",
             align: "center",
-            content: "Token Status",
+            content: "Token Profile",
             sortable: true,
             width: "15%",
          },
          {
-            id: "status",
+            id: "tokenInstance",
             align: "center",
-            content: "Status",
+            content: "Token Instance",
             sortable: true,
-            width: "7%",
+            width: "15%",
          },
       ],
       []
@@ -212,29 +239,29 @@ function TokenProfileList() {
 
    const profilesTableData: TableDataRow[] = useMemo(
 
-      () => tokenProfiles.map(
+      () => cryptographicKeys.map(
 
-         tokenProfile => ({
+         cryptographicKey => ({
 
-            id: tokenProfile.uuid,
+            id: cryptographicKey.uuid,
 
             columns: [
 
-               <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${tokenProfile.tokenInstanceUuid || "unknown"}/${tokenProfile.uuid}`}>{tokenProfile.name}</Link></span>,
+               <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/${cryptographicKey.uuid}`}>{cryptographicKey.name}</Link></span>,
 
-               <span style={{ whiteSpace: "nowrap" }}>{tokenProfile.description || ""}</span>,
+               <span style={{ whiteSpace: "nowrap" }}>{cryptographicKey.description || ""}</span>,
 
-               <Badge color="info">{tokenProfile.tokenInstanceName}</Badge>,
+               <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKey.creationTime) || ""}</span>,
 
-               <TokenStatusBadge status={tokenProfile.tokenInstanceStatus}/>,
+               <Badge color="secondary">{cryptographicKey.tokenProfileName}</Badge>,
 
-               <StatusBadge enabled={tokenProfile.enabled} />
+               <Badge color="primary">{cryptographicKey.tokenInstanceName}</Badge>,
 
             ]
 
          })
       ),
-      [tokenProfiles]
+      [cryptographicKeys]
 
    )
 
@@ -247,7 +274,7 @@ function TokenProfileList() {
 
             <br />
             <CustomTable
-               headers={tokenProfilesTableHeaders}
+               headers={cryptographicKeysTableHeaders}
                data={profilesTableData}
                onCheckedRowsChanged={setCheckedRows}
                canSearch={true}
@@ -259,11 +286,33 @@ function TokenProfileList() {
 
          <Dialog
             isOpen={confirmDelete}
-            caption={`Delete Token ${checkedRows.length > 1 ? "Profiles" : "Profile"}`}
-            body={`You are about to delete ${checkedRows.length > 1 ? "a Token Profile" : "RA profiles"}. Is this what you want to do?`}
+            caption={`Delete ${checkedRows.length > 1 ? "Keys" : "Key"}`}
+            body={`You are about to delete ${checkedRows.length > 1 ? "a Key" : "Keys"}. Is this what you want to do?`}
             toggle={() => setConfirmDelete(false)}
             buttons={[
-               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, Delete" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={confirmCompromise}
+            caption={`${checkedRows.length > 1 ? "Keys" : "Key"} Compromised?`}
+            body={`If the ${checkedRows.length > 1 ? "a Key" : "Keys"}. are compromised, proceed to make the platform stop using it for any operations.`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onCompromise, body: "Yes" },
+               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={confirmDestroy}
+            caption={`Destroy ${checkedRows.length > 1 ? "Keys" : "Key"}`}
+            body={`You are about to destroy ${checkedRows.length > 1 ? "a Key" : "Keys"}. Is this what you want to do?`}
+            toggle={() => setConfirmDelete(false)}
+            buttons={[
+               { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
             ]}
          />
@@ -283,4 +332,4 @@ function TokenProfileList() {
    );
 }
 
-export default TokenProfileList;
+export default CryptographicKeyList;

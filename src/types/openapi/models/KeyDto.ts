@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CryptographicAlgorithm,
-} from './';
-
 /**
  * @export
  * @interface KeyDto
@@ -44,11 +40,6 @@ export interface KeyDto {
      * @memberof KeyDto
      */
     creationTime: string;
-    /**
-     * @type {CryptographicAlgorithm}
-     * @memberof KeyDto
-     */
-    cryptographicAlgorithm: CryptographicAlgorithm;
     /**
      * UUID of the Token Profile
      * @type {string}

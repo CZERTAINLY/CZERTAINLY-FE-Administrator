@@ -15,7 +15,7 @@ import Select from "react-select";
 
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { TokenProfileDetailResponseModel, TokenProfileResponseModel } from "types/token-profiles";
+import { TokenProfileDetailResponseModel } from "types/token-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";

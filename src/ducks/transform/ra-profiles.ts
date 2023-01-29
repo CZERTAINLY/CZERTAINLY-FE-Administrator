@@ -32,8 +32,8 @@ export function transformRaProfileActivateAcmeRequestModelToDto(raAcmeRequest: R
 export function transformRaProfileAcmeDetailResponseDtoToModel(raAcmeResponse: RaProfileAcmeDetailResponseDto): RaProfileAcmeDetailResponseModel {
    return {
       ...raAcmeResponse,
-      issueCertificateAttributes: raAcmeResponse.issueCertificateAttributes.map(transformAttributeResponseDtoToModel),
-      revokeCertificateAttributes: raAcmeResponse.revokeCertificateAttributes.map(transformAttributeResponseDtoToModel)
+      issueCertificateAttributes: raAcmeResponse.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+      revokeCertificateAttributes: raAcmeResponse.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel)
    }
 }
 

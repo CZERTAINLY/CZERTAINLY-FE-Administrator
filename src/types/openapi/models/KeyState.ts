@@ -12,14 +12,16 @@
  */
 
 /**
+ * Key State
  * @export
- * @interface RandomDataResponseDto
+ * @enum {string}
  */
-export interface RandomDataResponseDto {
-    /**
-     * Base64 encoded random data
-     * @type {string}
-     * @memberof RandomDataResponseDto
-     */
-    data: string;
+export enum KeyState {
+    PreActive = 'pre-active',
+    Active = 'active',
+    Deactivated = 'deactivated',
+    Compromised = 'compromised',
+    Destroyed = 'destroyed',
+    CompromisedDestroyed = 'compromisedDestroyed'
 }
+

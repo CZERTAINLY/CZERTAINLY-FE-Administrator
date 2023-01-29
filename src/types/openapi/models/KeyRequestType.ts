@@ -12,14 +12,12 @@
  */
 
 /**
+ * 
  * @export
- * @interface RandomDataResponseDto
+ * @enum {string}
  */
-export interface RandomDataResponseDto {
-    /**
-     * Base64 encoded random data
-     * @type {string}
-     * @memberof RandomDataResponseDto
-     */
-    data: string;
+export enum KeyRequestType {
+    Secret = 'secret',
+    KeyPair = 'keyPair'
 }
+

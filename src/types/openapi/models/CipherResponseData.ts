@@ -18,11 +18,11 @@
  */
 export interface CipherResponseData {
     /**
-     * Encrypted/decrypted data. In case operation failed, it should be null with provided details
-     * @type {Array<string>}
+     * Base64 encoded encrypted/decrypted data
+     * @type {string}
      * @memberof CipherResponseData
      */
-    data: Array<string>;
+    data: string;
     /**
      * Custom identifier of the data, that should be the same as in the request, if available
      * @type {string}

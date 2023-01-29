@@ -10,6 +10,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import TokenStatusBadge from "components/TokenStatusBadge";
+import TokenActivationDialogBody from "../TokenActivationDialogBody";
 
 
 function TokenList() {
@@ -26,6 +27,8 @@ function TokenList() {
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
 
    const [confirmDelete, setConfirmDelete] = useState(false);
+   const [confirmDeactivation, setConfirmDeactivation] = useState<boolean>(false);
+   const [activateToken, setActivateToken] = useState<boolean>(false);
 
    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
 
@@ -81,11 +84,29 @@ function TokenList() {
    );
 
 
+   const onDeactivationConfirmed = useCallback(
+
+      () => {
+
+         if (!checkedRows) return;
+         if (checkedRows.length !== 1) return;
+
+         dispatch(actions.deactivateToken({ uuid: checkedRows[0] }));
+         setConfirmDeactivation(false);
+
+      },
+      [checkedRows, dispatch]
+
+   );
+
+
    const buttons: WidgetButtonProps[] = useMemo(
 
       () => [
          { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
          { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
+         { icon: "check", disabled: checkedRows.length !== 1, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
+         { icon: "times", disabled: checkedRows.length !== 1, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
       ],
       [checkedRows, onAddClick]
 
@@ -217,6 +238,26 @@ function TokenList() {
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
             ]}
+         />
+
+         <Dialog
+            isOpen={confirmDeactivation}
+            caption="Deactivate Token"
+            body="You are about to deactivate Token. If you continue, objects
+                  related to the token not work. Is this what you want to do?"
+            toggle={() => setConfirmDeactivation(false)}
+            buttons={[
+               { color: "danger", onClick: onDeactivationConfirmed, body: "Deactivate" },
+               { color: "secondary", onClick: () => setConfirmDeactivation(false), body: "Cancel" },
+            ]}
+         />
+
+         <Dialog
+            isOpen={activateToken}
+            caption="Activate Token"
+            body={TokenActivationDialogBody({ visible: activateToken, onClose: () => setActivateToken(false), tokenUuid: checkedRows[0]})}
+            toggle={() => setActivateToken(false)}
+            buttons={[]}
          />
 
       </Container>

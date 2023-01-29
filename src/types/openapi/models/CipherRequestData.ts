@@ -18,11 +18,11 @@
  */
 export interface CipherRequestData {
     /**
-     * Encrypted/decrypted data
-     * @type {Array<string>}
+     * Base64 encoded encrypted/decrypted data
+     * @type {string}
      * @memberof CipherRequestData
      */
-    data: Array<string>;
+    data: string;
     /**
      * Custom identifier of the data, that should be the same as in the request, if available
      * @type {string}

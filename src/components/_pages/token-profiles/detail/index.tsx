@@ -40,15 +40,6 @@ export default function TokenProfileDetail() {
 
    const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
-   const KeyUsageMap = {
-      [KeyUsage.Sign]: "Signing",
-      [KeyUsage.Verify]: "Verifying",
-      [KeyUsage.Encrypt]: "Encrypting",
-      [KeyUsage.Decrypt]: "Decrypting",
-      [KeyUsage.Wrap]: "Wrapping Key",
-      [KeyUsage.Unwrap]: "Unwrapping Key",
-   }
-
 
    const isBusy = useMemo(
       () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage,
@@ -119,19 +110,19 @@ export default function TokenProfileDetail() {
 
    )
 
-   const keyUsageOptions = [
-      { value: KeyUsage.Sign, label: "Signing" },
-      { value: KeyUsage.Verify, label: "Verifying" },
-      { value: KeyUsage.Encrypt, label: "Encrypting" },
-      { value: KeyUsage.Decrypt, label: "Decrypting" },
-      { value: KeyUsage.Wrap, label: "Wrapping Key" },
-      { value: KeyUsage.Unwrap, label: "Unwrapping Key" },
-   ]
+
+   const keyUsageOptions = () => {
+      let options: { value: KeyUsage; label: string }[] = [];
+      for (let key in KeyUsage) {
+         options.push({ value: KeyUsage[key as keyof typeof KeyUsage], label: key });
+      }
+      return options;
+   }
 
    const existingUsages = () => {
       if (!tokenProfile) return [];
       return tokenProfile?.usages.map((usage) => {
-         return { value: usage, label: KeyUsageMap[usage] }
+         return { value: usage, label: usage.toString() }
       })
    }
 
@@ -143,7 +134,7 @@ export default function TokenProfileDetail() {
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: !tokenProfile?.tokenInstanceUuid || tokenProfile?.enabled || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: !tokenProfile?.tokenInstanceUuid || !(tokenProfile?.enabled || false), tooltip: "Disable", onClick: () => { onDisableClick() } },
-         { icon: "gavel", disabled: !tokenProfile?.tokenInstanceUuid || false, tooltip: "Update Key Usages", onClick: () => { setKeyUsageUpdate(true); } },
+         { icon: "key", disabled: !tokenProfile?.tokenInstanceUuid || false, tooltip: "Update Key Usages", onClick: () => { setKeyUsageUpdate(true); } },
       ],
       [tokenProfile, onEditClick, onDisableClick, onEnableClick]
 
@@ -223,7 +214,7 @@ export default function TokenProfileDetail() {
          },
          {
             id: "Key Usages",
-            columns: ["Key Usages", tokenProfile.usages.map((usage) => <Badge key={usage} color="secondary" className="mr-xs">{KeyUsageMap[usage]}</Badge>)]
+            columns: ["Key Usages", tokenProfile.usages.map((usage) => <Badge key={usage} color="secondary" className="mr-xs">{usage}</Badge>)]
          }
 
       ],
@@ -239,7 +230,7 @@ export default function TokenProfileDetail() {
                <Select
                               isMulti = {true}
                               id="field"
-                              options={keyUsageOptions}
+                              options={keyUsageOptions()}
                               onChange={(e) => {
                                  setKeyUsages(e.map((item) => item.value));
                               }}

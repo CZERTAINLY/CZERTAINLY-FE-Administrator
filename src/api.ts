@@ -12,6 +12,8 @@ import {
    Configuration,
    ConnectorManagementApi,
    CredentialManagementApi,
+   CryptographicKeyControllerApi,
+   CryptographicOperationsControllerApi,
    CustomAttributesApi,
    DiscoveryManagementApi,
    EntityManagementApi,
@@ -49,6 +51,8 @@ export interface ApiClients {
    customAttributes: CustomAttributesApi;
    tokenInstances: TokenInstanceControllerApi;
    tokenProfiles: TokenProfileManagementApi;
+   cryptographicKeys: CryptographicKeyControllerApi;
+   cryptographicOperations: CryptographicOperationsControllerApi;
 }
 
 
@@ -75,4 +79,6 @@ export const backendClient: ApiClients = {
    customAttributes: new CustomAttributesApi(configuration),
    tokenInstances: new TokenInstanceControllerApi(configuration),
    tokenProfiles: new TokenProfileManagementApi(configuration),
+   cryptographicKeys: new CryptographicKeyControllerApi(configuration),
+   cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
 };
