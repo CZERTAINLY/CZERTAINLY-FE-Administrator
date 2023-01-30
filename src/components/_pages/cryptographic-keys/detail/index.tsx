@@ -268,7 +268,7 @@ export default function CryptographicKeyDetail() {
          },
          {
             id: "tokenProfileName",
-            columns: ["Token Instance Name", cryptographicKey.tokenInstanceUuid && cryptographicKey.tokenProfileUuid ? <Link to={`../../../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>{cryptographicKey.tokenProfileName}</Link> : ""]
+            columns: ["Token Profile Name", cryptographicKey.tokenInstanceUuid && cryptographicKey.tokenProfileUuid ? <Link to={`../../../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>{cryptographicKey.tokenProfileName}</Link> : ""]
          },
          {
             id: "tokenProfileUuid",
