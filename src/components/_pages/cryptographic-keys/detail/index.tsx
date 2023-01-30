@@ -10,7 +10,7 @@ import { actions, selectors } from "ducks/cryptographic-keys";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
 import { Col, Container, Label, Row } from "reactstrap";
@@ -260,7 +260,7 @@ export default function CryptographicKeyDetail() {
          },
          {
             id: "tokenName",
-            columns: ["Token Instance Name", cryptographicKey.tokenInstanceName]
+            columns: ["Token Instance Name", cryptographicKey.tokenInstanceUuid ? <Link to={`../../../tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>{cryptographicKey.tokenInstanceName}</Link> : ""]
          },
          {
             id: "tokenUuid",
@@ -268,7 +268,7 @@ export default function CryptographicKeyDetail() {
          },
          {
             id: "tokenProfileName",
-            columns: ["Token Profile Name", cryptographicKey.tokenProfileName || ""]
+            columns: ["Token Instance Name", cryptographicKey.tokenInstanceUuid && cryptographicKey.tokenProfileUuid ? <Link to={`../../../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>{cryptographicKey.tokenProfileName}</Link> : ""]
          },
          {
             id: "tokenProfileUuid",
@@ -280,7 +280,7 @@ export default function CryptographicKeyDetail() {
          },
          {
             id: "groupName",
-            columns: ["Group Name", cryptographicKey.group?.name || ""]
+            columns: ["Group Name", cryptographicKey.group ? <Link to={`../../groups/detail/${cryptographicKey.group.uuid}`}>{cryptographicKey.group.name}</Link> : ""]
          }
       ],
       [cryptographicKey]

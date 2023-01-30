@@ -8,7 +8,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/credentials";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
 
 function CredentialDetail() {
@@ -135,7 +135,7 @@ function CredentialDetail() {
          },
          {
             id: "credentialProviderName",
-            columns: ["Credential Provider Name", credential.connectorName]
+            columns: ["Credential Provider Name", credential.connectorUuid ? <Link to={`../../connectors/detail/${credential.connectorUuid}`}>{credential.connectorName}</Link> : ""]
          },
          {
             id: "credentialProviderUuid",

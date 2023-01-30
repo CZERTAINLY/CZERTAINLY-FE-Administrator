@@ -184,7 +184,7 @@ export default function CryptographicKeyItem({
          },
          {
             id: "Usages",
-            columns: ["Usages", keyItem.usage.map((usage) => <Badge key={usage} color="secondary" className="mr-xs">{usage}</Badge>)]
+            columns: ["Key Usages", keyItem.usage.map((usage) => <Badge key={usage} color="secondary" className="mr-xs">{usage}</Badge>)]
          },
          {
             id: "enabled",

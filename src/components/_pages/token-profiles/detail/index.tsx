@@ -11,7 +11,7 @@ import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
 import { Badge, Col, Container, Label, Row } from "reactstrap";
@@ -206,7 +206,7 @@ export default function TokenProfileDetail() {
          },
          {
             id: "tokenName",
-            columns: ["Token Instance Name", tokenProfile.tokenInstanceName]
+            columns: ["Token Instance Name", tokenProfile.tokenInstanceUuid ? <Link to={`../../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>{tokenProfile.tokenInstanceName}</Link> : ""]
          },
          {
             id: "tokenStatus",

@@ -8,7 +8,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/entities";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Container, Label } from "reactstrap";
 
@@ -147,7 +147,7 @@ export default function EntityDetail() {
          },
          {
             id: "entityProviderName",
-            columns: ["Entity Provider Name", entity.connectorName],
+            columns: ["Entity Provider Name", entity.connectorUuid ? <Link to={`../../connectors/detail/${entity.connectorUuid}`}>{entity.connectorName}</Link> : ""],
          }
 
       ],

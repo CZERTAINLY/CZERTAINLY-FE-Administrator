@@ -9,7 +9,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/acme-profiles";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
 
 export default function AdministratorDetail() {
@@ -201,7 +201,7 @@ export default function AdministratorDetail() {
          },
          {
             id: "directoryUrl",
-            columns: ["Dierectory URL", acmeProfile.directoryUrl || "N/A"]
+            columns: ["Directory URL", acmeProfile.directoryUrl || "N/A"]
          },
 
       ],
@@ -220,7 +220,7 @@ export default function AdministratorDetail() {
          },
          {
             id: "name",
-            columns: ["Name", acmeProfile.raProfile.name]
+            columns: ["Name", acmeProfile.raProfile?.uuid ? <Link to={`../../raprofiles/detail/${acmeProfile.raProfile.uuid}`}>{acmeProfile.raProfile.name}</Link> : ""]
          },
          {
             id: "status",

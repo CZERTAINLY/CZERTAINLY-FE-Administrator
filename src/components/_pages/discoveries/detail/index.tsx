@@ -198,7 +198,7 @@ export default function DiscoveryDetail() {
          },
          {
             id: "discoveryProviderName",
-            columns: ["Discovery Provider Name", discovery.connectorName],
+            columns: ["Discovery Provider Name", discovery.connectorUuid ? <Link to={`../../connectors/detail/${discovery.connectorUuid}`}>{discovery.connectorName}</Link> : ""],
          },
          {
             id: "status",
