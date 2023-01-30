@@ -166,6 +166,8 @@ models/KeyEventHistoryDto.ts
 models/KeyFormat.ts
 models/KeyItemDto.ts
 models/KeyRequestDto.ts
+models/KeyRequestType.ts
+models/KeyState.ts
 models/KeyType.ts
 models/KeyUsage.ts
 models/LocationDto.ts

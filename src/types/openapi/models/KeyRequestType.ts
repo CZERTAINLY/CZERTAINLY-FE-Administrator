@@ -12,16 +12,12 @@
  */
 
 /**
- * Usages for the Key
+ * 
  * @export
  * @enum {string}
  */
-export enum KeyUsage {
-    Sign = 'sign',
-    Verify = 'verify',
-    Encrypt = 'encrypt',
-    Decrypt = 'decrypt',
-    Wrap = 'wrap',
-    Unwrap = 'unwrap'
+export enum KeyRequestType {
+    Secret = 'secret',
+    KeyPair = 'keyPair'
 }
 

@@ -342,7 +342,7 @@ export default function RaProfileDetail() {
          },
          {
             id: "authorityName",
-            columns: ["Authority Instance Name", raProfile.authorityInstanceName]
+            columns: ["Authority Instance Name", raProfile.authorityInstanceUuid ? <Link to={`../../authorities/detail/${raProfile.authorityInstanceUuid}`}>{raProfile.authorityInstanceName}</Link> : ""]
          }
 
       ],

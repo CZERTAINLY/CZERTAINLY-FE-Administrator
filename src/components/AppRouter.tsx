@@ -85,6 +85,9 @@ import TokenEdit from "./_pages/tokens/form";
 import TokenProfileList from "./_pages/token-profiles/list";
 import TokenProfileDetail from "./_pages/token-profiles/detail";
 import TokenProfileForm from "./_pages/token-profiles/form";
+import CryptographicKeyList from "./_pages/cryptographic-keys/list";
+import CryptographicKeyDetail from "./_pages/cryptographic-keys/detail";
+import CryptographicKeyForm from "./_pages/cryptographic-keys/form";
 
 
 export default function AppRouter() {
@@ -208,6 +211,12 @@ export default function AppRouter() {
                <Route path="/tokenprofiles/detail/:tokenId/:id" element={<TokenProfileDetail />} />
                <Route path="/tokenprofiles/add" element={<TokenProfileForm />} />
                <Route path="/tokenprofiles/edit/:tokenId/:id" element={<TokenProfileForm />} />
+
+               <Route path="/cryptographickeys" element={<CryptographicKeyList />} />
+               <Route path="/cryptographickeys/list" element={<Navigate to="/cryptographickeys" />} />
+               <Route path="/cryptographickeys/detail/:tokenId/:id" element={<CryptographicKeyDetail />} />
+               <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
+               <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
 
             </Route >
 

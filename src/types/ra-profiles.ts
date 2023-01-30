@@ -12,7 +12,7 @@ export type RaProfileActivateAcmeRequestDto = ActivateAcmeForRaProfileRequestDto
 export type RaProfileActivateAcmeRequestModel = Omit<RaProfileActivateAcmeRequestDto, "issueCertificateAttributes | revokeCertificateAttributes"> & { issueCertificateAttributes: Array<AttributeRequestModel>, revokeCertificateAttributes: Array<AttributeRequestModel> }
 
 export type RaProfileAcmeDetailResponseDto = RaProfileAcmeDetailResponseDtoOpenApi;
-export type RaProfileAcmeDetailResponseModel = Omit<RaProfileAcmeDetailResponseDto, "issueCertificateAttributes | revokeCertificateAttributes"> & { issueCertificateAttributes: Array<AttributeResponseModel>, revokeCertificateAttributes: Array<AttributeResponseModel> }
+export type RaProfileAcmeDetailResponseModel = Omit<RaProfileAcmeDetailResponseDto, "issueCertificateAttributes | revokeCertificateAttributes"> & { issueCertificateAttributes?: Array<AttributeResponseModel>, revokeCertificateAttributes?: Array<AttributeResponseModel> }
 
 export type RaProfileAddRequestDto = AddRaProfileRequestDto;
 export type RaProfileAddRequestModel = Omit<RaProfileAddRequestDto, "attributes | customAttributes"> & { attributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel> };

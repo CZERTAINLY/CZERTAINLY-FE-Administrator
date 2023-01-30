@@ -394,7 +394,7 @@ export default function LocationDetail() {
          },
          {
             id: "entityName",
-            columns: ["Entity Name", location.entityInstanceName],
+            columns: ["Entity Name", location.entityInstanceUuid ? <Link to={`../../entities/detail/${location.entityInstanceUuid}`}>{location.entityInstanceName}</Link> : ""],
          }
 
       ],

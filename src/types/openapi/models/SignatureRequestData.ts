@@ -18,11 +18,11 @@
  */
 export interface SignatureRequestData {
     /**
-     * Data to be signed or verified
-     * @type {Array<string>}
+     * Base64 encoded data to be signed or verified
+     * @type {string}
      * @memberof SignatureRequestData
      */
-    data: Array<string>;
+    data: string;
     /**
      * Custom identifier of the data, that should be the same as in the request, if available
      * @type {string}

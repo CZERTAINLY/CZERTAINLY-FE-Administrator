@@ -25,6 +25,7 @@ import type {
     KeyDto,
     KeyEventHistoryDto,
     KeyRequestDto,
+    KeyRequestType,
     UpdateKeyUsageRequestDto,
 } from '../models';
 
@@ -41,7 +42,7 @@ export interface CompromiseKeysRequest {
 export interface CreateKeyRequest {
     tokenInstanceUuid: string;
     tokenProfileUuid: string;
-    type: CreateKeyTypeEnum;
+    type: KeyRequestType;
     keyRequestDto: KeyRequestDto;
 }
 
@@ -105,7 +106,7 @@ export interface GetKeyRequest {
 export interface ListCreateKeyAttributesRequest {
     tokenInstanceUuid: string;
     tokenProfileUuid: string;
-    type: ListCreateKeyAttributesTypeEnum;
+    type: KeyRequestType;
 }
 
 export interface ListKeysRequest {
@@ -492,21 +493,4 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         }, opts?.responseOpts);
     };
 
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum CreateKeyTypeEnum {
-    Secret = 'secret',
-    KeyPair = 'keyPair'
-}
-/**
- * @export
- * @enum {string}
- */
-export enum ListCreateKeyAttributesTypeEnum {
-    Secret = 'secret',
-    KeyPair = 'keyPair'
 }

@@ -12,16 +12,16 @@
  */
 
 /**
- * Usages for the Key
+ * Key State
  * @export
  * @enum {string}
  */
-export enum KeyUsage {
-    Sign = 'sign',
-    Verify = 'verify',
-    Encrypt = 'encrypt',
-    Decrypt = 'decrypt',
-    Wrap = 'wrap',
-    Unwrap = 'unwrap'
+export enum KeyState {
+    PreActive = 'pre-active',
+    Active = 'active',
+    Deactivated = 'deactivated',
+    Compromised = 'compromised',
+    Destroyed = 'destroyed',
+    CompromisedDestroyed = 'compromisedDestroyed'
 }
 

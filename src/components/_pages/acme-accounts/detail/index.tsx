@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Badge, Container } from "reactstrap";
 
@@ -158,7 +158,7 @@ export default function AcmeAccountDetail() {
             },
             {
                id: "acmeProfileName",
-               columns: ["ACME Profile Name", acmeAccount.acmeProfileName]
+               columns: ["ACME Profile Name", acmeAccount.acmeProfileUuid ? <Link to={`../../../acmeprofiles/detail/${acmeAccount.acmeProfileUuid}`}>{acmeAccount.acmeProfileName}</Link> : ""]
             },
             {
                id: "internalState",
@@ -206,16 +206,16 @@ export default function AcmeAccountDetail() {
       () => !acmeAccount ? [] : [
 
          {
-            id: "Succesfull orders",
-            columns: ["Succesfull orders", acmeAccount.successfulOrders.toString()]
+            id: "Successful orders",
+            columns: ["Successful orders", acmeAccount.successfulOrders.toString()]
          },
          {
             id: "Valid orders",
             columns: ["Valid orders", acmeAccount.validOrders.toString()],
          },
          {
-            id: "Pendning orders",
-            columns: ["Pendning orders", acmeAccount.pendingOrders.toString()],
+            id: "Pending orders",
+            columns: ["Pending orders", acmeAccount.pendingOrders.toString()],
          },
          {
             id: "Failed orders",

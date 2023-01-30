@@ -12,7 +12,6 @@
  */
 
 import type {
-    CryptographicAlgorithm,
     GroupDto,
     KeyItemDto,
     ResponseAttributeDto,
@@ -48,11 +47,6 @@ export interface KeyDetailDto {
      */
     creationTime: string;
     /**
-     * @type {CryptographicAlgorithm}
-     * @memberof KeyDetailDto
-     */
-    cryptographicAlgorithm: CryptographicAlgorithm;
-    /**
      * UUID of the Token Profile
      * @type {string}
      * @memberof KeyDetailDto
@@ -77,11 +71,17 @@ export interface KeyDetailDto {
      */
     tokenInstanceName: string;
     /**
-     * Custom Attributes for the Token Instance
+     * Custom Attributes for the Cryptographic Key
      * @type {Array<ResponseAttributeDto>}
      * @memberof KeyDetailDto
      */
     customAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * Attributes for the Cryptographic Key
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof KeyDetailDto
+     */
+    attributes: Array<ResponseAttributeDto>;
     /**
      * Owner of the Key
      * @type {string}

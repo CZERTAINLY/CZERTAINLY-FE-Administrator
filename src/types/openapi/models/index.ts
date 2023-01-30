@@ -135,6 +135,8 @@ export * from './KeyEventHistoryDto';
 export * from './KeyFormat';
 export * from './KeyItemDto';
 export * from './KeyRequestDto';
+export * from './KeyRequestType';
+export * from './KeyState';
 export * from './KeyType';
 export * from './KeyUsage';
 export * from './LocationDto';

@@ -17,9 +17,9 @@
  */
 export interface RandomDataResponseDto {
     /**
-     * Random generated data
-     * @type {Array<string>}
+     * Base64 encoded random data
+     * @type {string}
      * @memberof RandomDataResponseDto
      */
-    data: Array<string>;
+    data: string;
 }

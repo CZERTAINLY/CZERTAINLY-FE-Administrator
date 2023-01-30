@@ -14,7 +14,9 @@
 import type {
     CryptographicAlgorithm,
     KeyFormat,
+    KeyState,
     KeyType,
+    KeyUsage,
     MetadataResponseDto,
 } from './';
 
@@ -71,10 +73,10 @@ export interface KeyItemDto {
     metadata?: Array<MetadataResponseDto>;
     /**
      * Key Usages
-     * @type {Array<string>}
+     * @type {Array<KeyUsage>}
      * @memberof KeyItemDto
      */
-    usage: Array<string>;
+    usage: Array<KeyUsage>;
     /**
      * Boolean describing if the key is enabled or not
      * @type {boolean}
@@ -82,23 +84,8 @@ export interface KeyItemDto {
      */
     enabled: boolean;
     /**
-     * Key State
-     * @type {string}
+     * @type {KeyState}
      * @memberof KeyItemDto
      */
-    state: KeyItemDtoStateEnum;
+    state: KeyState;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum KeyItemDtoStateEnum {
-    Secret = 'secret',
-    KeyPair = 'keyPair',
-    Deactivated = 'deactivated',
-    Compromised = 'compromised',
-    Destroyed = 'destroyed',
-    CompromisedDestroyed = 'compromisedDestroyed'
-}
-

@@ -12,6 +12,7 @@
  */
 
 import type {
+    KeyUsage,
     RequestAttributeDto,
 } from './';
 
@@ -50,4 +51,10 @@ export interface AddTokenProfileRequestDto {
      * @memberof AddTokenProfileRequestDto
      */
     enabled?: boolean;
+    /**
+     * Usages for the Key
+     * @type {Array<KeyUsage>}
+     * @memberof AddTokenProfileRequestDto
+     */
+    usage?: Array<KeyUsage>;
 }

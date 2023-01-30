@@ -15,20 +15,21 @@ import Select from "react-select";
 
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { TokenProfileDetailResponseModel, TokenProfileResponseModel } from "types/token-profiles";
+import { TokenProfileDetailResponseModel } from "types/token-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { Resource } from "../../../../types/openapi";
+import { KeyUsage, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string;
    description: string;
    token: { value: any; label: string } | undefined;
+   usages: { value: KeyUsage; label: KeyUsage; }[];
 }
 
 
@@ -140,6 +141,7 @@ export default function TokenProfileForm() {
                        description: values.description,
                        attributes: collectFormAttributes("token-profile", [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
                        customAttributes: collectFormAttributes("customTokenProfile", resourceCustomAttributes, values),
+                       usage: values.usages.map((item) => item.value)
 
                    }
                })
@@ -155,6 +157,7 @@ export default function TokenProfileForm() {
                        description: values.description,
                        attributes: collectFormAttributes("token-profile", [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
                        customAttributes: collectFormAttributes("customTokenProfile", resourceCustomAttributes, values),
+                       usage: values.usages.map((item) => item.value)
                    }
                })
             );
@@ -185,7 +188,8 @@ export default function TokenProfileForm() {
       () => ({
          name: editMode ? tokenProfile?.name || "" : "",
          description: editMode ? tokenProfile?.description || "" : "",
-         token: editMode ? tokenProfile ? optionsForAuthorities.find(option => option.value === tokenProfile.tokenInstanceUuid) : undefined : undefined
+         token: editMode ? tokenProfile ? optionsForAuthorities.find(option => option.value === tokenProfile.tokenInstanceUuid) : undefined : undefined,
+         usages: editMode ? tokenProfile?.usages?.map((usage) => ({ value: usage, label: usage })) || [] : []
       }),
       [editMode, optionsForAuthorities, tokenProfile]
    );
@@ -195,6 +199,14 @@ export default function TokenProfileForm() {
       () => editMode ? "Edit Token Profile" : "Create Token Profile",
       [editMode]
    );
+
+   const keyUsageOptions = () => {
+      let options: { value: KeyUsage; label: string }[] = [];
+      for (let key in KeyUsage) {
+         options.push({ value: KeyUsage[key as keyof typeof KeyUsage], label: key });
+      }
+      return options;
+   }
 
 
    return (
@@ -276,6 +288,34 @@ export default function TokenProfileForm() {
                               options={optionsForAuthorities}
                               placeholder="Select to change Token if needed"
                               onChange={(event: any) => { onTokenChange(event.value, form); input.onChange(event) }}
+                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
+                           />
+
+                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
+
+                        </FormGroup>
+
+                     )}
+
+                  </Field>
+
+                  <Field name="usages">
+
+                     {({ input, meta }) => (
+
+                        <FormGroup>
+
+                           <Label for="usages">Key Usages</Label>
+
+                           <Select
+                              {...input}
+                              id="usages"
+                              isMulti = {true}
+                              maxMenuHeight={140}
+                              menuPlacement="auto"
+                              options={keyUsageOptions()}
+                              placeholder="Select Key Usages"
+                              onChange={(event: any) => { input.onChange(event) }}
                               styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
                            />
 

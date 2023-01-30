@@ -9,7 +9,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/tokens";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
 import { TokenInstanceStatus } from "types/openapi";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
@@ -119,7 +119,7 @@ export default function TokenDetail() {
          { icon: "check", disabled: token?.status.status !== TokenInstanceStatus.Deactivated, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
          { icon: "times", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
       ],
-      [onEditClick, onReload]
+      [onEditClick, onReload, token?.status.status ]
 
    );
 
@@ -192,7 +192,7 @@ export default function TokenDetail() {
          },
          {
             id: "cryptographyProviderName",
-            columns: ["Cryptography Provider Name", token.connectorName || ""],
+            columns: ["Cryptography Provider Name", token.connectorUuid ? <Link to={`../../connectors/detail/${token.connectorUuid}`}>{token.connectorName}</Link> : ""],
          },
          {
             id: "kind",
