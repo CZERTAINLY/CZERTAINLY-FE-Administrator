@@ -407,7 +407,7 @@ export default function AttributeEditor({
 
                             formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
 
-                        } else if (descriptor.content) {
+                        } else if (descriptor.content && descriptor.content.length > 0) {
 
                             formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
 

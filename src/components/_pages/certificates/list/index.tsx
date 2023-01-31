@@ -1,28 +1,27 @@
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+
+import Dialog from "components/Dialog";
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/certificates";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
-
-import { actions, selectors } from "ducks/certificates";
+import { CertificateSearchFilterModel } from "types/certificate";
 
 import { dateFormatter } from "utils/dateUtil";
 import { downloadFileZip } from "utils/download";
-
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-
-import Dialog from "components/Dialog";
-import CertificateUploadDialog from "../CertificateUploadDialog";
+import { AttributeRequestModel } from "../../../../types/attributes";
+import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
 import CertificateGroupDialog from "../CertificateGroupDialog";
+import CertificateInventoryFilter from "../CertificateInventoryFilter";
 import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
-import CertificateInventoryFilter from "../CertificateInventoryFilter";
-import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
-import { CertificateSearchFilterModel } from "types/certificate";
 import CertificateStatus from "../CertificateStatus";
-
+import CertificateUploadDialog from "../CertificateUploadDialog";
 
 interface Props {
    selectCertsOnly?: boolean;
@@ -153,12 +152,12 @@ export default function CertificateList({
 
    const onUploadClick = useCallback(
 
-      (data: { fileName: string, contentType: string, fileContent: string }) => {
+      (data: { fileName: string, contentType: string, fileContent: string, customAttributes?: Array<AttributeRequestModel> }) => {
 
          if (data.fileContent) {
 
             try {
-               dispatch(actions.uploadCertificate({ certificate: data.fileContent, customAttributes: [] }));
+               dispatch(actions.uploadCertificate({ certificate: data.fileContent, customAttributes: data.customAttributes ?? [] }));
             } catch (error) {
             }
          }

@@ -1,35 +1,37 @@
 import React from "react";
 import { Button, ButtonProps } from "reactstrap";
 
+export type IconName = "plus" |
+    "trash" |
+    "times" |
+    "check" |
+    "plug" |
+    "pencil" |
+    "cross-circle" |
+    "upload" |
+    "download" |
+    "group" |
+    "user" |
+    "cubes" |
+    "retweet" |
+    "minus-square" |
+    "info" |
+    "gavel" |
+    "push" |
+    "sync" |
+    "minus" |
+    "lock" |
+    "refresh" |
+    "handshake" |
+    "bomb" |
+    "search" |
+    "random" |
+    "sign" |
+    "verify" |
+    "key";
+
 export interface WidgetButtonProps {
-   icon: "plus" | 
-         "trash" | 
-         "times" | 
-         "check" | 
-         "plug" | 
-         "pencil" | 
-         "cross-circle" | 
-         "upload" | 
-         "download" | 
-         "group" | 
-         "user" | 
-         "cubes" | 
-         "retweet" | 
-         "minus-square" | 
-         "info" | 
-         "gavel" | 
-         "push" | 
-         "sync" | 
-         "minus" | 
-         "lock" | 
-         "refresh" |
-         "handshake" |
-         "bomb" |
-         "search" |
-         "random" |
-         "sign" | 
-         "verify" |
-         "key";
+   icon: IconName;
    id?: string;
    tooltip?: any;
    disabled: boolean;

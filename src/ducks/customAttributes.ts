@@ -6,8 +6,14 @@ import {
     CustomAttributeUpdateRequestModel,
 } from "types/customAttributes";
 import { createFeatureSelector } from "utils/ducks";
-import { CustomAttributeModel } from "../types/attributes";
+import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "../types/attributes";
 import { Resource } from "../types/openapi";
+
+type ResourceCustomAttributesContents = {
+    resource: Resource;
+    resourceUuid: string;
+    customAttributes: AttributeResponseModel[];
+}
 
 export type State = {
     checkedRows: string[];
@@ -15,6 +21,7 @@ export type State = {
     customAttribute?: CustomAttributeDetailResponseModel;
     customAttributes: CustomAttributeResponseModel[];
     resourceCustomAttributes: CustomAttributeModel[];
+    resourceCustomAttributesContents: ResourceCustomAttributesContents[];
     resources: Resource[];
 
     isFetchingList: boolean;
@@ -29,12 +36,14 @@ export type State = {
     isBulkDisabling: boolean;
     isDisabling: boolean;
     isUpdating: boolean;
+    isUpdatingContent: boolean;
 };
 
 export const initialState: State = {
     checkedRows: [],
     customAttributes: [],
     resourceCustomAttributes: [],
+    resourceCustomAttributesContents: [],
     resources: [],
     isFetchingList: false,
     isFetchingDetail: false,
@@ -48,6 +57,7 @@ export const initialState: State = {
     isBulkDisabling: false,
     isDisabling: false,
     isUpdating: false,
+    isUpdatingContent: false,
 };
 
 export const slice = createSlice({
@@ -123,6 +133,42 @@ export const slice = createSlice({
 
         updateCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
+        },
+
+        updateCustomAttributeContent: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, attributeUuid: string, content: BaseAttributeContentModel[] }>) => {
+            state.isUpdatingContent = true;
+        },
+
+        updateCustomAttributeContentSuccess: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
+            state.isUpdatingContent = false;
+            const index = state.resourceCustomAttributesContents.findIndex(r => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid);
+            if (index !== -1) {
+                state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
+            } else {
+                state.resourceCustomAttributesContents.push(action.payload);
+            }
+        },
+
+        updateCustomAttributeContentFailure: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, error: string | undefined }>) => {
+            state.isUpdatingContent = false;
+        },
+
+        removeCustomAttributeContent: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, attributeUuid: string }>) => {
+            state.isUpdatingContent = true;
+        },
+
+        removeCustomAttributeContentSuccess: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
+            state.isUpdatingContent = false;
+            const index = state.resourceCustomAttributesContents.findIndex(r => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid);
+            if (index !== -1) {
+                state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
+            } else {
+                state.resourceCustomAttributesContents.push(action.payload);
+            }
+        },
+
+        removeCustomAttributeContentFailure: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, error: string | undefined }>) => {
+            state.isUpdatingContent = false;
         },
 
         getCustomAttribute: (state, action: PayloadAction<string>) => {
@@ -270,6 +316,7 @@ const customAttribute = createSelector(state, (state: State) => state.customAttr
 const customAttributes = createSelector(state, (state: State) => state.customAttributes);
 const resources = createSelector(state, (state: State) => state.resources);
 const resourceCustomAttributes = createSelector(state, (state: State) => state.resourceCustomAttributes);
+const resourceCustomAttributesContents = (resource: Resource, resourceUuid: string) => createSelector(state, (state: State) => state.resourceCustomAttributesContents.find(c => c.resource === resource && c.resourceUuid === resourceUuid)?.customAttributes);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
@@ -283,6 +330,7 @@ const isEnabling = createSelector(state, (state: State) => state.isEnabling);
 const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
 const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const isUpdatingContent = createSelector(state, (state: State) => state.isUpdatingContent);
 
 export const selectors = {
 
@@ -294,6 +342,7 @@ export const selectors = {
     customAttributes,
     resources,
     resourceCustomAttributes,
+    resourceCustomAttributesContents,
 
     isCreating,
     isFetchingList,
@@ -307,6 +356,7 @@ export const selectors = {
     isBulkDisabling,
     isDisabling,
     isUpdating,
+    isUpdatingContent,
 };
 
 export const actions = slice.actions;

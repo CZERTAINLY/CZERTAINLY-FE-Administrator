@@ -1,10 +1,10 @@
-export const composeValidators = (...validators: any[]) => (value: string) =>
+export const composeValidators = (...validators: any[]) => (value: any) =>
    validators.reduce((error, validator) => error || validator(value), undefined);
 
 export const validateRequired = () => (value: any) => value ? undefined : "Required Field";
 
 const getValueFromObject = (value: any) => {
-    if (typeof value === "object" && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
+    if (typeof value === "object" && value && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
         return value["value"]["data"];
     } else {
         return value;

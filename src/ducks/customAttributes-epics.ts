@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./customAttributes";
-import { transformCustomAttributeDtoToModel } from "./transform/attributes";
+import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToModel } from "./transform/attributes";
 
 import {
     transformCustomAttributeCreateRequestModelToDto,
@@ -127,6 +127,61 @@ const updateCustomAttribute: AppEpic = (action$, state$, deps) => {
                     err => of(
                         slice.actions.updateCustomAttributeFailure({error: extractError(err, "Failed to update custom attribute")}),
                         appRedirectActions.fetchError({error: err, message: "Failed to update custom attribute"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.updateCustomAttributeContent.match,
+        ),
+        switchMap(
+            action => deps.apiClients.customAttributes.updateAttributeContentForResource({
+                    resourceName: action.payload.resource,
+                    objectUuid: action.payload.resourceUuid,
+                    attributeUuid: action.payload.attributeUuid,
+                    baseAttributeContentDto: action.payload.content
+                },
+            ).pipe(
+                map(
+                    response =>
+                        slice.actions.updateCustomAttributeContentSuccess({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, customAttributes: response.map(transformAttributeResponseDtoToModel)}),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.updateCustomAttributeContentFailure({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, error: extractError(err, "Failed to update custom attribute content")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to update custom attribute content"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.removeCustomAttributeContent.match,
+        ),
+        switchMap(
+            action => deps.apiClients.customAttributes.deleteAttributeContentForResource({
+                    resourceName: action.payload.resource,
+                    objectUuid: action.payload.resourceUuid,
+                    attributeUuid: action.payload.attributeUuid,
+                },
+            ).pipe(
+                map(
+                    response =>
+                        slice.actions.removeCustomAttributeContentSuccess({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, customAttributes: response.map(transformAttributeResponseDtoToModel)}),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.removeCustomAttributeContentFailure({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, error: extractError(err, "Failed to remove custom attribute content")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to remove custom attribute content"}),
                     ),
                 ),
             ),
@@ -297,6 +352,8 @@ const epics = [
     enableCustomAttribute,
     bulkDisableCustomAttributes,
     disableCustomAttribute,
+    updateCustomAttributeContent,
+    removeCustomAttributeContent,
 ];
 
 export default epics;
