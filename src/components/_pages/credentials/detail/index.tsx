@@ -9,7 +9,9 @@ import { actions, selectors } from "ducks/credentials";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container, Label } from "reactstrap";
+import { Container } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 function CredentialDetail() {
 
@@ -165,22 +167,15 @@ function CredentialDetail() {
          </Widget>
 
          {
-
             credential && credential.attributes && credential.attributes.length > 0 && (
-
                <Widget title="Credential Attributes">
-
                   <br />
                   <AttributeViewer attributes={credential?.attributes} />
-
-                   <br />
-                   <Label>Custom Attributes</Label>
-                   <AttributeViewer attributes={credential?.customAttributes} />
                </Widget>
             )
-
          }
 
+         {credential && <CustomAttributeWidget resource={Resource.Credentials} resourceUuid={credential.uuid} attributes={credential.customAttributes} />}
 
          <Dialog
             isOpen={confirmDelete}

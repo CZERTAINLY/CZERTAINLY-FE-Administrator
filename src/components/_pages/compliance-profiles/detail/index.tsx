@@ -19,7 +19,8 @@ import {
     ComplianceProfileResponseRuleRuleModel,
     ComplianceProfileRuleListResponseRuleModel,
 } from "types/complianceProfiles";
-import AttributeViewer from "../../../Attributes/AttributeViewer";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";
 import AssociateRaProfileDialogBody from "../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody";
 
@@ -1015,11 +1016,7 @@ export default function ComplianceProfileDetail() {
                   />
                </Widget>
 
-                <Widget title="Attributes">
-                    <br />
-                    <Label>Custom Attributes</Label>
-                    <AttributeViewer attributes={profile?.customAttributes} />
-                </Widget>
+                {profile && <CustomAttributeWidget resource={Resource.ComplianceProfiles} resourceUuid={profile.uuid} attributes={profile.customAttributes} />}
             </Col>
          </Row>
 

@@ -14,10 +14,10 @@ import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
 import { Col, Container, Label, Row } from "reactstrap";
-import { KeyState, KeyUsage } from "types/openapi";
+import { KeyState, KeyUsage, Resource } from "types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import CryptographicKeyItem from "./CryptographicKeyItem";
 import RandomDataGeneration from "./RandomDataGeneration";
-
 
 export default function CryptographicKeyDetail() {
 
@@ -337,11 +337,9 @@ export default function CryptographicKeyDetail() {
                   <br />
                   <Label>Key Attributes</Label>
                   <AttributeViewer attributes={cryptographicKey?.attributes} />
-
-                   <br />
-                   <Label>Custom Attributes</Label>
-                   <AttributeViewer attributes={cryptographicKey?.customAttributes} />
                </Widget>
+
+                {cryptographicKey && <CustomAttributeWidget resource={Resource.Keys} resourceUuid={cryptographicKey.uuid} attributes={cryptographicKey.customAttributes} />}
 
             </Col>
 

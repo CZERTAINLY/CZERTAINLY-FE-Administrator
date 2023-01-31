@@ -11,6 +11,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function AdministratorDetail() {
 
@@ -382,13 +384,7 @@ export default function AdministratorDetail() {
                         </Col>
 
                          <Col>
-                             {acmeProfile?.customAttributes && acmeProfile?.customAttributes.length > 0 &&
-                                 (<Widget title="List of Custom Attributes" busy={isBusy}>
-                                     <AttributeViewer
-                                         attributes={acmeProfile?.customAttributes}
-                                     />
-                                 </Widget>
-                                 )}
+                             {acmeProfile && <CustomAttributeWidget resource={Resource.AcmeProfiles} resourceUuid={acmeProfile.uuid} attributes={acmeProfile.customAttributes} />}
                          </Col>
                      </Row>
 

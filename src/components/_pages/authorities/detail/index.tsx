@@ -10,6 +10,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function AuthorityDetail() {
 
@@ -194,10 +196,9 @@ export default function AuthorityDetail() {
 
              <Label>Certification Authority Attributes</Label>
              <AttributeViewer attributes={authority?.attributes} />
-             <Label>Custom Attributes</Label>
-             <AttributeViewer attributes={authority?.customAttributes} />
-
          </Widget>
+
+          {authority && <CustomAttributeWidget resource={Resource.Authorities} resourceUuid={authority.uuid} attributes={authority.customAttributes} />}
 
 
          <Dialog

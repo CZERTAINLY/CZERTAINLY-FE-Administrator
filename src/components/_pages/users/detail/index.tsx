@@ -11,8 +11,9 @@ import { actions, selectors } from "ducks/users";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Container, Label } from "reactstrap";
-import AttributeViewer from "../../../Attributes/AttributeViewer";
+import { Badge, Container } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function UserDetail() {
 
@@ -240,11 +241,7 @@ export default function UserDetail() {
             <CertificateAttributes certificate={certificate} />
          </Widget>
 
-          <Widget title="Attributes">
-              <br />
-              <Label>Custom Attributes</Label>
-              <AttributeViewer attributes={user?.customAttributes} />
-          </Widget>
+          {user && <CustomAttributeWidget resource={Resource.Users} resourceUuid={user.uuid} attributes={user.customAttributes} />}
 
          <Dialog
             isOpen={confirmDelete}

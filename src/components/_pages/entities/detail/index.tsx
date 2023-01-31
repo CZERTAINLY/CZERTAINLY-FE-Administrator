@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Container, Label } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function EntityDetail() {
 
@@ -174,16 +176,12 @@ export default function EntityDetail() {
          </Widget>
 
          <Widget title="Attributes">
-
             <br />
-
              <Label>Entity Attributes</Label>
              <AttributeViewer attributes={entity?.attributes} />
-             <Label>Custom Attributes</Label>
-             <AttributeViewer attributes={entity?.customAttributes} />
-
          </Widget>
 
+          {entity && <CustomAttributeWidget resource={Resource.Entities} resourceUuid={entity.uuid} attributes={entity.customAttributes} />}
 
          <Dialog
             isOpen={confirmDelete}

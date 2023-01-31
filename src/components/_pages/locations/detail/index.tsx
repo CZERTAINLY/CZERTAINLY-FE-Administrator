@@ -25,6 +25,8 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 
 import { validateRequired } from "utils/validators";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function LocationDetail() {
 
@@ -490,10 +492,8 @@ export default function LocationDetail() {
 
             <Label>Location Attributes</Label>
             <AttributeViewer attributes={location?.attributes} />
-            <Label>Custom Attributes</Label>
-            <AttributeViewer attributes={location?.customAttributes} />
-
          </Widget>
+          {location && <CustomAttributeWidget resource={Resource.Locations} resourceUuid={location.uuid} attributes={location.customAttributes} />}
 
          <Widget title={certsTitle} busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}>
 
