@@ -63,8 +63,8 @@ export default function AttributeViewer({
                     width: "20%",
                 },
                 {
-                    id: "settings",
-                    content: "Settings",
+                    id: "content",
+                    content: "Content",
                     sortable: true,
                     width: "40%",
                 },
