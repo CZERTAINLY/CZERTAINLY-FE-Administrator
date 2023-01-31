@@ -13,6 +13,7 @@
 
 import type {
     GroupDto,
+    KeyAssociationDto,
     KeyItemDto,
     ResponseAttributeDto,
 } from './';
@@ -99,4 +100,10 @@ export interface KeyDetailDto {
      * @memberof KeyDetailDto
      */
     items: Array<KeyItemDto>;
+    /**
+     * List of associated items
+     * @type {Array<KeyAssociationDto>}
+     * @memberof KeyDetailDto
+     */
+    associations?: Array<KeyAssociationDto>;
 }

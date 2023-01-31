@@ -18,12 +18,17 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
+    BulkCompromiseKeyItemRequestDto,
+    BulkCompromiseKeyRequestDto,
+    BulkKeyItemUsageRequestDto,
     BulkKeyUsageRequestDto,
+    CompromiseKeyRequestDto,
     EditKeyRequestDto,
     ErrorMessageDto,
     KeyDetailDto,
     KeyDto,
     KeyEventHistoryDto,
+    KeyItemDto,
     KeyRequestDto,
     KeyRequestType,
     UpdateKeyUsageRequestDto,
@@ -32,11 +37,15 @@ import type {
 export interface CompromiseKeyRequest {
     tokenInstanceUuid: string;
     uuid: string;
-    requestBody?: Array<string>;
+    compromiseKeyRequestDto: CompromiseKeyRequestDto;
+}
+
+export interface CompromiseKeyItemsRequest {
+    bulkCompromiseKeyItemRequestDto: BulkCompromiseKeyItemRequestDto;
 }
 
 export interface CompromiseKeysRequest {
-    requestBody: Array<string>;
+    bulkCompromiseKeyRequestDto: BulkCompromiseKeyRequestDto;
 }
 
 export interface CreateKeyRequest {
@@ -52,6 +61,10 @@ export interface DeleteKeyRequest {
     requestBody?: Array<string>;
 }
 
+export interface DeleteKeyItemsRequest {
+    requestBody: Array<string>;
+}
+
 export interface DeleteKeysRequest {
     requestBody: Array<string>;
 }
@@ -62,6 +75,10 @@ export interface DestroyKeyRequest {
     requestBody?: Array<string>;
 }
 
+export interface DestroyKeyItemsRequest {
+    requestBody: Array<string>;
+}
+
 export interface DestroyKeysRequest {
     requestBody: Array<string>;
 }
@@ -70,6 +87,10 @@ export interface DisableKeyRequest {
     tokenInstanceUuid: string;
     uuid: string;
     requestBody?: Array<string>;
+}
+
+export interface DisableKeyItemsRequest {
+    requestBody: Array<string>;
 }
 
 export interface DisableKeysRequest {
@@ -88,6 +109,10 @@ export interface EnableKeyRequest {
     requestBody?: Array<string>;
 }
 
+export interface EnableKeyItemsRequest {
+    requestBody: Array<string>;
+}
+
 export interface EnableKeysRequest {
     requestBody: Array<string>;
 }
@@ -103,6 +128,12 @@ export interface GetKeyRequest {
     uuid: string;
 }
 
+export interface GetKeyItemRequest {
+    tokenInstanceUuid: string;
+    uuid: string;
+    keyItemUuid: string;
+}
+
 export interface ListCreateKeyAttributesRequest {
     tokenInstanceUuid: string;
     tokenProfileUuid: string;
@@ -111,6 +142,10 @@ export interface ListCreateKeyAttributesRequest {
 
 export interface ListKeysRequest {
     tokenProfileUuid?: string;
+}
+
+export interface UpdateKeyItemUsagesRequest {
+    bulkKeyItemUsageRequestDto: BulkKeyItemUsageRequestDto;
 }
 
 export interface UpdateKeyUsages1Request {
@@ -132,11 +167,12 @@ export class CryptographicKeyControllerApi extends BaseAPI {
      * If the request body is provided with the UUID of the items of Key, then only those itemswill be compromised. Else all the sub items of the key will be compromised
      * Mark Key and its Items as Compromised
      */
-    compromiseKey({ tokenInstanceUuid, uuid, requestBody }: CompromiseKeyRequest): Observable<void>
-    compromiseKey({ tokenInstanceUuid, uuid, requestBody }: CompromiseKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    compromiseKey({ tokenInstanceUuid, uuid, requestBody }: CompromiseKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+    compromiseKey({ tokenInstanceUuid, uuid, compromiseKeyRequestDto }: CompromiseKeyRequest): Observable<void>
+    compromiseKey({ tokenInstanceUuid, uuid, compromiseKeyRequestDto }: CompromiseKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    compromiseKey({ tokenInstanceUuid, uuid, compromiseKeyRequestDto }: CompromiseKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'compromiseKey');
         throwIfNullOrUndefined(uuid, 'uuid', 'compromiseKey');
+        throwIfNullOrUndefined(compromiseKeyRequestDto, 'compromiseKeyRequestDto', 'compromiseKey');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -146,18 +182,39 @@ export class CryptographicKeyControllerApi extends BaseAPI {
             url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/compromise'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{uuid}', encodeURI(uuid)),
             method: 'PATCH',
             headers,
-            body: requestBody,
+            body: compromiseKeyRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * This API can be used to mark multiple keys items to be marked as compromised.
+     * Mark Multiple Key Items as Compromised
+     */
+    compromiseKeyItems({ bulkCompromiseKeyItemRequestDto }: CompromiseKeyItemsRequest): Observable<void>
+    compromiseKeyItems({ bulkCompromiseKeyItemRequestDto }: CompromiseKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    compromiseKeyItems({ bulkCompromiseKeyItemRequestDto }: CompromiseKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(bulkCompromiseKeyItemRequestDto, 'bulkCompromiseKeyItemRequestDto', 'compromiseKeyItems');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/keys/items/compromise',
+            method: 'PATCH',
+            headers,
+            body: bulkCompromiseKeyItemRequestDto,
         }, opts?.responseOpts);
     };
 
     /**
      * This API can be used to mark multiple keys and its sub items to be marked as compromised.Specific part of the key cannot be mentioned in this API
-     * Mark Multiple Key and its Items as Compromised
+     * Mark Multiple Key and all its Items as Compromised
      */
-    compromiseKeys({ requestBody }: CompromiseKeysRequest): Observable<void>
-    compromiseKeys({ requestBody }: CompromiseKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    compromiseKeys({ requestBody }: CompromiseKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'compromiseKeys');
+    compromiseKeys({ bulkCompromiseKeyRequestDto }: CompromiseKeysRequest): Observable<void>
+    compromiseKeys({ bulkCompromiseKeyRequestDto }: CompromiseKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    compromiseKeys({ bulkCompromiseKeyRequestDto }: CompromiseKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(bulkCompromiseKeyRequestDto, 'bulkCompromiseKeyRequestDto', 'compromiseKeys');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -167,7 +224,7 @@ export class CryptographicKeyControllerApi extends BaseAPI {
             url: '/v1/keys/compromise',
             method: 'PATCH',
             headers,
-            body: requestBody,
+            body: bulkCompromiseKeyRequestDto,
         }, opts?.responseOpts);
     };
 
@@ -217,6 +274,26 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     };
 
     /**
+     * Delete Multiple Cryptographic Key Items
+     */
+    deleteKeyItems({ requestBody }: DeleteKeyItemsRequest): Observable<void>
+    deleteKeyItems({ requestBody }: DeleteKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteKeyItems({ requestBody }: DeleteKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'deleteKeyItems');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/keys/items',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Delete Multiple Cryptographic Key
      */
     deleteKeys({ requestBody }: DeleteKeysRequest): Observable<void>
@@ -259,6 +336,26 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     };
 
     /**
+     * Destroy Multiple Cryptographic Key items
+     */
+    destroyKeyItems({ requestBody }: DestroyKeyItemsRequest): Observable<void>
+    destroyKeyItems({ requestBody }: DestroyKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    destroyKeyItems({ requestBody }: DestroyKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'destroyKeyItems');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/keys/items/destroy',
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Destroy Multiple Cryptographic Key and its items
      */
     destroyKeys({ requestBody }: DestroyKeysRequest): Observable<void>
@@ -294,6 +391,26 @@ export class CryptographicKeyControllerApi extends BaseAPI {
 
         return this.request<void>({
             url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/disable'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Disable multiple Key Items
+     */
+    disableKeyItems({ requestBody }: DisableKeyItemsRequest): Observable<void>
+    disableKeyItems({ requestBody }: DisableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    disableKeyItems({ requestBody }: DisableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'disableKeyItems');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/keys/items/disable',
             method: 'PATCH',
             headers,
             body: requestBody,
@@ -365,6 +482,26 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     };
 
     /**
+     * Enable multiple Key Items
+     */
+    enableKeyItems({ requestBody }: EnableKeyItemsRequest): Observable<void>
+    enableKeyItems({ requestBody }: EnableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    enableKeyItems({ requestBody }: EnableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'enableKeyItems');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/keys/items/enable',
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Enable multiple Keys
      */
     enableKeys({ requestBody }: EnableKeysRequest): Observable<void>
@@ -416,6 +553,22 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     };
 
     /**
+     * Get Cryptographic Key Detail
+     */
+    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest): Observable<KeyItemDto>
+    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest, opts?: OperationOpts): Observable<AjaxResponse<KeyItemDto>>
+    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest, opts?: OperationOpts): Observable<KeyItemDto | AjaxResponse<KeyItemDto>> {
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'getKeyItem');
+        throwIfNullOrUndefined(uuid, 'uuid', 'getKeyItem');
+        throwIfNullOrUndefined(keyItemUuid, 'keyItemUuid', 'getKeyItem');
+
+        return this.request<KeyItemDto>({
+            url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/item/{keyItemUuid}'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{uuid}', encodeURI(uuid)).replace('{keyItemUuid}', encodeURI(keyItemUuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * List of Attributes to create a Key
      */
     listCreateKeyAttributes({ tokenInstanceUuid, tokenProfileUuid, type }: ListCreateKeyAttributesRequest): Observable<Array<BaseAttributeDto>>
@@ -446,6 +599,27 @@ export class CryptographicKeyControllerApi extends BaseAPI {
             url: '/v1/keys',
             method: 'GET',
             query,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Update the key usages for multiple keys Items
+     * Update Key Usages for Multiple Key Items
+     */
+    updateKeyItemUsages({ bulkKeyItemUsageRequestDto }: UpdateKeyItemUsagesRequest): Observable<void>
+    updateKeyItemUsages({ bulkKeyItemUsageRequestDto }: UpdateKeyItemUsagesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    updateKeyItemUsages({ bulkKeyItemUsageRequestDto }: UpdateKeyItemUsagesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(bulkKeyItemUsageRequestDto, 'bulkKeyItemUsageRequestDto', 'updateKeyItemUsages');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/keys/items/usages',
+            method: 'PUT',
+            headers,
+            body: bulkKeyItemUsageRequestDto,
         }, opts?.responseOpts);
     };
 

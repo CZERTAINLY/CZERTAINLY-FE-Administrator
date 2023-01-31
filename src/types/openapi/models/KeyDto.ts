@@ -11,6 +11,11 @@
  * Do not edit the class manually.
  */
 
+import type {
+    GroupDto,
+    KeyItemSummaryDto,
+} from './';
+
 /**
  * @export
  * @interface KeyDto
@@ -64,4 +69,27 @@ export interface KeyDto {
      * @memberof KeyDto
      */
     tokenInstanceName: string;
+    /**
+     * Owner of the Key
+     * @type {string}
+     * @memberof KeyDto
+     */
+    owner?: string;
+    /**
+     * @type {GroupDto}
+     * @memberof KeyDto
+     */
+    group?: GroupDto;
+    /**
+     * Key Items
+     * @type {Array<KeyItemSummaryDto>}
+     * @memberof KeyDto
+     */
+    items: Array<KeyItemSummaryDto>;
+    /**
+     * Number of associated objects
+     * @type {number}
+     * @memberof KeyDto
+     */
+    associations?: number;
 }

@@ -2,13 +2,17 @@ import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import { CertificateGroupResponseModel } from "./certificateGroups";
 import { MetadataModel } from "./locations";
 import { 
+    BulkCompromiseKeyItemRequestDto,
+    BulkCompromiseKeyRequestDto,
     BulkKeyUsageRequestDto, 
+    CompromiseKeyRequestDto, 
     EditKeyRequestDto, 
     KeyDetailDto, 
     KeyDto, 
     KeyEventHistoryDto, 
     KeyFormat, 
     KeyItemDto, 
+    KeyItemSummaryDto, 
     KeyRequestDto, 
     UpdateKeyUsageRequestDto,
 } from "./openapi";
@@ -28,6 +32,9 @@ export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailRes
 export type CryptographicKeyItemResponseDto = KeyItemDto;
 export type CryptographicKeyItemResponseModel = Omit<CryptographicKeyItemResponseDto, "metadata | format"> & { metadata?: Array<MetadataModel>, format?: KeyFormat};
 
+export type CryptographicKeyItemSummaryDto = KeyItemSummaryDto;
+export type CryptographicKeyItemSummaryModel = Omit<CryptographicKeyItemSummaryDto, "format"> & { format?: KeyFormat};
+
 export type CryptographicKeyKeyUsageUpdateRequestDto = UpdateKeyUsageRequestDto;
 export type CryptographicKeyKeyUsageUpdateRequestModel = CryptographicKeyKeyUsageUpdateRequestDto;
 
@@ -36,3 +43,12 @@ export type CryptographicKeyKeyUsageBulkUpdateRequestModel = CryptographicKeyKey
 
 export type CryptographicKeyHistoryDto = KeyEventHistoryDto;
 export type CryptographicKeyHistoryModel = CryptographicKeyHistoryDto;
+
+export type CryptographicKeyCompromiseRequestDto = CompromiseKeyRequestDto;
+export type CryptographicKeyCompromiseRequestModel = CryptographicKeyCompromiseRequestDto;
+
+export type CryptographicKeyBulkCompromiseRequestDto = BulkCompromiseKeyRequestDto;
+export type CryptographicKeyBulkCompromiseRequestModel = CryptographicKeyBulkCompromiseRequestDto;
+
+export type CryptographicKeyItemBulkCompromiseRequestDto = BulkCompromiseKeyItemRequestDto;
+export type CryptographicKeyItemBulkCompromiseRequestModel = CryptographicKeyItemBulkCompromiseRequestDto;

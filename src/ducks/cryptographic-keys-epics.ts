@@ -12,6 +12,10 @@ import {
     transformCryptographicKeyEditRequestModelToDto,
     transformCryptographicKeyResponseDtoToModel,
     transformCryptographicKeyDetailResponseDtoToModel,
+    transformKeyHistoryDtoToModel,
+    transformCryptographicKeyItemBulkCompromiseModelToDto,
+    transformCryptographicKeyBulkCompromiseModelToDto,
+    transformCryptographicKeyCompromiseModelToDto,
 } from "./transform/cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
@@ -401,6 +405,99 @@ const bulkDeleteCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
 }
 
+
+const bulkEnableCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkEnableCryptographicKeyItems.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.enableKeyItems({ requestBody: action.payload.uuids }).pipe(
+
+            map(
+               () => slice.actions.bulkEnableCryptographicKeyItemsSuccess({ uuids: action.payload.uuids })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.bulkEnableCryptographicKeyItemsFailure({ error: extractError(err, "Failed to enable Keys") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to enable Keys" })
+               )
+            )
+
+         )
+
+      )
+
+   );
+
+}
+
+
+const bulkDisableCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDisableCryptographicKeyItems.match
+      ),
+
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.disableKeyItems({ requestBody: action.payload.uuids }).pipe(
+
+            map(
+               () => slice.actions.bulkDisableCryptographicKeyItemsSuccess({ uuids: action.payload.uuids })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.bulkDisableCryptographicKeyItemsFailure({ error: extractError(err, "Failed to disable Keys") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to disable Keys" })
+               )
+            )
+
+         )
+
+      )
+
+   );
+
+}
+
+
+const bulkDeleteCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDeleteCryptographicKeyItems.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.deleteKeyItems({ requestBody: action.payload.uuids }).pipe(
+
+            map(
+               errors => slice.actions.bulkDeleteCryptographicKeyItemsSuccess({ uuids: action.payload.uuids })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.bulkDeleteCryptographicKeyItemsFailure({ error: extractError(err, "Failed to delete Keys") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete Keys" })
+               )
+            )
+
+         )
+      )
+
+   );
+
+}
+
 const updateKeyUsage: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -449,7 +546,38 @@ const bulkUpdateKeyUsage: AppEpic = (action$, state$, deps) => {
 
             catchError(
                err => of(
-                  slice.actions.bulkEnableCryptographicKeysFailure({ error: extractError(err, "Failed to Update Key Usages") }),
+                  slice.actions.bulkUpdateKeyUsageFailure({ error: extractError(err, "Failed to Update Key Usages") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to Update Key Usages" })
+               )
+            )
+
+         )
+
+      )
+
+   );
+
+}
+
+
+const bulkUpdateKeyItemsUsage: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkUpdateKeyItemUsage.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.updateKeyItemUsages({ bulkKeyItemUsageRequestDto: action.payload.usage }).pipe(
+
+            map(
+               () => slice.actions.bulkUpdateKeyItemUsageSuccess({ })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.bulkUpdateKeyItemUsageFailure({ error: extractError(err, "Failed to Update Key Usages") }),
                   appRedirectActions.fetchError({ error: err, message: "Failed to Update Key Usages" })
                )
             )
@@ -473,10 +601,10 @@ const compromiseCryptographicKey: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.cryptographicKeys.compromiseKey({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid, requestBody: action.payload.keyItemUuid }).pipe(
+         action => deps.apiClients.cryptographicKeys.compromiseKey({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid, compromiseKeyRequestDto: transformCryptographicKeyCompromiseModelToDto(action.payload.request) }).pipe(
 
             map(
-               () => slice.actions.compromiseCryptographicKeySuccess({ uuid: action.payload.uuid, keyItemUuid: action.payload.keyItemUuid })
+               () => slice.actions.compromiseCryptographicKeySuccess({ uuid: action.payload.uuid, request: transformCryptographicKeyCompromiseModelToDto(action.payload.request) })
             ),
 
             catchError(
@@ -503,15 +631,45 @@ const bulkCompromiseCryptographicKeys: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.cryptographicKeys.compromiseKeys({ requestBody: action.payload.uuids }).pipe(
+         action => deps.apiClients.cryptographicKeys.compromiseKeys({ bulkCompromiseKeyRequestDto: transformCryptographicKeyBulkCompromiseModelToDto(action.payload.request) }).pipe(
 
             map(
-               errors => slice.actions.bulkCompromiseCryptographicKeysSuccess({ uuids: action.payload.uuids })
+               errors => slice.actions.bulkCompromiseCryptographicKeysSuccess({ request: transformCryptographicKeyBulkCompromiseModelToDto(action.payload.request)})
             ),
 
             catchError(
                err => of(
                   slice.actions.bulkCompromiseCryptographicKeysFailure({ error: extractError(err, "Failed to mark the Keys as Compromised") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to mark the Keys as Compromised" })
+               )
+            )
+
+         )
+      )
+
+   );
+
+}
+
+
+const bulkCompromiseCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkCompromiseCryptographicKeyItems.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.compromiseKeyItems({ bulkCompromiseKeyItemRequestDto: transformCryptographicKeyItemBulkCompromiseModelToDto(action.payload.request) }).pipe(
+
+            map(
+               errors => slice.actions.bulkCompromiseCryptographicKeyItemsSuccess({ request: transformCryptographicKeyItemBulkCompromiseModelToDto(action.payload.request) })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.bulkCompromiseCryptographicKeyItemsFailure({ error: extractError(err, "Failed to mark the Keys as Compromised") }),
                   appRedirectActions.fetchError({ error: err, message: "Failed to mark the Keys as Compromised" })
                )
             )
@@ -585,6 +743,71 @@ const bulkDestroyCryptographicKeys: AppEpic = (action$, state$, deps) => {
 }
 
 
+
+const bulkDestroyCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.bulkDestroyCryptographicKeyItems.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.destroyKeyItems({ requestBody: action.payload.uuids }).pipe(
+
+            map(
+               errors => slice.actions.bulkDestroyCryptographicKeyItemsSuccess({ uuids: action.payload.uuids })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.bulkDestroyCryptographicKeyItemsFailure({ error: extractError(err, "Failed to destroy the key") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to destroy the key" })
+               )
+            )
+
+         )
+      )
+
+   );
+
+}
+
+
+
+const getKeyHistory: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getHistory.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.getEventHistory({keyItemUuid:action.payload.keyItemUuid, tokenInstanceUuid:action.payload.tokenInstanceUuid, uuid: action.payload.keyUuid}).pipe(
+
+            map(
+               records => slice.actions.getHistorySuccess({
+                  keyHistory: records.map(record => transformKeyHistoryDtoToModel(record)),
+                  keyItemUuid: action.payload.keyItemUuid
+               })
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.getHistoryFailure({ error: extractError(err, "Failed to get history") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get history" })
+               )
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
 const epics = [
    listCryptographicKeys,
    getCryptographicKeyDetail,
@@ -597,12 +820,19 @@ const epics = [
    bulkEnableCryptographicKeys,
    bulkDisableCryptographicKeys,
    bulkDeleteCryptographicKeys,
+   bulkEnableCryptographicKeyItems,
+   bulkDisableCryptographicKeyItems,
+   bulkDeleteCryptographicKeyItems,
    updateKeyUsage,
    bulkUpdateKeyUsage,
+   bulkUpdateKeyItemsUsage,
    compromiseCryptographicKey,
    bulkCompromiseCryptographicKeys,
+   bulkCompromiseCryptographicKeyItems,
    destroyCryptographicKey,
    bulkDestroyCryptographicKeys,
+   bulkDestroyCryptographicKeyItems,
+   getKeyHistory,
 ];
 
 

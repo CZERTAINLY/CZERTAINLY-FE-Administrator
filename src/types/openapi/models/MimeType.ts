@@ -38,16 +38,6 @@ export interface MimeType {
      */
     charset?: string;
     /**
-     * @type {string}
-     * @memberof MimeType
-     */
-    subtypeSuffix?: string;
-    /**
-     * @type {boolean}
-     * @memberof MimeType
-     */
-    concrete?: boolean;
-    /**
      * @type {boolean}
      * @memberof MimeType
      */
@@ -57,4 +47,14 @@ export interface MimeType {
      * @memberof MimeType
      */
     wildcardSubtype?: boolean;
+    /**
+     * @type {string}
+     * @memberof MimeType
+     */
+    subtypeSuffix?: string;
+    /**
+     * @type {boolean}
+     * @memberof MimeType
+     */
+    concrete?: boolean;
 }

@@ -1,7 +1,7 @@
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import TokenStatusBadge from "components/TokenStatusBadge";
+import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
@@ -14,6 +14,7 @@ import { Container, Label } from "reactstrap";
 import { Resource, TokenInstanceStatus } from "types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
+import RandomDataGeneration from "./RandomDataGeneration";
 
 export default function TokenDetail() {
 
@@ -33,6 +34,8 @@ export default function TokenDetail() {
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [confirmDeactivation, setConfirmDeactivation] = useState<boolean>(false);
    const [activateToken, setActivateToken] = useState<boolean>(false);
+
+   const [randomDataGeneration, setRandomDataGeneration] = useState<boolean>(false);
 
    const isBusy = useMemo(
       () => isFetching || isDeleting || isActivating || isDeactivating || isReloading,
@@ -119,6 +122,7 @@ export default function TokenDetail() {
          { icon: "refresh", disabled: false, tooltip: "Update Status", onClick: () => { onReload() } },
          { icon: "check", disabled: token?.status.status !== TokenInstanceStatus.Deactivated, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
          { icon: "times", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
+         { icon: "random", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Generate Random", onClick: () => { setRandomDataGeneration(true) } },
       ],
       [onEditClick, onReload, token?.status.status ]
 
@@ -272,6 +276,14 @@ export default function TokenDetail() {
             caption="Activate Token"
             body={TokenActivationDialogBody({ visible: activateToken, onClose: () => setActivateToken(false), tokenUuid: token?.uuid})}
             toggle={() => setActivateToken(false)}
+            buttons={[]}
+         />
+
+         <Dialog
+            isOpen={randomDataGeneration}
+            caption="Random Data Generation"
+            body={RandomDataGeneration({ visible: randomDataGeneration, onClose: () => setRandomDataGeneration(false), tokenUuid: token?.uuid})}
+            toggle={() => setRandomDataGeneration(false)}
             buttons={[]}
          />
 

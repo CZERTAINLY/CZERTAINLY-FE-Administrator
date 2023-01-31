@@ -16,12 +16,21 @@ import {
    CryptographicKeyHistoryModel,
    CryptographicKeyItemResponseDto,
    CryptographicKeyItemResponseModel,
+   CryptographicKeyItemSummaryDto,
+   CryptographicKeyItemSummaryModel,
+   CryptographicKeyCompromiseRequestDto,
+   CryptographicKeyCompromiseRequestModel,
+   CryptographicKeyBulkCompromiseRequestModel,
+   CryptographicKeyBulkCompromiseRequestDto,
+   CryptographicKeyItemBulkCompromiseRequestModel,
+   CryptographicKeyItemBulkCompromiseRequestDto,
 } from "types/cryptographic-keys";
 
 
 export function transformCryptographicKeyResponseDtoToModel(keyResponse: CryptographicKeyResponseDto): CryptographicKeyResponseModel {
    return {
       ...keyResponse,
+      items: keyResponse.items.map(transformCryptographicKeyItemSummaryDtoToModel),
    }
 }
 
@@ -35,6 +44,12 @@ export function transformCryptographicKeyDetailResponseDtoToModel(keyResponse: C
 }
 
 export function transformCryptographicKeyItemResponseDtoToModel(keyResponse: CryptographicKeyItemResponseDto): CryptographicKeyItemResponseModel {
+   return {
+      ...keyResponse,
+   }
+}
+
+export function transformCryptographicKeyItemSummaryDtoToModel(keyResponse: CryptographicKeyItemSummaryDto): CryptographicKeyItemSummaryModel {
    return {
       ...keyResponse,
    }
@@ -65,6 +80,25 @@ export function transformCryptographicKeyKeyUsageRequestModelToDto(keyUsageReque
 export function transformCryptographicKeyBulkKeyUsageRequestModelToDto(keyUsageRequest: CryptographicKeyKeyUsageBulkUpdateRequestModel): CryptographicKeyKeyUsageBulkUpdateRequestDto {
    return {
       ...keyUsageRequest,
+   }
+}
+
+export function transformCryptographicKeyCompromiseModelToDto(request: CryptographicKeyCompromiseRequestModel): CryptographicKeyCompromiseRequestDto {
+   return {
+      ...request,
+   }
+}
+
+export function transformCryptographicKeyBulkCompromiseModelToDto(request: CryptographicKeyBulkCompromiseRequestModel): CryptographicKeyBulkCompromiseRequestDto {
+   return {
+      ...request,
+   }
+}
+
+
+export function transformCryptographicKeyItemBulkCompromiseModelToDto(request: CryptographicKeyItemBulkCompromiseRequestModel): CryptographicKeyItemBulkCompromiseRequestDto {
+   return {
+      ...request,
    }
 }
 

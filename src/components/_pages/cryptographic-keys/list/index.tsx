@@ -9,9 +9,11 @@ import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import Dialog from "components/Dialog";
-import { KeyUsage } from "types/openapi";
+import { KeyCompromiseReason, KeyUsage } from "types/openapi";
 import Select from "react-select";
 import { dateFormatter } from "utils/dateUtil";
+import KeyStateCircle from "../KeyStateCircle";
+import KeyStatusCircle from "../KeyStatusCircle";
 
 function CryptographicKeyList() {
 
@@ -42,6 +44,8 @@ function CryptographicKeyList() {
 
    const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
+   const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
+
 
    useEffect(() => {
 
@@ -65,7 +69,7 @@ function CryptographicKeyList() {
    const onEnableClick = useCallback(
 
       () => {
-         dispatch(actions.bulkEnableCryptographicKeys({ uuids: checkedRows }));
+         dispatch(actions.bulkEnableCryptographicKeyItems({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
 
@@ -75,7 +79,7 @@ function CryptographicKeyList() {
    const onDisableClick = useCallback(
 
       () => {
-         dispatch(actions.bulkDisableCryptographicKeys({ uuids: checkedRows }));
+         dispatch(actions.bulkDisableCryptographicKeyItems({ uuids: checkedRows }));
       },
       [checkedRows, dispatch]
 
@@ -85,7 +89,7 @@ function CryptographicKeyList() {
    const onDeleteConfirmed = useCallback(
 
       () => {
-         dispatch(actions.bulkDeleteCryptographicKeys({ uuids: checkedRows }));
+         dispatch(actions.bulkDeleteCryptographicKeyItems({ uuids: checkedRows }));
          setConfirmDelete(false);
       },
       [checkedRows, dispatch]
@@ -96,7 +100,7 @@ function CryptographicKeyList() {
    const onUpdateKeyUsageConfirmed = useCallback(
 
       () => {
-         dispatch(actions.bulkUpdateKeyUsage({ usage: {usage: keyUsages, uuids: checkedRows} }));
+         dispatch(actions.bulkUpdateKeyItemUsage({ usage: {usage: keyUsages, uuids: checkedRows} }));
          setKeyUsageUpdate(false);
       },
       [checkedRows, dispatch, keyUsages]
@@ -106,18 +110,19 @@ function CryptographicKeyList() {
    const onCompromise = useCallback(
 
       () => {
-         dispatch(actions.bulkCompromiseCryptographicKeys({ uuids: checkedRows }));
+         if(!compromiseReason) return;
+         dispatch(actions.bulkCompromiseCryptographicKeyItems({ request: { reason: compromiseReason, uuids: checkedRows }}));
          setConfirmCompromise(false);
       },
-      [checkedRows, dispatch]
+      [checkedRows, dispatch, compromiseReason]
 
    );
 
    const onDestroy = useCallback(
 
       () => {
-         dispatch(actions.bulkDestroyCryptographicKeys({ uuids: checkedRows }));
-         setConfirmCompromise(false);
+         dispatch(actions.bulkDestroyCryptographicKeyItems({ uuids: checkedRows }));
+         setConfirmDestroy(false);
       },
       [checkedRows, dispatch]
 
@@ -199,22 +204,66 @@ function CryptographicKeyList() {
 
       () => [
          {
-            id: "name",
+            id: "status",
+            content: "Status",
+            align: "center",
+            width: "1%",
+         },
+         {
+            id: "state",
+            content: "State",
+            align: "center",
+            width: "1%",
+         },
+         {
+            id: "keyName",
             content: "Name",
-            sortable: true,
-            sort: "asc",
             width: "15%",
          },
          {
-            id: "description",
-            content: "Description",
+            id: "type",
+            content: "Type",
+            width: "15%",
+         },
+         {
+            id: "algorithm",
+            align: "center",
+            content: "Algorithm",
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "size",
+            align: "center",
+            content: "Size",
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "format",
+            align: "center",
+            content: "Format",
             sortable: true,
             width: "15%",
          },
          {
             id: "creationTime",
             align: "center",
-            content: "Creation Time",
+            content: "Creation Date",
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "group",
+            align: "center",
+            content: "Group",
+            sortable: true,
+            width: "15%",
+         },
+         {
+            id: "owner",
+            align: "center",
+            content: "Owner",
             sortable: true,
             width: "15%",
          },
@@ -232,38 +281,66 @@ function CryptographicKeyList() {
             sortable: true,
             width: "15%",
          },
+         {
+            id: "associations",
+            align: "center",
+            content: "Associations",
+            sortable: true,
+            width: "15%",
+         }
       ],
       []
    );
 
 
-   const profilesTableData: TableDataRow[] = useMemo(
+   const profilesTableData = (): TableDataRow[] => {
+      var responseList: TableDataRow[] = [];
+      for(let key in cryptographicKeys)   {
+         for(let item in cryptographicKeys[key].items) {
+            responseList.push({
+               id: cryptographicKeys[key].items[item].uuid,
+               columns: [
+                  
+                  <KeyStatusCircle status={cryptographicKeys[key].items[item].enabled}/>,
 
-      () => cryptographicKeys.map(
+                  <KeyStateCircle state={cryptographicKeys[key].items[item].state}/>,
 
-         cryptographicKey => ({
+                  <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${cryptographicKeys[key].tokenInstanceUuid || "unknown"}/${cryptographicKeys[key].uuid}`}>{cryptographicKeys[key].items[item].name}</Link></span>,
+                  
+                  <Badge color="secondary">{cryptographicKeys[key].items[item].type}</Badge>,
 
-            id: cryptographicKey.uuid,
+                  cryptographicKeys[key].items[item].cryptographicAlgorithm,
 
-            columns: [
+                  cryptographicKeys[key].items[item].length?.toString() || "unknown",
 
-               <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/${cryptographicKey.uuid}`}>{cryptographicKey.name}</Link></span>,
+                  cryptographicKeys[key].items[item].format || "unknown",
 
-               <span style={{ whiteSpace: "nowrap" }}>{cryptographicKey.description || ""}</span>,
+                  <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKeys[key].creationTime) || ""}</span>,
 
-               <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKey.creationTime) || ""}</span>,
+                  cryptographicKeys[key].group?.name || "",
 
-               <Badge color="secondary">{cryptographicKey.tokenProfileName}</Badge>,
+                  cryptographicKeys[key].owner || "",
 
-               <Badge color="primary">{cryptographicKey.tokenInstanceName}</Badge>,
+                  <Badge color="secondary">{cryptographicKeys[key].tokenProfileName}</Badge>,
 
-            ]
+                  <Badge color="primary">{cryptographicKeys[key].tokenInstanceName}</Badge>,
 
-         })
-      ),
-      [cryptographicKeys]
+                  cryptographicKeys[key].associations?.toString() || "",
+                  
+               ]
+            })
+         }}
+         return responseList;
+      }
 
-   )
+      const optionForCompromise = () => {
+         var options = [];
+         for (const reason in KeyCompromiseReason) {
+            const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
+            options.push({ value: myReason, label: myReason });
+         }
+         return options;
+        }
 
 
    return (
@@ -275,11 +352,12 @@ function CryptographicKeyList() {
             <br />
             <CustomTable
                headers={cryptographicKeysTableHeaders}
-               data={profilesTableData}
+               data={profilesTableData()}
                onCheckedRowsChanged={setCheckedRows}
                canSearch={true}
                hasCheckboxes={true}
                hasPagination={true}
+               // hasDetails={true}
             />
 
          </Widget>
@@ -298,11 +376,22 @@ function CryptographicKeyList() {
          <Dialog
             isOpen={confirmCompromise}
             caption={`${checkedRows.length > 1 ? "Keys" : "Key"} Compromised?`}
-            body={`If the ${checkedRows.length > 1 ? "a Key" : "Keys"}. are compromised, proceed to make the platform stop using it for any operations.`}
-            toggle={() => setConfirmDelete(false)}
+            body={
+               <div>
+                  <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
+                  <p><b>Warning:</b> This action cannot be undone.</p>
+                  <Select
+                     name="compromiseReason"
+                     id="compromiseReason"
+                     options={optionForCompromise()}
+                     onChange={(e) => setCompromiseReason(e?.value)}
+                  />
+               </div>
+            }
+            toggle={() => setConfirmCompromise(false)}
             buttons={[
                { color: "danger", onClick: onCompromise, body: "Yes" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+               { color: "secondary", onClick: () => setConfirmCompromise(false), body: "Cancel" },
             ]}
          />
 
