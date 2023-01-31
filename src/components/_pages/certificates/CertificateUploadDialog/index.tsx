@@ -11,6 +11,7 @@ import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
 }
@@ -228,11 +229,18 @@ export default function CertificateUploadDialog({
 
                      {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
 
-                     <br />
-                      <AttributeEditor
-                          id="customUploadCertificate"
-                          attributeDescriptors={resourceCustomAttributes}
-                      />
+                      <br />
+
+                      <TabLayout tabs={[
+                          {
+                              title: "Custom Attributes",
+                              content: (<AttributeEditor
+                                  id="customUploadCertificate"
+                                  attributeDescriptors={resourceCustomAttributes}
+                              />)
+                          }
+                      ]} />
+
                       <br/>
 
                      <div className="d-flex justify-content-end">

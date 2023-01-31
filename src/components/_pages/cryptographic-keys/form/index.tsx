@@ -2,11 +2,11 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
-import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
+import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as connectorActions } from "ducks/connectors";
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from "ducks/cryptographic-keys";
-import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
+import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
 import { FormApi } from "final-form";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
@@ -16,7 +16,9 @@ import Select, { SingleValue } from "react-select";
 
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
+import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { CryptographicKeyDetailResponseModel } from "types/cryptographic-keys";
+import { TokenProfileResponseModel } from "types/token-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -25,8 +27,6 @@ import { composeValidators, validateAlphaNumeric, validateRequired } from "utils
 import { selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { KeyRequestType, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
-import { TokenProfileResponseModel } from "types/token-profiles";
-import { CertificateGroupResponseModel } from "types/certificateGroups";
 
 interface FormValues {
    name: string;
@@ -465,7 +465,7 @@ export default function CryptographicKeyForm() {
                   </Field> : <></>}
 
 
-                   <hr />
+                   <br />
                    
                    <TabLayout tabs={attributeTabs(form)} />
 

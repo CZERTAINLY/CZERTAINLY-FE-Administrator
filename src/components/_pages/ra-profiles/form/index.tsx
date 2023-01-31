@@ -288,7 +288,7 @@ export default function RaProfileForm() {
                   </Field>
 
 
-                   <hr />
+                   <br />
                    <TabLayout tabs={[
                        {
                            title: "Connector Attributes",

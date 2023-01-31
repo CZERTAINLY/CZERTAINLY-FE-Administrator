@@ -1,22 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup } from 'reactstrap';
-import { Field, Form } from "react-final-form";
-import Select from 'react-select';
-
-import { mutators } from "utils/attributes/attributeEditorMutators";
-
-import { validateRequired } from 'utils/validators';
-
-import AttributeEditor from 'components/Attributes/AttributeEditor';
+import AttributeEditor from "components/Attributes/AttributeEditor";
 import Spinner from "components/Spinner";
 
 import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from "ducks/acme-profiles";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-import { collectFormAttributes } from 'utils/attributes/attributes';
-import { AttributeRequestModel } from "types/attributes";
-import { AttributeDescriptorModel } from "types/attributes";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes/attributes";
+
+import { validateRequired } from "utils/validators";
+import TabLayout from "../../Layout/TabLayout";
 
 interface Props {
    raProfileUuid?: string;
@@ -156,59 +154,40 @@ export default function AcmeProtocolActivationDialogBody({
                      }
 
                   </Field>
+                   <br />
 
-                  {!issuanceAttributes || issuanceAttributes.length === 0 ? <></> : (
-
-                     <Field name="IssuanceAttributes">
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="issuanceAttributes">Issuance attributes</Label>
-
-                              <AttributeEditor
-                                 id="issuanceAttributes"
-                                 attributeDescriptors={issuanceAttributes}
-                                 groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                 setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                              />
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                  )}
-
-
-                  {!revocationAttributes || revocationAttributes.length === 0 ? <></> : (
-
-                     <Field name="RevocationAttributes">
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="revocationAttributes">Revocation attributes</Label>
-
-                              <AttributeEditor
-                                 id="revocationAttributes"
-                                 attributeDescriptors={revocationAttributes}
-                                 groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
-                                 setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
-                              />
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                  )}
-
-
+                   <TabLayout tabs={[
+                       {
+                           title: "Issuance attributes",
+                           content: !issuanceAttributes || issuanceAttributes.length === 0 ? <></> : (<Field name="IssuanceAttributes">
+                               {({input, meta}) => (
+                                   <FormGroup>
+                                       <AttributeEditor
+                                           id="issuanceAttributes"
+                                           attributeDescriptors={issuanceAttributes}
+                                           groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                           setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                       />
+                                   </FormGroup>
+                               )}
+                           </Field>)
+                       },
+                       {
+                           title: "Revocation attributes",
+                           content: !revocationAttributes || revocationAttributes.length === 0 ? <></> : (<Field name="RevocationAttributes">
+                               {({input, meta}) => (
+                                   <FormGroup>
+                                       <AttributeEditor
+                                           id="revocationAttributes"
+                                           attributeDescriptors={revocationAttributes}
+                                           groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
+                                           setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
+                                       />
+                                   </FormGroup>
+                               )}
+                           </Field>)
+                       }
+                   ]} />
 
                   <div style={{ textAlign: "right" }}>
                      <ButtonGroup>

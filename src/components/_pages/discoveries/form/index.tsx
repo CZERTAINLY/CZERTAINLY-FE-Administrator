@@ -247,9 +247,7 @@ export default function DiscoveryForm() {
 
 
                      <>
-                        <hr />
-                        <h6>Discovery Attributes</h6>
-                        <hr />
+                        <br />
                          <TabLayout tabs={[
                              {
                                  title: "Connector Attributes",

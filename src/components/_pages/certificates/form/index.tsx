@@ -350,7 +350,7 @@ export default function CertificateForm() {
 
                            </div>
 
-                            <hr />
+                            <br />
                             <TabLayout tabs={[
                                 {
                                     title: "Connector Attributes",

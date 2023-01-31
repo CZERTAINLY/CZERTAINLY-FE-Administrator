@@ -46,6 +46,7 @@ import { downloadFile, formatPEM } from "utils/certificate";
 
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import TabLayout from "../../../Layout/TabLayout";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import CertificateStatus from "../CertificateStatus";
@@ -1463,23 +1464,19 @@ export default function CertificateDetail() {
                               onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
                            />
 
-                           {locationAttributeDescriptors && (
+                            <br />
 
-                              <>
-
-                                 <br />
-                                 <Label>Location attributes</Label>
-
-                                 <AttributeEditor
-                                    id="locationAttributes"
-                                    attributeDescriptors={locationAttributeDescriptors}
-                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                 />
-
-                              </>
-
-                           )}
+                            <TabLayout tabs={[
+                                {
+                                    title: "Location Attributes",
+                                    content: locationAttributeDescriptors ? (<AttributeEditor
+                                        id="locationAttributes"
+                                        attributeDescriptors={locationAttributeDescriptors}
+                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                    />) : <></>
+                                }
+                            ]} />
 
 
                            <div className="d-flex justify-content-end">

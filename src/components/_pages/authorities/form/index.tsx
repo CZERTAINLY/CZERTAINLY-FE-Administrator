@@ -421,9 +421,7 @@ export default function AuthorityForm() {
                   ) : null}
 
                      <>
-                        <hr />
-                        <h6>Authority Attributes</h6>
-                        <hr />
+                        <br />
 
                          <TabLayout tabs={[
                              {

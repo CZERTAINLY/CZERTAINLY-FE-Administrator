@@ -1,17 +1,16 @@
-import { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
-import { Field, Form } from "react-final-form";
-
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from 'utils/attributes/attributes';
-
-import AttributeEditor from 'components/Attributes/AttributeEditor';
+import AttributeEditor from "components/Attributes/AttributeEditor";
 
 import { actions } from "ducks/compliance-profiles";
+import React, { useCallback, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch } from "react-redux";
+
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes/attributes";
+import TabLayout from "../../../../Layout/TabLayout";
 
 interface Props {
    complianceProfileUuid?: string;
@@ -92,14 +91,19 @@ export default function AddRuleWithAttributesDialogBody({
 
                            <FormGroup>
 
-                              <Label for="attributes">Attributes</Label>
+                               <br />
 
-                              <AttributeEditor
-                                 id="attributes"
-                                 attributeDescriptors={attributes}
-                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                              />
+                               <TabLayout tabs={[
+                                   {
+                                       title: "Custom Attributes",
+                                       content: (<AttributeEditor
+                                           id="attributes"
+                                           attributeDescriptors={attributes}
+                                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                       />)
+                                   }]
+                               }/>
 
                            </FormGroup>
 

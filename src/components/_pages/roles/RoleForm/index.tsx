@@ -15,6 +15,7 @@ import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string;
@@ -185,11 +186,18 @@ function RoleForm() {
 
                      </Field>
 
-                      <AttributeEditor
-                          id="customRole"
-                          attributeDescriptors={resourceCustomAttributes}
-                          attributes={roleSelector?.customAttributes}
-                      />
+                      <br />
+
+                      <TabLayout tabs={[
+                          {
+                              title: "Custom Attributes",
+                              content: (<AttributeEditor
+                                  id="customRole"
+                                  attributeDescriptors={resourceCustomAttributes}
+                                  attributes={roleSelector?.customAttributes}
+                                />)
+                          }
+                      ]} />
 
                      <div className="d-flex justify-content-end">
 
