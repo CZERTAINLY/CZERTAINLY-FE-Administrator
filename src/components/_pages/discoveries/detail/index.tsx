@@ -13,6 +13,8 @@ import { Link, useParams } from "react-router-dom";
 import { Col, Container, Label, Row } from "reactstrap";
 
 import { dateFormatter } from "utils/dateUtil";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import DiscoveryStatus from "../DiscoveryStatus";
 
 export default function DiscoveryDetail() {
@@ -248,10 +250,8 @@ export default function DiscoveryDetail() {
                   <br />
                   <Label>Discovery Attributes</Label>
                   <AttributeViewer attributes={discovery?.attributes} />
-                    <br />
-                    <Label>Custom Attributes</Label>
-                    <AttributeViewer attributes={discovery?.customAttributes} />
                 </Widget>
+                {discovery && <CustomAttributeWidget resource={Resource.Discoveries} resourceUuid={discovery.uuid} attributes={discovery.customAttributes} />}
             </Col>
             <Col>
                <Widget title={metaTitle}>

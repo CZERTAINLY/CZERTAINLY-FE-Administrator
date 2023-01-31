@@ -11,7 +11,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
-import { TokenInstanceStatus } from "types/openapi";
+import { Resource, TokenInstanceStatus } from "types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
 
 export default function TokenDetail() {
@@ -232,12 +233,11 @@ export default function TokenDetail() {
 
              <Label>Token Attributes</Label>
              <AttributeViewer attributes={token?.attributes} />
-             <Label>Custom Attributes</Label>
-             <AttributeViewer attributes={token?.customAttributes} />
-
          </Widget>
 
-         <Widget title={metaTitle}>
+          {token && <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />}
+
+          <Widget title={metaTitle}>
                <br />
                   <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata}/>
          </Widget>

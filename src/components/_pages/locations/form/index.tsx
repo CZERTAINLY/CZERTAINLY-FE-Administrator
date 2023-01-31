@@ -299,9 +299,7 @@ export default function LocationForm() {
 
 
                      <>
-                        <hr />
-                        <h6>Location Attributes</h6>
-                        <hr />
+                        <br />
 
                          <TabLayout tabs={[
                              {

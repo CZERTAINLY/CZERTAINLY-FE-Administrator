@@ -394,9 +394,7 @@ export default function CredentialForm() {
                   ) : null}
 
                      <>
-                        <hr />
-                        <h6>Credential Attributes</h6>
-                         <hr />
+                         <br />
                          <TabLayout tabs={[
                              {
                                  title: "Connector Attributes",

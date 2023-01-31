@@ -31,12 +31,12 @@ import {
    CertificateUploadDto,
    CertificateUploadModel,
    RaProfileSimplifiedDto,
-   RaProfileSimplifiedModel
+   RaProfileSimplifiedModel,
 } from "types/certificate";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
-import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { CertificateComplianceCheckDto } from "../../types/openapi";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
+import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
 
 export function transformCertificateSearchFilterModelToDto(search: CertificateSearchFilterModel): CertificateSearchFilterDto {
    return { ...search };
@@ -129,7 +129,10 @@ export function transformCertificateBulkDeleteResponseDtoToModel(bulk: Certifica
 }
 
 export function transformCertificateUploadModelToDto(upload: CertificateUploadModel): CertificateUploadDto {
-   return { ...upload };
+   return {
+      ...upload,
+      customAttributes: upload.customAttributes.map(transformAttributeRequestModelToDto)
+   };
 }
 
 export function transformCertificateComplianceCheckModelToDto(check: CertificateComplianceCheckModel): CertificateComplianceCheckDto {

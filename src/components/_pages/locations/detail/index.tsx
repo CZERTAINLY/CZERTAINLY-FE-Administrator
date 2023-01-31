@@ -25,6 +25,9 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 
 import { validateRequired } from "utils/validators";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import TabLayout from "../../../Layout/TabLayout";
 
 export default function LocationDetail() {
 
@@ -490,10 +493,8 @@ export default function LocationDetail() {
 
             <Label>Location Attributes</Label>
             <AttributeViewer attributes={location?.attributes} />
-            <Label>Custom Attributes</Label>
-            <AttributeViewer attributes={location?.customAttributes} />
-
          </Widget>
+          {location && <CustomAttributeWidget resource={Resource.Locations} resourceUuid={location.uuid} attributes={location.customAttributes} />}
 
          <Widget title={certsTitle} busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}>
 
@@ -663,38 +664,28 @@ export default function LocationDetail() {
 
                            </Field>
 
+                            <br />
 
-                           <FormGroup>
-
-                              <Label>Certificate Signing Request Attributes</Label>
-
-                              {csrAttributeDescriptors && (
-                                 <AttributeEditor
-                                    id="csrAttributes"
-                                    attributeDescriptors={csrAttributeDescriptors}
-                                    groupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
-                                    setGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
-                                 />
-                              )}
-
-                           </FormGroup>
-
-
-                           <FormGroup>
-
-                              <Label>RA Profile Issuance Attributes</Label>
-
-                              {issuanceAttributeDescriptors && (
-                                 <AttributeEditor
-                                    id="issueAttributes"
-                                    attributeDescriptors={issuanceAttributeDescriptors}
-                                    groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                    setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                 />
-                              )}
-
-                           </FormGroup>
-
+                            <TabLayout tabs={[
+                                {
+                                    title: "Certificate Signing Request Attributes",
+                                    content: csrAttributeDescriptors ? (<AttributeEditor
+                                            id="csrAttributes"
+                                            attributeDescriptors={csrAttributeDescriptors}
+                                            groupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
+                                        />) : <></>
+                                },
+                                {
+                                    title: "RA Profile Issuance Attributes",
+                                    content: issuanceAttributeDescriptors ? (<AttributeEditor
+                                        id="issueAttributes"
+                                        attributeDescriptors={issuanceAttributeDescriptors}
+                                        groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                    />) : <></>
+                                },
+                            ]} />
 
                            <div style={{ textAlign: "right" }}>
 

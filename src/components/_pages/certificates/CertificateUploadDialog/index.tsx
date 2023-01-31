@@ -1,12 +1,24 @@
 import CertificateAttributes from "components/CertificateAttributes";
-import { useCallback, useState } from "react";
-import { Button, ButtonGroup, Col, FormGroup, FormText, Input, Label, Row } from "reactstrap";
-import { getCertificateInformation } from "utils/certificate";
+import React, { useCallback, useEffect, useState } from "react";
+import { Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormGroup, FormText, Input, Label, Row } from "reactstrap";
 import { CertificateResponseModel } from "types/certificate";
+import { getCertificateInformation } from "utils/certificate";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { AttributeRequestModel } from "../../../../types/attributes";
+import { Resource } from "../../../../types/openapi";
+import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "../../../../utils/attributes/attributes";
+import AttributeEditor from "../../../Attributes/AttributeEditor";
+import TabLayout from "../../../Layout/TabLayout";
+
+interface FormValues {
+}
 
 interface Props {
    onCancel: () => void;
-   onUpload: (data: { fileContent: string, fileName: string, contentType: string, certificate: CertificateResponseModel }) => void;
+   onUpload: (data: { fileContent: string, fileName: string, contentType: string, customAttributes?: Array<AttributeRequestModel>, certificate: CertificateResponseModel }) => void;
    okButtonTitle?: string;
 }
 
@@ -15,6 +27,7 @@ export default function CertificateUploadDialog({
    onUpload,
    okButtonTitle = "Upload"
 }: Props) {
+    const dispatch = useDispatch();
 
    const [fileName, setFileName] = useState("");
    const [contentType, setContentType] = useState("");
@@ -23,9 +36,14 @@ export default function CertificateUploadDialog({
    const [error, setError] = useState<string>("");
 
    const [certificate, setCertificate] = useState<CertificateResponseModel | undefined>();
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+
+    useEffect(() => {
+        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
+    }, [dispatch]);
 
 
-   const onFileLoaded = useCallback(
+    const onFileLoaded = useCallback(
 
       (data: ProgressEvent<FileReader>, fileName: string) => {
 
@@ -126,115 +144,137 @@ export default function CertificateUploadDialog({
 
    return (
 
-      <div>
+       <Form onSubmit={() => {}} mutators={{ ...mutators<FormValues>() }} >
 
-         <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
+           {({ values }) => (
 
-            <Row>
+               <BootstrapForm>
+                  <div>
 
-               <Col>
+                     <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
 
-                  <FormGroup>
+                        <Row>
 
-                     <Label for="fileName">File name</Label>
+                           <Col>
 
-                     <Input
-                        id="fileName"
-                        type="text"
-                        placeholder="File not selected"
-                        disabled={true}
-                        style={{ textAlign: "center" }}
-                        value={fileName}
-                     />
+                              <FormGroup>
 
-                  </FormGroup>
+                                 <Label for="fileName">File name</Label>
 
-               </Col>
+                                 <Input
+                                    id="fileName"
+                                    type="text"
+                                    placeholder="File not selected"
+                                    disabled={true}
+                                    style={{ textAlign: "center" }}
+                                    value={fileName}
+                                 />
 
-               <Col>
+                              </FormGroup>
 
-                  <FormGroup>
+                           </Col>
 
-                     <Label for="contentType">Content type</Label>
+                           <Col>
 
-                     <Input
-                        id="contentType"
-                        type="text"
-                        placeholder="File not selected"
-                        disabled={true}
-                        style={{ textAlign: "center" }}
-                        value={contentType}
-                     />
+                              <FormGroup>
 
-                  </FormGroup>
+                                 <Label for="contentType">Content type</Label>
 
-               </Col>
+                                 <Input
+                                    id="contentType"
+                                    type="text"
+                                    placeholder="File not selected"
+                                    disabled={true}
+                                    style={{ textAlign: "center" }}
+                                    value={contentType}
+                                 />
 
-            </Row>
+                              </FormGroup>
 
+                           </Col>
 
-            <FormGroup>
-
-               <Label for="fileContent">File content</Label>
-
-               <Input
-                  id="fileContent"
-                  type="textarea"
-                  rows={10}
-                  placeholder={`Select or drag & drop a certificate File`}
-                  readOnly={true}
-                  value={file}
-               />
-
-            </FormGroup>
-
-            <FormGroup style={{ textAlign: "right" }}>
-
-               <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
-
-               <Input id="file" type="file" style={{ display: "none" }} onChange={onFileChanged} />
-
-            </FormGroup>
-
-            <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
-               Select or Drag &amp; Drop file to Drop Zone.
-            </div>
-
-         </div>
-
-         {error && <><br /><div className="text-muted" style={{ textAlign: "center" }}>{error}</div><FormText style={{ textAlign: "center" }}>Possibly the certificate can be decoded on the server side</FormText></>}
-
-         {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
-
-         <br />
-
-         <div className="d-flex justify-content-end">
-
-            <ButtonGroup>
-
-               <Button
-                  color="primary"
-                  onClick={() => onUpload({ fileContent: file, fileName, contentType, certificate: certificate! })}
-                  disabled={!file}
-               >
-                  {okButtonTitle}
-               </Button>
-
-               <Button
-                  color="default"
-                  onClick={onCancel}
-               >
-                  Cancel
-               </Button>
+                        </Row>
 
 
+                        <FormGroup>
 
-            </ButtonGroup>
+                           <Label for="fileContent">File content</Label>
 
-         </div>
+                           <Input
+                              id="fileContent"
+                              type="textarea"
+                              rows={10}
+                              placeholder={`Select or drag & drop a certificate File`}
+                              readOnly={true}
+                              value={file}
+                           />
+
+                        </FormGroup>
+
+                        <FormGroup style={{ textAlign: "right" }}>
+
+                           <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
+
+                           <Input id="file" type="file" style={{ display: "none" }} onChange={onFileChanged} />
+
+                        </FormGroup>
+
+                        <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
+                           Select or Drag &amp; Drop file to Drop Zone.
+                        </div>
+
+                     </div>
+
+                     {error && <><br /><div className="text-muted" style={{ textAlign: "center" }}>{error}</div><FormText style={{ textAlign: "center" }}>Possibly the certificate can be decoded on the server side</FormText></>}
+
+                     {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
+
+                      <br />
+
+                      <TabLayout tabs={[
+                          {
+                              title: "Custom Attributes",
+                              content: (<AttributeEditor
+                                  id="customUploadCertificate"
+                                  attributeDescriptors={resourceCustomAttributes}
+                              />)
+                          }
+                      ]} />
+
+                      <br/>
+
+                     <div className="d-flex justify-content-end">
+
+                        <ButtonGroup>
+
+                           <Button
+                              color="primary"
+                              onClick={() => onUpload({ fileContent: file, fileName, contentType, customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values), certificate: certificate! })}
+                              disabled={!file}
+                           >
+                              {okButtonTitle}
+                           </Button>
+
+                           <Button
+                              color="default"
+                              onClick={onCancel}
+                           >
+                              Cancel
+                           </Button>
 
 
-      </div>
+
+                        </ButtonGroup>
+
+                     </div>
+
+
+                  </div>
+               </BootstrapForm>
+
+           )}
+
+       </Form>
 
    );
 

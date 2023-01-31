@@ -15,6 +15,7 @@ import { Resource } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string;
@@ -169,14 +170,18 @@ export default function GroupForm() {
                   </Field>
 
                    <>
-                       <hr />
-                       <h6>Group Attributes</h6>
-                       <hr />
-                       <AttributeEditor
-                           id="customGroup"
-                           attributeDescriptors={resourceCustomAttributes}
-                           attributes={group?.customAttributes}
-                       />
+                       <br />
+
+                       <TabLayout tabs={[
+                           {
+                               title: "Custom Attributes",
+                               content: (<AttributeEditor
+                                   id="customGroup"
+                                   attributeDescriptors={resourceCustomAttributes}
+                                   attributes={group?.customAttributes}
+                               />)
+                           }
+                       ]} />
                    </>
 
                    <div className="d-flex justify-content-end">

@@ -39,12 +39,14 @@ import {
     UncontrolledButtonDropdown,
 } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus } from "types/openapi";
+import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus, Resource } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { downloadFile, formatPEM } from "utils/certificate";
 
 import { dateFormatter } from "utils/dateUtil";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import TabLayout from "../../../Layout/TabLayout";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import CertificateStatus from "../CertificateStatus";
@@ -1319,9 +1321,8 @@ export default function CertificateDetail() {
                   <br />
                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata}/>
                </Widget>
-               <Widget title={"Custom Attributes"}>
-                    <AttributeViewer attributes={certificate?.customAttributes} />
-               </Widget>
+
+                {certificate && <CustomAttributeWidget resource={Resource.Certificates} resourceUuid={certificate.uuid} attributes={certificate.customAttributes} />}
 
             </Col>
          </Row>
@@ -1463,23 +1464,19 @@ export default function CertificateDetail() {
                               onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
                            />
 
-                           {locationAttributeDescriptors && (
+                            <br />
 
-                              <>
-
-                                 <br />
-                                 <Label>Location attributes</Label>
-
-                                 <AttributeEditor
-                                    id="locationAttributes"
-                                    attributeDescriptors={locationAttributeDescriptors}
-                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                 />
-
-                              </>
-
-                           )}
+                            <TabLayout tabs={[
+                                {
+                                    title: "Location Attributes",
+                                    content: locationAttributeDescriptors ? (<AttributeEditor
+                                        id="locationAttributes"
+                                        attributeDescriptors={locationAttributeDescriptors}
+                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                    />) : <></>
+                                }
+                            ]} />
 
 
                            <div className="d-flex justify-content-end">

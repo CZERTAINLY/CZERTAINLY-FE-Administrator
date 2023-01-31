@@ -395,9 +395,7 @@ export default function EntityForm() {
                   ) : null}
 
                      <>
-                        <hr />
-                        <h6>Entity Attributes</h6>
-                        <hr />
+                        <br />
                          <TabLayout tabs={[
                              {
                                  title: "Connector Attributes",

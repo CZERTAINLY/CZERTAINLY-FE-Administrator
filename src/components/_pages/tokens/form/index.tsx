@@ -4,9 +4,9 @@ import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
 import { actions as alertActions } from "ducks/alerts";
-import { actions as tokenActions, selectors as tokenSelectors } from "ducks/tokens";
 import { actions as connectorActions } from "ducks/connectors";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+import { actions as tokenActions, selectors as tokenSelectors } from "ducks/tokens";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Field, Form } from "react-final-form";
@@ -16,9 +16,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select, { SingleValue } from "react-select/";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { TokenDetailResponseDto } from "types/tokens";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode, Resource } from "types/openapi";
+import { TokenDetailResponseDto } from "types/tokens";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -426,9 +426,7 @@ export default function TokenForm() {
                   ) : null}
 
                      <>
-                        <hr />
-                        <h6>Token Attributes</h6>
-                        <hr />
+                        <br />
 
                          <TabLayout tabs={[
                              {

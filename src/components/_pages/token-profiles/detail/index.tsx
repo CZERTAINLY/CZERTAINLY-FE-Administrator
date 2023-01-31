@@ -15,8 +15,8 @@ import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
 import { Badge, Col, Container, Label, Row } from "reactstrap";
-import { KeyUsage } from "types/openapi";
-
+import { KeyUsage, Resource } from "types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function TokenProfileDetail() {
 
@@ -291,11 +291,9 @@ export default function TokenProfileDetail() {
                   <br />
                   <Label>Token Profile Attributes</Label>
                   <AttributeViewer attributes={tokenProfile?.attributes} />
-
-                   <br />
-                   <Label>Custom Attributes</Label>
-                   <AttributeViewer attributes={tokenProfile?.customAttributes} />
                </Widget>
+
+                {tokenProfile && <CustomAttributeWidget resource={Resource.TokenProfiles} resourceUuid={tokenProfile.uuid} attributes={tokenProfile.customAttributes} />}
 
             </Col>
 

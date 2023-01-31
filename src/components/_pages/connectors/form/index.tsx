@@ -20,6 +20,7 @@ import { composeValidators, validateAlphaNumeric, validateRequired, validateUrl 
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
+import TabLayout from "../../../Layout/TabLayout";
 import InventoryStatusBadge from "../ConnectorStatus";
 
 interface FormValues {
@@ -392,14 +393,18 @@ export default function ConnectorForm() {
                         }
 
                          <>
-                             <hr />
-                             <h6>Connector Attributes</h6>
-                             <hr />
-                             <AttributeEditor
-                                 id="customConnector"
-                                 attributeDescriptors={resourceCustomAttributes}
-                                 attributes={connector?.customAttributes}
-                             />
+                             <br />
+
+                             <TabLayout tabs={[
+                                 {
+                                     title: "Custom Attributes",
+                                     content: (<AttributeEditor
+                                         id="customConnector"
+                                         attributeDescriptors={resourceCustomAttributes}
+                                         attributes={connector?.customAttributes}
+                                     />)
+                                 }
+                             ]} />
                          </>
 
                          <div className="d-flex justify-content-end">

@@ -2,10 +2,10 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
-import { actions as tokensActions, selectors as tokensSelectors } from "ducks/tokens";
 import { actions as connectorActions } from "ducks/connectors";
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
+import { actions as tokensActions, selectors as tokensSelectors } from "ducks/tokens";
 import { FormApi } from "final-form";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
@@ -328,7 +328,7 @@ export default function TokenProfileForm() {
                   </Field>
 
 
-                   <hr />
+                   <br />
                    <TabLayout tabs={[
                        {
                            title: "Connector Attributes",

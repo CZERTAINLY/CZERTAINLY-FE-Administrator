@@ -27,6 +27,7 @@ import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    username: string;
@@ -699,12 +700,18 @@ function UserForm() {
 
                      )}
 
-                     <br />
-                      <AttributeEditor
-                          id="customUser"
-                          attributeDescriptors={resourceCustomAttributes}
-                          attributes={user?.customAttributes}
-                      />
+                      <br />
+                      <TabLayout tabs={[
+                          {
+                              title: "Custom attributes",
+                              content: (<AttributeEditor
+                                  id="customUser"
+                                  attributeDescriptors={resourceCustomAttributes}
+                                  attributes={user?.customAttributes}
+                              />)
+                          }
+                      ]} />
+
                      <br />
 
                      <p>Assigned User Roles</p>

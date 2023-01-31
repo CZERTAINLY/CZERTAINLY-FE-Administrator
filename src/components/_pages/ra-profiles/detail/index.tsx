@@ -14,6 +14,8 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 
 import { Col, Container, Label, Row } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 import AcmeProtocolActivationDialogBody from "../AcmeProtocolActivationDialogBody";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
@@ -535,11 +537,9 @@ export default function RaProfileDetail() {
                         </>
                      )
                   }
-                   <br />
-                   <Label>Custom Attributes</Label>
-                   <AttributeViewer attributes={raProfile?.customAttributes} />
-
                </Widget>
+
+                {raProfile && <CustomAttributeWidget resource={Resource.RaProfiles} resourceUuid={raProfile.uuid} attributes={raProfile.customAttributes} />}
 
             </Col>
 

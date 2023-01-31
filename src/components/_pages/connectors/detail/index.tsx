@@ -17,7 +17,8 @@ import { FunctionGroupModel, HealthModel } from "types/connectors";
 
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
-import AttributeViewer from "../../../Attributes/AttributeViewer";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 import styles from "./connectorDetails.module.scss";
 
@@ -557,10 +558,7 @@ export default function ConnectorDetail() {
 
                &nbsp;
 
-                <Widget title="Custom Attributes">
-                    <br />
-                    <AttributeViewer attributes={connector?.customAttributes} />
-                </Widget>
+                {connector && <CustomAttributeWidget resource={Resource.Connectors} resourceUuid={connector.uuid} attributes={connector.customAttributes} />}
 
 
             </Widget>

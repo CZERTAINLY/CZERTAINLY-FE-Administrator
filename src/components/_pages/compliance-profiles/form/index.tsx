@@ -16,6 +16,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { Resource } from "../../../../types/openapi";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string;
@@ -128,13 +129,17 @@ function ComplianceProfileForm() {
                   </Field>
 
                    <>
-                       <hr />
-                       <h6>Compliance Profile Attributes</h6>
-                       <hr />
-                       <AttributeEditor
-                           id="customCompliance"
-                           attributeDescriptors={resourceCustomAttributes}
-                       />
+                       <br />
+
+                       <TabLayout tabs={[
+                           {
+                               title: "Custom Attributes",
+                               content: (<AttributeEditor
+                                   id="customCompliance"
+                                   attributeDescriptors={resourceCustomAttributes}
+                               />)
+                           }
+                       ]} />
                    </>
 
                    <div className="d-flex justify-content-end">

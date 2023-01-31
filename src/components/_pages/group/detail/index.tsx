@@ -9,8 +9,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Container, Label } from "reactstrap";
-import AttributeViewer from "../../../Attributes/AttributeViewer";
+import { Container } from "reactstrap";
+import { Resource } from "../../../../types/openapi";
+import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function GroupDetail() {
 
@@ -151,11 +152,7 @@ export default function GroupDetail() {
 
          </Widget>
 
-          <Widget title="Attributes">
-              <br />
-              <Label>Custom Attributes</Label>
-              <AttributeViewer attributes={group?.customAttributes} />
-          </Widget>
+         {group && <CustomAttributeWidget resource={Resource.Groups} resourceUuid={group.uuid} attributes={group.customAttributes} />}
 
          <Dialog
             isOpen={confirmDelete}

@@ -1,19 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup, Input } from 'reactstrap';
-import { Field, Form } from "react-final-form";
-
-import { mutators } from "utils/attributes/attributeEditorMutators";
-
-import AttributeEditor from 'components/Attributes/AttributeEditor';
+import AttributeEditor from "components/Attributes/AttributeEditor";
 import Spinner from "components/Spinner";
 
 import { actions, selectors } from "ducks/cryptographic-operations";
-import { collectFormAttributes } from 'utils/attributes/attributes';
-import { AttributeRequestModel } from "types/attributes";
-import { AttributeDescriptorModel } from "types/attributes";
-import { CryptographicAlgorithm } from 'types/openapi';
+import React, { useCallback, useEffect, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Input, Label } from "reactstrap";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { CryptographicAlgorithm } from "types/openapi";
 
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes/attributes";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface Props {
    tokenUuid?: string;
@@ -183,14 +181,19 @@ export default function SignVerifyData({
 
                            <FormGroup>
 
-                              <Label for="attributes">attributes</Label>
+                               <br />
 
-                              <AttributeEditor
-                                 id="attributes"
-                                 attributeDescriptors={attributes}
-                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                              />
+                               <TabLayout tabs={[
+                                   {
+                                       title: "Connector Attributes",
+                                       content: (<AttributeEditor
+                                           id="attributes"
+                                           attributeDescriptors={attributes}
+                                           groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                           setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                       />)
+                                   }
+                               ]} />
 
                            </FormGroup>
 

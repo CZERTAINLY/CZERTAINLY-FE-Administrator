@@ -1,18 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup } from 'reactstrap';
-import { Field, Form } from "react-final-form";
-
-import { mutators } from "utils/attributes/attributeEditorMutators";
-
-import AttributeEditor from 'components/Attributes/AttributeEditor';
+import AttributeEditor from "components/Attributes/AttributeEditor";
 import Spinner from "components/Spinner";
 
 import { actions, selectors } from "ducks/tokens";
-import { collectFormAttributes } from 'utils/attributes/attributes';
-import { AttributeRequestModel } from "types/attributes";
-import { AttributeDescriptorModel } from "types/attributes";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup } from "reactstrap";
+import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 
+import { mutators } from "utils/attributes/attributeEditorMutators";
+import { collectFormAttributes } from "utils/attributes/attributes";
+import TabLayout from "../../Layout/TabLayout";
 
 interface Props {
    tokenUuid?: string;
@@ -91,30 +89,25 @@ export default function TokenActivationDialogBody({
 
                <BootstrapForm onSubmit={handleSubmit}>
 
-                  {!activationAttributes || activationAttributes.length === 0 ? <></> : (
+                   <br />
+                   <TabLayout tabs={[
+                       {
+                           title: "Issuance attributes",
+                           content: !activationAttributes || activationAttributes.length === 0 ? <></> : (<Field name="ActivationAttributes">
+                               {({input, meta}) => (
+                                   <FormGroup>
+                                       <AttributeEditor
+                                           id="activationAttributes"
+                                           attributeDescriptors={activationAttributes}
+                                           groupAttributesCallbackAttributes={activationGroupAttributesCallbackAttributes}
+                                           setGroupAttributesCallbackAttributes={setActivationGroupAttributesCallbackAttributes}
+                                       />
+                                   </FormGroup>
+                               )}
+                           </Field>)
+                       }
+                   ]} />
 
-                     <Field name="ActivationAttributes">
-
-                        {({ input, meta }) => (
-
-                           <FormGroup>
-
-                              <Label for="activationAttributes">Issuance attributes</Label>
-
-                              <AttributeEditor
-                                 id="activationAttributes"
-                                 attributeDescriptors={activationAttributes}
-                                 groupAttributesCallbackAttributes={activationGroupAttributesCallbackAttributes}
-                                 setGroupAttributesCallbackAttributes={setActivationGroupAttributesCallbackAttributes}
-                              />
-
-                           </FormGroup>
-
-                        )}
-
-                     </Field>
-
-                  )}
 
                   <div style={{ textAlign: "right" }}>
                      <ButtonGroup>
