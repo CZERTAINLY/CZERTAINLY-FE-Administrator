@@ -1,16 +1,10 @@
+import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import * as slice from "./auditLogs";
-import { actions as appRedirectActions } from "./app-redirect";
-import {
-    transformAuditLogDtoToModel,
-    transformAuditLogFilterModelToDto,
-    transformPageableModelToDto
-} from "./transform/auditLogs";
-
+import { transformAuditLogDtoToModel, transformAuditLogFilterModelToDto, transformPageableModelToDto } from "./transform/auditLogs";
 
 const listLogs: AppEpic = (action$, state, deps) => {
 
@@ -168,12 +162,34 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
 
 }
 
+const exportLogs: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.exportLogs.match
+        ),
+        switchMap(
+            action => deps.apiClients.auditLogs.exportAuditLogs({ pageable: transformPageableModelToDto({ page: action.payload.page, size: action.payload.size }), filter: action.payload.filters ? transformAuditLogFilterModelToDto(action.payload.filters) : {} }
+            ).pipe(
+                map(blob => slice.actions.exportLogsSuccess(window.URL.createObjectURL(blob))),
+                catchError(
+                    error => of(slice.actions.exportLogsFailure(),
+                        appRedirectActions.fetchError({ error, message: "Failed to get audit logs export" }))
+                )
+            )
+        )
+    )
+}
+
+
+
+
 const epics = [
    listLogs,
    listObjects,
    listOperations,
    listStatuses,
    purgeLogs,
+    exportLogs,
 ]
 
 export default epics

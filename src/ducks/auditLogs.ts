@@ -1,13 +1,13 @@
-import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuditLogFilterModel, AuditLogItemModel } from "types/auditLogs";
-
+import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
 
    loadedPageNumber: number;
    loadedPageSize: number;
    totalPagesAvailable: number;
+   exportUrl: string | undefined;
 
    pageData: AuditLogItemModel[];
    isFetchingPageData: boolean;
@@ -21,6 +21,7 @@ export type State = {
    statuses: string[]
    isFetchingStatuses: boolean;
    isPurging: boolean;
+   isExporting: boolean;
 
 };
 
@@ -30,6 +31,7 @@ export const initialState: State = {
    loadedPageNumber: 0,
    loadedPageSize: 0,
    totalPagesAvailable: 0,
+   exportUrl: undefined,
 
    pageData: [],
    isFetchingPageData: false,
@@ -42,7 +44,8 @@ export const initialState: State = {
 
    statuses: [],
    isFetchingStatuses: false,
-   isPurging: false
+   isPurging: false,
+   isExporting: false,
 
 };
 
@@ -178,6 +181,24 @@ export const slice = createSlice({
 
          state.isPurging = false;
 
+      },
+
+      exportLogs: (state, action: PayloadAction<{
+         page: number,
+         size: number,
+         filters?: AuditLogFilterModel
+      }> ) => {
+         state.exportUrl = undefined;
+         state.isExporting = true;
+      },
+
+      exportLogsSuccess: (state, action: PayloadAction<string>) => {
+         state.exportUrl = action.payload;
+         state.isExporting = false;
+      },
+
+      exportLogsFailure: (state, action: PayloadAction<void>) => {
+         state.isExporting = false;
       }
    }
 
@@ -190,6 +211,7 @@ const state = createFeatureSelector<State>(slice.name);
 const loadedPageNumber = createSelector(state, state => state.loadedPageNumber);
 const loadedPageSize = createSelector(state, state => state.loadedPageSize);
 const totalPagesAvailable = createSelector(state, state => state.totalPagesAvailable);
+const exportUrl = createSelector(state, state => state.exportUrl);
 
 const pageData = createSelector(state, state => state.pageData);
 const objects = createSelector(state, state => state.objects);
@@ -201,6 +223,7 @@ const isFetchingObjects = createSelector(state, state => state.isFetchingObjects
 const isFetchingOperations = createSelector(state, state => state.isFetchingOperations);
 const isFetchingStatuses = createSelector(state, state => state.isFetchingStatuses);
 const isPurging = createSelector(state, state => state.isPurging);
+const isExporting = createSelector(state, state => state.isExporting);
 
 export const selectors = {
 
@@ -209,6 +232,7 @@ export const selectors = {
    loadedPageNumber,
    loadedPageSize,
    totalPagesAvailable,
+   exportUrl,
 
    pageData,
    objects,
@@ -219,7 +243,8 @@ export const selectors = {
    isFetchingObjects,
    isFetchingOperations,
    isFetchingStatuses,
-   isPurging
+   isPurging,
+   isExporting,
 
 }
 
