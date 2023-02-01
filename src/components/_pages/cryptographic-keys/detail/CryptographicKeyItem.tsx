@@ -49,6 +49,8 @@ export default function CryptographicKeyItem({
 
    const history = useSelector(selectors.keyHistory);
 
+   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
+
    const [keyHistory, setKeyHistory] = useState<CryptographicKeyHistoryModel[]>([]);
 
    const [currentInfoId, setCurrentInfoId] = useState("");
@@ -58,9 +60,10 @@ export default function CryptographicKeyItem({
    useEffect(
 
       () => {
+         if (!keyItem) return;
          dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, tokenInstanceUuid: tokenInstanceUuid, keyUuid: keyUuid }));
       },
-      [dispatch, keyItem.uuid, tokenInstanceUuid, keyUuid]
+      [dispatch, keyItem.uuid, tokenInstanceUuid, keyUuid, keyItem]
 
    );
 

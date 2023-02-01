@@ -773,9 +773,9 @@ export const slice = createSlice({
       getHistory: (state, action: PayloadAction<{ tokenInstanceUuid: string, keyUuid: string, keyItemUuid: string }>) => {
 
          // set key history for the uuid as empty array
-         state.keyHistory?.forEach(keyHistory => {
-            if (keyHistory.uuid === action.payload.keyItemUuid) {
-               keyHistory.history = [];
+         state.keyHistory?.forEach(keyHistoryItem => {
+            if (keyHistoryItem.uuid === action.payload.keyItemUuid) {
+               state.keyHistory?.splice(state.keyHistory?.indexOf(keyHistoryItem), 1);
             }
          });
          state.isFetchingHistory = true;

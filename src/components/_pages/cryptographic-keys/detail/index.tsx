@@ -51,8 +51,8 @@ export default function CryptographicKeyDetail() {
    const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
 
    const isBusy = useMemo(
-      () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying || isFetchingHistory,
-      [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying, isFetchingHistory]
+      () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
+      [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying]
    );
 
 
@@ -260,7 +260,7 @@ export default function CryptographicKeyDetail() {
          },
          {
             id: "resource",
-            content: "resource",
+            content: "Resource",
          },
       ],
       []
@@ -380,7 +380,7 @@ export default function CryptographicKeyDetail() {
 
          return ({"title": <Badge key={item.uuid} color="dark" className="mr-xs">{item.type}</Badge>, 
          "content": (
-            <Widget busy={isBusy}>
+            <Widget busy={isBusy || isFetchingHistory}>
                      <CryptographicKeyItem 
                         key={item.uuid}
                         keyItem={item} 

@@ -1,5 +1,5 @@
 import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { catchError, concatMap, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
@@ -782,7 +782,7 @@ const getKeyHistory: AppEpic = (action$, state, deps) => {
       filter(
          slice.actions.getHistory.match
       ),
-      switchMap(
+      concatMap(
 
          action => deps.apiClients.cryptographicKeys.getEventHistory({keyItemUuid:action.payload.keyItemUuid, tokenInstanceUuid:action.payload.tokenInstanceUuid, uuid: action.payload.keyUuid}).pipe(
 

@@ -13,7 +13,7 @@ import {
     transformTokenProfileResponseDtoToModel,
     transformTokenProfileDetailResponseDtoToModel,
 } from "./transform/token-profiles";
-
+   
 
 const listTokenProfiles: AppEpic = (action$, state$, deps) => {
 
