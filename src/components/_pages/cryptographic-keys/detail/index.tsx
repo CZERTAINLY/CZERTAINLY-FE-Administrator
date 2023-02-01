@@ -378,7 +378,7 @@ export default function CryptographicKeyDetail() {
    const itemTabs = () => {
       return !cryptographicKey? [] : cryptographicKey?.items.map((item, index) => {
 
-         return ({"title": <Badge key={item.uuid} color="dark" className="mr-xs">{item.type}</Badge>, 
+         return ({"title": item.type, 
          "content": (
             <Widget busy={isBusy || isFetchingHistory}>
                      <CryptographicKeyItem 
