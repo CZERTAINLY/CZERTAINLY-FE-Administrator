@@ -225,7 +225,7 @@ export default function CryptographicKeyDetail() {
 
          </div>
 
-      ), [buttons]
+      ), []
 
    );
 

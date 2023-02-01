@@ -72,7 +72,7 @@ export default function CryptographicKeyItem({
             setKeyHistory(history.filter((item) => item.uuid === keyItem.uuid)?.[0]?.history || []);
          }
       },
-      [history]
+      [history, keyItem.uuid]
 
    );
 
