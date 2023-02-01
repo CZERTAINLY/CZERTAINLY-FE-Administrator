@@ -1,20 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Widget from "components/Widget";
 
-import { Button, ButtonGroup, Container } from "reactstrap";
+import { actions as auditLogActions, selectors } from "ducks/auditLogs";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { actions as auditLogActions, selectors } from "ducks/auditLogs";
+import { Button, ButtonGroup, Container } from "reactstrap";
+import { AuditLogFilterModel } from "types/auditLogs";
+import { dateFormatter } from "utils/dateUtil";
+
+import styles from "./auditLogs.module.scss";
 
 import AuditLogsFilters from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
-import Widget from "components/Widget";
-
-import styles from "./auditLogs.module.scss";
-import { dateFormatter } from "utils/dateUtil";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { AuditLogFilterModel } from "types/auditLogs";
-import { Link } from "react-router-dom";
 
 const defaultPageSize = 10;
 
@@ -29,12 +28,14 @@ function AuditLogs() {
    const isFetchingOperations = useSelector(selectors.isFetchingOperations);
    const isFetchingStatuses = useSelector(selectors.isFetchingStatuses);
    const isPurging = useSelector(selectors.isPurging);
+   const exportUrl = useSelector(selectors.exportUrl);
+   const isExporting = useSelector(selectors.isExporting);
    const logs = useSelector(selectors.pageData);
    const objects = useSelector(selectors.objects);
    const operations = useSelector(selectors.operations);
    const states = useSelector(selectors.statuses);
 
-   const isBusy = isFetchingPageData || isFetchingObjects || isFetchingOperations || isFetchingStatuses || isPurging;
+   const isBusy = isFetchingPageData || isFetchingObjects || isFetchingOperations || isFetchingStatuses || isPurging || isExporting;
    const isFilterBusy = isFetchingObjects || isFetchingOperations || isFetchingStatuses;
 
    const [page, setPage] = useState(1);
@@ -68,6 +69,13 @@ function AuditLogs() {
 
    );
 
+   useEffect(() => {
+       const link = document.getElementById("exportLink");
+       if (link && exportUrl) {
+           link.click();
+       }
+   }, [exportUrl])
+
 
    const onFiltersChanged = useCallback(
 
@@ -100,30 +108,17 @@ function AuditLogs() {
    );
 
 
-   const queryString = useMemo(
-
-      () => (
-         filters
-            ?
-            Object.entries(filters).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join("&")
-            : ""
-      ),
-      [filters]
-
-   )
-
     const purgeCallback = useCallback(
-
-        () => {
-
-            dispatch(auditLogActions.purgeLogs({ page: page - 1, size: pageSize, filters }));
-
-        },
+        () => dispatch(auditLogActions.purgeLogs({ page: page - 1, size: pageSize, filters })),
         [dispatch, page, pageSize, filters]
-
     );
 
-   const auditLogsTitle = useMemo(
+    const exportCallback = useCallback(
+        () => dispatch(auditLogActions.exportLogs({ page: page - 1, size: pageSize, filters })),
+        [dispatch, page, pageSize, filters]
+    );
+
+    const auditLogsTitle = useMemo(
 
       () => (
 
@@ -135,14 +130,15 @@ function AuditLogs() {
 
              <div>
                  <ButtonGroup>
-                    <Link to={`/api/v1/auditLogs/export?${queryString}`}><Button color={"default"}>Export</Button></Link>
-                    <Button type="submit" color="primary" onClick={() => purgeCallback()}>Purge</Button>
+                    <Button color={"default"} onClick={exportCallback}>Export</Button>
+                     <a id={"exportLink"} href={exportUrl} download="auditLogs.zip" hidden={true}/>
+                    <Button type="submit" color="primary" onClick={purgeCallback}>Purge</Button>
                  </ButtonGroup>
              </div>
 
          </div>
       ),
-      [purgeCallback, queryString]
+      [purgeCallback, exportCallback, exportUrl]
 
    );
 
