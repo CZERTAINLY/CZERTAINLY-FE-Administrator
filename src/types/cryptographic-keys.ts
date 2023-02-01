@@ -11,8 +11,8 @@ import {
     KeyDto, 
     KeyEventHistoryDto, 
     KeyFormat, 
+    KeyItemDetailDto, 
     KeyItemDto, 
-    KeyItemSummaryDto, 
     KeyRequestDto, 
     UpdateKeyUsageRequestDto,
 } from "./openapi";
@@ -29,11 +29,11 @@ export type CryptographicKeyResponseModel = CryptographicKeyResponseDto;
 export type CryptographicKeyDetailResponseDto = KeyDetailDto;
 export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, "attributes | customAttributes | group"> & { attributes: Array<AttributeResponseModel>, customAttributes?: Array<AttributeResponseModel>, group?: CertificateGroupResponseModel};
 
-export type CryptographicKeyItemResponseDto = KeyItemDto;
-export type CryptographicKeyItemResponseModel = Omit<CryptographicKeyItemResponseDto, "metadata | format"> & { metadata?: Array<MetadataModel>, format?: KeyFormat};
+export type CryptographicKeyItemDetailResponseDto = KeyItemDetailDto;
+export type CryptographicKeyItemDetailResponseModel = Omit<CryptographicKeyItemDetailResponseDto, "metadata | format"> & { metadata?: Array<MetadataModel>, format?: KeyFormat};
 
-export type CryptographicKeyItemSummaryDto = KeyItemSummaryDto;
-export type CryptographicKeyItemSummaryModel = Omit<CryptographicKeyItemSummaryDto, "format"> & { format?: KeyFormat};
+export type CryptographicKeyItemDto = KeyItemDto;
+export type CryptographicKeyItemModel = Omit<CryptographicKeyItemDto, "format"> & { format?: KeyFormat};
 
 export type CryptographicKeyKeyUsageUpdateRequestDto = UpdateKeyUsageRequestDto;
 export type CryptographicKeyKeyUsageUpdateRequestModel = CryptographicKeyKeyUsageUpdateRequestDto;

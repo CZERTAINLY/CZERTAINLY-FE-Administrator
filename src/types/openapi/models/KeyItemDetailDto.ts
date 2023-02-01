@@ -13,72 +13,85 @@
 
 import type {
     CryptographicAlgorithm,
+    KeyCompromiseReason,
     KeyFormat,
     KeyState,
     KeyType,
     KeyUsage,
+    MetadataResponseDto,
 } from './';
 
 /**
- * Key Items
+ * Key Objects
  * @export
- * @interface KeyItemSummaryDto
+ * @interface KeyItemDetailDto
  */
-export interface KeyItemSummaryDto {
+export interface KeyItemDetailDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     uuid: string;
     /**
      * Object Name
      * @type {string}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     name: string;
     /**
      * UUID of the key item in the Connector
      * @type {string}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     keyReferenceUuid: string;
     /**
      * @type {KeyType}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     type: KeyType;
     /**
      * @type {CryptographicAlgorithm}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     cryptographicAlgorithm: CryptographicAlgorithm;
     /**
      * @type {KeyFormat}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     format?: KeyFormat;
     /**
      * Key Length
      * @type {number}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     length?: number;
     /**
+     * Metadata for the key
+     * @type {Array<MetadataResponseDto>}
+     * @memberof KeyItemDetailDto
+     */
+    metadata?: Array<MetadataResponseDto>;
+    /**
      * Key Usages
      * @type {Array<KeyUsage>}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     usage: Array<KeyUsage>;
     /**
      * Boolean describing if the key is enabled or not
      * @type {boolean}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     enabled: boolean;
     /**
      * @type {KeyState}
-     * @memberof KeyItemSummaryDto
+     * @memberof KeyItemDetailDto
      */
     state: KeyState;
+    /**
+     * @type {KeyCompromiseReason}
+     * @memberof KeyItemDetailDto
+     */
+    reason?: KeyCompromiseReason;
 }

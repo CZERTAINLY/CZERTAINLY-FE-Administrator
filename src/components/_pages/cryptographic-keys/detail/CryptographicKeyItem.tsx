@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 
 import { Badge, Button, Col, Label, Row } from "reactstrap";
-import { CryptographicKeyHistoryModel, CryptographicKeyItemResponseModel } from "types/cryptographic-keys";
+import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
 import { KeyCompromiseReason, KeyState } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateBadge from "../KeyStateBadge";
@@ -23,7 +23,7 @@ interface Props {
    keyUuid: string;
    tokenInstanceUuid: string;
    tokenProfileUuid?: string;
-   keyItem: CryptographicKeyItemResponseModel;
+   keyItem: CryptographicKeyItemDetailResponseModel;
    totalKeyItems: number;
 }
 
@@ -48,8 +48,6 @@ export default function CryptographicKeyItem({
    const [verifyData, setVerifyData] = useState<boolean>(false);
 
    const history = useSelector(selectors.keyHistory);
-
-   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
 
    const [keyHistory, setKeyHistory] = useState<CryptographicKeyHistoryModel[]>([]);
 

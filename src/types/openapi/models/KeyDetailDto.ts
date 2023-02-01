@@ -14,7 +14,7 @@
 import type {
     GroupDto,
     KeyAssociationDto,
-    KeyItemDto,
+    KeyItemDetailDto,
     ResponseAttributeDto,
 } from './';
 
@@ -96,10 +96,10 @@ export interface KeyDetailDto {
     group?: GroupDto;
     /**
      * Key Objects
-     * @type {Array<KeyItemDto>}
+     * @type {Array<KeyItemDetailDto>}
      * @memberof KeyDetailDto
      */
-    items: Array<KeyItemDto>;
+    items: Array<KeyItemDetailDto>;
     /**
      * List of associated items
      * @type {Array<KeyAssociationDto>}

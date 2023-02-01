@@ -28,7 +28,7 @@ import type {
     KeyDetailDto,
     KeyDto,
     KeyEventHistoryDto,
-    KeyItemDto,
+    KeyItemDetailDto,
     KeyRequestDto,
     KeyRequestType,
     UpdateKeyUsageRequestDto,
@@ -555,15 +555,15 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     /**
      * Get Cryptographic Key Detail
      */
-    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest): Observable<KeyItemDto>
-    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest, opts?: OperationOpts): Observable<AjaxResponse<KeyItemDto>>
-    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest, opts?: OperationOpts): Observable<KeyItemDto | AjaxResponse<KeyItemDto>> {
+    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest): Observable<KeyItemDetailDto>
+    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest, opts?: OperationOpts): Observable<AjaxResponse<KeyItemDetailDto>>
+    getKeyItem({ tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest, opts?: OperationOpts): Observable<KeyItemDetailDto | AjaxResponse<KeyItemDetailDto>> {
         throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'getKeyItem');
         throwIfNullOrUndefined(uuid, 'uuid', 'getKeyItem');
         throwIfNullOrUndefined(keyItemUuid, 'keyItemUuid', 'getKeyItem');
 
-        return this.request<KeyItemDto>({
-            url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/item/{keyItemUuid}'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{uuid}', encodeURI(uuid)).replace('{keyItemUuid}', encodeURI(keyItemUuid)),
+        return this.request<KeyItemDetailDto>({
+            url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/items/{keyItemUuid}'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{uuid}', encodeURI(uuid)).replace('{keyItemUuid}', encodeURI(keyItemUuid)),
             method: 'GET',
         }, opts?.responseOpts);
     };

@@ -13,7 +13,7 @@
 
 import type {
     GroupDto,
-    KeyItemSummaryDto,
+    KeyItemDto,
 } from './';
 
 /**
@@ -82,10 +82,10 @@ export interface KeyDto {
     group?: GroupDto;
     /**
      * Key Items
-     * @type {Array<KeyItemSummaryDto>}
+     * @type {Array<KeyItemDto>}
      * @memberof KeyDto
      */
-    items: Array<KeyItemSummaryDto>;
+    items: Array<KeyItemDto>;
     /**
      * Number of associated objects
      * @type {number}

@@ -170,8 +170,8 @@ models/KeyDetailDto.ts
 models/KeyDto.ts
 models/KeyEventHistoryDto.ts
 models/KeyFormat.ts
+models/KeyItemDetailDto.ts
 models/KeyItemDto.ts
-models/KeyItemSummaryDto.ts
 models/KeyRequestDto.ts
 models/KeyRequestType.ts
 models/KeyState.ts

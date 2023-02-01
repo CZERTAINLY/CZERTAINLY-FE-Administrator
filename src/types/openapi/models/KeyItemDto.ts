@@ -13,16 +13,14 @@
 
 import type {
     CryptographicAlgorithm,
-    KeyCompromiseReason,
     KeyFormat,
     KeyState,
     KeyType,
     KeyUsage,
-    MetadataResponseDto,
 } from './';
 
 /**
- * Key Objects
+ * Key Items
  * @export
  * @interface KeyItemDto
  */
@@ -67,12 +65,6 @@ export interface KeyItemDto {
      */
     length?: number;
     /**
-     * Metadata for the key
-     * @type {Array<MetadataResponseDto>}
-     * @memberof KeyItemDto
-     */
-    metadata?: Array<MetadataResponseDto>;
-    /**
      * Key Usages
      * @type {Array<KeyUsage>}
      * @memberof KeyItemDto
@@ -89,9 +81,4 @@ export interface KeyItemDto {
      * @memberof KeyItemDto
      */
     state: KeyState;
-    /**
-     * @type {KeyCompromiseReason}
-     * @memberof KeyItemDto
-     */
-    reason?: KeyCompromiseReason;
 }

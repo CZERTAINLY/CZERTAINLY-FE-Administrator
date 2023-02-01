@@ -14,10 +14,10 @@ import {
    CryptographicKeyKeyUsageBulkUpdateRequestDto,
    CryptographicKeyHistoryDto,
    CryptographicKeyHistoryModel,
-   CryptographicKeyItemResponseDto,
-   CryptographicKeyItemResponseModel,
-   CryptographicKeyItemSummaryDto,
-   CryptographicKeyItemSummaryModel,
+   CryptographicKeyItemDetailResponseDto,
+   CryptographicKeyItemDetailResponseModel,
+   CryptographicKeyItemDto,
+   CryptographicKeyItemModel,
    CryptographicKeyCompromiseRequestDto,
    CryptographicKeyCompromiseRequestModel,
    CryptographicKeyBulkCompromiseRequestModel,
@@ -30,7 +30,7 @@ import {
 export function transformCryptographicKeyResponseDtoToModel(keyResponse: CryptographicKeyResponseDto): CryptographicKeyResponseModel {
    return {
       ...keyResponse,
-      items: keyResponse.items.map(transformCryptographicKeyItemSummaryDtoToModel),
+      items: keyResponse.items.map(transformCryptographicKeyItemDtoToModel),
    }
 }
 
@@ -43,13 +43,13 @@ export function transformCryptographicKeyDetailResponseDtoToModel(keyResponse: C
    }
 }
 
-export function transformCryptographicKeyItemResponseDtoToModel(keyResponse: CryptographicKeyItemResponseDto): CryptographicKeyItemResponseModel {
+export function transformCryptographicKeyItemResponseDtoToModel(keyResponse: CryptographicKeyItemDetailResponseDto): CryptographicKeyItemDetailResponseModel {
    return {
       ...keyResponse,
    }
 }
 
-export function transformCryptographicKeyItemSummaryDtoToModel(keyResponse: CryptographicKeyItemSummaryDto): CryptographicKeyItemSummaryModel {
+export function transformCryptographicKeyItemDtoToModel(keyResponse: CryptographicKeyItemDto): CryptographicKeyItemModel {
    return {
       ...keyResponse,
    }
