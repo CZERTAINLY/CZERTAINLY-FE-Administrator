@@ -2,7 +2,7 @@ import AttributeViewer from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
-import TokenStatusBadge from "components/TokenStatusBadge";
+import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 
 type Props = {
-    tabs: { title: string; content: JSX.Element }[];
+    tabs: { title: string | JSX.Element; content: JSX.Element }[];
 }
 
 export default function TabLayout({tabs}: Props) {

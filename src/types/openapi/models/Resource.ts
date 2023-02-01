@@ -12,7 +12,7 @@
  */
 
 /**
- * List of resource to be associated with the custom attribute
+ * Type of the resource
  * @export
  * @enum {string}
  */

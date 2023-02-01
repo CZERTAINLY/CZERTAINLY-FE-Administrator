@@ -28,7 +28,8 @@ export type IconName = "plus" |
     "random" |
     "sign" |
     "verify" |
-    "key";
+    "key" |
+    "link";
 
 export interface WidgetButtonProps {
    icon: IconName;
@@ -73,7 +74,8 @@ const colors = {
    "random": "auto",
    "sign": "auto",
    "verify": "green",
-   "key": "auto"
+   "key": "auto",
+   "link": "auto"
 };
 
 
@@ -105,7 +107,8 @@ const classNames = {
    "random": "fa fa-random",
    "sign": "fas fa-file-signature",
    "verify": "fa fa-check-square",
-   "key": "fa fa-key"
+   "key": "fa fa-key",
+   "link": "fa fa-link"
 }
 
 

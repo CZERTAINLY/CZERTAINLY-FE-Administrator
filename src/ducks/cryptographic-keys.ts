@@ -2,8 +2,12 @@ import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
    CryptographicKeyAddRequestModel,
+   CryptographicKeyBulkCompromiseRequestModel,
+   CryptographicKeyCompromiseRequestModel,
    CryptographicKeyDetailResponseModel,
    CryptographicKeyEditRequestModel,
+   CryptographicKeyHistoryModel,
+   CryptographicKeyItemBulkCompromiseRequestModel,
    CryptographicKeyKeyUsageBulkUpdateRequestModel,
    CryptographicKeyKeyUsageUpdateRequestModel,
    CryptographicKeyResponseModel,
@@ -44,6 +48,10 @@ export type State = {
 
    isFetchingAttributes: boolean;
 
+   isFetchingHistory: boolean;
+
+   keyHistory?: {uuid: string, history: CryptographicKeyHistoryModel[]}[];
+
 };
 
 export const initialState: State = {
@@ -75,6 +83,10 @@ export const initialState: State = {
    isBulkDestroying: false,
 
    isFetchingAttributes: false,
+
+   isFetchingHistory: false,
+
+   keyHistory: [],
 
 };
 
@@ -344,26 +356,28 @@ export const slice = createSlice({
       },
 
 
-      compromiseCryptographicKey: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string, keyItemUuid: Array<string> }>) => {
+      compromiseCryptographicKey: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string, request: CryptographicKeyCompromiseRequestModel }>) => {
 
          state.isCompromising = true;
 
       },
 
 
-      compromiseCryptographicKeySuccess: (state, action: PayloadAction<{ uuid: string, keyItemUuid: Array<string> }>) => {
+      compromiseCryptographicKeySuccess: (state, action: PayloadAction<{ uuid: string, request: CryptographicKeyCompromiseRequestModel }>) => {
 
          state.isCompromising = false;
 
-         if(action.payload.keyItemUuid.length > 0){
-            action.payload.keyItemUuid.forEach((keyItemUuid) => {
+         if(action.payload.request.uuids){
+            action.payload.request.uuids.forEach((keyItemUuid) => {
                const keyItem = state.cryptographicKey?.items.find(keyItem => keyItem.uuid === keyItemUuid);
                if (keyItem) keyItem.state = KeyState.Compromised;
+               if (keyItem) keyItem.reason = action.payload.request.reason;
             });
          }
          else{
                state.cryptographicKey?.items.forEach((keyItem) => {
                   keyItem.state = KeyState.Compromised;
+                  keyItem.reason = action.payload.request.reason;
                });
          }
       },
@@ -441,6 +455,41 @@ export const slice = createSlice({
       },
 
 
+      bulkDeleteCryptographicKeyItems: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.bulkDeleteErrorMessages = [];
+         state.isBulkDeleting = true;
+
+      },
+
+
+      bulkDeleteCryptographicKeyItemsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDeleting = false;
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               state.cryptographicKeys.forEach(cryptographicKey => {
+                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) cryptographicKey.items.splice(keyItemIndex, 1);
+               });
+            }
+
+         );
+
+         if (state.cryptographicKey && action.payload.uuids.includes(state.cryptographicKey.uuid)) state.cryptographicKey = undefined;
+
+      },
+
+
+      bulkDeleteCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkDeleting = false;
+
+      },
+
+
       bulkEnableCryptographicKeys: (state, action: PayloadAction<{ uuids: string[] }>) => {
 
          state.isBulkEnabling = true;
@@ -456,6 +505,38 @@ export const slice = createSlice({
 
 
       bulkEnableCryptographicKeysFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isBulkEnabling = false;
+
+      },
+
+      bulkEnableCryptographicKeyItems: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkEnabling = true;
+
+      },
+
+
+      bulkEnableCryptographicKeyItemsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkEnabling = false;
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               state.cryptographicKeys.forEach(cryptographicKey => {
+                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) cryptographicKey.items[keyItemIndex].enabled = true;
+               });
+            }
+
+         );
+
+
+      },
+
+
+      bulkEnableCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkEnabling = false;
 
@@ -477,6 +558,38 @@ export const slice = createSlice({
 
 
       bulkDisableCryptographicKeysFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkDisabling = false;
+
+      },
+
+      bulkDisableCryptographicKeyItems: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDisabling = true;
+
+      },
+
+
+      bulkDisableCryptographicKeyItemsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDisabling = false;
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               state.cryptographicKeys.forEach(cryptographicKey => {
+                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) cryptographicKey.items[keyItemIndex].enabled = false;
+               });
+            }
+
+         );
+
+
+      },
+
+
+      bulkDisableCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDisabling = false;
 
@@ -533,15 +646,35 @@ export const slice = createSlice({
 
       },
 
+      bulkUpdateKeyItemUsage: (state, action: PayloadAction<{ usage: CryptographicKeyKeyUsageBulkUpdateRequestModel }>) => {
 
-      bulkCompromiseCryptographicKeys: (state, action: PayloadAction<{ uuids: string[] }>) => {
+         state.isBulkUpdatingKeyUsage = true;
+
+      },
+
+
+      bulkUpdateKeyItemUsageSuccess: (state, action: PayloadAction<{ }>) => {
+
+         state.isBulkUpdatingKeyUsage = false;
+
+      },
+
+
+      bulkUpdateKeyItemUsageFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkUpdatingKeyUsage = false;
+
+      },
+
+
+      bulkCompromiseCryptographicKeys: (state, action: PayloadAction<{ request: CryptographicKeyBulkCompromiseRequestModel }>) => {
 
          state.isBulkCompromising = true;
 
       },
 
 
-      bulkCompromiseCryptographicKeysSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+      bulkCompromiseCryptographicKeysSuccess: (state, action: PayloadAction<{ request: CryptographicKeyBulkCompromiseRequestModel }>) => {
 
          state.isBulkCompromising = false;
 
@@ -549,6 +682,37 @@ export const slice = createSlice({
 
 
       bulkCompromiseCryptographicKeysFailure: (state, action: PayloadAction<{ error: string }>) => {
+
+         state.isBulkCompromising = false;
+
+      },
+
+      bulkCompromiseCryptographicKeyItems: (state, action: PayloadAction<{ request: CryptographicKeyItemBulkCompromiseRequestModel }>) => {
+
+         state.isBulkCompromising = true;
+
+      },
+
+
+      bulkCompromiseCryptographicKeyItemsSuccess: (state, action: PayloadAction<{ request: CryptographicKeyItemBulkCompromiseRequestModel }>) => {
+
+         state.isBulkCompromising = false;
+
+         action.payload.request.uuids?.forEach(
+
+            uuid => {
+               state.cryptographicKeys.forEach(cryptographicKey => {
+                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) {cryptographicKey.items[keyItemIndex].state = KeyState.Compromised};
+               });
+            }
+
+         );
+
+      },
+
+
+      bulkCompromiseCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkCompromising = false;
 
@@ -572,6 +736,64 @@ export const slice = createSlice({
       bulkDestroyCryptographicKeysFailure: (state, action: PayloadAction<{ error: string }>) => {
 
          state.isBulkDestroying = false;
+
+      },
+
+      bulkDestroyCryptographicKeyItems: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDestroying = true;
+
+      },
+
+
+      bulkDestroyCryptographicKeyItemsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+
+         state.isBulkDestroying = false;
+
+         action.payload.uuids.forEach(
+
+            uuid => {
+               state.cryptographicKeys.forEach(cryptographicKey => {
+                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) cryptographicKey.items[keyItemIndex].state = KeyState.Destroyed;
+               });
+            }
+
+         );
+
+      },
+
+
+      bulkDestroyCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isBulkDestroying = false;
+
+      },
+
+      getHistory: (state, action: PayloadAction<{ tokenInstanceUuid: string, keyUuid: string, keyItemUuid: string }>) => {
+
+         // set key history for the uuid as empty array
+         state.keyHistory?.forEach(keyHistoryItem => {
+            if (keyHistoryItem.uuid === action.payload.keyItemUuid) {
+               state.keyHistory?.splice(state.keyHistory?.indexOf(keyHistoryItem), 1);
+            }
+         });
+         state.isFetchingHistory = true;
+
+      },
+
+
+      getHistorySuccess: (state, action: PayloadAction<{ keyItemUuid: string, keyHistory: CryptographicKeyHistoryModel[] }>) => {
+
+         state.isFetchingHistory = false;
+         state.keyHistory?.push({ uuid: action.payload.keyItemUuid, history: action.payload.keyHistory });
+
+      },
+
+
+      getHistoryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingHistory = false;
 
       },
    }
@@ -607,6 +829,9 @@ const isBulkUpdatingKeyUsage = createSelector(state, (state: State) => state.isB
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
 const keyAttributeDescriptors = createSelector(state, (state: State) => state.keyAttributeDescriptors);
 
+const isFetchingHistory = createSelector(state, (state: State) => state.isFetchingHistory);
+const keyHistory = createSelector(state, (state: State) => state.keyHistory);
+
 
 
 export const selectors = {
@@ -638,6 +863,9 @@ export const selectors = {
 
    isFetchingAttributes,
    keyAttributeDescriptors,
+
+   isFetchingHistory,
+   keyHistory,
 
 };
 

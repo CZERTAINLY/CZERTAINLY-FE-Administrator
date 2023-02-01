@@ -1,26 +1,29 @@
 import AttributeViewer from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import KeyStateBadge from "components/KeyStateBadge";
 import StatusBadge from "components/StatusBadge";
 
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
-import { actions } from "ducks/cryptographic-keys";
+import { actions, selectors } from "ducks/cryptographic-keys";
 
-import React, { useCallback, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
 
-import { Badge, Col, Label, Row } from "reactstrap";
-import { CryptographicKeyItemResponseModel } from "types/cryptographic-keys";
-import { KeyState } from "types/openapi";
+import { Badge, Button, Col, Label, Row } from "reactstrap";
+import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
+import { KeyCompromiseReason, KeyState } from "types/openapi";
+import { dateFormatter } from "utils/dateUtil";
+import KeyStateBadge from "../KeyStateBadge";
+import KeyStatus from "../KeyStatus";
 import SignVerifyData from "./SignVerifyData";
 
 interface Props {
    keyUuid: string;
    tokenInstanceUuid: string;
    tokenProfileUuid?: string;
-   keyItem: CryptographicKeyItemResponseModel;
+   keyItem: CryptographicKeyItemDetailResponseModel;
    totalKeyItems: number;
 }
 
@@ -43,6 +46,36 @@ export default function CryptographicKeyItem({
    const [signData, setSignData] = useState<boolean>(false);
 
    const [verifyData, setVerifyData] = useState<boolean>(false);
+
+   const history = useSelector(selectors.keyHistory);
+
+   const [keyHistory, setKeyHistory] = useState<CryptographicKeyHistoryModel[]>([]);
+
+   const [currentInfoId, setCurrentInfoId] = useState("");
+
+   const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
+
+   useEffect(
+
+      () => {
+         if (!keyItem) return;
+         dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, tokenInstanceUuid: tokenInstanceUuid, keyUuid: keyUuid }));
+      },
+      [dispatch, keyItem.uuid, tokenInstanceUuid, keyUuid, keyItem]
+
+   );
+
+
+   useEffect(
+
+      () => {
+         if (history) {
+            setKeyHistory(history.filter((item) => item.uuid === keyItem.uuid)?.[0]?.history || []);
+         }
+      },
+      [history, keyItem.uuid]
+
+   );
 
    const onEnableClick = useCallback(
 
@@ -92,13 +125,18 @@ export default function CryptographicKeyItem({
    const onCompromise = useCallback(
 
       () => {
+         if(!keyItem) return;
+         if(!compromiseReason) return;
          dispatch(actions.compromiseCryptographicKey({ 
-            keyItemUuid: [keyItem.uuid],
+            request: {
+               uuids: [keyItem.uuid],
+               reason: compromiseReason
+            },
             tokenInstanceUuid: tokenInstanceUuid, 
             uuid: keyUuid }));
          setConfirmCompromise(false);
       },
-      [dispatch, keyItem, tokenInstanceUuid, keyUuid]
+      [dispatch, keyItem, tokenInstanceUuid, keyUuid, compromiseReason]
 
    );
 
@@ -193,12 +231,124 @@ export default function CryptographicKeyItem({
          },
          {
             id: "state",
-            columns: ["State", <KeyStateBadge state={keyItem.state}/>]
+            columns: ["State", keyItem.reason ? <><KeyStateBadge state={keyItem.state}/>&nbsp;({keyItem.reason})</> : <KeyStateBadge state={keyItem.state}/>]
          }
       ],
       [keyItem]
 
    )
+
+   const historyHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "time",
+            content: "Time",
+         },
+         {
+            id: "user",
+            content: "User",
+         },
+         {
+            id: "event",
+            content: "Event",
+         },
+         {
+            id: "status",
+            content: "Status",
+         },
+         {
+            id: "message",
+            content: "Message",
+         },
+         {
+            id: "additionalMessage",
+            content: "Additional Message",
+         },
+      ],
+      []
+
+   );
+
+   const optionForCompromise = () => {
+      var options = [];
+      for (const reason in KeyCompromiseReason) {
+         const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
+         options.push({ value: myReason, label: myReason });
+      }
+      return options;
+     }
+
+
+   const historyEntry: TableDataRow[] = useMemo(
+
+      () => !keyHistory ? [] : keyHistory.map(function (history) {
+
+         return (
+
+            {
+               "id": history.uuid,
+               "columns": [<span style={{ whiteSpace: "nowrap" }}>{dateFormatter(history.created)}</span>,
+
+               history.createdBy,
+
+               history.event,
+
+               <KeyStatus status={history.status} />,
+
+               <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
+
+               history.additionalInformation ? (
+                  <Button
+                     color="white"
+                     onClick={() => setCurrentInfoId(history.uuid)}
+                     title="Show Additional Information"
+                  >
+                     <i className="fa fa-info-circle" aria-hidden="true"></i>
+                  </Button>
+               ) : ""
+               ]
+            }
+
+         )
+
+      }), [keyHistory]
+
+   );
+
+   const additionalInfoEntry = (): any => {
+
+      let returnList = [];
+
+      if (!currentInfoId) return;
+
+      const currentHistory = keyHistory?.filter(
+         (history) => history.uuid === currentInfoId
+      );
+
+      for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
+
+         returnList.push(
+            <tr>
+               <td style={{ padding: "0.25em" }}>{key}</td>
+               <td style={{ padding: "0.25em" }}>
+                  <p
+                     style={{
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-all",
+                     }}
+                  >
+                     {JSON.stringify(value)}
+                  </p>
+               </td>
+            </tr>
+         );
+
+      }
+
+      return returnList;
+
+   };
 
 
 
@@ -206,7 +356,7 @@ export default function CryptographicKeyItem({
       <div className="key-details">
          <div>
             <h6 className="d-inline-block">
-            <Badge key={keyItem.uuid} color="dark" className="mr-xs">{keyItem.type}</Badge>
+               <Badge key={keyItem.uuid} color="dark" className="mr-xs">{keyItem.cryptographicAlgorithm}</Badge>
             </h6>
             <div className="fa-pull-right mt-n-xs">
                <WidgetButtons buttons={buttons} />
@@ -244,6 +394,13 @@ export default function CryptographicKeyItem({
             }
          </Row>
 
+         <br />
+         <CustomTable
+            headers={historyHeaders}
+            data={historyEntry}
+            hasPagination={true}
+         />
+
          <Dialog
             isOpen={confirmDelete}
             caption="Delete Key"
@@ -258,11 +415,22 @@ export default function CryptographicKeyItem({
          <Dialog
             isOpen={confirmCompromise}
             caption={`Key Compromised?`}
-            body={`If the Key is compromised, proceed to make the platform stop using it for any operations.`}
-            toggle={() => setConfirmDelete(false)}
+            body={
+               <div>
+                  <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
+                  <p><b>Warning:</b> This action cannot be undone.</p>
+                  <Select
+                     name="compromiseReason"
+                     id="compromiseReason"
+                     options={optionForCompromise()}
+                     onChange={(e) => setCompromiseReason(e?.value)}
+                  />
+               </div>
+            }
+            toggle={() => setConfirmCompromise(false)}
             buttons={[
                { color: "danger", onClick: onCompromise, body: "Yes" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+               { color: "secondary", onClick: () => setConfirmCompromise(false), body: "Cancel" },
             ]}
          />
 
@@ -270,10 +438,10 @@ export default function CryptographicKeyItem({
             isOpen={confirmDestroy}
             caption={`Destroy Key"}`}
             body={`You are about to destroy the Key. Is this what you want to do?`}
-            toggle={() => setConfirmDelete(false)}
+            toggle={() => setConfirmDestroy(false)}
             buttons={[
                { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+               { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
             ]}
          />
 
@@ -291,6 +459,15 @@ export default function CryptographicKeyItem({
             body={SignVerifyData({action:"verify", visible: verifyData, onClose: () => setVerifyData(false), tokenUuid: tokenInstanceUuid, keyUuid: keyUuid, keyItemUuid: keyItem.uuid, algorithm: keyItem.cryptographicAlgorithm, tokenProfileUuid: tokenProfileUuid })}
             toggle={() => setVerifyData(false)}
             buttons={[]}
+         />
+
+         <Dialog
+            isOpen={currentInfoId !== ""}
+            caption={`Additional Information`}
+            body={additionalInfoEntry()}
+            toggle={() => setCurrentInfoId("")}
+            buttons={[]}
+            size="lg"
          />
 
       </div >

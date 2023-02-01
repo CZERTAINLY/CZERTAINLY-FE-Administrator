@@ -2,12 +2,16 @@ import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import { CertificateGroupResponseModel } from "./certificateGroups";
 import { MetadataModel } from "./locations";
 import { 
+    BulkCompromiseKeyItemRequestDto,
+    BulkCompromiseKeyRequestDto,
     BulkKeyUsageRequestDto, 
+    CompromiseKeyRequestDto, 
     EditKeyRequestDto, 
     KeyDetailDto, 
     KeyDto, 
     KeyEventHistoryDto, 
     KeyFormat, 
+    KeyItemDetailDto, 
     KeyItemDto, 
     KeyRequestDto, 
     UpdateKeyUsageRequestDto,
@@ -25,8 +29,11 @@ export type CryptographicKeyResponseModel = CryptographicKeyResponseDto;
 export type CryptographicKeyDetailResponseDto = KeyDetailDto;
 export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, "attributes | customAttributes | group"> & { attributes: Array<AttributeResponseModel>, customAttributes?: Array<AttributeResponseModel>, group?: CertificateGroupResponseModel};
 
-export type CryptographicKeyItemResponseDto = KeyItemDto;
-export type CryptographicKeyItemResponseModel = Omit<CryptographicKeyItemResponseDto, "metadata | format"> & { metadata?: Array<MetadataModel>, format?: KeyFormat};
+export type CryptographicKeyItemDetailResponseDto = KeyItemDetailDto;
+export type CryptographicKeyItemDetailResponseModel = Omit<CryptographicKeyItemDetailResponseDto, "metadata | format"> & { metadata?: Array<MetadataModel>, format?: KeyFormat};
+
+export type CryptographicKeyItemDto = KeyItemDto;
+export type CryptographicKeyItemModel = Omit<CryptographicKeyItemDto, "format"> & { format?: KeyFormat};
 
 export type CryptographicKeyKeyUsageUpdateRequestDto = UpdateKeyUsageRequestDto;
 export type CryptographicKeyKeyUsageUpdateRequestModel = CryptographicKeyKeyUsageUpdateRequestDto;
@@ -36,3 +43,12 @@ export type CryptographicKeyKeyUsageBulkUpdateRequestModel = CryptographicKeyKey
 
 export type CryptographicKeyHistoryDto = KeyEventHistoryDto;
 export type CryptographicKeyHistoryModel = CryptographicKeyHistoryDto;
+
+export type CryptographicKeyCompromiseRequestDto = CompromiseKeyRequestDto;
+export type CryptographicKeyCompromiseRequestModel = CryptographicKeyCompromiseRequestDto;
+
+export type CryptographicKeyBulkCompromiseRequestDto = BulkCompromiseKeyRequestDto;
+export type CryptographicKeyBulkCompromiseRequestModel = CryptographicKeyBulkCompromiseRequestDto;
+
+export type CryptographicKeyItemBulkCompromiseRequestDto = BulkCompromiseKeyItemRequestDto;
+export type CryptographicKeyItemBulkCompromiseRequestModel = CryptographicKeyItemBulkCompromiseRequestDto;

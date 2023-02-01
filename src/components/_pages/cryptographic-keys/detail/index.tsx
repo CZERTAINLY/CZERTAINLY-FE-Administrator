@@ -1,6 +1,7 @@
 import AttributeViewer from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import TabLayout from "components/Layout/TabLayout";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
@@ -13,11 +14,10 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { Col, Container, Label, Row } from "reactstrap";
-import { KeyState, KeyUsage, Resource } from "types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { Badge, Col, Container, Label, Row } from "reactstrap";
+import { KeyCompromiseReason, KeyState, KeyUsage, Resource } from "types/openapi";
 import CryptographicKeyItem from "./CryptographicKeyItem";
-import RandomDataGeneration from "./RandomDataGeneration";
 
 export default function CryptographicKeyDetail() {
 
@@ -36,6 +36,7 @@ export default function CryptographicKeyDetail() {
    const isDisabling = useSelector(selectors.isDisabling);
    const isCompromising = useSelector(selectors.isBulkCompromising);
    const isDestroying = useSelector(selectors.isBulkDestroying);
+   const isFetchingHistory = useSelector(selectors.isFetchingHistory);
    
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -45,9 +46,9 @@ export default function CryptographicKeyDetail() {
 
    const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
 
-   const [randomDataGeneration, setRandomDataGeneration] = useState<boolean>(false);
-
    const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
+
+   const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
 
    const isBusy = useMemo(
       () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
@@ -131,13 +132,14 @@ export default function CryptographicKeyDetail() {
 
       () => {
          if (!cryptographicKey) return;
+         if (!compromiseReason) return;
          dispatch(actions.compromiseCryptographicKey({ 
-            keyItemUuid: [],
+            request: { reason: compromiseReason },
             tokenInstanceUuid: cryptographicKey.tokenInstanceUuid, 
             uuid: cryptographicKey.uuid }));
          setConfirmCompromise(false);
       },
-      [dispatch, cryptographicKey]
+      [dispatch, cryptographicKey, compromiseReason]
 
    );
 
@@ -164,6 +166,15 @@ export default function CryptographicKeyDetail() {
       { value: KeyUsage.Unwrap, label: "Unwrapping Key" },
    ]
 
+   const optionForCompromise = () => {
+      var options = [];
+      for (const reason in KeyCompromiseReason) {
+         const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
+         options.push({ value: myReason, label: myReason });
+      }
+      return options;
+     }
+
 
    const buttons: WidgetButtonProps[] = useMemo(
 
@@ -175,7 +186,6 @@ export default function CryptographicKeyDetail() {
          { icon: "key", disabled: !cryptographicKey?.items.some(item => item.state === KeyState.Active) || false, tooltip: "Update Key Usages", onClick: () => { setKeyUsageUpdate(true); } },
          { icon: "handshake", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Compromised) || false, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
          { icon: "bomb", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Destroyed) || false, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
-         { icon: "random", disabled: !cryptographicKey?.items.some(item => item.state === KeyState.Active) || false, tooltip: "Generate Random", onClick: () => { setRandomDataGeneration(true) } },
       ],
       [cryptographicKey, onEditClick, onDisableClick, onEnableClick, setKeyUsageUpdate, setConfirmCompromise, setConfirmDestroy]
 
@@ -203,6 +213,23 @@ export default function CryptographicKeyDetail() {
    );
 
 
+   const associationTitle = useMemo(
+
+      () => (
+
+         <div>
+
+            <h5>
+               Key <span className="fw-semi-bold">Associations</span>
+            </h5>
+
+         </div>
+
+      ), []
+
+   );
+
+
    const detailHeaders: TableHeader[] = useMemo(
 
       () => [
@@ -216,6 +243,47 @@ export default function CryptographicKeyDetail() {
          },
       ],
       []
+
+   );
+
+
+   const associationHeaders: TableHeader[] = useMemo(
+
+      () => [
+         {
+            id: "name",
+            content: "Name",
+         },
+         {
+            id: "uuid",
+            content: "UUID",
+         },
+         {
+            id: "resource",
+            content: "Resource",
+         },
+      ],
+      []
+
+   );
+
+
+   const associationBody = useMemo(
+
+      () => !cryptographicKey || !cryptographicKey.associations ? [] : cryptographicKey.associations.map((item) => (
+         {
+            id: item.uuid,
+            columns: [
+                        item.resource !== Resource.Certificates ? item.name : <Link to={`../../../certificates/detail/${item.uuid}`}>{item.name}</Link>, 
+                        
+                        item.uuid, 
+                        
+                        item.resource
+                     
+                     ],
+         }
+      )),
+      [cryptographicKey]
 
    );
 
@@ -307,6 +375,25 @@ export default function CryptographicKeyDetail() {
 
    );
 
+   const itemTabs = () => {
+      return !cryptographicKey? [] : cryptographicKey?.items.map((item, index) => {
+
+         return ({"title": item.type, 
+         "content": (
+            <Widget busy={isBusy || isFetchingHistory}>
+                     <CryptographicKeyItem 
+                        key={item.uuid}
+                        keyItem={item} 
+                        keyUuid={cryptographicKey.uuid} 
+                        tokenInstanceUuid={cryptographicKey.tokenInstanceUuid} 
+                        tokenProfileUuid={cryptographicKey.tokenProfileUuid}
+                        totalKeyItems={cryptographicKey.items.length}
+                     />
+                  </Widget>
+         )
+         })
+      })
+   }
 
 
    return (
@@ -345,26 +432,19 @@ export default function CryptographicKeyDetail() {
 
          </Row>
 
-         <>
-         {
-            cryptographicKey?.items.map((item, index) => {
+         <TabLayout tabs={itemTabs()} />
 
-               return (
-               <Widget busy={isBusy}>
-                  <CryptographicKeyItem 
-                     key={item.uuid}
-                     keyItem={item} 
-                     keyUuid={cryptographicKey.uuid} 
-                     tokenInstanceUuid={cryptographicKey.tokenInstanceUuid} 
-                     tokenProfileUuid={cryptographicKey.tokenProfileUuid}
-                     totalKeyItems={cryptographicKey.items.length}
-                  />
+         <Widget title={associationTitle} busy={isBusy}>
 
-               </Widget>
-               )
-            })
-         }
-         </>
+               <br />
+
+               <CustomTable
+                  headers={associationHeaders}
+                  data={associationBody}
+               />
+
+            </Widget>
+
 
          <Dialog
             isOpen={confirmDelete}
@@ -391,11 +471,22 @@ export default function CryptographicKeyDetail() {
          <Dialog
             isOpen={confirmCompromise}
             caption={`Key Compromised?`}
-            body={`If the Key is compromised, proceed to make the platform stop using it for any operations.`}
-            toggle={() => setConfirmDelete(false)}
+            body={
+               <div>
+                  <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
+                  <p><b>Warning:</b> This action cannot be undone.</p>
+                  <Select
+                     name="compromiseReason"
+                     id="compromiseReason"
+                     options={optionForCompromise()}
+                     onChange={(e) => setCompromiseReason(e?.value)}
+                  />
+               </div>
+            }
+            toggle={() => setConfirmCompromise(false)}
             buttons={[
                { color: "danger", onClick: onCompromise, body: "Yes" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+               { color: "secondary", onClick: () => setConfirmCompromise(false), body: "Cancel" },
             ]}
          />
 
@@ -403,20 +494,11 @@ export default function CryptographicKeyDetail() {
             isOpen={confirmDestroy}
             caption={`Destroy Key"}`}
             body={`You are about to destroy the Key. Is this what you want to do?`}
-            toggle={() => setConfirmDelete(false)}
+            toggle={() => setConfirmDestroy(false)}
             buttons={[
                { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+               { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
             ]}
-         />
-
-
-         <Dialog
-            isOpen={randomDataGeneration}
-            caption="Random Data Generation"
-            body={RandomDataGeneration({ visible: randomDataGeneration, onClose: () => setRandomDataGeneration(false), tokenUuid: cryptographicKey?.tokenInstanceUuid})}
-            toggle={() => setRandomDataGeneration(false)}
-            buttons={[]}
          />
 
       </Container >
