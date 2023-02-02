@@ -3,6 +3,7 @@ import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./customAttributes";
@@ -241,8 +242,11 @@ const bulkDeleteCustomAttributes: AppEpic = (action$, state$, deps) => {
         ),
         switchMap(
             action => deps.apiClients.customAttributes.bulkDeleteCustomAttributes({requestBody: action.payload}).pipe(
-                map(
-                    errors => slice.actions.bulkDeleteCustomAttributesSuccess(action.payload),
+                mergeMap(
+                    () => of(
+                        slice.actions.bulkDeleteCustomAttributesSuccess(action.payload),
+                        alertActions.success("Selected custom attributes successfully deleted.")
+                    )
                 ),
                 catchError(
                     err => of(

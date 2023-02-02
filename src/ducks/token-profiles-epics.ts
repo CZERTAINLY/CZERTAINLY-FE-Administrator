@@ -1,19 +1,18 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./token-profiles";
-import { actions as appRedirectActions } from "./app-redirect";
 
 import {
     transformTokenProfileAddRequestModelToDto,
+    transformTokenProfileDetailResponseDtoToModel,
     transformTokenProfileEditRequestModelToDto,
     transformTokenProfileResponseDtoToModel,
-    transformTokenProfileDetailResponseDtoToModel,
 } from "./transform/token-profiles";
-   
 
 const listTokenProfiles: AppEpic = (action$, state$, deps) => {
 
@@ -342,9 +341,12 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.tokenProfiles.deleteTokenProfiles({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteTokenProfilesSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.bulkDeleteTokenProfilesSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected profiles successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(

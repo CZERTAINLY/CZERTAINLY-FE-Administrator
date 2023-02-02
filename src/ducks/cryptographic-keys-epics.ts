@@ -1,24 +1,23 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, concatMap, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./cryptographic-keys";
-import { actions as appRedirectActions } from "./app-redirect";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 import {
     transformCryptographicKeyAddRequestModelToDto,
-    transformCryptographicKeyEditRequestModelToDto,
-    transformCryptographicKeyResponseDtoToModel,
-    transformCryptographicKeyDetailResponseDtoToModel,
-    transformKeyHistoryDtoToModel,
-    transformCryptographicKeyItemBulkCompromiseModelToDto,
     transformCryptographicKeyBulkCompromiseModelToDto,
     transformCryptographicKeyCompromiseModelToDto,
+    transformCryptographicKeyDetailResponseDtoToModel,
+    transformCryptographicKeyEditRequestModelToDto,
+    transformCryptographicKeyItemBulkCompromiseModelToDto,
+    transformCryptographicKeyResponseDtoToModel,
+    transformKeyHistoryDtoToModel,
 } from "./transform/cryptographic-keys";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-
 
 const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
@@ -387,9 +386,12 @@ const bulkDeleteCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.cryptographicKeys.deleteKeys({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteCryptographicKeysSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.bulkDeleteCryptographicKeysSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected keys successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(
@@ -480,9 +482,12 @@ const bulkDeleteCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.cryptographicKeys.deleteKeyItems({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteCryptographicKeyItemsSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.bulkDeleteCryptographicKeyItemsSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected key items successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(

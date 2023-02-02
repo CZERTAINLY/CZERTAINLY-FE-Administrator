@@ -1,18 +1,15 @@
+import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
+import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./credentials";
-import { actions as appRedirectActions } from "./app-redirect";
-import {
-    transformCredentialCreateRequestModelToDto, transformCredentialEditRequestModelToDto,
-    transformCredentialResponseDtoToModel
-} from "./transform/credentials";
-import { FunctionGroupCode } from "types/openapi";
-import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { transformCredentialCreateRequestModelToDto, transformCredentialEditRequestModelToDto, transformCredentialResponseDtoToModel } from "./transform/credentials";
 
 const listCredentials: AppEpic = (action$, state, deps) => {
 
@@ -262,9 +259,12 @@ const bulkDeleteCredential: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.credentials.bulkDeleteCredential({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-                () => slice.actions.bulkDeleteCredentialsSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.bulkDeleteCredentialsSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected credentials successfully deleted.")
+                 )
+             ),
 
             catchError(
                error => of(

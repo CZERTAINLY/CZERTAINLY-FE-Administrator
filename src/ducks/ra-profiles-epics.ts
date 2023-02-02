@@ -1,11 +1,12 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./ra-profiles";
-import { actions as appRedirectActions } from "./app-redirect";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 import {
     transformComplianceProfileSimplifiedDtoToModel,
@@ -13,10 +14,8 @@ import {
     transformRaProfileActivateAcmeRequestModelToDto,
     transformRaProfileAddRequestModelToDto,
     transformRaProfileEditRequestModelToDto,
-    transformRaProfileResponseDtoToModel
+    transformRaProfileResponseDtoToModel,
 } from "./transform/ra-profiles";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
 
@@ -516,9 +515,12 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.raProfiles.bulkDeleteRaProfile({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteRaProfilesSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.bulkDeleteRaProfilesSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected RA profiles successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(
@@ -547,9 +549,12 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.raProfiles.checkRaProfileCompliance({ requestBody: action.payload.uuids }
          ).pipe(
 
-            map(
-               () => slice.actions.checkComplianceSuccess()
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.checkComplianceSuccess(),
+                     alertActions.success("Compliance Check for the certificates initiated")
+                 )
+             ),
 
             catchError(
                err => of(

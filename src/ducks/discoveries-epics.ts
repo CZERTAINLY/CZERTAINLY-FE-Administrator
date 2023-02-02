@@ -1,19 +1,15 @@
+import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
+import { FunctionGroupCode } from "../types/openapi";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./discoveries";
-import { actions as appRedirectActions } from "./app-redirect";
-import {
-    transformDiscoveryRequestModelToDto,
-    transformDiscoveryResponseDetailDtoToModel,
-    transformDiscoveryResponseDtoToModel
-} from "./transform/discoveries";
-import { FunctionGroupCode } from "../types/openapi";
-import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { transformDiscoveryRequestModelToDto, transformDiscoveryResponseDetailDtoToModel, transformDiscoveryResponseDtoToModel } from "./transform/discoveries";
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
 
@@ -230,9 +226,12 @@ const bulkDeleteDiscovery: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.discoveries.bulkDeleteDiscovery({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               () => slice.actions.bulkDeleteDiscoverySuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                    slice.actions.bulkDeleteDiscoverySuccess({ uuids: action.payload.uuids }),
+                    alertActions.success("Selected discoveries successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(

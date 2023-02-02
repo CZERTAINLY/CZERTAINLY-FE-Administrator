@@ -9,12 +9,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import { Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
+import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 import { CertificateSearchFilterModel } from "types/certificate";
 
 import { dateFormatter } from "utils/dateUtil";
 import { downloadFileZip } from "utils/download";
 import { AttributeRequestModel } from "../../../../types/attributes";
+import { CertificateType } from "../../../../types/openapi";
 import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
 import CertificateGroupDialog from "../CertificateGroupDialog";
 import CertificateInventoryFilter from "../CertificateInventoryFilter";
@@ -295,6 +296,12 @@ export default function CertificateList({
             id: "expiresAt",
             width: "15%"
          },
+          {
+              content: "Type",
+              //sortable: true,
+              id: "type",
+              width: "15%"
+          },
          {
             content: "Group",
             //sortable: true,
@@ -369,6 +376,8 @@ export default function CertificateList({
                   <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>,
 
                   <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>,
+
+                  certificate.certificateType ? <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>{certificate.certificateType}</Badge> : "",
 
                   certificate.group?.name || "Unassigned",
 
