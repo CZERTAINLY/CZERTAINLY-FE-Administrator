@@ -29,7 +29,8 @@ export type IconName = "plus" |
     "sign" |
     "verify" |
     "key" |
-    "link";
+    "link" |
+    "recycle" ;
 
 export interface WidgetButtonProps {
    icon: IconName;
@@ -75,7 +76,8 @@ const colors = {
    "sign": "auto",
    "verify": "green",
    "key": "auto",
-   "link": "auto"
+   "link": "auto",
+   "recycle": "auto",
 };
 
 
@@ -108,7 +110,8 @@ const classNames = {
    "sign": "fas fa-file-signature",
    "verify": "fa fa-check-square",
    "key": "fa fa-key",
-   "link": "fa fa-link"
+   "link": "fa fa-link",
+   "recycle": "fa fa-recycle",
 }
 
 

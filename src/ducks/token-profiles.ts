@@ -100,7 +100,7 @@ export const slice = createSlice({
       },
 
 
-      listTokenProfiles: (state, action: PayloadAction<void>) => {
+      listTokenProfiles: (state, action: PayloadAction<{enabled?: boolean}>) => {
 
          state.tokenProfiles = [];
          state.isFetchingList = true;

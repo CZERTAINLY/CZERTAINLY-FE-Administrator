@@ -15,7 +15,7 @@ import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
-import { Badge, Col, Container, Label, Row } from "reactstrap";
+import { Col, Container, Label, Row } from "reactstrap";
 import { KeyCompromiseReason, KeyState, KeyUsage, Resource } from "types/openapi";
 import CryptographicKeyItem from "./CryptographicKeyItem";
 

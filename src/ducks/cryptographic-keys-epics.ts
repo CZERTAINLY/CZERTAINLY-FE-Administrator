@@ -29,7 +29,7 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.cryptographicKeys.listKeys({}).pipe(
+         action => deps.apiClients.cryptographicKeys.listKeys({tokenProfileUuid: action.payload.tokenProfileUuid}).pipe(
 
             map(
                list => slice.actions.listCryptographicKeysSuccess({

@@ -3,7 +3,7 @@ import { Button, ButtonGroup, FormGroup, FormText, Input, Label } from "reactstr
 
 interface Props {
    onCancel: () => void,
-   onRenew: (data: { fileContent: string, fileName: string, contentType: string }) => void
+   onRenew: (data: { fileContent?: string, fileName?: string, contentType?: string }) => void
 }
 
 export default function CertificateRenewDialog({
@@ -15,6 +15,8 @@ export default function CertificateRenewDialog({
    const [contentType, setContentType] = useState("");
    const [file, setFile] = useState<string>("");
    const [error, setError] = useState<string>("");
+
+   const [uploadCsr, setUploadCsr] = useState(false);
 
    const onFileLoaded = useCallback(
 
@@ -96,6 +98,21 @@ export default function CertificateRenewDialog({
       <div>
 
          <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
+         <FormGroup>
+
+            <Label for="uploadCsr">Upload new CSR ?</Label>
+            &nbsp;&nbsp;
+            <input
+               id="uploadCsr"
+               type="checkbox"
+               placeholder="Select Option"
+               onChange={e => { setUploadCsr(e.target.checked) }}
+            />
+
+            </FormGroup>
+
+            { uploadCsr ? (
+            <>
             <FormGroup>
 
                <Label for="fileName">File name</Label>
@@ -111,6 +128,8 @@ export default function CertificateRenewDialog({
 
             </FormGroup>
 
+            
+
             <FormGroup style={{ textAlign: "right" }}>
 
                <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
@@ -122,6 +141,10 @@ export default function CertificateRenewDialog({
             <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
                Select or Drag &amp; Drop file to Drop Zone.
             </div>
+
+            </>
+            ) : <></>
+         }
 
          </div>
 
@@ -136,7 +159,6 @@ export default function CertificateRenewDialog({
                <Button
                   color="primary"
                   onClick={() => onRenew({ fileContent: file, fileName, contentType })}
-                  disabled={!file}
                >
                   Renew
                </Button>

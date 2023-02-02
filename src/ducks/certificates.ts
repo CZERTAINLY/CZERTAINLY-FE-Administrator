@@ -7,6 +7,7 @@ import {
    CertificateComplianceCheckModel,
    CertificateHistoryModel,
    CertificateObjectModel,
+   CertificateRekeyRequestModel,
    CertificateRenewRequestModel,
    CertificateResponseModel,
    CertificateRevokeRequestModel,
@@ -60,6 +61,7 @@ export type State = {
    isIssuing: boolean;
    isRevoking: boolean;
    isRenewing: boolean;
+   isRekeying: boolean;
 
    isDeleting: boolean;
    isBulkDeleting: boolean;
@@ -78,6 +80,10 @@ export type State = {
    isFetchingRevocationAttributes: boolean;
 
    isCheckingCompliance: boolean;
+
+   isFetchingCsrAttributes: boolean;
+
+   csrAttributeDescriptors: AttributeDescriptorModel[];
 
 
 };
@@ -114,6 +120,7 @@ export const initialState: State = {
    isIssuing: false,
    isRevoking: false,
    isRenewing: false,
+   isRekeying: false,
 
    isDeleting: false,
    isBulkDeleting: false,
@@ -132,6 +139,10 @@ export const initialState: State = {
    isFetchingRevocationAttributes: false,
 
    isCheckingCompliance: false,
+
+   isFetchingCsrAttributes: false,
+
+   csrAttributeDescriptors: [],
 
 
 };
@@ -352,6 +363,33 @@ export const slice = createSlice({
       renewCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isRenewing = false;
+
+      },
+
+
+      rekeyCertificate: (state, action: PayloadAction<{
+         authorityUuid: string
+         raProfileUuid: string;
+         uuid: string;
+         rekey: CertificateRekeyRequestModel
+      }>) => {
+
+         state.isRekeying = true;
+
+      },
+
+
+      rekeyCertificateSuccess: (state, action: PayloadAction<{
+         uuid: string;
+      }>) => {
+
+         state.isRekeying = false;
+      },
+
+
+      rekeyCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isRekeying = false;
 
       },
 
@@ -744,6 +782,27 @@ export const slice = createSlice({
          state.isCheckingCompliance = false;
       },
 
+      getCsrAttributes: (state, action: PayloadAction<void>) => {
+
+         state.isFetchingCsrAttributes = true;
+
+      },
+
+
+      getCsrAttributesSuccess: (state, action: PayloadAction<{ csrAttributes: AttributeDescriptorModel[] }>) => {
+
+         state.isFetchingCsrAttributes = false;
+         state.csrAttributeDescriptors = action.payload.csrAttributes;
+
+      },
+
+
+      getCsrAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingCsrAttributes = false;
+
+      },
+
 
    }
 
@@ -781,6 +840,7 @@ const isFetchingLocations = createSelector(state, state => state.isFetchingLocat
 const isIssuing = createSelector(state, state => state.isIssuing);
 const isRevoking = createSelector(state, state => state.isRevoking);
 const isRenewing = createSelector(state, state => state.isRenewing);
+const isRekeying = createSelector(state, state => state.isRekeying);
 
 const isDeleting = createSelector(state, state => state.isDeleting);
 const isBulkDeleting = createSelector(state, state => state.isBulkDeleting);
@@ -800,6 +860,9 @@ const isFetchingRevocationAttributes = createSelector(state, state => state.isFe
 
 const isFetchingValidationResult = createSelector(state, state => state.isFetchingValidationResult);
 const validationResult = createSelector(state, state => state.validationResult);
+
+const isFetchingCsrAttributes = createSelector(state, state => state.isFetchingCsrAttributes);
+const csrAttributeDescriptors = createSelector(state, state => state.csrAttributeDescriptors);
 
 
 export const selectors = {
@@ -825,6 +888,7 @@ export const selectors = {
    isIssuing,
    isRevoking,
    isRenewing,
+   isRekeying,
    isDeleting,
    isBulkDeleting,
    isUpdatingGroup,
@@ -837,7 +901,9 @@ export const selectors = {
    isFetchingIssuanceAttributes,
    isFetchingRevocationAttributes,
    isFetchingValidationResult,
-   validationResult
+   validationResult,
+   isFetchingCsrAttributes,
+   csrAttributeDescriptors,
 };
 
 

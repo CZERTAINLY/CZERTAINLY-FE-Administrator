@@ -17,6 +17,7 @@ import type {
     CertificateType,
     ComplianceStatus,
     GroupDto,
+    KeyDto,
     LocationDto,
     MetadataResponseDto,
     ResponseAttributeDto,
@@ -216,4 +217,9 @@ export interface CertificateDto {
      * @memberof CertificateDto
      */
     signatureAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * @type {KeyDto}
+     * @memberof CertificateDto
+     */
+    key?: KeyDto;
 }
