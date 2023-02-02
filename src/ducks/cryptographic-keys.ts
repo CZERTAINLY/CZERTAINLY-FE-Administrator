@@ -133,7 +133,7 @@ export const slice = createSlice({
       },
 
 
-      listCryptographicKeys: (state, action: PayloadAction<void>) => {
+      listCryptographicKeys: (state, action: PayloadAction<{tokenProfileUuid?: string}>) => {
 
          state.cryptographicKeys = [];
          state.isFetchingList = true;

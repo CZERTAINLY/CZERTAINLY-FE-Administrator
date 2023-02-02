@@ -47,6 +47,7 @@ import { downloadFile, formatPEM } from "utils/certificate";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
+import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import CertificateStatus from "../CertificateStatus";
@@ -87,6 +88,7 @@ export default function CertificateDetail() {
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [renew, setRenew] = useState<boolean>(false);
+   const [rekey, setRekey] = useState<boolean>(false);
    const [revoke, setRevoke] = useState<boolean>(false);
    const [updateGroup, setUpdateGroup] = useState<boolean>(false);
    const [updateOwner, setUpdateOwner] = useState<boolean>(false);
@@ -375,15 +377,9 @@ export default function CertificateDetail() {
 
    const onRenew = useCallback(
 
-      (data: { fileName: string, contentType: string, fileContent: string }) => {
+      (data: { fileName?: string, contentType?: string, fileContent? : string }) => {
 
-         if (data.fileContent) {
-
-            try {
-               dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", renewRequest: { pkcs10: data.fileContent }, raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
-            } catch (error) {
-            }
-         }
+         dispatch(actions.renewCertificate({ uuid: certificate?.uuid || "", renewRequest: { pkcs10: data.fileContent ? data.fileContent : undefined }, raProfileUuid: certificate?.raProfile?.uuid || "", authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "" }));
 
          setRenew(false);
 
@@ -485,7 +481,8 @@ export default function CertificateDetail() {
 
       () => [
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
+         { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked' || !certificate.privateKeyAvailability || !certificate.csr, tooltip: "Renew", onClick: () => { setRenew(true); } },
+         { icon: "recycle", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Rekey", onClick: () => { setRekey(true); } },
          { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
          { icon: "gavel", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
          { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },
@@ -691,6 +688,12 @@ export default function CertificateDetail() {
    const complianceTitle = (
       <h5>
          <span className="fw-semi-bold">Non Compliant Rules</span>
+      </h5>
+   );
+
+   const csrTitle = (
+      <h5>
+         <span className="fw-semi-bold">CSR Attributes</span>
       </h5>
    );
 
@@ -1029,6 +1032,10 @@ export default function CertificateDetail() {
             columns: ["Serial Number", certificate.serialNumber]
          },
          {
+            id: "key",
+            columns: ["Key", certificate.key && certificate.key.tokenInstanceUuid ? <Link to={`../cryptographicKeys/detail/${certificate.key?.tokenInstanceUuid}/${certificate.key?.uuid}`}>{certificate.key?.name}</Link> : "",]
+         },
+         {
             id: "issuerCommonName",
             columns: ["Issuer Common Name", certificate.issuerCommonName]
          },
@@ -1322,6 +1329,15 @@ export default function CertificateDetail() {
                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata}/>
                </Widget>
 
+               { certificate?.csrAttributes && certificate.csrAttributes.length > 0 ? 
+                  
+                  <Widget title={csrTitle} busy={isBusy}>
+                     
+                     <AttributeViewer attributes={certificate.csrAttributes} />
+                  
+                  </Widget> 
+            : null}
+
                 {certificate && <CustomAttributeWidget resource={Resource.Certificates} resourceUuid={certificate.uuid} attributes={certificate.customAttributes} />}
 
             </Col>
@@ -1413,6 +1429,15 @@ export default function CertificateDetail() {
             caption={`Renew Certificate`}
             body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew} />}
             toggle={() => setRenew(false)}
+            buttons={[]}
+         />
+
+
+         <Dialog
+            isOpen={rekey}
+            caption={`Rekey Certificate`}
+            body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate} />}
+            toggle={() => setRekey(false)}
             buttons={[]}
          />
 

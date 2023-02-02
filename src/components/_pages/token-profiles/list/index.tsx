@@ -43,7 +43,7 @@ function TokenProfileList() {
    useEffect(() => {
 
       dispatch(actions.setCheckedRows({ checkedRows: [] }));
-      dispatch(actions.listTokenProfiles());
+      dispatch(actions.listTokenProfiles({}));
 
    }, [dispatch]);
 

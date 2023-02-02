@@ -51,6 +51,7 @@ export * from './CipherDataRequestDto';
 export * from './CipherRequestData';
 export * from './CipherResponseData';
 export * from './ClientCertificateDataResponseDto';
+export * from './ClientCertificateRekeyRequestDto';
 export * from './ClientCertificateRenewRequestDto';
 export * from './ClientCertificateRevocationDto';
 export * from './ClientCertificateSignRequestDto';

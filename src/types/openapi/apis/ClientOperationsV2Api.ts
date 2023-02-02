@@ -19,6 +19,7 @@ import type {
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
     ClientCertificateDataResponseDto,
+    ClientCertificateRekeyRequestDto,
     ClientCertificateRenewRequestDto,
     ClientCertificateRevocationDto,
     ClientCertificateSignRequestDto,
@@ -40,6 +41,13 @@ export interface ListIssueCertificateAttributesRequest {
 export interface ListRevokeCertificateAttributesRequest {
     authorityUuid: string;
     raProfileUuid: string;
+}
+
+export interface RekeyCertificateRequest {
+    authorityUuid: string;
+    raProfileUuid: string;
+    certificateUuid: string;
+    clientCertificateRekeyRequestDto: ClientCertificateRekeyRequestDto;
 }
 
 export interface RenewCertificateRequest {
@@ -122,6 +130,29 @@ export class ClientOperationsV2Api extends BaseAPI {
         return this.request<Array<BaseAttributeDto>>({
             url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
             method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Rekey Certificate
+     */
+    rekeyCertificate({ authorityUuid, raProfileUuid, certificateUuid, clientCertificateRekeyRequestDto }: RekeyCertificateRequest): Observable<ClientCertificateDataResponseDto>
+    rekeyCertificate({ authorityUuid, raProfileUuid, certificateUuid, clientCertificateRekeyRequestDto }: RekeyCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<ClientCertificateDataResponseDto>>
+    rekeyCertificate({ authorityUuid, raProfileUuid, certificateUuid, clientCertificateRekeyRequestDto }: RekeyCertificateRequest, opts?: OperationOpts): Observable<ClientCertificateDataResponseDto | AjaxResponse<ClientCertificateDataResponseDto>> {
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'rekeyCertificate');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'rekeyCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'rekeyCertificate');
+        throwIfNullOrUndefined(clientCertificateRekeyRequestDto, 'clientCertificateRekeyRequestDto', 'rekeyCertificate');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<ClientCertificateDataResponseDto>({
+            url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/rekey'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)).replace('{certificateUuid}', encodeURI(certificateUuid)),
+            method: 'POST',
+            headers,
+            body: clientCertificateRekeyRequestDto,
         }, opts?.responseOpts);
     };
 

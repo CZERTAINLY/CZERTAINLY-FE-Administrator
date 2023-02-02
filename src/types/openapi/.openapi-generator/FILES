@@ -82,6 +82,7 @@ models/CipherDataRequestDto.ts
 models/CipherRequestData.ts
 models/CipherResponseData.ts
 models/ClientCertificateDataResponseDto.ts
+models/ClientCertificateRekeyRequestDto.ts
 models/ClientCertificateRenewRequestDto.ts
 models/ClientCertificateRevocationDto.ts
 models/ClientCertificateSignRequestDto.ts

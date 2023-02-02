@@ -79,7 +79,7 @@ export default function CryptographicKeyForm() {
 
       () => {
          setGroupAttributesCallbackAttributes([]);
-         dispatch(tokenProfilesActions.listTokenProfiles());
+         dispatch(tokenProfilesActions.listTokenProfiles({}));
          dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
          dispatch(connectorActions.clearCallbackData());
          dispatch(groupActions.listGroups());

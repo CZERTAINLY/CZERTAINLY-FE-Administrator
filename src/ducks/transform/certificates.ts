@@ -14,6 +14,8 @@ import {
    CertificateListResponseModel,
    CertificateObjectDto,
    CertificateObjectModel,
+   CertificateRekeyRequestDto,
+   CertificateRekeyRequestModel,
    CertificateRenewRequestDto,
    CertificateRenewRequestModel,
    CertificateResponseDto,
@@ -96,6 +98,10 @@ export function transformCertificateRevokeRequestModelToDto(revokeRequest: Certi
 
 export function transformCertificateRenewRequestModelToDto(renewRequest: CertificateRenewRequestModel): CertificateRenewRequestDto {
    return { ...renewRequest };
+}
+
+export function transformCertificateRekeyRequestModelToDto(rekeyRequest: CertificateRekeyRequestModel): CertificateRekeyRequestDto {
+   return { ...rekeyRequest };
 }
 
 export function transformCertificateSearchFieldDtoToModel(searchField: CertificateSearchFieldDto): CertificateSearchFieldModel {

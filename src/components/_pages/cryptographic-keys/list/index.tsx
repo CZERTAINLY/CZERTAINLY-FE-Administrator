@@ -51,7 +51,7 @@ function CryptographicKeyList() {
 
       dispatch(actions.setCheckedRows({ checkedRows: [] }));
       dispatch(actions.clearDeleteErrorMessages())
-      dispatch(actions.listCryptographicKeys());
+      dispatch(actions.listCryptographicKeys({}));
 
    }, [dispatch]);
 

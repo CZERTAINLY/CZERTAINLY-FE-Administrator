@@ -13,10 +13,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
-import { Col, Container, Label, Row } from "reactstrap";
-import { KeyCompromiseReason, KeyState, KeyUsage, Resource } from "types/openapi";
 
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { Col, Container, Label, Row } from "reactstrap";
+import { KeyCompromiseReason, KeyState, KeyUsage, Resource } from "types/openapi";
 import CryptographicKeyItem from "./CryptographicKeyItem";
 
 export default function CryptographicKeyDetail() {

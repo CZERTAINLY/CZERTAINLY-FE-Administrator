@@ -4,6 +4,7 @@ import {
     CertificateDto, CertificateEventHistoryDto,
     CertificateResponseDto as CertificateResponseDtoOpenApi, CertificateUpdateObjectsDto,
     CertificateValidationDto as CertificateValidationDtoOpenApi,
+    ClientCertificateRekeyRequestDto,
     ClientCertificateRenewRequestDto,
     ClientCertificateRevocationDto,
     ClientCertificateSignRequestDto, MultipleCertificateObjectUpdateDto,
@@ -45,13 +46,16 @@ export type CertificateValidationDto = CertificateValidationDtoOpenApi;
 export type CertificateValidationModel = CertificateValidationDto;
 
 export type CertificateSignRequestDto = ClientCertificateSignRequestDto;
-export type CertificateSignRequestModel = Omit<CertificateSignRequestDto, "attributes | customAttributes"> & { attributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel> };
+export type CertificateSignRequestModel = Omit<CertificateSignRequestDto, "attributes | customAttributes | csrAttributes | signatureAttributes"> & { attributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel>, csrAttributes?: Array<AttributeRequestModel>, signatureAttributes?: Array<AttributeRequestModel> };
 
 export type CertificateRevokeRequestDto = ClientCertificateRevocationDto;
 export type CertificateRevokeRequestModel = Omit<CertificateRevokeRequestDto, "attributes"> & { attributes: Array<AttributeRequestModel> };
 
 export type CertificateRenewRequestDto = ClientCertificateRenewRequestDto;
 export type CertificateRenewRequestModel = CertificateRenewRequestDto;
+
+export type CertificateRekeyRequestDto = ClientCertificateRekeyRequestDto;
+export type CertificateRekeyRequestModel = CertificateRekeyRequestDto;
 
 export type CertificateSearchFieldDto = SearchFieldDataDto;
 export type CertificateSearchFieldModel = CertificateSearchFieldDto;

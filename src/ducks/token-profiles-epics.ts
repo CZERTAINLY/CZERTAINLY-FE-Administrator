@@ -23,7 +23,7 @@ const listTokenProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.tokenProfiles.listTokenProfiles({}).pipe(
+         action => deps.apiClients.tokenProfiles.listTokenProfiles({enabled: action.payload.enabled}).pipe(
 
             map(
                list => slice.actions.listTokenProfilesSuccess({

@@ -41,20 +41,20 @@ export interface MimeType {
      * @type {boolean}
      * @memberof MimeType
      */
+    wildcardType?: boolean;
+    /**
+     * @type {boolean}
+     * @memberof MimeType
+     */
     wildcardSubtype?: boolean;
     /**
      * @type {boolean}
      * @memberof MimeType
      */
-    wildcardType?: boolean;
+    concrete?: boolean;
     /**
      * @type {string}
      * @memberof MimeType
      */
     subtypeSuffix?: string;
-    /**
-     * @type {boolean}
-     * @memberof MimeType
-     */
-    concrete?: boolean;
 }

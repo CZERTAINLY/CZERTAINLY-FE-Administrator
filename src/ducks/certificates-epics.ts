@@ -17,6 +17,7 @@ import {
     transformCertificateHistoryDtoToModel,
     transformCertificateListResponseDtoToModel,
     transformCertificateObjectModelToDto,
+    transformCertificateRekeyRequestModelToDto,
     transformCertificateRenewRequestModelToDto,
     transformCertificateResponseDtoToModel,
     transformCertificateRevokeRequestModelToDto,
@@ -233,7 +234,7 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
             mergeMap(
                operation => of(
                   slice.actions.renewCertificateSuccess({ uuid: operation.uuid }),
-                  appRedirectActions.redirect({ url: `./${operation.uuid}` })
+                  appRedirectActions.redirect({ url: `../${operation.uuid}` })
                )
             ),
 
@@ -241,6 +242,46 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
                err => of(
                   slice.actions.renewCertificateFailure({ error: extractError(err, "Failed to renew certificate") }),
                   appRedirectActions.fetchError({ error: err, message: "Failed to renew certificate" })
+               )
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
+
+const rekeyCertificate: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.rekeyCertificate.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.clientOperations.rekeyCertificate({
+                 authorityUuid: action.payload.authorityUuid,
+                 raProfileUuid: action.payload.raProfileUuid,
+                 certificateUuid: action.payload.uuid,
+                 clientCertificateRekeyRequestDto: transformCertificateRekeyRequestModelToDto(action.payload.rekey),
+             }
+         ).pipe(
+
+            mergeMap(
+               operation => of(
+                  slice.actions.rekeyCertificateSuccess({ uuid: operation.uuid }),
+                  appRedirectActions.redirect({ url: `../${operation.uuid}` })
+               )
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.rekeyCertificateFailure({ error: extractError(err, "Failed to rekey certificate") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to rekey certificate" })
                )
             )
 
@@ -873,6 +914,42 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
 }
 
 
+
+const getCsrAttributes: AppEpic = (action$, state, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCsrAttributes.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.getCsrGenerationAttributes().pipe(
+
+            map(
+
+               attributes => slice.actions.getCsrAttributesSuccess({
+                  csrAttributes: attributes.map(attribute => transformAttributeDescriptorDtoToModel(attribute)),
+               }),
+
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.getCsrAttributesFailure({ error: extractError(err, "Failed to get CSR generation attributes") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get CSR generation attributes" })
+               )
+            )
+
+         )
+
+      )
+
+   )
+
+}
+
+
 const epics = [
    listCertificates,
    getCertificateDetail,
@@ -880,6 +957,7 @@ const epics = [
    issueCertificate,
    revokeCertificate,
    renewCertificate,
+   rekeyCertificate,
    getAvailableCertificateFilters,
    getCertificateHistory,
    listCertificateLocations,
@@ -895,6 +973,7 @@ const epics = [
    getIssuanceAttributes,
    getRevocationAttributes,
    checkCompliance,
+   getCsrAttributes,
 ];
 
 
