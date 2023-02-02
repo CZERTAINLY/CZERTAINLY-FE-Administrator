@@ -1,17 +1,14 @@
+import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
-import { AppEpic } from "ducks";
-
-import { slice } from "./certificateGroups";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import {
-    transformCertificateGroupRequestModelToDto,
-    transformCertificateGroupResponseDtoToModel
-} from "./transform/certificateGroups";
+import { slice } from "./certificateGroups";
 
+import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 const listGroups: AppEpic = (action$, state$, deps) => {
 
@@ -168,7 +165,7 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
 
                () => of(
                   slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid }),
-                  appRedirectActions.redirect({ url: "../" })
+                  appRedirectActions.redirect({ url: "../../" })
                )
 
             ),
@@ -202,9 +199,12 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.certificateGroups.bulkDeleteGroup({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteGroupsSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                    slice.actions.bulkDeleteGroupsSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected groups successfully deleted.")
+                 )
+             ),
 
             catchError(
 

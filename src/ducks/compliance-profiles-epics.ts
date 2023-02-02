@@ -1,12 +1,12 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
+import { RaProfileSimplifiedModel } from "types/certificate";
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./compliance-profiles";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as alertActions } from "./alerts";
 import {
     transformComplianceProfileGroupListResponseDtoToModel,
     transformComplianceProfileGroupRequestModelToDto,
@@ -16,10 +16,8 @@ import {
     transformComplianceProfileRuleAddRequestModelToDto,
     transformComplianceProfileRuleAddResponseDtoToModel,
     transformComplianceProfileRuleDeleteRequestModelToDto,
-    transformComplianceProfileRuleListResponseDtoToModel
+    transformComplianceProfileRuleListResponseDtoToModel,
 } from "./transform/compliance-profiles";
-import { RaProfileSimplifiedModel } from "types/certificate";
-
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
 
@@ -169,9 +167,12 @@ const bulkDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.complianceProfile.bulkDeleteComplianceProfiles({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors })
-            ),
+             mergeMap(
+                 (errors) => of(
+                     slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors }),
+                     alertActions.success("Selected compliance profiles successfully deleted.")
+                 )
+             ),
 
             catchError(
                error => of(

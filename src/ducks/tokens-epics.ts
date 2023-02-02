@@ -1,21 +1,16 @@
+import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
+import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
-
-import { slice } from "./tokens";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import {
-    transformTokenRequestModelToDto,
-    transformTokenDetailResponseDtoToModel,
-    transformTokenResponseDtoToModel,
-} from "./transform/tokens";
+import { slice } from "./tokens";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
-import { FunctionGroupCode } from "types/openapi";
 
+import { transformTokenDetailResponseDtoToModel, transformTokenRequestModelToDto, transformTokenResponseDtoToModel } from "./transform/tokens";
 
 const listTokens: AppEpic = (action$, state$, deps) => {
 
@@ -435,9 +430,12 @@ const bulkDeleteToken: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.tokenInstances.deleteTokenInstance1({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteTokenSuccess({ uuids: action.payload.uuids })
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.bulkDeleteTokenSuccess({ uuids: action.payload.uuids }),
+                     alertActions.success("Selected tokens successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(

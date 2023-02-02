@@ -1,21 +1,16 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
+import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
-
-import { slice } from "./authorities";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
-import {
-    transformAuthorityRequestModelToDto,
-    transformAuthorityResponseDtoToModel,
-    transformAuthorityUpdateRequestModelToDto
-} from "./transform/authorities";
+import { slice } from "./authorities";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformConnectorResponseDtoToModel } from "./transform/connectors";
-import { FunctionGroupCode } from "types/openapi";
 
+import { transformAuthorityRequestModelToDto, transformAuthorityResponseDtoToModel, transformAuthorityUpdateRequestModelToDto } from "./transform/authorities";
+import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 
 const listAuthorities: AppEpic = (action$, state$, deps) => {
 
@@ -303,9 +298,12 @@ const bulkDeleteAuthority: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.authorities.bulkDeleteAuthorityInstance({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteAuthoritySuccess({ uuids: action.payload.uuids, errors })
-            ),
+             mergeMap(
+                 (errors) => of(
+                     slice.actions.bulkDeleteAuthoritySuccess({ uuids: action.payload.uuids, errors }),
+                     alertActions.success("Selected authorities successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(
