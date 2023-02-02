@@ -265,3 +265,7 @@ pre {
    margin: 0;
 }
 
+.btn.disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+}

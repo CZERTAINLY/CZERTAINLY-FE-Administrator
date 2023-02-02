@@ -118,7 +118,7 @@ export default function AttributeViewer({
             buttons.push({
                 icon: "pencil" as IconName,
                 disabled: descriptor.properties.readOnly,
-                tooltip: "Edit",
+                tooltip: descriptor.properties.readOnly ? "Attribute is read only, edit is disabled" : "Edit",
                 onClick: () => {
                     setEditingAttributesNames([...editingAttributesNames, attributeName]);
                 },
@@ -127,7 +127,7 @@ export default function AttributeViewer({
         onRemove && buttons.push({
             icon: "trash" as IconName,
             disabled: descriptor.properties.required,
-            tooltip: "Remove",
+            tooltip: descriptor.properties.required ? "Attribute is required, can't be removed" : "Remove",
             onClick: () => onRemove(descriptor.uuid),
         });
         return buttons;
