@@ -463,7 +463,7 @@ export default function ComplianceProfileDetail() {
             },
             {
                id: "attributes",
-               columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer descriptorAttributes={rule.attributes} /> : <></>]
+               columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer descriptorAttributes={rule.attributes} /> : <>No attributes</>]
             }
          ]
 
@@ -508,7 +508,7 @@ export default function ComplianceProfileDetail() {
                 },
                 {
                     id: "attributes",
-                    columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <></>]
+                    columns: ["Attributes", rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <>No attributes</>]
                 }
             ]
 

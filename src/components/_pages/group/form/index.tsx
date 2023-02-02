@@ -144,7 +144,7 @@ export default function GroupForm() {
 
                   </Field>
 
-                  <Field name="description" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                  <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
 
                      {({ input, meta }) => (
 

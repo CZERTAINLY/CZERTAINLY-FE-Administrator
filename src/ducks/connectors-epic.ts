@@ -2,6 +2,7 @@ import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./connectors";
@@ -205,7 +206,7 @@ const createConnector: AppEpic = (action$, state, deps) => {
                         slice.actions.createConnectorSuccess({
                            connector: transformConnectorResponseDtoToModel(connector)
                         }),
-                        appRedirectActions.redirect({ url: `./detail/${connector.uuid}` })
+                        appRedirectActions.redirect({ url: `../detail/${connector.uuid}` })
                      )
                   ),
 
@@ -313,12 +314,15 @@ const bulkDeleteConnectors: AppEpic = (action$, state, deps) => {
 
          action => deps.apiClients.connectors.bulkDeleteConnector({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteConnectorsSuccess({
-                  uuids: action.payload.uuids,
-                  errors: errors.map(transformBulkActionDtoToModel)
-               })
-            ),
+             mergeMap(
+                 (errors) => of(
+                       slice.actions.bulkDeleteConnectorsSuccess({
+                          uuids: action.payload.uuids,
+                          errors: errors.map(transformBulkActionDtoToModel)
+                       }),
+                     alertActions.success("Selected connectors successfully deleted.")
+                 )
+             ),
 
             catchError(
                error => of(

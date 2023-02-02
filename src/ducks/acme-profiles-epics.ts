@@ -1,14 +1,16 @@
+import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
 import { slice } from "./acme-profiles";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import {
-    transformAcmeProfileAddRequestModelToDto, transformAcmeProfileEditRequestModelToDto,
-    transformAcmeProfileListResponseDtoToModel, transformAcmeProfileResponseDtoToModel
+    transformAcmeProfileAddRequestModelToDto,
+    transformAcmeProfileEditRequestModelToDto,
+    transformAcmeProfileListResponseDtoToModel,
+    transformAcmeProfileResponseDtoToModel,
 } from "./transform/acme-profiles";
 
 const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
@@ -256,9 +258,12 @@ const bulkDeleteAcmeProfiles: AppEpic = (action$, state$, deps) => {
 
          action => deps.apiClients.acmeProfiles.bulkDeleteAcmeProfile({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, errors })
-            ),
+             mergeMap(
+                 (errors) => of(
+                    slice.actions.bulkDeleteAcmeProfilesSuccess({ uuids: action.payload.uuids, errors }),
+                    alertActions.success("Selected ACME profiles successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(

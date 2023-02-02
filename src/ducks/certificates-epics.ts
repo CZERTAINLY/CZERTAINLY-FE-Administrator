@@ -1,15 +1,19 @@
+import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-
-import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
-
-import * as slice from "./certificates";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
+import * as slice from "./certificates";
+import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
+
 import {
-    transformCertificateBulkDeleteRequestModelToDto, transformCertificateBulkDeleteResponseDtoToModel,
-    transformCertificateBulkObjectModelToDto, transformCertificateComplianceCheckModelToDto,
+    transformCertificateBulkDeleteRequestModelToDto,
+    transformCertificateBulkDeleteResponseDtoToModel,
+    transformCertificateBulkObjectModelToDto,
+    transformCertificateComplianceCheckModelToDto,
     transformCertificateHistoryDtoToModel,
     transformCertificateListResponseDtoToModel,
     transformCertificateObjectModelToDto,
@@ -18,12 +22,11 @@ import {
     transformCertificateRevokeRequestModelToDto,
     transformCertificateSearchFieldDtoToModel,
     transformCertificateSearchRequestModelToDto,
-    transformCertificateSignRequestModelToDto, transformCertificateUploadModelToDto,
+    transformCertificateSignRequestModelToDto,
+    transformCertificateUploadModelToDto,
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
-import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
 
@@ -363,7 +366,7 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
             mergeMap(
                () => of(
                   slice.actions.deleteCertificateSuccess({ uuid: action.payload.uuid }),
-                  appRedirectActions.redirect({ url: "../" })
+                  appRedirectActions.redirect({ url: "../../" })
                )
             ),
 
@@ -686,13 +689,12 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.certificates.bulkDeleteCertificate({ removeCertificateDto: transformCertificateBulkDeleteRequestModelToDto(action.payload) }
          ).pipe(
 
-            map(
-
-               (result) => slice.actions.bulkDeleteSuccess({
-                  response: transformCertificateBulkDeleteResponseDtoToModel(result),
-               }),
-
-            ),
+             mergeMap(
+                 (result) => of(
+                     slice.actions.bulkDeleteSuccess({response: transformCertificateBulkDeleteResponseDtoToModel(result)}),
+                     alertActions.success("Selected certificates successfully deleted.")
+                 )
+             ),
 
             catchError(
                err => of(
@@ -848,9 +850,12 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.certificates.checkCertificatesCompliance({ certificateComplianceCheckDto: transformCertificateComplianceCheckModelToDto(action.payload) }
          ).pipe(
 
-            map(
-               () => slice.actions.checkComplianceSuccess()
-            ),
+             mergeMap(
+                 () => of(
+                     slice.actions.checkComplianceSuccess(),
+                     alertActions.success("Compliance Check for the certificates initiated")
+                 )
+             ),
 
             catchError(
                err => of(

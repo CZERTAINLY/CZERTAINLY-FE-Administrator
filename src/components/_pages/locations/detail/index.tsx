@@ -273,7 +273,7 @@ export default function LocationDetail() {
 
          if (!location) return;
 
-         dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: "../" }));
+         dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: "../../../" }));
          setConfirmDelete(false);
 
       },
@@ -444,7 +444,7 @@ export default function LocationDetail() {
          cert => ({
             id: cert.certificateUuid,
             columns: [
-               <Link to={`../../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
+               <Link key={cert.certificateUuid} to={`../../../certificates/detail/${cert.certificateUuid}`}>{cert.commonName || ("empty")}</Link>,
                cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                 !cert.metadata || (cert.metadata.length === 0) ? "" :
