@@ -540,7 +540,7 @@ export default function CertificateForm() {
       
                      { values.tokenProfile && values.key ? <TabLayout tabs={[
                                 {
-                                    title: "CSR Generation Attributes",
+                                    title: "Request Attributes",
                                     content: (
                                           <AttributeEditor
                                              id="csrAttributes"

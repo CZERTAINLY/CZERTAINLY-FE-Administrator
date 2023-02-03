@@ -259,7 +259,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
       () => ([
                { label: "External", value: true },
-               { label: "Generate CSR", value: false },
+               { label: "Existing Key", value: false },
             ]
          ),
       []
@@ -304,7 +304,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
                   </Widget>
 
-                  <Widget title={<h5><span className="fw-semi-bold">Request Attributes</span></h5>}>
+                  <Widget title={<h5><span className="fw-semi-bold">Request Properties</span></h5>}>
                      {
 
                         values.uploadCsr?.value && certificate?.raProfile ? (
@@ -473,7 +473,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
                      { values.tokenProfile && values.key ? <TabLayout tabs={[
                                 {
-                                    title: "CSR Generation Attributes",
+                                    title: "Request Attributes",
                                     content: (
                                           <AttributeEditor
                                              id="csrAttributes"
