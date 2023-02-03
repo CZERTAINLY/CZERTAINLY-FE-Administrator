@@ -481,7 +481,7 @@ export default function CertificateDetail() {
 
       () => [
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked' || !certificate.privateKeyAvailability || !certificate.csr, tooltip: "Renew", onClick: () => { setRenew(true); } },
+         { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
          { icon: "recycle", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Rekey", onClick: () => { setRekey(true); } },
          { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
          { icon: "gavel", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
@@ -1427,13 +1427,14 @@ export default function CertificateDetail() {
          <Dialog
             isOpen={renew}
             caption={`Renew Certificate`}
-            body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew} />}
+            body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew} allowWithoutFile={certificate?.privateKeyAvailability || false}/>}
             toggle={() => setRenew(false)}
             buttons={[]}
          />
 
 
          <Dialog
+            size="lg"
             isOpen={rekey}
             caption={`Rekey Certificate`}
             body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate} />}

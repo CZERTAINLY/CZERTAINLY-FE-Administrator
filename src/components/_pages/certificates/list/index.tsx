@@ -277,6 +277,13 @@ export default function CertificateList({
             width: "5%"
          },
          {
+            content: "",
+            //sortable: true,
+            align: "center",
+            id: "keyAvailability",
+            width: "1%"
+         },
+         {
             content: "Common Name",
             //sortable: true,
             id: "commonName",
@@ -296,12 +303,6 @@ export default function CertificateList({
             id: "expiresAt",
             width: "15%"
          },
-          {
-              content: "Type",
-              //sortable: true,
-              id: "type",
-              width: "15%"
-          },
          {
             content: "Group",
             //sortable: true,
@@ -370,14 +371,14 @@ export default function CertificateList({
                   <CertificateStatus status={certificate.status} asIcon={true} />,
 
                   <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
+                  
+                  certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : "",
 
                   selectCertsOnly ? certificate.commonName || "(empty)" : <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 
                   <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>,
 
                   <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>,
-
-                  certificate.certificateType ? <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>{certificate.certificateType}</Badge> : "",
 
                   certificate.group?.name || "Unassigned",
 
@@ -393,7 +394,7 @@ export default function CertificateList({
 
                   certificate.issuerCommonName,
 
-                  certificate.certificateType || "Unknown",
+                  certificate.certificateType ? <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>{certificate.certificateType}</Badge> : "",
 
                ]
 

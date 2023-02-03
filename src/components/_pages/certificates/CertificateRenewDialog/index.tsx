@@ -3,12 +3,15 @@ import { Button, ButtonGroup, FormGroup, FormText, Input, Label } from "reactstr
 
 interface Props {
    onCancel: () => void,
+   allowWithoutFile: boolean,
    onRenew: (data: { fileContent?: string, fileName?: string, contentType?: string }) => void
 }
 
 export default function CertificateRenewDialog({
    onCancel,
+   allowWithoutFile,
    onRenew,
+
 }: Props) {
 
    const [fileName, setFileName] = useState("");
@@ -100,18 +103,24 @@ export default function CertificateRenewDialog({
          <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
          <FormGroup>
 
-            <Label for="uploadCsr">Upload new CSR ?</Label>
-            &nbsp;&nbsp;
-            <input
-               id="uploadCsr"
-               type="checkbox"
-               placeholder="Select Option"
-               onChange={e => { setUploadCsr(e.target.checked) }}
-            />
+               { allowWithoutFile ? (
+               <>
+                  <Label for="uploadCsr">Upload new CSR ?</Label>
+                     &nbsp;&nbsp;
+                     <input
+                        id="uploadCsr"
+                        type="checkbox"
+                        placeholder="Select Option"
+                        onChange={e => { setUploadCsr(e.target.checked) }}
+                  />
+               </>
+               )
+               : <></>
+            }
 
             </FormGroup>
 
-            { uploadCsr ? (
+            { !allowWithoutFile || uploadCsr ? (
             <>
             <FormGroup>
 
