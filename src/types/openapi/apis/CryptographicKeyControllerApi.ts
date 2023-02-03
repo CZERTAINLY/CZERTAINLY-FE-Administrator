@@ -140,6 +140,10 @@ export interface ListCreateKeyAttributesRequest {
     type: KeyRequestType;
 }
 
+export interface ListKeyPairsRequest {
+    tokenProfileUuid?: string;
+}
+
 export interface ListKeysRequest {
     tokenProfileUuid?: string;
 }
@@ -581,6 +585,25 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         return this.request<Array<BaseAttributeDto>>({
             url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{type}/attributes'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{tokenProfileUuid}', encodeURI(tokenProfileUuid)).replace('{type}', encodeURI(type)),
             method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * This API contains the logic to get the keys that contains the full key pair (private and public Key)
+     * List Cryptographic Keys with full Key Pairs
+     */
+    listKeyPairs({ tokenProfileUuid }: ListKeyPairsRequest): Observable<Array<KeyDto>>
+    listKeyPairs({ tokenProfileUuid }: ListKeyPairsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<KeyDto>>>
+    listKeyPairs({ tokenProfileUuid }: ListKeyPairsRequest, opts?: OperationOpts): Observable<Array<KeyDto> | AjaxResponse<Array<KeyDto>>> {
+
+        const query: HttpQuery = {};
+
+        if (tokenProfileUuid != null) { query['tokenProfileUuid'] = tokenProfileUuid; }
+
+        return this.request<Array<KeyDto>>({
+            url: '/v1/keys/pairs',
+            method: 'GET',
+            query,
         }, opts?.responseOpts);
     };
 

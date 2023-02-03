@@ -36,7 +36,7 @@ interface FormValues {
    fileName: string;
    contentType: string;
    file: string;
-   uploadCsr: boolean;
+   uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
    tokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
    key?: SingleValue<{ label: string; value: CryptographicKeyResponseModel }> | null;
 
@@ -56,7 +56,7 @@ export default function CertificateForm() {
 
    const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
-   const keys = useSelector(keySelectors.cryptographicKeys);
+   const keys = useSelector(keySelectors.cryptographicKeyPairs);
 
    const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
@@ -194,7 +194,7 @@ export default function CertificateForm() {
       (event: SingleValue<{ label: string; value: TokenProfileResponseModel }>) => {
 
          if (!event) return;
-         dispatch(keyActions.listCryptographicKeys({ tokenProfileUuid: event.value.uuid }));
+         dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value.uuid }));
       },
       [dispatch]
 
@@ -209,6 +209,7 @@ export default function CertificateForm() {
          if(!event.value.tokenProfileUuid) return;
          if(!event.value.tokenInstanceUuid) return;
          if(event.value.items.filter(e => e.type === KeyType.PrivateKey).length === 0) return;
+         dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors());
          dispatch(cryptographyOperationActions.listSignatureAttributeDescriptors({ 
             uuid: event.value.uuid,
             tokenProfileUuid: event.value.tokenInstanceUuid,
@@ -285,8 +286,19 @@ export default function CertificateForm() {
          fileName: "",
          contentType: "",
          file: "",
-         uploadCsr: false,
       }),
+      []
+
+   );
+
+
+   const inputOptions = useMemo(
+
+      () => ([
+               { label: "External", value: true },
+               { label: "Existing Key", value: false },
+            ]
+         ),
       []
 
    );
@@ -294,37 +306,37 @@ export default function CertificateForm() {
 
    return (
 
-      <Widget title={<h5>Add new <span className="fw-semi-bold">Certificate</span></h5>} busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-
          <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }} >
 
             {({ handleSubmit, valid, submitting, values, form }) => (
 
                <BootstrapForm onSubmit={handleSubmit}>
+                  
+                  <Widget title={<h5>Add new <span className="fw-semi-bold">Certificate</span></h5>} busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                  
+                     <Field name="raProfile" validate={validateRequired()}>
 
-                  <Field name="raProfile" validate={validateRequired()}>
+                        {({ input, meta, onChange }) => (
 
-                     {({ input, meta, onChange }) => (
+                           <FormGroup>
 
-                        <FormGroup>
+                              <Label for="raProfile">RA Profile</Label>
 
-                           <Label for="raProfile">RA Profile</Label>
+                              <Select
+                                 {...input}
+                                 id="raProfile"
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={options}
+                                 placeholder="Select RA Profile"
+                                 onChange={e => { onRaProfileChange(e); input.onChange(e) }}
+                              />
 
-                           <Select
-                              {...input}
-                              id="raProfile"
-                              maxMenuHeight={140}
-                              menuPlacement="auto"
-                              options={options}
-                              placeholder="Select RA Profile"
-                              onChange={e => { onRaProfileChange(e); input.onChange(e) }}
-                           />
+                              <FormFeedback>{meta.error}</FormFeedback>
 
-                           <FormFeedback>{meta.error}</FormFeedback>
+                           </FormGroup>
 
-                        </FormGroup>
-
-                     )}
+                        )}
 
                   </Field>
 
@@ -334,17 +346,18 @@ export default function CertificateForm() {
 
                         <FormGroup>
 
-                           <Label for="uploadCsr">Upload CSR ?</Label>
-                           &nbsp;&nbsp;
-                           <input
-                              {...input}
-                              id="uploadCsr"
-                              type="checkbox"
-                              placeholder="Select Option"
-                              onChange={e => { input.onChange(e) }}
-                           />
+                           <Label for="uploadCsr">Key Source</Label>
+                           <Select
+                                 {...input}
+                                 id="uploadCsr"
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={inputOptions}
+                                 placeholder="Select Key Source"
+                                 onChange={e => { input.onChange(e) }}
+                              />
 
-                           <FormFeedback>{meta.error}</FormFeedback>
+                              <FormFeedback>{meta.error}</FormFeedback>
 
                         </FormGroup>
 
@@ -352,197 +365,214 @@ export default function CertificateForm() {
 
                   </Field>
 
+                  </Widget>
 
-                  {
+                  <Widget title={<h5><span className="fw-semi-bold">Request Properties</span></h5>} busy={issuingCertificate || isFetchingResourceCustomAttributes}>
 
-                     values.uploadCsr && values.raProfile ? (
+                     {
 
-                        <>
+                        values.uploadCsr?.value && values.raProfile ? (
 
-                           <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={(e) => onFileDrop(e, form)} onDragOver={onFileDragOver}>
+                              <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={(e) => onFileDrop(e, form)} onDragOver={onFileDragOver}>
 
-                              <Row>
+                                 <Row>
 
-                                 <Col>
+                                    <Col>
 
-                                    <Field name="fileName">
+                                       <Field name="fileName">
 
-                                       {({ input, meta }) => (
+                                          {({ input, meta }) => (
 
-                                          <FormGroup>
+                                             <FormGroup>
 
-                                             <Label for="fileName">File name</Label>
+                                                <Label for="fileName">File name</Label>
 
-                                             <Input
-                                                {...input}
-                                                id="fileName"
-                                                type="text"
-                                                placeholder="File not selected"
-                                                disabled={true}
-                                                style={{ textAlign: "center" }}
-                                             />
+                                                <Input
+                                                   {...input}
+                                                   id="fileName"
+                                                   type="text"
+                                                   placeholder="File not selected"
+                                                   disabled={true}
+                                                   style={{ textAlign: "center" }}
+                                                />
 
-                                          </FormGroup>
+                                             </FormGroup>
 
-                                       )}
+                                          )}
 
-                                    </Field>
+                                       </Field>
 
-                                 </Col>
+                                    </Col>
 
-                                 <Col>
+                                    <Col>
 
-                                    <Field name="contentType">
+                                       <Field name="contentType">
 
-                                       {({ input, meta }) => (
+                                          {({ input, meta }) => (
 
-                                          <FormGroup>
+                                             <FormGroup>
 
-                                             <Label for="contentType">Content type</Label>
+                                                <Label for="contentType">Content type</Label>
 
-                                             <Input
-                                                {...input}
-                                                id="contentType"
-                                                type="text"
-                                                placeholder="File not selected"
-                                                disabled={true}
-                                                style={{ textAlign: "center" }}
-                                             />
+                                                <Input
+                                                   {...input}
+                                                   id="contentType"
+                                                   type="text"
+                                                   placeholder="File not selected"
+                                                   disabled={true}
+                                                   style={{ textAlign: "center" }}
+                                                />
 
-                                          </FormGroup>
+                                             </FormGroup>
 
-                                       )}
+                                          )}
 
-                                    </Field>
+                                       </Field>
 
-                                 </Col>
+                                    </Col>
 
-                              </Row>
+                                 </Row>
 
-                              <Field name="file" validate={validateRequired()}>
+                                 <Field name="file" validate={validateRequired()}>
 
-                                 {({ input, meta }) => (
+                                    {({ input, meta }) => (
 
-                                    <FormGroup>
+                                       <FormGroup>
 
-                                       <Label for="fileContent">File content</Label>
+                                          <Label for="fileContent">File content</Label>
 
-                                       <Input
-                                          {...input}
-                                          id="fileContent"
-                                          type="textarea"
-                                          rows={6}
-                                          placeholder={`Select or drag & drop a certificate File`}
-                                          readOnly={true}
-                                       />
+                                          <Input
+                                             {...input}
+                                             id="fileContent"
+                                             type="textarea"
+                                             rows={6}
+                                             placeholder={`Select or drag & drop a certificate File`}
+                                             readOnly={true}
+                                          />
 
-                                       <FormFeedback>{meta.error}</FormFeedback>
+                                          <FormFeedback>{meta.error}</FormFeedback>
 
-                                    </FormGroup>
+                                       </FormGroup>
 
-                                 )}
+                                    )}
 
-                              </Field>
+                                 </Field>
 
 
 
-                              <FormGroup style={{ textAlign: "right" }}>
+                                 <FormGroup style={{ textAlign: "right" }}>
 
-                                 <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
+                                    <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
 
-                                 <Input id="file" type="file" style={{ display: "none" }} onChange={(e) => onFileChanged(e, form)} />
+                                    <Input id="file" type="file" style={{ display: "none" }} onChange={(e) => onFileChanged(e, form)} />
 
-                              </FormGroup>
+                                 </FormGroup>
 
-                              <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
-                                 Select or Drag &amp; Drop file to Drop Zone.
+                                 <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
+                                    Select or Drag &amp; Drop file to Drop Zone.
+                                 </div>
+
                               </div>
 
-                           </div>
+                        ) : <></>
 
-                        </>
-                     ) : <></>
+                     }
 
-                  }
+                     { values.uploadCsr && !values.uploadCsr?.value && values.raProfile ?
+                        <>
+                        <Field name="tokenProfile" validate={validateRequired()}>
 
-                  { !values.uploadCsr && values.raProfile ?
-                     <>
-                     <Field name="tokenProfile" validate={validateRequired()}>
+                        {({ input, meta, onChange }) => (
 
-                     {({ input, meta, onChange }) => (
+                           <FormGroup>
 
-                        <FormGroup>
+                              <Label for="tokenProfile">Token Profile</Label>
 
-                           <Label for="tokenProfile">Token Profile</Label>
+                              <Select
+                                 {...input}
+                                 id="tokenProfile"
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={tokenProfileOptions}
+                                 placeholder="Select Token Profile"
+                                 onChange={e => { onTokenProfileChange(e); input.onChange(e) }}
+                              />
 
-                           <Select
-                              {...input}
-                              id="tokenProfile"
-                              maxMenuHeight={140}
-                              menuPlacement="auto"
-                              options={tokenProfileOptions}
-                              placeholder="Select Token Profile"
-                              onChange={e => { onTokenProfileChange(e); input.onChange(e) }}
-                           />
+                              <FormFeedback>{meta.error}</FormFeedback>
 
-                           <FormFeedback>{meta.error}</FormFeedback>
+                           </FormGroup>
 
-                        </FormGroup>
+                        )}
 
-                     )}
+                     </Field>
 
-                  </Field>
+                     { values.tokenProfile ? <Field name="key" validate={validateRequired()}>
 
-                  <Field name="key" validate={validateRequired()}>
+                        {({ input, meta, onChange }) => (
 
-                     {({ input, meta, onChange }) => (
+                           <FormGroup>
 
-                        <FormGroup>
+                              <Label for="key">Key</Label>
 
-                           <Label for="key">Select Key</Label>
+                              <Select
+                                 {...input}
+                                 id="key"
+                                 maxMenuHeight={140}
+                                 menuPlacement="auto"
+                                 options={keyOptions}
+                                 placeholder="Select Key"
+                                 onChange={e => { onKeyChange(e); input.onChange(e) }}
+                              />
 
-                           <Select
-                              {...input}
-                              id="key"
-                              maxMenuHeight={140}
-                              menuPlacement="auto"
-                              options={keyOptions}
-                              placeholder="Select Key"
-                              onChange={e => { onKeyChange(e); input.onChange(e) }}
-                           />
+                              <FormFeedback>{meta.error}</FormFeedback>
 
-                           <FormFeedback>{meta.error}</FormFeedback>
+                           </FormGroup>
 
-                        </FormGroup>
+                        )}
 
-                     )}
+                     </Field>
 
-                  </Field>
+                     : <></>
+                     
+                     }
+
+                     
       
-                  <Label>CSR Generation Attributes</Label>
-                  
-                  <AttributeEditor
-                     id="csrAttributes"
-                     attributeDescriptors={csrAttributeDescriptors || []}
-                     groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
-                     setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
-                  />
-                  
-                  <br />
-                  
-                  { signatureAttributeDescriptors?.length ? <Label>Signature Attributes</Label> : <></> }
-                  
-                  <AttributeEditor
-                     id="signatureAttributes"
-                     attributeDescriptors={signatureAttributeDescriptors || []}
-                     groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                     setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                  />
-                  
-                  </>
-                  
-                  : <></>
+                     { values.tokenProfile && values.key ? <TabLayout tabs={[
+                                {
+                                    title: "Request Attributes",
+                                    content: (
+                                          <AttributeEditor
+                                             id="csrAttributes"
+                                             attributeDescriptors={csrAttributeDescriptors || []}
+                                             groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
+                                             setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
+                                          />
+                                    )
+                                 },
+                                 {
+                                    title: "Signature Attributes",
+                                    content: (
+                                          <AttributeEditor
+                                             id="signatureAttributes"
+                                             attributeDescriptors={signatureAttributeDescriptors || []}
+                                             groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                             setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
+                                          />
+                                    )
+                                 }
+                              ]}
+                           /> : <></>
+                           }
+                     
+                     </>
+                     
+                     : <></>
                   }
+
+                  </Widget>
+
+                  <Widget title="Other Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
 
                      <br />
                             <TabLayout tabs={[
@@ -593,13 +623,13 @@ export default function CertificateForm() {
 
                   </div>
 
+                  </Widget>
+
                </BootstrapForm>
 
             )}
 
          </Form>
-
-      </Widget>
 
    );
 }

@@ -515,7 +515,7 @@ const bulkForceDeleteConnectors: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.connectors.bulkDeleteConnector({ requestBody: action.payload.uuids }).pipe(
+         action => deps.apiClients.connectors.forceDeleteConnector({ requestBody: action.payload.uuids }).pipe(
 
             mergeMap(
 

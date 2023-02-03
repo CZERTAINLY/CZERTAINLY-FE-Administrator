@@ -27,8 +27,10 @@ export type State = {
 
    cryptographicKey?: CryptographicKeyDetailResponseModel;
    cryptographicKeys: CryptographicKeyResponseModel[];
+   cryptographicKeyPairs: CryptographicKeyResponseModel[];
 
    isFetchingList: boolean;
+   isFetchingKeyPairs: boolean;
    isFetchingDetail: boolean;
    isUpdatingKeyUsage: boolean;
    isBulkUpdatingKeyUsage: boolean;
@@ -64,8 +66,10 @@ export const initialState: State = {
    keyAttributeDescriptors: [],
 
    cryptographicKeys: [],
+   cryptographicKeyPairs: [],
 
    isFetchingList: false,
+   isFetchingKeyPairs: false,
    isFetchingDetail: false,
    isUpdatingKeyUsage: false,
    isBulkUpdatingKeyUsage: false,
@@ -152,6 +156,29 @@ export const slice = createSlice({
       listCryptographicKeysFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false;
+
+      },
+
+
+      listCryptographicKeyPairs: (state, action: PayloadAction<{tokenProfileUuid?: string}>) => {
+
+         state.cryptographicKeyPairs = [];
+         state.isFetchingKeyPairs = true;
+
+      },
+
+
+      listCryptographicKeyPairSuccess: (state, action: PayloadAction<{ cryptographicKeys: CryptographicKeyResponseModel[] }>) => {
+
+         state.cryptographicKeyPairs = action.payload.cryptographicKeys;
+         state.isFetchingKeyPairs = false;
+
+      },
+
+
+      listCryptographicKeyPairFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingKeyPairs = false;
 
       },
 
@@ -807,8 +834,11 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
 const cryptographicKey = createSelector(state, (state: State) => state.cryptographicKey);
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);
+const cryptographicKeyPairs = createSelector(state, (state: State) => state.cryptographicKeyPairs);
+
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
+const isFetchingKeyPairs = createSelector(state, (state: State) => state.isFetchingKeyPairs);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
@@ -842,8 +872,10 @@ export const selectors = {
 
    cryptographicKey,
    cryptographicKeys,
+   cryptographicKeyPairs,
 
    isFetchingList,
+   isFetchingKeyPairs,
    isFetchingDetail,
    isCreating,
    isDeleting,

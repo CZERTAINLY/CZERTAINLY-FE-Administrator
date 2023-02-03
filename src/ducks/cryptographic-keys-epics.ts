@@ -49,6 +49,36 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
 }
 
 
+const listCryptographicKeyPairs: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.listCryptographicKeyPairs.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.listKeyPairs({tokenProfileUuid: action.payload.tokenProfileUuid}).pipe(
+
+            map(
+               list => slice.actions.listCryptographicKeyPairSuccess({
+                  cryptographicKeys: list.map(transformCryptographicKeyResponseDtoToModel)
+               })
+            ),
+
+            catchError(
+               error => of(
+                  slice.actions.listCryptographicKeyPairFailure({ error: extractError(error, "Failed to get key list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get key list" })
+               )
+            )
+         )
+      )
+   );
+
+}
+
+
 const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
 
    return action$.pipe(
@@ -815,6 +845,7 @@ const getKeyHistory: AppEpic = (action$, state, deps) => {
 
 const epics = [
    listCryptographicKeys,
+   listCryptographicKeyPairs,
    getCryptographicKeyDetail,
    getAttributesDescriptors,
    createCryptographicKey,
