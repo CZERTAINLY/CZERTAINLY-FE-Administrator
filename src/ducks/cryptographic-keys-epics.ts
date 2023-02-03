@@ -7,6 +7,7 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { transformSearchFieldDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
 
 import {
     transformCryptographicKeyAddRequestModelToDto,
@@ -28,11 +29,13 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.cryptographicKeys.listKeys({tokenProfileUuid: action.payload.tokenProfileUuid}).pipe(
+         action => deps.apiClients.cryptographicKeys.listCryptographicKeys({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }).pipe(
 
             map(
                list => slice.actions.listCryptographicKeysSuccess({
-                  cryptographicKeys: list.map(transformCryptographicKeyResponseDtoToModel)
+                  cryptographicKeys: list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
+                   totalItems: list.totalItems,
+                   totalPages: list.totalPages,
                })
             ),
 
@@ -808,7 +811,37 @@ const bulkDestroyCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
 
 }
 
+const getAvailableKeyFilters: AppEpic = (action$, state, deps) => {
 
+    return action$.pipe(
+
+        filter(
+            slice.actions.getAvailableKeyFilters.match
+        ),
+        switchMap(
+
+            action => deps.apiClients.cryptographicKeys.getSearchableFieldInformation().pipe(
+
+                map(
+                    filters => slice.actions.getAvailableKeyFiltersSuccess({
+                        availableKeyFilters: filters.map(filter => transformSearchFieldDtoToModel(filter))
+                    })
+                ),
+
+                catchError(
+                    err => of(
+                        slice.actions.getAvailableKeyFiltersFailure({ error: extractError(err, "Failed to get available key filters") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get available key filters" })
+                    )
+                )
+
+            )
+
+        )
+
+    )
+
+}
 
 const getKeyHistory: AppEpic = (action$, state, deps) => {
 
@@ -868,6 +901,7 @@ const epics = [
    destroyCryptographicKey,
    bulkDestroyCryptographicKeys,
    bulkDestroyCryptographicKeyItems,
+    getAvailableKeyFilters,
    getKeyHistory,
 ];
 

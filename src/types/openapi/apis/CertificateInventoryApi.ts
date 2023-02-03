@@ -236,9 +236,9 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * Get Certificate searchable fields information
      */
-    getSearchableFieldInformation(): Observable<Array<SearchFieldDataDto>>
-    getSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataDto>>>
-    getSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataDto> | AjaxResponse<Array<SearchFieldDataDto>>> {
+    getSearchableFieldInformation1(): Observable<Array<SearchFieldDataDto>>
+    getSearchableFieldInformation1(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataDto>>>
+    getSearchableFieldInformation1(opts?: OperationOpts): Observable<Array<SearchFieldDataDto> | AjaxResponse<Array<SearchFieldDataDto>>> {
         return this.request<Array<SearchFieldDataDto>>({
             url: '/v1/certificates/search',
             method: 'GET',

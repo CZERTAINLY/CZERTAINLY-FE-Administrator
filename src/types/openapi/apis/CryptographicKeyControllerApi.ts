@@ -23,6 +23,7 @@ import type {
     BulkKeyItemUsageRequestDto,
     BulkKeyUsageRequestDto,
     CompromiseKeyRequestDto,
+    CryptographicKeyResponseDto,
     EditKeyRequestDto,
     ErrorMessageDto,
     KeyDetailDto,
@@ -31,6 +32,8 @@ import type {
     KeyItemDetailDto,
     KeyRequestDto,
     KeyRequestType,
+    SearchFieldDataDto,
+    SearchRequestDto,
     UpdateKeyUsageRequestDto,
 } from '../models';
 
@@ -140,11 +143,11 @@ export interface ListCreateKeyAttributesRequest {
     type: KeyRequestType;
 }
 
-export interface ListKeyPairsRequest {
-    tokenProfileUuid?: string;
+export interface ListCryptographicKeysRequest {
+    searchRequestDto: SearchRequestDto;
 }
 
-export interface ListKeysRequest {
+export interface ListKeyPairsRequest {
     tokenProfileUuid?: string;
 }
 
@@ -573,6 +576,18 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     };
 
     /**
+     * Get CryptographicKey searchable fields information
+     */
+    getSearchableFieldInformation(): Observable<Array<SearchFieldDataDto>>
+    getSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataDto>>>
+    getSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataDto> | AjaxResponse<Array<SearchFieldDataDto>>> {
+        return this.request<Array<SearchFieldDataDto>>({
+            url: '/v1/keys/search',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * List of Attributes to create a Key
      */
     listCreateKeyAttributes({ tokenInstanceUuid, tokenProfileUuid, type }: ListCreateKeyAttributesRequest): Observable<Array<BaseAttributeDto>>
@@ -585,6 +600,26 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         return this.request<Array<BaseAttributeDto>>({
             url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{type}/attributes'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)).replace('{tokenProfileUuid}', encodeURI(tokenProfileUuid)).replace('{type}', encodeURI(type)),
             method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * List cryptographic keys
+     */
+    listCryptographicKeys({ searchRequestDto }: ListCryptographicKeysRequest): Observable<CryptographicKeyResponseDto>
+    listCryptographicKeys({ searchRequestDto }: ListCryptographicKeysRequest, opts?: OperationOpts): Observable<AjaxResponse<CryptographicKeyResponseDto>>
+    listCryptographicKeys({ searchRequestDto }: ListCryptographicKeysRequest, opts?: OperationOpts): Observable<CryptographicKeyResponseDto | AjaxResponse<CryptographicKeyResponseDto>> {
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listCryptographicKeys');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<CryptographicKeyResponseDto>({
+            url: '/v1/keys',
+            method: 'POST',
+            headers,
+            body: searchRequestDto,
         }, opts?.responseOpts);
     };
 
@@ -602,24 +637,6 @@ export class CryptographicKeyControllerApi extends BaseAPI {
 
         return this.request<Array<KeyDto>>({
             url: '/v1/keys/pairs',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * List Cryptographic Keys
-     */
-    listKeys({ tokenProfileUuid }: ListKeysRequest): Observable<Array<KeyDto>>
-    listKeys({ tokenProfileUuid }: ListKeysRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<KeyDto>>>
-    listKeys({ tokenProfileUuid }: ListKeysRequest, opts?: OperationOpts): Observable<Array<KeyDto> | AjaxResponse<Array<KeyDto>>> {
-
-        const query: HttpQuery = {};
-
-        if (tokenProfileUuid != null) { query['tokenProfileUuid'] = tokenProfileUuid; }
-
-        return this.request<Array<KeyDto>>({
-            url: '/v1/keys',
             method: 'GET',
             query,
         }, opts?.responseOpts);

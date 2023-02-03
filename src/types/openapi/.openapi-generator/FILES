@@ -121,6 +121,7 @@ models/CredentialDto.ts
 models/CredentialRequestDto.ts
 models/CredentialUpdateRequestDto.ts
 models/CryptographicAlgorithm.ts
+models/CryptographicKeyResponseDto.ts
 models/CustomAttribute.ts
 models/CustomAttributeCreateRequestDto.ts
 models/CustomAttributeDefinitionDetailDto.ts

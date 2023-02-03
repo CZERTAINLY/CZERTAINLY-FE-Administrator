@@ -21,10 +21,10 @@ import {
     transformCertificateRenewRequestModelToDto,
     transformCertificateResponseDtoToModel,
     transformCertificateRevokeRequestModelToDto,
-    transformCertificateSearchFieldDtoToModel,
-    transformCertificateSearchRequestModelToDto,
     transformCertificateSignRequestModelToDto,
     transformCertificateUploadModelToDto,
+    transformSearchFieldDtoToModel,
+    transformSearchRequestModelToDto,
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
@@ -40,7 +40,7 @@ const listCertificates: AppEpic = (action$, state, deps) => {
 
          action => {
 
-            return deps.apiClients.certificates.listCertificates({ searchRequestDto: transformCertificateSearchRequestModelToDto(action.payload) }
+            return deps.apiClients.certificates.listCertificates({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }
             ).pipe(
 
                map(
@@ -303,11 +303,11 @@ const getAvailableCertificateFilters: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.certificates.getSearchableFieldInformation().pipe(
+         action => deps.apiClients.certificates.getSearchableFieldInformation1().pipe(
 
             map(
                filters => slice.actions.getAvailableCertificateFiltersSuccess({
-                  availableCertificateFilters: filters.map(filter => transformCertificateSearchFieldDtoToModel(filter))
+                  availableCertificateFilters: filters.map(filter => transformSearchFieldDtoToModel(filter))
                })
             ),
 

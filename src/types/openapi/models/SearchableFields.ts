@@ -41,6 +41,17 @@ export enum SearchableFields {
     IssuerSerialNumber = 'issuerSerialNumber',
     OcspValidation = 'ocspValidation',
     CrlValidation = 'crlValidation',
-    SignatureValidation = 'signatureValidation'
+    SignatureValidation = 'signatureValidation',
+    CryptographicKeyName = 'cryptographicKey.name',
+    CryptographicKeyGroup = 'cryptographicKey.group',
+    CryptographicKeyOwner = 'cryptographicKey.owner',
+    CryptographicKeyTokenProfileName = 'cryptographicKey.tokenProfile.name',
+    CryptographicKeyTokenInstanceReferenceName = 'cryptographicKey.tokenInstanceReference.name',
+    Type = 'type',
+    Format = 'format',
+    State = 'state',
+    Length = 'length',
+    Usage = 'usage',
+    CryptographicAlgorithm = 'cryptographicAlgorithm'
 }
 
