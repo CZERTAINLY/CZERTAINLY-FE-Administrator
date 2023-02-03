@@ -80,12 +80,15 @@ export default function TokenProfileForm() {
 
    )
 
+   useEffect(() => {
+      dispatch(customAttributesActions.listResourceCustomAttributes(Resource.TokenProfiles));
+  }, [dispatch]);
+
 
    useEffect(
 
       () => {
 
-         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.TokenProfiles));
          if (editMode && tokenProfileSelector && tokenProfileSelector.uuid !== tokenProfile?.uuid) {
 
             setTokenProfile(tokenProfileSelector);

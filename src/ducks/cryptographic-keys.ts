@@ -136,6 +136,12 @@ export const slice = createSlice({
 
       },
 
+      clearCryptographicKey: (state, action: PayloadAction<void>) => {
+
+         state.cryptographicKey = undefined;
+
+      },
+
 
       listCryptographicKeys: (state, action: PayloadAction<{tokenProfileUuid?: string}>) => {
 
