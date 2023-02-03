@@ -426,7 +426,7 @@ export default function CryptographicKeyForm() {
                      </Field>
 
 
-                  { !editMode ? <Field name="type" validate={validateRequired()}>
+                  { tokenProfile && !editMode ? <Field name="type" validate={validateRequired()}>
 
                      {({ input, meta }) => (
 
