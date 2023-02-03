@@ -1,4 +1,5 @@
 import AttributeEditor from "components/Attributes/AttributeEditor";
+import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
@@ -17,16 +18,14 @@ import Select, { SingleValue } from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
-import { CryptographicKeyDetailResponseModel } from "types/cryptographic-keys";
 import { TokenProfileResponseModel } from "types/token-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
-import { selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { selectors as customAttributesSelectors, actions as customAttributesActions } from "../../../../ducks/customAttributes";
 import { KeyRequestType, Resource } from "../../../../types/openapi";
-import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    name: string;
@@ -64,8 +63,6 @@ export default function CryptographicKeyForm() {
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    const [cryptographicKey, setCryptographicKey] = useState<CryptographicKeyDetailResponseModel>();
-
     const [tokenProfile, setTokenProfile] = useState<TokenProfileResponseModel>();
 
 
@@ -78,9 +75,9 @@ export default function CryptographicKeyForm() {
    useEffect(
 
       () => {
+         dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
          setGroupAttributesCallbackAttributes([]);
          dispatch(tokenProfilesActions.listTokenProfiles({}));
-         dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
          dispatch(connectorActions.clearCallbackData());
          dispatch(groupActions.listGroups());
          if (editMode) dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId!, uuid: id! }));
@@ -89,16 +86,10 @@ export default function CryptographicKeyForm() {
 
    )
 
+   useEffect(() => {
+      dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Keys));
+  }, [dispatch]);
 
-   useEffect(
-
-      () => {
-         if(!keyDetail) return;
-         setCryptographicKey(keyDetail);
-      },
-      [keyDetail]
-
-   )
 
    const onTokenProfileChange = useCallback(
       (event: SingleValue<{
@@ -131,7 +122,6 @@ export default function CryptographicKeyForm() {
          dispatch(connectorActions.clearCallbackData());
          setGroupAttributesCallbackAttributes([]);
          form.mutators.clearAttributes("cryptographicKey");
-         if (cryptographicKey) setCryptographicKey({ ...cryptographicKey });
          dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
          dispatch(cryptographicKeysActions.listAttributeDescriptors({ 
             tokenInstanceUuid: tokenProfile.tokenInstanceUuid, 
@@ -140,7 +130,7 @@ export default function CryptographicKeyForm() {
          }));
 
       },
-      [dispatch, cryptographicKey, editMode, tokenProfile]
+      [dispatch, editMode, tokenProfile]
 
    );
 
@@ -246,10 +236,9 @@ export default function CryptographicKeyForm() {
              content: !cryptographicKeyAttributeDescriptors ? <></> : (
                  <AttributeEditor
                      id="cryptographicKey"
-                     callbackParentUuid={cryptographicKey?.tokenProfileUuid || form.getFieldState("tokenProfile")?.value?.value.uuid || ""}
+                     callbackParentUuid={keyDetail?.tokenProfileUuid || form.getFieldState("tokenProfile")?.value?.value.uuid || ""}
                      callbackResource={Resource.Keys}
                      attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
-                     attributes={cryptographicKey?.attributes}
                      groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                      setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                  />)
@@ -259,7 +248,7 @@ export default function CryptographicKeyForm() {
              content: <AttributeEditor
                  id="customCryptographicKey"
                  attributeDescriptors={resourceCustomAttributes}
-                 attributes={cryptographicKey?.customAttributes}
+                 attributes={keyDetail?.customAttributes}
              />
          }
      ]
@@ -270,7 +259,7 @@ export default function CryptographicKeyForm() {
          content: <AttributeEditor
              id="customCryptographicKey"
              attributeDescriptors={resourceCustomAttributes}
-             attributes={cryptographicKey?.customAttributes}
+             attributes={keyDetail?.customAttributes}
          />
      }]
     }
@@ -279,14 +268,14 @@ export default function CryptographicKeyForm() {
 
    const defaultValues: FormValues = useMemo(
       () => ({
-         name: editMode ? cryptographicKey?.name || "" : "",
-         description: editMode ? cryptographicKey?.description || "" : "",
-         tokenProfile: editMode ? cryptographicKey ? optionsForKeys.find(option => option.value.uuid === (cryptographicKey.tokenProfileUuid || "")) : undefined : undefined,
-         group: editMode ? cryptographicKey  && cryptographicKey.group ? { value: cryptographicKey.group, label: cryptographicKey.group?.name } : undefined : undefined,
-         owner: editMode ? cryptographicKey && cryptographicKey.owner ?  cryptographicKey.owner : undefined : undefined,
+         name: editMode ? keyDetail?.name || "" : "",
+         description: editMode ? keyDetail?.description || "" : "",
+         tokenProfile: editMode ? keyDetail ? optionsForKeys.find(option => option.value.uuid === (keyDetail.tokenProfileUuid || "")) : undefined : undefined,
+         group: editMode ? keyDetail  && keyDetail.group ? { value: keyDetail.group, label: keyDetail.group?.name } : undefined : undefined,
+         owner: editMode ? keyDetail && keyDetail.owner ?  keyDetail.owner : undefined : undefined,
          type: undefined,
       }),
-      [editMode, optionsForKeys, cryptographicKey]
+      [editMode, optionsForKeys, keyDetail]
    );
 
 
