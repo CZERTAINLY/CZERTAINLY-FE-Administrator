@@ -17,7 +17,7 @@ import type {
 } from './';
 
 /**
- * Key Pair of the certificate
+ * CryptographicKeys
  * @export
  * @interface KeyDto
  */

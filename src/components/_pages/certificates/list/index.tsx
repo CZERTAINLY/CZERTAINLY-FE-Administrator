@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
-import { CertificateSearchFilterModel } from "types/certificate";
 
 import { dateFormatter } from "utils/dateUtil";
 import { downloadFileZip } from "utils/download";
@@ -45,8 +44,8 @@ export default function CertificateList({
 
    const totalItems = useSelector(selectors.totalItems);
 
-   const isFetchingAvailableFilters = useSelector(selectors.isFetchingAvailableFilters);
    const currentFilters = useSelector(selectors.currentCertificateFilters);
+
    const isFetchingList = useSelector(selectors.isFetchingList);
    const isIssuing = useSelector(selectors.isIssuing);
    const isRevoking = useSelector(selectors.isRevoking);
@@ -64,8 +63,6 @@ export default function CertificateList({
    const [pageSize, setPageSize] = useState(10);
    const [pageNumber, setPageNumber] = useState(1);
 
-   const [filters, setFilters] = useState<CertificateSearchFilterModel[]>();
-
    const [upload, setUpload] = useState<boolean>(false);
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [updateGroup, setUpdateGroup] = useState<boolean>(false);
@@ -73,39 +70,35 @@ export default function CertificateList({
    const [updateEntity, setUpdateEntity] = useState<boolean>(false);
    const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
 
-   const isBusy = isFetchingAvailableFilters || isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
+   const isBusy = isFetchingList || isIssuing || isRevoking || isRenewing || isDeleting || isBulkDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isBulkUpdatingGroup || isBulkUpdatingRaProfile || isBulkUpdatingOwner || isUploading;
 
    useEffect(
 
       () => {
          dispatch(actions.clearDeleteErrorMessages());
          dispatch(actions.setCheckedRows({ checkedRows: [] }));
-         setFilters(currentFilters);
       },
-      [currentFilters, dispatch]
+      [dispatch]
 
    );
+
+    useEffect(
+       () => {
+          setPageNumber(1);
+       },
+       [currentFilters]
+    );
 
 
    useEffect(
 
       () => {
-         if (!filters) return;
-         dispatch(actions.setCurrentFilters({currentFilters: filters}));
-      },
-      [dispatch, filters]
-   );
-
-
-   useEffect(
-
-      () => {
-         if (!filters) return;
-         dispatch(actions.listCertificates({ itemsPerPage: pageSize, pageNumber, filters }));
+         if (!currentFilters) return;
+         dispatch(actions.listCertificates({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
          dispatch(actions.setForceRefreshList({ forceRefreshList: false }));
          dispatch(actions.setCheckedRows({checkedRows: []}));
       },
-      [dispatch, filters, pageSize, pageNumber]
+      [dispatch, currentFilters, pageSize, pageNumber]
 
    );
 
@@ -117,17 +110,6 @@ export default function CertificateList({
       },
       [dispatch, onCheckedRowsChanged]
    );
-
-
-   const onFiltersChanged = useCallback(
-
-      (fltrs: CertificateSearchFilterModel[]) => { if (fltrs !== filters) setFilters(fltrs); setPageNumber(1); },
-      [filters]
-
-   );
-
-
-
 
 
    const onPageSizeChanged = useCallback(
@@ -177,11 +159,11 @@ export default function CertificateList({
 
          if (checkedRows.length === 0) return;
 
-         dispatch(actions.bulkDelete({ uuids: checkedRows, filters }));
+         dispatch(actions.bulkDelete({ uuids: checkedRows, filters: currentFilters }));
          setConfirmDelete(false);
 
       },
-      [checkedRows, dispatch, filters]
+      [checkedRows, dispatch, currentFilters]
 
    );
 
@@ -371,7 +353,7 @@ export default function CertificateList({
                   <CertificateStatus status={certificate.status} asIcon={true} />,
 
                   <CertificateComplianceStatusIcon status={certificate.complianceStatus} id={`compliance-${certificate.fingerprint || certificate.serialNumber}`} />,
-                  
+
                   certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : "",
 
                   selectCertsOnly ? certificate.commonName || "(empty)" : <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
@@ -431,9 +413,7 @@ export default function CertificateList({
 
          <br />
 
-         <CertificateInventoryFilter
-            onFiltersChanged={onFiltersChanged}
-         />
+         <CertificateInventoryFilter />
 
          <Widget title={title} busy={isBusy}>
 

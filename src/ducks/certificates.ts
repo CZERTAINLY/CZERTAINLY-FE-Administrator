@@ -1,5 +1,5 @@
-import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AttributeDescriptorModel } from "types/attributes";
 import {
    CertificateBulkDeleteRequestModel,
    CertificateBulkDeleteResponseModel,
@@ -11,19 +11,18 @@ import {
    CertificateRenewRequestModel,
    CertificateResponseModel,
    CertificateRevokeRequestModel,
-   CertificateSearchFieldModel,
-   CertificateSearchFilterModel,
-   CertificateSearchRequestModel,
    CertificateSignRequestModel,
    CertificateUploadModel,
-   CertificateValidationModel
+   CertificateValidationModel,
+   SearchFieldModel,
+   SearchFilterModel,
+   SearchRequestModel,
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { AttributeDescriptorModel } from "types/attributes";
 import { LocationResponseModel } from "types/locations";
 import { CertificateStatus } from "types/openapi";
-
+import { RaProfileResponseModel } from "types/ra-profiles";
+import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
 
@@ -33,10 +32,10 @@ export type State = {
 
    deleteErrorMessage: string;
 
-   lastQuery?: CertificateSearchRequestModel;
+   lastQuery?: SearchRequestModel;
 
-   availableFilters: CertificateSearchFieldModel[];
-   currentFilters: CertificateSearchFilterModel[];
+   availableFilters: SearchFieldModel[];
+   currentFilters: SearchFilterModel[];
 
    certificates: CertificateResponseModel[];
    totalPages: number;
@@ -98,7 +97,7 @@ export const initialState: State = {
    deleteErrorMessage: "",
 
    availableFilters: [],
-   currentFilters: [], // used just in the filter
+   currentFilters: [],
 
    certificates: [],
    totalPages: 0,
@@ -198,13 +197,13 @@ export const slice = createSlice({
       },
 
 
-      setCurrentFilters: (state, action: PayloadAction<{ currentFilters: CertificateSearchFilterModel[] }>) => {
-         state.currentFilters = action.payload.currentFilters;
+      setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
+         state.currentFilters = action.payload;
 
       },
 
 
-      listCertificates: (state, action: PayloadAction<CertificateSearchRequestModel>) => {
+      listCertificates: (state, action: PayloadAction<SearchRequestModel>) => {
 
          state.certificates = [];
          state.isFetchingList = true;
@@ -402,7 +401,7 @@ export const slice = createSlice({
       },
 
 
-      getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: CertificateSearchFieldModel[] }>) => {
+      getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: SearchFieldModel[] }>) => {
 
          state.isFetchingAvailableFilters = false;
          state.availableFilters = action.payload.availableCertificateFilters;

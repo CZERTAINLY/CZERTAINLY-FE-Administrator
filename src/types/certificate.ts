@@ -1,27 +1,33 @@
+import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
+import { CertificateGroupResponseModel } from "./certificateGroups";
+import { LocationResponseModel, MetadataModel } from "./locations";
 import {
-    BulkOperationResponse, CertificateComplianceCheckDto,
+    BulkOperationResponse,
+    CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
-    CertificateDto, CertificateEventHistoryDto,
-    CertificateResponseDto as CertificateResponseDtoOpenApi, CertificateUpdateObjectsDto,
+    CertificateDto,
+    CertificateEventHistoryDto,
+    CertificateResponseDto as CertificateResponseDtoOpenApi,
+    CertificateUpdateObjectsDto,
     CertificateValidationDto as CertificateValidationDtoOpenApi,
     ClientCertificateRekeyRequestDto,
     ClientCertificateRenewRequestDto,
     ClientCertificateRevocationDto,
-    ClientCertificateSignRequestDto, MultipleCertificateObjectUpdateDto,
-    RemoveCertificateDto, SearchFieldDataDto,
+    ClientCertificateSignRequestDto,
+    MultipleCertificateObjectUpdateDto,
+    RemoveCertificateDto,
+    SearchFieldDataDto,
     SearchFilterRequestDto,
-    SearchRequestDto,
-    SimplifiedRaProfileDto, UploadCertificateRequestDto
+    SearchRequestDto as SearchRequestDtoOpenApi,
+    SimplifiedRaProfileDto,
+    UploadCertificateRequestDto,
 } from "./openapi";
-import { LocationResponseModel, MetadataModel } from "./locations";
-import { CertificateGroupResponseModel } from "./certificateGroups";
-import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 
-export type CertificateSearchFilterDto = SearchFilterRequestDto;
-export type CertificateSearchFilterModel = CertificateSearchFilterDto;
+export type SearchFilterDto = SearchFilterRequestDto;
+export type SearchFilterModel = SearchFilterDto;
 
-export type CertificateSearchRequestDto = SearchRequestDto;
-export type CertificateSearchRequestModel = Omit<CertificateSearchRequestDto, "filters"> & { filters?: Array<CertificateSearchFilterModel> };
+export type SearchRequestDto = SearchRequestDtoOpenApi;
+export type SearchRequestModel = Omit<SearchRequestDto, "filters"> & { filters?: Array<SearchFilterModel> };
 
 export type RaProfileSimplifiedDto = SimplifiedRaProfileDto;
 export type RaProfileSimplifiedModel = RaProfileSimplifiedDto;
@@ -57,8 +63,8 @@ export type CertificateRenewRequestModel = CertificateRenewRequestDto;
 export type CertificateRekeyRequestDto = ClientCertificateRekeyRequestDto;
 export type CertificateRekeyRequestModel = CertificateRekeyRequestDto;
 
-export type CertificateSearchFieldDto = SearchFieldDataDto;
-export type CertificateSearchFieldModel = CertificateSearchFieldDto;
+export type SearchFieldDto = SearchFieldDataDto;
+export type SearchFieldModel = SearchFieldDto;
 
 export type CertificateHistoryDto = CertificateEventHistoryDto;
 export type CertificateHistoryModel = CertificateHistoryDto;
@@ -67,10 +73,10 @@ export type CertificateObjectDto = CertificateUpdateObjectsDto;
 export type CertificateObjectModel = CertificateObjectDto;
 
 export type CertificateBulkObjectDto = MultipleCertificateObjectUpdateDto;
-export type CertificateBulkObjectModel = Omit<CertificateBulkObjectDto, "filters"> & { filters?: Array<CertificateSearchFilterModel> };
+export type CertificateBulkObjectModel = Omit<CertificateBulkObjectDto, "filters"> & { filters?: Array<SearchFilterModel> };
 
 export type CertificateBulkDeleteRequestDto = RemoveCertificateDto;
-export type CertificateBulkDeleteRequestModel = Omit<CertificateBulkDeleteRequestDto, "filters"> & { filters?: Array<CertificateSearchFilterModel> };
+export type CertificateBulkDeleteRequestModel = Omit<CertificateBulkDeleteRequestDto, "filters"> & { filters?: Array<SearchFilterModel> };
 
 export type CertificateBulkDeleteResponseDto = BulkOperationResponse;
 export type CertificateBulkDeleteResponseModel = CertificateBulkDeleteResponseDto;

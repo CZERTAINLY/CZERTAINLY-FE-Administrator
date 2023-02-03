@@ -1,17 +1,18 @@
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/cryptographic-keys";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
-
-import { actions, selectors } from "ducks/cryptographic-keys";
-
-import Widget from "components/Widget";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import Dialog from "components/Dialog";
-import { KeyCompromiseReason, KeyUsage } from "types/openapi";
 import Select from "react-select";
+import { Badge, Container } from "reactstrap";
+import { KeyCompromiseReason, KeyUsage } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
+import KeyFilter from "../KeyFilter";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
 
@@ -23,7 +24,13 @@ function CryptographicKeyList() {
    const checkedRows = useSelector(selectors.checkedRows);
    const cryptographicKeys = useSelector(selectors.cryptographicKeys);
 
-   const isFetching = useSelector(selectors.isFetchingList);
+    const currentFilters = useSelector(selectors.currentKeyFilters);
+
+    const [pageSize, setPageSize] = useState(10);
+    const [pageNumber, setPageNumber] = useState(1);
+    const totalItems = useSelector(selectors.totalItems);
+
+    const isFetching = useSelector(selectors.isFetchingList);
    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
    const isBulkEnabling = useSelector(selectors.isBulkEnabling);
    const isBulkDisabling = useSelector(selectors.isBulkDisabling);
@@ -51,12 +58,28 @@ function CryptographicKeyList() {
 
       dispatch(actions.setCheckedRows({ checkedRows: [] }));
       dispatch(actions.clearDeleteErrorMessages())
-      dispatch(actions.listCryptographicKeys({}));
+      dispatch(actions.listCryptographicKeys({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
 
-   }, [dispatch]);
+   }, [dispatch, currentFilters, pageNumber, pageSize]);
 
+    useEffect(
+        () => {
+            setPageNumber(1);
+        },
+        [currentFilters]
+    );
 
-   const onAddClick = useCallback(
+    const onPageSizeChanged = useCallback(
+
+        (pageSize: number) => {
+            setPageSize(pageSize);
+            setPageNumber(1);
+        },
+        [setPageSize, setPageNumber]
+
+    );
+
+    const onAddClick = useCallback(
 
       () => {
          navigate(`./add`);
@@ -342,10 +365,25 @@ function CryptographicKeyList() {
          return options;
         }
 
+    const paginationData = useMemo(
+
+        () => ({
+            page: pageNumber,
+            totalItems: totalItems,
+            pageSize: pageSize,
+            loadedPageSize: pageSize,
+            totalPages: Math.ceil(totalItems / pageSize),
+            itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+        }),
+        [pageNumber, totalItems, pageSize]
+
+    );
 
    return (
 
       <Container className="themed-container" fluid>
+          <br/>
+          <KeyFilter />
 
          <Widget title={title} busy={isBusy}>
 
@@ -357,7 +395,9 @@ function CryptographicKeyList() {
                canSearch={true}
                hasCheckboxes={true}
                hasPagination={true}
-               // hasDetails={true}
+               paginationData={paginationData}
+               onPageChanged={setPageNumber}
+               onPageSizeChanged={onPageSizeChanged}
             />
 
          </Widget>

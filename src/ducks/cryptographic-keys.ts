@@ -1,5 +1,6 @@
-import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AttributeDescriptorModel } from "types/attributes";
+import { BulkActionModel } from "types/connectors";
 import {
    CryptographicKeyAddRequestModel,
    CryptographicKeyBulkCompromiseRequestModel,
@@ -12,9 +13,9 @@ import {
    CryptographicKeyKeyUsageUpdateRequestModel,
    CryptographicKeyResponseModel,
 } from "types/cryptographic-keys";
-import { BulkActionModel } from "types/connectors";
-import { KeyState, KeyRequestType, KeyUsage } from "types/openapi";
-import { AttributeDescriptorModel } from "types/attributes";
+import { KeyRequestType, KeyState, KeyUsage } from "types/openapi";
+import { createFeatureSelector } from "utils/ducks";
+import { SearchFieldModel, SearchFilterModel, SearchRequestModel } from "../types/certificate";
 
 export type State = {
 
@@ -25,10 +26,17 @@ export type State = {
 
    keyAttributeDescriptors?: AttributeDescriptorModel[];
 
+   availableFilters: SearchFieldModel[];
+   currentFilters: SearchFilterModel[];
+
+   totalPages: number;
+   totalItems: number;
+
    cryptographicKey?: CryptographicKeyDetailResponseModel;
    cryptographicKeys: CryptographicKeyResponseModel[];
    cryptographicKeyPairs: CryptographicKeyResponseModel[];
 
+   isFetchingAvailableFilters: boolean;
    isFetchingList: boolean;
    isFetchingKeyPairs: boolean;
    isFetchingDetail: boolean;
@@ -65,9 +73,16 @@ export const initialState: State = {
 
    keyAttributeDescriptors: [],
 
+   availableFilters: [],
+   currentFilters: [],
+
+   totalPages: 0,
+   totalItems: 0,
+
    cryptographicKeys: [],
    cryptographicKeyPairs: [],
 
+   isFetchingAvailableFilters: false,
    isFetchingList: false,
    isFetchingKeyPairs: false,
    isFetchingDetail: false,
@@ -104,7 +119,7 @@ export const slice = createSlice({
    reducers: {
 
       resetState: (state, action: PayloadAction<void>) => {
-
+         let currentFilterRef = state.currentFilters;
          Object.keys(state).forEach(
             key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
          );
@@ -112,9 +127,13 @@ export const slice = createSlice({
          Object.keys(initialState).forEach(
             key => (state as any)[key] = (initialState as any)[key]
          );
+         state.currentFilters = currentFilterRef;
 
       },
 
+      setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
+         state.currentFilters = action.payload;
+      },
 
       setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
 
@@ -143,7 +162,7 @@ export const slice = createSlice({
       },
 
 
-      listCryptographicKeys: (state, action: PayloadAction<{tokenProfileUuid?: string}>) => {
+      listCryptographicKeys: (state, action: PayloadAction<SearchRequestModel>) => {
 
          state.cryptographicKeys = [];
          state.isFetchingList = true;
@@ -151,10 +170,12 @@ export const slice = createSlice({
       },
 
 
-      listCryptographicKeysSuccess: (state, action: PayloadAction<{ cryptographicKeys: CryptographicKeyResponseModel[] }>) => {
+      listCryptographicKeysSuccess: (state, action: PayloadAction<{ cryptographicKeys: CryptographicKeyResponseModel[], totalPages: number, totalItems: number}>) => {
 
          state.cryptographicKeys = action.payload.cryptographicKeys;
          state.isFetchingList = false;
+         state.totalItems = action.payload.totalItems;
+         state.totalPages = action.payload.totalPages;
 
       },
 
@@ -210,6 +231,19 @@ export const slice = createSlice({
 
       },
 
+      getAvailableKeyFilters: (state, action: PayloadAction<void>) => {
+         state.availableFilters = [];
+         state.isFetchingAvailableFilters = true;
+      },
+
+      getAvailableKeyFiltersSuccess: (state, action: PayloadAction<{ availableKeyFilters: SearchFieldModel[] }>) => {
+         state.isFetchingAvailableFilters = false;
+         state.availableFilters = action.payload.availableKeyFilters;
+      },
+
+      getAvailableKeyFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+         state.isFetchingAvailableFilters = false;
+      },
 
       createCryptographicKey: (state, action: PayloadAction<{
          tokenInstanceUuid: string,
@@ -842,7 +876,13 @@ const cryptographicKey = createSelector(state, (state: State) => state.cryptogra
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);
 const cryptographicKeyPairs = createSelector(state, (state: State) => state.cryptographicKeyPairs);
 
+const availableKeyFilters = createSelector(state, state => state.availableFilters);
+const currentKeyFilters = createSelector(state, state => state.currentFilters);
 
+const totalItems = createSelector(state, state => state.totalItems);
+const totalPages = createSelector(state, state => state.totalPages);
+
+const isFetchingAvailableFilters = createSelector(state, state => state.isFetchingAvailableFilters);
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingKeyPairs = createSelector(state, (state: State) => state.isFetchingKeyPairs);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
@@ -880,6 +920,13 @@ export const selectors = {
    cryptographicKeys,
    cryptographicKeyPairs,
 
+   availableKeyFilters,
+   currentKeyFilters,
+
+   totalItems,
+   totalPages,
+
+   isFetchingAvailableFilters,
    isFetchingList,
    isFetchingKeyPairs,
    isFetchingDetail,

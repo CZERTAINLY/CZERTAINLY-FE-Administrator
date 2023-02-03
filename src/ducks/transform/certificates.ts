@@ -22,32 +22,32 @@ import {
    CertificateResponseModel,
    CertificateRevokeRequestDto,
    CertificateRevokeRequestModel,
-   CertificateSearchFieldDto,
-   CertificateSearchFieldModel,
-   CertificateSearchFilterDto,
-   CertificateSearchFilterModel,
-   CertificateSearchRequestDto,
-   CertificateSearchRequestModel,
    CertificateSignRequestDto,
    CertificateSignRequestModel,
    CertificateUploadDto,
    CertificateUploadModel,
    RaProfileSimplifiedDto,
    RaProfileSimplifiedModel,
+   SearchFieldDto,
+   SearchFieldModel,
+   SearchFilterDto,
+   SearchFilterModel,
+   SearchRequestDto,
+   SearchRequestModel,
 } from "types/certificate";
 import { CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
 
-export function transformCertificateSearchFilterModelToDto(search: CertificateSearchFilterModel): CertificateSearchFilterDto {
+export function transformSearchFilterModelToDto(search: SearchFilterModel): SearchFilterDto {
    return { ...search };
 }
 
-export function transformCertificateSearchRequestModelToDto(search: CertificateSearchRequestModel): CertificateSearchRequestDto {
+export function transformSearchRequestModelToDto(search: SearchRequestModel): SearchRequestDto {
    return {
       ...search,
-      filters: search.filters?.map(transformCertificateSearchFilterModelToDto)
+      filters: search.filters?.map(transformSearchFilterModelToDto)
    };
 }
 
@@ -104,7 +104,7 @@ export function transformCertificateRekeyRequestModelToDto(rekeyRequest: Certifi
    return { ...rekeyRequest };
 }
 
-export function transformCertificateSearchFieldDtoToModel(searchField: CertificateSearchFieldDto): CertificateSearchFieldModel {
+export function transformSearchFieldDtoToModel(searchField: SearchFieldDto): SearchFieldModel {
    return { ...searchField };
 }
 
@@ -119,14 +119,14 @@ export function transformCertificateObjectModelToDto(certificateObject: Certific
 export function transformCertificateBulkObjectModelToDto(bulk: CertificateBulkObjectModel): CertificateBulkObjectDto {
    return {
       ...bulk,
-      filters: bulk.filters?.map(transformCertificateSearchFilterModelToDto)
+      filters: bulk.filters?.map(transformSearchFilterModelToDto)
    }
 }
 
 export function transformCertificateBulkDeleteRequestModelToDto(bulk: CertificateBulkDeleteRequestModel): CertificateBulkDeleteRequestDto {
    return {
       ...bulk,
-      filters: bulk.filters?.map(transformCertificateSearchFilterModelToDto)
+      filters: bulk.filters?.map(transformSearchFilterModelToDto)
    }
 }
 

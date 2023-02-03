@@ -90,6 +90,7 @@ export * from './CredentialDto';
 export * from './CredentialRequestDto';
 export * from './CredentialUpdateRequestDto';
 export * from './CryptographicAlgorithm';
+export * from './CryptographicKeyResponseDto';
 export * from './CustomAttribute';
 export * from './CustomAttributeCreateRequestDto';
 export * from './CustomAttributeDefinitionDetailDto';
