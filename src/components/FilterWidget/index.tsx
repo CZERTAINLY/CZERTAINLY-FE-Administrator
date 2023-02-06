@@ -74,7 +74,7 @@ export default function FilterWidget({
             setFilterField({label: field.label, value: field.field});
             setFilterCondition({label: currentFilters[selectedFilter].condition, value: currentFilters[selectedFilter].condition});
 
-            if (field.type === SearchFieldDataDtoTypeEnum.String) {
+            if (field.type === SearchFieldDataDtoTypeEnum.String || field.type === SearchFieldDataDtoTypeEnum.Number) {
                 setFilterValue(currentFilters[selectedFilter].value);
                 return;
             }
@@ -194,7 +194,7 @@ export default function FilterWidget({
                                 <FormGroup>
                                     <Label for="value">Filter Value</Label>
                                     {
-                                        currentFieldData?.type === undefined || currentFieldData?.type === "string" || currentFieldData?.type === "date"
+                                        currentFieldData?.type === undefined || currentFieldData?.type === "string" || currentFieldData?.type === "date" || currentFieldData?.type === "number"
                                             ? (
                                                 <Input
                                                     id="value"
