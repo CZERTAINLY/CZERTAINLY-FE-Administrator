@@ -23,8 +23,11 @@ export type CryptographicKeyAddRequestModel = Omit<CryptographicKeyAddRequestDto
 export type CryptographicKeyEditRequestDto = EditKeyRequestDto;
 export type CryptographicKeyEditRequestModel = Omit<CryptographicKeyEditRequestDto, "customAttributes"> & { customAttributes?: Array<AttributeRequestModel> };
 
-export type CryptographicKeyResponseDto = KeyDto;
+export type CryptographicKeyResponseDto = KeyItemDto;
 export type CryptographicKeyResponseModel = CryptographicKeyResponseDto;
+
+export type CryptographicKeyPairResponseDto = KeyDto;
+export type CryptographicKeyPairResponseModel = CryptographicKeyPairResponseDto;
 
 export type CryptographicKeyDetailResponseDto = KeyDetailDto;
 export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, "attributes | customAttributes | group"> & { attributes: Array<AttributeResponseModel>, customAttributes?: Array<AttributeResponseModel>, group?: CertificateGroupResponseModel};

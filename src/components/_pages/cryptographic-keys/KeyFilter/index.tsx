@@ -19,7 +19,7 @@ export default function KeyFilter() {
         dispatch(actions.setCurrentFilters(filters));
     }, [dispatch]);
 
-    return <FilterWidget title="Key Filter"
+    return <FilterWidget title="Key Inventory Filter"
                          onFiltersChanged={onFiltersChanged}
                          availableFilters={availableFilters}
                          currentFilters={currentFilters}

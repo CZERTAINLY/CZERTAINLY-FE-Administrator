@@ -27,7 +27,7 @@ import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { KeyType, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
-import { CryptographicKeyResponseModel } from "types/cryptographic-keys";
+import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
 import { TokenProfileResponseModel } from "types/token-profiles";
 
 interface FormValues {
@@ -38,7 +38,7 @@ interface FormValues {
    file: string;
    uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
    tokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
-   key?: SingleValue<{ label: string; value: CryptographicKeyResponseModel }> | null;
+   key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
 
 }
 
@@ -203,7 +203,7 @@ export default function CertificateForm() {
 
    const onKeyChange = useCallback(
 
-      (event: SingleValue<{ label: string; value: CryptographicKeyResponseModel }>) => {
+      (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>) => {
 
          if (!event) return;
          if(!event.value.tokenProfileUuid) return;

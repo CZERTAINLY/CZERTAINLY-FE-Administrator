@@ -482,7 +482,7 @@ export default function CertificateDetail() {
       () => [
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Renew", onClick: () => { setRenew(true); } },
-         { icon: "recycle", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Rekey", onClick: () => { setRekey(true); } },
+         { icon: "rekey", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Rekey", onClick: () => { setRekey(true); } },
          { icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Revoke", onClick: () => { setRevoke(true); } },
          { icon: "gavel", disabled: !certificate?.raProfile || certificate?.status === 'revoked', tooltip: "Check Compliance", onClick: () => { onComplianceCheck(); } },
          { icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => { } },

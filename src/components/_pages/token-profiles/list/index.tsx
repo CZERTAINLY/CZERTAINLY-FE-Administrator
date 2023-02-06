@@ -13,6 +13,7 @@ import Dialog from "components/Dialog";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 import { KeyUsage } from "types/openapi";
 import Select from "react-select";
+import { TokenProfileResponseModel } from "types/token-profiles";
 
 function TokenProfileList() {
 
@@ -121,14 +122,13 @@ function TokenProfileList() {
       [checkedRows, onAddClick, onEnableClick, onDisableClick, setKeyUsageUpdate]
    );
 
-   const keyUsageOptions = [
-      { value: KeyUsage.Sign, label: "Signing" },
-      { value: KeyUsage.Verify, label: "Verifying" },
-      { value: KeyUsage.Encrypt, label: "Encrypting" },
-      { value: KeyUsage.Decrypt, label: "Decrypting" },
-      { value: KeyUsage.Wrap, label: "Wrapping Key" },
-      { value: KeyUsage.Unwrap, label: "Unwrapping Key" },
-   ]
+   const keyUsageOptions = () => {
+      let options = [];
+      for (const suit in KeyUsage) {
+        options.push({label: suit, value: KeyUsage[suit as keyof typeof KeyUsage]});
+     }
+     return options;
+   }
 
 
    const title = useMemo(
@@ -156,7 +156,7 @@ function TokenProfileList() {
                <Select
                               isMulti = {true}
                               id="field"
-                              options={keyUsageOptions}
+                              options={keyUsageOptions()}
                               onChange={(e) => {
                                  setKeyUsages(e.map((item) => item.value));
                               }}
@@ -185,6 +185,11 @@ function TokenProfileList() {
             sortable: true,
          },
          {
+            id: "usages",
+            align: "center",
+            content: "Usages",
+         },
+         {
             id: "token",
             align: "center",
             content: "Token",
@@ -209,6 +214,12 @@ function TokenProfileList() {
       []
    );
 
+   const getTokenProfileUsages = (tokenProfile: TokenProfileResponseModel) => {
+      return tokenProfile.usages.map((keyUsage) => {
+         return <Badge color="secondary" key={keyUsage}>{keyUsage}</Badge>
+      })
+   }
+
 
    const profilesTableData: TableDataRow[] = useMemo(
 
@@ -223,6 +234,8 @@ function TokenProfileList() {
                <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${tokenProfile.tokenInstanceUuid || "unknown"}/${tokenProfile.uuid}`}>{tokenProfile.name}</Link></span>,
 
                <span style={{ whiteSpace: "nowrap" }}>{tokenProfile.description || ""}</span>,
+
+               <>{getTokenProfileUsages(tokenProfile)}</>,
 
                <Badge color="info">{tokenProfile.tokenInstanceName}</Badge>,
 

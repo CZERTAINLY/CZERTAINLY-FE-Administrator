@@ -13,7 +13,7 @@ import Select from "react-select";
 
 import { Badge, Button, Col, Label, Row } from "reactstrap";
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
-import { KeyCompromiseReason, KeyState } from "types/openapi";
+import { KeyCompromiseReason, KeyState, KeyType, KeyUsage } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateBadge from "../KeyStateBadge";
 import KeyStatus from "../KeyStatus";
@@ -54,6 +54,12 @@ export default function CryptographicKeyItem({
    const [currentInfoId, setCurrentInfoId] = useState("");
 
    const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
+
+   const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
+
+   const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
+
+   const [displayKeyData, setDisplayKeyData] = useState<boolean>(false);
 
    useEffect(
 
@@ -103,6 +109,16 @@ export default function CryptographicKeyItem({
          }));
       },
       [dispatch, keyItem, tokenInstanceUuid, keyUuid]
+
+   );
+
+   const onUpdateKeyUsageConfirmed = useCallback(
+
+      () => {
+         dispatch(actions.bulkUpdateKeyItemUsage({ usage: {usage: keyUsages, uuids: [keyItem.uuid]} }));
+         setKeyUsageUpdate(false);
+      },
+      [dispatch, keyUsages, keyItem]
 
    );
 
@@ -160,13 +176,14 @@ export default function CryptographicKeyItem({
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: keyItem.state !== KeyState.Active || keyItem.enabled, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: keyItem.state !== KeyState.Active || !keyItem.enabled, tooltip: "Disable", onClick: () => { onDisableClick() } },
-         { icon: "handshake", disabled: keyItem.state === KeyState.Compromised || keyItem.state === KeyState.Destroyed, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
-         { icon: "bomb", disabled: keyItem.state === KeyState.Destroyed, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
-         { icon: "sign", disabled: keyItem.state !== KeyState.Active || !keyItem.enabled, tooltip: "Sign", onClick: () => { setSignData(true) } },
-         { icon: "verify", disabled: keyItem.state !== KeyState.Active || !keyItem.enabled, tooltip: "Verify", onClick: () => { setVerifyData(true) } },
+         { icon: "key", disabled: keyItem.state !== KeyState.Active || !keyItem.enabled, tooltip: "Update Key Usage", onClick: () => { setKeyUsageUpdate(true) } },
+         { icon: "compromise", disabled: keyItem.state === KeyState.Compromised || keyItem.state === KeyState.Destroyed, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
+         { icon: "destroy", disabled: keyItem.state === KeyState.Destroyed, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
+         { icon: "sign", disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.PublicKey, tooltip: "Sign", onClick: () => { setSignData(true) } },
+         { icon: "verify", disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.PrivateKey, tooltip: "Verify", onClick: () => { setVerifyData(true) } },
 
       ],
-      [onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy, keyItem.enabled, keyItem.state]
+      [onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy, keyItem.enabled, keyItem.state, keyItem.type]
 
    );
 
@@ -218,7 +235,17 @@ export default function CryptographicKeyItem({
       () => !keyItem ? [] : [
          {
             id: "format",
-            columns: ["Key Format", keyItem.format || ""]
+            columns: ["Key Format", <div>
+               {keyItem.format} &nbsp;&nbsp;&nbsp;
+               <Button
+                     color="white"
+                     size="sm"
+                     onClick={() => setDisplayKeyData(true)}
+                     title="Show Additional Information"
+                  >
+                     <i className="fa fa-info-circle" aria-hidden="true"></i>
+                  </Button>
+                  </div>]
          },
          {
             id: "Usages",
@@ -316,6 +343,21 @@ export default function CryptographicKeyItem({
 
    );
 
+   const keyUsageOptions = () => {
+      let options = [];
+      for (const suit in KeyUsage) {
+        options.push({label: suit, value: KeyUsage[suit as keyof typeof KeyUsage]});
+     }
+     return options;
+   }
+
+   const existingUsages = () => {
+      if (!keyItem) return [];
+      return keyItem?.usage.map((usage) => {
+         return { value: usage, label: usage.toString() }
+      })
+   }
+
    const additionalInfoEntry = (): any => {
 
       let returnList = [];
@@ -349,6 +391,25 @@ export default function CryptographicKeyItem({
       return returnList;
 
    };
+
+   const keyUsageBody = 
+         <div>
+            
+            <div className="form-group">
+               <label className="form-label">Key Usage</label>
+               <Select
+                              isMulti = {true}
+                              id="field"
+                              options={keyUsageOptions()}
+                              onChange={(e) => {
+                                 setKeyUsages(e.map((item) => item.value));
+                              }}
+                              defaultValue={existingUsages()}
+                              isClearable={true}
+                           />
+            </div>
+
+         </div>
 
 
 
@@ -414,7 +475,7 @@ export default function CryptographicKeyItem({
 
          <Dialog
             isOpen={confirmCompromise}
-            caption={`Key Compromised?`}
+            caption={`Compromised Key`}
             body={
                <div>
                   <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
@@ -436,11 +497,16 @@ export default function CryptographicKeyItem({
 
          <Dialog
             isOpen={confirmDestroy}
-            caption={`Destroy Key"}`}
-            body={`You are about to destroy the Key. Is this what you want to do?`}
+            caption={`Destroy Key`}
+            body={
+               <div>
+                  <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
+                  <p><b>Warning:</b> This action cannot be undone.</p>
+               </div>
+            }
             toggle={() => setConfirmDestroy(false)}
             buttons={[
-               { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
+               { color: "danger", onClick: onDestroy, body: "Yes, Destroy"},
                { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
             ]}
          />
@@ -468,6 +534,27 @@ export default function CryptographicKeyItem({
             toggle={() => setCurrentInfoId("")}
             buttons={[]}
             size="lg"
+         />
+
+
+         <Dialog
+            isOpen={displayKeyData}
+            caption={`Key Data`}
+            body={<div style={{lineBreak: "anywhere"}}>{keyItem.keyData}</div>}
+            toggle={() => setDisplayKeyData(false)}
+            buttons={[]}
+            size="lg"
+         />
+
+         <Dialog
+            isOpen={keyUsageUpdate}
+            caption={`Update Key Usage`}
+            body={keyUsageBody}
+            toggle={() => setKeyUsageUpdate(false)}
+            buttons={[
+               { color: "primary", onClick: onUpdateKeyUsageConfirmed, body: "Update" },
+               { color: "secondary", onClick: () => setKeyUsageUpdate(false), body: "Cancel" },
+            ]}
          />
 
       </div >

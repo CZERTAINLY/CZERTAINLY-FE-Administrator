@@ -11,6 +11,7 @@ import {
    CryptographicKeyItemBulkCompromiseRequestModel,
    CryptographicKeyKeyUsageBulkUpdateRequestModel,
    CryptographicKeyKeyUsageUpdateRequestModel,
+   CryptographicKeyPairResponseModel,
    CryptographicKeyResponseModel,
 } from "types/cryptographic-keys";
 import { KeyRequestType, KeyState, KeyUsage } from "types/openapi";
@@ -34,7 +35,7 @@ export type State = {
 
    cryptographicKey?: CryptographicKeyDetailResponseModel;
    cryptographicKeys: CryptographicKeyResponseModel[];
-   cryptographicKeyPairs: CryptographicKeyResponseModel[];
+   cryptographicKeyPairs: CryptographicKeyPairResponseModel[];
 
    isFetchingAvailableFilters: boolean;
    isFetchingList: boolean;
@@ -55,6 +56,7 @@ export type State = {
    isBulkCompromising: boolean;
    isDestroying: boolean;
    isBulkDestroying: boolean;
+   isSyncing: boolean;
 
    isFetchingAttributes: boolean;
 
@@ -100,6 +102,7 @@ export const initialState: State = {
    isBulkCompromising: false,
    isDestroying: false,
    isBulkDestroying: false,
+   isSyncing: false,
 
    isFetchingAttributes: false,
 
@@ -195,7 +198,7 @@ export const slice = createSlice({
       },
 
 
-      listCryptographicKeyPairSuccess: (state, action: PayloadAction<{ cryptographicKeys: CryptographicKeyResponseModel[] }>) => {
+      listCryptographicKeyPairSuccess: (state, action: PayloadAction<{ cryptographicKeys: CryptographicKeyPairResponseModel[] }>) => {
 
          state.cryptographicKeyPairs = action.payload.cryptographicKeys;
          state.isFetchingKeyPairs = false;
@@ -227,7 +230,28 @@ export const slice = createSlice({
 
       getCryptographicKeyDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
-         state.isFetchingDetail = false;
+         state.isSyncing = false;
+
+      },
+
+
+      syncKeys: (state, action: PayloadAction<{ tokenInstanceUuid: string}>) => {
+
+         state.isSyncing = true;
+
+      },
+
+
+      syncKeysSuccess: (state, action: PayloadAction<void>) => {
+
+         state.isSyncing = false;
+
+      },
+
+
+      syncKeysFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isSyncing = false;
 
       },
 
@@ -537,10 +561,8 @@ export const slice = createSlice({
          action.payload.uuids.forEach(
 
             uuid => {
-               state.cryptographicKeys.forEach(cryptographicKey => {
-                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
-                  if (keyItemIndex >= 0) cryptographicKey.items.splice(keyItemIndex, 1);
-               });
+               const keyItemIndex = state.cryptographicKeys.findIndex(keyItem => keyItem.uuid === uuid);
+               if (keyItemIndex >= 0) state.cryptographicKeys.splice(keyItemIndex, 1);
             }
 
          );
@@ -591,10 +613,8 @@ export const slice = createSlice({
          action.payload.uuids.forEach(
 
             uuid => {
-               state.cryptographicKeys.forEach(cryptographicKey => {
-                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
-                  if (keyItemIndex >= 0) cryptographicKey.items[keyItemIndex].enabled = true;
-               });
+                  const keyItemIndex = state.cryptographicKeys.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) state.cryptographicKeys[keyItemIndex].enabled = true;
             }
 
          );
@@ -644,10 +664,8 @@ export const slice = createSlice({
          action.payload.uuids.forEach(
 
             uuid => {
-               state.cryptographicKeys.forEach(cryptographicKey => {
-                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
-                  if (keyItemIndex >= 0) cryptographicKey.items[keyItemIndex].enabled = false;
-               });
+                  const keyItemIndex = state.cryptographicKeys.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) state.cryptographicKeys[keyItemIndex].enabled = false;
             }
 
          );
@@ -720,10 +738,14 @@ export const slice = createSlice({
       },
 
 
-      bulkUpdateKeyItemUsageSuccess: (state, action: PayloadAction<{ }>) => {
+      bulkUpdateKeyItemUsageSuccess: (state, action: PayloadAction<{usages: Array<KeyUsage>, uuids: Array<string> }>) => {
 
          state.isBulkUpdatingKeyUsage = false;
 
+         if(action.payload.uuids && action.payload.uuids.length === 1) {
+            const index = state.cryptographicKey!.items.findIndex(keyItem => keyItem.uuid === action.payload.uuids[0]);
+            if (index >= 0) state.cryptographicKey!.items[index].usage = action.payload.usages;
+         }
       },
 
 
@@ -768,10 +790,8 @@ export const slice = createSlice({
          action.payload.request.uuids?.forEach(
 
             uuid => {
-               state.cryptographicKeys.forEach(cryptographicKey => {
-                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
-                  if (keyItemIndex >= 0) {cryptographicKey.items[keyItemIndex].state = KeyState.Compromised};
-               });
+                  const keyItemIndex = state.cryptographicKeys.findIndex(keyItem => keyItem.uuid === uuid);
+                  if (keyItemIndex >= 0) {state.cryptographicKeys[keyItemIndex].state = KeyState.Compromised};
             }
 
          );
@@ -820,10 +840,8 @@ export const slice = createSlice({
          action.payload.uuids.forEach(
 
             uuid => {
-               state.cryptographicKeys.forEach(cryptographicKey => {
-                  const keyItemIndex = cryptographicKey.items.findIndex(keyItem => keyItem.uuid === uuid);
-                  if (keyItemIndex >= 0) cryptographicKey.items[keyItemIndex].state = KeyState.Destroyed;
-               });
+               const keyItemIndex = state.cryptographicKeys.findIndex(keyItem => keyItem.uuid === uuid);
+               if (keyItemIndex >= 0) state.cryptographicKeys[keyItemIndex].state = KeyState.Destroyed;
             }
 
          );
@@ -898,6 +916,7 @@ const isCompromising = createSelector(state, (state: State) => state.isCompromis
 const isBulkCompromising = createSelector(state, (state: State) => state.isBulkCompromising);
 const isDestroying = createSelector(state, (state: State) => state.isDestroying);
 const isBulkDestroying = createSelector(state, (state: State) => state.isBulkDestroying);
+const isSyncing = createSelector(state, (state: State) => state.isSyncing);
 
 const isUpdatingKeyUsage = createSelector(state, (state: State) => state.isUpdatingKeyUsage);
 const isBulkUpdatingKeyUsage = createSelector(state, (state: State) => state.isBulkUpdatingKeyUsage);
@@ -942,6 +961,7 @@ export const selectors = {
    isBulkCompromising,
    isDestroying,
    isBulkDestroying,
+   isSyncing,
 
    isUpdatingKeyUsage,
    isBulkUpdatingKeyUsage,

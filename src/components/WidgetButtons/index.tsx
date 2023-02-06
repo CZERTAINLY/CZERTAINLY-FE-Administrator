@@ -22,7 +22,10 @@ export type IconName = "plus" |
     "minus" |
     "lock" |
     "refresh" |
+    "reload"  |
     "handshake" |
+    "compromise" |
+    "destroy" |
     "bomb" |
     "search" |
     "random" |
@@ -30,7 +33,8 @@ export type IconName = "plus" |
     "verify" |
     "key" |
     "link" |
-    "recycle" ;
+    "recycle" |
+    "rekey" ;
 
 export interface WidgetButtonProps {
    icon: IconName;
@@ -69,7 +73,10 @@ const colors = {
    "gavel": "auto",
    "lock": "auto",
    "refresh": "auto",
+   "reload": "auto",
    "handshake": "red",
+   "compromise": "red",
+   "destroy": "red",
    "bomb": "red",
    "search": "auto",
    "random": "auto",
@@ -78,6 +85,7 @@ const colors = {
    "key": "auto",
    "link": "auto",
    "recycle": "auto",
+   "rekey": "auto",
 };
 
 
@@ -103,15 +111,19 @@ const classNames = {
    "gavel": "fa fa-gavel",
    "lock": "fa fa-lock",
    "refresh": "fa fa-refresh",
-   "handshake": "fa fa-handshake-o",
+   "reload": "fa fa-rotate-right",
+   "handshake": "fa fa-circle-exclamation",
+   "compromise": "fa fa-ban",
+   "destroy": "fa fa-circle-minus",
    "bomb": "fa fa-bomb",
    "search": "fa fa-search",
-   "random": "fa fa-random",
-   "sign": "fas fa-file-signature",
+   "random": "fa fa-dice",
+   "sign": "fas fa-pen",
    "verify": "fa fa-check-square",
    "key": "fa fa-key",
    "link": "fa fa-link",
    "recycle": "fa fa-recycle",
+   "rekey": "fa fa-random",
 }
 
 

@@ -170,20 +170,18 @@ function CryptographicKeyList() {
          { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } },
          { icon: "key", disabled: checkedRows.length === 0, tooltip: "Update Key Usage", onClick: () => { setKeyUsageUpdate(true) } },
          { icon: "handshake", disabled: checkedRows.length === 0, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
-         { icon: "bomb", disabled: checkedRows.length === 0, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
+         { icon: "destroy", disabled: checkedRows.length === 0, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
       ],
       [checkedRows, onAddClick, onEnableClick, onDisableClick, setKeyUsageUpdate]
    );
 
-   const keyUsageOptions = [
-      { value: KeyUsage.Sign, label: "Signing" },
-      { value: KeyUsage.Verify, label: "Verifying" },
-      { value: KeyUsage.Encrypt, label: "Encrypting" },
-      { value: KeyUsage.Decrypt, label: "Decrypting" },
-      { value: KeyUsage.Wrap, label: "Wrapping Key" },
-      { value: KeyUsage.Unwrap, label: "Unwrapping Key" },
-   ]
-
+   const keyUsageOptions = () => {
+      let options = [];
+      for (const suit in KeyUsage) {
+        options.push({label: suit, value: KeyUsage[suit as keyof typeof KeyUsage]});
+     }
+     return options;
+   }
 
    const title = useMemo(
       () => (
@@ -210,7 +208,7 @@ function CryptographicKeyList() {
                <Select
                               isMulti = {true}
                               id="field"
-                              options={keyUsageOptions}
+                              options={keyUsageOptions()}
                               onChange={(e) => {
                                  setKeyUsages(e.map((item) => item.value));
                               }}
@@ -252,63 +250,54 @@ function CryptographicKeyList() {
             id: "algorithm",
             align: "center",
             content: "Algorithm",
-            sortable: true,
             width: "15%",
          },
          {
             id: "size",
             align: "center",
             content: "Size",
-            sortable: true,
             width: "15%",
          },
          {
             id: "format",
             align: "center",
             content: "Format",
-            sortable: true,
             width: "15%",
          },
          {
             id: "creationTime",
             align: "center",
             content: "Creation Date",
-            sortable: true,
             width: "15%",
          },
          {
             id: "group",
             align: "center",
             content: "Group",
-            sortable: true,
             width: "15%",
          },
          {
             id: "owner",
             align: "center",
             content: "Owner",
-            sortable: true,
             width: "15%",
          },
          {
             id: "tokenProfile",
             align: "center",
             content: "Token Profile",
-            sortable: true,
             width: "15%",
          },
          {
             id: "tokenInstance",
             align: "center",
             content: "Token Instance",
-            sortable: true,
             width: "15%",
          },
          {
             id: "associations",
             align: "center",
             content: "Associations",
-            sortable: true,
             width: "15%",
          }
       ],
@@ -319,24 +308,23 @@ function CryptographicKeyList() {
    const profilesTableData = (): TableDataRow[] => {
       var responseList: TableDataRow[] = [];
       for(let key in cryptographicKeys)   {
-         for(let item in cryptographicKeys[key].items) {
             responseList.push({
-               id: cryptographicKeys[key].items[item].uuid,
+               id: cryptographicKeys[key].uuid,
                columns: [
                   
-                  <KeyStatusCircle status={cryptographicKeys[key].items[item].enabled}/>,
+                  <KeyStatusCircle status={cryptographicKeys[key].enabled}/>,
 
-                  <KeyStateCircle state={cryptographicKeys[key].items[item].state}/>,
+                  <KeyStateCircle state={cryptographicKeys[key].state}/>,
 
-                  <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${cryptographicKeys[key].tokenInstanceUuid || "unknown"}/${cryptographicKeys[key].uuid}`}>{cryptographicKeys[key].items[item].name}</Link></span>,
+                  <span style={{ whiteSpace: "nowrap" }}><Link to={`./detail/${cryptographicKeys[key].tokenInstanceUuid || "unknown"}/${cryptographicKeys[key].keyWrapperUuid}`}>{cryptographicKeys[key].name}</Link></span>,
                   
-                  <Badge color="secondary">{cryptographicKeys[key].items[item].type}</Badge>,
+                  <Badge color="secondary">{cryptographicKeys[key].type}</Badge>,
 
-                  cryptographicKeys[key].items[item].cryptographicAlgorithm,
+                  cryptographicKeys[key].cryptographicAlgorithm,
 
-                  cryptographicKeys[key].items[item].length?.toString() || "unknown",
+                  cryptographicKeys[key].length?.toString() || "unknown",
 
-                  cryptographicKeys[key].items[item].format || "unknown",
+                  cryptographicKeys[key].format || "unknown",
 
                   <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKeys[key].creationTime) || ""}</span>,
 
@@ -352,7 +340,7 @@ function CryptographicKeyList() {
                   
                ]
             })
-         }}
+         }
          return responseList;
       }
 
@@ -392,7 +380,7 @@ function CryptographicKeyList() {
                headers={cryptographicKeysTableHeaders}
                data={profilesTableData()}
                onCheckedRowsChanged={setCheckedRows}
-               canSearch={true}
+               canSearch={false}
                hasCheckboxes={true}
                hasPagination={true}
                paginationData={paginationData}

@@ -24,13 +24,21 @@ import {
    CryptographicKeyBulkCompromiseRequestDto,
    CryptographicKeyItemBulkCompromiseRequestModel,
    CryptographicKeyItemBulkCompromiseRequestDto,
+   CryptographicKeyPairResponseDto,
+   CryptographicKeyPairResponseModel,
 } from "types/cryptographic-keys";
 
 
 export function transformCryptographicKeyResponseDtoToModel(keyResponse: CryptographicKeyResponseDto): CryptographicKeyResponseModel {
    return {
       ...keyResponse,
-      items: keyResponse.items.map(transformCryptographicKeyItemDtoToModel),
+   }
+}
+
+
+export function transformCryptographicKeyPairResponseDtoToModel(keyResponse: CryptographicKeyPairResponseDto): CryptographicKeyPairResponseModel {
+   return {
+      ...keyResponse,
    }
 }
 
