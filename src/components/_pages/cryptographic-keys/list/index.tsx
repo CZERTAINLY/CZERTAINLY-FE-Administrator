@@ -169,7 +169,7 @@ function CryptographicKeyList() {
          { icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => { onDisableClick() } },
          { icon: "key", disabled: checkedRows.length === 0, tooltip: "Update Key Usage", onClick: () => { setKeyUsageUpdate(true) } },
-         { icon: "handshake", disabled: checkedRows.length === 0, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
+         { icon: "compromise", disabled: checkedRows.length === 0, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
          { icon: "destroy", disabled: checkedRows.length === 0, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
       ],
       [checkedRows, onAddClick, onEnableClick, onDisableClick, setKeyUsageUpdate]
