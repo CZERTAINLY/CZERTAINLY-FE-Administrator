@@ -329,10 +329,10 @@ export default function AdministratorDetail() {
 
          </Row>
 
+          {acmeProfile && <CustomAttributeWidget resource={Resource.AcmeProfiles} resourceUuid={acmeProfile.uuid} attributes={acmeProfile.customAttributes} />}
 
 
-
-         <Widget title={raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"} busy={isBusy}>
+          <Widget title={raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"} busy={isBusy}>
 
             {
 
@@ -345,7 +345,7 @@ export default function AdministratorDetail() {
                         data={raProfileDetailData}
                      />
 
-                     <Row xs="1" sm="1" md="3" lg="3" xl="3">
+                     <Row xs="1" sm="1" md="2" lg="2" xl="2">
 
                         <Col>
 
@@ -383,9 +383,6 @@ export default function AdministratorDetail() {
 
                         </Col>
 
-                         <Col>
-                             {acmeProfile && <CustomAttributeWidget resource={Resource.AcmeProfiles} resourceUuid={acmeProfile.uuid} attributes={acmeProfile.customAttributes} />}
-                         </Col>
                      </Row>
 
                   </>
@@ -395,7 +392,6 @@ export default function AdministratorDetail() {
             }
 
          </Widget>
-
 
          <Dialog
             isOpen={confirmDelete}
