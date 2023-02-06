@@ -21,7 +21,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { validateRequired } from "utils/validators";
-import { CryptographicKeyResponseModel } from "types/cryptographic-keys";
+import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
 import { CertificateResponseModel } from "types/certificate";
 import { KeyType } from "types/openapi";
 import TabLayout from "components/Layout/TabLayout";
@@ -33,7 +33,7 @@ interface FormValues {
    file: string;
    uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
    tokenProfile?: SingleValue<{ label: string; value: string }> | null;
-   key?: SingleValue<{ label: string; value: CryptographicKeyResponseModel }> | null;
+   key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
 
 }
 
@@ -185,7 +185,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
    const onKeyChange = useCallback(
 
-      (event: SingleValue<{ label: string; value: CryptographicKeyResponseModel }>) => {
+      (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>) => {
 
          if (!event) return;
          if(!event.value.tokenProfileUuid) return;

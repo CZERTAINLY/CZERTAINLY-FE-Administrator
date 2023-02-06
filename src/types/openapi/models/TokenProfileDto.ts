@@ -12,6 +12,7 @@
  */
 
 import type {
+    KeyUsage,
     TokenInstanceStatus,
 } from './';
 
@@ -61,4 +62,10 @@ export interface TokenProfileDto {
      * @memberof TokenProfileDto
      */
     enabled: boolean;
+    /**
+     * Usages for the Keys assoiated to the profile
+     * @type {Array<KeyUsage>}
+     * @memberof TokenProfileDto
+     */
+    usages: Array<KeyUsage>;
 }

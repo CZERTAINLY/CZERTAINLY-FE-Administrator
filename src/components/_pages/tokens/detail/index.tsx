@@ -7,6 +7,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/tokens";
+import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -31,6 +32,8 @@ export default function TokenDetail() {
    const isDeactivating = useSelector(selectors.isDeactivating);
    const isReloading = useSelector(selectors.isReloading);
 
+   const isSyncing = useSelector(keySelectors.isSyncing);
+
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
    const [confirmDeactivation, setConfirmDeactivation] = useState<boolean>(false);
    const [activateToken, setActivateToken] = useState<boolean>(false);
@@ -38,8 +41,8 @@ export default function TokenDetail() {
    const [randomDataGeneration, setRandomDataGeneration] = useState<boolean>(false);
 
    const isBusy = useMemo(
-      () => isFetching || isDeleting || isActivating || isDeactivating || isReloading,
-      [isFetching, isDeleting, isActivating, isDeactivating, isReloading]
+      () => isFetching || isDeleting || isActivating || isDeactivating || isReloading || isSyncing,
+      [isFetching, isDeleting, isActivating, isDeactivating, isReloading, isSyncing]
    );
 
 
@@ -113,18 +116,32 @@ export default function TokenDetail() {
 
    );
 
+   const onSync = useCallback(
+
+      () => {
+
+         if (!token) return;
+
+         dispatch(keyActions.syncKeys({ tokenInstanceUuid: token.uuid }));
+
+      },
+      [token, dispatch]
+
+   );
+
 
    const buttons: WidgetButtonProps[] = useMemo(
 
       () => [
          { icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => { onEditClick(); } },
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-         { icon: "refresh", disabled: false, tooltip: "Update Status", onClick: () => { onReload() } },
+         { icon: "reload", disabled: false, tooltip: "Reload Status", onClick: () => { onReload() } },
+         { icon: "refresh", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Sync Keys", onClick: () => { onSync() } },
          { icon: "check", disabled: token?.status.status !== TokenInstanceStatus.Deactivated, tooltip: "Activate", onClick: () => { setActivateToken(true); } },
          { icon: "times", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Deactivate", onClick: () => { setConfirmDeactivation(true); } },
          { icon: "random", disabled: token?.status.status !== TokenInstanceStatus.Activated, tooltip: "Generate Random", onClick: () => { setRandomDataGeneration(true) } },
       ],
-      [onEditClick, onReload, token?.status.status ]
+      [onEditClick, onReload, token?.status.status, onSync, setRandomDataGeneration ]
 
    );
 

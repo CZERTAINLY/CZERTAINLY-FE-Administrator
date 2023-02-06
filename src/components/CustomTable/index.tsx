@@ -660,8 +660,6 @@ function CustomTable({
             </Table>
          </div>
 
-         {paginationData && (canSearch || canSort) ? <div><FormText>Please note the search and sort functionality is applied only to the the single data page<br /><br /></FormText></div> : <></>}
-
          {!hasPagination ? <></> : (
 
             <div className={styles.paginationContainer}>

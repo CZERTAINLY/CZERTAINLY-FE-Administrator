@@ -16,6 +16,7 @@ import {
     transformCryptographicKeyDetailResponseDtoToModel,
     transformCryptographicKeyEditRequestModelToDto,
     transformCryptographicKeyItemBulkCompromiseModelToDto,
+    transformCryptographicKeyPairResponseDtoToModel,
     transformCryptographicKeyResponseDtoToModel,
     transformKeyHistoryDtoToModel,
 } from "./transform/cryptographic-keys";
@@ -65,7 +66,7 @@ const listCryptographicKeyPairs: AppEpic = (action$, state$, deps) => {
 
             map(
                list => slice.actions.listCryptographicKeyPairSuccess({
-                  cryptographicKeys: list.map(transformCryptographicKeyResponseDtoToModel)
+                  cryptographicKeys: list.map(transformCryptographicKeyPairResponseDtoToModel)
                })
             ),
 
@@ -231,6 +232,37 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
 
          )
 
+      )
+
+   );
+
+}
+
+
+const syncCryptographicKeys: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.syncKeys.match
+      ),
+
+      switchMap(
+
+         action => deps.apiClients.cryptographicKeys.syncKeys({tokenInstanceUuid: action.payload.tokenInstanceUuid }).pipe(
+
+            map(
+               () => slice.actions.syncKeysSuccess()
+            ),
+
+            catchError(
+               err => of(
+                  slice.actions.syncKeysFailure({ error: extractError(err, "Failed to sync Keys") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to sync Keys" })
+               )
+            )
+
+         )
       )
 
    );
@@ -610,7 +642,7 @@ const bulkUpdateKeyItemsUsage: AppEpic = (action$, state$, deps) => {
          action => deps.apiClients.cryptographicKeys.updateKeyItemUsages({ bulkKeyItemUsageRequestDto: action.payload.usage }).pipe(
 
             map(
-               () => slice.actions.bulkUpdateKeyItemUsageSuccess({ })
+               () => slice.actions.bulkUpdateKeyItemUsageSuccess({usages: action.payload.usage.usage, uuids: action.payload.usage.uuids })
             ),
 
             catchError(
@@ -886,6 +918,7 @@ const epics = [
    enableCryptographicKey,
    disableCryptographicKey,
    deleteCryptographicKey,
+   syncCryptographicKeys,
    bulkEnableCryptographicKeys,
    bulkDisableCryptographicKeys,
    bulkDeleteCryptographicKeys,
@@ -901,7 +934,7 @@ const epics = [
    destroyCryptographicKey,
    bulkDestroyCryptographicKeys,
    bulkDestroyCryptographicKeyItems,
-    getAvailableKeyFilters,
+   getAvailableKeyFilters,
    getKeyHistory,
 ];
 

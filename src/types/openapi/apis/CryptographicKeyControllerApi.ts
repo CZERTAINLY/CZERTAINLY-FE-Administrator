@@ -151,6 +151,10 @@ export interface ListKeyPairsRequest {
     tokenProfileUuid?: string;
 }
 
+export interface SyncKeysRequest {
+    tokenInstanceUuid: string;
+}
+
 export interface UpdateKeyItemUsagesRequest {
     bulkKeyItemUsageRequestDto: BulkKeyItemUsageRequestDto;
 }
@@ -639,6 +643,20 @@ export class CryptographicKeyControllerApi extends BaseAPI {
             url: '/v1/keys/pairs',
             method: 'GET',
             query,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Sync Keys from connector
+     */
+    syncKeys({ tokenInstanceUuid }: SyncKeysRequest): Observable<void>
+    syncKeys({ tokenInstanceUuid }: SyncKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    syncKeys({ tokenInstanceUuid }: SyncKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'syncKeys');
+
+        return this.request<void>({
+            url: '/v1/tokens/{tokenInstanceUuid}/sync'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
+            method: 'PATCH',
         }, opts?.responseOpts);
     };
 

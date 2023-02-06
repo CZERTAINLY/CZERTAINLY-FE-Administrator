@@ -12,7 +12,7 @@
  */
 
 import type {
-    KeyDto,
+    KeyItemDto,
 } from './';
 
 /**
@@ -21,11 +21,11 @@ import type {
  */
 export interface CryptographicKeyResponseDto {
     /**
-     * CryptographicKeys
-     * @type {Array<KeyDto>}
+     * Cryptographic Keys
+     * @type {Array<KeyItemDto>}
      * @memberof CryptographicKeyResponseDto
      */
-    cryptographicKeys: Array<KeyDto>;
+    cryptographicKeys: Array<KeyItemDto>;
     /**
      * Number of entries per page
      * @type {number}

@@ -61,6 +61,12 @@ export interface KeyItemDetailDto {
      */
     format?: KeyFormat;
     /**
+     * Key Data
+     * @type {string}
+     * @memberof KeyItemDetailDto
+     */
+    keyData?: string;
+    /**
      * Key Length
      * @type {number}
      * @memberof KeyItemDetailDto

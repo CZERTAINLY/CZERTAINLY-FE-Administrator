@@ -17,9 +17,9 @@
  * @enum {string}
  */
 export enum KeyCompromiseReason {
-    Disclosure = 'Unauthorized Disclosure',
-    Modification = 'Unauthorized Modification',
-    Substitution = 'Unauthorized Substitution',
+    Disclosure = 'Unauthorized disclosure',
+    Modification = 'Unauthorized modification',
+    Substitution = 'Unauthorized substitution',
     UseOfSensitiveData = 'Unauthorized use of sensitive data'
 }
 

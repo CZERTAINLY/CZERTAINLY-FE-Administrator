@@ -44,6 +44,14 @@ export default function SignVerifyData({
 
    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
+   const [fileContent, setFileContent] = useState<string>("");
+
+   const [fileName, setFileName] = useState("");
+
+   const [signatureContent, setSignatureContent] = useState<string>("");
+
+   const [signatureFileName, setSignatureFileName] = useState("");
+
 
    useEffect(
 
@@ -88,7 +96,7 @@ export default function SignVerifyData({
                tokenProfileUuid: tokenProfileUuid || "",
                request: {
                   signatureAttributes: attribs,
-                  data: [{data: btoa(values.data)}],
+                  data: [{data: btoa(fileContent)}],
                }
             }));
          } else {
@@ -99,8 +107,8 @@ export default function SignVerifyData({
                tokenProfileUuid: tokenProfileUuid || "",
                request: {
                   signatureAttributes: attribs,
-                  signatures: [{data: btoa(values.signature)}],
-                  data: [{data: btoa(values.data)}],
+                  signatures: [{data: btoa(signatureContent)}],
+                  data: [{data: btoa(fileContent)}],
                }
             }));
          }
@@ -108,9 +116,106 @@ export default function SignVerifyData({
          onClose();
 
       },
-      [dispatch, attributes, onClose, tokenUuid, groupAttributesCallbackAttributes, action, keyUuid, keyItemUuid, tokenProfileUuid]
+      [dispatch, attributes, onClose, tokenUuid, groupAttributesCallbackAttributes, action, keyUuid, keyItemUuid, tokenProfileUuid, fileContent, signatureContent]
 
    )
+
+   const onFileLoaded = useCallback(
+
+      (data: ProgressEvent<FileReader>, fileName: string, verify: boolean) => {
+
+         const fileInfo = data.target!.result as string;
+
+         const fileContent = fileInfo.split(",")[1];
+
+         if(verify) {
+
+            setSignatureContent(fileContent);
+            
+            setSignatureFileName(fileName);
+         
+         } else {
+
+               setFileName(fileName);
+
+               setFileContent(fileContent);
+
+         }
+
+      }
+      ,
+      [setFileContent]
+
+   )
+
+   const onFileDrop = useCallback(
+
+      (e: React.DragEvent<HTMLInputElement>) => {
+
+         e.preventDefault();
+
+         if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+
+         const fileName = e.dataTransfer.files[0].name;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.dataTransfer.files[0]);
+         reader.onload = (data) => { onFileLoaded(data, fileName, false); }
+
+      },
+      [onFileLoaded]
+
+   )
+
+
+   const onSignatureDrop = useCallback(
+
+      (e: React.DragEvent<HTMLInputElement>) => {
+
+         e.preventDefault();
+
+         if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+
+         const fileName = e.dataTransfer.files[0].name;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.dataTransfer.files[0]);
+         reader.onload = (data) => { onFileLoaded(data, fileName, true); }
+
+      },
+      [onFileLoaded]
+
+   )
+
+
+   const onFileDragOver = useCallback(
+
+      (e: React.DragEvent<HTMLInputElement>) => {
+
+         e.preventDefault();
+      },
+      []
+
+   )
+
+
+   const onFileChanged = useCallback(
+
+      (e: React.ChangeEvent<HTMLInputElement>, verify: boolean) => {
+
+         if (!e.target.files || e.target.files.length === 0) return;
+
+         const fileName = e.target.files[0].name;
+
+         const reader = new FileReader();
+         reader.readAsDataURL(e.target.files[0]);
+         reader.onload = (data) => onFileLoaded(data, fileName, verify);
+
+      },
+      [onFileLoaded]
+
+   )
+
 
 
    if (!tokenUuid) return <></>;
@@ -128,17 +233,32 @@ export default function SignVerifyData({
                   {({ input, meta }) => (
 
                      <FormGroup>
+                        <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
 
                         <Label for="data">Data</Label>
 
                         <Input
-                           {...input}
-                           id="data"
-                           type="textarea"
-                           placeholder={"Data to " + action}
-                           valid={!meta.error && meta.touched}
-                           invalid={!!meta.error && meta.touched}
-                        />
+                              id="fileName"
+                              type="text"
+                              placeholder="File not selected"
+                              disabled={true}
+                              style={{ textAlign: "center" }}
+                              value={fileName}
+                           />
+
+                        <FormGroup style={{ textAlign: "right" }}>
+
+                        <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
+
+                        <Input id="file" type="file" style={{ display: "none" }} onChange={e => onFileChanged(e, false)} />
+
+                        </FormGroup>
+
+                        <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
+                        Select or Drag &amp; Drop file to Drop Zone.
+                        </div>
+
+                        </div>
 
                      </FormGroup>
 
@@ -154,16 +274,32 @@ export default function SignVerifyData({
 
                            <FormGroup>
 
-                              <Label for="signature">Signature</Label>
+                                 <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onSignatureDrop} onDragOver={onFileDragOver}>
 
-                              <Input
-                                 {...input}
-                                 id="signature"
-                                 type="textarea"
-                                 placeholder={"Signature " + action}
-                                 valid={!meta.error && meta.touched}
-                                 invalid={!!meta.error && meta.touched}
-                              />
+                                 <Label for="signatureFileName">Signature</Label>
+
+                                 <Input
+                                       id="signatureFileName"
+                                       type="text"
+                                       placeholder="File not selected"
+                                       disabled={true}
+                                       style={{ textAlign: "center" }}
+                                       value={signatureFileName}
+                                    />
+
+                                 <FormGroup style={{ textAlign: "right" }}>
+
+                                 <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
+
+                                 <Input id="file" type="file" style={{ display: "none" }} onChange={e => onFileChanged(e, true)} />
+
+                                 </FormGroup>
+
+                                 <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
+                                 Select or Drag &amp; Drop file to Drop Zone.
+                                 </div>
+
+                              </div>
 
                            </FormGroup>
 

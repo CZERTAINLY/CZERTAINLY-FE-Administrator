@@ -91,13 +91,13 @@ export default function RandomDataGeneration({
 
                      <FormGroup>
 
-                        <Label for="name">Random Data Length</Label>
+                        <Label for="name">Random Data Length (in bytes)</Label>
 
                         <Input
                            {...input}
                            id="length"
                            type="number"
-                           placeholder="Random Data Length"
+                           placeholder="Random Data Length (in bytes)"
                            valid={!meta.error && meta.touched}
                            invalid={!!meta.error && meta.touched}
                         />

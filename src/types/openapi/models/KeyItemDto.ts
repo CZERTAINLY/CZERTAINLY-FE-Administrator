@@ -13,6 +13,7 @@
 
 import type {
     CryptographicAlgorithm,
+    GroupDto,
     KeyFormat,
     KeyState,
     KeyType,
@@ -20,7 +21,7 @@ import type {
 } from './';
 
 /**
- * Key Items
+ * Cryptographic Keys
  * @export
  * @interface KeyItemDto
  */
@@ -37,6 +38,65 @@ export interface KeyItemDto {
      * @memberof KeyItemDto
      */
     name: string;
+    /**
+     * Description of the Key
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    description: string;
+    /**
+     * Creation time of the Key. If the key is discovered from the connector, then it will be returned
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    creationTime: string;
+    /**
+     * UUID of the wrapper object
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    keyWrapperUuid: string;
+    /**
+     * UUID of the Token Profile
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    tokenProfileUuid?: string;
+    /**
+     * Name of the Token Profile
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    tokenProfileName?: string;
+    /**
+     * Token Instance UUID
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    tokenInstanceUuid: string;
+    /**
+     * Token Instance Name
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    tokenInstanceName: string;
+    /**
+     * Owner of the Key
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    owner?: string;
+    /**
+     * @type {GroupDto}
+     * @memberof KeyItemDto
+     */
+    group?: GroupDto;
+    /**
+     * Number of associated objects
+     * @type {number}
+     * @memberof KeyItemDto
+     */
+    associations?: number;
     /**
      * UUID of the key item in the Connector
      * @type {string}

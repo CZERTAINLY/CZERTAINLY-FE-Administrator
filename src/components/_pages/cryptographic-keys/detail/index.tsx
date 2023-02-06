@@ -18,6 +18,7 @@ import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import { Col, Container, Label, Row } from "reactstrap";
 import { KeyCompromiseReason, KeyState, KeyUsage, Resource } from "types/openapi";
 import CryptographicKeyItem from "./CryptographicKeyItem";
+import { dateFormatter } from "utils/dateUtil";
 
 export default function CryptographicKeyDetail() {
 
@@ -157,14 +158,13 @@ export default function CryptographicKeyDetail() {
 
    );
 
-   const keyUsageOptions = [
-      { value: KeyUsage.Sign, label: "Signing" },
-      { value: KeyUsage.Verify, label: "Verifying" },
-      { value: KeyUsage.Encrypt, label: "Encrypting" },
-      { value: KeyUsage.Decrypt, label: "Decrypting" },
-      { value: KeyUsage.Wrap, label: "Wrapping Key" },
-      { value: KeyUsage.Unwrap, label: "Unwrapping Key" },
-   ]
+   const keyUsageOptions = () => {
+      let options = [];
+      for (const suit in KeyUsage) {
+        options.push({label: suit, value: KeyUsage[suit as keyof typeof KeyUsage]});
+     }
+     return options;
+   }
 
    const optionForCompromise = () => {
       var options = [];
@@ -184,8 +184,8 @@ export default function CryptographicKeyDetail() {
          { icon: "check", disabled: cryptographicKey?.items.every(item => item.enabled) || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: !cryptographicKey?.items.every(item => item.enabled) || false, tooltip: "Disable", onClick: () => { onDisableClick() } },
          { icon: "key", disabled: !cryptographicKey?.items.some(item => item.state === KeyState.Active) || false, tooltip: "Update Key Usages", onClick: () => { setKeyUsageUpdate(true); } },
-         { icon: "handshake", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Compromised) || false, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
-         { icon: "bomb", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Destroyed) || false, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
+         { icon: "compromise", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Compromised) || false, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
+         { icon: "destroy", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Destroyed) || false, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
       ],
       [cryptographicKey, onEditClick, onDisableClick, onEnableClick, setKeyUsageUpdate, setConfirmCompromise, setConfirmDestroy]
 
@@ -296,7 +296,7 @@ export default function CryptographicKeyDetail() {
                <Select
                               isMulti = {true}
                               id="field"
-                              options={keyUsageOptions}
+                              options={keyUsageOptions()}
                               onChange={(e) => {
                                  setKeyUsages(e.map((item) => item.value));
                               }}
@@ -324,7 +324,7 @@ export default function CryptographicKeyDetail() {
          },
          {
             id: "creationTime",
-            columns: ["Creation Time", cryptographicKey.creationTime || ""]
+            columns: ["Creation Time", dateFormatter(cryptographicKey.creationTime) || ""]
          },
          {
             id: "tokenName",
@@ -470,7 +470,7 @@ export default function CryptographicKeyDetail() {
 
          <Dialog
             isOpen={confirmCompromise}
-            caption={`Key Compromised?`}
+            caption={`Compromise Key`}
             body={
                <div>
                   <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
