@@ -403,7 +403,7 @@ function CryptographicKeyList() {
 
          <Dialog
             isOpen={confirmCompromise}
-            caption={`${checkedRows.length > 1 ? "Keys" : "Key"} Compromised?`}
+            caption={`Compromise ${checkedRows.length > 1 ? "Keys" : "Key"}`}
             body={
                <div>
                   <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
