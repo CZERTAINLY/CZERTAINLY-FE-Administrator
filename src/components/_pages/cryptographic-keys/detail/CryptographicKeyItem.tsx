@@ -115,7 +115,7 @@ export default function CryptographicKeyItem({
    const onUpdateKeyUsageConfirmed = useCallback(
 
       () => {
-         dispatch(actions.bulkUpdateKeyItemUsage({ usage: {usage: keyUsages, uuids: [keyItem.uuid]} }));
+         dispatch(actions.updateKeyUsage({ tokenInstanceUuid: tokenInstanceUuid, uuid: keyUuid, usage: {usage: keyUsages, uuids: [keyItem.uuid]} }));
          setKeyUsageUpdate(false);
       },
       [dispatch, keyUsages, keyItem]
@@ -354,7 +354,7 @@ export default function CryptographicKeyItem({
    const existingUsages = () => {
       if (!keyItem) return [];
       return keyItem?.usage.map((usage) => {
-         return { value: usage, label: usage.toString() }
+         return { value: usage, label: usage.charAt(0).toUpperCase() + usage.slice(1).toLowerCase()}
       })
    }
 

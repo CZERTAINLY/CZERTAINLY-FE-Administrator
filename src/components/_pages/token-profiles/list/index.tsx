@@ -216,7 +216,7 @@ function TokenProfileList() {
 
    const getTokenProfileUsages = (tokenProfile: TokenProfileResponseModel) => {
       return tokenProfile.usages.map((keyUsage) => {
-         return <Badge color="secondary" key={keyUsage}>{keyUsage}</Badge>
+         return <>&nbsp;<Badge color="secondary" key={keyUsage}>{keyUsage}</Badge></>
       })
    }
 
