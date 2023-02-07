@@ -122,7 +122,7 @@ export default function TokenProfileDetail() {
    const existingUsages = () => {
       if (!tokenProfile) return [];
       return tokenProfile?.usages.map((usage) => {
-         return { value: usage, label: usage.toString() }
+         return { value: usage, label: usage.charAt(0).toUpperCase() + usage.slice(1).toLowerCase() }
       })
    }
 

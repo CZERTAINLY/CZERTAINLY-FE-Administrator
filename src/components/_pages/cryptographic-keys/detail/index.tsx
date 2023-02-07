@@ -16,7 +16,7 @@ import Select from "react-select";
 
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import { Col, Container, Label, Row } from "reactstrap";
-import { KeyCompromiseReason, KeyState, KeyUsage, Resource } from "types/openapi";
+import { KeyCompromiseReason, KeyState, Resource } from "types/openapi";
 import CryptographicKeyItem from "./CryptographicKeyItem";
 import { dateFormatter } from "utils/dateUtil";
 
@@ -44,10 +44,6 @@ export default function CryptographicKeyDetail() {
    const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
 
    const [confirmDestroy, setConfirmDestroy] = useState<boolean>(false);
-
-   const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
-
-   const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
    const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
 
@@ -158,14 +154,6 @@ export default function CryptographicKeyDetail() {
 
    );
 
-   const keyUsageOptions = () => {
-      let options = [];
-      for (const suit in KeyUsage) {
-        options.push({label: suit, value: KeyUsage[suit as keyof typeof KeyUsage]});
-     }
-     return options;
-   }
-
    const optionForCompromise = () => {
       var options = [];
       for (const reason in KeyCompromiseReason) {
@@ -183,11 +171,10 @@ export default function CryptographicKeyDetail() {
          { icon: "trash", disabled: false, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
          { icon: "check", disabled: cryptographicKey?.items.every(item => item.enabled) || false, tooltip: "Enable", onClick: () => { onEnableClick() } },
          { icon: "times", disabled: !cryptographicKey?.items.every(item => item.enabled) || false, tooltip: "Disable", onClick: () => { onDisableClick() } },
-         { icon: "key", disabled: !cryptographicKey?.items.some(item => item.state === KeyState.Active) || false, tooltip: "Update Key Usages", onClick: () => { setKeyUsageUpdate(true); } },
          { icon: "compromise", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Compromised) || false, tooltip: "Compromised", onClick: () => { setConfirmCompromise(true) } },
          { icon: "destroy", disabled: cryptographicKey?.items.every(item => item.state === KeyState.Destroyed) || false, tooltip: "Destroy", onClick: () => { setConfirmDestroy(true) } },
       ],
-      [cryptographicKey, onEditClick, onDisableClick, onEnableClick, setKeyUsageUpdate, setConfirmCompromise, setConfirmDestroy]
+      [cryptographicKey, onEditClick, onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy]
 
    );
 
@@ -288,24 +275,6 @@ export default function CryptographicKeyDetail() {
    );
 
 
-   const keyUsageBody = 
-         <div>
-            
-            <div className="form-group">
-               <label className="form-label">Key Usage</label>
-               <Select
-                              isMulti = {true}
-                              id="field"
-                              options={keyUsageOptions()}
-                              onChange={(e) => {
-                                 setKeyUsages(e.map((item) => item.value));
-                              }}
-                              isClearable={true}
-                           />
-            </div>
-         </div>
-
-
    const detailData: TableDataRow[] = useMemo(
 
       () => !cryptographicKey ? [] : [
@@ -355,25 +324,6 @@ export default function CryptographicKeyDetail() {
 
    )
 
-
-   const onUpdateKeyUsageConfirmed = useCallback(
-
-      () => {
-
-         dispatch(actions.updateKeyUsage({ 
-
-            tokenInstanceUuid: cryptographicKey?.tokenInstanceUuid || "unknown", 
-
-            uuid: cryptographicKey?.uuid || "unknown", 
-
-            usage: {usage: keyUsages} 
-         }));
-         
-         setKeyUsageUpdate(false);
-      },
-      [dispatch, cryptographicKey, keyUsages]
-
-   );
 
    const itemTabs = () => {
       return !cryptographicKey? [] : cryptographicKey?.items.map((item, index) => {
@@ -454,17 +404,6 @@ export default function CryptographicKeyDetail() {
             buttons={[
                { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
                { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-            ]}
-         />
-
-         <Dialog
-            isOpen={keyUsageUpdate}
-            caption={`Update Key Usage`}
-            body={keyUsageBody}
-            toggle={() => setKeyUsageUpdate(false)}
-            buttons={[
-               { color: "primary", onClick: onUpdateKeyUsageConfirmed, body: "Update" },
-               { color: "secondary", onClick: () => setKeyUsageUpdate(false), body: "Cancel" },
             ]}
          />
 
