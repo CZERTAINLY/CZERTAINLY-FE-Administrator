@@ -27,6 +27,7 @@
       "jszip": "^3.10.1",
       "marked": "^4.2.4",
       "npm": "^8.19.2",
+      "prismjs": "^1.29.0",
       "react": "^18.2.0",
       "react-apexcharts": "^1.4.0",
       "react-dom": "^18.2.0",
@@ -35,6 +36,7 @@
       "react-router-dom": "^6.4.3",
       "react-scripts": "^5.0.1",
       "react-select": "^5.6.0",
+      "react-simple-code-editor": "^0.13.1",
       "reactstrap": "^9.1.5",
       "redux-observable": "^2.0.0",
       "rxjs": "^7.5.7",
@@ -66,5 +68,8 @@
          "last 1 firefox version",
          "last 1 safari version"
       ]
+   },
+   "devDependencies": {
+      "@types/prismjs": "^1.26.0"
    }
 }

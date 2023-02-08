@@ -28,6 +28,7 @@ export enum AttributeContentType {
     Object = 'object',
     Text = 'text',
     Time = 'time',
-    Datetime = 'datetime'
+    Datetime = 'datetime',
+    Codeblock = 'codeblock'
 }
 

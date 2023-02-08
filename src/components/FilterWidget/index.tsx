@@ -238,15 +238,19 @@ export default function FilterWidget({
                     </div>
                     {
                         currentFilters.map(
-                            (f, i) => (
-                                <Badge className={styles.filterBadge} key={f.field + i} onClick={() => toggleFilter(i)}
-                                       color={selectedFilter === i ? "primary" : "secondary"}>
-                                    '{f.field}'&nbsp;
-                                    {f.condition}&nbsp;
-                                    {Array.isArray(f.value) && f.value.length > 1 ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : f.value ? `'${f.value}'` : ""}
-                                    <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>&times;</span>
-                                </Badge>
-                            ),
+                            (f, i) => {
+                                const available = availableFilters.find(a => a.field === f.field);
+                                const label = available ? available.label : f.field;
+                                return (
+                                    <Badge className={styles.filterBadge} key={f.field + i} onClick={() => toggleFilter(i)}
+                                           color={selectedFilter === i ? "primary" : "secondary"}>
+                                        '{label}'&nbsp;
+                                        {f.condition}&nbsp;
+                                        {Array.isArray(f.value) && f.value.length > 1 ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : f.value ? `'${f.value}'` : ""}
+                                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>&times;</span>
+                                    </Badge>
+                                )
+                            },
                         )
                     }
                 </div>

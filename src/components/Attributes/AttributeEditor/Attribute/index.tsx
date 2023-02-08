@@ -1,10 +1,13 @@
 import * as DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { marked } from "marked";
-import { useCallback } from "react";
-import { Field, useForm } from "react-final-form";
+import "prismjs/components";
+import "prismjs/themes/prism.css";
+import React, { useCallback } from "react";
+import { Field, useForm, useFormState } from "react-final-form";
 
 import Select from "react-select";
+import Editor from "react-simple-code-editor";
 
 import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
@@ -17,9 +20,10 @@ import {
     RegexpAttributeConstraintModel,
 } from "types/attributes";
 import { AttributeConstraintType, AttributeContentType } from "types/openapi";
-import { getAttributeContent } from "utils/attributes/attributes";
 
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
+import { getAttributeContent } from "../../../../utils/attributes/attributes";
+import { getHighLightedCode } from "../../CodeBlock";
 
 interface Props {
    name: string;
@@ -35,6 +39,7 @@ export function Attribute({
 }: Props): JSX.Element {
 
    const form = useForm();
+   const formState = useFormState();
 
 
    const onFileLoaded = useCallback(
@@ -120,6 +125,7 @@ export function Attribute({
            case AttributeContentType.Object:
                return "text";
            case AttributeContentType.Text:
+           case AttributeContentType.Codeblock:
                return "textarea";
            case AttributeContentType.Date:
                return "date";
@@ -338,8 +344,34 @@ export function Attribute({
 
    };
 
+    const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+        if (descriptor.contentType === AttributeContentType.Codeblock) {
+            const attributes = formState.values[name.slice(0, name.indexOf("."))];
+            const language = attributes ? attributes[descriptor.name]?.language ?? "javascript" : "javascript";
 
-   const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+            return <><Label for={`${name}.code`}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
+                <Field name={`${name}.code`} type={getFormType(descriptor.contentType)}>
+                {({input}) => {
+                    return (
+                        <Editor
+                            {...input}
+                            id={`${name}.code`}
+                            value={input.value}
+                            onValueChange={code => {
+                                form.change(`${name}.code`, code);
+                            }}
+                            highlight={code => getHighLightedCode(code, language)}
+                            padding={10}
+                            style={{
+                                fontFamily: "\"Fira code\", \"Fira Mono\", monospace",
+                                fontSize: 14,
+                                border: "solid 1px #ccc",
+                                borderRadius: "0.375rem",
+                            }}
+                        />);
+                }}
+            </Field></>;
+        }
 
       return (
 
@@ -409,7 +441,7 @@ export function Attribute({
                {descriptor.properties.label}
            </CardHeader>
            <CardBody>
-               {parse(DOMPurify.sanitize(marked.parse(getAttributeContent(descriptor.contentType, descriptor.content))))}
+               {parse(DOMPurify.sanitize(marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString())))}
            </CardBody>
        </Card>);
    };

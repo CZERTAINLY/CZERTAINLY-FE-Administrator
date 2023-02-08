@@ -6,6 +6,8 @@ import {
    BaseAttributeContentDto as BaseAttributeContent,
    BaseAttributeDto,
    BooleanAttributeContent,
+   CodeBlockAttributeContent,
+   CodeBlockAttributeContentData,
    CredentialAttributeContent,
    CredentialAttributeContentData,
    CustomAttribute,
@@ -63,6 +65,12 @@ export type FileAttributeContentDataModel = Omit<FileAttributeContentDataDto, "m
 export type FileAttributeContentDto = FileAttributeContent;
 export type FileAttributeContentModel = Omit<FileAttributeContentDto, "data"> & { data: FileAttributeContentDataModel };
 
+export type CodeBlockAttributeContentDataDto = CodeBlockAttributeContentData;
+export type CodeBlockAttributeContentDataModel = CodeBlockAttributeContentDataDto;
+
+export type CodeBlockAttributeContentDto = CodeBlockAttributeContent;
+export type CodeBlockAttributeContentModel = Omit<CodeBlockAttributeContentDto, "data"> & { data: CodeBlockAttributeContentDataModel };
+
 export type FloatAttributeContentDto = FloatAttributeContent;
 export type FloatAttributeContentModel = FloatAttributeContentDto;
 
@@ -88,7 +96,7 @@ export type TimeAttributeContentDto = TimeAttributeContent;
 export type TimeAttributeContentModel = TimeAttributeContentDto;
 
 export type BaseAttributeContentDto = BaseAttributeContent;
-export type BaseAttributeContentModel = BooleanAttributeContentModel | CredentialAttributeContentModel | DateAttributeContentModel | DateTimeAttributeContentModel | FileAttributeContentModel | FloatAttributeContentModel | IntegerAttributeContentModel | ObjectAttributeContentModel | SecretAttributeContentModel | StringAttributeContentModel | TextAttributeContentModel | TimeAttributeContentModel;
+export type BaseAttributeContentModel = BooleanAttributeContentModel | CredentialAttributeContentModel | DateAttributeContentModel | DateTimeAttributeContentModel | FileAttributeContentModel | FloatAttributeContentModel | IntegerAttributeContentModel | ObjectAttributeContentModel | SecretAttributeContentModel | StringAttributeContentModel | TextAttributeContentModel | TimeAttributeContentModel | CodeBlockAttributeContentModel;
 
 export type AttributeRequestDto = RequestAttributeDto;
 export type AttributeRequestModel = Omit<AttributeRequestDto, "content"> & { content: Array<BaseAttributeContentModel> };
