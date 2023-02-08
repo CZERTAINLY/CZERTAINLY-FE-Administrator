@@ -220,6 +220,7 @@ models/SearchCondition.ts
 models/SearchFieldDataDto.ts
 models/SearchFilterRequestDto.ts
 models/SearchRequestDto.ts
+models/SearchableFieldType.ts
 models/SearchableFields.ts
 models/SecretAttributeContent.ts
 models/SecretAttributeContentData.ts

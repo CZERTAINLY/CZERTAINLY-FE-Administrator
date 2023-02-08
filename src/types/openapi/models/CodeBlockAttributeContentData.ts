@@ -16,6 +16,7 @@ import type {
 } from './';
 
 /**
+ * CodeBlock attribute content data
  * @export
  * @interface CodeBlockAttributeContentData
  */

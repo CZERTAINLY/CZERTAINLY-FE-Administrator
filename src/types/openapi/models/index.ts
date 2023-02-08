@@ -189,6 +189,7 @@ export * from './SearchCondition';
 export * from './SearchFieldDataDto';
 export * from './SearchFilterRequestDto';
 export * from './SearchRequestDto';
+export * from './SearchableFieldType';
 export * from './SearchableFields';
 export * from './SecretAttributeContent';
 export * from './SecretAttributeContentData';

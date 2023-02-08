@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Select, { MultiValue, SingleValue } from "react-select";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { SearchFieldModel, SearchFilterModel } from "types/certificate";
-import { SearchableFields, SearchCondition, SearchFieldDataDtoTypeEnum } from "types/openapi";
+import { SearchableFields, SearchableFieldType, SearchCondition } from "types/openapi";
 import styles from "./FilterWidget.module.scss";
 
 const noValue: { [condition in SearchCondition]: boolean } = {
@@ -74,12 +74,12 @@ export default function FilterWidget({
             setFilterField({label: field.label, value: field.field});
             setFilterCondition({label: currentFilters[selectedFilter].condition, value: currentFilters[selectedFilter].condition});
 
-            if (field.type === SearchFieldDataDtoTypeEnum.String || field.type === SearchFieldDataDtoTypeEnum.Number) {
+            if (field.type === SearchableFieldType.String || field.type === SearchableFieldType.Number) {
                 setFilterValue(currentFilters[selectedFilter].value);
                 return;
             }
 
-            if (field.type === SearchFieldDataDtoTypeEnum.Date) {
+            if (field.type === SearchableFieldType.Date) {
                 setFilterValue(currentFilters[selectedFilter].value);
                 return;
             }

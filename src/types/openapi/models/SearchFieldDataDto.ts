@@ -13,6 +13,7 @@
 
 import type {
     SearchCondition,
+    SearchableFieldType,
     SearchableFields,
 } from './';
 
@@ -33,11 +34,10 @@ export interface SearchFieldDataDto {
      */
     label: string;
     /**
-     * Type of the field
-     * @type {string}
+     * @type {SearchableFieldType}
      * @memberof SearchFieldDataDto
      */
-    type: SearchFieldDataDtoTypeEnum;
+    type: SearchableFieldType;
     /**
      * List of available conditions for the field
      * @type {Array<SearchCondition>}
@@ -57,15 +57,3 @@ export interface SearchFieldDataDto {
      */
     multiValue?: boolean;
 }
-
-/**
- * @export
- * @enum {string}
- */
-export enum SearchFieldDataDtoTypeEnum {
-    String = 'string',
-    Number = 'number',
-    List = 'list',
-    Date = 'date'
-}
-
