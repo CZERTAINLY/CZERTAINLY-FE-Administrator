@@ -18,7 +18,7 @@ import Select from "react-select";
 
 import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { UserDetailModel } from "types/auth";
-import { CertificateResponseModel } from "types/certificate";
+import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
 import { emptyCertificate } from "utils/certificate";
 import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
@@ -68,7 +68,7 @@ function UserForm() {
    const isCreatingUser = useSelector(userSelectors.isCreating);
    const isUpdatingUser = useSelector(userSelectors.isUpdating);
 
-   const [loadedCerts, setLoadedCerts] = useState<CertificateResponseModel[]>([]);
+   const [loadedCerts, setLoadedCerts] = useState<CertificateListResponseModel[]>([]);
    const [currentPage, setCurrentPage] = useState(1);
    const [user, setUser] = useState<UserDetailModel>();
 
@@ -93,7 +93,7 @@ function UserForm() {
    const [selectedCertificate, setSelectedCertificate] = useState<{ label: string, value: string }>();
 
    const [certUploadDialog, setCertUploadDialog] = useState(false);
-   const [certToUpload, setCertToUpload] = useState<CertificateResponseModel>();
+   const [certToUpload, setCertToUpload] = useState<CertificateDetailResponseModel>();
 
 
    /* Load first page of certificates & all roles available */

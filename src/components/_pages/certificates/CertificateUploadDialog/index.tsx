@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, Col, Form as BootstrapForm, FormGroup, FormText, Input, Label, Row } from "reactstrap";
-import { CertificateResponseModel } from "types/certificate";
+import { CertificateDetailResponseModel } from "types/certificate";
 import { getCertificateInformation } from "utils/certificate";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { AttributeRequestModel } from "../../../../types/attributes";
@@ -18,7 +18,7 @@ interface FormValues {
 
 interface Props {
    onCancel: () => void;
-   onUpload: (data: { fileContent: string, fileName: string, contentType: string, customAttributes?: Array<AttributeRequestModel>, certificate: CertificateResponseModel }) => void;
+   onUpload: (data: { fileContent: string, fileName: string, contentType: string, customAttributes?: Array<AttributeRequestModel>, certificate: CertificateDetailResponseModel }) => void;
    okButtonTitle?: string;
 }
 
@@ -35,7 +35,7 @@ export default function CertificateUploadDialog({
 
    const [error, setError] = useState<string>("");
 
-   const [certificate, setCertificate] = useState<CertificateResponseModel | undefined>();
+   const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
     useEffect(() => {
@@ -67,7 +67,7 @@ export default function CertificateUploadDialog({
             return;
          }
 
-         let crt: CertificateResponseModel | undefined = undefined;
+         let crt: CertificateDetailResponseModel | undefined = undefined;
 
          try {
             crt = getCertificateInformation(b64decoded);

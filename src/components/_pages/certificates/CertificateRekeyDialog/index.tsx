@@ -22,7 +22,7 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { validateRequired } from "utils/validators";
 import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
-import { CertificateResponseModel } from "types/certificate";
+import { CertificateDetailResponseModel } from "types/certificate";
 import { KeyType } from "types/openapi";
 import TabLayout from "components/Layout/TabLayout";
 
@@ -39,7 +39,7 @@ interface FormValues {
 
 interface props {
    onCancel: () => void;
-   certificate?: CertificateResponseModel;
+   certificate?: CertificateDetailResponseModel;
 }
 
 

@@ -8,6 +8,7 @@ import {
     CertificateDto,
     CertificateEventHistoryDto,
     CertificateResponseDto as CertificateResponseDtoOpenApi,
+    CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
     CertificateUpdateObjectsDto,
     CertificateValidationDto as CertificateValidationDtoOpenApi,
     ClientCertificateRekeyRequestDto,
@@ -35,8 +36,8 @@ export type RaProfileSimplifiedModel = RaProfileSimplifiedDto;
 export type CertificateComplianceResponseDto = CertificateComplianceResultDto;
 export type CertificateComplianceResponseModel = Omit<CertificateComplianceResponseDto, "attributes"> & { attributes?: Array<AttributeResponseModel> };
 
-export type CertificateResponseDto = CertificateDto;
-export type CertificateResponseModel = Omit<CertificateResponseDto, "metadata | raProfile | locations | group | nonCompliantRules | customAttributes"> & {
+export type CertificateDetailResponseDto = CertificateDetailResponseDtoOpenApi;
+export type CertificateDetailResponseModel = Omit<CertificateDetailResponseDto, "metadata | raProfile | locations | group | nonCompliantRules | customAttributes"> & {
     metadata?: Array<MetadataModel>,
     raProfile?: RaProfileSimplifiedModel,
     locations?: Array<LocationResponseModel>,
@@ -45,8 +46,8 @@ export type CertificateResponseModel = Omit<CertificateResponseDto, "metadata | 
     customAttributes?: Array<AttributeResponseModel>,
 }
 
-export type CertificateListResponseDto = CertificateResponseDtoOpenApi;
-export type CertificateListResponseModel = Omit<CertificateListResponseDto, "certificates"> & { certificates: Array<CertificateResponseModel> };
+export type CertificateListResponseDto = CertificateDto;
+export type CertificateListResponseModel = CertificateListResponseDto;
 
 export type CertificateValidationDto = CertificateValidationDtoOpenApi;
 export type CertificateValidationModel = CertificateValidationDto;

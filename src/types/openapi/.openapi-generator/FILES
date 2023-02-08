@@ -70,6 +70,7 @@ models/BulkOperationResponse.ts
 models/BulkTokenProfileKeyUsageRequestDto.ts
 models/CertificateComplianceCheckDto.ts
 models/CertificateComplianceResultDto.ts
+models/CertificateDetailDto.ts
 models/CertificateDto.ts
 models/CertificateEventHistoryDto.ts
 models/CertificateInLocationDto.ts
