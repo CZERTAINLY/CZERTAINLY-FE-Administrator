@@ -12,15 +12,10 @@
  */
 
 import type {
-    CertificateComplianceResultDto,
     CertificateStatus,
     CertificateType,
     ComplianceStatus,
     GroupDto,
-    KeyDto,
-    LocationDto,
-    MetadataResponseDto,
-    ResponseAttributeDto,
     SimplifiedRaProfileDto,
 } from './';
 
@@ -103,30 +98,6 @@ export interface CertificateDto {
      */
     keySize: number;
     /**
-     * Extended key usages
-     * @type {Array<string>}
-     * @memberof CertificateDto
-     */
-    extendedKeyUsage?: Array<string>;
-    /**
-     * Key usages
-     * @type {Array<string>}
-     * @memberof CertificateDto
-     */
-    keyUsage: Array<string>;
-    /**
-     * Basic Constraints
-     * @type {string}
-     * @memberof CertificateDto
-     */
-    basicConstraints: string;
-    /**
-     * Certificate metadata
-     * @type {Array<MetadataResponseDto>}
-     * @memberof CertificateDto
-     */
-    metadata?: Array<MetadataResponseDto>;
-    /**
      * @type {CertificateStatus}
      * @memberof CertificateDto
      */
@@ -142,18 +113,6 @@ export interface CertificateDto {
      * @memberof CertificateDto
      */
     fingerprint: string;
-    /**
-     * Subject alternative names
-     * @type {{ [key: string]: object; }}
-     * @memberof CertificateDto
-     */
-    subjectAlternativeNames?: { [key: string]: object; };
-    /**
-     * Locations associated to the Certificate
-     * @type {Array<LocationDto>}
-     * @memberof CertificateDto
-     */
-    locations?: Array<LocationDto>;
     /**
      * @type {GroupDto}
      * @memberof CertificateDto
@@ -177,49 +136,14 @@ export interface CertificateDto {
      */
     issuerSerialNumber?: string;
     /**
-     * Certificate compliance check result
-     * @type {Array<CertificateComplianceResultDto>}
-     * @memberof CertificateDto
-     */
-    nonCompliantRules?: Array<CertificateComplianceResultDto>;
-    /**
      * @type {ComplianceStatus}
      * @memberof CertificateDto
      */
     complianceStatus?: ComplianceStatus;
-    /**
-     * List of Custom Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof CertificateDto
-     */
-    customAttributes?: Array<ResponseAttributeDto>;
-    /**
-     * CSR for the certificate
-     * @type {string}
-     * @memberof CertificateDto
-     */
-    csr?: string;
     /**
      * Private Key Availability
      * @type {boolean}
      * @memberof CertificateDto
      */
     privateKeyAvailability: boolean;
-    /**
-     * CSR Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof CertificateDto
-     */
-    csrAttributes?: Array<ResponseAttributeDto>;
-    /**
-     * Signature Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof CertificateDto
-     */
-    signatureAttributes?: Array<ResponseAttributeDto>;
-    /**
-     * @type {KeyDto}
-     * @memberof CertificateDto
-     */
-    key?: KeyDto;
 }

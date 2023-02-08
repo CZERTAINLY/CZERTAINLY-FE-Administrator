@@ -1,7 +1,7 @@
-import { CertificateResponseModel } from "types/certificate";
+import { CertificateDetailResponseModel } from "types/certificate";
 import { CertificateStatus, CertificateType } from "types/openapi";
 
-export const emptyCertificate: CertificateResponseModel = {
+export const emptyCertificate: CertificateDetailResponseModel = {
    uuid: "",
    commonName: "",
    serialNumber: "",
@@ -25,14 +25,14 @@ export const emptyCertificate: CertificateResponseModel = {
    privateKeyAvailability: false,
 }
 
-export function certificatePEM2CertificateModel(pem: string): CertificateResponseModel {
+export function certificatePEM2CertificateModel(pem: string): CertificateDetailResponseModel {
 
    return emptyCertificate;
 
 }
 
 
-export function getCertificateInformation(encoded: string): CertificateResponseModel {
+export function getCertificateInformation(encoded: string): CertificateDetailResponseModel {
 
    return emptyCertificate;
 

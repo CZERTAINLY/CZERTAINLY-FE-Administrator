@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 import { Buffer } from "buffer";
 
 import JSZip from "jszip";
-import { CertificateResponseModel } from "types/certificate";
+import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
 
 
@@ -23,7 +23,7 @@ export function downloadFile(content: any, fileName: string) {
 
 export function downloadFileZip(
    certificateUuids: string[],
-   certificates: CertificateResponseModel[],
+   certificates: CertificateDetailResponseModel[] | CertificateListResponseModel[],
    fileType: string
 ) {
 

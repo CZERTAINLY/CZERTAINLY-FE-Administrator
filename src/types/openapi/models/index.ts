@@ -39,6 +39,7 @@ export * from './BulkOperationResponse';
 export * from './BulkTokenProfileKeyUsageRequestDto';
 export * from './CertificateComplianceCheckDto';
 export * from './CertificateComplianceResultDto';
+export * from './CertificateDetailDto';
 export * from './CertificateDto';
 export * from './CertificateEventHistoryDto';
 export * from './CertificateInLocationDto';

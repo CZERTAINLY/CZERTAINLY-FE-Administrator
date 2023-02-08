@@ -9,7 +9,7 @@ import {
    CertificateObjectModel,
    CertificateRekeyRequestModel,
    CertificateRenewRequestModel,
-   CertificateResponseModel,
+   CertificateDetailResponseModel,
    CertificateRevokeRequestModel,
    CertificateSignRequestModel,
    CertificateUploadModel,
@@ -17,6 +17,7 @@ import {
    SearchFieldModel,
    SearchFilterModel,
    SearchRequestModel,
+   CertificateListResponseModel,
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
@@ -37,11 +38,11 @@ export type State = {
    availableFilters: SearchFieldModel[];
    currentFilters: SearchFilterModel[];
 
-   certificates: CertificateResponseModel[];
+   certificates: CertificateListResponseModel[];
    totalPages: number;
    totalItems: number;
 
-   certificateDetail?: CertificateResponseModel;
+   certificateDetail?: CertificateDetailResponseModel;
    certificateHistory?: CertificateHistoryModel[];
    certificateLocations?: LocationResponseModel[];
    issuanceAttributes:  { [raProfileId: string]: AttributeDescriptorModel[] };
@@ -213,7 +214,7 @@ export const slice = createSlice({
 
 
       listCertificatesSuccess: (state, action: PayloadAction<{
-         certificateList: CertificateResponseModel[],
+         certificateList: CertificateListResponseModel[],
          totalPages: number,
          totalItems: number
       }>) => {
@@ -241,7 +242,7 @@ export const slice = createSlice({
       },
 
 
-      getCertificateDetailSuccess: (state, action: PayloadAction<{ certificate: CertificateResponseModel }>) => {
+      getCertificateDetailSuccess: (state, action: PayloadAction<{ certificate: CertificateDetailResponseModel }>) => {
 
          state.isFetchingDetail = false;
          state.certificateDetail = action.payload.certificate;
@@ -707,7 +708,7 @@ export const slice = createSlice({
       },
 
 
-      uploadCertificateSuccess: (state, action: PayloadAction<{ uuid: string, certificate: CertificateResponseModel }>) => {
+      uploadCertificateSuccess: (state, action: PayloadAction<{ uuid: string, certificate: CertificateDetailResponseModel }>) => {
 
          state.isUploading = false;
          state.forceRefreshList = true;

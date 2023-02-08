@@ -20,7 +20,7 @@ import type {
     BaseAttributeDto,
     BulkOperationResponse,
     CertificateComplianceCheckDto,
-    CertificateDto,
+    CertificateDetailDto,
     CertificateEventHistoryDto,
     CertificateResponseDto,
     CertificateUpdateObjectsDto,
@@ -182,12 +182,12 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * Get Certificate Details
      */
-    getCertificate({ uuid }: GetCertificateRequest): Observable<CertificateDto>
-    getCertificate({ uuid }: GetCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<CertificateDto>>
-    getCertificate({ uuid }: GetCertificateRequest, opts?: OperationOpts): Observable<CertificateDto | AjaxResponse<CertificateDto>> {
+    getCertificate({ uuid }: GetCertificateRequest): Observable<CertificateDetailDto>
+    getCertificate({ uuid }: GetCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<CertificateDetailDto>>
+    getCertificate({ uuid }: GetCertificateRequest, opts?: OperationOpts): Observable<CertificateDetailDto | AjaxResponse<CertificateDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getCertificate');
 
-        return this.request<CertificateDto>({
+        return this.request<CertificateDetailDto>({
             url: '/v1/certificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'GET',
         }, opts?.responseOpts);

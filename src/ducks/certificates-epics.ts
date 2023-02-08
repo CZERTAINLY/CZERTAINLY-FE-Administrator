@@ -14,12 +14,12 @@ import {
     transformCertificateBulkDeleteResponseDtoToModel,
     transformCertificateBulkObjectModelToDto,
     transformCertificateComplianceCheckModelToDto,
+    transformCertificateDetailResponseDtoToModel,
     transformCertificateHistoryDtoToModel,
     transformCertificateListResponseDtoToModel,
     transformCertificateObjectModelToDto,
     transformCertificateRekeyRequestModelToDto,
     transformCertificateRenewRequestModelToDto,
-    transformCertificateResponseDtoToModel,
     transformCertificateRevokeRequestModelToDto,
     transformCertificateSignRequestModelToDto,
     transformCertificateUploadModelToDto,
@@ -45,11 +45,11 @@ const listCertificates: AppEpic = (action$, state, deps) => {
 
                map(
                   list => {
-                      const certificateList = transformCertificateListResponseDtoToModel(list);
+                      const certificateList = list.certificates.map(transformCertificateListResponseDtoToModel);
                       return slice.actions.listCertificatesSuccess({
-                          certificateList: certificateList.certificates,
-                          totalItems: certificateList.totalItems,
-                          totalPages: certificateList.totalPages,
+                          certificateList: certificateList,
+                          totalItems: list.totalItems,
+                          totalPages: list.totalPages,
                       })
                   }
                ),
@@ -83,7 +83,7 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
          action => deps.apiClients.certificates.getCertificate({ uuid: action.payload.uuid }).pipe(
 
             map(
-               certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertificateResponseDtoToModel(certificate) })
+               certificate => slice.actions.getCertificateDetailSuccess({ certificate: transformCertificateDetailResponseDtoToModel(certificate) })
             ),
 
             catchError(
@@ -773,7 +773,7 @@ const uploadCertificate: AppEpic = (action$, state, deps) => {
 
                      certificate => slice.actions.uploadCertificateSuccess({
                         uuid: obj.uuid,
-                        certificate: transformCertificateResponseDtoToModel(certificate),
+                        certificate: transformCertificateDetailResponseDtoToModel(certificate),
                      })
 
                   ),

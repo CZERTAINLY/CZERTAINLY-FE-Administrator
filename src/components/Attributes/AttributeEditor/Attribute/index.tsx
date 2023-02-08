@@ -137,6 +137,8 @@ export function Attribute({
                return "file";
            case AttributeContentType.Secret:
                return "password";
+            default:
+                  return "text";
        }
     }
 

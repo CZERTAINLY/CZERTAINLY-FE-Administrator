@@ -18,8 +18,8 @@ import {
    CertificateRekeyRequestModel,
    CertificateRenewRequestDto,
    CertificateRenewRequestModel,
-   CertificateResponseDto,
-   CertificateResponseModel,
+   CertificateDetailResponseDto,
+   CertificateDetailResponseModel,
    CertificateRevokeRequestDto,
    CertificateRevokeRequestModel,
    CertificateSignRequestDto,
@@ -62,7 +62,7 @@ export function transformCertificateComplianceResponseDtoToModel(cerCompliance: 
    };
 }
 
-export function transformCertificateResponseDtoToModel(certificate: CertificateResponseDto): CertificateResponseModel {
+export function transformCertificateDetailResponseDtoToModel(certificate: CertificateDetailResponseDto): CertificateDetailResponseModel {
    return {
       ...certificate,
       metadata: certificate.metadata?.map(transformMetadataDtoToModel),
@@ -74,10 +74,18 @@ export function transformCertificateResponseDtoToModel(certificate: CertificateR
    };
 }
 
+
+export function transformCertificateResponseDtoToModel(certificate: CertificateListResponseDto): CertificateListResponseModel {
+   return {
+      ...certificate,
+      raProfile: certificate.raProfile ? transformRaProfileSimplifiedDtoToModel(certificate.raProfile) : undefined,
+      group: certificate.group ? transformCertificateGroupResponseDtoToModel(certificate.group) : undefined,
+   };
+}
+
 export function transformCertificateListResponseDtoToModel(certificates: CertificateListResponseDto): CertificateListResponseModel {
    return {
-      ...certificates,
-      certificates: certificates.certificates.map(transformCertificateResponseDtoToModel)
+      ...certificates
    };
 }
 
