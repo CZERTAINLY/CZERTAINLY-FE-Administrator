@@ -494,6 +494,8 @@ export default function ConnectorDetail() {
 
          </Row>
 
+          {connector && <CustomAttributeWidget resource={Resource.Connectors} resourceUuid={connector.uuid} attributes={connector.customAttributes} />}
+
 
          <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting}>
 
@@ -517,7 +519,7 @@ export default function ConnectorDetail() {
 
             &nbsp;
 
-            <Widget title="End Points">
+            <Widget title="Endpoints">
 
                <CustomTable
                   headers={endPointsHeaders}
@@ -557,9 +559,6 @@ export default function ConnectorDetail() {
                </Widget>
 
                &nbsp;
-
-                {connector && <CustomAttributeWidget resource={Resource.Connectors} resourceUuid={connector.uuid} attributes={connector.customAttributes} />}
-
 
             </Widget>
 

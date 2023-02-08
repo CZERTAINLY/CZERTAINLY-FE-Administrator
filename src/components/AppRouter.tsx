@@ -1,94 +1,91 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useSelector } from "react-redux";
-import React, { useMemo } from "react";
-
 import { selectors } from "ducks/auth";
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AcmeAccountDetail from "./_pages/acme-accounts/detail";
 
-import Layout from "./Layout";
-import Spinner from "./Spinner";
-
-import AppRedirect from "./AppRedirect";
-import AppLogin from "./AppLogin/AppLogin";
-
-import Home from "./_pages/home";
-import About from "./_pages/about";
-import Dashboard from "./_pages/dashboard";
-
-import UserProfileDetail from "./_pages/user-profile/detail";
-import UserProfileEdit from "./_pages/user-profile/form";
-
-import UsersList from "./_pages/users/list";
-import UserDetail from "./_pages/users/detail";
-import UserEdit from "./_pages/users/form";
-
-import RolesList from "./_pages/roles/list";
-import RoleDetail from "./_pages/roles/detail";
-import RoleEdit from "./_pages/roles/RoleForm";
-import RoleUsers from "./_pages/roles/RoleUsersForm";
-import RolePermissions from "./_pages/roles/RolePermissionsForm";
-
-import CertificatesList from "./_pages/certificates/list";
-import CertificateDetail from "./_pages/certificates/detail";
-import CertificateEdit from "./_pages/certificates/form";
-
-import ConnectorsList from "./_pages/connectors/list";
-import ConnectorDetail from "./_pages/connectors/detail";
-import ConnectorEdit from "./_pages/connectors/form";
-
-import DiscoveriesList from "./_pages/discoveries/list";
-import DiscoveryDetail from "./_pages/discoveries/detail";
-import DiscoveryEdit from "./_pages/discoveries/form";
-
-import AuthoritiesList from "./_pages/authorities/list";
-import AuthorityDetail from "./_pages/authorities/detail";
-import AuthorityEdit from "./_pages/authorities/form";
-
-import RaProfilesList from "./_pages/ra-profiles/list";
-import RaProfileDetail from "./_pages/ra-profiles/detail";
-import RaProfileEdit from "./_pages/ra-profiles/form";
-
-import ComplianceProfilesList from "./_pages/compliance-profiles/list";
-import ComplianceProfileDetail from "./_pages/compliance-profiles/detail";
-import ComplianceProfileEdit from "./_pages/compliance-profiles/form";
-
-import AcmeProfilesList from "./_pages/acme-profiles/list";
+import AcmeAccountsList from "./_pages/acme-accounts/list";
 import AcmeProfileDetail from "./_pages/acme-profiles/detail";
 import AcmeProfileEdit from "./_pages/acme-profiles/form";
 
-import AcmeAccountsList from "./_pages/acme-accounts/list";
-import AcmeAccountDetail from "./_pages/acme-accounts/detail";
+import AcmeProfilesList from "./_pages/acme-profiles/list";
+import AuditLogs from "./_pages/auditLogs";
+import AuthorityDetail from "./_pages/authorities/detail";
+import AuthorityEdit from "./_pages/authorities/form";
 
-import GroupList from "./_pages/group/list";
-import GroupDetail from "./_pages/group/detail";
-import GroupEdit from "./_pages/group/form";
+import AuthoritiesList from "./_pages/authorities/list";
+import CertificateDetail from "./_pages/certificates/detail";
+import CertificateEdit from "./_pages/certificates/form";
 
-import CredentialsList from "./_pages/credentials/list";
+import CertificatesList from "./_pages/certificates/list";
+import ComplianceProfileDetail from "./_pages/compliance-profiles/detail";
+import ComplianceProfileEdit from "./_pages/compliance-profiles/form";
+
+import ComplianceProfilesList from "./_pages/compliance-profiles/list";
+import ConnectorDetail from "./_pages/connectors/detail";
+import ConnectorEdit from "./_pages/connectors/form";
+
+import ConnectorsList from "./_pages/connectors/list";
 import CredentialDetail from "./_pages/credentials/detail";
 import CredentialEdit from "./_pages/credentials/form";
 
-import EntitiesList from "./_pages/entities/list";
-import EntityDetail from "./_pages/entities/detail";
-import EntityEdit from "./_pages/entities/form";
-
-import LocationsList from "./_pages/locations/list";
-import LocationDetail from "./_pages/locations/detail";
-import LocationEdit from "./_pages/locations/form";
-import AuditLogs from "./_pages/auditLogs";
-
-import CustomAttributesList from "./_pages/custom-attributes/list";
+import CredentialsList from "./_pages/credentials/list";
+import CryptographicKeyDetail from "./_pages/cryptographic-keys/detail";
+import CryptographicKeyForm from "./_pages/cryptographic-keys/form";
+import CryptographicKeyList from "./_pages/cryptographic-keys/list";
 import CustomAttributesDetail from "./_pages/custom-attributes/detail";
 import CustomAttributesEdit from "./_pages/custom-attributes/form";
 
-import TokenList from "./_pages/tokens/list";
-import TokenDetail from "./_pages/tokens/detail";
-import TokenEdit from "./_pages/tokens/form";
-import TokenProfileList from "./_pages/token-profiles/list";
+import CustomAttributesList from "./_pages/custom-attributes/list";
+import Dashboard from "./_pages/dashboard";
+import DiscoveryDetail from "./_pages/discoveries/detail";
+import DiscoveryEdit from "./_pages/discoveries/form";
+
+import DiscoveriesList from "./_pages/discoveries/list";
+import EntityDetail from "./_pages/entities/detail";
+import EntityEdit from "./_pages/entities/form";
+
+import EntitiesList from "./_pages/entities/list";
+import GroupDetail from "./_pages/group/detail";
+import GroupEdit from "./_pages/group/form";
+
+import GroupList from "./_pages/group/list";
+
+import Home from "./_pages/home";
+import LocationDetail from "./_pages/locations/detail";
+import LocationEdit from "./_pages/locations/form";
+
+import LocationsList from "./_pages/locations/list";
+import RaProfileDetail from "./_pages/ra-profiles/detail";
+import RaProfileEdit from "./_pages/ra-profiles/form";
+
+import RaProfilesList from "./_pages/ra-profiles/list";
+import RoleDetail from "./_pages/roles/detail";
+
+import RolesList from "./_pages/roles/list";
+import RoleEdit from "./_pages/roles/RoleForm";
+import RolePermissions from "./_pages/roles/RolePermissionsForm";
+import RoleUsers from "./_pages/roles/RoleUsersForm";
 import TokenProfileDetail from "./_pages/token-profiles/detail";
 import TokenProfileForm from "./_pages/token-profiles/form";
-import CryptographicKeyList from "./_pages/cryptographic-keys/list";
-import CryptographicKeyDetail from "./_pages/cryptographic-keys/detail";
-import CryptographicKeyForm from "./_pages/cryptographic-keys/form";
+import TokenProfileList from "./_pages/token-profiles/list";
+import TokenDetail from "./_pages/tokens/detail";
+import TokenEdit from "./_pages/tokens/form";
 
+import TokenList from "./_pages/tokens/list";
+
+import UserProfileDetail from "./_pages/user-profile/detail";
+import UserProfileEdit from "./_pages/user-profile/form";
+import UserDetail from "./_pages/users/detail";
+import UserEdit from "./_pages/users/form";
+
+import UsersList from "./_pages/users/list";
+import AppLogin from "./AppLogin/AppLogin";
+
+import AppRedirect from "./AppRedirect";
+
+import Layout from "./Layout";
+import Spinner from "./Spinner";
 
 export default function AppRouter() {
 
@@ -105,7 +102,6 @@ export default function AppRouter() {
                <Route path="/" element={<Navigate to="/home" />} />
 
                <Route path="/home" element={<Home />} />
-               <Route path="/about" element={<About />} />
                <Route path="/dashboard" element={<Dashboard />} />
 
                <Route path="/users" element={<UsersList />} />

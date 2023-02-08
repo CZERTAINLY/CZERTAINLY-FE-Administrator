@@ -79,7 +79,6 @@ export default function Sidebar() {
 
 
                 <LinksGroup _key="/audit" header="Audit Logs" headerLink="/audit" />
-               <LinksGroup _key="/about" header="About" headerLink="/about" />
 
             </ul>
 
