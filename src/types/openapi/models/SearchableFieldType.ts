@@ -12,23 +12,14 @@
  */
 
 /**
- * Type of the attribute content. 
+ * Type of the field
  * @export
  * @enum {string}
  */
-export enum AttributeContentType {
+export enum SearchableFieldType {
     String = 'string',
-    Integer = 'integer',
-    Secret = 'secret',
-    File = 'file',
-    Boolean = 'boolean',
-    Credential = 'credential',
-    Date = 'date',
-    Float = 'float',
-    Object = 'object',
-    Text = 'text',
-    Time = 'time',
-    Datetime = 'datetime',
-    Codeblock = 'codeblock'
+    Number = 'number',
+    List = 'list',
+    Date = 'date'
 }
 

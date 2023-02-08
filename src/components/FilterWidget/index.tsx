@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Select, { MultiValue, SingleValue } from "react-select";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { SearchFieldModel, SearchFilterModel } from "types/certificate";
-import { SearchableFields, SearchCondition, SearchFieldDataDtoTypeEnum } from "types/openapi";
+import { SearchableFields, SearchableFieldType, SearchCondition } from "types/openapi";
 import styles from "./FilterWidget.module.scss";
 
 const noValue: { [condition in SearchCondition]: boolean } = {
@@ -74,12 +74,12 @@ export default function FilterWidget({
             setFilterField({label: field.label, value: field.field});
             setFilterCondition({label: currentFilters[selectedFilter].condition, value: currentFilters[selectedFilter].condition});
 
-            if (field.type === SearchFieldDataDtoTypeEnum.String || field.type === SearchFieldDataDtoTypeEnum.Number) {
+            if (field.type === SearchableFieldType.String || field.type === SearchableFieldType.Number) {
                 setFilterValue(currentFilters[selectedFilter].value);
                 return;
             }
 
-            if (field.type === SearchFieldDataDtoTypeEnum.Date) {
+            if (field.type === SearchableFieldType.Date) {
                 setFilterValue(currentFilters[selectedFilter].value);
                 return;
             }
@@ -238,15 +238,19 @@ export default function FilterWidget({
                     </div>
                     {
                         currentFilters.map(
-                            (f, i) => (
-                                <Badge className={styles.filterBadge} key={f.field + i} onClick={() => toggleFilter(i)}
-                                       color={selectedFilter === i ? "primary" : "secondary"}>
-                                    '{f.field}'&nbsp;
-                                    {f.condition}&nbsp;
-                                    {Array.isArray(f.value) && f.value.length > 1 ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : f.value ? `'${f.value}'` : ""}
-                                    <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>&times;</span>
-                                </Badge>
-                            ),
+                            (f, i) => {
+                                const available = availableFilters.find(a => a.field === f.field);
+                                const label = available ? available.label : f.field;
+                                return (
+                                    <Badge className={styles.filterBadge} key={f.field + i} onClick={() => toggleFilter(i)}
+                                           color={selectedFilter === i ? "primary" : "secondary"}>
+                                        '{label}'&nbsp;
+                                        {f.condition}&nbsp;
+                                        {Array.isArray(f.value) && f.value.length > 1 ? `(${f.value.map(v => `'${v}'`).join(" OR ")})` : f.value ? `'${f.value}'` : ""}
+                                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>&times;</span>
+                                    </Badge>
+                                )
+                            },
                         )
                     }
                 </div>

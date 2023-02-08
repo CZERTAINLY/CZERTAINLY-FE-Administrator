@@ -13,6 +13,7 @@
 
 import type {
     BooleanAttributeContent,
+    CodeBlockAttributeContent,
     CredentialAttributeContent,
     DateAttributeContent,
     DateTimeAttributeContent,
@@ -31,4 +32,4 @@ import type {
  * Base Attribute content definition
  * @export
  */
-export type BaseAttributeContentDto = BooleanAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;
+export type BaseAttributeContentDto = BooleanAttributeContent | CodeBlockAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;

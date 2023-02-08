@@ -1,5 +1,13 @@
-import { AttributeDescriptorModel, AttributeRequestModel, BaseAttributeContentModel, isCustomAttributeModel, isDataAttributeModel } from "types/attributes";
+import {
+   AttributeDescriptorModel,
+   AttributeRequestModel,
+   BaseAttributeContentModel,
+   CodeBlockAttributeContentModel,
+   isCustomAttributeModel,
+   isDataAttributeModel,
+} from "types/attributes";
 import { AttributeContentType } from "types/openapi";
+import CodeBlock from "../../components/Attributes/CodeBlock";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
    name: "Name",
@@ -15,7 +23,11 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 
    if (!content) return "Not set";
 
-   const mapping = (content: BaseAttributeContentModel): string | undefined => {
+   if (contentType === AttributeContentType.Codeblock && content.length > 0) {
+      return (<CodeBlock content={content[0] as CodeBlockAttributeContentModel}/>);
+   }
+
+   const mapping = (content: BaseAttributeContentModel): string | JSX.Element | undefined => {
       switch (contentType) {
          case AttributeContentType.Boolean:
             return content.data ? "true" : "false"
@@ -43,6 +55,9 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
    if (contentType === AttributeContentType.Datetime || contentType === AttributeContentType.Date) {
       return item.value ? new Date(item.value).toISOString() : {data: new Date(item).toISOString()};
+   }
+   if (contentType === AttributeContentType.Codeblock) {
+      return {data: {code: btoa(item.code), language: item.language}};
    }
 
    return item.value ?? {data: item}

@@ -1,6 +1,6 @@
 import cx from "classnames";
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { FormText, Input, Pagination, PaginationItem, PaginationLink, Table } from "reactstrap";
+import { Input, Pagination, PaginationItem, PaginationLink, Table } from "reactstrap";
 import { jsxInnerText } from "utils/jsxInnerText";
 
 import styles from "./CustomTable.module.scss";
@@ -625,12 +625,6 @@ function CustomTable({
       </Pagination>
 
    ) : undefined;
-
-
-   const canSort: boolean = useMemo(
-      () => headers?.some(header => header.sortable) || false,
-      [headers]
-   )
 
 
    return (

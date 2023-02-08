@@ -8,6 +8,7 @@ import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
     AttributeResponseModel,
+    CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
     FileAttributeContentModel,
@@ -411,6 +412,13 @@ export default function AttributeEditor({
 
                             formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
 
+                        }
+
+                        if (descriptor.contentType === AttributeContentType.Codeblock && (formAttributeValue !== undefined) && (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined) {
+                            formAttributeValue = {
+                                code: atob((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                                language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                            };
                         }
 
                         form.mutators.setAttribute(formAttributeName, formAttributeValue);
