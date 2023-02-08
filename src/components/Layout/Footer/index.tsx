@@ -1,7 +1,7 @@
-import React from 'react';
-import cx from 'classnames';
+import cx from "classnames";
+import React from "react";
 
-import style from './Footer.module.scss';
+import style from "./Footer.module.scss";
 
 interface Props {
    className?: string;
@@ -15,7 +15,7 @@ function Footer({ className }: Props) {
 
          <div className={style.container}>
 
-            <span>© 2018-{new Date().getFullYear()} &nbsp;3Key Company s.r.o. </span>
+            <span>© 2018-{new Date().getFullYear()} &nbsp;CZERTAINLY s.r.o. </span>
             <span className={style.spacer}>·</span>
             <a href="https://docs.czertainly.com/docs" target="_blank" rel="noopener noreferrer">Documentation</a>
             <span className={style.spacer}>·</span>
