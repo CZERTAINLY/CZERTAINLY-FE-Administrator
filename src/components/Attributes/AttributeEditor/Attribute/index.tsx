@@ -349,7 +349,7 @@ export function Attribute({
             const attributes = formState.values[name.slice(0, name.indexOf("."))];
             const language = attributes ? attributes[descriptor.name]?.language ?? "javascript" : "javascript";
 
-            return <><Label for={`${name}.code`}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>
+            return <><Label for={`${name}.code`}>{descriptor.properties.label}{descriptor.properties.required ? " *" : ""}</Label>&nbsp;<Label for={`${name}.code`} style={{fontStyle: "italic"}}>({language})</Label>
                 <Field name={`${name}.code`} type={getFormType(descriptor.contentType)}>
                 {({input}) => {
                     return (
