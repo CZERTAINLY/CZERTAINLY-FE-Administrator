@@ -12,6 +12,7 @@ import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
 import TabLayout from "../../../Layout/TabLayout";
+import ProgressButton from "../../../ProgressButton";
 
 interface FormValues {
 }
@@ -144,11 +145,11 @@ export default function CertificateUploadDialog({
 
    return (
 
-       <Form onSubmit={() => {}} mutators={{ ...mutators<FormValues>() }} >
+       <Form onSubmit={(values) => onUpload({ fileContent: file, fileName, contentType, customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values), certificate: certificate! })} mutators={{ ...mutators<FormValues>() }} >
 
-           {({ values }) => (
+           {({ handleSubmit, valid, submitting }) => (
 
-               <BootstrapForm>
+               <BootstrapForm onSubmit={handleSubmit}>
                   <div>
 
                      <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={onFileDrop} onDragOver={onFileDragOver}>
@@ -247,21 +248,20 @@ export default function CertificateUploadDialog({
 
                         <ButtonGroup>
 
-                           <Button
-                              color="primary"
-                              onClick={() => onUpload({ fileContent: file, fileName, contentType, customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values), certificate: certificate! })}
-                              disabled={!file}
-                           >
-                              {okButtonTitle}
-                           </Button>
+                            <ProgressButton
+                                title={okButtonTitle}
+                                inProgressTitle={okButtonTitle}
+                                inProgress={submitting}
+                                disabled={!valid || !file}
+                            />
 
-                           <Button
-                              color="default"
-                              onClick={onCancel}
-                           >
-                              Cancel
-                           </Button>
-
+                            <Button
+                                color="default"
+                                onClick={onCancel}
+                                disabled={submitting}
+                            >
+                                Cancel
+                            </Button>
 
 
                         </ButtonGroup>
