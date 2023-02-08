@@ -552,7 +552,7 @@ export default function ConnectorDetail() {
 
                &nbsp;
 
-               <Widget title="End Points">
+               <Widget>
 
                   <AttributeDescriptorViewer attributeDescriptors={currentFunctionGroupKindAttributes || []} />
 
