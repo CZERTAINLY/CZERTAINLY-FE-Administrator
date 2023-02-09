@@ -16,7 +16,8 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
    discoveryProvider: "Discovery Provider",
    legacyAuthorityProvider: "Legacy Authority Provider",
    complianceProvider: "Compliance Provider",
-   entityProvider: "Entity Provider"
+   entityProvider: "Entity Provider",
+   cryptographyProvider: "Cryptography Provider"
 };
 
 export const getAttributeContent = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {
