@@ -1,16 +1,21 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { LocationModel } from "models/locations";
 import { createFeatureSelector } from "utils/ducks";
+import { AttributeDescriptorModel } from "types/attributes";
+import {
+   LocationAddRequestModel,
+   LocationEditRequestModel,
+   LocationIssueRequestModel,
+   LocationPushRequestModel,
+   LocationResponseModel
+} from "types/locations";
 
 
 export type State = {
 
    checkedRows: string[];
 
-   location?: LocationModel;
-   locations: LocationModel[];
+   location?: LocationResponseModel;
+   locations: LocationResponseModel[];
 
    pushAttributeDescriptors?: AttributeDescriptorModel[];
    csrAttributeDescriptors?: AttributeDescriptorModel[];
@@ -109,7 +114,7 @@ export const slice = createSlice({
       },
 
 
-      listLocationsSuccess: (state, action: PayloadAction<{ locations: LocationModel[] }>) => {
+      listLocationsSuccess: (state, action: PayloadAction<{ locations: LocationResponseModel[] }>) => {
 
          state.isFetchingList = false;
          state.locations = action.payload.locations;
@@ -132,7 +137,7 @@ export const slice = createSlice({
       },
 
 
-      getLocationDetailSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      getLocationDetailSuccess: (state, action: PayloadAction<{ location: LocationResponseModel }>) => {
 
          state.location = action.payload.location;
          state.isFetchingDetail = false;
@@ -149,10 +154,7 @@ export const slice = createSlice({
 
       addLocation: (state, action: PayloadAction<{
          entityUuid: string,
-         name: string,
-         description: string,
-         attributes: AttributeModel[],
-         enabled: boolean
+         addLocationRequest: LocationAddRequestModel
       }>) => {
 
          state.isCreating = true;
@@ -160,7 +162,7 @@ export const slice = createSlice({
       },
 
 
-      addLocationSuccess: (state, action: PayloadAction<{ location: LocationModel, entityUuid: string }>) => {
+      addLocationSuccess: (state, action: PayloadAction<{ location: LocationResponseModel, entityUuid: string }>) => {
 
          state.isCreating = false;
          state.locations.push(action.payload.location);
@@ -178,9 +180,7 @@ export const slice = createSlice({
       editLocation: (state, action: PayloadAction<{
          uuid: string,
          entityUuid: string,
-         description: string,
-         attributes: AttributeModel[],
-         enabled: boolean
+         editLocationRequest: LocationEditRequestModel
       }>) => {
 
          state.isUpdating = true;
@@ -188,7 +188,7 @@ export const slice = createSlice({
       },
 
 
-      editLocationSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      editLocationSuccess: (state, action: PayloadAction<{ location: LocationResponseModel }>) => {
 
          state.isUpdating = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
@@ -230,7 +230,7 @@ export const slice = createSlice({
       enableLocation: (state, action: PayloadAction<{ entityUuid: string, uuid: string }>) => {
 
          state.isEnabling = true;
-         
+
       },
 
 
@@ -281,7 +281,7 @@ export const slice = createSlice({
       },
 
 
-      syncLocationSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      syncLocationSuccess: (state, action: PayloadAction<{ location: LocationResponseModel }>) => {
 
          state.isSyncing = false;
 
@@ -355,7 +355,7 @@ export const slice = createSlice({
          entityUuid: string,
          locationUuid: string,
          certificateUuid: string,
-         pushAttributes: AttributeModel[]
+         pushRequest: LocationPushRequestModel
       }>) => {
 
          state.isPushingCertificate = true;
@@ -363,7 +363,7 @@ export const slice = createSlice({
       },
 
 
-      pushCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      pushCertificateSuccess: (state, action: PayloadAction<{ location: LocationResponseModel, certificateUuid: string }>) => {
 
          state.isPushingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
@@ -383,9 +383,7 @@ export const slice = createSlice({
       issueCertificate: (state, action: PayloadAction<{
          entityUuid: string,
          locationUuid: string,
-         raProfileUuid: string,
-         csrAttributes: AttributeModel[],
-         issueAttributes: AttributeModel[]
+         issueRequest: LocationIssueRequestModel
       }>) => {
 
          state.isIssuingCertificate = true;
@@ -393,7 +391,7 @@ export const slice = createSlice({
       },
 
 
-      issueCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      issueCertificateSuccess: (state, action: PayloadAction<{ location: LocationResponseModel }>) => {
 
          state.isIssuingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
@@ -417,13 +415,12 @@ export const slice = createSlice({
       },
 
 
-      autoRenewCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      autoRenewCertificateSuccess: (state, action: PayloadAction<{ location: LocationResponseModel, certificateUuid: string }>) => {
 
          state.isAutoRenewingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);
          if (index > 0) state.locations[index] = action.payload.location;
          if (state.location?.uuid === action.payload.location.uuid) state.location = action.payload.location;
-
 
       },
 
@@ -442,7 +439,7 @@ export const slice = createSlice({
       },
 
 
-      removeCertificateSuccess: (state, action: PayloadAction<{ location: LocationModel }>) => {
+      removeCertificateSuccess: (state, action: PayloadAction<{ location: LocationResponseModel, certificateUuid: string }>) => {
 
          state.isRemovingCertificate = false;
          const index = state.locations.findIndex(l => l.uuid === action.payload.location.uuid);

@@ -1,38 +1,91 @@
-import { LocationCertificateDTO, LocationDTO } from "api/location";
+import {
+   LocationAddRequestDto,
+   LocationAddRequestModel,
+   LocationCertificateDto,
+   LocationCertificateModel, LocationEditRequestDto, LocationEditRequestModel, LocationIssueRequestDto,
+   LocationIssueRequestModel, LocationPushRequestDto,
+   LocationPushRequestModel,
+   LocationResponseDto,
+   LocationResponseModel,
+   MetadataDto,
+   MetadataItemDto,
+   MetadataItemModel,
+   MetadataModel, NameAndUuidDto, NameAndUuidModel
+} from "types/locations";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
-import { LocationCertificateModel, LocationModel } from "models/locations";
-import { transformAttributeDTOToModel } from "./attributes";
+export function transformNameAndUuidDtoToModel(name: NameAndUuidDto): NameAndUuidModel {
+   return { ...name };
+}
 
-
-export function transformLocationCertificateDtoToModel(locationCertificate: LocationCertificateDTO): LocationCertificateModel {
-
+export function transformMetadataItemDtoToModel(metadataItem: MetadataItemDto): MetadataItemModel {
    return {
-      certificateUuid: locationCertificate.certificateUuid,
-      commonName: locationCertificate.commonName,
-      serialNumber: locationCertificate.serialNumber,
-      metadata: locationCertificate.metadata,
-      pushAttributes: locationCertificate.pushAttributes ? locationCertificate.pushAttributes.map(transformAttributeDTOToModel) : [],
-      csrAttributes: locationCertificate.csrAttributes ? locationCertificate.csrAttributes.map(transformAttributeDTOToModel) : [],
-      withKey: locationCertificate.withKey
-   };
-
+      ...metadataItem,
+      sourceObjects: metadataItem.sourceObjects?.map(transformNameAndUuidDtoToModel)
+   }
 }
 
 
-export function transformLocationDtoToModel(location: LocationDTO): LocationModel {
-
+export function transformMetadataDtoToModel(metadata: MetadataDto): MetadataModel {
    return {
-      uuid: location.uuid,
-      name: location.name,
-      description: location.description,
-      entityInstanceUuid: location.entityInstanceUuid,
-      entityInstanceName: location.entityInstanceName,
-      attributes: location.attributes ? location.attributes.map(transformAttributeDTOToModel) : [],
-      enabled: location.enabled,
-      supportMultipleEntries: location.supportMultipleEntries,
-      supportKeyManagement: location.supportKeyManagement,
-      certificates: location.certificates ? location.certificates.map(transformLocationCertificateDtoToModel) : [],
-      metadata: location.metadata
-   };
+      ...metadata,
+      items: metadata.items.map(transformMetadataItemDtoToModel)
+   }
+}
 
+
+export function transformLocationCertificateDtoToModel(locationCertificate: LocationCertificateDto): LocationCertificateModel {
+   return {
+      ...locationCertificate,
+      metadata: locationCertificate.metadata.map(transformMetadataDtoToModel),
+      pushAttributes: locationCertificate.pushAttributes?.map(transformAttributeResponseDtoToModel),
+      csrAttributes: locationCertificate.csrAttributes?.map(transformAttributeResponseDtoToModel)
+   };
+}
+
+
+export function transformLocationResponseDtoToModel(location: LocationResponseDto): LocationResponseModel {
+   return {
+      ...location,
+      attributes: location.attributes.map(transformAttributeResponseDtoToModel),
+      certificates: location.certificates.map(transformLocationCertificateDtoToModel),
+      metadata: location.metadata?.map(transformMetadataDtoToModel),
+      customAttributes: location.customAttributes?.map(transformAttributeResponseDtoToModel),
+   };
+}
+
+
+export function transformLocationAddRequestModelToDto(addReq: LocationAddRequestModel): LocationAddRequestDto {
+   return {
+      ...addReq,
+      attributes: addReq.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: addReq.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
+}
+
+
+export function transformLocationEditRequestModelToDto(editReq: LocationEditRequestModel): LocationEditRequestDto {
+   return {
+      ...editReq,
+      attributes: editReq.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: editReq.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
+}
+
+
+export function transformLocationPushRequestModelToDto(pushReq: LocationPushRequestModel): LocationPushRequestDto {
+   return {
+      ...pushReq,
+      attributes: pushReq.attributes.map(transformAttributeRequestModelToDto)
+   }
+}
+
+
+export function transformLocationIssueRequestModelToDto(issueReq: LocationIssueRequestModel): LocationIssueRequestDto {
+   return {
+      ...issueReq,
+      csrAttributes: issueReq.csrAttributes.map(transformAttributeRequestModelToDto),
+      issueAttributes: issueReq.issueAttributes.map(transformAttributeRequestModelToDto),
+      customAttributes: issueReq.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
 }

@@ -1,15 +1,14 @@
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createFeatureSelector } from 'utils/ducks';
-
-import { ResourceDetailModel } from 'models';
-import { UserDetailModel } from 'models/users';
-import { ProfileDetailModel } from 'models/user-profile';
+import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
+import { NameAndUuidModel } from "types/locations";
+import { Resource } from "types/openapi";
 
 export type State = {
 
    profile?: UserDetailModel;
-   resources?: ResourceDetailModel[];
-   objects?: { uuid: string; name: string; }[];
+   resources?: ResourceModel[];
+   objects?: NameAndUuidModel[];
 
    isFetchingProfile: boolean;
    isUpdatingProfile: boolean;
@@ -73,14 +72,14 @@ export const slice = createSlice({
       },
 
 
-      getProfileFailure(state, action: PayloadAction<{ error: string }>) {
+      getProfileFailure(state, action: PayloadAction<void>) {
 
          state.isFetchingProfile = false;
 
       },
 
 
-      updateProfile(state, action: PayloadAction<{ profile: ProfileDetailModel, redirect?: string }>) {
+      updateProfile(state, action: PayloadAction<{ profile: UserUpdateRequestModel, redirect?: string }>) {
 
          state.isUpdatingProfile = true;
 
@@ -95,7 +94,7 @@ export const slice = createSlice({
       },
 
 
-      updateProfileFailure(state, action: PayloadAction<{ error: string }>) {
+      updateProfileFailure(state, action: PayloadAction<void>) {
 
          state.isUpdatingProfile = false;
 
@@ -110,7 +109,7 @@ export const slice = createSlice({
       },
 
 
-      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceDetailModel[] }>) {
+      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceModel[] }>) {
 
          state.isFetchingResources = false;
          state.resources = action.payload.resources;
@@ -118,14 +117,14 @@ export const slice = createSlice({
       },
 
 
-      getResourcesFailure(state, action: PayloadAction<{ error: string }>) {
+      getResourcesFailure(state, action: PayloadAction<void>) {
 
          state.isFetchingResources = false;
 
       },
 
 
-      listObjects(state, action: PayloadAction<{ endpoint: string }>) {
+      getObjectsForResource(state, action: PayloadAction<{ resource: Resource }>) {
 
          state.objects = undefined;
          state.isFetchingObjects = true;
@@ -133,7 +132,7 @@ export const slice = createSlice({
       },
 
 
-      listObjectsSuccess(state, action: PayloadAction<{ objects: { uuid: string; name: string; }[] }>) {
+      getObjectsForResourceSuccess(state, action: PayloadAction<{ objects: NameAndUuidModel[] }>) {
 
          state.isFetchingObjects = false;
          state.objects = action.payload.objects;
@@ -141,7 +140,7 @@ export const slice = createSlice({
       },
 
 
-      listObjectsFailure(state, action: PayloadAction<{ error: string }>) {
+      getObjectsForResourceFailure(state, action: PayloadAction<void>) {
 
          state.isFetchingObjects = false;
 

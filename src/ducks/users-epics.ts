@@ -1,16 +1,18 @@
-import { EMPTY, of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import history from "browser-history";
 
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
-import * as slice from "./users";
-import { actions as alertActions } from "./alerts";
+import { slice } from "./users";
+import { actions as appRedirectActions } from "./app-redirect";
 
-import { transformCertModelToDTO } from "./transform/certificates";
-import { transformUserDetailDTOToModel, transformUserDTOToModel } from "./transform/users";
-import { transformRoleDTOToModel } from "./transform/roles";
+import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from "./transform/users";
+import {
+    transformRoleResponseDtoToModel,
+    transformUserDetailDtoToModel,
+    transformUserUpdateRequestModelToDto
+} from "./transform/auth";
 
 
 const list: AppEpic = (action$, state, deps) => {
@@ -22,36 +24,25 @@ const list: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.users.list().pipe(
+         () => deps.apiClients.users.listUsers().pipe(
 
             map(
-               list => slice.actions.listSuccess({ users: list.map(transformUserDTOToModel) })
+               list => slice.actions.listSuccess({
+                  users: list.map(transformUserResponseDtoToModel)
+               })
             ),
 
             catchError(
-               err => of(slice.actions.listFailure({ error: extractError(err, "Failed to get user list") }))
+               err => of(
+                  slice.actions.listFailure({ error: extractError(err, "Failed to get user list") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get user list" })
+               )
             )
 
          )
       )
 
    )
-}
-
-
-const listFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
-      )
-
-   )
-
 }
 
 
@@ -64,14 +55,19 @@ const getDetail: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.detail(action.payload.uuid).pipe(
+         action => deps.apiClients.users.getUser({ userUuid: action.payload.uuid }).pipe(
 
             map(
-               detail => slice.actions.getDetailSuccess({ user: transformUserDetailDTOToModel(detail) })
+               detail => slice.actions.getDetailSuccess({
+                  user: transformUserDetailDtoToModel(detail)
+               })
             ),
 
             catchError(
-               err => of(slice.actions.getDetailFailure({ error: extractError(err, "Failed to load user detail") }))
+               err => of(
+                  slice.actions.getDetailFailure({ error: extractError(err, "Failed to load user detail") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to load user detail" })
+               )
             )
 
          )
@@ -83,23 +79,7 @@ const getDetail: AppEpic = (action$, state, deps) => {
 }
 
 
-const getDetailFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getDetailFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
-      )
-
-   )
-
-}
-
-
-const createUser: AppEpic = (action$, state, deps) => {
+const create: AppEpic = (action$, state, deps) => {
 
    return action$.pipe(
 
@@ -109,79 +89,43 @@ const createUser: AppEpic = (action$, state, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.users.create(
-            action.payload.username,
-            action.payload.description,
-            action.payload.firstName,
-            action.payload.lastName,
-            action.payload.email,
-            action.payload.enabled,
-            action.payload.certificateUuid,
-            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
-         ).pipe(
+         action => deps.apiClients.users.createUser({ addUserRequestDto: transformUserAddRequestModelToDto(action.payload.userAddRequest) }
+            ).pipe(
 
             switchMap(
 
-               user => deps.apiClients.users.updateRoles(
-                  user.uuid,
-                  action.payload.roles || []
+               user => deps.apiClients.users.updateRoles({
+                   userUuid: user.uuid,
+                   requestBody: action.payload.roles || []
+                   },
                ).pipe(
 
-                  map(
-                     userDetailDTO => slice.actions.createSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
+                  mergeMap(
+                     userDetailDto => of(
+                        slice.actions.createSuccess({ user: transformUserDetailDtoToModel(userDetailDto) }),
+                        appRedirectActions.redirect({ url: `../detail/${userDetailDto.uuid}` })
+                     )
                   ),
 
                   catchError(
-                     err => of(slice.actions.createFailure({ error: extractError(err, "Failed to update user roles") }))
+                     err => of(
+                        slice.actions.createFailure({ error: extractError(err, "Failed to update user roles") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to update user roles" })
+                     )
                   )
 
                )
             ),
 
             catchError(
-               err => of(slice.actions.createFailure({ error: extractError(err, "Failed to create user") }))
+               err => of(
+                  slice.actions.createFailure({ error: extractError(err, "Failed to create user") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to create user" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const createAdminSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createSuccess.match
-      ),
-
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.user.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const createAdminFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -198,26 +142,25 @@ const update: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.update(
-            action.payload.uuid,
-            action.payload.description,
-            action.payload.firstName,
-            action.payload.lastName,
-            action.payload.email,
-            action.payload.certificateUuid,
-            action.payload.certificate ? transformCertModelToDTO(action.payload.certificate) : undefined
+         action => deps.apiClients.users.updateUser({ userUuid: action.payload.uuid, updateUserRequestDto: transformUserUpdateRequestModelToDto(action.payload.updateUserRequest) }
          ).pipe(
 
             switchMap(
 
-               userDetailDTO => deps.apiClients.users.updateRoles(userDetailDTO.uuid, action.payload.roles || []).pipe(
+               userDetailDto => deps.apiClients.users.updateRoles({ userUuid: userDetailDto.uuid, requestBody: action.payload.roles || [] }).pipe(
 
-                  map(
-                     () => slice.actions.updateSuccess({ user: transformUserDetailDTOToModel(userDetailDTO) })
+                  mergeMap(
+                     () => of(
+                        slice.actions.updateSuccess({ user: transformUserDetailDtoToModel(userDetailDto) }),
+                        appRedirectActions.redirect({ url: `../../detail/${userDetailDto.uuid}` })
+                     )
                   ),
 
                   catchError(
-                     err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update user roles") }))
+                     err => of(
+                        slice.actions.updateFailure({ error: extractError(err, "Failed to update user roles") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to update user roles" })
+                     )
                   )
 
                )
@@ -225,48 +168,14 @@ const update: AppEpic = (action$, state, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.updateFailure({ error: extractError(err, "Failed to update user") }))
+               err => of(
+                  slice.actions.updateFailure({ error: extractError(err, "Failed to update user") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to update user" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const updateSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            history.push(`../detail/${action.payload.user.uuid}`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const updateFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -283,55 +192,34 @@ const deleteUser: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.users.delete(action.payload.uuid).pipe(
+         action => deps.apiClients.users.deleteUser({ userUuid: action.payload.uuid }).pipe(
 
-            map(
-               () => slice.actions.deleteUserSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+            mergeMap(
+
+               () => iif(
+
+                  () => !!action.payload.redirect,
+                  of(
+                     slice.actions.deleteUserSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.deleteUserSuccess({ uuid: action.payload.uuid, redirect: action.payload.redirect })
+                  )
+
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.deleteUserFailure({ error: extractError(err, "Failed to delete user") }))
+               err => of(
+                  slice.actions.deleteUserFailure({ error: extractError(err, "Failed to delete user") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to delete user" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const deleteUserSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteUserSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-
-const deleteUserFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteUserFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -348,34 +236,21 @@ const enable: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.users.enable(action.payload.uuid).pipe(
+         action => deps.apiClients.users.enableUser({ userUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.enableSuccess({ uuid: action.payload.uuid })
             ),
 
             catchError(
-               err => of(slice.actions.enableFailure({ error: extractError(err, "Failed to enable user") }))
+               err => of(
+                  slice.actions.enableFailure({ error: extractError(err, "Failed to enable user") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to enable user" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const enableFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.enableFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -392,34 +267,21 @@ const disable: AppEpic = (action$, state, deps) => {
       ),
       mergeMap(
 
-         action => deps.apiClients.users.disable(action.payload.uuid).pipe(
+         action => deps.apiClients.users.disableUser({ userUuid: action.payload.uuid }).pipe(
 
             map(
                () => slice.actions.disableSuccess({ uuid: action.payload.uuid })
             ),
 
             catchError(
-               err => of(slice.actions.disableFailure({ error: extractError(err, "Failed to disable user") }))
+               err => of(
+                  slice.actions.disableFailure({ error: extractError(err, "Failed to disable user") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to disable user" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const disableFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.disableFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -436,34 +298,21 @@ const getRoles: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.getRoles(action.payload.uuid).pipe(
+         action => deps.apiClients.users.getUserRoles({ userUuid: action.payload.uuid }).pipe(
 
             map(
-               roles => slice.actions.getRolesSuccess({ uuid: action.payload.uuid, roles: roles.map(transformRoleDTOToModel) })
+               roles => slice.actions.getRolesSuccess({ uuid: action.payload.uuid, roles: roles.map(transformRoleResponseDtoToModel) })
             ),
 
             catchError(
-               err => of(slice.actions.getRolesFailure({ error: extractError(err, "Failed to get roles") }))
+               err => of(
+                  slice.actions.getRolesFailure({ error: extractError(err, "Failed to get roles") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to get roles" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const getRolesFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getRolesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -480,34 +329,21 @@ const updateRoles: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.updateRoles(action.payload.uuid, action.payload.roles).pipe(
+         action => deps.apiClients.users.updateRoles({ userUuid: action.payload.uuid, requestBody: action.payload.roles }).pipe(
 
             map(
-               user => slice.actions.updateRolesSuccess({ user: transformUserDetailDTOToModel(user) })
+               user => slice.actions.updateRolesSuccess({ user: transformUserDetailDtoToModel(user) })
             ),
 
             catchError(
-               err => of(slice.actions.updateRolesFailure({ error: extractError(err, "Failed to update roles") }))
+               err => of(
+                  slice.actions.updateRolesFailure({ error: extractError(err, "Failed to update roles") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to update roles" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const updateRolesFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.updateRolesFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -524,34 +360,21 @@ const addRole: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.addRole(action.payload.uuid, action.payload.roleUuid).pipe(
+         action => deps.apiClients.users.addRole({ userUuid: action.payload.uuid, roleUuid: action.payload.roleUuid }).pipe(
 
             map(
-               user => slice.actions.addRoleSuccess({ user: transformUserDetailDTOToModel(user) })
+               user => slice.actions.addRoleSuccess({ user: transformUserDetailDtoToModel(user) })
             ),
 
             catchError(
-               err => of(slice.actions.addRoleFailure({ error: extractError(err, "Failed to add role") }))
+               err => of(
+                  slice.actions.addRoleFailure({ error: extractError(err, "Failed to add role") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to add role" })
+               )
             )
 
          )
 
-      )
-
-   )
-
-}
-
-
-const addRoleFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.addRoleFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
       )
 
    )
@@ -568,14 +391,17 @@ const removeRole: AppEpic = (action$, state, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.users.removeRole(action.payload.uuid, action.payload.roleUuid).pipe(
+         action => deps.apiClients.users.removeRole({ userUuid: action.payload.uuid, roleUuid: action.payload.roleUuid }).pipe(
 
             map(
-               user => slice.actions.removeRoleSuccess({ user: transformUserDetailDTOToModel(user) })
+               user => slice.actions.removeRoleSuccess({ user: transformUserDetailDtoToModel(user) })
             ),
 
             catchError(
-               err => of(slice.actions.removeRoleFailure({ error: extractError(err, "Failed to remove role") }))
+               err => of(
+                  slice.actions.removeRoleFailure({ error: extractError(err, "Failed to remove role") }),
+                  appRedirectActions.fetchError({ error: err, message: "Failed to remove role" })
+               )
             )
 
          )
@@ -587,49 +413,18 @@ const removeRole: AppEpic = (action$, state, deps) => {
 }
 
 
-const removeRoleFailure: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.removeRoleFailure.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occured")
-      )
-
-   )
-
-}
-
-
-
 const epics = [
    list,
-   listFailure,
    getDetail,
-   getDetailFailure,
-   createUser,
-   createAdminSuccess,
-   createAdminFailure,
+   create,
    update,
-   updateSuccess,
-   updateFailure,
    deleteUser,
-   deleteUserSuccess,
-   deleteUserFailure,
    enable,
-   enableFailure,
    disable,
-   disableFailure,
    getRoles,
-   getRolesFailure,
    updateRoles,
-   updateRolesFailure,
    addRole,
-   addRoleFailure,
    removeRole,
-   removeRoleFailure
 ];
 
 export default epics;

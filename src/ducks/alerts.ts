@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MessageModel } from "models";
+import { MessageModel } from "types/alerts";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector } from 'reselect';
-import { store } from "../index"
+import { store } from "index"
 
 
 export type State = {
@@ -115,11 +115,11 @@ setInterval(
       alerts.messages.forEach(
          message => {
 
-            if (Date.now() - message.time > 7000) {
+            if (Date.now() - message.time > 17000) {
                store.dispatch(actions.hide(message.id));
             }
 
-            if (Date.now() - message.time > 10000) {
+            if (Date.now() - message.time > 20000) {
                store.dispatch(actions.dismiss(message.id));
             }
 

@@ -1,13 +1,23 @@
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
-
-import { actions as alertActions } from "./alerts";
-import { extractError } from "utils/net";
 import { AppEpic } from "ducks";
-import { slice } from "./compliance-profiles";
-import history from "browser-history";
-import { transformComplianceConnectorGroupDTOToModel, transformComplianceConnectorRuleDTOToModel, transformComplianceProfileDtoToModel, transformComplianceProfileListDtoToModel, transformComplianceRuleDTOToModel } from "./transform/compliance-profiles";
+import { iif, of } from "rxjs";
+import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { RaProfileSimplifiedModel } from "types/certificate";
+import { extractError } from "utils/net";
+import { actions as alertActions } from "./alerts";
+import { actions as appRedirectActions } from "./app-redirect";
 
+import { slice } from "./compliance-profiles";
+import {
+    transformComplianceProfileGroupListResponseDtoToModel,
+    transformComplianceProfileGroupRequestModelToDto,
+    transformComplianceProfileListModelToDto,
+    transformComplianceProfileRequestModelToDto,
+    transformComplianceProfileResponseDtoToModel,
+    transformComplianceProfileRuleAddRequestModelToDto,
+    transformComplianceProfileRuleAddResponseDtoToModel,
+    transformComplianceProfileRuleDeleteRequestModelToDto,
+    transformComplianceProfileRuleListResponseDtoToModel,
+} from "./transform/compliance-profiles";
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
 
@@ -18,37 +28,24 @@ const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         () => deps.apiClients.complianceProfile.getComplianceProfileList().pipe(
+         () => deps.apiClients.complianceProfile.listComplianceProfiles().pipe(
 
             map(
                complianceProfiles => slice.actions.listComplianceProfilesSuccess(
-                  { complianceProfileList: complianceProfiles.map(transformComplianceProfileListDtoToModel) }
+                  { complianceProfileList: complianceProfiles.map(transformComplianceProfileListModelToDto) }
                )
             ),
 
             catchError(
-               err => of(slice.actions.listComplianceProfilesFailed({ error: extractError(err, "Failed to get Compliance Profiles list") }))
+               error => of(
+                  slice.actions.listComplianceProfilesFailed({ error: extractError(error, "Failed to get Compliance Profiles list") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Compliance Profiles list" })
+               )
 
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const listComplianceProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listComplianceProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -66,34 +63,21 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getComplianceProfileDetail(action.payload.uuid).pipe(
+         action => deps.apiClients.complianceProfile.getComplianceProfile({ uuid: action.payload.uuid }).pipe(
 
             map(
-               detail => slice.actions.getComplianceProfileSuccess({ complianceProfile: transformComplianceProfileDtoToModel(detail) })
+               detail => slice.actions.getComplianceProfileSuccess({ complianceProfile: transformComplianceProfileResponseDtoToModel(detail) })
             ),
 
             catchError(
-               err => of(slice.actions.getComplianceProfileFailed({ error: extractError(err, "Failed to get Compliance Profile details") }))
+               error => of(
+                  slice.actions.getComplianceProfileFailed({ error: extractError(error, "Failed to get Compliance Profile details") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get Compliance Profile details" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const getComplianceProfileDetailFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getComplianceProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -111,56 +95,24 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.complianceProfile.createComplianceProfile(
-            action.payload.name,
-            action.payload.description
+         action => deps.apiClients.complianceProfile.createComplianceProfile({ complianceProfileRequestDto: transformComplianceProfileRequestModelToDto(action.payload) }
          ).pipe(
 
-            map(
-               obj => slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
+            mergeMap(
+               obj => of(
+                  slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
+                  appRedirectActions.redirect({ url: `../detail/${obj.uuid}` })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.createComplianceProfileFailed({ error: extractError(err, "Failed to create Compliance Profile") }))
+               error => of(
+                  slice.actions.createComplianceProfileFailed({ error: extractError(error, "Failed to create Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to create Compliance Profile" })
+               )
             )
 
-
          )
-
-      )
-
-   )
-
-}
-
-
-const createComplianceProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createComplianceProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-   );
-}
-
-
-const createComplianceProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.createComplianceProfileSuccess.match
-      ),
-      switchMap(
-
-         action => {
-            history.push(`./detail/${action.payload.uuid}`);
-            return EMPTY;
-         }
 
       )
 
@@ -178,54 +130,24 @@ const deleteComplianceProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.deleteComplianceProfile(action.payload.uuid).pipe(
+         action => deps.apiClients.complianceProfile.deleteComplianceProfile({ uuid: action.payload.uuid }).pipe(
 
-            map(
-               () => slice.actions.deleteComplianceProfileSuccess({ uuid: action.payload.uuid })
+            mergeMap(
+               () => of(
+                  slice.actions.deleteComplianceProfileSuccess({ uuid: action.payload.uuid }),
+                  appRedirectActions.redirect({ url: "../../" })
+               )
             ),
 
             catchError(
-               err => of(slice.actions.deleteComplianceProfileFailed({ error: extractError(err, "Failed to delete Compliance Profile") }))
+               error => of(
+                  slice.actions.deleteComplianceProfileFailed({ error: extractError(error, "Failed to delete Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete Compliance Profile" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const deleteComplianceProfileSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteComplianceProfileSuccess.match
-      ),
-      switchMap(
-
-         () => {
-            history.push(`../`);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-const deleteComplianceProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteComplianceProfileFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -243,14 +165,20 @@ const bulkDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
 
       switchMap(
 
-         action => deps.apiClients.complianceProfile.bulkDeleteComplianceProfiles(action.payload.uuids).pipe(
+         action => deps.apiClients.complianceProfile.bulkDeleteComplianceProfiles({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               errors => slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors })
-            ),
+             mergeMap(
+                 (errors) => of(
+                     slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors }),
+                     alertActions.success("Selected compliance profiles successfully deleted.")
+                 )
+             ),
 
             catchError(
-               err => of(slice.actions.bulkDeleteComplianceProfilesFailed({ error: extractError(err, "Failed to delete Compliance Accounts") }))
+               error => of(
+                  slice.actions.bulkDeleteComplianceProfilesFailed({ error: extractError(error, "Failed to delete Compliance Accounts") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete Compliance Accounts" })
+               )
             )
 
          )
@@ -258,22 +186,6 @@ const bulkDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
       )
 
    )
-
-}
-
-
-const bulkDeleteComplianceProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDeleteComplianceProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 
 }
 
@@ -288,53 +200,34 @@ const bulkForceDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.bulkForceDeleteComplianceProfiles(action.payload.uuids).pipe(
+         action => deps.apiClients.complianceProfile.forceDeleteComplianceProfiles({ requestBody: action.payload.uuids }).pipe(
 
-            map(
-               () => slice.actions.bulkForceDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
+            mergeMap(
+
+               () => iif(
+
+                  () => !!action.payload.redirect,
+                  of(
+                     slice.actions.bulkForceDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect }),
+                     appRedirectActions.redirect({ url: action.payload.redirect! })
+                  ),
+                  of(
+                     slice.actions.bulkForceDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, redirect: action.payload.redirect })
+                  )
+
+               )
+
             ),
 
             catchError(
-               err => of(slice.actions.bulkForceDeleteComplianceProfilesFailed({ error: extractError(err, "Failed to delete Compliance Accounts") }))
+               error => of(
+                  slice.actions.bulkForceDeleteComplianceProfilesFailed({ error: extractError(error, "Failed to delete Compliance Accounts") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete Compliance Accounts" })
+               )
             )
 
          )
 
-      )
-
-   );
-
-}
-
-
-const bulkForceDeleteComplianceProfilesSuccess: AppEpic = (action$, state, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteComplianceProfilesSuccess.match
-      ),
-      switchMap(
-         action => {
-            if (action.payload.redirect) history.push(action.payload.redirect);
-            return EMPTY;
-         }
-
-      )
-
-   )
-
-}
-
-const bulkForceDeleteComplianceProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkForceDeleteComplianceProfilesFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
       )
 
    );
@@ -351,25 +244,26 @@ const addRule: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.addRuleToComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.ruleUuid,
-            action.payload.attributes
+         action => deps.apiClients.complianceProfile.addRule({ uuid: action.payload.uuid, complianceRuleAdditionRequestDto: transformComplianceProfileRuleAddRequestModelToDto(action.payload.addRequest) }
          ).pipe(
 
             map(
-               rule => slice.actions.addRuleSuccess({
-                  connectorUuid: action.payload.connectorUuid,
-                  connectorName: action.payload.connectorName,
-                  kind: action.payload.kind,
-                  rule: transformComplianceRuleDTOToModel(rule)
-               })
+               rule => {
+                   const ruleModel = transformComplianceProfileRuleAddResponseDtoToModel(rule);
+                   return slice.actions.addRuleSuccess({
+                       connectorUuid: action.payload.addRequest.connectorUuid,
+                       connectorName: ruleModel.connectorName,
+                       kind: action.payload.addRequest.kind,
+                       rule: ruleModel
+                   })
+               }
             ),
 
             catchError(
-               err => of(slice.actions.addRuleFailed({ error: extractError(err, "Failed to add rule to Compliance Profile") }))
+               error => of(
+                  slice.actions.addRuleFailed({ error: extractError(error, "Failed to add rule to Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to add rule to Compliance Profile" })
+               )
             )
 
          )
@@ -377,21 +271,6 @@ const addRule: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const addRuleFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.addRuleFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -404,11 +283,7 @@ const addGroup: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.addGroupToComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.groupUuid,
+         action => deps.apiClients.complianceProfile.addGroup({ uuid: action.payload.uuid, complianceGroupRequestDto: transformComplianceProfileGroupRequestModelToDto(action.payload.addRequest) }
          ).pipe(
 
             map(
@@ -424,7 +299,10 @@ const addGroup: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.addGroupFailed({ error: extractError(err, "Failed to add group to Compliance Profile") }))
+               error => of(
+                  slice.actions.addGroupFailed({ error: extractError(error, "Failed to add group to Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to add group to Compliance Profile" })
+               )
             )
 
          )
@@ -432,20 +310,6 @@ const addGroup: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const addGroupFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-      filter(
-         slice.actions.addGroupFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -458,18 +322,17 @@ const deleteRule: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.deleteRuleFromComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.ruleUuid
+         action => deps.apiClients.complianceProfile.removeRule({ uuid: action.payload.uuid, complianceRuleDeletionRequestDto: transformComplianceProfileRuleDeleteRequestModelToDto(action.payload.deleteRequest) }
          ).pipe(
 
             map(
-               () => slice.actions.deleteRuleSuccess({ connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, ruleUuid: action.payload.ruleUuid })
+               () => slice.actions.deleteRuleSuccess({ connectorUuid: action.payload.deleteRequest.connectorUuid, kind: action.payload.deleteRequest.kind, ruleUuid: action.payload.deleteRequest.ruleUuid })
             ),
             catchError(
-               err => of(slice.actions.deleteRuleFailed({ error: extractError(err, "Failed to delete rule from Compliance Profile") }))
+               error => of(
+                  slice.actions.deleteRuleFailed({ error: extractError(error, "Failed to delete rule from Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete rule from Compliance Profile" })
+               )
             )
 
          )
@@ -477,21 +340,6 @@ const deleteRule: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const deleteRuleFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteRuleFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -504,19 +352,18 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.deleteGroupFromComplianceProfile(
-            action.payload.uuid,
-            action.payload.connectorUuid,
-            action.payload.kind,
-            action.payload.groupUuid
+         action => deps.apiClients.complianceProfile.removeGroup({ uuid: action.payload.uuid, complianceGroupRequestDto: transformComplianceProfileGroupRequestModelToDto(action.payload.deleteRequest) }
          ).pipe(
 
             map(
-               () => slice.actions.deleteGroupSuccess({ connectorUuid: action.payload.connectorUuid, kind: action.payload.kind, groupUuid: action.payload.groupUuid })
+               () => slice.actions.deleteGroupSuccess({ connectorUuid: action.payload.deleteRequest.connectorUuid, kind: action.payload.deleteRequest.kind, groupUuid: action.payload.deleteRequest.groupUuid })
             ),
 
             catchError(
-               err => of(slice.actions.deleteGroupFailed({ error: extractError(err, "Failed to delete group from Compliance Profile") }))
+               error => of(
+                  slice.actions.deleteGroupFailed({ error: extractError(error, "Failed to delete group from Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to delete group from Compliance Profile" })
+               )
             )
 
          )
@@ -524,21 +371,6 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const deleteGroupFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.deleteGroupFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -551,9 +383,7 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.associateComplianceProfileToRaProfile(
-            action.payload.uuid,
-            action.payload.raProfileUuids.map((raProfile) => (raProfile.uuid))
+         action => deps.apiClients.complianceProfile.associateProfiles({ uuid: action.payload.uuid, raProfileAssociationRequestDto: { raProfileUuids: action.payload.raProfileUuids.map((raProfile: RaProfileSimplifiedModel) => (raProfile.uuid)) }}
          ).pipe(
 
             map(
@@ -561,7 +391,10 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.associateRaProfileFailed({ error: extractError(err, "Failed to associate RA Profile to Compliance Profile") }))
+               error => of(
+                  slice.actions.associateRaProfileFailed({ error: extractError(error, "Failed to associate RA Profile to Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to associate RA Profile to Compliance Profile" })
+               )
             )
 
          )
@@ -569,22 +402,6 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const associateRaProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.associateRaProfileFailed.match
-      ),
-      map(
-
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -597,9 +414,7 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.dissociateComplianceProfileFromRaProfile(
-            action.payload.uuid,
-            action.payload.raProfileUuids
+         action => deps.apiClients.complianceProfile.disassociateProfiles({ uuid: action.payload.uuid, raProfileAssociationRequestDto: { raProfileUuids: action.payload.raProfileUuids } }
          ).pipe(
 
             map(
@@ -607,7 +422,10 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.dissociateRaProfileFailed({ error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile") }))
+               error => of(
+                  slice.actions.dissociateRaProfileFailed({ error: extractError(error, "Failed to dissociate RA Profile from Compliance Profile") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to dissociate RA Profile from Compliance Profile" })
+               )
             )
 
          )
@@ -615,22 +433,6 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const dissociateRaProfileFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.dissociateRaProfileFailed.match
-      ),
-      map(
-
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -643,8 +445,7 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getAssociatedRaProfiles(
-            action.payload.uuid
+         action => deps.apiClients.complianceProfile.getAssociatedRAProfiles({ uuid: action.payload.uuid }
          ).pipe(
 
             map(
@@ -652,7 +453,10 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
             ),
 
             catchError(
-               err => of(slice.actions.getAssociatedRaProfilesFailed({ error: extractError(err, "Failed to get associated RA Profiles") }))
+               error => of(
+                  slice.actions.getAssociatedRaProfilesFailed({ error: extractError(error, "Failed to get associated RA Profiles") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to get associated RA Profiles" })
+               )
             )
 
          )
@@ -660,22 +464,6 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const getAssociatedRaProfilesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.getAssociatedRaProfilesFailed.match
-      ),
-      map(
-
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -688,15 +476,18 @@ const getRules: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getComplianceProfileRules()
+         action => deps.apiClients.complianceProfile.getComplianceRules({})
             .pipe(
 
                map(
-                  (rules) => slice.actions.listComplianceRulesSuccess(rules.map(transformComplianceConnectorRuleDTOToModel))
+                  (rules) => slice.actions.listComplianceRulesSuccess(rules.map(transformComplianceProfileRuleListResponseDtoToModel))
                ),
 
                catchError(
-                  err => of(slice.actions.listComplianceRulesFailed({ error: extractError(err, "Failed to get compliance rules") }))
+                  error => of(
+                     slice.actions.listComplianceRulesFailed({ error: extractError(error, "Failed to get compliance rules") }),
+                     appRedirectActions.fetchError({ error, message: "Failed to get compliance rules" })
+                  )
                )
 
             )
@@ -704,22 +495,6 @@ const getRules: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const getRulesFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listComplianceRulesFailed.match
-      ),
-      map(
-
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -732,15 +507,18 @@ const getGroups: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.getComplianceProfileGroups()
+         action => deps.apiClients.complianceProfile.getComplianceGroups({})
             .pipe(
 
                map(
-                  (groups) => slice.actions.listComplianceGroupsSuccess(groups.map(transformComplianceConnectorGroupDTOToModel))
+                  (groups) => slice.actions.listComplianceGroupsSuccess(groups.map(transformComplianceProfileGroupListResponseDtoToModel))
                ),
 
                catchError(
-                  err => of(slice.actions.listComplianceGroupsFailed({ error: extractError(err, "Failed to get compliance groups") }))
+                  error => of(
+                     slice.actions.listComplianceGroupsFailed({ error: extractError(error, "Failed to get compliance groups") }),
+                     appRedirectActions.fetchError({ error, message: "Failed to get compliance groups" })
+                  )
                )
 
             )
@@ -748,21 +526,6 @@ const getGroups: AppEpic = (action$, state$, deps) => {
       )
 
    )
-}
-
-
-const getGroupsFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.listComplianceGroupsFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
 }
 
 
@@ -775,16 +538,21 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
       ),
       switchMap(
 
-         action => deps.apiClients.complianceProfile.checkCompliance(
-            action.payload.uuids
+         action => deps.apiClients.complianceProfile.checkCompliance({ requestBody: action.payload.uuids }
          ).pipe(
 
-            map(
-               () => slice.actions.checkComplianceSuccess()
+            mergeMap(
+               () => of(
+                  slice.actions.checkComplianceSuccess(),
+                  alertActions.success("Compliance Check for the certificates initiated")
+               )
             ),
 
             catchError(
-               err => of(slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to check compliance") }))
+               error => of(
+                  slice.actions.checkComplianceFailed({ error: extractError(error, "Failed to check compliance") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to check compliance" })
+               )
 
             )
 
@@ -796,74 +564,25 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
 }
 
 
-const checkComplianceFailed: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.checkComplianceFailed.match
-      ),
-      map(
-         action => alertActions.error(action.payload.error || "Unexpected error occurred")
-      )
-
-   );
-}
-
-
-const checkComplianceSuccess: AppEpic = (action$, state$, deps) => {
-
-   return action$.pipe(
-
-      filter(
-         slice.actions.checkComplianceSuccess.match
-      ),
-      map(
-         action => alertActions.success("Compliance Check for the certificates initiated")
-      )
-
-   );
-}
 
 
 const epics = [
    listComplianceProfiles,
-   listComplianceProfilesFailed,
    getComplianceProfileDetail,
-   getComplianceProfileDetailFailed,
    createComplianceProfile,
-   createComplianceProfileFailed,
-   createComplianceProfileSuccess,
    deleteComplianceProfile,
-   deleteComplianceProfileSuccess,
-   deleteComplianceProfileFailed,
    bulkDeleteComplianceProfiles,
-   bulkDeleteComplianceProfilesFailed,
    bulkForceDeleteComplianceProfiles,
-   bulkForceDeleteComplianceProfilesSuccess,
-   bulkForceDeleteComplianceProfilesFailed,
    addRule,
-   addRuleFailed,
    deleteRule,
-   deleteRuleFailed,
    addGroup,
-   addGroupFailed,
    deleteGroup,
-   deleteGroupFailed,
    associateRaProfile,
-   associateRaProfileFailed,
    dissociateRaProfile,
-   dissociateRaProfileFailed,
    getAssociatedRaProfiles,
-   getAssociatedRaProfilesFailed,
    getRules,
-   getRulesFailed,
    getGroups,
-   getGroupsFailed,
    checkCompliance,
-   checkComplianceSuccess,
-   checkComplianceFailed
-
 ];
 
 

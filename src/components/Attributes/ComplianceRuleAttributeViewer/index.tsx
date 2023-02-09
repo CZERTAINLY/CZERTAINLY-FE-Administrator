@@ -1,81 +1,70 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { AttributeModel } from "models/attributes/AttributeModel";
 import { useCallback, useMemo } from "react";
-
+import { AttributeDescriptorModel, AttributeResponseModel, isDataAttributeModel } from "types/attributes";
+import { getAttributeContent } from "utils/attributes/attributes";
 
 export interface Props {
-   attributes: AttributeModel[] | undefined;
-   hasHeader?: boolean
+    attributes?: AttributeResponseModel[];
+    descriptorAttributes?: AttributeDescriptorModel[];
+    hasHeader?: boolean;
 }
 
-
 export default function ComplianceRuleAttributeViewer({
-   attributes = [],
-   hasHeader = true
-}: Props) {
+                                                          attributes,
+                                                          descriptorAttributes,
+                                                          hasHeader = true,
+                                                      }: Props) {
 
-   const getAttributeContent = useCallback(
+    const getContent = useCallback(getAttributeContent, []);
 
-      (attribute: AttributeModel) => {
+    const tableHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "name",
+                content: "Name",
+                sortable: true,
+                width: "20%",
+            },
+            {
+                id: "value",
+                content: "Value",
+                sortable: true,
+                width: "80%",
+            },
+        ],
+        [],
+    );
 
+    const tableData: TableDataRow[] = useMemo(
+        () => {
+            const attributeRows = attributes?.map(attribute => ({
+                    id: attribute.uuid || attribute.name,
+                    columns: [
+                        attribute.name || "",
+                        getContent(attribute.contentType, attribute.content),
+                    ],
+                }),
+            );
+            const descriptorRows = descriptorAttributes?.filter(isDataAttributeModel).map(attribute => ({
+                    id: attribute.uuid || attribute.name,
+                    columns: [
+                        attribute.name || "",
+                        getContent(attribute.contentType, attribute.content),
+                    ],
+                }),
+            );
+            return [...attributeRows ?? [], ...descriptorRows ?? []];
+        },
+        [attributes, descriptorAttributes, getContent],
+    );
 
-         return Array.isArray(attribute.content) ?
-            attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-            :
-            attribute?.content?.value ? attribute?.content?.value as string : "Not set";
-
-      },
-      []
-
-   );
-
-
-   const tableHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "name",
-            content: "name",
-            sortable: true,
-            width: "20%",
-         },
-         {
-            id: "value",
-            content: "Value",
-            sortable: true,
-            width: "80%",
-         }
-      ],
-      []
-
-   );
-
-   const tableData: TableDataRow[] = useMemo(
-
-      () => attributes.map(
-
-         attribute => {
-            return ({
-               id: attribute.uuid || attribute.name,
-               columns: [
-                  attribute.name || "",
-                  getAttributeContent(attribute)
-               ]
-            })
-         }
-
-      ),
-      [attributes, getAttributeContent]
-   );
-
-
-   return (
-      <CustomTable
-         headers={tableHeaders}
-         data={tableData}
-         hasHeader={hasHeader}
-      />
-   )
+    return (
+        <CustomTable
+            headers={tableHeaders}
+            data={tableData}
+            hasHeader={hasHeader}
+        />
+    );
 
 }
 

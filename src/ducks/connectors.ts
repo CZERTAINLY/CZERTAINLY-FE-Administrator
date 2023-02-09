@@ -1,32 +1,35 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { AttributeDescriptorCollectionModel, AttributeDescriptorModel } from "types/attributes";
+
+import {
+   BulkActionModel,
+   CallbackConnectorModel,
+   CallbackResourceModel,
+   ConnectorRequestModel,
+   ConnectorResponseModel,
+   ConnectorUpdateRequestModel,
+   ConnectRequestModel,
+   FunctionGroupModel,
+   HealthModel,
+} from "types/connectors";
+import { ConnectorStatus, FunctionGroupCode } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
-
-import { AttributeDescriptorCollectionModel } from "models/attributes/AttributeDescriptorCollectionModel";
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-
-import { AuthType, FunctionGroupCode } from "types/connectors";
-import { ConnectorHealthModel, ConnectorModel, FunctionGroupModel } from "models/connectors";
-
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
-
 
 export type State = {
 
    checkedRows: string[]
 
-   connector?: ConnectorModel;
-   connectorHealth?: ConnectorHealthModel;
+   connector?: ConnectorResponseModel;
+   connectorHealth?: HealthModel;
    connectorAttributes?: AttributeDescriptorCollectionModel;
    connectorConnectionDetails?: FunctionGroupModel[];
-   connectors: ConnectorModel[];
+   connectors: ConnectorResponseModel[];
 
    callbackData: { [key: string]: any }
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -138,7 +141,7 @@ export const slice = createSlice({
       },
 
 
-      listConnectorsSuccess: (state, action: PayloadAction<{ connectorList: ConnectorModel[] }>) => {
+      listConnectorsSuccess: (state, action: PayloadAction<{ connectorList: ConnectorResponseModel[] }>) => {
 
          state.isFetchingList = false;
          state.connectors = action.payload.connectorList;
@@ -146,7 +149,7 @@ export const slice = createSlice({
       },
 
 
-      listConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingList = false;
 
@@ -164,7 +167,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorDetailSuccess: (state, action: PayloadAction<{ connector: ConnectorModel }>) => {
+      getConnectorDetailSuccess: (state, action: PayloadAction<{ connector: ConnectorResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -181,7 +184,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getConnectorDetailFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingDetail = false;
 
@@ -195,7 +198,7 @@ export const slice = createSlice({
             state.connectorAttributes.hasOwnProperty(action.payload.functionGroup) &&
             state.connectorAttributes[action.payload.functionGroup]!.hasOwnProperty(action.payload.kind)
          ) {
-            delete state.connectorAttributes![action.payload.functionGroup]![action.payload.functionGroup];
+            delete state.connectorAttributes![action.payload.functionGroup]![action.payload.kind];
          }
 
          state.isFetchingAttributes = true;
@@ -203,17 +206,17 @@ export const slice = createSlice({
       },
 
 
-      getConnectorAttributeDescriptorsSuccess: (state, action: PayloadAction<{ functionGroup: FunctionGroupCode, kind: string, attributes: AttributeDescriptorModel[] }>) => {
+      getConnectorAttributeDescriptorsSuccess: (state, action: PayloadAction<{ functionGroup: string, kind: string, attributes: AttributeDescriptorModel[] }>) => {
 
          state.isFetchingAllAttributes = false;
          state.connectorAttributes = state.connectorAttributes || {};
          state.connectorAttributes[action.payload.functionGroup] = state.connectorAttributes[action.payload.functionGroup] || {};
-         state.connectorAttributes![action.payload.functionGroup]![action.payload.functionGroup] = action.payload.attributes;
+         state.connectorAttributes[action.payload.functionGroup][action.payload.kind] = action.payload.attributes;
 
       },
 
 
-      getConnectorAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getConnectorAttributesDescriptorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingAllAttributes = false;
 
@@ -236,7 +239,7 @@ export const slice = createSlice({
       },
 
 
-      getAllConnectorAllAttributesDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getAllConnectorAllAttributesDescriptorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingAllAttributes = false;
 
@@ -251,7 +254,7 @@ export const slice = createSlice({
       },
 
 
-      getConnectorHealthSuccess: (state, action: PayloadAction<{ health: ConnectorHealthModel }>) => {
+      getConnectorHealthSuccess: (state, action: PayloadAction<{ health: HealthModel }>) => {
 
          state.isFetchingHealth = false;
          state.connectorHealth = action.payload.health;
@@ -259,26 +262,21 @@ export const slice = createSlice({
       },
 
 
-      getConnectorHealthFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getConnectorHealthFailure: (state, action: PayloadAction<void>) => {
 
          state.isFetchingHealth = false;
 
       },
 
 
-      createConnector: (state, action: PayloadAction<{
-         name: string,
-         url: string,
-         authType: AuthType,
-         authAttributes?: AttributeModel[]
-      }>) => {
+      createConnector: (state, action: PayloadAction<ConnectorRequestModel>) => {
 
          state.isCreating = true;
 
       },
 
 
-      createConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorModel }>) => {
+      createConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorResponseModel }>) => {
 
          state.isCreating = false;
 
@@ -298,7 +296,7 @@ export const slice = createSlice({
       },
 
 
-      createConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      createConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isCreating = false;
 
@@ -307,9 +305,7 @@ export const slice = createSlice({
 
       updateConnector: (state, action: PayloadAction<{
          uuid: string,
-         url: string,
-         authType: AuthType,
-         authAttributes?: AttributeModel[]
+         connectorUpdateRequest: ConnectorUpdateRequestModel
       }>) => {
 
          state.isUpdating = true;
@@ -317,7 +313,7 @@ export const slice = createSlice({
       },
 
 
-      updateConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorModel }>) => {
+      updateConnectorSuccess: (state, action: PayloadAction<{ connector: ConnectorResponseModel }>) => {
 
          state.isUpdating = false;
 
@@ -334,7 +330,7 @@ export const slice = createSlice({
       },
 
 
-      updateConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      updateConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isUpdating = false;
 
@@ -383,11 +379,11 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteConnectorsSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
 
-         if (action.payload.errors.length > 0) {
+         if (action.payload.errors?.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return;
          }
@@ -411,7 +407,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkDeleting = false;
 
@@ -450,14 +446,14 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkForceDeleteConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkForceDeleting = false;
 
       },
 
 
-      connectConnector: (state, action: PayloadAction<{ url: string, authType: AuthType, authAttributes?: AttributeModel[], uuid?: string }>) => {
+      connectConnector: (state, action: PayloadAction<ConnectRequestModel>) => {
 
          state.connectorConnectionDetails = [];
          state.isConnecting = true;
@@ -473,7 +469,7 @@ export const slice = createSlice({
       },
 
 
-      connectConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      connectConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isConnecting = false;
 
@@ -496,7 +492,7 @@ export const slice = createSlice({
       },
 
 
-      reconnectConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      reconnectConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isReconnecting = false;
 
@@ -516,7 +512,7 @@ export const slice = createSlice({
       },
 
 
-      bulkReconnectConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkReconnectConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkReconnecting = false;
 
@@ -530,14 +526,14 @@ export const slice = createSlice({
       },
 
 
-      authorizeConnectorAuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+      authorizeConnectorSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
 
          state.isAuthorizing = false;
-         state.connector!.status = "connected"
+         state.connector!.status = ConnectorStatus.Connected
       },
 
 
-      authorizeConnectorFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      authorizeConnectorFailure: (state, action: PayloadAction<void>) => {
 
          state.isAuthorizing = false;
 
@@ -558,17 +554,26 @@ export const slice = createSlice({
       },
 
 
-      bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkAuthorizeConnectorsFailure: (state, action: PayloadAction<void>) => {
 
          state.isBulkAuthorizing = false;
 
       },
 
-
-      callback: (state, action: PayloadAction<{
+      callbackConnector: (state, action: PayloadAction<{
          callbackId: string,
-         url: string,
-         callbackData: AttributeCallbackDataModel,
+         callbackConnector: CallbackConnectorModel
+      }>) => {
+
+         if (state.callbackData[action.payload.callbackId]) state.callbackData[action.payload.callbackId] = undefined;
+
+         state.isRunningCallback[action.payload.callbackId] = true;
+
+      },
+
+      callbackResource: (state, action: PayloadAction<{
+         callbackId: string,
+         callbackResource: CallbackResourceModel
       }>) => {
 
          if (state.callbackData[action.payload.callbackId]) state.callbackData[action.payload.callbackId] = undefined;
@@ -578,7 +583,7 @@ export const slice = createSlice({
       },
 
 
-      callbackSuccess: (state, action: PayloadAction<{ callbackId: string, data: AttributeContentModel | AttributeContentModel[] }>) => {
+      callbackSuccess: (state, action: PayloadAction<{ callbackId: string, data: object }>) => {
 
          state.callbackData[action.payload.callbackId] = action.payload.data;
          state.isRunningCallback[action.payload.callbackId] = false;
@@ -586,7 +591,7 @@ export const slice = createSlice({
       },
 
 
-      callbackFailure: (state, action: PayloadAction<{ callbackId: string, error: string | undefined }>) => {
+      callbackFailure: (state, action: PayloadAction<{ callbackId: string }>) => {
 
          state.isRunningCallback[action.payload.callbackId] = false;
       }

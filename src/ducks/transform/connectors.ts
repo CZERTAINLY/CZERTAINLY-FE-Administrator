@@ -1,67 +1,59 @@
-import { ConnectorDTO, EndpointDTO, FunctionGroupDTO } from "api/connectors";
-import { ConnectorModel, EndpointModel, FunctionGroupModel } from "models/connectors";
-import { FunctionGroupCode, FunctionGroupFilter } from "types/connectors";
-import { transformAttributeDTOToModel } from "./attributes";
+import {
+   BulkActionDto, BulkActionModel,
+   ConnectorRequestDto,
+   ConnectorRequestModel,
+   ConnectorResponseDto,
+   ConnectorResponseModel, ConnectorUpdateRequestDto, ConnectorUpdateRequestModel,
+   EndpointDto,
+   EndpointModel,
+   FunctionGroupDto,
+   FunctionGroupModel
+} from "types/connectors";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
+export function transformBulkActionDtoToModel(error: BulkActionDto): BulkActionModel {
+   return { ...error };
+}
 
-export const functionGroupCodeToGroupFilter: { [code in FunctionGroupCode]: FunctionGroupFilter } = {
-   "credentialProvider": "CREDENTIAL_PROVIDER",
-   "legacyAuthorityProvider": "LEGACY_AUTHORITY_PROVIDER",
-   "authorityProvider": "AUTHORITY_PROVIDER",
-   "discoveryProvider": "DISCOVERY_PROVIDER",
-   "entityProvider": "ENTITY_PROVIDER",
-   "locationProvider": "LOCATION_PROVIDER",
-   "complianceProvider": "COMPLIANCE_PROVIDER",
+export function transformEndpointDtoToModel(endPoint: EndpointDto): EndpointModel {
+   return {...endPoint}
 }
 
 
-export const functionGroupFilterToGroupCode: { [filter in FunctionGroupFilter]: FunctionGroupCode } = {
-   "CREDENTIAL_PROVIDER": "credentialProvider",
-   "AUTHORITY_PROVIDER": "entityProvider",
-   "LEGACY_AUTHORITY_PROVIDER": "legacyAuthorityProvider",
-   "DISCOVERY_PROVIDER": "discoveryProvider",
-   "ENTITY_PROVIDER": "entityProvider",
-   "LOCATION_PROVIDER": "locationProvider",
-   "COMPLIANCE_PROVIDER": "complianceProvider",
-}
-
-
-export function transformEndPointDTOToModel(endPoint: EndpointDTO): EndpointModel {
+export function transformFunctionGroupDtoToModel(functionGroup: FunctionGroupDto): FunctionGroupModel {
 
    return {
-      uuid: endPoint.uuid,
-      name: endPoint.name,
-      method: endPoint.method,
-      context: endPoint.context,
-      required: endPoint.required
+      ...functionGroup,
+      kinds: functionGroup.kinds ?? [],
+      endPoints: functionGroup.endPoints.map(endpoint => transformEndpointDtoToModel(endpoint))
    }
 
 }
 
 
-export function transformFunctionGroupDTOtoModel(functionGroup: FunctionGroupDTO): FunctionGroupModel {
+export function transformConnectorResponseDtoToModel(connector: ConnectorResponseDto): ConnectorResponseModel {
 
    return {
-      uuid: functionGroup.uuid,
-      name: functionGroup.name,
-      functionGroupCode: functionGroup.functionGroupCode,
-      kinds: functionGroup.kinds ? [...functionGroup.kinds] : [],
-      endPoints: functionGroup.endPoints ? functionGroup.endPoints.map(endpoint => transformEndPointDTOToModel(endpoint)) : []
+      ...connector,
+      authAttributes: connector.authAttributes?.map(attr => transformAttributeResponseDtoToModel(attr)),
+      functionGroups: connector.functionGroups.map(group => transformFunctionGroupDtoToModel(group)),
+      customAttributes: connector.customAttributes?.map(transformAttributeResponseDtoToModel)
    }
 
 }
 
-
-export function transformConnectorDTOToModel(connector: ConnectorDTO): ConnectorModel {
-
+export function transformConnectorRequestModelToDto(connector: ConnectorRequestModel): ConnectorRequestDto {
    return {
-      uuid: connector.uuid,
-      name: connector.name,
-      url: connector.url,
-      status: connector.status,
-      authType: connector.authType,
-      authAttributes: connector.authAttributes?.map(attr => transformAttributeDTOToModel(attr)),
-      functionGroups: connector.functionGroups.map(fngroup => transformFunctionGroupDTOtoModel(fngroup))
+      ...connector,
+      authAttributes: connector.authAttributes?.map(transformAttributeRequestModelToDto),
+      customAttributes: connector.customAttributes?.map(transformAttributeRequestModelToDto)
    }
+}
 
+export function transformConnectorUpdateRequestModelToDto(connector: ConnectorUpdateRequestModel): ConnectorUpdateRequestDto {
+   return {
+      ...connector,
+      authAttributes: connector.authAttributes?.map(transformAttributeRequestModelToDto),
+      customAttributes: connector.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
 }

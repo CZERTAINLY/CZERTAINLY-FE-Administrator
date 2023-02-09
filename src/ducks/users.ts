@@ -1,7 +1,7 @@
-import { UserModel, UserDetailModel, CertificateModel } from "models";
 import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RoleModel } from "models/roles";
+import { UserAddRequestModel, UserResponseModel } from "types/users";
+import { RoleResponseModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
 
 
 export type State = {
@@ -12,9 +12,9 @@ export type State = {
    deleteErrorMessage: string;
 
    user?: UserDetailModel;
-   userRoles?: RoleModel[];
+   userRoles?: RoleResponseModel[];
 
-   users: UserModel[];
+   users: UserResponseModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -105,7 +105,7 @@ export const slice = createSlice({
       },
 
 
-      listSuccess: (state, action: PayloadAction<{ users: UserModel[] }>) => {
+      listSuccess: (state, action: PayloadAction<{ users: UserResponseModel[] }>) => {
 
          state.isFetchingList = false;
          state.users = action.payload.users;
@@ -154,14 +154,7 @@ export const slice = createSlice({
 
 
       create: (state, action: PayloadAction<{
-         username: string,
-         description?: string | undefined,
-         firstName: string | undefined,
-         lastName: string | undefined,
-         email: string | undefined,
-         enabled: boolean,
-         certificate: CertificateModel | undefined,
-         certificateUuid: string | undefined,
+         userAddRequest: UserAddRequestModel,
          roles?: string[]
       }>) => {
 
@@ -187,12 +180,7 @@ export const slice = createSlice({
 
       update: (state, action: PayloadAction<{
          uuid: string,
-         description?: string | undefined,
-         firstName: string | undefined,
-         lastName: string | undefined,
-         email: string | undefined,
-         certificate: CertificateModel | undefined,
-         certificateUuid: string | undefined,
+         updateUserRequest: UserUpdateRequestModel,
          roles?: string[]
       }>) => {
 
@@ -315,7 +303,7 @@ export const slice = createSlice({
       },
 
 
-      getRolesSuccess: (state, action: PayloadAction<{ uuid: string, roles: RoleModel[] }>) => {
+      getRolesSuccess: (state, action: PayloadAction<{ uuid: string, roles: RoleResponseModel[] }>) => {
 
          state.isFetchingRoles = false;
 

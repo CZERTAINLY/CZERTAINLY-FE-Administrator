@@ -1,47 +1,14 @@
-import { UserCertificateDTO, UserDetailDTO, UserDTO } from "api/users";
-import { UserCertificateModel, UserDetailModel, UserModel } from "models";
-import { transformRoleDTOToModel } from "./roles";
+import { UserAddRequestDto, UserAddRequestModel, UserResponseDto, UserResponseModel } from "types/users";
+import { transformAttributeRequestModelToDto } from "./attributes";
 
-
-export function transformUserCertificateDTOToModel(certificate: UserCertificateDTO): UserCertificateModel | undefined {
-
-   return certificate ? {
-      uuid: certificate.uuid,
-      fingerprint: certificate.fingerprint,
-   } : undefined;
-
+export function transformUserResponseDtoToModel(user: UserResponseDto): UserResponseModel {
+   return { ...user };
 }
 
-
-export function transformUserDetailDTOToModel(user: UserDetailDTO): UserDetailModel {
-
+export function transformUserAddRequestModelToDto(user: UserAddRequestModel): UserAddRequestDto {
    return {
-      uuid: user.uuid,
-      username: user.username,
-      description: user.description,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      enabled: user.enabled,
-      systemUser: user.systemUser,
-      certificate: transformUserCertificateDTOToModel(user.certificate),
-      roles: user.roles.map(role => transformRoleDTOToModel(role))
-   }
-
+      ...user,
+      customAttributes: user.customAttributes?.map(transformAttributeRequestModelToDto)
+   };
 }
 
-
-export function transformUserDTOToModel(user: UserDTO): UserModel {
-
-   return {
-      uuid: user.uuid,
-      username: user.username,
-      description: user.description,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      enabled: user.enabled,
-      systemUser: user.systemUser,
-   }
-
-}

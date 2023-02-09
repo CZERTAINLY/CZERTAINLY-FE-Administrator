@@ -1,8 +1,11 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { AcmeProfileListItemModel, AcmeProfileModel } from "models/acme-profiles";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
+import {
+   AcmeProfileAddRequestModel, AcmeProfileEditRequestModel,
+   AcmeProfileListResponseModel,
+   AcmeProfileResponseModel
+} from "types/acme-profiles";
+import { BulkActionModel } from "types/connectors";
 
 
 export type State = {
@@ -10,10 +13,10 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
-   acmeProfile?: AcmeProfileModel;
-   acmeProfiles: AcmeProfileListItemModel[];
+   acmeProfile?: AcmeProfileResponseModel;
+   acmeProfiles: AcmeProfileListResponseModel[];
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -97,7 +100,7 @@ export const slice = createSlice({
       },
 
 
-      listAcmeProfilesSuccess: (state, action: PayloadAction<{ acmeProfileList: AcmeProfileListItemModel[] }>) => {
+      listAcmeProfilesSuccess: (state, action: PayloadAction<{ acmeProfileList: AcmeProfileListResponseModel[] }>) => {
 
          state.acmeProfiles = action.payload.acmeProfileList;
          state.isFetchingList = false;
@@ -105,7 +108,7 @@ export const slice = createSlice({
       },
 
 
-      listAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      listAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingList = false
 
@@ -119,7 +122,7 @@ export const slice = createSlice({
       },
 
 
-      getAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileModel }>) => {
+      getAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -137,30 +140,14 @@ export const slice = createSlice({
       },
 
 
-      getAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      getAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isFetchingDetail = false
 
       },
 
 
-      createAcmeProfile: (state, action: PayloadAction<{
-         name: string,
-         description: string,
-         termsOfServiceUrl: string,
-         dnsResolverIp: string,
-         dnsResolverPort: string,
-         raProfileUuid: string | undefined,
-         websiteUrl: string,
-         retryInterval: number,
-         termsOfServiceChangeDisable: boolean,
-         validity: number,
-         issueCertificateAttributes: AttributeModel[],
-         revokeCertificateAttributes: AttributeModel[],
-         requireContact: boolean,
-         requireTermsOfService: boolean,
-         termsOfServiceChangeUrl: string
-      }>) => {
+      createAcmeProfile: (state, action: PayloadAction<AcmeProfileAddRequestModel>) => {
 
          state.isCreating = true;
 
@@ -174,7 +161,7 @@ export const slice = createSlice({
       },
 
 
-      createAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      createAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isCreating = false
 
@@ -183,20 +170,7 @@ export const slice = createSlice({
 
       updateAcmeProfile: (state, action: PayloadAction<{
          uuid: string,
-         description: string,
-         termsOfServiceUrl: string,
-         dnsResolverIp: string,
-         dnsResolverPort: string,
-         raProfileUuid: string | undefined,
-         websiteUrl: string,
-         retryInterval: number,
-         termsOfServiceChangeDisable: boolean,
-         validity: number,
-         issueCertificateAttributes: AttributeModel[],
-         revokeCertificateAttributes: AttributeModel[],
-         requireContact: boolean,
-         requireTermsOfService: boolean,
-         termsOfServiceChangeUrl: string
+         updateAcmeRequest: AcmeProfileEditRequestModel
       }>) => {
 
          state.isUpdating = true;
@@ -204,7 +178,7 @@ export const slice = createSlice({
       },
 
 
-      updateAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileModel }>) => {
+      updateAcmeProfileSuccess: (state, action: PayloadAction<{ acmeProfile: AcmeProfileResponseModel }>) => {
 
          state.isUpdating = false;
 
@@ -221,7 +195,7 @@ export const slice = createSlice({
       },
 
 
-      updateAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      updateAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isUpdating = false
 
@@ -249,7 +223,7 @@ export const slice = createSlice({
       },
 
 
-      deleteAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      deleteAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDeleting = false
          state.deleteErrorMessage = action.payload.error || "Unknown error";
@@ -277,7 +251,7 @@ export const slice = createSlice({
       },
 
 
-      enableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      enableAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isEnabling = false;
 
@@ -304,7 +278,7 @@ export const slice = createSlice({
       },
 
 
-      disableAcmeProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      disableAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isDisabling = false;
 
@@ -319,10 +293,10 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteAcmeProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
-         if (action.payload.errors.length > 0) {
+         if (action.payload.errors?.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return
          }
@@ -341,7 +315,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkDeleteAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDeleting = false;
 
@@ -373,7 +347,7 @@ export const slice = createSlice({
       },
 
 
-      bulkForceDeleteAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkForceDeleteAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkForceDeleting = false;
 
@@ -405,7 +379,7 @@ export const slice = createSlice({
       },
 
 
-      bulkEnableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkEnableAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkEnabling = false
 
@@ -437,7 +411,7 @@ export const slice = createSlice({
       },
 
 
-      bulkDisableAcmeProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+      bulkDisableAcmeProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
 
          state.isBulkDisabling = false
 

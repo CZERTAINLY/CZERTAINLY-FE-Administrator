@@ -1,22 +1,38 @@
-import { DiscoveryDTO } from "api/discovery";
-import { DiscoveryModel } from "models/discoveries";
+import {
+   DiscoveryCertificateResponseDto,
+   DiscoveryCertificateResponseModel,
+   DiscoveryRequestDto,
+   DiscoveryRequestModel,
+   DiscoveryResponseDetailDto,
+   DiscoveryResponseDetailModel,
+   DiscoveryResponseDto,
+   DiscoveryResponseModel
+} from "types/discoveries";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+import { transformMetadataDtoToModel } from "./locations";
 
-export function transformDiscoveryDTOToModel(discovery: DiscoveryDTO): DiscoveryModel {
+export function transformDiscoveryCertificateResponseDtoToModel(certificate: DiscoveryCertificateResponseDto): DiscoveryCertificateResponseModel {
+   return { ...certificate };
+}
 
+export function transformDiscoveryResponseDtoToModel(discovery: DiscoveryResponseDto): DiscoveryResponseModel {
+   return { ...discovery }
+}
+
+export function transformDiscoveryResponseDetailDtoToModel(discovery: DiscoveryResponseDetailDto): DiscoveryResponseDetailModel {
    return {
-      uuid: discovery.uuid,
-      name: discovery.name,
-      connectorUuid: discovery.connectorUuid,
-      connectorName: discovery.connectorName,
-      status: discovery.status,
-      totalCertificatesDiscovered: discovery.totalCertificatesDiscovered,
-      startTime: discovery.startTime,
-      endTime: discovery.endTime,
-      attributes: discovery.attributes,
-      certificate: discovery.certificate,
-      meta: discovery.meta,
-      kind: discovery.kind,
-      message: discovery.message,
-   };
+      ...discovery,
+      certificate: discovery.certificate.map(transformDiscoveryCertificateResponseDtoToModel),
+      attributes: discovery.attributes.map(transformAttributeResponseDtoToModel),
+      metadata: discovery.metadata?.map(transformMetadataDtoToModel),
+      customAttributes: discovery.customAttributes?.map(transformAttributeResponseDtoToModel)
+   }
+}
 
+export function transformDiscoveryRequestModelToDto(discovery: DiscoveryRequestModel): DiscoveryRequestDto {
+   return {
+      ...discovery,
+      attributes: discovery.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: discovery.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
 }

@@ -1,7 +1,17 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { DeleteObjectErrorModel } from "models/deleteObjectErrorModel";
-import { ComplianceConnectorAndGroupsModel, ComplianceConnectorAndRulesModel, ComplianceProfileListItemModel, ComplianceProfileModel, ComplianceRaProfileModel, ComplianceRuleModel } from "models/compliance-profiles";
+import {
+   ComplianceProfileGroupListResponseModel,
+   ComplianceProfileGroupRequestModel,
+   ComplianceProfileListModel,
+   ComplianceProfileRequestModel,
+   ComplianceProfileResponseModel,
+   ComplianceProfileRuleAddRequestModel,
+   ComplianceProfileRuleAddResponseModel,
+   ComplianceProfileRuleDeleteRequestModel, ComplianceProfileRuleListResponseModel
+} from "types/complianceProfiles";
+import { RaProfileSimplifiedModel } from "types/certificate";
+import { BulkActionModel } from "types/connectors";
 
 
 export type State = {
@@ -9,13 +19,13 @@ export type State = {
    checkedRows: string[];
 
    deleteErrorMessage: string;
-   bulkDeleteErrorMessages: DeleteObjectErrorModel[];
+   bulkDeleteErrorMessages: BulkActionModel[];
 
-   complianceProfile?: ComplianceProfileModel;
-   complianceProfiles: ComplianceProfileListItemModel[];
+   complianceProfile?: ComplianceProfileResponseModel;
+   complianceProfiles: ComplianceProfileListModel[];
 
-   rules: ComplianceConnectorAndRulesModel[]
-   groups: ComplianceConnectorAndGroupsModel[]
+   rules: ComplianceProfileRuleListResponseModel[]
+   groups: ComplianceProfileGroupListResponseModel[]
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -112,7 +122,7 @@ export const slice = createSlice({
       },
 
 
-      listComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfileList: ComplianceProfileListItemModel[] }>) => {
+      listComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfileList: ComplianceProfileListModel[] }>) => {
 
          state.complianceProfiles = action.payload.complianceProfileList;
          state.isFetchingList = false;
@@ -134,7 +144,7 @@ export const slice = createSlice({
       },
 
 
-      getComplianceProfileSuccess: (state, action: PayloadAction<{ complianceProfile: ComplianceProfileModel }>) => {
+      getComplianceProfileSuccess: (state, action: PayloadAction<{ complianceProfile: ComplianceProfileResponseModel }>) => {
 
          state.isFetchingDetail = false;
 
@@ -150,10 +160,7 @@ export const slice = createSlice({
       },
 
 
-      createComplianceProfile: (state, action: PayloadAction<{
-         name: string,
-         description: string
-      }>) => {
+      createComplianceProfile: (state, action: PayloadAction<ComplianceProfileRequestModel>) => {
 
          state.isCreating = true;
 
@@ -211,10 +218,10 @@ export const slice = createSlice({
       },
 
 
-      bulkDeleteComplianceProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: DeleteObjectErrorModel[] }>) => {
+      bulkDeleteComplianceProfilesSuccess: (state, action: PayloadAction<{ uuids: string[], errors: BulkActionModel[] }>) => {
 
          state.isBulkDeleting = false;
-         if (action.payload.errors.length > 0) {
+         if (action.payload.errors?.length > 0) {
             state.bulkDeleteErrorMessages = action.payload.errors;
             return
          }
@@ -272,14 +279,14 @@ export const slice = createSlice({
       },
 
 
-      addRule: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, connectorName: string, kind: string, ruleUuid: string, ruleName: string, description?: string, groupUuid?: string, attributes: any }>) => {
+      addRule: (state, action: PayloadAction<{ uuid: string, addRequest: ComplianceProfileRuleAddRequestModel }>) => {
 
          state.isAddingRule = true;
 
       },
 
 
-      addRuleSuccess: (state, action: PayloadAction<{ connectorUuid: string, connectorName: string, kind: string, rule: ComplianceRuleModel }>) => {
+      addRuleSuccess: (state, action: PayloadAction<{ connectorUuid: string, connectorName: string, kind: string, rule: ComplianceProfileRuleAddResponseModel }>) => {
 
          state.isAddingRule = false;
          let found = false;
@@ -295,8 +302,9 @@ export const slice = createSlice({
                   uuid: action.payload.rule.uuid,
                   name: action.payload.rule.name,
                   description: action.payload.rule.description,
-                  groupUuid: action.payload.rule.groupUuid,
-                  attributes: action.payload.rule.attributes
+                  // groupUuid: action.payload.rule.groupUuid,
+                  attributes: action.payload.rule.attributes,
+                  certificateType: action.payload.rule.certificateType
                }]
             }]
 
@@ -306,12 +314,13 @@ export const slice = createSlice({
 
                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
                   found = true;
-                  connector.rules.push({
+                  connector.rules?.push({
                      uuid: action.payload.rule.uuid,
                      name: action.payload.rule.name,
                      description: action.payload.rule.description,
-                     groupUuid: action.payload.rule.groupUuid,
-                     attributes: action.payload.rule.attributes
+                     // groupUuid: action.payload.rule.groupUuid,
+                     attributes: action.payload.rule.attributes,
+                     certificateType: action.payload.rule.certificateType
                   });
                }
 
@@ -327,8 +336,9 @@ export const slice = createSlice({
                      uuid: action.payload.rule.uuid,
                      name: action.payload.rule.name,
                      description: action.payload.rule.description,
-                     groupUuid: action.payload.rule.groupUuid,
-                     attributes: action.payload.rule.attributes
+                     // groupUuid: action.payload.rule.groupUuid,
+                     attributes: action.payload.rule.attributes,
+                     certificateType: action.payload.rule.certificateType
                   }]
                });
 
@@ -345,7 +355,7 @@ export const slice = createSlice({
       },
 
 
-      deleteRule: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, kind: string, ruleUuid: string }>) => {
+      deleteRule: (state, action: PayloadAction<{ uuid: string, deleteRequest: ComplianceProfileRuleDeleteRequestModel }>) => {
 
          state.isDeletingRule = true;
 
@@ -359,8 +369,8 @@ export const slice = createSlice({
 
          for (let connector of state.complianceProfile.rules || []) {
             if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
-               const ruleIndex = connector.rules.findIndex(rule => rule.uuid === action.payload.ruleUuid);
-               if (ruleIndex >= 0) connector.rules.splice(ruleIndex, 1);
+               const ruleIndex = connector.rules?.findIndex(rule => rule.uuid === action.payload.ruleUuid) ?? -1;
+               if (ruleIndex >= 0) connector.rules!.splice(ruleIndex, 1);
             }
          }
       },
@@ -373,7 +383,7 @@ export const slice = createSlice({
       },
 
 
-      addGroup: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, connectorName: string, kind: string, groupUuid: string, groupName: string, description: string }>) => {
+      addGroup: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, connectorName: string, kind: string, groupUuid: string, groupName: string, description: string, addRequest: ComplianceProfileGroupRequestModel }>) => {
 
          state.isAddingGroup = true;
 
@@ -401,7 +411,7 @@ export const slice = createSlice({
             for (let connector of state.complianceProfile.groups || []) {
                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
                   found = true;
-                  connector.groups.push({
+                  connector.groups?.push({
                      uuid: action.payload.groupUuid,
                      name: action.payload.groupName,
                      description: action.payload.description
@@ -432,7 +442,7 @@ export const slice = createSlice({
       },
 
 
-      deleteGroup: (state, action: PayloadAction<{ uuid: string, connectorUuid: string, kind: string, groupUuid: string }>) => {
+      deleteGroup: (state, action: PayloadAction<{ uuid: string, deleteRequest: ComplianceProfileGroupRequestModel }>) => {
 
          state.isDeletingGroup = true;
 
@@ -446,8 +456,8 @@ export const slice = createSlice({
 
          for (let connector of state.complianceProfile.groups || []) {
             if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
-               const groupIndex = connector.groups.findIndex(group => group.uuid === action.payload.groupUuid);
-               if (groupIndex >= 0) connector.groups.splice(groupIndex, 1);
+               const groupIndex = connector.groups?.findIndex(group => group.uuid === action.payload.groupUuid) ?? -1;
+               if (groupIndex >= 0) connector.groups!.splice(groupIndex, 1);
             }
          }
       },
@@ -459,20 +469,20 @@ export const slice = createSlice({
       },
 
 
-      associateRaProfile: (state, action: PayloadAction<{ uuid: string, raProfileUuids: ComplianceRaProfileModel[] }>) => {
+      associateRaProfile: (state, action: PayloadAction<{ uuid: string, raProfileUuids: RaProfileSimplifiedModel[] }>) => {
 
          state.isAssociatingRaProfile = true;
 
       },
 
 
-      associateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuids: ComplianceRaProfileModel[] }>) => {
+      associateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string, raProfileUuids: RaProfileSimplifiedModel[] }>) => {
 
          state.isAssociatingRaProfile = false;
 
          if (!state.complianceProfile) return;
 
-         state.complianceProfile.raProfiles = state.complianceProfile.raProfiles.concat(action.payload.raProfileUuids);
+         state.complianceProfile.raProfiles = state.complianceProfile.raProfiles?.concat(action.payload.raProfileUuids);
 
       },
 
@@ -497,8 +507,8 @@ export const slice = createSlice({
          for (let profile of state.complianceProfile.raProfiles || []) {
             for (let requestUuid of action.payload.raProfileUuids) {
                if (profile.uuid === requestUuid) {
-                  const raProfileIndex = state.complianceProfile.raProfiles.findIndex(raProfile => raProfile.uuid === requestUuid);
-                  if (raProfileIndex >= 0) state.complianceProfile.raProfiles.splice(raProfileIndex, 1);
+                  const raProfileIndex = state.complianceProfile.raProfiles?.findIndex(raProfile => raProfile.uuid === requestUuid) ?? -1;
+                  if (raProfileIndex >= 0) state.complianceProfile.raProfiles!.splice(raProfileIndex, 1);
                }
             }
          }
@@ -515,7 +525,7 @@ export const slice = createSlice({
       },
 
 
-      getAssociatedRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: ComplianceRaProfileModel[] }>) => {
+      getAssociatedRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: RaProfileSimplifiedModel[] }>) => {
 
          state.isFetchingRaProfile = false;
          state.complianceProfile!.raProfiles = action.payload.raProfiles;
@@ -531,7 +541,7 @@ export const slice = createSlice({
          state.isFetchingRules = true;
       },
 
-      listComplianceRulesSuccess: (state, action: PayloadAction<ComplianceConnectorAndRulesModel[]>) => {
+      listComplianceRulesSuccess: (state, action: PayloadAction<ComplianceProfileRuleListResponseModel[]>) => {
 
          state.isFetchingRules = false;
          state.rules = action.payload;
@@ -547,7 +557,7 @@ export const slice = createSlice({
          state.isFetchingGroups = true;
       },
 
-      listComplianceGroupsSuccess: (state, action: PayloadAction<ComplianceConnectorAndGroupsModel[]>) => {
+      listComplianceGroupsSuccess: (state, action: PayloadAction<ComplianceProfileGroupListResponseModel[]>) => {
 
          state.isFetchingGroups = false;
          state.groups = action.payload;

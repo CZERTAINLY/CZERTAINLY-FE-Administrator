@@ -1,168 +1,192 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { useCallback, useMemo } from "react";
+import CustomTable, { TableDataRow } from "components/CustomTable";
+import React, { useCallback, useMemo, useState } from "react";
+import { Form } from "react-final-form";
+import { Form as BootstrapForm } from "reactstrap";
+import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "types/attributes";
+import { MetadataItemModel, MetadataModel } from "types/locations";
+import { getAttributeContent } from "utils/attributes/attributes";
+import ContentValueField from "../../Input/DynamicContent/ContentValueField";
+import WidgetButtons, { IconName } from "../../WidgetButtons";
 
-
-export interface Props {
-   attributes: AttributeModel[] | undefined;
-   hasHeader?: boolean
+export enum ATTRIBUTE_VIEWER_TYPE {
+    ATTRIBUTE,
+    METADATA,
+    METADATA_FLAT,
+    ATTRIBUTE_EDIT,
 }
 
+export interface Props {
+    attributes?: AttributeResponseModel[] | undefined;
+    descriptors?: CustomAttributeModel[];
+    metadata?: MetadataModel[] | undefined;
+    viewerType?: ATTRIBUTE_VIEWER_TYPE;
+    hasHeader?: boolean;
+    onSubmit?: (attributeUuid: string, content: BaseAttributeContentModel[]) => void;
+    onRemove?: (attributeUuid: string) => void;
+}
 
 export default function AttributeViewer({
-   attributes = [],
-   hasHeader = true
-}: Props) {
+                                            attributes = [],
+                                            descriptors = [],
+                                            metadata = [],
+                                            hasHeader = true,
+                                            viewerType = ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE,
+                                            onSubmit,
+                                            onRemove,
+                                        }: Props) {
+    const getContent = useCallback(getAttributeContent, []);
+    const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
 
-   const getAttributeContent = useCallback(
+    const tableHeaders = (viewerType: ATTRIBUTE_VIEWER_TYPE) => {
+        const result = [];
+        if (viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT) {
+            result.push(
+                {
+                    id: "connector",
+                    content: "Connector",
+                    sortable: true,
+                },
+            );
+        }
+        if (viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT || viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT) {
+            result.push(
+                {
+                    id: "name",
+                    content: "Name",
+                    sortable: true,
+                    width: "20%",
+                },
+                {
+                    id: "contentType",
+                    content: "Content Type",
+                    sortable: true,
+                    width: "20%",
+                },
+                {
+                    id: "content",
+                    content: "Content",
+                    sortable: true,
+                    width: "40%",
+                },
+            );
+        }
+        if (viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT) {
+            result.push(
+                {
+                    id: "actions",
+                    content: "Actions",
+                    sortable: false,
+                    width: "15%",
+                },
+            );
+        }
+        return result;
+    };
 
-      (attribute: AttributeModel) => {
+    const getAttributesTableData = useCallback((attribute: AttributeResponseModel | MetadataItemModel) => ({
+        id: attribute.uuid || "",
+        columns: [
+            attribute.label || "",
+            attribute.contentType || "",
+            getContent(attribute.contentType, attribute.content),
+        ],
+    }), [getContent]);
 
-         if (!attribute.type || !attribute.content) return "Not set";
+    const getMetadataTableData = useCallback((attribute: MetadataModel) => ({
+        id: attribute.connectorUuid || "",
+        columns: [attribute.connectorName],
+        detailColumns: [
+            <CustomTable
+                headers={tableHeaders(ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE)}
+                data={attribute.items.map(getAttributesTableData)}
+                hasHeader={true}/>,
+        ],
+    }), [getAttributesTableData]);
 
-         const typeMap = {
+    const getButtons = useCallback((descriptor: CustomAttributeModel, attributeName: string) => {
+        const buttons = [];
+        if (editingAttributesNames.find(a => a === attributeName)) {
+            buttons.push({
+                icon: "times" as IconName,
+                disabled: false,
+                tooltip: "Cancel",
+                onClick: () => {
+                    setEditingAttributesNames(editingAttributesNames.filter(n => n !== attributeName));
+                },
+            });
+        } else {
+            buttons.push({
+                icon: "pencil" as IconName,
+                disabled: descriptor.properties.readOnly,
+                tooltip: descriptor.properties.readOnly ? "Attribute is read only, edit is disabled" : "Edit",
+                onClick: () => {
+                    setEditingAttributesNames([...editingAttributesNames, attributeName]);
+                },
+            });
+        }
+        onRemove && buttons.push({
+            icon: "trash" as IconName,
+            disabled: descriptor.properties.required,
+            tooltip: descriptor.properties.required ? "Attribute is required, can't be removed" : "Remove",
+            onClick: () => onRemove(descriptor.uuid),
+        });
+        return buttons;
+    }, [editingAttributesNames, onRemove]);
 
-            "BOOLEAN":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value !== undefined ? content.value ? "true" : "false" : "Not set").join(", ")
-                  :
-                  attribute.content.value ? "True" : "False",
+    const getAttributesEditTableData = useCallback((attributes: AttributeResponseModel[], descriptors: CustomAttributeModel[]) => {
+        if (!attributes || !descriptors) {
+            return [];
+        }
+        return attributes.filter(a => descriptors.find(d => d.name === a.name)).map(a => {
+            const descriptor = descriptors.find(d => d.name === a.name);
+            return {
+                id: a.uuid || "",
+                columns: [
+                    a.label || "",
+                    a.contentType || "",
+                    onSubmit && descriptor && editingAttributesNames.find(n => n === a.name)
+                        ? <Form onSubmit={() => {
+                        }}>
+                            {({values}) => (
+                                <BootstrapForm>
+                                    <ContentValueField descriptor={descriptor} initialContent={a.content} onSubmit={(uuid, content) => {
+                                        setEditingAttributesNames(editingAttributesNames.filter(n => n !== descriptor.name));
+                                        onSubmit(uuid, content);
+                                    }}/>
+                                </BootstrapForm>
+                            )}
+                        </Form>
+                        : getContent(a.contentType, a.content),
+                    <WidgetButtons buttons={getButtons(descriptor!, a.name)}/>,
+                ],
+            };
+        });
+    }, [getContent, getButtons, editingAttributesNames, onSubmit]);
 
-            "INTEGER":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? parseInt(attribute.content.value as string, 10).toString() : "Not set",
+    const tableData: TableDataRow[] = useMemo(() => {
+        switch (viewerType) {
+            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE:
+                return attributes?.map(getAttributesTableData);
+            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT:
+                return getAttributesEditTableData(attributes, descriptors);
+            case ATTRIBUTE_VIEWER_TYPE.METADATA:
+                return metadata?.map(getMetadataTableData);
+            case ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT:
+                return metadata?.map(m => m.items.map(i => ({
+                    ...getAttributesTableData(i),
+                    columns: [m.connectorName, ...getAttributesTableData(i).columns],
+                }))).flat();
+            default:
+                return [];
+        }
+    }, [attributes, metadata, getAttributesTableData, getAttributesEditTableData, getMetadataTableData, viewerType, descriptors]);
 
-            "FLOAT":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? parseFloat(attribute.content.value as string).toString() : "Not set",
-
-            "STRING":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-            "TEXT":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-            "DATE":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-            "TIME":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-
-            "DATETIME":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-
-            "FILE":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(
-                     content =>
-                        content.value ?
-                           content.value.toString().length > 40 ? content.value.toString().substring(0, 40) + "..." : content.value.toString()
-                           :
-                           "Not set"
-                  ).join(", ")
-                  :
-                  attribute.content.value ?
-                     attribute.content.value.toString().length > 40 ? attribute.content.value.toString().substring(0, 40) + "..." : attribute.content.value.toString()
-                     :
-                     "Not set",
-
-            "SECRET": "*****",
-
-            "CREDENTIAL":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-            "JSON":
-               Array.isArray(attribute.content) ?
-                  attribute.content.map(content => content.value ? content.value.toString() : "Not set").join(", ")
-                  :
-                  attribute.content.value ? attribute.content.value as string : "Not set",
-
-         }
-
-         return typeMap[attribute.type] || "Unknown data type"
-
-      },
-      []
-
-   );
-
-
-   const tableHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "name",
-            content: "name",
-            sortable: true,
-            width: "20%",
-         },
-         {
-            id: "type",
-            content: "Type",
-            sortable: true,
-            width: "20%",
-         },
-         {
-            id: "settings",
-            content: "Settings",
-            sortable: true,
-            width: "80%",
-         }
-      ],
-      []
-
-   );
-
-   const tableData: TableDataRow[] = useMemo(
-
-      () => attributes.map(
-
-         attribute => {
-            return ({
-               id: attribute.uuid || "",
-               columns: [
-                  attribute.label || "",
-                  attribute.type || "",
-                  getAttributeContent(attribute)
-               ]
-            })
-         }
-
-      ),
-      [attributes, getAttributeContent]
-   );
-
-
-   return (
-      <CustomTable
-         headers={tableHeaders}
-         data={tableData}
-         hasHeader={hasHeader}
-      />
-   )
-
+    return (tableData) ? (
+        <CustomTable
+            headers={tableHeaders(viewerType)}
+            data={tableData}
+            hasHeader={hasHeader}
+            hasDetails={viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA}
+        />
+    ) : <></>;
 }

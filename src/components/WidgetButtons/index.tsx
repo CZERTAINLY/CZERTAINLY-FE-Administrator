@@ -1,12 +1,44 @@
 import React from "react";
 import { Button, ButtonProps } from "reactstrap";
-import ToolTip from "../ToolTip";
 
+export type IconName = "plus" |
+    "trash" |
+    "times" |
+    "check" |
+    "plug" |
+    "pencil" |
+    "cross-circle" |
+    "upload" |
+    "download" |
+    "group" |
+    "user" |
+    "cubes" |
+    "retweet" |
+    "minus-square" |
+    "info" |
+    "gavel" |
+    "push" |
+    "sync" |
+    "minus" |
+    "lock" |
+    "refresh" |
+    "reload"  |
+    "handshake" |
+    "compromise" |
+    "destroy" |
+    "bomb" |
+    "search" |
+    "random" |
+    "sign" |
+    "verify" |
+    "key" |
+    "link" |
+    "recycle" |
+    "rekey" ;
 
 export interface WidgetButtonProps {
-   icon: "plus" | "trash" | "times" | "check" | "plug" | "pencil" | "cross-circle" | "upload" | "download" | "group" | "user" | "cubes" | "retweet" | "minus-square" | "info" | "gavel" | "push" | "sync" | "minus" | "lock";
-   additionalTooltipId?: string;
-   tooltipScheme?: "dark" | "success" | "warning" | "error" | "info" | "light";
+   icon: IconName;
+   id?: string;
    tooltip?: any;
    disabled: boolean;
    custom?: React.ReactNode;
@@ -23,7 +55,7 @@ const colors = {
    "plus": "auto",
    "trash": "red",
    "times": "red",
-   "check": "auto",
+   "check": "green",
    "plug": "auto",
    "pencil": "auto",
    "cross-circle": "black",
@@ -39,7 +71,21 @@ const colors = {
    "info": "auto",
    "minus": "red",
    "gavel": "auto",
-   "lock": "auto"
+   "lock": "auto",
+   "refresh": "auto",
+   "reload": "auto",
+   "handshake": "red",
+   "compromise": "red",
+   "destroy": "red",
+   "bomb": "red",
+   "search": "auto",
+   "random": "auto",
+   "sign": "auto",
+   "verify": "green",
+   "key": "auto",
+   "link": "auto",
+   "recycle": "auto",
+   "rekey": "auto",
 };
 
 
@@ -63,7 +109,21 @@ const classNames = {
    "info": "fa fa-info-circle",
    "minus": "fa fa-minus",
    "gavel": "fa fa-gavel",
-   "lock": "fa fa-lock"
+   "lock": "fa fa-lock",
+   "refresh": "fa fa-refresh",
+   "reload": "fa fa-rotate-right",
+   "handshake": "fa fa-circle-exclamation",
+   "compromise": "fa fa-ban",
+   "destroy": "fa fa-circle-minus",
+   "bomb": "fa fa-bomb",
+   "search": "fa fa-search",
+   "random": "fa fa-dice",
+   "sign": "fas fa-pen",
+   "verify": "fa fa-check-square",
+   "key": "fa fa-key",
+   "link": "fa fa-link",
+   "recycle": "fa fa-recycle",
+   "rekey": "fa fa-random",
 }
 
 
@@ -75,22 +135,11 @@ function WidgetButtons({ buttons }: Props) {
       let style;
 
       let btnProps: ButtonProps = {
-         key: button.icon + button.tooltip + button.additionalTooltipId || "",
+         key: button.icon + button.tooltip + button.id || "",
          className: "btn btn-link",
          color: "white",
          onClick: button.onClick,
          disabled: button.disabled,
-      }
-
-      if (button.tooltip) {
-
-         const toolTipId = `btn_tooltip_${button.tooltip}_${button.additionalTooltipId || ""}`;
-
-         btnProps["data-for"] = toolTipId;
-         btnProps["data-tip"] = "";
-
-         toolTip = <ToolTip id={toolTipId} message={button.tooltip} tooltipType={button.tooltipScheme}/>
-
       }
 
       if (!button.disabled) {
@@ -102,7 +151,7 @@ function WidgetButtons({ buttons }: Props) {
          ( <span key={button.icon + button.tooltip}>{ button.custom }</span>)
          :
          (
-            <Button {...btnProps}>
+            <Button {...btnProps} title={button.tooltip}>
                <i className={classNames[button.icon]} style={style} />
                {toolTip}
             </Button>

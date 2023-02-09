@@ -1,21 +1,18 @@
 import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
+import logo from "resources/images/czertainly_white_H.svg";
 
 import LinksGroup from "./LinksGroup";
 import style from "./Sidebar.module.scss";
-import logo from "images/czertainly_white_H.svg";
-import { inIFrame } from "utils/inIFrame";
 
-function Sidebar() {
-
-   const inFrame = inIFrame();
+export default function Sidebar() {
 
    return (
 
       <nav className={style.root}>
 
          <header className={style.logo}>
-            <Link to="/app/home">
+            <Link to="/home">
                <img src={logo} alt="CZERTAINLY Logo" />
             </Link>
          </header>
@@ -24,18 +21,19 @@ function Sidebar() {
 
             <ul>
 
-               {!inFrame ? <LinksGroup _key="/app/home" header="Home" headerLink="/app/home" /> : null}
-               <LinksGroup _key="/app/dashboard" header="Dashboard" headerLink="/app/dashboard" />
-               <LinksGroup _key="/app/certificates" header="Certificates" headerLink="/app/certificates" />
-               <LinksGroup _key="/app/discovery" header="Discovery" headerLink="/app/discovery" />
-               <LinksGroup _key="/app/connectors" header="Connectors" headerLink="/app/connectors" />
+               <LinksGroup _key="/home" header="Home" headerLink="/home" />
+               <LinksGroup _key="/dashboard" header="Dashboard" headerLink="/dashboard" />
+               <LinksGroup _key="/certificates" header="Certificates" headerLink="/certificates" />
+               <LinksGroup _key="/cryptographickeys" header="Keys" headerLink="/cryptographickeys" />
+               <LinksGroup _key="/discovery" header="Discoveries" headerLink="/discoveries" />
+               <LinksGroup _key="/connectors" header="Connectors" headerLink="/connectors" />
 
                <LinksGroup
                   _key="accessControl"
                   header="Access Control"
                   childrenLinks={[
-                     { _key: "/app/users", name: "Users", link: "/app/users" },
-                     { _key: "/app/roles", name: "Roles", link: "/app/roles" }
+                     { _key: "/users", name: "Users", link: "/users" },
+                     { _key: "/roles", name: "Roles", link: "/roles" }
                   ]}
                />
 
@@ -43,8 +41,9 @@ function Sidebar() {
                   _key="profiles"
                   header="Profiles"
                   childrenLinks={[
-                     { _key: "/app/raprofiles", name: "RA Profiles", link: "/app/raprofiles" },
-                     { _key: "/app/complianceprofiles", name: "Compliance Profiles", link: "/app/complianceprofiles" },
+                     { _key: "/raprofiles", name: "RA Profiles", link: "/raprofiles" },
+                     { _key: "/tokenprofiles", name: "Token Profiles", link: "/tokenprofiles" },
+                     { _key: "/complianceprofiles", name: "Compliance Profiles", link: "/complianceprofiles" },
                   ]}
                />
 
@@ -52,11 +51,12 @@ function Sidebar() {
                   _key="inventory"
                   header="Inventory"
                   childrenLinks={[
-                     { _key: "/app/credentials", name: "Credentials", link: "/app/credentials" },
-                     { _key: "/app/authorities", name: "Authorities", link: "/app/authorities" },
-                     { _key: "/app/groups", name: "Certificate Groups", link: "/app/groups" },
-                     { _key: "/app/entities", name: "Entities", link: "/app/entities" },
-                     { _key: "/app/locations", name: "Locations", link: "/app/locations" },
+                     { _key: "/credentials", name: "Credentials", link: "/credentials" },
+                     { _key: "/authorities", name: "Authorities", link: "/authorities" },
+                     { _key: "/tokens", name: "Tokens", link: "/tokens" },
+                     { _key: "/groups", name: "Groups", link: "/groups" },
+                     { _key: "/entities", name: "Entities", link: "/entities" },
+                     { _key: "/locations", name: "Locations", link: "/locations" },
                   ]}
                />
 
@@ -64,14 +64,21 @@ function Sidebar() {
                   _key="acm1"
                   header="ACME"
                   childrenLinks={[
-                     { _key: "/app/acmeaccounts", name: "ACME Accounts", link: "/app/acmeaccounts" },
-                     { _key: "/app/acmeprofiles", name: "ACME Profiles", link: "/app/acmeprofiles" },
+                     { _key: "/acmeaccounts", name: "ACME Accounts", link: "/acmeaccounts" },
+                     { _key: "/acmeprofiles", name: "ACME Profiles", link: "/acmeprofiles" },
                   ]}
                />
 
+                <LinksGroup
+                    _key="settings"
+                    header="Settings"
+                    childrenLinks={[
+                        { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
+                    ]}
+                />
 
-               <LinksGroup _key="/app/audit" header="Audit Logs" headerLink="/app/audit" />
-               {!inFrame ? (<LinksGroup _key="/app/about" header="About" headerLink="/app/about" />) : null}
+
+                <LinksGroup _key="/audit" header="Audit Logs" headerLink="/audit" />
 
             </ul>
 
@@ -79,6 +86,5 @@ function Sidebar() {
 
       </nav>
    );
-}
 
-export default withRouter(Sidebar);
+}

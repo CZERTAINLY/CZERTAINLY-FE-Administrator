@@ -1,8 +1,11 @@
 import "jszip";
-import { saveAs } from "file-saver";
 
-import { CertificateModel } from "models/certificate";
+import { saveAs } from "file-saver";
+import { Buffer } from "buffer";
+
 import JSZip from "jszip";
+import { CertificateContentResponseModel, CertificateDetailResponseModel } from "types/certificate";
+
 
 
 export function downloadFile(content: any, fileName: string) {
@@ -20,7 +23,7 @@ export function downloadFile(content: any, fileName: string) {
 
 export function downloadFileZip(
    certificateUuids: string[],
-   certificates: CertificateModel[],
+   certificates: CertificateDetailResponseModel[] | CertificateContentResponseModel[],
    fileType: string
 ) {
 
@@ -40,7 +43,7 @@ export function downloadFileZip(
       }
 
       zip.file(
-         certificate.commonName + "_" + certificate.serialNumber + "." + fileType,
+         certificate.commonName.replace("*.", "_.") + "_" + certificate.serialNumber + "." + fileType,
          content
       );
 

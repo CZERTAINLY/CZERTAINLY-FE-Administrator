@@ -17,6 +17,7 @@ function Header({ sidebarToggle }: Props) {
    const [isOpen, setIsOpen] = useState(false);
    const profile = useSelector(selectors.profile);
 
+
    const toggleDropdown = useCallback(
       () => setIsOpen(!isOpen),
       [isOpen],
@@ -50,7 +51,7 @@ function Header({ sidebarToggle }: Props) {
                      <DropdownMenu style={{ width: '100%' }}>
 
                         <DropdownItem>
-                           <NavLink to={`/app/userprofile/detail`}>Profile</NavLink>
+                           <NavLink to={`/userprofile`}>Profile</NavLink>
                         </DropdownItem>
 
                         <DropdownItem>

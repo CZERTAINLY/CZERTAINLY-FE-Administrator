@@ -1,195 +1,162 @@
-import { AvailableCertificateFilterDTO, CertificateDTO, CertificateEventHistoryDTO, CertificateSubjectAlternativeNamesDTO, NonCompliantRuleDTO } from "api/certificates";
-import { RaProfileDTO } from "api/profiles";
-import { AvailableCertificateFilterModel, CertificateEventHistoryModel, CertificateModel, CertificateRAProfileModel, NonCompliantRuleModel } from "models";
-import { transformAttributeDTOToModel } from "./attributes";
+import {
+   CertificateBulkDeleteRequestDto,
+   CertificateBulkDeleteRequestModel,
+   CertificateBulkDeleteResponseDto,
+   CertificateBulkDeleteResponseModel,
+   CertificateBulkObjectDto,
+   CertificateBulkObjectModel,
+   CertificateComplianceCheckModel,
+   CertificateComplianceResponseDto,
+   CertificateComplianceResponseModel,
+   CertificateHistoryDto,
+   CertificateHistoryModel,
+   CertificateListResponseDto,
+   CertificateListResponseModel,
+   CertificateObjectDto,
+   CertificateObjectModel,
+   CertificateRekeyRequestDto,
+   CertificateRekeyRequestModel,
+   CertificateRenewRequestDto,
+   CertificateRenewRequestModel,
+   CertificateDetailResponseDto,
+   CertificateDetailResponseModel,
+   CertificateRevokeRequestDto,
+   CertificateRevokeRequestModel,
+   CertificateSignRequestDto,
+   CertificateSignRequestModel,
+   CertificateUploadDto,
+   CertificateUploadModel,
+   RaProfileSimplifiedDto,
+   RaProfileSimplifiedModel,
+   SearchFieldDto,
+   SearchFieldModel,
+   SearchFilterDto,
+   SearchFilterModel,
+   SearchRequestDto,
+   SearchRequestModel,
+   CertificateContentResponseDto,
+   CertificateContentResponseModel,
+} from "types/certificate";
+import { CertificateComplianceCheckDto } from "../../types/openapi";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
+import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
 
-export function transformCertDTOToModel(certificate: CertificateDTO): CertificateModel {
+export function transformSearchFilterModelToDto(search: SearchFilterModel): SearchFilterDto {
+   return { ...search };
+}
 
-   const sanClone: CertificateSubjectAlternativeNamesDTO = JSON.parse(JSON.stringify(certificate.subjectAlternativeNames));
-
+export function transformSearchRequestModelToDto(search: SearchRequestModel): SearchRequestDto {
    return {
-      uuid: certificate.uuid,
-      commonName: certificate.commonName,
-      serialNumber: certificate.serialNumber,
-      issuerCommonName: certificate.issuerCommonName,
-      certificateContent: certificate.certificateContent,
-      issuerDn: certificate.issuerDn,
-      subjectDn: certificate.subjectDn,
-      notBefore: certificate.notBefore,
-      notAfter: certificate.notAfter,
-      publicKeyAlgorithm: certificate.publicKeyAlgorithm,
-      signatureAlgorithm: certificate.signatureAlgorithm,
-      keySize: certificate.keySize,
-      keyUsage: JSON.parse(JSON.stringify(certificate.keyUsage)),
-      extendedKeyUsage: certificate.extendedKeyUsage ? JSON.parse(JSON.stringify(certificate.extendedKeyUsage)) : undefined,
-      basicConstraints: certificate.basicConstraints,
-      status: certificate.status,
-      fingerprint: certificate.fingerprint,
-      certificateType: certificate.certificateType,
-      issuerSerialNumber: certificate.issuerSerialNumber,
+      ...search,
+      filters: search.filters?.map(transformSearchFilterModelToDto)
+   };
+}
 
-      subjectAlternativeNames: {
-         dNSName: sanClone.dNSName,
-         directoryName: sanClone.directoryName,
-         ediPartyName: sanClone.ediPartyName,
-         iPAddress: sanClone.iPAddress,
-         otherName: sanClone.otherName,
-         registeredID: sanClone.registeredID,
-         rfc822Name: sanClone.rfc822Name,
-         uniformResourceIdentifier: sanClone.uniformResourceIdentifier,
-         x400Address: sanClone.x400Address
-      },
+export function transformRaProfileSimplifiedDtoToModel(raProfile: RaProfileSimplifiedDto): RaProfileSimplifiedModel {
+   return { ...raProfile };
+}
 
-      meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
+export function transformCertificateComplianceResponseDtoToModel(cerCompliance: CertificateComplianceResponseDto): CertificateComplianceResponseModel {
+   return {
+      ...cerCompliance,
+      attributes: cerCompliance.attributes?.map(transformAttributeResponseDtoToModel)
+   };
+}
 
-      entity: certificate.entity ? {
-         uuid: certificate.entity.uuid,
-         entityType: certificate.entity.entityType,
-         name: certificate.entity.name,
-         description: certificate.entity.description
-      } : undefined,
-
-      group: certificate.group ? {
-         uuid: certificate.group.uuid,
-         name: certificate.group.name,
-         description: certificate.group.description
-      } : undefined,
-
-      owner: certificate.owner,
-
-      raProfile: certificate.raProfile ? {
-         uuid: certificate.raProfile.uuid,
-         name: certificate.raProfile.name,
-         enabled: certificate.raProfile.enabled,
-         authorityInstanceUuid: certificate.raProfile.authorityInstanceUuid,
-      } : undefined,
-
-      complianceStatus: certificate.complianceStatus,
-      nonCompliantRules: transformNonComplianceRulesToModel(certificate.nonCompliantRules),
-   }
-
+export function transformCertificateDetailResponseDtoToModel(certificate: CertificateDetailResponseDto): CertificateDetailResponseModel {
+   return {
+      ...certificate,
+      metadata: certificate.metadata?.map(transformMetadataDtoToModel),
+      raProfile: certificate.raProfile ? transformRaProfileSimplifiedDtoToModel(certificate.raProfile) : undefined,
+      locations: certificate.locations?.map(transformLocationResponseDtoToModel),
+      group: certificate.group ? transformCertificateGroupResponseDtoToModel(certificate.group) : undefined,
+      nonCompliantRules: certificate.nonCompliantRules?.map(transformCertificateComplianceResponseDtoToModel),
+      customAttributes: certificate.customAttributes?.map(transformAttributeResponseDtoToModel)
+   };
 }
 
 
-export function transformCertModelToDTO(certificate: CertificateModel): CertificateDTO {
-
-   const sanClone: CertificateSubjectAlternativeNamesDTO = JSON.parse(JSON.stringify(certificate.subjectAlternativeNames));
-
+export function transformCertificateResponseDtoToModel(certificate: CertificateListResponseDto): CertificateListResponseModel {
    return {
-      uuid: certificate.uuid,
-      commonName: certificate.commonName,
-      serialNumber: certificate.serialNumber,
-      issuerCommonName: certificate.issuerCommonName,
-      certificateContent: certificate.certificateContent,
-      issuerDn: certificate.issuerDn,
-      subjectDn: certificate.subjectDn,
-      notBefore: certificate.notBefore,
-      notAfter: certificate.notAfter,
-      publicKeyAlgorithm: certificate.publicKeyAlgorithm,
-      signatureAlgorithm: certificate.signatureAlgorithm,
-      keySize: certificate.keySize,
-      keyUsage: JSON.parse(JSON.stringify(certificate.keyUsage)),
-      extendedKeyUsage: certificate.extendedKeyUsage ? JSON.parse(JSON.stringify(certificate.extendedKeyUsage)) : undefined,
-      basicConstraints: certificate.basicConstraints,
-      status: certificate.status,
-      fingerprint: certificate.fingerprint,
-      certificateType: certificate.certificateType,
-      issuerSerialNumber: certificate.issuerSerialNumber,
-
-      subjectAlternativeNames: {
-         dNSName: sanClone.dNSName,
-         directoryName: sanClone.directoryName,
-         ediPartyName: sanClone.ediPartyName,
-         iPAddress: sanClone.iPAddress,
-         otherName: sanClone.otherName,
-         registeredID: sanClone.registeredID,
-         rfc822Name: sanClone.rfc822Name,
-         uniformResourceIdentifier: sanClone.uniformResourceIdentifier,
-         x400Address: sanClone.x400Address
-      },
-
-      meta: certificate.meta ? JSON.parse(JSON.stringify(certificate.meta)) : undefined,
-
-      entity: certificate.entity ? {
-         uuid: certificate.entity.uuid,
-         entityType: certificate.entity.entityType,
-         name: certificate.entity.name,
-         description: certificate.entity.description
-      } : undefined,
-
-      group: certificate.group ? {
-         uuid: certificate.group.uuid,
-         name: certificate.group.name,
-         description: certificate.group.description
-      } : undefined,
-
-      owner: certificate.owner,
-
-      raProfile: certificate.raProfile ? {
-         uuid: certificate.raProfile.uuid,
-         name: certificate.raProfile.name,
-         enabled: certificate.raProfile.enabled,
-         authorityInstanceUuid: certificate.raProfile.authorityInstanceUuid,
-      } : undefined
-   }
-
+      ...certificate,
+      raProfile: certificate.raProfile ? transformRaProfileSimplifiedDtoToModel(certificate.raProfile) : undefined,
+      group: certificate.group ? transformCertificateGroupResponseDtoToModel(certificate.group) : undefined,
+   };
 }
 
-
-export function transformAvailableCertificateFilterDTOToModel(availableCertificateFilter: AvailableCertificateFilterDTO): AvailableCertificateFilterModel {
-
+export function transformCertificateListResponseDtoToModel(certificates: CertificateListResponseDto): CertificateListResponseModel {
    return {
-      field: availableCertificateFilter.field,
-      label: availableCertificateFilter.label,
-      type: availableCertificateFilter.type,
-      conditions: [...availableCertificateFilter.conditions],
-      value: availableCertificateFilter.value,
-      multiValue: availableCertificateFilter.multiValue
-   }
-
+      ...certificates
+   };
 }
 
-
-export function transformCertificateHistoryDTOToModel(certificateHistory: CertificateEventHistoryDTO): CertificateEventHistoryModel {
-
+export function transformCertificateContentResponseDtoToModel(contents: CertificateContentResponseDto): CertificateContentResponseModel {
    return {
-      uuid: certificateHistory.uuid,
-      certificateUuid: certificateHistory.certificateUuid,
-      event: certificateHistory.event,
-      message: certificateHistory.message,
-      status: certificateHistory.status,
-      created: certificateHistory.created,
-      createdBy: certificateHistory.createdBy,
-      additionalInformation: certificateHistory.additionalInformation
-   }
-
+      ...contents
+   };
 }
 
-
-export function transformRaProfileDTOToCertificateModel(raProfile: RaProfileDTO): CertificateRAProfileModel {
-
+export function transformCertificateSignRequestModelToDto(signRequest: CertificateSignRequestModel): CertificateSignRequestDto {
    return {
-      uuid: raProfile.uuid,
-      name: raProfile.name,
-      enabled: raProfile.enabled,
-      authorityInstanceUuid: raProfile.authorityInstanceUuid,
-   }
-
+      ...signRequest,
+      attributes: signRequest.attributes.map(transformAttributeRequestModelToDto),
+      customAttributes: signRequest.customAttributes?.map(transformAttributeRequestModelToDto)
+   };
 }
 
+export function transformCertificateRevokeRequestModelToDto(revokeRequest: CertificateRevokeRequestModel): CertificateRevokeRequestDto {
+   return {
+      ...revokeRequest,
+      attributes: revokeRequest.attributes.map(transformAttributeRequestModelToDto)
+   };
+}
 
-export function transformNonComplianceRulesToModel(nonComplianceRules?: NonCompliantRuleDTO[]): NonCompliantRuleModel[] {
+export function transformCertificateRenewRequestModelToDto(renewRequest: CertificateRenewRequestModel): CertificateRenewRequestDto {
+   return { ...renewRequest };
+}
 
-   if (!nonComplianceRules) return [];
+export function transformCertificateRekeyRequestModelToDto(rekeyRequest: CertificateRekeyRequestModel): CertificateRekeyRequestDto {
+   return { ...rekeyRequest };
+}
 
-   return nonComplianceRules.map(
-      rule => ({
-         connectorName: rule.connectorName,
-         ruleName: rule.ruleName,
-         ruleDescription: rule.ruleDescription,
-         status: rule.status,
-         attributes: rule.attributes?.map(attribute => transformAttributeDTOToModel(attribute))
-      })
-   );
+export function transformSearchFieldDtoToModel(searchField: SearchFieldDto): SearchFieldModel {
+   return { ...searchField };
+}
 
+export function transformCertificateHistoryDtoToModel(history: CertificateHistoryDto): CertificateHistoryModel {
+   return { ...history };
+}
+
+export function transformCertificateObjectModelToDto(certificateObject: CertificateObjectModel): CertificateObjectDto {
+   return { ...certificateObject };
+}
+
+export function transformCertificateBulkObjectModelToDto(bulk: CertificateBulkObjectModel): CertificateBulkObjectDto {
+   return {
+      ...bulk,
+      filters: bulk.filters?.map(transformSearchFilterModelToDto)
+   }
+}
+
+export function transformCertificateBulkDeleteRequestModelToDto(bulk: CertificateBulkDeleteRequestModel): CertificateBulkDeleteRequestDto {
+   return {
+      ...bulk,
+      filters: bulk.filters?.map(transformSearchFilterModelToDto)
+   }
+}
+
+export function transformCertificateBulkDeleteResponseDtoToModel(bulk: CertificateBulkDeleteResponseDto): CertificateBulkDeleteResponseModel {
+   return { ...bulk };
+}
+
+export function transformCertificateUploadModelToDto(upload: CertificateUploadModel): CertificateUploadDto {
+   return {
+      ...upload,
+      customAttributes: upload.customAttributes.map(transformAttributeRequestModelToDto)
+   };
+}
+
+export function transformCertificateComplianceCheckModelToDto(check: CertificateComplianceCheckModel): CertificateComplianceCheckDto {
+   return { ...check };
 }

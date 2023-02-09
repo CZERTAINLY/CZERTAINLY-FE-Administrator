@@ -1,63 +1,57 @@
-import { Observable } from "rxjs";
 import { combineEpics, Epic } from "redux-observable";
 import { AnyAction, combineReducers } from "redux";
 
 import { ApiClients } from "api";
 
-import statupEpics from "./startup-epics";
-
 import { initialState as initialAlertsState, slice as alertsSlice } from "./alerts";
-
+import { initialState as initialAppRedirectState, slice as appRedirectSlice } from "./app-redirect";
 import { initialState as initialAuthState, slice as authSlice } from "./auth";
-import authEpics from "./auth-epics";
-
-import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./audit";
-import auditLogsEpics from "./audit-epics";
-
-import { initialState as initialUsersState, slice as usersSlice } from "./users";
-import usersEpics from "./users-epics";
-
-import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
-import rolesEpics from "./roles-epics";
-
-import { initialState as initialCertificatesState, slice as certificatesSlice } from "./certificates";
-import certificatesEpics from "./certificates-epic";
-
+import { initialState as initialDashboardState, slice as dashboardSlice } from "./statisticsDashboard";
+import { initialState as initialGroupsState, slice as groupsSlice } from "./certificateGroups";
 import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
-import connectorsEpics from "./connectors-epic";
-
-import { initialState as initialDashboardState, slice as dashboardSlice } from "./dashboard";
-import dashboardEpics from "./dashboard-epics";
-
-import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
-import raProfilesEpics from "./ra-profiles-epics";
-
-import { initialState as initialCredentialsState, slice as credentialsSlice } from "./credentials";
-import credentialsEpics from "./credentials-epics";
-
-import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } from "./acme-accounts";
-import acmeAccountsEpics from "./acme-accounts-epics";
-
-import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
-import acmeProfilesEpics from "./acme-profiles-epics";
-
+import { initialState as initialDiscoveriesState, slice as discoveriesSlice } from "./discoveries";
+import { initialState as initialUsersState, slice as usersSlice } from "./users";
+import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
+import { initialState as initialCertificatesState, slice as certificatesSlice } from "./certificates";
 import { initialState as initialAuthoritiesState, slice as authoritiesSlice } from "./authorities";
+import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
+import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } from "./acme-accounts";
+import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
+import { initialState as initialComplianceProfilesState, slice as initialComplianceProfilesSlice } from "./compliance-profiles";
+import { initialState as initialCredentialsState, slice as initialCredentialsSlice } from "./credentials";
+import { initialState as initialEntitiesState, slice as initialEntitiesSlice } from "./entities";
+import { initialState as initialLocationsState, slice as initialLocationsSlice } from "./locations";
+import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./auditLogs";
+import { initialState as initialCustomAttributesState, slice as customAttributesSlice } from "./customAttributes";
+import { initialState as initialTokenAttributesState, slice as tokenSlice } from "./tokens";
+import { initialState as initialTokenProfileAttributesState, slice as tokenProfileSlice } from "./token-profiles";
+import { initialState as initialCryptographicKeyAttributesState, slice as cryptographicKeySlice } from "./cryptographic-keys";
+import { initialState as initialCryptographicOperationsAttributesState, slice as cryptographicOperationsSlice } from "./cryptographic-operations";
+
+import authEpics from "./auth-epics";
+import appRedirectEpics from "./app-redirect-epics";
+import startupEpics from "./startup-epics";
+import dashboardEpics from "./statisticsDashboard-epics";
+import groupsEpics from "./certificateGroups-epics";
+import connectorsEpics from "./connectors-epic";
+import discoveriesEpics from "./discoveries-epics";
+import usersEpics from "./users-epics";
+import rolesEpics from "./roles-epics";
+import certificatesEpics from "./certificates-epics";
 import authoritiesEpics from "./authorities-epics";
-
-import { initialState as initialEntitiesState, slice as entitiesSlice } from "./entities";
+import raProfilesEpics from "./ra-profiles-epics";
+import acmeAccountsEpics from "./acme-accounts-epics";
+import acmeProfilesEpics from "./acme-profiles-epics";
+import complianceProfilesEpics from "./compliance-profiles-epics";
+import credentialsEpics from "./credentials-epics";
 import entitiesEpics from "./entities-epics";
-
-import { initialState as initialLocationState, slice as locationsSlice } from "./locations";
 import locationsEpics from "./locations-epics";
-
-import { initialState as initialGroupState, slice as groupSlice } from "./groups";
-import groupEpics from "./groups-epics";
-
-import { initialState as initialDiscoveryState, slice as discoverySlice } from "./discoveries";
-import discoveryEpics from "./discoveries-epics";
-
-import { initialState as initialComplianceProfileState, slice as complianceProfileSlice } from "./compliance-profiles";
-import complianceProfileEpics from "./compliance-profiles-epics";
+import auditLogsEpics from "./auditLogs-epics";
+import customAttributesEpics from "./customAttributes-epics";
+import tokenEpics from "./tokens-epics";
+import tokenProfileEpics from "./token-profiles-epics";
+import cryptographicKeyEpics from "./cryptographic-keys-epics";
+import cryptographicOperationsEpics from "./cryptographic-operations-epics";
 
 
 export interface EpicDependencies {
@@ -65,7 +59,7 @@ export interface EpicDependencies {
 }
 
 
-export type AppState = Observable<ReturnType<typeof reducers>>;
+export type AppState = ReturnType<typeof reducers>;
 
 
 export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
@@ -73,65 +67,83 @@ export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
 
 export const initialState = {
    [alertsSlice.name]: initialAlertsState,
-   [auditLogsSlice.name]: initialAuditLogsState,
+   [appRedirectSlice.name]: initialAppRedirectState,
    [authSlice.name]: initialAuthState,
+   [dashboardSlice.name]: initialDashboardState,
+   [groupsSlice.name]: initialGroupsState,
+   [connectorsSlice.name]: initialConnectorsState,
+   [discoveriesSlice.name]: initialDiscoveriesState,
    [usersSlice.name]: initialUsersState,
    [rolesSlice.name]: initialRolesState,
    [certificatesSlice.name]: initialCertificatesState,
-   [connectorsSlice.name]: initialConnectorsState,
-   [dashboardSlice.name]: initialDashboardState,
+   [authoritiesSlice.name]: initialAuthoritiesState,
    [raProfilesSlice.name]: initialRaProfilesState,
-   [credentialsSlice.name]: initialCredentialsState,
    [acmeAccountsSlice.name]: initialAcmeAccountsState,
    [acmeProfilesSlice.name]: initialAcmeProfilesState,
-   [authoritiesSlice.name]: initialAuthoritiesState,
-   [entitiesSlice.name]: initialEntitiesState,
-   [locationsSlice.name]: initialLocationState,
-   [groupSlice.name]: initialGroupState,
-   [discoverySlice.name]: initialDiscoveryState,
-   [complianceProfileSlice.name]: initialComplianceProfileState,
+   [initialComplianceProfilesSlice.name]: initialComplianceProfilesState,
+   [initialCredentialsSlice.name]: initialCredentialsState,
+   [initialEntitiesSlice.name]: initialEntitiesState,
+   [initialLocationsSlice.name]: initialLocationsState,
+   [auditLogsSlice.name]: initialAuditLogsState,
+   [customAttributesSlice.name]: initialCustomAttributesState,
+   [tokenSlice.name]: initialTokenAttributesState,
+   [tokenProfileSlice.name]: initialTokenProfileAttributesState,
+   [cryptographicKeySlice.name]: initialCryptographicKeyAttributesState,
+   [cryptographicOperationsSlice.name]: initialCryptographicOperationsAttributesState,
 };
 
 
 export const reducers = combineReducers<typeof initialState, any>({
    [alertsSlice.name]: alertsSlice.reducer,
-   [auditLogsSlice.name]: auditLogsSlice.reducer,
+   [appRedirectSlice.name]: appRedirectSlice.reducer,
    [authSlice.name]: authSlice.reducer,
-   [certificatesSlice.name]: certificatesSlice.reducer,
+   [dashboardSlice.name]: dashboardSlice.reducer,
+   [groupsSlice.name]: groupsSlice.reducer,
+   [connectorsSlice.name]: connectorsSlice.reducer,
+   [discoveriesSlice.name]: discoveriesSlice.reducer,
    [usersSlice.name]: usersSlice.reducer,
    [rolesSlice.name]: rolesSlice.reducer,
-   [connectorsSlice.name]: connectorsSlice.reducer,
-   [dashboardSlice.name]: dashboardSlice.reducer,
+   [certificatesSlice.name]: certificatesSlice.reducer,
+   [authoritiesSlice.name]: authoritiesSlice.reducer,
    [raProfilesSlice.name]: raProfilesSlice.reducer,
-   [credentialsSlice.name]: credentialsSlice.reducer,
    [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
    [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
-   [authoritiesSlice.name]: authoritiesSlice.reducer,
-   [entitiesSlice.name]: entitiesSlice.reducer,
-   [locationsSlice.name]: locationsSlice.reducer,
-   [groupSlice.name]: groupSlice.reducer,
-   [discoverySlice.name]: discoverySlice.reducer,
-   [complianceProfileSlice.name]: complianceProfileSlice.reducer,
+   [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
+   [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
+   [initialEntitiesSlice.name]: initialEntitiesSlice.reducer,
+   [initialLocationsSlice.name]: initialLocationsSlice.reducer,
+   [auditLogsSlice.name]: auditLogsSlice.reducer,
+   [customAttributesSlice.name]: customAttributesSlice.reducer,
+   [tokenSlice.name]: tokenSlice.reducer,
+   [tokenProfileSlice.name]: tokenProfileSlice.reducer,
+   [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,
+   [cryptographicOperationsSlice.name]: cryptographicOperationsSlice.reducer,
 });
 
 
 export const epics = combineEpics(
-   ...statupEpics,
+   ...startupEpics,
+   ...authEpics,
+   ...appRedirectEpics,
+   ...dashboardEpics,
+   ...groupsEpics,
+   ...connectorsEpics,
+   ...discoveriesEpics,
    ...usersEpics,
    ...rolesEpics,
-   ...authEpics,
-   ...auditLogsEpics,
    ...certificatesEpics,
-   ...connectorsEpics,
-   ...dashboardEpics,
+   ...authoritiesEpics,
    ...raProfilesEpics,
-   ...credentialsEpics,
    ...acmeAccountsEpics,
    ...acmeProfilesEpics,
-   ...authoritiesEpics,
+   ...complianceProfilesEpics,
+   ...credentialsEpics,
    ...entitiesEpics,
    ...locationsEpics,
-   ...groupEpics,
-   ...discoveryEpics,
-   ...complianceProfileEpics,
+   ...auditLogsEpics,
+   ...customAttributesEpics,
+   ...tokenEpics,
+   ...tokenProfileEpics,
+   ...cryptographicKeyEpics,
+   ...cryptographicOperationsEpics,
 );

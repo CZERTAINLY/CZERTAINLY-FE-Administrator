@@ -18,8 +18,16 @@ function Alerts() {
          {
             alerts.map(
                alert => (
-                  <Alert className={style.alert} key={alert.id} color={alert.color} toggle={() => dispatch(actions.dismiss(alert.id))} isOpen data-hiding={alert.isHiding}>
-                     {alert.message}
+                  <Alert
+                     className={style.alert}
+                     key={alert.id}
+                     color={alert.color}
+                     toggle={
+                        () => dispatch(actions.dismiss(alert.id))
+                     }
+                     isOpen data-hiding={alert.isHiding}
+                  >
+                     <span dangerouslySetInnerHTML={{__html: alert.message}} />
                   </Alert>
                )
             )

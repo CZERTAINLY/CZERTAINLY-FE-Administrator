@@ -1,34 +1,45 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useForm, useFormState } from "react-final-form";
-
-import { AttributeDescriptorModel } from "models/attributes/AttributeDescriptorModel";
-import { AttributeModel } from "models/attributes/AttributeModel";
-import { AttributeDescriptorCallbackMappingModel } from "models/attributes/AttributeDescriptorCallbackMappingModel";
-
-import { selectors as connectorSelectors, actions as connectorActions } from "ducks/connectors";
-
 import Widget from "components/Widget";
-import { FunctionGroupCode } from "types/connectors";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { AttributeCallbackDataModel } from "models/attributes/AttributeCallbackDataModel";
-import { AttributeContentModel } from "models/attributes/AttributeContentModel";
-import { Attribute } from "./Attribute";
-import { FileAttributeContentModel } from "models/attributes/FileAttributeContentModel";
 
+import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useForm, useFormState } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    AttributeCallbackMappingModel,
+    AttributeDescriptorModel,
+    AttributeResponseModel,
+    CodeBlockAttributeContentDataModel,
+    CustomAttributeModel,
+    DataAttributeModel,
+    FileAttributeContentModel,
+    InfoAttributeModel,
+    isAttributeDescriptorModel,
+    isCustomAttributeModel,
+    isDataAttributeModel,
+    isGroupAttributeModel,
+    isInfoAttributeModel,
+} from "types/attributes";
+import { CallbackAttributeModel } from "types/connectors";
+import { AttributeContentType, FunctionGroupCode, Resource } from "types/openapi";
+import { Attribute } from "./Attribute";
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
-const emptyAttributes: AttributeModel[] = [];
+const emptyAttributes: AttributeResponseModel[] = [];
+const emptyGroupAttributesCallbackAttributes: AttributeDescriptorModel[] = [];
 
 
 interface Props {
    id: string;
    attributeDescriptors: AttributeDescriptorModel[];
-   attributes?: AttributeModel[];
-   authorityUuid?: string;
+   groupAttributesCallbackAttributes?: AttributeDescriptorModel[];
+   setGroupAttributesCallbackAttributes?: Function;
+   attributes?: AttributeResponseModel[];
    connectorUuid?: string;
    functionGroupCode?: FunctionGroupCode;
    kind?: string;
+   callbackResource?: Resource;
+   callbackParentUuid?: string;
 }
 
 
@@ -36,10 +47,13 @@ export default function AttributeEditor({
    id,
    attributeDescriptors,
    attributes = emptyAttributes,
-   authorityUuid,
    connectorUuid,
    functionGroupCode,
-   kind
+   kind,
+   callbackResource,
+   callbackParentUuid,
+   groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
+   setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
 }: Props) {
 
    const dispatch = useDispatch();
@@ -56,7 +70,9 @@ export default function AttributeEditor({
    const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModel[]>();
 
    // used to check if attributes have changed
-   const [prevAttributes, setPrevAttributes] = useState<AttributeModel[]>();
+   const [prevAttributes, setPrevAttributes] = useState<AttributeResponseModel[]>();
+
+   const [prevGroupDescriptors, setPrevGroupDescriptors] = useState<AttributeDescriptorModel[]>();
 
    // options for selects
    const [options, setOptions] = useState<{ [attributeName: string]: { label: string, value: any }[] }>({});
@@ -96,7 +112,15 @@ export default function AttributeEditor({
                return undefined;
             }
 
-            currentObject = currentObject[pathPart];
+            if (Array.isArray(currentObject)) {
+                if (currentObject.length > 0) {
+                    currentObject = currentObject[0][pathPart];
+                } else {
+                    return undefined;
+                }
+            } else {
+                currentObject = currentObject[pathPart];
+            }
          }
 
          return currentObject;
@@ -124,7 +148,7 @@ export default function AttributeEditor({
     */
    const getAttributeValue = useCallback(
 
-      (attributes: AttributeModel[], path: string | undefined): any => {
+      (attributes: AttributeResponseModel[], path: string | undefined): any => {
 
          if (!path) return undefined;
 
@@ -145,7 +169,7 @@ export default function AttributeEditor({
     */
    const getCurrentFromMappingValue = useCallback(
 
-      (descriptor: AttributeDescriptorModel, mapping: AttributeDescriptorCallbackMappingModel): any => {
+      (mapping: AttributeCallbackMappingModel): any => {
 
          const attributeFromValue = getAttributeValue(attributes, mapping.from);
 
@@ -155,16 +179,19 @@ export default function AttributeEditor({
 
          // only lists are supported now, because of this the 'value' is added to the path as the list selected option is { label: "", value: "" }
          const formMappingPath = mapping.from ? mapping.from.includes(".") ? "value." + mapping.from.split(".").slice(1).join(".") : "value" : "value";
-         const currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) : undefined;
+         const currentContent = formAttribute ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) ?? formAttributes[formAttribute] : undefined;
 
-         const depDescriptor = attributeDescriptors.find(d => d.name === mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : "");
+         const depDescriptor = attributeDescriptors.find(d => d.name === (mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : ""));
          const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
 
-         return currentContent || attributeFromValue || depDescriptorValue;
+         const groupDescriptor = groupAttributesCallbackAttributes.find(d => d.name === (mapping.from ? mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from : ""));
+         const groupDescriptorValue = groupDescriptor ? getObjectPropertyValue(groupDescriptor, `content.${formMappingPath}`) : undefined;
+
+         return currentContent || attributeFromValue || depDescriptorValue || groupDescriptorValue;
 
       },
 
-      [attributeDescriptors, attributes, formState.values, getAttributeValue, getObjectPropertyValue, id]
+      [attributeDescriptors, groupAttributesCallbackAttributes, attributes, formState.values, getAttributeValue, getObjectPropertyValue, id]
 
    );
 
@@ -175,34 +202,36 @@ export default function AttributeEditor({
     */
    const buildCallbackMappings = useCallback(
 
-      (descriptor: AttributeDescriptorModel): AttributeCallbackDataModel | undefined => {
+      (descriptor: AttributeDescriptorModel): CallbackAttributeModel | undefined => {
 
          let hasUndefinedMapping = false;
 
-         const data: AttributeCallbackDataModel = {
+         const data: CallbackAttributeModel = {
             uuid: "",
             name: "",
             pathVariable: {},
-            queryParameter: {},
+            requestParameter: {},
             body: {}
          };
 
-         descriptor.callback?.mappings.forEach(
+        if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
 
-            mapping => {
+            descriptor.attributeCallback?.mappings.forEach(
+                mapping => {
 
-               mapping.targets.forEach(
-                  target => {
-                     let value = mapping.value || getCurrentFromMappingValue(descriptor, mapping);
-                     if (typeof value === "object" && value.hasOwnProperty("value")) value = value.value;
-                     if (value === undefined) hasUndefinedMapping = true;
-                     data[target][mapping.to] = value;
-                  }
-               )
+                    let value = mapping.value || getCurrentFromMappingValue(mapping);
+                    if (typeof value === "object" && value.hasOwnProperty("data")) value = value.data;
+                    if (value === undefined) hasUndefinedMapping = true;
 
-            }
+                    mapping.targets.forEach(
+                        target => {
+                            data[target]![mapping.to] = value;
+                        }
+                    )
 
-         );
+                }
+            );
+        }
 
          return hasUndefinedMapping ? undefined : data;
 
@@ -211,32 +240,52 @@ export default function AttributeEditor({
 
    );
 
+    const executeCallback = useCallback(
+        (mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
+            mappings.name = descriptor.name;
+            mappings.uuid = descriptor.uuid;
+            dispatch(callbackParentUuid && callbackResource
+                ? connectorActions.callbackResource({
+                    callbackId: formAttributeName,
+                    callbackResource: {
+                        parentObjectUuid: callbackParentUuid,
+                        resource: callbackResource,
+                        requestAttributeCallback: mappings
+                    }
+                })
+                :
+                connectorActions.callbackConnector({
+                    callbackId: formAttributeName,
+                    callbackConnector: {
+                        uuid: connectorUuid!,
+                        kind: kind!,
+                        functionGroup: functionGroupCode!,
+                        requestAttributeCallback: mappings
+                    }
+                })
+            );
+        }, [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind]
+    );
 
    /**
     * Groups attributes for rendering according to the attribute descriptor group property
     */
-   const groupedAttributesDescriptors: { [key: string]: AttributeDescriptorModel[] } = useMemo(
+   const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = useMemo(
 
       () => {
+         const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
 
-         const grouped: { [key: string]: AttributeDescriptorModel[] } = {};
-
-         attributeDescriptors.forEach(
-
+          [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach(
             descriptor => {
-
-               const groupName = descriptor.group || "__";
-               grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
-
+                if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                    const groupName = descriptor.properties.group || "__";
+                    grouped[groupName] ? grouped[groupName].push(descriptor) : grouped[groupName] = [descriptor]
+                }
             }
-
          );
-
          return grouped;
-
       },
-      [attributeDescriptors]
-
+      [attributeDescriptors, groupAttributesCallbackAttributes]
    );
 
 
@@ -245,13 +294,12 @@ export default function AttributeEditor({
     */
    useEffect(
       () => {
-
          // variables are passed just to prevent linting error, they are unused in the clearAttributes function
-         form.mutators.clearAttributes(attributeDescriptors, attributes);
+         form.mutators.clearAttributes(id, attributeDescriptors, attributes);
+         // setGroupAttributesCallbackAttributes(emptyGroupAttributesCallbackAttributes);
          dispatch(connectorActions.clearCallbackData());
-
       },
-      [attributeDescriptors, attributes, dispatch, form.mutators]
+      [attributeDescriptors, attributes, dispatch, form.mutators, id]
    );
 
 
@@ -264,128 +312,119 @@ export default function AttributeEditor({
    useEffect(
 
       () => {
-
          // run this effect only when attribute descriptors or attributes changes
-         if (attributeDescriptors === prevDescriptors && attributes === prevAttributes) return;
+         if (attributeDescriptors === prevDescriptors && attributes === prevAttributes && groupAttributesCallbackAttributes === prevGroupDescriptors) return;
 
          let newOptions: { [attributeName: string]: { label: string; value: any; }[] } = {};
 
-         attributeDescriptors.forEach(
+         const descriptorsToLoad = attributeDescriptors === prevDescriptors && attributes === prevAttributes
+             ? (groupAttributesCallbackAttributes ?? [])
+             : [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+
+          setPrevGroupDescriptors(groupAttributesCallbackAttributes);
+          setPrevDescriptors(attributeDescriptors);
+          setPrevAttributes(attributes);
+
+          descriptorsToLoad.forEach(
 
             descriptor => {
+                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
 
-               const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+                    const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
-               const attribute = attributes.find(a => a.name === descriptor.name);
-
-
-               // Build "static" options from the descriptor
-
-               if (descriptor.list && Array.isArray(descriptor.content)) {
-
-                  newOptions = { ...newOptions, [formAttributeName]: descriptor.content.map(data => ({ label: data.value as string, value: data })) };
-
-               }
+                    const attribute = attributes.find(a => a.name === descriptor.name);
 
 
-               // Perform initial callbacks based on "static" mappings
+                    // Build "static" options from the descriptor
+                    if ((isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) && descriptor.properties.list && Array.isArray(descriptor.content)) {
 
-               if (descriptor.callback) {
+                        newOptions = {
+                            ...newOptions,
+                            [formAttributeName]: descriptor.content.map(data => ({
+                                label: data.reference ?? data.data.toString(),
+                                value: data
+                            }))
+                        };
+                    }
 
-                  let mappings = buildCallbackMappings(descriptor);
+                    if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                        // Perform initial callbacks based on "static" mappings
+                        if (descriptor.attributeCallback) {
+                            let mappings = buildCallbackMappings(descriptor);
+                            if (mappings) {
+                                executeCallback(mappings, descriptor, formAttributeName);
+                            }
+                        }
+                    }
 
-                  if (mappings) {
+                    // Set initial values from the attribute
+                    if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                        if (descriptor.contentType === AttributeContentType.File) {
+                            if (attribute?.content) {
+                                form.mutators.setAttribute(`${formAttributeName}.content`, (attribute.content as FileAttributeContentModel[])[0].reference);
+                                form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
+                                form.mutators.setAttribute(`${formAttributeName}.mimeType.type`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            } else if (descriptor.content) {
+                                form.mutators.setAttribute(`${formAttributeName}.content`, (descriptor.content as FileAttributeContentModel[])[0].reference);
+                                form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
+                                form.mutators.setAttribute(`${formAttributeName}.mimeType.type`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                            }
+                            return;
+                        }
 
-                     mappings.name = descriptor.name;
-                     mappings.uuid = descriptor.uuid;
+                        let formAttributeValue = undefined;
 
-                     const url = authorityUuid
-                        ?
-                        `${authorityUuid}/callback`
-                        :
-                        `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                        ;
+                        if (descriptor.properties.list && descriptor.properties.multiSelect) {
 
-                     dispatch(
+                            if (Array.isArray(attribute?.content)) {
 
-                        connectorActions.callback({
-                           callbackId: formAttributeName,
-                           url,
-                           callbackData: mappings
-                        })
+                                formAttributeValue = attribute!.content.map(content => ({
+                                    label: content.reference ?? content.data.toString(),
+                                    value: content
+                                }))
 
-                     );
+                            } else {
 
-                  }
+                                formAttributeValue = undefined;
 
-               }
+                            }
 
-               // Set initial values from the attribute
+                        } else if (descriptor.properties.list) {
 
-               if (descriptor.type === "FILE") {
+                            if (attribute?.content) {
 
-                  if (attribute?.content) {
+                                formAttributeValue = {
+                                    label: attribute.content[0].reference ?? attribute.content[0].data.toString(),
+                                    value: attribute.content[0]
+                                }
 
-                     form.mutators.setAttribute(`${formAttributeName}.value`, (attribute.content as FileAttributeContentModel).value);
-                     form.mutators.setAttribute(`${formAttributeName}.contentType`, (attribute.content as FileAttributeContentModel).contentType || "unknown");
-                     form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel).fileName || "unknown");
+                            } else {
 
-                  } else if (descriptor.content) {
+                                formAttributeValue = undefined;
 
-                     form.mutators.setAttribute(`${formAttributeName}.value`, (descriptor.content as FileAttributeContentModel).value);
-                     form.mutators.setAttribute(`${formAttributeName}.contentType`, (descriptor.content as FileAttributeContentModel).contentType || "unknown");
-                     form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel).fileName || "unknown");
+                            }
 
-                  }
+                        } else if (attribute?.content) {
 
-                  return;
+                            formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
 
-               }
+                        } else if (descriptor.content && descriptor.content.length > 0) {
 
+                            formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
 
-               let formAttributeValue = undefined;
+                        }
 
-               if (descriptor.list && descriptor.multiSelect) {
+                        if (descriptor.contentType === AttributeContentType.Codeblock && (formAttributeValue !== undefined) && (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined) {
+                            formAttributeValue = {
+                                code: atob((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                                language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                            };
+                        }
 
-                  if (Array.isArray(attribute?.content)) {
+                        form.mutators.setAttribute(formAttributeName, formAttributeValue);
+                    }
 
-                     formAttributeValue = attribute!.content.map(content => ({ label: content.value, value: content }))
-
-                  } else if (attribute?.content) {
-
-                     formAttributeValue = [{ label: attribute!.content.value, value: attribute!.content }]
-
-
-                  } else {
-
-                     formAttributeValue = undefined;
-
-                  }
-
-               } else if (descriptor.list) {
-
-                  if (attribute?.content) {
-
-                     formAttributeValue = { label: (attribute.content as AttributeContentModel).value, value: attribute.content }
-
-                  } else {
-
-                     formAttributeValue = undefined;
-
-                  }
-
-               } else if (attribute?.content) {
-
-                  formAttributeValue = (attribute?.content as AttributeContentModel).value;
-
-               } else if (descriptor.content) {
-
-                  formAttributeValue = (descriptor.content as AttributeContentModel).value;
-
-               }
-
-               form.mutators.setAttribute(formAttributeName, formAttributeValue);
-
+                }
             }
 
          )
@@ -394,24 +433,18 @@ export default function AttributeEditor({
          // eslint-disable-next-line react-hooks/exhaustive-deps
          opts = { ...opts, ...newOptions };
          setOptions({ ...options, ...opts });
-
-         setPrevDescriptors(attributeDescriptors);
-         setPrevAttributes(attributes);
-
       },
-      [id, attributeDescriptors, attributes, form.mutators, options, dispatch, authorityUuid, connectorUuid, functionGroupCode, kind, prevDescriptors, prevAttributes, buildCallbackMappings]
+      [id, attributeDescriptors, groupAttributesCallbackAttributes, attributes, form.mutators, options, dispatch, prevDescriptors, prevAttributes, prevGroupDescriptors, buildCallbackMappings]
 
    )
 
-
-   /**
+    /**
     * Called on every form change
     * Evaluates changed attributes and eventually performs a callback whenever necessary
     */
    useEffect(
 
       () => {
-
          if (previousFormValues === formState.values) return;
 
          setPreviousFormValues(formState.values);
@@ -423,91 +456,54 @@ export default function AttributeEditor({
          const changedAttributes: { [name: string]: { previous: any, current: any } } = {};
 
          // get changed attributes and their current values
-
          for (const key in formState.values) {
-
-            if (key.startsWith("__attributes__")) {
-
+            if (key.startsWith(`__attributes__${id}__`)) {
                for (const attrKey in formState.values[key]) {
-
                   if (previousFormValues[key] === undefined || previousFormValues[key][attrKey] === undefined || previousFormValues[key][attrKey] !== formState.values[key][attrKey]) {
-
                      changedAttributes[attrKey] = {
                         previous: previousFormValues[key] !== undefined && previousFormValues[key][attrKey] !== undefined ? previousFormValues[key][attrKey] : undefined,
                         current: formState.values[key][attrKey]
                      }
-
                   }
-
                }
-
             }
-
          }
 
          // for each changed attribute check if there are mappings depending on it and if so perform the callback
-
-         attributeDescriptors.forEach(
+         [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach(
 
             descriptor => {
+                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
 
-               // list all 'from' mappings (get attribute names from the descriptor)
-               const fromNames: string[] = [];
+                   // list all 'from' mappings (get attribute names from the descriptor)
+                   const fromNames: string[] = [];
 
-               descriptor.callback?.mappings?.forEach(
-                  mapping => {
-                     if (mapping.from) fromNames.push(mapping.from);
-                  }
-               )
+                   descriptor.attributeCallback?.mappings?.forEach(
+                      mapping => {
+                         if (mapping.from) fromNames.push(mapping.from);
+                      }
+                   )
 
-               // check if any of the changed attributes is in the 'from' list
-               for (const fromName in fromNames) {
+                   // check if any of the changed attributes is in the 'from' list
+                   for (const fromName in fromNames) {
+                      const attributeName = fromNames[fromName].includes(".") ? fromNames[fromName].split(".")[0] : fromNames[fromName];
 
-                  const attributeName = fromNames[fromName].includes(".") ? fromNames[fromName].split(".")[0] : fromNames[fromName];
+                      // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
+                      if (changedAttributes[attributeName]) {
+                         let mappings = buildCallbackMappings(descriptor);
 
-                  // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
-
-                  if (changedAttributes[attributeName]) {
-
-                     let mappings = buildCallbackMappings(descriptor);
-
-                     if (mappings) {
-
-                        const formAttributeName = `__attributes__${id}__.${descriptor.name}`
-
-                        mappings.name = descriptor.name;
-                        mappings.uuid = descriptor.uuid;
-
-                        const url = authorityUuid
-                           ?
-                           `${authorityUuid}/callback`
-                           :
-                           `connectors/${connectorUuid}/${functionGroupCode}/${kind}/callback`
-                           ;
-
-                        form.mutators.setAttribute(formAttributeName, undefined);
-
-                        dispatch(
-
-                           connectorActions.callback({
-                              callbackId: formAttributeName,
-                              url,
-                              callbackData: mappings
-                           })
-
-                        );
-
-                     }
-
-                  }
-
-               }
-
-            }
+                         if (mappings) {
+                            const formAttributeName = `__attributes__${id}__.${descriptor.name}`
+                             form.mutators.setAttribute(formAttributeName, undefined);
+                             executeCallback(mappings, descriptor, formAttributeName);
+                         }
+                      }
+                   }
+                }
+          }
          )
-
       },
-      [attributeDescriptors, authorityUuid, buildCallbackMappings, connectorUuid, dispatch, form.mutators, formState.values, functionGroupCode, id, isRunningCb, kind, previousFormValues]
+      [attributeDescriptors, groupAttributesCallbackAttributes, buildCallbackMappings, dispatch, form.mutators, formState.values, id, isRunningCb, previousFormValues, executeCallback]
 
    );
 
@@ -518,37 +514,57 @@ export default function AttributeEditor({
    useEffect(
 
       () => {
-
          if (previousCallbackData === callbackData) return;
 
          for (const callbackId in callbackData) {
-
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
-
             if (!callbackData[callbackId]) continue;
 
             // Update options
-
             if (Array.isArray(callbackData[callbackId])) {
-               // multiple effects can modify opts during single render call
+                const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
+                setGroupAttributesCallbackAttributes(groupCallbackAttributes);
+
+                const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
+                    if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
+                        const formAttributeName = `__attributes__${id}__.${attr.name}`
+                        const optionsFromGroupCallback = attr.content?.map((value: any) => ({ label: value.reference ?? value.data.toString(), value }))
+                        const callbackContentOpts = optionsFromGroupCallback ? { [formAttributeName]: optionsFromGroupCallback } : {};
+                        return {...acc, ...callbackContentOpts}
+                    }
+
+                    return {...acc}
+                }, {})
+
+                const callbackContentOpts = {
+                    [callbackId]: callbackData[callbackId]
+                        .filter((v: any) => !isAttributeDescriptorModel(v))
+                        .map((value: any) => ({ label: value.reference ?? value.data.toString(), value }))
+                };
+
+                // multiple effects can modify opts during single render call
                // eslint-disable-next-line react-hooks/exhaustive-deps
-               opts = { ...opts, [callbackId]: callbackData[callbackId].map((value: any) => ({ label: value.value, value })) };
+               opts = {
+                   ...opts,
+                   ...callbackContentOpts,
+                   ...groupCallbackAttributesContentOpts,
+               };
+
                setOptions({ ...options, ...opts });
                continue;
             }
 
-            // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
-            if (callbackData[callbackId].value) {
-               form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
-               continue;
-            }
+            // // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
+            // if (callbackData[callbackId].value) {
+            //    form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
+            //    continue;
+            // }
 
          }
 
          setPreviousCallbackData(callbackData);
-
       },
-      [callbackData, form.mutators, options, previousCallbackData]
+      [callbackData, options, previousCallbackData]
 
    )
 

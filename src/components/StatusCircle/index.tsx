@@ -1,5 +1,5 @@
 import React from 'react';
-import { MDBBadge, MDBIcon } from "mdbreact";
+import { Badge } from 'reactstrap';
 
 interface Props {
    status?: boolean;
@@ -14,25 +14,25 @@ function StatusCircle({
       case true:
 
          return (
-            <MDBBadge color="success">
-               <MDBIcon icon="check-circle" />
-            </MDBBadge>
+            <Badge color="success">
+               <i className="fa fa-check-circle"></i>
+            </Badge>
          );
 
       case false:
 
          return (
-            <MDBBadge color="danger">
-               <MDBIcon icon="times-circle" />
-            </MDBBadge>
+            <Badge color="danger">
+               <i className="fa fa-times-circle"></i>
+            </Badge>
          );
 
       default:
 
          return (
-            <MDBBadge color="dark">
-               <MDBIcon icon="question-circle" />
-            </MDBBadge>
+            <Badge color="dark">
+               <i className="fa fa-question-circle"></i>
+            </Badge>
          );
 
    }
