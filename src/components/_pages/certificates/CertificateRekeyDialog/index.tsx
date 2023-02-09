@@ -512,7 +512,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
                            title="Rekey"
                            inProgressTitle="Rekeying..."
                            inProgress={submitting || rekeying}
-                           disabled={!valid}
+                           disabled={!valid || (!values.uploadCsr?.value && (values.key?.value.uuid === certificate?.key?.uuid))}
                         />
 
                         <Button

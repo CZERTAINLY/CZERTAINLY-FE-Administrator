@@ -54,12 +54,6 @@ export interface CertificateDetailDto {
      */
     issuerCommonName: string;
     /**
-     * Base64 encoded Certificate content
-     * @type {string}
-     * @memberof CertificateDetailDto
-     */
-    certificateContent: string;
-    /**
      * Issuer DN of the Certificate
      * @type {string}
      * @memberof CertificateDetailDto
@@ -174,6 +168,12 @@ export interface CertificateDetailDto {
      * @memberof CertificateDetailDto
      */
     metadata?: Array<MetadataResponseDto>;
+    /**
+     * Base64 encoded Certificate content
+     * @type {string}
+     * @memberof CertificateDetailDto
+     */
+    certificateContent: string;
     /**
      * Subject alternative names
      * @type {{ [key: string]: object; }}

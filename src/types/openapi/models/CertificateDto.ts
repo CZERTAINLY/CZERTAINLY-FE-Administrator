@@ -50,12 +50,6 @@ export interface CertificateDto {
      */
     issuerCommonName: string;
     /**
-     * Base64 encoded Certificate content
-     * @type {string}
-     * @memberof CertificateDto
-     */
-    certificateContent: string;
-    /**
      * Issuer DN of the Certificate
      * @type {string}
      * @memberof CertificateDto

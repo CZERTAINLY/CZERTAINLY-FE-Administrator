@@ -18,11 +18,13 @@ import {
    SearchFilterModel,
    SearchRequestModel,
    CertificateListResponseModel,
+   CertificateContentResponseModel,
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
 import { CertificateStatus } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
+import { downloadFileZip } from "utils/download";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
@@ -85,6 +87,8 @@ export type State = {
 
    csrAttributeDescriptors: AttributeDescriptorModel[];
 
+   isFetchingContents: boolean;
+
 
 };
 
@@ -143,6 +147,8 @@ export const initialState: State = {
    isFetchingCsrAttributes: false,
 
    csrAttributeDescriptors: [],
+
+   isFetchingContents: false,
 
 
 };
@@ -803,6 +809,26 @@ export const slice = createSlice({
 
       },
 
+      getCertificateContents: (state, action: PayloadAction<{ uuids: string[], format: string }>) => {
+
+         state.isFetchingContents = true;
+
+      },
+
+
+      getCertificateContentsSuccess: (state, action: PayloadAction<{ uuids: string[], format: string, contents: CertificateContentResponseModel[] }>) => {
+
+         state.isFetchingContents = false;
+         downloadFileZip(action.payload.uuids, action.payload.contents, action.payload.format)
+
+      },
+
+
+      getCertificateContentsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+
+         state.isFetchingContents = false;
+
+      },
 
    }
 
@@ -864,6 +890,8 @@ const validationResult = createSelector(state, state => state.validationResult);
 const isFetchingCsrAttributes = createSelector(state, state => state.isFetchingCsrAttributes);
 const csrAttributeDescriptors = createSelector(state, state => state.csrAttributeDescriptors);
 
+const isFetchingContents = createSelector(state, state => state.isFetchingContents);
+
 
 export const selectors = {
    state,
@@ -904,6 +932,7 @@ export const selectors = {
    validationResult,
    isFetchingCsrAttributes,
    csrAttributeDescriptors,
+   isFetchingContents,
 };
 
 

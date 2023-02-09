@@ -22,6 +22,7 @@ import {
     SearchRequestDto as SearchRequestDtoOpenApi,
     SimplifiedRaProfileDto,
     UploadCertificateRequestDto,
+    CertificateContentDto,
 } from "./openapi";
 
 export type SearchFilterDto = SearchFilterRequestDto;
@@ -87,3 +88,6 @@ export type CertificateUploadModel = CertificateUploadDto;
 
 export type CertificateCheckComplianceDto = CertificateComplianceCheckDto;
 export type CertificateComplianceCheckModel = CertificateComplianceCheckDto;
+
+export type CertificateContentResponseDto = CertificateContentDto;
+export type CertificateContentResponseModel = CertificateContentResponseDto;

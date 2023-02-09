@@ -12,7 +12,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
 import { dateFormatter } from "utils/dateUtil";
-import { downloadFileZip } from "utils/download";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType } from "../../../../types/openapi";
 import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
@@ -186,11 +185,11 @@ export default function CertificateList({
 
                <DropdownMenu>
 
-                  <DropdownItem key="pem" onClick={() => {downloadFileZip(checkedRows, certificates, "pem")} }>
+                  <DropdownItem key="pem" onClick={() => {dispatch(actions.getCertificateContents({uuids: checkedRows, format:"pem"}))} }>
                      PEM (.pem)
                   </DropdownItem>
 
-                  <DropdownItem key="der" onClick={() => {downloadFileZip(checkedRows, certificates, "cer")} }>
+                  <DropdownItem key="der" onClick={() => {dispatch(actions.getCertificateContents({uuids: checkedRows, format:"cer"}))} }>
                      DER (.cer)
                   </DropdownItem>
 
@@ -199,7 +198,7 @@ export default function CertificateList({
             </UncontrolledButtonDropdown>
 
          ),
-         [certificates, checkedRows]
+         [dispatch, checkedRows]
 
       );
 
