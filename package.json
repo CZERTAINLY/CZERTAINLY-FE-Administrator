@@ -1,6 +1,6 @@
 {
    "name": "czertainly-administrator",
-   "version": "2.5.0",
+   "version": "2.5.1-SNAPSHOT",
    "homepage": "/administrator",
    "private": true,
    "dependencies": {
