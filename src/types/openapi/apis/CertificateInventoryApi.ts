@@ -20,6 +20,7 @@ import type {
     BaseAttributeDto,
     BulkOperationResponse,
     CertificateComplianceCheckDto,
+    CertificateContentDto,
     CertificateDetailDto,
     CertificateEventHistoryDto,
     CertificateResponseDto,
@@ -57,6 +58,10 @@ export interface DeleteCertificateRequest {
 
 export interface GetCertificateRequest {
     uuid: string;
+}
+
+export interface GetCertificateContentRequest {
+    requestBody: Array<string>;
 }
 
 export interface GetCertificateEventHistoryRequest {
@@ -190,6 +195,26 @@ export class CertificateInventoryApi extends BaseAPI {
         return this.request<CertificateDetailDto>({
             url: '/v1/certificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get Certificate Content
+     */
+    getCertificateContent({ requestBody }: GetCertificateContentRequest): Observable<Array<CertificateContentDto>>
+    getCertificateContent({ requestBody }: GetCertificateContentRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateContentDto>>>
+    getCertificateContent({ requestBody }: GetCertificateContentRequest, opts?: OperationOpts): Observable<Array<CertificateContentDto> | AjaxResponse<Array<CertificateContentDto>>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'getCertificateContent');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<Array<CertificateContentDto>>({
+            url: '/v1/certificates/content',
+            method: 'POST',
+            headers,
+            body: requestBody,
         }, opts?.responseOpts);
     };
 

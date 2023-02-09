@@ -34,6 +34,8 @@ import {
    SearchFilterModel,
    SearchRequestDto,
    SearchRequestModel,
+   CertificateContentResponseDto,
+   CertificateContentResponseModel,
 } from "types/certificate";
 import { CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
@@ -86,6 +88,12 @@ export function transformCertificateResponseDtoToModel(certificate: CertificateL
 export function transformCertificateListResponseDtoToModel(certificates: CertificateListResponseDto): CertificateListResponseModel {
    return {
       ...certificates
+   };
+}
+
+export function transformCertificateContentResponseDtoToModel(contents: CertificateContentResponseDto): CertificateContentResponseModel {
+   return {
+      ...contents
    };
 }
 

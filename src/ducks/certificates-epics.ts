@@ -14,6 +14,7 @@ import {
     transformCertificateBulkDeleteResponseDtoToModel,
     transformCertificateBulkObjectModelToDto,
     transformCertificateComplianceCheckModelToDto,
+    transformCertificateContentResponseDtoToModel,
     transformCertificateDetailResponseDtoToModel,
     transformCertificateHistoryDtoToModel,
     transformCertificateListResponseDtoToModel,
@@ -950,6 +951,39 @@ const getCsrAttributes: AppEpic = (action$, state, deps) => {
 }
 
 
+
+const getCertificateContent: AppEpic = (action$, state$, deps) => {
+
+   return action$.pipe(
+
+      filter(
+         slice.actions.getCertificateContents.match
+      ),
+      switchMap(
+
+         action => deps.apiClients.certificates.getCertificateContent({requestBody: action.payload.uuids}).pipe(
+
+            map(
+               list => slice.actions.getCertificateContentsSuccess({
+                  contents: list.map(transformCertificateContentResponseDtoToModel),
+                  format: action.payload.format,
+                  uuids: action.payload.uuids,
+               })
+            ),
+
+            catchError(
+               error => of(
+                  slice.actions.getCertificateContentsFailure({ error: extractError(error, "Failed to download certificates") }),
+                  appRedirectActions.fetchError({ error, message: "Failed to download certificates" })
+               )
+            )
+         )
+      )
+   );
+
+}
+
+
 const epics = [
    listCertificates,
    getCertificateDetail,
@@ -974,6 +1008,7 @@ const epics = [
    getRevocationAttributes,
    checkCompliance,
    getCsrAttributes,
+   getCertificateContent
 ];
 
 
