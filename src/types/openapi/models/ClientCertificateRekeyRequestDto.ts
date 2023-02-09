@@ -45,12 +45,6 @@ export interface ClientCertificateRekeyRequestDto {
      */
     tokenProfileUuid: string;
     /**
-     * CSR Attributes. If not provided, existing attributes will be used to generate the new CSR
-     * @type {Array<RequestAttributeDto>}
-     * @memberof ClientCertificateRekeyRequestDto
-     */
-    csrAttributes?: Array<RequestAttributeDto>;
-    /**
      * Signature Attributes. If not provided, existing attributes will be used to generate the new CSR
      * @type {Array<RequestAttributeDto>}
      * @memberof ClientCertificateRekeyRequestDto

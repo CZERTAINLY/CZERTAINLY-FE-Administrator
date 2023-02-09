@@ -84,6 +84,7 @@ export default function CertificateDetail() {
    const isFetchingLocations = useSelector(selectors.isFetchingLocations);
    const isRevoking = useSelector(selectors.isRevoking);
    const isRenewing = useSelector(selectors.isRenewing);
+   const isRekeying = useSelector(selectors.isRekeying);
    const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
 
    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -119,8 +120,8 @@ export default function CertificateDetail() {
 
 
    const isBusy = useMemo(
-      () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing,
-      [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing]
+      () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
+      [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying]
    );
 
 

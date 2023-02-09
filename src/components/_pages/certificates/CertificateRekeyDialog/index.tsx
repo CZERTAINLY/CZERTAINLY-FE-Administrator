@@ -24,7 +24,6 @@ import { validateRequired } from "utils/validators";
 import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
 import { CertificateDetailResponseModel } from "types/certificate";
 import { KeyType } from "types/openapi";
-import TabLayout from "components/Layout/TabLayout";
 
 interface FormValues {
    pkcs10: File | null;
@@ -49,7 +48,6 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
    const isFetchingCsrAttributes = useSelector(certificateSelectors.isFetchingIssuanceAttributes);
    const isFetchingSignatureAttributes = useSelector(cryptographyOperationSelectors.isFetchingSignatureAttributes);
-   const csrAttributeDescriptors = useSelector(certificateSelectors.csrAttributeDescriptors);
    const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
 
    const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
@@ -58,7 +56,6 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
    const rekeying = useSelector(certificateSelectors.isRekeying);
 
-   const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
    const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
    useEffect(() => {
@@ -157,7 +154,6 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
             authorityUuid: certificate.raProfile.authorityInstanceUuid,
             rekey : {
                  pkcs10: values.file ? values.file : undefined,
-                 csrAttributes: collectFormAttributes("csrAttributes", csrAttributeDescriptors, values),
                  signatureAttributes: collectFormAttributes("signatureAttributes", signatureAttributeDescriptors, values),
                  keyUuid: values.key?.value.uuid || "",
                  tokenProfileUuid: values.tokenProfile?.value || ""  ,
@@ -166,7 +162,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
          }));
          onCancel();
       },
-      [dispatch, certificate, csrAttributeDescriptors, signatureAttributeDescriptors, onCancel]
+      [dispatch, certificate, signatureAttributeDescriptors, onCancel]
 
    );
 
@@ -471,35 +467,18 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
                      </Field>
 
-                     { values.tokenProfile && values.key ? <TabLayout tabs={[
-                                {
-                                    title: "Request Attributes",
-                                    content: (
-                                          <AttributeEditor
-                                             id="csrAttributes"
-                                             attributeDescriptors={csrAttributeDescriptors || []}
-                                             groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
-                                             setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
-                                             attributes={certificate?.csrAttributes}
-                                          />
-                                    )
-                                 },
-                                 {
-                                    title: "Signature Attributes",
-                                    content: (
-                                          <AttributeEditor
-                                             id="signatureAttributes"
-                                             attributeDescriptors={signatureAttributeDescriptors || []}
-                                             groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                                             setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                          />
-                                    )
-                                 }
-                              ]}
-                           /> : <></>
+                     { values.tokenProfile && values.key && !(!values.uploadCsr?.value && (values.key?.value.uuid === certificate?.key?.uuid)) ? 
+                              <AttributeEditor
+                                 id="signatureAttributes"
+                                 attributeDescriptors={signatureAttributeDescriptors || []}
+                                 groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                 setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
+                              />
+                  
+                           : <></>
                         }
                   
-                  </>
+                     </>
                   
                   : <></>
                   }

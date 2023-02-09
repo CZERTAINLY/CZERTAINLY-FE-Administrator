@@ -41,7 +41,12 @@ export interface MimeType {
      * @type {boolean}
      * @memberof MimeType
      */
-    concrete?: boolean;
+    wildcardSubtype?: boolean;
+    /**
+     * @type {boolean}
+     * @memberof MimeType
+     */
+    wildcardType?: boolean;
     /**
      * @type {string}
      * @memberof MimeType
@@ -51,10 +56,5 @@ export interface MimeType {
      * @type {boolean}
      * @memberof MimeType
      */
-    wildcardType?: boolean;
-    /**
-     * @type {boolean}
-     * @memberof MimeType
-     */
-    wildcardSubtype?: boolean;
+    concrete?: boolean;
 }
