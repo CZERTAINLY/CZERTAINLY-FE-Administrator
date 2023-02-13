@@ -1,8 +1,6 @@
 import * as DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { marked } from "marked";
-import "prismjs/components";
-import "prismjs/themes/prism.css";
 import React, { useCallback } from "react";
 import { Field, useForm, useFormState } from "react-final-form";
 
