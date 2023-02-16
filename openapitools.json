@@ -2,12 +2,28 @@
   "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
-    "version": "6.2.1",
+    "version": "6.3.0",
     "generators": {
       "typescript-rxjs-local": {
         "generatorName": "typescript-rxjs",
+        "inputSpec": "https://api.czertainly.com/develop/doc-openapi-czertainly-core.yaml",
         "output": "./src/types/openapi",
-        "glob": "./src/types/openapi/src/doc-openapi-czertainly-core.yaml",
+        "typeMappings": {
+          "set": "Array",
+          "Date": "string"
+        },
+        "additionalProperties": {
+          "withoutRuntimeChecks": true,
+          "supportsES6": true,
+          "withInterfaces": true,
+          "stringEnums": true,
+          "typescriptThreePlus": true
+        }
+      },
+      "typescript-rxjs-utils": {
+        "generatorName": "typescript-rxjs",
+        "inputSpec": "https://api.czertainly.com/utils/develop/utils-service.yaml",
+        "output": "./src/types/openapi/utils",
         "typeMappings": {
           "set": "Array",
           "Date": "string"
