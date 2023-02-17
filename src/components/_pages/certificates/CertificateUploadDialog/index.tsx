@@ -42,13 +42,8 @@ export default function CertificateUploadDialog({
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
+        dispatch(utilsCertificateActions.reset());
     }, [dispatch]);
-
-    useEffect(() => {
-        if (file.length > 0) {
-            dispatch(utilsCertificateActions.parseCertificate(file));
-        }
-    }, [dispatch, file])
 
     useEffect(() => {
         setCertificate(parsedCertificate ? transformParseCertificateResponseDtoToCertificateResponseDetailModel(parsedCertificate) : undefined);
@@ -59,11 +54,12 @@ export default function CertificateUploadDialog({
             const fileInfo = data.target!.result as string;
             const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
             const fileContent = fileInfo.split(",")[1];
+            dispatch(utilsCertificateActions.parseCertificate(fileContent));
 
             setFileName(fileName);
             setContentType(contentType);
             setFile(fileContent);
-        }, []);
+        }, [dispatch]);
 
 
    const onFileChanged = useCallback(

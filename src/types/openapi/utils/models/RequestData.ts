@@ -18,51 +18,8 @@ import type {
 } from './';
 
 /**
+ * @type RequestData
  * Certification request data
  * @export
- * @interface RequestData
  */
-export interface RequestData {
-    /**
-     * Subject of the PKCS#10 certification request
-     * @type {string}
-     * @memberof RequestData
-     */
-    subject: string;
-    /**
-     * List of subject alternative names
-     * @type {Array<string>}
-     * @memberof RequestData
-     */
-    sans?: Array<string>;
-    /**
-     * Signature algorithm for the certification request
-     * @type {string}
-     * @memberof RequestData
-     */
-    signatureAlgorithm: string;
-    /**
-     * Public key algorithm
-     * @type {string}
-     * @memberof RequestData
-     */
-    algorithm: string;
-    /**
-     * Base64-encoded public key
-     * @type {string}
-     * @memberof RequestData
-     */
-    publicKey: string;
-    /**
-     * List of certification request attributes
-     * @type {Array<string>}
-     * @memberof RequestData
-     */
-    attributes?: Array<string>;
-    /**
-     * ASN.1 dump the PKCS#10 certification request
-     * @type {string}
-     * @memberof RequestData
-     */
-    asn1dump: string;
-}
+export type RequestData = Pkcs10RequestAsn1Data | Pkcs10RequestBasicData | Pkcs10RequestExtendedData;

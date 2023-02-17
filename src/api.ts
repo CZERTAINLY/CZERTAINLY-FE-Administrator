@@ -25,7 +25,7 @@ import {
    UserManagementApi,
 } from "types/openapi";
 import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
-import { CertificateUtilsAPIApi, Configuration as ConfigurationUtils } from "types/openapi/utils";
+import { CertificateUtilsAPIApi, CertificationRequestUtilsAPIApi, Configuration as ConfigurationUtils } from "types/openapi/utils";
 import { OIDUtilsAPIApi } from "./types/openapi/utils";
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
@@ -58,6 +58,7 @@ export interface ApiClients {
    cryptographicOperations: CryptographicOperationsControllerApi;
    utilsOid: OIDUtilsAPIApi;
    utilsCertificate: CertificateUtilsAPIApi;
+   utilsCertificateRequest: CertificationRequestUtilsAPIApi;
 }
 
 
@@ -88,4 +89,5 @@ export const backendClient: ApiClients = {
    cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
    utilsOid: new OIDUtilsAPIApi(configurationUtils),
    utilsCertificate: new CertificateUtilsAPIApi(configurationUtils),
+   utilsCertificateRequest: new CertificationRequestUtilsAPIApi(configurationUtils),
 };

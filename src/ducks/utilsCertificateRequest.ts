@@ -1,9 +1,9 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { ParseCertificateResponseDto } from "../types/openapi/utils";
+import { ParseRequestResponseDto } from "../types/openapi/utils";
 
 export type State = {
-    parsedCertificate?: ParseCertificateResponseDto;
+    parsedCertificateRequest?: ParseRequestResponseDto;
     isFetchingDetail: boolean;
 };
 
@@ -12,23 +12,23 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "utilsCertificate",
+    name: "utilsCertificateRequest",
     initialState,
     reducers: {
         reset: (state) => {
-            state.parsedCertificate = undefined;
+            state.parsedCertificateRequest = undefined;
         },
-        parseCertificate: (state, action: PayloadAction<string>) => {
-            state.parsedCertificate = undefined;
+        parseCertificateRequest: (state, action: PayloadAction<string>) => {
+            state.parsedCertificateRequest = undefined;
             state.isFetchingDetail = true;
         },
 
-        parseCertificateSuccess: (state, action: PayloadAction<ParseCertificateResponseDto>) => {
-            state.parsedCertificate = action.payload;
+        parseCertificateRequestSuccess: (state, action: PayloadAction<ParseRequestResponseDto>) => {
+            state.parsedCertificateRequest = action.payload;
             state.isFetchingDetail = false;
         },
 
-        parseCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        parseCertificateRequestFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
         },
     },
@@ -36,12 +36,12 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const parsedCertificate = createSelector(state, (state: State) => state.parsedCertificate);
+const parsedCertificateRequest = createSelector(state, (state: State) => state.parsedCertificateRequest);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 
 export const selectors = {
     state,
-    parsedCertificate,
+    parsedCertificateRequest,
     isFetchingDetail,
 };
 

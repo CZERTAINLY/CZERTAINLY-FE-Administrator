@@ -25,20 +25,6 @@ export const emptyCertificate: CertificateDetailResponseModel = {
    privateKeyAvailability: false,
 }
 
-export function certificatePEM2CertificateModel(pem: string): CertificateDetailResponseModel {
-
-   return emptyCertificate;
-
-}
-
-
-export function getCertificateInformation(encoded: string): CertificateDetailResponseModel {
-
-   return emptyCertificate;
-
-}
-
-
 export function formatPEM(pemString: string) {
 
    const PEM_STRING_LENGTH = pemString.length, LINE_LENGTH = 64;

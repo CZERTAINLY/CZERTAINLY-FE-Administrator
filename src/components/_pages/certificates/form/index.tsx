@@ -5,10 +5,10 @@ import Widget from "components/Widget";
 
 import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
 import { actions as connectorActions } from "ducks/connectors";
-import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
-import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
-import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
 import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
+import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
+import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
 import { FormApi } from "final-form";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
@@ -19,16 +19,20 @@ import { useNavigate } from "react-router-dom";
 import Select, { SingleValue } from "react-select";
 import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
+import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
 import { RaProfileResponseModel } from "types/ra-profiles";
+import { TokenProfileResponseModel } from "types/token-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as utilsCertificateRequestActions, selectors as utilsCertificateRequestSelectors } from "../../../../ducks/utilsCertificateRequest";
+import { CertificateDetailResponseModel } from "../../../../types/certificate";
 import { KeyType, Resource } from "../../../../types/openapi";
+import CertificateAttributes from "../../../CertificateAttributes";
 import TabLayout from "../../../Layout/TabLayout";
-import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
-import { TokenProfileResponseModel } from "types/token-profiles";
 
 interface FormValues {
    raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
@@ -64,6 +68,9 @@ export default function CertificateForm() {
    const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
    const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
+    const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
+    const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
+
    useEffect(() => {
 
       dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
@@ -71,9 +78,13 @@ export default function CertificateForm() {
       dispatch(raProfileActions.listRaProfiles());
       dispatch(tokenProfileActions.listTokenProfiles({enabled: true}));
       dispatch(connectorActions.clearCallbackData());
+       dispatch(utilsCertificateRequestActions.reset());
 
    }, [dispatch]);
 
+    useEffect(() => {
+        setCertificate(parsedCertificateRequest ? transformParseRequestResponseDtoToCertificateResponseDetailModel(parsedCertificateRequest) : undefined);
+    }, [parsedCertificateRequest])
 
    const onFileLoaded = useCallback(
 
@@ -83,13 +94,14 @@ export default function CertificateForm() {
 
          const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
          const fileContent = fileInfo.split(",")[1];
+         dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
 
          form.mutators.setAttribute("fileName", fileName);
          form.mutators.setAttribute("contentType", contentType);
          form.mutators.setAttribute("file", fileContent);
 
       },
-      []
+      [dispatch]
 
    );
 
@@ -373,6 +385,7 @@ export default function CertificateForm() {
 
                         values.uploadCsr?.value && values.raProfile ? (
 
+                            <>
                               <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={(e) => onFileDrop(e, form)} onDragOver={onFileDragOver}>
 
                                  <Row>
@@ -474,7 +487,11 @@ export default function CertificateForm() {
 
                               </div>
 
-                        ) : <></>
+                            {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
+                         </>
+
+
+                         ) : <></>
 
                      }
 

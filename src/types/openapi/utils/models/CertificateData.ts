@@ -18,75 +18,8 @@ import type {
 } from './';
 
 /**
+ * @type CertificateData
  * Certificate data
  * @export
- * @interface CertificateData
  */
-export interface CertificateData {
-    /**
-     * Subject of the X.509 certificate
-     * @type {string}
-     * @memberof CertificateData
-     */
-    subject: string;
-    /**
-     * Issuer of the X.509 certificate
-     * @type {string}
-     * @memberof CertificateData
-     */
-    issuer: string;
-    /**
-     * notBefore in epoch / unix format
-     * @type {number}
-     * @memberof CertificateData
-     */
-    validFrom: number;
-    /**
-     * notAfter in epoch / unix format
-     * @type {number}
-     * @memberof CertificateData
-     */
-    validTo: number;
-    /**
-     * Serial number of the certificate in HEX
-     * @type {string}
-     * @memberof CertificateData
-     */
-    serialNumber: string;
-    /**
-     * Version of the X.509 certificate
-     * @type {number}
-     * @memberof CertificateData
-     */
-    version: number;
-    /**
-     * Signature algorithm for the certificate
-     * @type {string}
-     * @memberof CertificateData
-     */
-    signatureAlgorithm: string;
-    /**
-     * Public key algorithm
-     * @type {string}
-     * @memberof CertificateData
-     */
-    algorithm: string;
-    /**
-     * Base64-encoded public key
-     * @type {string}
-     * @memberof CertificateData
-     */
-    publicKey: string;
-    /**
-     * List of subject alternative names
-     * @type {Array<string>}
-     * @memberof CertificateData
-     */
-    sans?: Array<string>;
-    /**
-     * ASN.1 dump the X.509 certificate
-     * @type {string}
-     * @memberof CertificateData
-     */
-    asn1dump: string;
-}
+export type CertificateData = X509CertificateAsn1Data | X509CertificateBasicData | X509CertificateExtendedData;
