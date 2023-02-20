@@ -2,10 +2,11 @@ import CertificateAttributes from "components/CertificateAttributes";
 import React, { useCallback, useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ButtonGroup, Col, Form as BootstrapForm, FormGroup, FormText, Input, Label, Row } from "reactstrap";
+import { Button, ButtonGroup, Col, Form as BootstrapForm, FormGroup, Input, Label, Row } from "reactstrap";
 import { CertificateDetailResponseModel } from "types/certificate";
-import { getCertificateInformation } from "utils/certificate";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificate";
+import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -34,65 +35,31 @@ export default function CertificateUploadDialog({
    const [contentType, setContentType] = useState("");
    const [file, setFile] = useState<string>("");
 
-   const [error, setError] = useState<string>("");
-
    const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
+    const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
+
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
+        dispatch(utilsCertificateActions.reset());
     }, [dispatch]);
 
+    useEffect(() => {
+        setCertificate(parsedCertificate ? transformParseCertificateResponseDtoToCertificateResponseDetailModel(parsedCertificate) : undefined);
+    }, [parsedCertificate])
 
     const onFileLoaded = useCallback(
+        (data: ProgressEvent<FileReader>, fileName: string) => {
+            const fileInfo = data.target!.result as string;
+            const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
+            const fileContent = fileInfo.split(",")[1];
+            dispatch(utilsCertificateActions.parseCertificate(fileContent));
 
-      (data: ProgressEvent<FileReader>, fileName: string) => {
-
-         const fileInfo = data.target!.result as string;
-
-         const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
-         const fileContent = fileInfo.split(",")[1];
-
-         setFileName(fileName);
-         setContentType(contentType);
-
-         let b64decoded: string;
-
-         try {
-            b64decoded = atob(fileContent);
-            setFile(b64decoded.includes("-----BEGIN CERTIFICATE-----") ? b64decoded : fileContent);
-         } catch (e) {
-            setError("Failed to decode passed file. Certificate will not be shown.");
-            setFile("base64:" + fileContent);
-            setCertificate(undefined);
-            return;
-         }
-
-         let crt: CertificateDetailResponseModel | undefined = undefined;
-
-         try {
-            crt = getCertificateInformation(b64decoded);
-         } catch (e) {
-
-            try {
-               crt = getCertificateInformation(btoa(b64decoded));
-            } catch (e) {
-            }
-
-         }
-
-         if (!crt) {
-            setError("Failed to decode passed file. Certificate will not be shown.");
-         } else {
-            setError("");
-         }
-
-         setCertificate(crt);
-
-      },
-      []
-
-   );
+            setFileName(fileName);
+            setContentType(contentType);
+            setFile(fileContent);
+        }, [dispatch]);
 
 
    const onFileChanged = useCallback(
@@ -225,8 +192,6 @@ export default function CertificateUploadDialog({
                         </div>
 
                      </div>
-
-                     {error && <><br /><div className="text-muted" style={{ textAlign: "center" }}>{error}</div><FormText style={{ textAlign: "center" }}>Possibly the certificate can be decoded on the server side</FormText></>}
 
                      {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
 

@@ -5,9 +5,9 @@ import Widget from "components/Widget";
 
 import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
 import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
-import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
 import { FormApi } from "final-form";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
@@ -17,13 +17,16 @@ import { useDispatch, useSelector } from "react-redux";
 import Select, { SingleValue } from "react-select";
 import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
+import { CertificateDetailResponseModel } from "types/certificate";
+import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
+import { KeyType } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { validateRequired } from "utils/validators";
-import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
-import { CertificateDetailResponseModel } from "types/certificate";
-import { KeyType } from "types/openapi";
+import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as utilsCertificateRequestActions, selectors as utilsCertificateRequestSelectors } from "../../../../ducks/utilsCertificateRequest";
+import CertificateAttributes from "../../../CertificateAttributes";
 
 interface FormValues {
    pkcs10: File | null;
@@ -58,7 +61,18 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
    const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-   useEffect(() => {
+    const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
+    const [certificateRequest, setCertificateRequest] = useState<CertificateDetailResponseModel | undefined>();
+
+    useEffect(() => {
+        dispatch(utilsCertificateRequestActions.reset());
+    }, [dispatch]);
+
+    useEffect(() => {
+        setCertificateRequest(parsedCertificateRequest ? transformParseRequestResponseDtoToCertificateResponseDetailModel(parsedCertificateRequest) : undefined);
+    }, [parsedCertificateRequest])
+
+    useEffect(() => {
 
       dispatch(certificateActions.getCsrAttributes())
       dispatch(tokenProfileActions.listTokenProfiles({enabled: true}));
@@ -78,13 +92,14 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
          const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
          const fileContent = fileInfo.split(",")[1];
+          dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
 
          form.mutators.setAttribute("fileName", fileName);
          form.mutators.setAttribute("contentType", contentType);
          form.mutators.setAttribute("file", fileContent);
 
       },
-      []
+      [dispatch]
 
    );
 
@@ -407,6 +422,8 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
                                  </div>
 
                               </div>
+
+                               {certificateRequest && <><br /><CertificateAttributes certificate={certificateRequest} /></>}
 
                            </>
                         ) : <></>

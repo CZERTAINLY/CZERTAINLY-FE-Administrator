@@ -25,8 +25,11 @@ import {
    UserManagementApi,
 } from "types/openapi";
 import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
+import { CertificateUtilsAPIApi, CertificationRequestUtilsAPIApi, Configuration as ConfigurationUtils } from "types/openapi/utils";
+import { OIDUtilsAPIApi } from "./types/openapi/utils";
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
+const configurationUtils = new ConfigurationUtils({ basePath: "/utils" });
 
 export interface ApiClients {
    auth: AuthenticationManagementApi;
@@ -53,6 +56,9 @@ export interface ApiClients {
    tokenProfiles: TokenProfileManagementApi;
    cryptographicKeys: CryptographicKeyControllerApi;
    cryptographicOperations: CryptographicOperationsControllerApi;
+   utilsOid: OIDUtilsAPIApi;
+   utilsCertificate: CertificateUtilsAPIApi;
+   utilsCertificateRequest: CertificationRequestUtilsAPIApi;
 }
 
 
@@ -81,4 +87,7 @@ export const backendClient: ApiClients = {
    tokenProfiles: new TokenProfileManagementApi(configuration),
    cryptographicKeys: new CryptographicKeyControllerApi(configuration),
    cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
+   utilsOid: new OIDUtilsAPIApi(configurationUtils),
+   utilsCertificate: new CertificateUtilsAPIApi(configurationUtils),
+   utilsCertificateRequest: new CertificationRequestUtilsAPIApi(configurationUtils),
 };

@@ -1,5 +1,10 @@
-import { useCallback, useState } from "react";
-import { Button, ButtonGroup, FormGroup, FormText, Input, Label } from "reactstrap";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, ButtonGroup, FormGroup, Input, Label } from "reactstrap";
+import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificate";
+import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
+import { CertificateDetailResponseModel } from "../../../../types/certificate";
+import CertificateAttributes from "../../../CertificateAttributes";
 
 interface Props {
    onCancel: () => void,
@@ -13,39 +18,37 @@ export default function CertificateRenewDialog({
    onRenew,
 
 }: Props) {
+    const dispatch = useDispatch();
 
    const [fileName, setFileName] = useState("");
    const [contentType, setContentType] = useState("");
    const [file, setFile] = useState<string>("");
-   const [error, setError] = useState<string>("");
 
    const [uploadCsr, setUploadCsr] = useState(false);
 
-   const onFileLoaded = useCallback(
+    const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
+    const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
 
-      (data: ProgressEvent<FileReader>, fileName: string) => {
+    useEffect(() => {
+        dispatch(utilsCertificateActions.reset());
+    }, [dispatch]);
 
-         const fileInfo = data.target!.result as string;
+    useEffect(() => {
+        setCertificate(parsedCertificate ? transformParseCertificateResponseDtoToCertificateResponseDetailModel(parsedCertificate) : undefined);
+    }, [parsedCertificate])
 
-         const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
-         const fileContent = fileInfo.split(",")[1];
+    const onFileLoaded = useCallback(
+        (data: ProgressEvent<FileReader>, fileName: string) => {
+            const fileInfo = data.target!.result as string;
+            const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
+            const fileContent = fileInfo.split(",")[1];
+            dispatch(utilsCertificateActions.parseCertificate(fileContent));
 
-         setFileName(fileName);
-         setContentType(contentType);
-         let b64decoded: string;
-
-         try {
-            b64decoded = atob(fileContent);
-            setFile(b64decoded.startsWith("-----") ? b64decoded : fileContent);
-         } catch (e) {
-            setError("Failed to decode passed file. Certificate will not be shown.");
-            setFile("base64:" + fileContent);
-            return;
-         }
-      },
-      []
-
-   );
+            setFileName(fileName);
+            setContentType(contentType);
+            setFile(fileContent);
+        }, [dispatch],
+    );
 
 
    const onFileChanged = useCallback(
@@ -151,13 +154,12 @@ export default function CertificateRenewDialog({
                Select or Drag &amp; Drop file to Drop Zone.
             </div>
 
+            {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
             </>
             ) : <></>
          }
 
          </div>
-
-         {error && <><br /><div className="text-muted" style={{ textAlign: "center" }}>{error}</div><FormText style={{ textAlign: "center" }}>Possibly the CSR can be decoded on the server side</FormText></>}
 
          <br />
 
