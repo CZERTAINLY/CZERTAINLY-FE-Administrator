@@ -1,7 +1,7 @@
 import { selectors } from "ducks/auth";
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {HashRouter, Navigate, Route, Routes} from "react-router-dom";
 import AcmeAccountDetail from "./_pages/acme-accounts/detail";
 
 import AcmeAccountsList from "./_pages/acme-accounts/list";
@@ -233,7 +233,7 @@ export default function AppRouter() {
 
    return (
 
-      <BrowserRouter basename={(window as any).__ENV__.BASE_URL}>
+      <HashRouter>
 
          <AppRedirect />
 
@@ -247,7 +247,7 @@ export default function AppRouter() {
 
          </Routes>
 
-      </BrowserRouter >
+      </HashRouter >
 
    );
 

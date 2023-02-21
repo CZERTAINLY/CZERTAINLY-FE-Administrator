@@ -1,7 +1,7 @@
 {
    "name": "czertainly-administrator",
    "version": "2.5.1-SNAPSHOT",
-   "homepage": "/administrator",
+   "homepage": ".",
    "private": true,
    "dependencies": {
       "@openapitools/openapi-generator-cli": "^2.5.2",
