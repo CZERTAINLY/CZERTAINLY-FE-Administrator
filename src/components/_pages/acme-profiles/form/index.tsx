@@ -177,16 +177,7 @@ export default function AcmeProfileForm() {
 
    );
 
-
-   const onCancelClick = useCallback(
-
-      () => {
-         navigate(`../../detail/${id}`, { relative: "path" });
-      },
-      [navigate, id]
-
-   );
-
+   const onCancelClick = useCallback(() => navigate(-1), [navigate]);
 
    const onRaProfileChange = useCallback(
 
