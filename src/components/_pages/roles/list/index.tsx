@@ -1,14 +1,14 @@
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
+
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+
+import { actions, selectors } from "ducks/roles";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
-
-import { actions, selectors } from "ducks/roles";
-
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
 
 export default function RolesList() {
 
@@ -56,7 +56,7 @@ export default function RolesList() {
       () => {
 
          if (checkedRows.length !== 1) return;
-         navigate(`./roles/users/${checkedRows[0]}`);
+         navigate(`./users/${checkedRows[0]}`);
 
       },
       [checkedRows, navigate]
@@ -69,7 +69,7 @@ export default function RolesList() {
       () => {
 
          if (checkedRows.length !== 1) return;
-         navigate(`./roles/permissions/${checkedRows[0]}`);
+         navigate(`./permissions/${checkedRows[0]}`);
 
       },
       [checkedRows, navigate]
