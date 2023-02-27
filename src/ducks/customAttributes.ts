@@ -193,9 +193,6 @@ export const slice = createSlice({
             state.isDeleting = false;
             const index = state.customAttributes.findIndex(attr => attr.uuid === action.payload);
             if (index !== -1) state.customAttributes.splice(index, 1);
-            if (state.customAttribute?.uuid === action.payload) {
-                state.customAttribute = undefined;
-            }
         },
 
         deleteCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

@@ -74,6 +74,7 @@ export default function Sidebar() {
                     header="Settings"
                     childrenLinks={[
                         { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
+                        { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
                     ]}
                 />
 

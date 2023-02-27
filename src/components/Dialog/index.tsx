@@ -23,7 +23,7 @@ export default function Dialog(props: Props) {
 
    return (
 
-      <Modal size={props.size || undefined} overflowScroll={false} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
+      <Modal size={props.size || undefined} isOpen={props.isOpen} toggle={() => { if (props.toggle) props.toggle() }}>
 
          <ModalHeader toggle={() => { if (props.toggle) props.toggle() }}>
             {props.caption}
