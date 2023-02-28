@@ -92,7 +92,7 @@ export default function ConnectorMetadataDialog({show, setShow}: Props) {
                 return [];
             }
         },
-        [connectorMetadata],
+        [connectorMetadata, dispatch, connectorUuid],
     );
 
     return <Dialog
