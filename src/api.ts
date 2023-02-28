@@ -17,6 +17,7 @@ import {
    CustomAttributesApi,
    DiscoveryManagementApi,
    EntityManagementApi,
+   GlobalMetadataApi,
    LocationManagementApi,
    RAProfileManagementApi,
    RoleManagementApi,
@@ -52,6 +53,7 @@ export interface ApiClients {
    discoveries: DiscoveryManagementApi;
    complianceProfile: ComplianceProfileManagementApi;
    customAttributes: CustomAttributesApi;
+   globalMetadata: GlobalMetadataApi;
    tokenInstances: TokenInstanceControllerApi;
    tokenProfiles: TokenProfileManagementApi;
    cryptographicKeys: CryptographicKeyControllerApi;
@@ -83,6 +85,7 @@ export const backendClient: ApiClients = {
    discoveries: new DiscoveryManagementApi(configuration),
    complianceProfile: new ComplianceProfileManagementApi(configuration),
    customAttributes: new CustomAttributesApi(configuration),
+   globalMetadata: new GlobalMetadataApi(configuration),
    tokenInstances: new TokenInstanceControllerApi(configuration),
    tokenProfiles: new TokenProfileManagementApi(configuration),
    cryptographicKeys: new CryptographicKeyControllerApi(configuration),

@@ -1,7 +1,7 @@
 import { selectors } from "ducks/auth";
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import {HashRouter, Navigate, Route, Routes} from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import AcmeAccountDetail from "./_pages/acme-accounts/detail";
 
 import AcmeAccountsList from "./_pages/acme-accounts/list";
@@ -46,6 +46,10 @@ import EntityDetail from "./_pages/entities/detail";
 import EntityEdit from "./_pages/entities/form";
 
 import EntitiesList from "./_pages/entities/list";
+import GlobalMetadataDetail from "./_pages/global-metadata/detail";
+import GlobalMetadataEdit from "./_pages/global-metadata/form";
+
+import GlobalMetadataList from "./_pages/global-metadata/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
 
@@ -195,6 +199,12 @@ export default function AppRouter() {
                <Route path="/customattributes/detail/:id" element={<CustomAttributesDetail />} />
                <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
                <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
+
+               <Route path="/globalmetadata" element={<GlobalMetadataList />} />
+               <Route path="/globalmetadata/list" element={<Navigate to="/globalmetadata" />} />
+               <Route path="/globalmetadata/detail/:id" element={<GlobalMetadataDetail />} />
+               <Route path="/globalmetadata/add" element={<GlobalMetadataEdit />} />
+               <Route path="/globalmetadata/edit/:id" element={<GlobalMetadataEdit />} />
 
                <Route path="/tokens" element={<TokenList />} />
                <Route path="/tokens/list" element={<Navigate to="/tokens" />} />
