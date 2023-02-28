@@ -68,7 +68,7 @@ export default function GlobalMetadataForm() {
 
                         <TextField label={"Name"} id={"name"} disabled={editMode} validators={[validateRequired(), validateAlphaNumeric()]}/>
                         <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumeric()]}/>
-                        <TextField label={"Description"} id={"description"} validators={[validateRequired(), validateAlphaNumeric()]}/>
+                        <TextField label={"Description"} id={"description"} validators={[validateAlphaNumeric()]}/>
 
                         <Field name="contentType" validate={composeValidators(validateRequired())}>
                             {({input, meta}) => (

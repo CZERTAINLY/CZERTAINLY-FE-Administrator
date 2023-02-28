@@ -22,6 +22,7 @@ export * from './LocalOperationsApi';
 export * from './LocationManagementApi';
 export * from './RAProfileManagementApi';
 export * from './RoleManagementApi';
+export * from './SettingsApi';
 export * from './StatisticsDashboardApi';
 export * from './TokenInstanceControllerApi';
 export * from './TokenProfileManagementApi';
