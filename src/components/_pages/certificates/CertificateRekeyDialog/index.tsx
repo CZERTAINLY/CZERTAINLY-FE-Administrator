@@ -395,7 +395,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
                                              id="fileContent"
                                              type="textarea"
                                              rows={6}
-                                             placeholder={`Select or drag & drop a certificate File`}
+                                             placeholder={`Select or drag & drop a CSR File`}
                                              readOnly={true}
                                           />
 
@@ -423,7 +423,7 @@ export default function CertificateRekeyDialog(  { onCancel, certificate }: prop
 
                               </div>
 
-                               {certificateRequest && <><br /><CertificateAttributes certificate={certificateRequest} /></>}
+                               {certificateRequest && <><br /><CertificateAttributes csr={true} certificate={certificateRequest} /></>}
 
                            </>
                         ) : <></>

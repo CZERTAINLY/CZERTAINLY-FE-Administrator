@@ -1,5 +1,5 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
+import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
@@ -14,7 +14,7 @@ const parseCertificateRequest: AppEpic = (action$, state$, deps) => {
             slice.actions.parseCertificateRequest.match,
         ),
         switchMap(
-            action => deps.apiClients.utilsCertificateRequest.parseRequest({
+            action => deps.apiClients.utilsCertificateRequest?.parseRequest({
                 requestType: ParseRequestRequestTypeEnum.Pkcs10,
                 parseRequestRequestDto: {
                     request: action.payload,
@@ -30,7 +30,7 @@ const parseCertificateRequest: AppEpic = (action$, state$, deps) => {
                         appRedirectActions.fetchError({error: err, message: "Failed to get certificate request."}),
                     ),
                 ),
-            ),
+            ) ?? EMPTY,
         ),
     );
 };

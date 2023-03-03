@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, FormGroup, Input, Label } from "reactstrap";
-import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificate";
-import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
+import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as utilsCertificateRequestActions, selectors as utilsCertificateRequestSelectors } from "../../../../ducks/utilsCertificateRequest";
 import { CertificateDetailResponseModel } from "../../../../types/certificate";
 import CertificateAttributes from "../../../CertificateAttributes";
 
@@ -27,22 +27,22 @@ export default function CertificateRenewDialog({
    const [uploadCsr, setUploadCsr] = useState(false);
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
-    const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
+    const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
 
     useEffect(() => {
-        dispatch(utilsCertificateActions.reset());
+        dispatch(utilsCertificateRequestActions.reset());
     }, [dispatch]);
 
     useEffect(() => {
-        setCertificate(parsedCertificate ? transformParseCertificateResponseDtoToCertificateResponseDetailModel(parsedCertificate) : undefined);
-    }, [parsedCertificate])
+        setCertificate(parsedCertificateRequest ? transformParseRequestResponseDtoToCertificateResponseDetailModel(parsedCertificateRequest) : undefined);
+    }, [parsedCertificateRequest])
 
     const onFileLoaded = useCallback(
         (data: ProgressEvent<FileReader>, fileName: string) => {
             const fileInfo = data.target!.result as string;
             const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
             const fileContent = fileInfo.split(",")[1];
-            dispatch(utilsCertificateActions.parseCertificate(fileContent));
+            dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
 
             setFileName(fileName);
             setContentType(contentType);
@@ -154,7 +154,7 @@ export default function CertificateRenewDialog({
                Select or Drag &amp; Drop file to Drop Zone.
             </div>
 
-            {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
+            {certificate && <><br /><CertificateAttributes csr={true} certificate={certificate} /></>}
             </>
             ) : <></>
          }

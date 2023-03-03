@@ -459,7 +459,7 @@ export default function CertificateForm() {
                                              id="fileContent"
                                              type="textarea"
                                              rows={6}
-                                             placeholder={`Select or drag & drop a certificate File`}
+                                             placeholder={`Select or drag & drop a CSR File`}
                                              readOnly={true}
                                           />
 
@@ -487,7 +487,7 @@ export default function CertificateForm() {
 
                               </div>
 
-                            {certificate && <><br /><CertificateAttributes certificate={certificate} /></>}
+                            {certificate && <><br /><CertificateAttributes csr={true} certificate={certificate} /></>}
                          </>
 
 
