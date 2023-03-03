@@ -44,6 +44,8 @@ import { initialState as initialRaProfilesState, slice as raProfilesSlice } from
 import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
 import rolesEpics from "./roles-epics";
+import { initialState as initialSettingsState, slice as settingsSlice } from "./settings";
+import settingsEpics from "./settings-epics";
 import startupEpics from "./startup-epics";
 import { initialState as initialDashboardState, slice as dashboardSlice } from "./statisticsDashboard";
 import dashboardEpics from "./statisticsDashboard-epics";
@@ -93,6 +95,7 @@ export const initialState = {
    [auditLogsSlice.name]: initialAuditLogsState,
    [customAttributesSlice.name]: initialCustomAttributesState,
    [globalMetadataSlice.name]: initialGlobalMetadataState,
+   [settingsSlice.name]: initialSettingsState,
    [tokenSlice.name]: initialTokenAttributesState,
    [tokenProfileSlice.name]: initialTokenProfileAttributesState,
    [cryptographicKeySlice.name]: initialCryptographicKeyAttributesState,
@@ -125,6 +128,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [auditLogsSlice.name]: auditLogsSlice.reducer,
    [customAttributesSlice.name]: customAttributesSlice.reducer,
    [globalMetadataSlice.name]: globalMetadataSlice.reducer,
+   [settingsSlice.name]: settingsSlice.reducer,
    [tokenSlice.name]: tokenSlice.reducer,
    [tokenProfileSlice.name]: tokenProfileSlice.reducer,
    [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,
@@ -157,6 +161,7 @@ export const epics = combineEpics(
    ...auditLogsEpics,
    ...customAttributesEpics,
    ...globalMetadataEpics,
+   ...settingsEpics,
    ...tokenEpics,
    ...tokenProfileEpics,
    ...cryptographicKeyEpics,

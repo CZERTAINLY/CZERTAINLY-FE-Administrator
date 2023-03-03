@@ -21,6 +21,7 @@ import {
    LocationManagementApi,
    RAProfileManagementApi,
    RoleManagementApi,
+   SettingsApi,
    StatisticsDashboardApi,
    TokenProfileManagementApi,
    UserManagementApi,
@@ -30,7 +31,6 @@ import { CertificateUtilsAPIApi, CertificationRequestUtilsAPIApi, Configuration 
 import { OIDUtilsAPIApi } from "./types/openapi/utils";
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
-const configurationUtils = new ConfigurationUtils({ basePath: "/utils" });
 
 export interface ApiClients {
    auth: AuthenticationManagementApi;
@@ -54,13 +54,14 @@ export interface ApiClients {
    complianceProfile: ComplianceProfileManagementApi;
    customAttributes: CustomAttributesApi;
    globalMetadata: GlobalMetadataApi;
+   settings: SettingsApi;
    tokenInstances: TokenInstanceControllerApi;
    tokenProfiles: TokenProfileManagementApi;
    cryptographicKeys: CryptographicKeyControllerApi;
    cryptographicOperations: CryptographicOperationsControllerApi;
-   utilsOid: OIDUtilsAPIApi;
-   utilsCertificate: CertificateUtilsAPIApi;
-   utilsCertificateRequest: CertificationRequestUtilsAPIApi;
+   utilsOid?: OIDUtilsAPIApi;
+   utilsCertificate?: CertificateUtilsAPIApi;
+   utilsCertificateRequest?: CertificationRequestUtilsAPIApi;
 }
 
 
@@ -86,11 +87,22 @@ export const backendClient: ApiClients = {
    complianceProfile: new ComplianceProfileManagementApi(configuration),
    customAttributes: new CustomAttributesApi(configuration),
    globalMetadata: new GlobalMetadataApi(configuration),
+   settings: new SettingsApi(configuration),
    tokenInstances: new TokenInstanceControllerApi(configuration),
    tokenProfiles: new TokenProfileManagementApi(configuration),
    cryptographicKeys: new CryptographicKeyControllerApi(configuration),
    cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
-   utilsOid: new OIDUtilsAPIApi(configurationUtils),
-   utilsCertificate: new CertificateUtilsAPIApi(configurationUtils),
-   utilsCertificateRequest: new CertificationRequestUtilsAPIApi(configurationUtils),
 };
+
+export const updateBackendUtilsClients = (url: string | undefined) => {
+   if (url && url !== "") {
+      const configuration = new ConfigurationUtils({basePath: url});
+      backendClient.utilsCertificate = new CertificateUtilsAPIApi(configuration);
+      backendClient.utilsOid = new OIDUtilsAPIApi(configuration);
+      backendClient.utilsCertificateRequest = new CertificationRequestUtilsAPIApi(configuration);
+   } else {
+      backendClient.utilsCertificate = undefined;
+      backendClient.utilsOid = undefined;
+      backendClient.utilsCertificateRequest = undefined;
+   }
+}

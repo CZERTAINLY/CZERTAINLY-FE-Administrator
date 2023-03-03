@@ -1,5 +1,5 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
+import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
@@ -13,7 +13,7 @@ const getOidInfo: AppEpic = (action$, state$, deps) => {
             slice.actions.getOidInfo.match,
         ),
         switchMap(
-            action => deps.apiClients.utilsOid.getOidInfo({identifier: action.payload}).pipe(
+            action => deps.apiClients.utilsOid?.getOidInfo({identifier: action.payload}).pipe(
                 map(
                     oidInfo => slice.actions.getOidInfoSuccess(oidInfo),
                 ),
@@ -23,7 +23,7 @@ const getOidInfo: AppEpic = (action$, state$, deps) => {
                         appRedirectActions.fetchError({error: err, message: "Failed to get OID."}),
                     ),
                 ),
-            ),
+            ) ?? EMPTY,
         ),
     );
 };
