@@ -1,4 +1,8 @@
 import {
+   DiscoveryCertificateDto,
+   DiscoveryCertificateListDto,
+   DiscoveryCertificateListModel,
+   DiscoveryCertificateModel,
    DiscoveryRequestDto,
    DiscoveryRequestModel,
    DiscoveryResponseDetailDto,
@@ -27,5 +31,16 @@ export function transformDiscoveryRequestModelToDto(discovery: DiscoveryRequestM
       ...discovery,
       attributes: discovery.attributes.map(transformAttributeRequestModelToDto),
       customAttributes: discovery.customAttributes?.map(transformAttributeRequestModelToDto)
+   }
+}
+
+export function transformDiscoveryCertificateDtoToModel(cert: DiscoveryCertificateDto): DiscoveryCertificateModel {
+   return { ...cert };
+}
+
+export function transformDiscoveryCertificateListDtoToModel(list: DiscoveryCertificateListDto): DiscoveryCertificateListModel {
+   return {
+      ...list,
+      certificates: list.certificates.map(transformDiscoveryCertificateDtoToModel)
    }
 }

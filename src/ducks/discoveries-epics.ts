@@ -9,7 +9,12 @@ import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./discoveries";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
-import { transformDiscoveryRequestModelToDto, transformDiscoveryResponseDetailDtoToModel, transformDiscoveryResponseDtoToModel } from "./transform/discoveries";
+import {
+    transformDiscoveryCertificateListDtoToModel,
+    transformDiscoveryRequestModelToDto,
+    transformDiscoveryResponseDetailDtoToModel,
+    transformDiscoveryResponseDtoToModel,
+} from "./transform/discoveries";
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
 
@@ -145,6 +150,26 @@ const getDiscoveryProviderAttributesDescriptors: AppEpic = (action$, state, deps
    );
 }
 
+const getDiscoveryCertificates: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.getDiscoveryCertificates.match,
+        ),
+        switchMap(
+            (action) => deps.apiClients.discoveries.getDiscoveryCertificates(action.payload).pipe(
+                map(
+                    certificates => slice.actions.getDiscoveryCertificatesSuccess(transformDiscoveryCertificateListDtoToModel(certificates)),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.getDiscoveryCertificatesFailure({error: extractError(err, "Failed to get Discovery Certificates list")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to get Discovery Certificates list"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
 
 const createDiscovery: AppEpic = (action$, state$, deps) => {
 
@@ -254,6 +279,7 @@ const epics = [
    getDiscoveryDetail,
    listDiscoveryProviders,
    getDiscoveryProviderAttributesDescriptors,
+   getDiscoveryCertificates,
    createDiscovery,
    deleteDiscovery,
    bulkDeleteDiscovery,
