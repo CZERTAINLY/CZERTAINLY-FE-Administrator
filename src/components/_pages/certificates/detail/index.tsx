@@ -1050,6 +1050,10 @@ export default function CertificateDetail() {
                 id: "basicConstraint",
                 columns: ["Basic Constraint", certificate.basicConstraints],
             },
+            {
+                id: "asn1structure",
+                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
+            },
         ],
         [certificate],
     );
@@ -1242,8 +1246,6 @@ export default function CertificateDetail() {
                                     data={propertiesData}
                                 />
                             </Widget>
-
-                            {certificate && <Asn1Dialog certificateContent={certificate.certificateContent}/>}
 
                         </Col>
                     </Row>

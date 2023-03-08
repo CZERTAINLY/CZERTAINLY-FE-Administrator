@@ -5,7 +5,6 @@ import { transformParseCertificateResponseDtoToAsn1String } from "../../../../du
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
 import { ParseCertificateRequestDtoParseTypeEnum } from "../../../../types/openapi/utils";
 import Dialog from "../../../Dialog";
-import Widget from "../../../Widget";
 
 interface Props {
     certificateContent: string;
@@ -31,11 +30,19 @@ export default function Asn1Dialog({certificateContent}: Props) {
     }, [parsedCertificate]);
 
     return asn1 ? <>
-        <Widget><Button color={"primary"} onClick={() => setIsOpen(true)}>Show ASN.1 Data</Button></Widget>
+        <Button
+            className="btn btn-link p-0"
+            size="sm"
+            color="primary"
+            onClick={() => setIsOpen(true)}
+            title="Show ASN.1 Structure"
+        >
+            Show
+        </Button>
         <Dialog
             isOpen={isOpen}
             size={"lg"}
-            caption="ASN.1 Data"
+            caption="ASN.1 Structure"
             body={asn1}
             toggle={() => setIsOpen(false)}
             buttons={[{color: "primary", onClick: () => setIsOpen(false), body: "Close"}]}
