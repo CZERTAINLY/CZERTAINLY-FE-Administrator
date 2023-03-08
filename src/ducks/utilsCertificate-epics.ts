@@ -3,7 +3,7 @@ import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
-import { ParseCertificateCertificateTypeEnum, ParseCertificateRequestDtoParseTypeEnum } from "../types/openapi/utils";
+import { ParseCertificateCertificateTypeEnum } from "../types/openapi/utils";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./utilsCertificate";
@@ -17,8 +17,8 @@ const parseCertificate: AppEpic = (action$, state$, deps) => {
             action => deps.apiClients.utilsCertificate?.parseCertificate({
                 certificateType: ParseCertificateCertificateTypeEnum.X509,
                 parseCertificateRequestDto: {
-                    certificate: action.payload,
-                    parseType: ParseCertificateRequestDtoParseTypeEnum.Basic,
+                    certificate: action.payload.certificate,
+                    parseType: action.payload.parseType,
                 },
             }).pipe(
                 map(

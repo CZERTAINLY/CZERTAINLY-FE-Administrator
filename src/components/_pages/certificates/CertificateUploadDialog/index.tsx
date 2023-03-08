@@ -9,6 +9,7 @@ import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } 
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { Resource } from "../../../../types/openapi";
+import { ParseCertificateRequestDtoParseTypeEnum } from "../../../../types/openapi/utils";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
@@ -54,7 +55,7 @@ export default function CertificateUploadDialog({
             const fileInfo = data.target!.result as string;
             const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
             const fileContent = fileInfo.split(",")[1];
-            dispatch(utilsCertificateActions.parseCertificate(fileContent));
+            dispatch(utilsCertificateActions.parseCertificate({certificate: fileContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Basic}));
 
             setFileName(fileName);
             setContentType(contentType);
