@@ -1283,14 +1283,14 @@ export default function CertificateDetail() {
                             data={validationData}
                         />
                     </Widget>
-                        {certificate?.nonCompliantRules ? <Widget title={complianceTitle} busy={isFetching}>
+                        <Widget title={complianceTitle} busy={isFetching}>
                             <br/>
                             <CustomTable
                                 headers={complianceHeaders}
                                 data={complianceData}
                                 hasDetails={true}
                             />
-                        </Widget> : null}
+                        </Widget>
 
                     </Widget>,
 
