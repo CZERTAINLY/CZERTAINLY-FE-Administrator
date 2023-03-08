@@ -6,19 +6,13 @@ import { actions, selectors } from "ducks/discoveries";
 import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Col, FormGroup, Input, Label, Row } from "reactstrap";
 
 import { dateFormatter } from "utils/dateUtil";
 import PagedCustomTable from "../../../CustomTable/PagedCustomTable";
+import TabLayout from "../../../Layout/TabLayout";
 
 interface Props {
     id: string;
-}
-
-enum NEWLY_DISCOVERED {
-    ALL = "All",
-    NEW = "New",
-    EXISTING = "Existing"
 }
 
 export default function DiscoveryCertificates({id}: Props) {
@@ -87,35 +81,23 @@ export default function DiscoveryCertificates({id}: Props) {
         [discoveryCertificates],
     );
 
+    const pagedTable = <PagedCustomTable
+        headers={discoveryCertificatesHeaders}
+        data={discoveryCertificatesData}
+        totalItems={discoveryCertificates?.totalItems}
+        onReloadData={onReloadData}
+    />;
+
     return (
         <Widget title={discoveryCertificatesTitle} busy={isFetchingDiscoveryCertificates}>
 
             <br/>
 
-            <FormGroup>
-                <Label for="newlyDiscovered">Newly discovered</Label>
-                <Row>
-                    <Col xs="6" sm="6" md="5" lg="4" xl="3">
-                        <Input
-                            type="select"
-                            id="newlyDiscovered"
-                            value={newlyDiscovered === undefined ? NEWLY_DISCOVERED.ALL : newlyDiscovered ? NEWLY_DISCOVERED.NEW : NEWLY_DISCOVERED.EXISTING}
-                            onChange={(e) => setNewlyDiscovered(e.target.value === NEWLY_DISCOVERED.ALL ? undefined : e.target.value === NEWLY_DISCOVERED.NEW)}
-                        >
-                            <option key={NEWLY_DISCOVERED.ALL} value={NEWLY_DISCOVERED.ALL}>{NEWLY_DISCOVERED.ALL}</option>
-                            <option key={NEWLY_DISCOVERED.NEW} value={NEWLY_DISCOVERED.NEW}>{NEWLY_DISCOVERED.NEW}</option>
-                            <option key={NEWLY_DISCOVERED.EXISTING} value={NEWLY_DISCOVERED.EXISTING}>{NEWLY_DISCOVERED.EXISTING}</option>
-                        </Input>
-                    </Col>
-                </Row>
-            </FormGroup>
-
-            <PagedCustomTable
-                headers={discoveryCertificatesHeaders}
-                data={discoveryCertificatesData}
-                totalItems={discoveryCertificates?.totalItems}
-                onReloadData={onReloadData}
-            />
+            <TabLayout tabs={[
+                {title: "All", onClick: () => setNewlyDiscovered(undefined), content: pagedTable},
+                {title: "New", onClick: () => setNewlyDiscovered(true), content: pagedTable},
+                {title: "Existing", onClick: () => setNewlyDiscovered(false), content: pagedTable},
+            ]}/>
 
         </Widget>
     );
