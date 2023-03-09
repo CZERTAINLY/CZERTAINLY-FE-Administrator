@@ -97,7 +97,7 @@ export default function DiscoveryCertificates({id}: Props) {
                 {title: "All", onClick: () => setNewlyDiscovered(undefined), content: pagedTable},
                 {title: "New", onClick: () => setNewlyDiscovered(true), content: pagedTable},
                 {title: "Existing", onClick: () => setNewlyDiscovered(false), content: pagedTable},
-            ]}/>
+            ]} onlyActiveTabContent={true}/>
 
         </Widget>
     );

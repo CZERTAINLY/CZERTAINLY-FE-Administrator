@@ -5,11 +5,12 @@ type Props = {
     tabs: {
         title: string | JSX.Element;
         content: JSX.Element;
-        onClick?: () => void
+        onClick?: () => void;
     }[];
+    onlyActiveTabContent?: boolean;
 }
 
-export default function TabLayout({tabs}: Props) {
+export default function TabLayout({tabs, onlyActiveTabContent = false}: Props) {
     const [activeTab, setActiveTab] = useState(0);
 
     return (<>
@@ -23,7 +24,7 @@ export default function TabLayout({tabs}: Props) {
                 }}>{t.title}</NavLink></NavItem>))}
         </Nav>
         <TabContent activeTab={activeTab}>
-            {tabs.map((t, i) => activeTab === i ?
+            {tabs.map((t, i) => (onlyActiveTabContent === false) || (activeTab === i) ?
                 <TabPane key={`pane-${i}`} tabId={i}>
                     {t.content}
                 </TabPane> : null)
