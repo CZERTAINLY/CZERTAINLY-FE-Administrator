@@ -1,8 +1,7 @@
+import { actions, selectors } from "ducks/app-redirect";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
-import { actions, selectors } from 'ducks/app-redirect';
+import { useNavigate } from "react-router-dom";
 
 export default function AppRedirect() {
 
@@ -36,11 +35,11 @@ export default function AppRedirect() {
          if (!unauthorized) return;
          dispatch(actions.clearUnauthorized());
 
-         const url = encodeURIComponent(
-            window.location.toString().substring(window.location.origin.length)
-         );
 
-         navigate(`${__ENV__.LOGIN_URL}?redirect=${url}`);
+         const url = window.location.toString().substring(window.location.origin.length);
+         if (!url.startsWith("/#/login?redirect=")) {
+            navigate(`/login?redirect=${encodeURIComponent(url)}`);
+         }
 
       },
       [dispatch, navigate, unauthorized]

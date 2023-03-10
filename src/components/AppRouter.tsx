@@ -1,8 +1,7 @@
 import { selectors } from "ducks/auth";
-import React, { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import { slice as settingsSlice } from "../ducks/settings";
 import AcmeAccountDetail from "./_pages/acme-accounts/detail";
 
 import AcmeAccountsList from "./_pages/acme-accounts/list";
@@ -95,12 +94,6 @@ import Layout from "./Layout";
 import Spinner from "./Spinner";
 
 export default function AppRouter() {
-   const dispatch = useDispatch();
-
-   useEffect(() => {
-      dispatch(settingsSlice.actions.getAllSettings())
-   }, [dispatch]);
-
    const profile = useSelector(selectors.profile);
 
    const appRoutes = useMemo(
