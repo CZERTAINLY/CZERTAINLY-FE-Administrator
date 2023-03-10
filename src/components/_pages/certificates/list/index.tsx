@@ -134,7 +134,7 @@ export default function CertificateList({
 
    const onUploadClick = useCallback(
 
-      (data: { fileName: string, contentType: string, fileContent: string, customAttributes?: Array<AttributeRequestModel> }) => {
+      (data: { fileContent: string, customAttributes?: Array<AttributeRequestModel> }) => {
 
          if (data.fileContent) {
 

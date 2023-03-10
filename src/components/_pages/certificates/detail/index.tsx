@@ -336,7 +336,7 @@ export default function CertificateDetail() {
     );
 
     const onRenew = useCallback(
-        (data: { fileName?: string, contentType?: string, fileContent?: string }) => {
+        (data: { fileContent?: string }) => {
 
             dispatch(actions.renewCertificate({
                 uuid: certificate?.uuid || "",
