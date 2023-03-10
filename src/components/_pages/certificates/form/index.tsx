@@ -9,7 +9,6 @@ import { actions as keyActions, selectors as keySelectors } from "ducks/cryptogr
 import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
-import { FormApi } from "final-form";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 
@@ -17,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import Select, { SingleValue } from "react-select";
-import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
+import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
 import { RaProfileResponseModel } from "types/ra-profiles";
@@ -32,18 +31,15 @@ import { actions as utilsCertificateRequestActions, selectors as utilsCertificat
 import { CertificateDetailResponseModel } from "../../../../types/certificate";
 import { KeyType, Resource } from "../../../../types/openapi";
 import CertificateAttributes from "../../../CertificateAttributes";
+import FileUpload from "../../../Input/FileUpload/FileUpload";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
    raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
    pkcs10: File | null;
-   fileName: string;
-   contentType: string;
-   file: string;
    uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
    tokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
    key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
-
 }
 
 export default function CertificateForm() {
@@ -64,11 +60,13 @@ export default function CertificateForm() {
 
    const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
-   const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
+
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
    const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
    const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [fileContent, setFileContent] = useState<string>("");
 
-    const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
 
    useEffect(() => {
@@ -86,75 +84,6 @@ export default function CertificateForm() {
         setCertificate(parsedCertificateRequest ? transformParseRequestResponseDtoToCertificateResponseDetailModel(parsedCertificateRequest) : undefined);
     }, [parsedCertificateRequest])
 
-   const onFileLoaded = useCallback(
-
-      (form: FormApi<FormValues>, data: { target: any; }, fileName: string) => {
-
-         const fileInfo = data.target!.result as string;
-
-         const contentType = fileInfo.split(",")[0].split(":")[1].split(";")[0];
-         const fileContent = fileInfo.split(",")[1];
-         dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
-
-         form.mutators.setAttribute("fileName", fileName);
-         form.mutators.setAttribute("contentType", contentType);
-         form.mutators.setAttribute("file", fileContent);
-
-      },
-      [dispatch]
-
-   );
-
-
-   const onFileChanged = useCallback(
-
-      (e: React.ChangeEvent<HTMLInputElement>, form: FormApi<FormValues>) => {
-
-         if (!e.target.files || e.target.files.length === 0) return;
-
-         const fileName = e.target.files[0].name;
-
-         const reader = new FileReader();
-         reader.readAsDataURL(e.target.files[0]);
-         reader.onload = (data) => onFileLoaded(form, data, fileName);
-
-      },
-      [onFileLoaded]
-
-   )
-
-
-   const onFileDrop = useCallback(
-
-      (e: React.DragEvent<HTMLDivElement>, form: FormApi<FormValues>) => {
-
-         e.preventDefault();
-
-         if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
-
-         const fileName = e.dataTransfer.files[0].name;
-
-         const reader = new FileReader();
-         reader.readAsDataURL(e.dataTransfer.files[0]);
-         reader.onload = (data) => { onFileLoaded(form, data, fileName); }
-
-      },
-      [onFileLoaded]
-
-   )
-
-
-   const onFileDragOver = useCallback(
-
-      (e: React.DragEvent<HTMLInputElement>) => {
-
-         e.preventDefault();
-      },
-      []
-
-   )
-
-
    const submitCallback = useCallback(
 
       (values: FormValues) => {
@@ -166,7 +95,7 @@ export default function CertificateForm() {
             raProfileUuid: values.raProfile.value.uuid,
             authorityUuid: values.raProfile.value.authorityInstanceUuid,
              signRequest: {
-                 pkcs10: values.file,
+                 pkcs10: fileContent,
                  attributes,
                  csrAttributes: collectFormAttributes("csrAttributes", csrAttributeDescriptors, values),
                  signatureAttributes: collectFormAttributes("signatureAttributes", signatureAttributeDescriptors, values),
@@ -178,7 +107,7 @@ export default function CertificateForm() {
          }));
 
       },
-      [dispatch, issuanceAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes, csrAttributeDescriptors, signatureAttributeDescriptors]
+      [dispatch, issuanceAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes, csrAttributeDescriptors, signatureAttributeDescriptors, fileContent]
 
    );
 
@@ -386,109 +315,13 @@ export default function CertificateForm() {
                         values.uploadCsr?.value && values.raProfile ? (
 
                             <>
-                              <div className="border border-light rounded mb-0" style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }} onDrop={(e) => onFileDrop(e, form)} onDragOver={onFileDragOver}>
+                                <FileUpload fileType={"CSR"} onFileContentLoaded={(fileContent) => {
+                                    setFileContent(fileContent);
+                                    dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
+                                }}/>
 
-                                 <Row>
-
-                                    <Col>
-
-                                       <Field name="fileName">
-
-                                          {({ input, meta }) => (
-
-                                             <FormGroup>
-
-                                                <Label for="fileName">File name</Label>
-
-                                                <Input
-                                                   {...input}
-                                                   id="fileName"
-                                                   type="text"
-                                                   placeholder="File not selected"
-                                                   disabled={true}
-                                                   style={{ textAlign: "center" }}
-                                                />
-
-                                             </FormGroup>
-
-                                          )}
-
-                                       </Field>
-
-                                    </Col>
-
-                                    <Col>
-
-                                       <Field name="contentType">
-
-                                          {({ input, meta }) => (
-
-                                             <FormGroup>
-
-                                                <Label for="contentType">Content type</Label>
-
-                                                <Input
-                                                   {...input}
-                                                   id="contentType"
-                                                   type="text"
-                                                   placeholder="File not selected"
-                                                   disabled={true}
-                                                   style={{ textAlign: "center" }}
-                                                />
-
-                                             </FormGroup>
-
-                                          )}
-
-                                       </Field>
-
-                                    </Col>
-
-                                 </Row>
-
-                                 <Field name="file" validate={validateRequired()}>
-
-                                    {({ input, meta }) => (
-
-                                       <FormGroup>
-
-                                          <Label for="fileContent">File content</Label>
-
-                                          <Input
-                                             {...input}
-                                             id="fileContent"
-                                             type="textarea"
-                                             rows={6}
-                                             placeholder={`Select or drag & drop a CSR File`}
-                                             readOnly={true}
-                                          />
-
-                                          <FormFeedback>{meta.error}</FormFeedback>
-
-                                       </FormGroup>
-
-                                    )}
-
-                                 </Field>
-
-
-
-                                 <FormGroup style={{ textAlign: "right" }}>
-
-                                    <Label className="btn btn-default" for="file" style={{ margin: 0 }}>Select file...</Label>
-
-                                    <Input id="file" type="file" style={{ display: "none" }} onChange={(e) => onFileChanged(e, form)} />
-
-                                 </FormGroup>
-
-                                 <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
-                                    Select or Drag &amp; Drop file to Drop Zone.
-                                 </div>
-
-                              </div>
-
-                            {certificate && <><br /><CertificateAttributes csr={true} certificate={certificate} /></>}
-                         </>
+                                {certificate && <><br/><CertificateAttributes csr={true} certificate={certificate}/></>}
+                            </>
 
 
                          ) : <></>
