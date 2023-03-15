@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import Spinner from "components/Spinner";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
 import { transformParseCertificateResponseDtoToAsn1String } from "../../../../ducks/transform/utilsCertificate";
@@ -10,42 +11,43 @@ interface Props {
     certificateContent: string;
 }
 
-export default function Asn1Dialog({certificateContent}: Props) {
+export default function Asn1Dialog({ certificateContent }: Props) {
     const dispatch = useDispatch();
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
+    const isFetchingDetail = useSelector(utilsCertificateSelectors.isFetchingDetail);
     const [asn1, setAsn1] = useState<string | undefined>(undefined);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        if (certificateContent) {
-            dispatch(utilsCertificateActions.reset());
-            dispatch(utilsCertificateActions.parseCertificate({certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1}));
-        }
-    }, [dispatch, certificateContent]);
-
+        dispatch(utilsCertificateActions.reset());
+    }, [dispatch]);
+    
     useEffect(() => {
         if (parsedCertificate) {
             setAsn1(transformParseCertificateResponseDtoToAsn1String(parsedCertificate));
         }
     }, [parsedCertificate]);
 
-    return asn1 ? <>
+    return <>
+        <Spinner active={isFetchingDetail} />
         <Button
             className="btn btn-link p-0"
+            disabled={isFetchingDetail}
             size="sm"
             color="primary"
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+                if (certificateContent) {
+                    dispatch(utilsCertificateActions.parseCertificate({ certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1 }));
+                }
+            }}
             title="Show ASN.1 Structure"
-        >
-            Show
-        </Button>
+        >Show</Button>
         <Dialog
-            isOpen={isOpen}
+            isOpen={!!asn1}
             size={"lg"}
             caption="ASN.1 Structure"
-            body={asn1}
-            toggle={() => setIsOpen(false)}
-            buttons={[{color: "primary", onClick: () => setIsOpen(false), body: "Close"}]}
+            body={<pre>{asn1}</pre>}
+            toggle={() => setAsn1(undefined)}
+            buttons={[{ color: "primary", onClick: () => setAsn1(undefined), body: "Close" }]}
         />
-    </> : <></>
+    </>
 }
