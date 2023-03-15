@@ -17,7 +17,7 @@ import { actions as connectorActions } from "ducks/connectors";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -36,7 +36,7 @@ import {
     Input,
     Label,
     Row,
-    UncontrolledButtonDropdown,
+    UncontrolledButtonDropdown
 } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus, Resource } from "types/openapi";
@@ -840,7 +840,7 @@ export default function CertificateDetail() {
             e => ({
                 id: e.ruleDescription,
                 columns: [<CertificateStatus status={e.status}/>, e.ruleDescription],
-                detailColumns: !e.attributes ? undefined : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false}/>],
+                detailColumns: !e.attributes || e.attributes.length === 0 ? undefined : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false}/>],
 
             }),
         ),
