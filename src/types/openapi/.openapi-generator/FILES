@@ -224,6 +224,7 @@ models/RoleDto.ts
 models/RolePermissionsRequestDto.ts
 models/RoleRequestDto.ts
 models/SearchCondition.ts
+models/SearchFieldDataByGroupDto.ts
 models/SearchFieldDataDto.ts
 models/SearchFilterRequestDto.ts
 models/SearchRequestDto.ts

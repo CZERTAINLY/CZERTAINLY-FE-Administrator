@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SearchCondition,
-    SearchableFieldType,
-    SearchableFields,
-} from './';
+import type { SearchableFieldType, SearchCondition } from "./";
 
 /**
  * @export
@@ -23,16 +19,17 @@ import type {
  */
 export interface SearchFieldDataDto {
     /**
-     * @type {SearchableFields}
+     * Identifier of field to search
+     * @type {string}
      * @memberof SearchFieldDataDto
      */
-    field: SearchableFields;
+    fieldIdentifier: string;
     /**
      * Label for the field
      * @type {string}
      * @memberof SearchFieldDataDto
      */
-    label: string;
+    fieldLabel: string;
     /**
      * @type {SearchableFieldType}
      * @memberof SearchFieldDataDto

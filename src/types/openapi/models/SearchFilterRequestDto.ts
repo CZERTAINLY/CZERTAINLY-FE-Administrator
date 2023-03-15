@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SearchCondition,
-    SearchableFields,
-} from './';
+import type { SearchCondition } from "./";
 
 /**
  * Certificate filter input
@@ -23,10 +20,17 @@ import type {
  */
 export interface SearchFilterRequestDto {
     /**
-     * @type {SearchableFields}
+     * Group to search
+     * @type {string}
      * @memberof SearchFilterRequestDto
      */
-    field: SearchableFields;
+    groupName: string;
+    /**
+     * Field to search
+     * @type {string}
+     * @memberof SearchFilterRequestDto
+     */
+    fieldIdentifier: string;
     /**
      * @type {SearchCondition}
      * @memberof SearchFilterRequestDto

@@ -192,6 +192,7 @@ export * from './RoleDto';
 export * from './RolePermissionsRequestDto';
 export * from './RoleRequestDto';
 export * from './SearchCondition';
+export * from './SearchFieldDataByGroupDto';
 export * from './SearchFieldDataDto';
 export * from './SearchFilterRequestDto';
 export * from './SearchRequestDto';

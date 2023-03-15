@@ -10,22 +10,22 @@ import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 import {
-    transformCertificateBulkDeleteRequestModelToDto,
-    transformCertificateBulkDeleteResponseDtoToModel,
-    transformCertificateBulkObjectModelToDto,
-    transformCertificateComplianceCheckModelToDto,
-    transformCertificateContentResponseDtoToModel,
-    transformCertificateDetailResponseDtoToModel,
-    transformCertificateHistoryDtoToModel,
-    transformCertificateListResponseDtoToModel,
-    transformCertificateObjectModelToDto,
-    transformCertificateRekeyRequestModelToDto,
-    transformCertificateRenewRequestModelToDto,
-    transformCertificateRevokeRequestModelToDto,
-    transformCertificateSignRequestModelToDto,
-    transformCertificateUploadModelToDto,
-    transformSearchFieldDtoToModel,
-    transformSearchRequestModelToDto,
+   transformCertificateBulkDeleteRequestModelToDto,
+   transformCertificateBulkDeleteResponseDtoToModel,
+   transformCertificateBulkObjectModelToDto,
+   transformCertificateComplianceCheckModelToDto,
+   transformCertificateContentResponseDtoToModel,
+   transformCertificateDetailResponseDtoToModel,
+   transformCertificateHistoryDtoToModel,
+   transformCertificateListResponseDtoToModel,
+   transformCertificateObjectModelToDto,
+   transformCertificateRekeyRequestModelToDto,
+   transformCertificateRenewRequestModelToDto,
+   transformCertificateRevokeRequestModelToDto,
+   transformCertificateSignRequestModelToDto,
+   transformCertificateUploadModelToDto,
+   transformSearchFieldListDtoToModel,
+   transformSearchRequestModelToDto
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
@@ -308,7 +308,7 @@ const getAvailableCertificateFilters: AppEpic = (action$, state, deps) => {
 
             map(
                filters => slice.actions.getAvailableCertificateFiltersSuccess({
-                  availableCertificateFilters: filters.map(filter => transformSearchFieldDtoToModel(filter))
+                  availableCertificateFilters: filters.map(filter => transformSearchFieldListDtoToModel(filter))
                })
             ),
 
