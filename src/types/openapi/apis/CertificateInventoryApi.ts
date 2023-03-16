@@ -30,7 +30,7 @@ import type {
     LocationDto,
     MultipleCertificateObjectUpdateDto,
     RemoveCertificateDto,
-    SearchFieldDataDto,
+    SearchFieldDataByGroupDto,
     SearchRequestDto,
     UploadCertificateRequestDto,
     UuidDto,
@@ -261,10 +261,10 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * Get Certificate searchable fields information
      */
-    getSearchableFieldInformation1(): Observable<Array<SearchFieldDataDto>>
-    getSearchableFieldInformation1(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataDto>>>
-    getSearchableFieldInformation1(opts?: OperationOpts): Observable<Array<SearchFieldDataDto> | AjaxResponse<Array<SearchFieldDataDto>>> {
-        return this.request<Array<SearchFieldDataDto>>({
+    getSearchableFieldInformation1(): Observable<Array<SearchFieldDataByGroupDto>>
+    getSearchableFieldInformation1(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getSearchableFieldInformation1(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/certificates/search',
             method: 'GET',
         }, opts?.responseOpts);

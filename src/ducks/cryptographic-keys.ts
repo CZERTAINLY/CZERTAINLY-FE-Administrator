@@ -12,11 +12,11 @@ import {
    CryptographicKeyKeyUsageBulkUpdateRequestModel,
    CryptographicKeyKeyUsageUpdateRequestModel,
    CryptographicKeyPairResponseModel,
-   CryptographicKeyResponseModel,
+   CryptographicKeyResponseModel
 } from "types/cryptographic-keys";
 import { KeyRequestType, KeyState, KeyUsage } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
-import { SearchFieldModel, SearchFilterModel, SearchRequestModel } from "../types/certificate";
+import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "../types/certificate";
 
 export type State = {
 
@@ -27,7 +27,7 @@ export type State = {
 
    keyAttributeDescriptors?: AttributeDescriptorModel[];
 
-   availableFilters: SearchFieldModel[];
+   availableFilters: SearchFieldListModel[];
    currentFilters: SearchFilterModel[];
 
    totalPages: number;
@@ -260,7 +260,7 @@ export const slice = createSlice({
          state.isFetchingAvailableFilters = true;
       },
 
-      getAvailableKeyFiltersSuccess: (state, action: PayloadAction<{ availableKeyFilters: SearchFieldModel[] }>) => {
+      getAvailableKeyFiltersSuccess: (state, action: PayloadAction<{ availableKeyFilters: SearchFieldListModel[] }>) => {
          state.isFetchingAvailableFilters = false;
          state.availableFilters = action.payload.availableKeyFilters;
       },

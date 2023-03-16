@@ -8,6 +8,10 @@ import {
    CertificateComplianceCheckModel,
    CertificateComplianceResponseDto,
    CertificateComplianceResponseModel,
+   CertificateContentResponseDto,
+   CertificateContentResponseModel,
+   CertificateDetailResponseDto,
+   CertificateDetailResponseModel,
    CertificateHistoryDto,
    CertificateHistoryModel,
    CertificateListResponseDto,
@@ -18,8 +22,6 @@ import {
    CertificateRekeyRequestModel,
    CertificateRenewRequestDto,
    CertificateRenewRequestModel,
-   CertificateDetailResponseDto,
-   CertificateDetailResponseModel,
    CertificateRevokeRequestDto,
    CertificateRevokeRequestModel,
    CertificateSignRequestDto,
@@ -29,13 +31,13 @@ import {
    RaProfileSimplifiedDto,
    RaProfileSimplifiedModel,
    SearchFieldDto,
+   SearchFieldListDto,
+   SearchFieldListModel,
    SearchFieldModel,
    SearchFilterDto,
    SearchFilterModel,
    SearchRequestDto,
-   SearchRequestModel,
-   CertificateContentResponseDto,
-   CertificateContentResponseModel,
+   SearchRequestModel
 } from "types/certificate";
 import { CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
@@ -122,6 +124,13 @@ export function transformCertificateRekeyRequestModelToDto(rekeyRequest: Certifi
 
 export function transformSearchFieldDtoToModel(searchField: SearchFieldDto): SearchFieldModel {
    return { ...searchField };
+}
+
+export function transformSearchFieldListDtoToModel(searchFields: SearchFieldListDto): SearchFieldListModel {
+   return {
+      ...searchFields,
+      searchFieldData: searchFields.searchFieldData?.map(transformSearchFieldDtoToModel)
+   };
 }
 
 export function transformCertificateHistoryDtoToModel(history: CertificateHistoryDto): CertificateHistoryModel {

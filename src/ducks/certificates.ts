@@ -5,20 +5,20 @@ import {
    CertificateBulkDeleteResponseModel,
    CertificateBulkObjectModel,
    CertificateComplianceCheckModel,
+   CertificateContentResponseModel,
+   CertificateDetailResponseModel,
    CertificateHistoryModel,
+   CertificateListResponseModel,
    CertificateObjectModel,
    CertificateRekeyRequestModel,
    CertificateRenewRequestModel,
-   CertificateDetailResponseModel,
    CertificateRevokeRequestModel,
    CertificateSignRequestModel,
    CertificateUploadModel,
    CertificateValidationModel,
-   SearchFieldModel,
+   SearchFieldListModel,
    SearchFilterModel,
-   SearchRequestModel,
-   CertificateListResponseModel,
-   CertificateContentResponseModel,
+   SearchRequestModel
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
@@ -37,7 +37,7 @@ export type State = {
 
    lastQuery?: SearchRequestModel;
 
-   availableFilters: SearchFieldModel[];
+   availableFilters: SearchFieldListModel[];
    currentFilters: SearchFilterModel[];
 
    certificates: CertificateListResponseModel[];
@@ -408,7 +408,7 @@ export const slice = createSlice({
       },
 
 
-      getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: SearchFieldModel[] }>) => {
+      getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: SearchFieldListModel[] }>) => {
 
          state.isFetchingAvailableFilters = false;
          state.availableFilters = action.payload.availableCertificateFilters;

@@ -32,7 +32,7 @@ import type {
     KeyItemDetailDto,
     KeyRequestDto,
     KeyRequestType,
-    SearchFieldDataDto,
+    SearchFieldDataByGroupDto,
     SearchRequestDto,
     UpdateKeyUsageRequestDto,
 } from '../models';
@@ -582,10 +582,10 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     /**
      * Get CryptographicKey searchable fields information
      */
-    getSearchableFieldInformation(): Observable<Array<SearchFieldDataDto>>
-    getSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataDto>>>
-    getSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataDto> | AjaxResponse<Array<SearchFieldDataDto>>> {
-        return this.request<Array<SearchFieldDataDto>>({
+    getSearchableFieldInformation(): Observable<Array<SearchFieldDataByGroupDto>>
+    getSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
+    getSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
+        return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/keys/search',
             method: 'GET',
         }, opts?.responseOpts);
