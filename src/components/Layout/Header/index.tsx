@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
 import cx from 'classnames';
-import { Navbar, Nav, NavItem, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavItem } from 'reactstrap';
 
 import { selectors } from 'ducks/auth';
 
@@ -26,7 +26,7 @@ function Header({ sidebarToggle }: Props) {
 
    return (
 
-      <Navbar className={style.root}>
+      <Navbar className={cx(style.root, "sticky-top")}>
 
          <Nav>
             <NavItem className={cx('visible-xs mr-4 d-sm-up-none', style.headerIcon, style.sidebarToggler)} href="#" onClick={sidebarToggle}>
