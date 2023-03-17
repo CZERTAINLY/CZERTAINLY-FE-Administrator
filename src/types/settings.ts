@@ -1,8 +1,7 @@
-import { AttributeDescriptorModel, AttributeResponseModel } from "./attributes";
-import { AllSettingsDto, SectionSettingsDto } from "./openapi";
+import { PlatformSettingsDto, UtilsSettingsDto } from "./openapi";
 
-export type SettingsResponseDto = SectionSettingsDto;
-export type SettingsResponseModel = Omit<SettingsResponseDto, "attributeDefinitions | attributes"> & { attributeDefinitions: Array<AttributeDescriptorModel>, attributes: Array<AttributeResponseModel>};
+export type SettingsUtilsDto = UtilsSettingsDto;
+export type SettingsUtilsModel = SettingsUtilsDto;
 
-export type SettingsAllResponseDto = AllSettingsDto;
-export type SettingsAllResponseModel = SettingsAllResponseDto;
+export type SettingsPlatformDto = PlatformSettingsDto;
+export type SettingsPlatformModel = Omit<SettingsPlatformDto, "utils"> & { utils: SettingsUtilsModel };

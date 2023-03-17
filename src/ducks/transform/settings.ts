@@ -1,10 +1,12 @@
-import { SettingsResponseDto, SettingsResponseModel } from "../../types/settings";
-import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from "./attributes";
+import { SettingsPlatformDto, SettingsPlatformModel, SettingsUtilsDto, SettingsUtilsModel } from "../../types/settings";
 
-export function transformSettingsResponseDtoToModel(settings: SettingsResponseDto): SettingsResponseModel {
+export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto): SettingsUtilsModel {
+    return { ...settings };
+}
+
+export function transformSettingsPlatformDtoToModel(settings: SettingsPlatformDto): SettingsPlatformModel {
     return {
         ...settings,
-        attributeDefinitions: settings.attributeDefinitions.map(transformAttributeDescriptorDtoToModel),
-        attributes: settings.attributes.map(transformAttributeResponseDtoToModel)
+        utils: transformSettingsUtilsDtoToModel(settings.utils),
     };
 }

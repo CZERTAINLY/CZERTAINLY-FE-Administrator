@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
 import { transformParseCertificateResponseDtoToAsn1String } from "../../../../ducks/transform/utilsCertificate";
@@ -10,18 +11,26 @@ interface Props {
     certificateContent: string;
 }
 
-export default function Asn1Dialog({certificateContent}: Props) {
+export default function Asn1Dialog({ certificateContent }: Props) {
     const dispatch = useDispatch();
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
     const [asn1, setAsn1] = useState<string | undefined>(undefined);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
+    const health = useSelector(utilsActuatorSelectors.health);
+
     useEffect(() => {
-        if (certificateContent) {
-            dispatch(utilsCertificateActions.reset());
-            dispatch(utilsCertificateActions.parseCertificate({certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1}));
+        if (!health) {
+            dispatch(utilsActuatorActions.health());
         }
-    }, [dispatch, certificateContent]);
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (certificateContent && health) {
+            dispatch(utilsCertificateActions.reset());
+            dispatch(utilsCertificateActions.parseCertificate({ certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1 }));
+        }
+    }, [dispatch, certificateContent, health]);
 
     useEffect(() => {
         if (parsedCertificate) {
@@ -45,7 +54,7 @@ export default function Asn1Dialog({certificateContent}: Props) {
             caption="ASN.1 Structure"
             body={asn1}
             toggle={() => setIsOpen(false)}
-            buttons={[{color: "primary", onClick: () => setIsOpen(false), body: "Close"}]}
+            buttons={[{ color: "primary", onClick: () => setIsOpen(false), body: "Close" }]}
         />
     </> : <></>
 }

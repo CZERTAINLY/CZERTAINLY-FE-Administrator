@@ -55,6 +55,8 @@ import { initialState as initialTokenAttributesState, slice as tokenSlice } from
 import tokenEpics from "./tokens-epics";
 import { initialState as initialUsersState, slice as usersSlice } from "./users";
 import usersEpics from "./users-epics";
+import { initialState as initialUtilsActuatorState, slice as utilsActuatorSlice } from "./utilsActuator";
+import utilsActuatorEpics from "./utilsActuator-epics";
 import { initialState as initialUtilsCertificateState, slice as utilsCertificateSlice } from "./utilsCertificate";
 import utilsCertificateEpics from "./utilsCertificate-epics";
 import { initialState as initialUtilsCertificateRequestState, slice as utilsCertificateRequestSlice } from "./utilsCertificateRequest";
@@ -103,6 +105,7 @@ export const initialState = {
    [utilsOidSlice.name]: initialUtilsOidState,
    [utilsCertificateSlice.name]: initialUtilsCertificateState,
    [utilsCertificateRequestSlice.name]: initialUtilsCertificateRequestState,
+   [utilsActuatorSlice.name]: initialUtilsActuatorState,
 };
 
 
@@ -136,6 +139,7 @@ export const reducers = combineReducers<typeof initialState, any>({
    [utilsOidSlice.name]: utilsOidSlice.reducer,
    [utilsCertificateSlice.name]: utilsCertificateSlice.reducer,
    [utilsCertificateRequestSlice.name]: utilsCertificateRequestSlice.reducer,
+   [utilsActuatorSlice.name]: utilsActuatorSlice.reducer,
 });
 
 
@@ -169,4 +173,5 @@ export const epics = combineEpics(
    ...utilsOidEpics,
    ...utilsCertificateEpics,
    ...utilsCertificateRequestEpics,
+   ...utilsActuatorEpics,
 );

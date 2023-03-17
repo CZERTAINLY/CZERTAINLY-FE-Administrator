@@ -7,6 +7,7 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
@@ -123,6 +124,12 @@ export default function CertificateDetail() {
         () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
+
+    const health = useSelector(utilsActuatorSelectors.health);
+
+    useEffect(() => {
+        dispatch(utilsActuatorActions.health());
+    }, [dispatch]);
 
     useEffect(
         () => {
@@ -952,8 +959,8 @@ export default function CertificateDetail() {
     );
 
     const detailData: TableDataRow[] = useMemo(
-        () => !certificate ? [] : [
-
+        () => {
+            const certDetail = !certificate ? [] : [
             {
                 id: "commonName",
                 columns: [<span style={{whiteSpace: "nowrap"}}>Common Name</span>, certificate.commonName],
@@ -1049,13 +1056,16 @@ export default function CertificateDetail() {
             {
                 id: "basicConstraint",
                 columns: ["Basic Constraint", certificate.basicConstraints],
-            },
-            {
-                id: "asn1structure",
-                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
-            },
-        ],
-        [certificate],
+            }];
+            if (health) {
+                certDetail.push({
+                    id: "asn1structure",
+                    columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
+                });
+            }
+            return certDetail;
+        },
+        [certificate, health],
     );
 
     const locationsHeaders: TableHeader[] = useMemo(

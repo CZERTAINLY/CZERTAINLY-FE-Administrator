@@ -16,16 +16,13 @@ import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
-    AllSettingsDto,
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
-    RequestAttributeDto,
-    SectionDto,
-    SectionSettingsDto,
+    PlatformSettingsDto,
 } from '../models';
 
-export interface UpdateSettingsRequest {
-    requestBody: { [key: string]: Array<RequestAttributeDto>; };
+export interface UpdatePlatformSettingsRequest {
+    platformSettingsDto: PlatformSettingsDto;
 }
 
 /**
@@ -34,58 +31,34 @@ export interface UpdateSettingsRequest {
 export class SettingsApi extends BaseAPI {
 
     /**
-     * Get all settings extracted from attributes in dedicated DTO
+     * Get platform settings
      */
-    getAllSettings(): Observable<AllSettingsDto>
-    getAllSettings(opts?: OperationOpts): Observable<AjaxResponse<AllSettingsDto>>
-    getAllSettings(opts?: OperationOpts): Observable<AllSettingsDto | AjaxResponse<AllSettingsDto>> {
-        return this.request<AllSettingsDto>({
-            url: '/v1/settings/all',
+    getPlatformSettings(): Observable<PlatformSettingsDto>
+    getPlatformSettings(opts?: OperationOpts): Observable<AjaxResponse<PlatformSettingsDto>>
+    getPlatformSettings(opts?: OperationOpts): Observable<PlatformSettingsDto | AjaxResponse<PlatformSettingsDto>> {
+        return this.request<PlatformSettingsDto>({
+            url: '/v1/settings/platform',
             method: 'GET',
         }, opts?.responseOpts);
     };
 
     /**
-     * Get settings sections
+     * Update platform setting
      */
-    getSections(): Observable<Array<SectionDto>>
-    getSections(opts?: OperationOpts): Observable<AjaxResponse<Array<SectionDto>>>
-    getSections(opts?: OperationOpts): Observable<Array<SectionDto> | AjaxResponse<Array<SectionDto>>> {
-        return this.request<Array<SectionDto>>({
-            url: '/v1/settings/sections',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Get sections settings
-     */
-    getSettings(): Observable<Array<SectionSettingsDto>>
-    getSettings(opts?: OperationOpts): Observable<AjaxResponse<Array<SectionSettingsDto>>>
-    getSettings(opts?: OperationOpts): Observable<Array<SectionSettingsDto> | AjaxResponse<Array<SectionSettingsDto>>> {
-        return this.request<Array<SectionSettingsDto>>({
-            url: '/v1/settings',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Update setting
-     */
-    updateSettings({ requestBody }: UpdateSettingsRequest): Observable<Array<SectionSettingsDto>>
-    updateSettings({ requestBody }: UpdateSettingsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<SectionSettingsDto>>>
-    updateSettings({ requestBody }: UpdateSettingsRequest, opts?: OperationOpts): Observable<Array<SectionSettingsDto> | AjaxResponse<Array<SectionSettingsDto>>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'updateSettings');
+    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest): Observable<void>
+    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(platformSettingsDto, 'platformSettingsDto', 'updatePlatformSettings');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<SectionSettingsDto>>({
-            url: '/v1/settings',
+        return this.request<void>({
+            url: '/v1/settings/platform',
             method: 'PUT',
             headers,
-            body: requestBody,
+            body: platformSettingsDto,
         }, opts?.responseOpts);
     };
 

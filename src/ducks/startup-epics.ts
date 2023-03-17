@@ -8,7 +8,7 @@ const startup: AppEpic = action$ => action$.pipe(
     take(1),
     mergeMap(() => [
         authActions.getProfile(),
-        settingsActions.getAllSettings(),
+        settingsActions.getPlatformSettings(),
     ]),
 );
 

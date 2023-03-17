@@ -1,83 +1,61 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { AttributeRequestModel } from "../types/attributes";
-import { SettingsAllResponseModel, SettingsResponseModel } from "../types/settings";
+import { SettingsPlatformModel } from "../types/settings";
 
 export type State = {
-    settings?: SettingsResponseModel[];
-    allSettings?: SettingsAllResponseModel;
-    isFetching: boolean;
-    isUpdating: boolean;
+    platformSettings?: SettingsPlatformModel;
+    isFetchingPlatform: boolean;
+    isUpdatingPlatform: boolean;
 };
 
 export const initialState: State = {
-    isFetching: false,
-    isUpdating: false,
+    isFetchingPlatform: false,
+    isUpdatingPlatform: false,
 };
 
 export const slice = createSlice({
     name: "settings",
     initialState,
     reducers: {
-        getAllSettings: (state, action: PayloadAction<void>) => {
-            state.isFetching = true;
+        getPlatformSettings: (state, action: PayloadAction<void>) => {
+            state.isFetchingPlatform = true;
         },
 
-        getAllSettingsSuccess: (state, action: PayloadAction<SettingsAllResponseModel>) => {
-            state.allSettings = action.payload;
-            state.isFetching = false;
+        getPlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformModel>) => {
+            state.platformSettings = action.payload;
+            state.isFetchingPlatform = false;
         },
 
-        getAllSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetching = false;
+        getPlatformSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingPlatform = false;
         },
 
-        getSettings: (state, action: PayloadAction<void>) => {
-            state.settings = [];
-            state.isFetching = true;
+        updatePlatformSettings: (state, action: PayloadAction<SettingsPlatformModel>) => {
+            state.isUpdatingPlatform = true;
         },
 
-        getSettingsSuccess: (state, action: PayloadAction<SettingsResponseModel[]>) => {
-            state.settings = action.payload;
-            state.isFetching = false;
+        updatePlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformModel>) => {
+            state.isUpdatingPlatform = false;
+            state.platformSettings = action.payload;
         },
 
-        getSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetching = false;
+        updatePlatformSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingPlatform = false;
         },
-
-        updateSettings: (state, action: PayloadAction<{ [key: string]: Array<AttributeRequestModel> }>) => {
-            state.isUpdating = true;
-        },
-
-        updateSettingsSuccess: (state, action: PayloadAction<SettingsResponseModel[]>) => {
-            state.isUpdating = false;
-            state.settings = action.payload;
-        },
-
-        updateSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isUpdating = false;
-        },
-
-        settingsUpdated: (state, action: PayloadAction<void>) => {
-        },
-
     },
 });
 
 const state = createFeatureSelector<State>(slice.name);
 
-const settings = createSelector(state, (state: State) => state.settings);
-const allSettings = createSelector(state, (state: State) => state.allSettings);
-const isFetching = createSelector(state, (state: State) => state.isFetching);
-const isUpdating = createSelector(state, (state: State) => state.isUpdating);
+const platformSettings = createSelector(state, (state: State) => state.platformSettings);
+const isFetchingPlatform = createSelector(state, (state: State) => state.isFetchingPlatform);
+const isUpdatingPlatform = createSelector(state, (state: State) => state.isUpdatingPlatform);
 
 export const selectors = {
     state,
-    settings,
-    allSettings,
-    isFetching,
-    isUpdating,
+    platformSettings,
+    isFetchingPlatform,
+    isUpdatingPlatform,
 };
 
 export const actions = slice.actions;
