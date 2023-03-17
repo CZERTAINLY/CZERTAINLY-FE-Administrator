@@ -17,7 +17,7 @@
  */
 export interface ParseCertificateRequestDto {
     /**
-     * Base64-encoded certificate data
+     * Base64-encoded certificate data in DER or PEM format
      * @type {string}
      * @memberof ParseCertificateRequestDto
      */

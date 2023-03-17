@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import logo from "resources/images/czertainly_white_H.svg";
 
@@ -73,7 +72,7 @@ export default function Sidebar() {
                     _key="settings"
                     header="Settings"
                     childrenLinks={[
-                        { _key: "/configuration", name: "Configuration", link: "/configuration" },
+                        { _key: "/platform", name: "Platform", link: "/platform" },
                         { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
                         { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
                     ]}

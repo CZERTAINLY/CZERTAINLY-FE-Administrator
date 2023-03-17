@@ -12,31 +12,17 @@
  */
 
 import type {
-    Section,
+    UtilsSettingsDto,
 } from './';
 
 /**
  * @export
- * @interface SectionDto
+ * @interface PlatformSettingsDto
  */
-export interface SectionDto {
+export interface PlatformSettingsDto {
     /**
-     * @type {Section}
-     * @memberof SectionDto
+     * @type {UtilsSettingsDto}
+     * @memberof PlatformSettingsDto
      */
-    section: Section;
-    /**
-     * Setting section display name
-     * @type {string}
-     * @memberof SectionDto
-     */
-    name: string;
-    /**
-     * Setting section description
-     * @type {string}
-     * @memberof SectionDto
-     */
-    description?: string;
+    utils: UtilsSettingsDto;
 }
-
-

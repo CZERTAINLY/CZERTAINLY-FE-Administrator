@@ -1,5 +1,5 @@
 .gitignore
-.openapi-generator-ignore
+apis/ActuatorApi.ts
 apis/CertificateUtilsAPIApi.ts
 apis/CertificationRequestUtilsAPIApi.ts
 apis/OIDUtilsAPIApi.ts

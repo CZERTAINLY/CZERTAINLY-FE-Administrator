@@ -1,5 +1,5 @@
 import { selectors } from "ducks/auth";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import AcmeAccountDetail from "./_pages/acme-accounts/detail";
@@ -66,12 +66,12 @@ import RaProfileEdit from "./_pages/ra-profiles/form";
 import RaProfilesList from "./_pages/ra-profiles/list";
 import RoleDetail from "./_pages/roles/detail";
 
+import PlatformSettingsDetail from "./_pages/platform-settings/detail";
+import PlatformSettingsEdit from "./_pages/platform-settings/form";
 import RolesList from "./_pages/roles/list";
 import RoleEdit from "./_pages/roles/RoleForm";
 import RolePermissions from "./_pages/roles/RolePermissionsForm";
 import RoleUsers from "./_pages/roles/RoleUsersForm";
-import SettingsDetail from "./_pages/settings/detail";
-import SettingsEdit from "./_pages/settings/form";
 import TokenProfileDetail from "./_pages/token-profiles/detail";
 import TokenProfileForm from "./_pages/token-profiles/form";
 import TokenProfileList from "./_pages/token-profiles/list";
@@ -85,8 +85,8 @@ import UserProfileEdit from "./_pages/user-profile/form";
 import UserDetail from "./_pages/users/detail";
 import UserEdit from "./_pages/users/form";
 
-import UsersList from "./_pages/users/list";
 import AppLogin from "./AppLogin/AppLogin";
+import UsersList from "./_pages/users/list";
 
 import AppRedirect from "./AppRedirect";
 
@@ -225,8 +225,8 @@ export default function AppRouter() {
                <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
                <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
 
-               <Route path="/configuration" element={<SettingsDetail />} />
-               <Route path="/configuration/edit" element={<SettingsEdit />} />
+               <Route path="/platform" element={<PlatformSettingsDetail />} />
+               <Route path="/platform/edit" element={<PlatformSettingsEdit />} />
 
             </Route >
 

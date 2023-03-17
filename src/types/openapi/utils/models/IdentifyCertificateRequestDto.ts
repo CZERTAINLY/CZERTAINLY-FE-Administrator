@@ -17,7 +17,7 @@
  */
 export interface IdentifyCertificateRequestDto {
     /**
-     * Base64-encoded data to be identified
+     * Base64-encoded data to be identified in DER or PEM format
      * @type {string}
      * @memberof IdentifyCertificateRequestDto
      */

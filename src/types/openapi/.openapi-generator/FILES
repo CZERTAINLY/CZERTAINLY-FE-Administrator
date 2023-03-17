@@ -43,7 +43,6 @@ models/AddLocationRequestDto.ts
 models/AddRaProfileRequestDto.ts
 models/AddTokenProfileRequestDto.ts
 models/AddUserRequestDto.ts
-models/AllSettingsDto.ts
 models/AttributeCallback.ts
 models/AttributeCallbackMapping.ts
 models/AttributeConstraintType.ts
@@ -162,7 +161,6 @@ models/FileAttributeContentData.ts
 models/FloatAttributeContent.ts
 models/FunctionGroupCode.ts
 models/FunctionGroupDto.ts
-models/GeneralSettingsDto.ts
 models/GlobalMetadataCreateRequestDto.ts
 models/GlobalMetadataDefinitionDetailDto.ts
 models/GlobalMetadataUpdateRequestDto.ts
@@ -200,6 +198,7 @@ models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
 models/Pageable.ts
+models/PlatformSettingsDto.ts
 models/ProgrammingLanguageEnum.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
@@ -232,9 +231,6 @@ models/SearchableFieldType.ts
 models/SearchableFields.ts
 models/SecretAttributeContent.ts
 models/SecretAttributeContentData.ts
-models/Section.ts
-models/SectionDto.ts
-models/SectionSettingsDto.ts
 models/SignDataRequestDto.ts
 models/SignDataResponseDto.ts
 models/SignatureRequestData.ts
@@ -261,6 +257,7 @@ models/UploadCertificateRequestDto.ts
 models/UserCertificateDto.ts
 models/UserDetailDto.ts
 models/UserDto.ts
+models/UtilsSettingsDto.ts
 models/UuidDto.ts
 models/VerificationResponseData.ts
 models/VerifyDataRequestDto.ts
