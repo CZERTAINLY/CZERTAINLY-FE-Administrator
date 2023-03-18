@@ -27,7 +27,7 @@ function Header({ sidebarToggle }: Props) {
 
    return (
 
-      <Navbar className={cx(style.root, "sticky-top")}>
+      <Navbar className={cx(style.root, style.sticky)}>
 
          <Nav>
           <NavItem className={cx(style.logo)}>

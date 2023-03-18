@@ -20,9 +20,7 @@ function Layout() {
    return (
 
       <div className={style.root}>
-         <div className={cx("sticky-top")}>
-          <Header sidebarToggle={toggleSidebar} />
-         </div>
+         <Header sidebarToggle={toggleSidebar} />
          <Sidebar />
 
          <div className={cx(style.wrap, { [style.sidebarOpen]: sidebarOpen })}>
