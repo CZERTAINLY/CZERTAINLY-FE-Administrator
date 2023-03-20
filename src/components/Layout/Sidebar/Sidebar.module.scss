@@ -7,8 +7,10 @@
    top: 0;
    bottom: 0;
    //background-color: $threekey-secondary;
-   background-color: $sidebar-bg-color;
+   //background-color: $sidebar-bg-color;
+   background-color: $white;
    color: $sidebar-color;
+   margin-top: $navbar-height;
 }
 
 .logo {

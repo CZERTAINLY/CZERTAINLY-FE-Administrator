@@ -10,12 +10,6 @@ export default function Sidebar() {
 
       <nav className={style.root}>
 
-         <header className={style.logo}>
-            <Link to="/home">
-               <img src={logo} alt="CZERTAINLY Logo" />
-            </Link>
-         </header>
-
          <div className={style.nav}>
 
             <ul>

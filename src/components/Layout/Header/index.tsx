@@ -1,12 +1,13 @@
 import cx from 'classnames';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import {Link, NavLink} from 'react-router-dom';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavItem } from 'reactstrap';
 
 import { selectors } from 'ducks/auth';
 
 import style from './Header.module.scss';
+import logo from "../../../resources/images/czertainly_white_H.svg";
 
 interface Props {
    sidebarToggle: () => void;
@@ -26,7 +27,15 @@ function Header({ sidebarToggle }: Props) {
 
    return (
 
-      <Navbar className={cx(style.root, "sticky-top")}>
+      <Navbar className={cx(style.root, style.sticky)}>
+
+         <Nav>
+          <NavItem className={cx(style.logo)}>
+              <Link to="/home">
+                  <img src={logo} alt="CZERTAINLY Logo" />
+              </Link>
+          </NavItem>
+         </Nav>
 
          <Nav>
             <NavItem className={cx('visible-xs mr-4 d-sm-up-none', style.headerIcon, style.sidebarToggler)} href="#" onClick={sidebarToggle}>
@@ -44,7 +53,7 @@ function Header({ sidebarToggle }: Props) {
 
                      <DropdownToggle nav>
                         <i className={cx('fa fa-user-circle-o fa-2x', style.adminPhoto)} />
-                        <span className="text-body">{profile.username}</span>
+                        <span className={style.adminName}>{profile.username}</span>
                         <i className={cx('fa fa-angle-down ml-sm', style.arrow, { [style.arrowActive]: isOpen })} />
                      </DropdownToggle>
 

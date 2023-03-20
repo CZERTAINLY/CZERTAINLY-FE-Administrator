@@ -8,11 +8,12 @@
 
    a {
       display: flex;
-      color: #ffffff;
+      color: black;
       align-items: center;
       text-decoration: none;
       cursor: pointer;
       font-size: $font-size-small;
+      margin: 5px 5px 5px 5px;
 
       &:hover,
       &:active,
@@ -34,8 +35,9 @@
 
       &:hover {
          font-weight: $font-weight-bold;
-         color: #ffffff;
-         background-color: $czertainly-green;
+         color: black;
+         background-color: $czertainly-green-light;
+         border-radius: 5px 5px 5px 5px;
          //background-image: linear-gradient(to right, $czertainly-green , $sidebar-bg-color);
       }
 
@@ -57,11 +59,12 @@
 }
 
 .headerLinkActive {
-   border-right: 6px solid $czertainly-green;
-   background-color: #2B81BC;
+   //border-right: 6px solid $czertainly-green-light;
+   background-color: $czertainly-blue-light;
+   border-radius: 5px 5px 5px 5px;
 
    span {
-      color: #ffffff;
+      color: black;
       font-weight: $font-weight-bold;
    }
 
@@ -71,11 +74,11 @@
 }
 
 .panel {
-   border: none;
+   border-right: 6px solid $czertainly-green-light;
    box-shadow: none;
    margin: 0;
    border-radius: 0;
-   background: rgba(#000, 0.1);
+   background: white;
 
    div {
       padding: 0;
