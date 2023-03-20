@@ -22,7 +22,6 @@ export default function Asn1Dialog({ certificateContent }: Props) {
     const health = useSelector(utilsActuatorSelectors.health);
 
     useEffect(() => {
-        console.log(health)
         if (!health) {
             dispatch(utilsActuatorActions.health());
         }

@@ -17,6 +17,7 @@ import { actions, selectors } from "ducks/certificates";
 import { actions as connectorActions } from "ducks/connectors";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { selectors as settingSelectors } from "ducks/settings";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
@@ -126,10 +127,12 @@ export default function CertificateDetail() {
     );
 
     const health = useSelector(utilsActuatorSelectors.health);
+    const settings = useSelector(settingSelectors.platformSettings)
 
     useEffect(() => {
+        if(!settings?.utils.utilsServiceUrl) return;
         dispatch(utilsActuatorActions.health());
-    }, [dispatch]);
+    }, [dispatch, settings]);
 
     useEffect(
         () => {
