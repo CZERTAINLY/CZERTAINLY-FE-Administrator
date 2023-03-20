@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
@@ -26,9 +27,11 @@ export default function CertificateRenewDialog({
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
 
     const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
+    const health = useSelector(utilsActuatorSelectors.health);
 
     useEffect(() => {
         dispatch(utilsCertificateRequestActions.reset());
+        dispatch(utilsActuatorActions.health());
     }, [dispatch]);
 
     useEffect(() => {
@@ -60,7 +63,9 @@ export default function CertificateRenewDialog({
                 <>
                     <FileUpload fileType={"CSR"} onFileContentLoaded={(fileContent) => {
                         setFileContent(fileContent);
-                        dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent));
+                        if (health) {
+                            dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent));
+                        }
                     }}/>
 
                     {certificate && <><br/><CertificateAttributes csr={true} certificate={certificate}/></>}

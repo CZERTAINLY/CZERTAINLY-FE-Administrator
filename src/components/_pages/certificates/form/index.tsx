@@ -9,7 +9,7 @@ import { actions as keyActions, selectors as keySelectors } from "ducks/cryptogr
 import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +24,7 @@ import { TokenProfileResponseModel } from "types/token-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
@@ -68,6 +69,7 @@ export default function CertificateForm() {
     const [fileContent, setFileContent] = useState<string>("");
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
+    const health = useSelector(utilsActuatorSelectors.health);
 
    useEffect(() => {
 
@@ -77,6 +79,7 @@ export default function CertificateForm() {
       dispatch(tokenProfileActions.listTokenProfiles({enabled: true}));
       dispatch(connectorActions.clearCallbackData());
        dispatch(utilsCertificateRequestActions.reset());
+       dispatch(utilsActuatorActions.health());
 
    }, [dispatch]);
 
@@ -317,7 +320,9 @@ export default function CertificateForm() {
                             <>
                                 <FileUpload fileType={"CSR"} onFileContentLoaded={(fileContent) => {
                                     setFileContent(fileContent);
-                                    dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
+                                    if (health) {
+                                       dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent))
+                                    }
                                 }}/>
 
                                 {certificate && <><br/><CertificateAttributes csr={true} certificate={certificate}/></>}

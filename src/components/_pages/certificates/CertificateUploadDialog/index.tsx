@@ -1,5 +1,6 @@
 import CertificateAttributes from "components/CertificateAttributes";
-import React, { useEffect, useState } from "react";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
+import { useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, Form as BootstrapForm } from "reactstrap";
@@ -38,10 +39,12 @@ export default function CertificateUploadDialog({
 
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
+    const health = useSelector(utilsActuatorSelectors.health);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
         dispatch(utilsCertificateActions.reset());
+        dispatch(utilsActuatorActions.health());
     }, [dispatch]);
 
     useEffect(() => {
@@ -61,7 +64,9 @@ export default function CertificateUploadDialog({
 
                         <FileUpload fileType={"certificate"} onFileContentLoaded={(fileContent) => {
                             setFileContent(fileContent);
-                            dispatch(utilsCertificateActions.parseCertificate({certificate: fileContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Basic}));
+                            if (health) {
+                                dispatch(utilsCertificateActions.parseCertificate({certificate: fileContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Basic}));
+                            }
                         }}/>
 
                         {certificate && <><br/><CertificateAttributes certificate={certificate}/></>}

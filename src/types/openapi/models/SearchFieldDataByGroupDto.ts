@@ -11,16 +11,23 @@
  * Do not edit the class manually.
  */
 
+import type {
+    SearchFieldDataDto,
+} from './';
+
 /**
- * General setting
  * @export
- * @interface GeneralSettingsDto
+ * @interface SearchFieldDataByGroupDto
  */
-export interface GeneralSettingsDto {
+export interface SearchFieldDataByGroupDto {
     /**
-     * URL of the Util Service
-     * @type {string}
-     * @memberof GeneralSettingsDto
+     * @type {Array<SearchFieldDataDto>}
+     * @memberof SearchFieldDataByGroupDto
      */
-    utilsServiceUrl?: string;
+    searchFieldData?: Array<SearchFieldDataDto>;
+    /**
+     * @type {string}
+     * @memberof SearchFieldDataByGroupDto
+     */
+    groupName?: string;
 }

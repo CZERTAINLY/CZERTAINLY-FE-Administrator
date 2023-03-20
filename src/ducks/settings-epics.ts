@@ -1,5 +1,4 @@
 import { AppEpic } from "ducks";
-import { ofType } from "redux-observable";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
@@ -8,74 +7,54 @@ import { updateBackendUtilsClients } from "../api";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./settings";
-import { transformSettingsResponseDtoToModel } from "./transform/settings";
+import { transformSettingsPlatformDtoToModel } from "./transform/settings";
 
-const getSettings: AppEpic = (action$, state$, deps) => {
+const getPlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(
-            slice.actions.getSettings.match,
+            slice.actions.getPlatformSettings.match,
         ),
         switchMap(
-            () => deps.apiClients.settings.getSettings().pipe(
+            () => deps.apiClients.settings.getPlatformSettings().pipe(
                 map(
-                    settings => slice.actions.getSettingsSuccess(settings.map(transformSettingsResponseDtoToModel)),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.getSettingsFailure({error: extractError(err, "Failed to get Settings list")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get Settings list"}),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
-const updateSettings: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(
-            slice.actions.updateSettings.match,
-        ),
-        switchMap(
-            action => deps.apiClients.settings.updateSettings({
-                    requestBody: action.payload,
-                },
-            ).pipe(
-                mergeMap(
-                    settings => of(
-                        slice.actions.updateSettingsSuccess(settings.map(transformSettingsResponseDtoToModel)),
-                        slice.actions.settingsUpdated(),
-                        appRedirectActions.redirect({url: `../`}),
-                    ),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.updateSettingsFailure({error: extractError(err, "Failed to update settings")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to update settings"}),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
-const getAllSettings: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        ofType(
-            slice.actions.getAllSettings, slice.actions.settingsUpdated,
-        ),
-        switchMap(
-            () => deps.apiClients.settings.getAllSettings().pipe(
-                map(
-                    allSettings => {
-                        updateBackendUtilsClients(allSettings.general.utilsServiceUrl);
-                        return slice.actions.getAllSettingsSuccess(allSettings);
+                    platformSettings => {
+                        const platformSettingsModel = transformSettingsPlatformDtoToModel(platformSettings);
+                        updateBackendUtilsClients(platformSettingsModel.utils.utilsServiceUrl);
+                        return slice.actions.getPlatformSettingsSuccess(platformSettingsModel);
                     },
                 ),
                 catchError(
                     err => of(
-                        slice.actions.getAllSettingsFailure({error: extractError(err, "Failed to get Settings")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get Settings"}),
+                        slice.actions.getPlatformSettingsFailure({ error: extractError(err, "Failed to get platform settings") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get platform settings" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.updatePlatformSettings.match,
+        ),
+        switchMap(
+            action => deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload },
+            ).pipe(
+                mergeMap(
+                    () => {
+                        updateBackendUtilsClients(action.payload.utils.utilsServiceUrl);
+                        return of(
+                            slice.actions.updatePlatformSettingsSuccess(action.payload),
+                            appRedirectActions.redirect({ url: `../` }),
+                        )
+                    }
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.updatePlatformSettingsFailure({ error: extractError(err, "Failed to update platform settings") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to update platform settings" }),
                     ),
                 ),
             ),
@@ -84,9 +63,8 @@ const getAllSettings: AppEpic = (action$, state$, deps) => {
 };
 
 const epics = [
-    getSettings,
-    getAllSettings,
-    updateSettings,
+    getPlatformSettings,
+    updatePlatformSettings,
 ];
 
 export default epics;

@@ -11,18 +11,16 @@
  * Do not edit the class manually.
  */
 
-import type {
-    GeneralSettingsDto,
-} from './';
-
 /**
+ * Utils settings of the platform
  * @export
- * @interface AllSettingsDto
+ * @interface UtilsSettingsDto
  */
-export interface AllSettingsDto {
+export interface UtilsSettingsDto {
     /**
-     * @type {GeneralSettingsDto}
-     * @memberof AllSettingsDto
+     * URL of the Util Service
+     * @type {string}
+     * @memberof UtilsSettingsDto
      */
-    general: GeneralSettingsDto;
+    utilsServiceUrl?: string;
 }

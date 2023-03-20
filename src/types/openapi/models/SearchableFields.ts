@@ -12,7 +12,7 @@
  */
 
 /**
- * Field to search
+ * 
  * @export
  * @enum {string}
  */

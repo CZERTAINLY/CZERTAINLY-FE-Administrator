@@ -24,10 +24,10 @@ import {
    SettingsApi,
    StatisticsDashboardApi,
    TokenProfileManagementApi,
-   UserManagementApi,
+   UserManagementApi
 } from "types/openapi";
 import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
-import { CertificateUtilsAPIApi, CertificationRequestUtilsAPIApi, Configuration as ConfigurationUtils } from "types/openapi/utils";
+import { ActuatorApi, CertificateUtilsAPIApi, CertificationRequestUtilsAPIApi, Configuration as ConfigurationUtils } from "types/openapi/utils";
 import { OIDUtilsAPIApi } from "./types/openapi/utils";
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
@@ -60,6 +60,7 @@ export interface ApiClients {
    cryptographicKeys: CryptographicKeyControllerApi;
    cryptographicOperations: CryptographicOperationsControllerApi;
    utilsOid?: OIDUtilsAPIApi;
+   utilsActuator?: ActuatorApi;
    utilsCertificate?: CertificateUtilsAPIApi;
    utilsCertificateRequest?: CertificationRequestUtilsAPIApi;
 }
@@ -100,9 +101,11 @@ export const updateBackendUtilsClients = (url: string | undefined) => {
       backendClient.utilsCertificate = new CertificateUtilsAPIApi(configuration);
       backendClient.utilsOid = new OIDUtilsAPIApi(configuration);
       backendClient.utilsCertificateRequest = new CertificationRequestUtilsAPIApi(configuration);
+      backendClient.utilsActuator = new ActuatorApi(configuration);
    } else {
       backendClient.utilsCertificate = undefined;
       backendClient.utilsOid = undefined;
       backendClient.utilsCertificateRequest = undefined;
+      backendClient.utilsActuator = undefined;
    }
 }

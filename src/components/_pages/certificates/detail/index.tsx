@@ -7,6 +7,7 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
@@ -17,7 +18,7 @@ import { actions as connectorActions } from "ducks/connectors";
 import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -36,7 +37,7 @@ import {
     Input,
     Label,
     Row,
-    UncontrolledButtonDropdown,
+    UncontrolledButtonDropdown
 } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus, Resource } from "types/openapi";
@@ -123,6 +124,12 @@ export default function CertificateDetail() {
         () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
+
+    const health = useSelector(utilsActuatorSelectors.health);
+
+    useEffect(() => {
+        dispatch(utilsActuatorActions.health());
+    }, [dispatch]);
 
     useEffect(
         () => {
@@ -840,7 +847,7 @@ export default function CertificateDetail() {
             e => ({
                 id: e.ruleDescription,
                 columns: [<CertificateStatus status={e.status}/>, e.ruleDescription],
-                detailColumns: !e.attributes ? undefined : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false}/>],
+                detailColumns: !e.attributes || e.attributes.length === 0 ? undefined : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false}/>],
 
             }),
         ),
@@ -952,8 +959,8 @@ export default function CertificateDetail() {
     );
 
     const detailData: TableDataRow[] = useMemo(
-        () => !certificate ? [] : [
-
+        () => {
+            const certDetail = !certificate ? [] : [
             {
                 id: "commonName",
                 columns: [<span style={{whiteSpace: "nowrap"}}>Common Name</span>, certificate.commonName],
@@ -1049,13 +1056,16 @@ export default function CertificateDetail() {
             {
                 id: "basicConstraint",
                 columns: ["Basic Constraint", certificate.basicConstraints],
-            },
-            {
-                id: "asn1structure",
-                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
-            },
-        ],
-        [certificate],
+            }];
+            if (health) {
+                certDetail.push({
+                    id: "asn1structure",
+                    columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
+                });
+            }
+            return certDetail;
+        },
+        [certificate, health],
     );
 
     const locationsHeaders: TableHeader[] = useMemo(
