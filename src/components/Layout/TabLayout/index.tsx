@@ -5,6 +5,7 @@ type Props = {
     tabs: {
         title: string | JSX.Element;
         content: JSX.Element;
+        disabled?: boolean;
         onClick?: () => void;
     }[];
     onlyActiveTabContent?: boolean;
@@ -17,6 +18,9 @@ export default function TabLayout({tabs, onlyActiveTabContent = false}: Props) {
         <Nav tabs>
             {tabs.map((t, i) => (
                 <NavItem key={`nav-${i}`}><NavLink className={activeTab === i ? "active" : ""} onClick={() => {
+                    if (t.disabled) {
+                        return;
+                    }
                     setActiveTab(i);
                     if (t.onClick) {
                         t.onClick();

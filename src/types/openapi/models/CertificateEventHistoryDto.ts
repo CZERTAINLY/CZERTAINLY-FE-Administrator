@@ -72,6 +72,7 @@ export interface CertificateEventHistoryDto {
  */
 export enum CertificateEventHistoryDtoEventEnum {
     IssueCertificate = 'Issue Certificate',
+    CreateCsr = 'Create CSR',
     RenewCertificate = 'Renew Certificate',
     RevokeCertificate = 'Revoke Certificate',
     DeleteCertificate = 'Delete Certificate',

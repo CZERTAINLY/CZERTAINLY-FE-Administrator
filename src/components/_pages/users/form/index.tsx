@@ -149,7 +149,6 @@ function UserForm() {
             if (userSelector.certificate) dispatch(certActions.getCertificateDetail({ uuid: userSelector.certificate.uuid }));
 
          } else {
-
             if (!user) setUser({
                uuid: "",
                description: "",
@@ -158,7 +157,6 @@ function UserForm() {
                lastName: "",
                email: "",
                enabled: false,
-               certificate: emptyCertificate,
                roles: [],
                systemUser: false
             });
@@ -231,9 +229,9 @@ function UserForm() {
 
          setOptionsForCertificte(
 
-            loadedCerts.map(
+            loadedCerts.filter(e => e.status.toString().toLowerCase() !== "new").map(
                loadedCert => ({
-                  label: `${loadedCert.commonName} (${loadedCert.fingerprint})` || `( empty ) ( ${loadedCert.serialNumber} )`,
+                  label: `${loadedCert.commonName} (${loadedCert.serialNumber})` || `( empty ) ( ${loadedCert.serialNumber} )`,
                   value: loadedCert.uuid,
                })
             )

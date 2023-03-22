@@ -141,10 +141,19 @@ export default function CertificateDetail() {
             dispatch(actions.resetState());
             dispatch(actions.getCertificateDetail({uuid: id}));
             dispatch(actions.getCertificateHistory({uuid: id}));
-            dispatch(actions.getCertificateValidationResult({uuid: id}));
-
         },
         [dispatch, id],
+    );
+
+    useEffect(
+        () => {
+
+            if (!certificate) return;
+            if (certificate.status.toString() === "new") return;
+            dispatch(actions.getCertificateValidationResult({uuid: certificate.uuid}));
+
+        },
+        [dispatch, certificate],
     );
 
     useEffect(
@@ -971,7 +980,7 @@ export default function CertificateDetail() {
             },
             {
                 id: "serialNumber",
-                columns: ["Serial Number", certificate.serialNumber],
+                columns: ["Serial Number", certificate.serialNumber || ""],
             },
             {
                 id: "key",
@@ -980,11 +989,11 @@ export default function CertificateDetail() {
             },
             {
                 id: "issuerCommonName",
-                columns: ["Issuer Common Name", certificate.issuerCommonName],
+                columns: ["Issuer Common Name", certificate.issuerCommonName || ""],
             },
             {
                 id: "issuerDN",
-                columns: ["Issuer DN", certificate.issuerDn],
+                columns: ["Issuer DN", certificate.issuerDn || ""],
             },
             {
                 id: "subjectDN",
@@ -992,11 +1001,11 @@ export default function CertificateDetail() {
             },
             {
                 id: "expiresAt",
-                columns: ["Expires At", <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>],
+                columns: ["Expires At", certificate.notAfter ? <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span> : ""],
             },
             {
                 id: "validFrom",
-                columns: ["Valid From", <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>],
+                columns: ["Valid From", certificate.notBefore ? <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span> : ""],
             },
             {
                 id: "publicKeyAlgorithm",
@@ -1016,7 +1025,7 @@ export default function CertificateDetail() {
             },
             {
                 id: "fingerprint",
-                columns: ["Fingerprint", certificate.fingerprint],
+                columns: ["Fingerprint", certificate.fingerprint || ""],
             },
             {
                 id: "fingerprintAlgorithm",
@@ -1289,6 +1298,7 @@ export default function CertificateDetail() {
                 },
                 {
                     title: "Validation",
+                    disabled: certificate?.status.toString() === "new",
                     content: <Widget><Widget title={validationTitle} busy={isFetchingValidationResult}>
                         <br/>
                         <CustomTable
@@ -1310,6 +1320,7 @@ export default function CertificateDetail() {
                 },
                 {
                     title: "Locations",
+                    disabled: certificate?.status.toString() === "new",
                     content: <Widget>
                         <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
                             <br/>
