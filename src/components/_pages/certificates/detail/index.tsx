@@ -19,6 +19,8 @@ import { actions as locationActions, selectors as locationSelectors } from "duck
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { selectors as settingSelectors } from "ducks/settings";
 
+import { CertificateStatus as CertStatus } from "../../../../types/openapi";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -149,7 +151,7 @@ export default function CertificateDetail() {
         () => {
 
             if (!certificate) return;
-            if (certificate.status.toString() === "new") return;
+            if (certificate.status === CertStatus.New) return;
             dispatch(actions.getCertificateValidationResult({uuid: certificate.uuid}));
 
         },
@@ -1298,7 +1300,7 @@ export default function CertificateDetail() {
                 },
                 {
                     title: "Validation",
-                    disabled: certificate?.status.toString() === "new",
+                    disabled: certificate?.status === CertStatus.New,
                     content: <Widget><Widget title={validationTitle} busy={isFetchingValidationResult}>
                         <br/>
                         <CustomTable
@@ -1320,7 +1322,7 @@ export default function CertificateDetail() {
                 },
                 {
                     title: "Locations",
-                    disabled: certificate?.status.toString() === "new",
+                    disabled: certificate?.status === CertStatus.New,
                     content: <Widget>
                         <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
                             <br/>
