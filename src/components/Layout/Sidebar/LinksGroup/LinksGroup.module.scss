@@ -74,10 +74,9 @@
 }
 
 .panel {
-   border-right: 6px solid $czertainly-green-light;
-   box-shadow: none;
+   border-left: 6px solid $czertainly-green;
+   box-shadow: -6px 0px 10px -10px rgba(0,0,0,0.5) inset;
    margin: 0;
-   border-radius: 0;
    background: white;
 
    div {
