@@ -93,15 +93,6 @@ export default function LocationDetail() {
 
    )
 
-   useEffect(
-
-      () => {
-
-         console.log(resourceCustomAttributes);
-      },
-      [resourceCustomAttributes]
-
-   )
 
    useEffect(
 
