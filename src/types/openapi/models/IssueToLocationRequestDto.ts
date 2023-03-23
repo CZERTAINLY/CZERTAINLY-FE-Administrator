@@ -44,4 +44,10 @@ export interface IssueToLocationRequestDto {
      * @memberof IssueToLocationRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
+    /**
+     * List of Certificate Custom Attributes
+     * @type {Array<RequestAttributeDto>}
+     * @memberof IssueToLocationRequestDto
+     */
+    certificateCustomAttributes?: Array<RequestAttributeDto>;
 }
