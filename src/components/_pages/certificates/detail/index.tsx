@@ -627,7 +627,7 @@ export default function CertificateDetail() {
                 </div>
 
                 <h5>
-                    Basic Certificate Properties
+                    {certificate?.status === CertStatus.New ? "CSR" : "Certificate"} Properties
                 </h5>
 
             </div>
@@ -656,7 +656,7 @@ export default function CertificateDetail() {
 
     const propertiesTitle = (
         <h5>
-            Object Properties
+            Other Properties
         </h5>
     );
 
