@@ -14,7 +14,6 @@ export default function Sidebar() {
 
             <ul>
 
-               <LinksGroup _key="/home" header="Home" headerLink="/home" />
                <LinksGroup _key="/dashboard" header="Dashboard" headerLink="/dashboard" />
                <LinksGroup _key="/certificates" header="Certificates" headerLink="/certificates" />
                <LinksGroup _key="/cryptographickeys" header="Keys" headerLink="/cryptographickeys" />

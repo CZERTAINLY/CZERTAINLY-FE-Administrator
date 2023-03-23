@@ -75,9 +75,9 @@
 
 .panel {
    border-left: 6px solid $czertainly-green;
-   box-shadow: -6px 0px 10px -10px rgba(0,0,0,0.5) inset;
+   //box-shadow: -6px 0px 10px -10px $czertainly-green inset;
    margin: 0;
-   background: white;
+   background: #fcfcfc;
 
    div {
       padding: 0;

@@ -31,7 +31,7 @@ function Header({ sidebarToggle }: Props) {
 
          <Nav>
           <NavItem className={cx(style.logo)}>
-              <Link to="/home">
+              <Link to="/dashboard">
                   <img src={logo} alt="CZERTAINLY Logo" />
               </Link>
           </NavItem>
