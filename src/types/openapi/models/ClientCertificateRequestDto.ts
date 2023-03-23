@@ -17,55 +17,43 @@ import type {
 
 /**
  * @export
- * @interface ClientCertificateSignRequestDto
+ * @interface ClientCertificateRequestDto
  */
-export interface ClientCertificateSignRequestDto {
+export interface ClientCertificateRequestDto {
     /**
      * List of attributes to create CSR. Required if CSR is not provided
      * @type {Array<RequestAttributeDto>}
-     * @memberof ClientCertificateSignRequestDto
+     * @memberof ClientCertificateRequestDto
      */
     csrAttributes?: Array<RequestAttributeDto>;
     /**
      * List of attributes to sign the CSR
      * @type {Array<RequestAttributeDto>}
-     * @memberof ClientCertificateSignRequestDto
+     * @memberof ClientCertificateRequestDto
      */
     signatureAttributes?: Array<RequestAttributeDto>;
     /**
      * Certificate sign request (PKCS#10) encoded as Base64 string
      * @type {string}
-     * @memberof ClientCertificateSignRequestDto
+     * @memberof ClientCertificateRequestDto
      */
     pkcs10: string;
     /**
      * Token Profile UUID. Required if CSR is not uploaded
      * @type {string}
-     * @memberof ClientCertificateSignRequestDto
+     * @memberof ClientCertificateRequestDto
      */
     tokenProfileUuid?: string;
     /**
      * Key UUID. Required if CSR is not uploaded
      * @type {string}
-     * @memberof ClientCertificateSignRequestDto
+     * @memberof ClientCertificateRequestDto
      */
     keyUuid?: string;
     /**
-     * List of RA Profile related Attributes to issue Certificate
-     * @type {Array<RequestAttributeDto>}
-     * @memberof ClientCertificateSignRequestDto
-     */
-    attributes: Array<RequestAttributeDto>;
-    /**
      * List of Custom Attributes
      * @type {Array<RequestAttributeDto>}
-     * @memberof ClientCertificateSignRequestDto
+     * @memberof ClientCertificateRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
-    /**
-     * UUID of CSR Entity to be signed
-     * @type {string}
-     * @memberof ClientCertificateSignRequestDto
-     */
-    uuid?: string;
 }

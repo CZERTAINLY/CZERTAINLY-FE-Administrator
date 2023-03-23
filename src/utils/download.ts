@@ -31,7 +31,8 @@ export function downloadFileZip(
 
    for (let i of certificateUuids) {
 
-      const certificate = certificates.find(c => c.uuid === i);
+      const certificate = (certificates as Array<CertificateDetailResponseModel|CertificateContentResponseModel>).find(c => c.uuid === i);
+      
       if (!certificate) continue;
 
       let content: string | Buffer;
