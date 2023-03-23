@@ -46,19 +46,19 @@ export interface CertificateDetailDto {
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    serialNumber: string;
+    serialNumber?: string;
     /**
      * Certificate issuer common name
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    issuerCommonName: string;
+    issuerCommonName?: string;
     /**
      * Issuer DN of the Certificate
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    issuerDn: string;
+    issuerDn?: string;
     /**
      * Subject DN of the Certificate
      * @type {string}
@@ -70,13 +70,13 @@ export interface CertificateDetailDto {
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    notBefore: string;
+    notBefore?: string;
     /**
      * Certificate expiration date
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    notAfter: string;
+    notAfter?: string;
     /**
      * Public key algorithm
      * @type {string}
@@ -110,7 +110,7 @@ export interface CertificateDetailDto {
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    fingerprint: string;
+    fingerprint?: string;
     /**
      * @type {GroupDto}
      * @memberof CertificateDetailDto

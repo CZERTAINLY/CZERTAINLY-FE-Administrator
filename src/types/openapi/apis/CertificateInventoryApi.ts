@@ -26,6 +26,7 @@ import type {
     CertificateResponseDto,
     CertificateUpdateObjectsDto,
     CertificateValidationDto,
+    ClientCertificateRequestDto,
     ErrorMessageDto,
     LocationDto,
     MultipleCertificateObjectUpdateDto,
@@ -50,6 +51,10 @@ export interface CheckRequest {
 
 export interface CheckCertificatesComplianceRequest {
     certificateComplianceCheckDto: CertificateComplianceCheckDto;
+}
+
+export interface CreateCsrRequest {
+    clientCertificateRequestDto: ClientCertificateRequestDto;
 }
 
 export interface DeleteCertificateRequest {
@@ -167,6 +172,26 @@ export class CertificateInventoryApi extends BaseAPI {
             method: 'POST',
             headers,
             body: certificateComplianceCheckDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Generate CSR Entity
+     */
+    createCsr({ clientCertificateRequestDto }: CreateCsrRequest): Observable<CertificateDetailDto>
+    createCsr({ clientCertificateRequestDto }: CreateCsrRequest, opts?: OperationOpts): Observable<AjaxResponse<CertificateDetailDto>>
+    createCsr({ clientCertificateRequestDto }: CreateCsrRequest, opts?: OperationOpts): Observable<CertificateDetailDto | AjaxResponse<CertificateDetailDto>> {
+        throwIfNullOrUndefined(clientCertificateRequestDto, 'clientCertificateRequestDto', 'createCsr');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<CertificateDetailDto>({
+            url: '/v1/certificates/create',
+            method: 'POST',
+            headers,
+            body: clientCertificateRequestDto,
         }, opts?.responseOpts);
     };
 
