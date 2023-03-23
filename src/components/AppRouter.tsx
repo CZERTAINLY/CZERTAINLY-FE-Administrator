@@ -55,7 +55,6 @@ import GroupEdit from "./_pages/group/form";
 
 import GroupList from "./_pages/group/list";
 
-import Home from "./_pages/home";
 import LocationDetail from "./_pages/locations/detail";
 import LocationEdit from "./_pages/locations/form";
 
@@ -103,10 +102,9 @@ export default function AppRouter() {
          <>
             <Route element={< Layout />}>
 
-               <Route path="" element={<Navigate to="/home" />} />
-               <Route path="/" element={<Navigate to="/home" />} />
+               <Route path="" element={<Navigate to="/dashboard" />} />
+               <Route path="/" element={<Navigate to="/dashboard" />} />
 
-               <Route path="/home" element={<Home />} />
                <Route path="/dashboard" element={<Dashboard />} />
 
                <Route path="/users" element={<UsersList />} />
