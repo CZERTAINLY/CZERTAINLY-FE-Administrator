@@ -4,6 +4,7 @@ import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 type Props = {
     tabs: {
         title: string | JSX.Element;
+        hidden?: boolean;
         content: JSX.Element;
         disabled?: boolean;
         onClick?: () => void;
@@ -16,7 +17,7 @@ export default function TabLayout({tabs, onlyActiveTabContent = false}: Props) {
 
     return (<>
         <Nav tabs>
-            {tabs.map((t, i) => (
+            {tabs.filter(e=>!e.hidden).map((t, i) => (
                 <NavItem key={`nav-${i}`}><NavLink className={activeTab === i ? "active" : ""} onClick={() => {
                     if (t.disabled) {
                         return;
@@ -28,7 +29,7 @@ export default function TabLayout({tabs, onlyActiveTabContent = false}: Props) {
                 }}>{t.title}</NavLink></NavItem>))}
         </Nav>
         <TabContent activeTab={activeTab}>
-            {tabs.map((t, i) => (onlyActiveTabContent === false) || (activeTab === i) ?
+            {tabs.filter(e=>!e.hidden).map((t, i) => (onlyActiveTabContent === false) || (activeTab === i) ?
                 <TabPane key={`pane-${i}`} tabId={i}>
                     {t.content}
                 </TabPane> : null)

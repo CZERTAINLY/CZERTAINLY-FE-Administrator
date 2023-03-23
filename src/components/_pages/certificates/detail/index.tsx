@@ -1071,7 +1071,7 @@ export default function CertificateDetail() {
                 id: "basicConstraint",
                 columns: ["Basic Constraint", certificate.basicConstraints],
             }];
-            if (health) {
+            if (health && certificate?.status !== CertStatus.New) {
                 certDetail.push({
                     id: "asn1structure",
                     columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
@@ -1300,7 +1300,7 @@ export default function CertificateDetail() {
                 },
                 {
                     title: "Validation",
-                    disabled: certificate?.status === CertStatus.New,
+                    hidden: certificate?.status === CertStatus.New,
                     content: <Widget><Widget title={validationTitle} busy={isFetchingValidationResult}>
                         <br/>
                         <CustomTable
@@ -1322,7 +1322,7 @@ export default function CertificateDetail() {
                 },
                 {
                     title: "Locations",
-                    disabled: certificate?.status === CertStatus.New,
+                    hidden: certificate?.status === CertStatus.New,
                     content: <Widget>
                         <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
                             <br/>
