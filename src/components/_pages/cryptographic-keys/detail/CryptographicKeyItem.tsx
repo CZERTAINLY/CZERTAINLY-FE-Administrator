@@ -1,7 +1,8 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
+import Widget from "components/Widget";
 
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
@@ -444,23 +445,24 @@ export default function CryptographicKeyItem({
 
             {
                keyItem.metadata && keyItem.metadata.length > 0 ? <Col>
+                     <Widget title="Metadata" className="mt-3">
                      
-                     <Label>Meta Data</Label>
-                     
-                     <AttributeViewer metadata={keyItem.metadata} />
+                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={keyItem.metadata} />
+
+                     </Widget>
                
                </Col>
                
                : null
             }
          </Row>
-
-         <br />
-         <CustomTable
-            headers={historyHeaders}
-            data={historyEntry}
-            hasPagination={true}
-         />
+         <Widget title="Event History" className="mt-3">
+            <CustomTable
+               headers={historyHeaders}
+               data={historyEntry}
+               hasPagination={true}
+            />
+         </Widget>
 
          <Dialog
             isOpen={confirmDelete}
