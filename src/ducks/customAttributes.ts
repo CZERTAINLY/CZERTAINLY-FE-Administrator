@@ -21,6 +21,7 @@ export type State = {
     customAttribute?: CustomAttributeDetailResponseModel;
     customAttributes: CustomAttributeResponseModel[];
     resourceCustomAttributes: CustomAttributeModel[];
+    secondaryResourceCustomAttributes: CustomAttributeModel[];
     resourceCustomAttributesContents: ResourceCustomAttributesContents[];
     resources: Resource[];
 
@@ -43,6 +44,7 @@ export const initialState: State = {
     checkedRows: [],
     customAttributes: [],
     resourceCustomAttributes: [],
+    secondaryResourceCustomAttributes: [],
     resourceCustomAttributesContents: [],
     resources: [],
     isFetchingList: false,
@@ -107,6 +109,20 @@ export const slice = createSlice({
         },
 
         listResourceCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingResourceCustomAttributes = false;
+        },
+
+        listSecondaryResourceCustomAttributes: (state, action: PayloadAction<Resource>) => {
+            state.secondaryResourceCustomAttributes = [];
+            state.isFetchingResourceCustomAttributes = true;
+        },
+
+        listSecondaryResourceCustomAttributesSuccess: (state, action: PayloadAction<CustomAttributeModel[]>) => {
+            state.secondaryResourceCustomAttributes = action.payload;
+            state.isFetchingResourceCustomAttributes = false;
+        },
+
+        listSecondaryResourceCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingResourceCustomAttributes = false;
         },
 
@@ -313,6 +329,7 @@ const customAttribute = createSelector(state, (state: State) => state.customAttr
 const customAttributes = createSelector(state, (state: State) => state.customAttributes);
 const resources = createSelector(state, (state: State) => state.resources);
 const resourceCustomAttributes = createSelector(state, (state: State) => state.resourceCustomAttributes);
+const secondaryResourceCustomAttributes = createSelector(state, (state: State) => state.secondaryResourceCustomAttributes);
 const resourceCustomAttributesContents = (resource: Resource, resourceUuid: string) => createSelector(state, (state: State) => state.resourceCustomAttributesContents.find(c => c.resource === resource && c.resourceUuid === resourceUuid)?.customAttributes);
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
@@ -339,6 +356,7 @@ export const selectors = {
     customAttributes,
     resources,
     resourceCustomAttributes,
+    secondaryResourceCustomAttributes,
     resourceCustomAttributesContents,
 
     isCreating,

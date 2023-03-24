@@ -21,7 +21,7 @@ export type LocationPushRequestDto = PushToLocationRequestDto;
 export type LocationPushRequestModel = Omit<LocationPushRequestDto, "attributes"> & { attributes: Array<AttributeRequestModel> }
 
 export type LocationIssueRequestDto = IssueToLocationRequestDto;
-export type LocationIssueRequestModel = Omit<LocationIssueRequestDto, "csrAttributes | issueAttributes | customAttributes"> & { csrAttributes: Array<AttributeRequestModel>, issueAttributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel> }
+export type LocationIssueRequestModel = Omit<LocationIssueRequestDto, "csrAttributes | issueAttributes | customAttributes | certificateCustomAttributes"> & { csrAttributes: Array<AttributeRequestModel>, issueAttributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel>, certificateCustomAttributes?: Array<AttributeRequestModel> }
 
 export type NameAndUuidDto = NameAndUuidDtoOpenApi;
 export type NameAndUuidModel = NameAndUuidDto;

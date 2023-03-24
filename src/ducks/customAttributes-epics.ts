@@ -82,6 +82,29 @@ const listResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
 
 };
 
+
+const listSecondaryResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(
+            slice.actions.listSecondaryResourceCustomAttributes.match,
+        ),
+        switchMap(
+            action => deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
+                map(
+                    list => slice.actions.listSecondaryResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel)),
+                ),
+                catchError(
+                    err => of(
+                        slice.actions.listSecondaryResourceCustomAttributesFailure({error: extractError(err, "Failed to get Resource Custom Attributes list")}),
+                        appRedirectActions.fetchError({error: err, message: "Failed to get Resource Custom Attributes list"}),
+                    ),
+                ),
+            ),
+        ),
+    );
+
+};
+
 const createCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(
@@ -347,6 +370,7 @@ const epics = [
     listCustomAttributes,
     listResources,
     listResourceCustomAttributes,
+    listSecondaryResourceCustomAttributes,
     createCustomAttribute,
     updateCustomAttribute,
     getCustomAttribute,
