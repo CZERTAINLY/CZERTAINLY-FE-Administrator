@@ -248,7 +248,7 @@ export default function AuthorityForm() {
    const optionsForKinds = useMemo(
 
       () => authorityProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "authorityProvider"
+         fg => fg.functionGroupCode === "authorityProvider" || fg.functionGroupCode === "legacyAuthorityProvider"
       )?.kinds.map(
          kind => ({
             label: kind,
