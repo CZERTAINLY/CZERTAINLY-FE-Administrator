@@ -76,7 +76,7 @@ export default function FilterWidget({
             if (!field) return;
 
             setFilterGroup({ label: currentFilters[selectedFilter].groupName, value: currentFilters[selectedFilter].groupName });
-            setFilterField({ label: field.fieldLabel, value: field.fieldIdentifier });
+            setFilterField({ label: field.fieldLabel, value: field.fieldIdentifier + "^|^" + field.fieldLabel });
             setFilterCondition({ label: currentFilters[selectedFilter].condition, value: currentFilters[selectedFilter].condition });
 
             if (field.type === SearchableFieldType.String || field.type === SearchableFieldType.Number || field.type === SearchableFieldType.Date) {
@@ -124,7 +124,7 @@ export default function FilterWidget({
 
             const updatedFilterItem: SearchFilterModel = {
                 groupName: filterGroup?.value ?? "",
-                fieldIdentifier: filterField.value,
+                fieldIdentifier: filterField.value.split("^|^")[0],
                 condition: filterCondition.value,
                 value: filterValue ? typeof filterValue === "string" ? filterValue : Array.isArray(filterValue) ? filterValue.map(v => (v as any).value) : (filterValue as any).value : "",
             };
@@ -155,7 +155,7 @@ export default function FilterWidget({
     );
 
     const currentField = useMemo(
-        () => currentFields?.find(f => f.fieldIdentifier === filterField?.value),
+        () => currentFields?.find(f => f.fieldIdentifier === filterField?.value.split("^|^")[0]),
         [filterField, currentFields],
     );
 
@@ -193,7 +193,7 @@ export default function FilterWidget({
                                     <Label for="field">Filter Field</Label>
                                     <Select
                                         id="field"
-                                        options={currentFields?.map(f => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
+                                        options={currentFields?.map(f => ({ label: f.fieldLabel, value: f.fieldIdentifier  + "^|^" + f.fieldLabel }))}
                                         onChange={(e) => {
                                             setFilterField(e);
                                             setFilterCondition(undefined);
