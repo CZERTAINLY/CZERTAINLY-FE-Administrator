@@ -8,11 +8,11 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/cryptographic-keys";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 
-import { Badge, Button, Col, Label, Row } from "reactstrap";
+import { Badge, Button, Col, Row } from "reactstrap";
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
 import { KeyCompromiseReason, KeyState, KeyType, KeyUsage } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
@@ -119,7 +119,7 @@ export default function CryptographicKeyItem({
          dispatch(actions.updateKeyUsage({ tokenInstanceUuid: tokenInstanceUuid, uuid: keyUuid, usage: {usage: keyUsages, uuids: [keyItem.uuid]} }));
          setKeyUsageUpdate(false);
       },
-      [dispatch, keyUsages, keyItem]
+      [dispatch, keyUsages, keyItem, keyUuid, tokenInstanceUuid]
 
    );
 

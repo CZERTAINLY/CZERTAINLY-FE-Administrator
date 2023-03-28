@@ -4,13 +4,13 @@ import Widget from "components/Widget";
 import { actions as connectorActions, actions as connectorsActions } from "ducks/connectors";
 
 import { actions, selectors } from "ducks/credentials";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Select from "react-select/";
+import Select from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
@@ -21,7 +21,7 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { Resource } from "../../../../types/openapi";
+import { FunctionGroupCode, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
@@ -217,7 +217,7 @@ export default function CredentialForm() {
    const optionsForKinds = useMemo(
 
       () => credentialProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "credentialProvider"
+         fg => fg.functionGroupCode === FunctionGroupCode.CredentialProvider
       )?.kinds.map(
          kind => ({
             label: kind,

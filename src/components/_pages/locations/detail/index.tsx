@@ -1,4 +1,3 @@
-import CertificateList from "components/_pages/certificates/list";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
@@ -6,13 +5,14 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
+import CertificateList from "components/_pages/certificates/list";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/locations";
 import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -270,7 +270,7 @@ export default function LocationDetail() {
          setIssueDialog(false);
 
       },
-      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, issueGroupAttributesCallbackAttributes, csrGroupAttributesCallbackAttributes]
+      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, issueGroupAttributesCallbackAttributes, csrGroupAttributesCallbackAttributes, resourceCustomAttributes]
 
    )
 
