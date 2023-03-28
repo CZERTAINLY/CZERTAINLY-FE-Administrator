@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select/";
+import Select from "react-select";
 import { Col, Form as BootstrapForm, Row } from "reactstrap";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../ducks/customAttributes";
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "../../../types/attributes";

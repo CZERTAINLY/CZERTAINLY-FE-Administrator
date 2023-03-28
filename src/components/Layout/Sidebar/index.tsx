@@ -1,6 +1,3 @@
-import { Link } from "react-router-dom";
-import logo from "resources/images/czertainly_white_H.svg";
-
 import LinksGroup from "./LinksGroup";
 import style from "./Sidebar.module.scss";
 

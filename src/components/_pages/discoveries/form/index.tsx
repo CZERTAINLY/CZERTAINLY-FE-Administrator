@@ -6,7 +6,7 @@ import { actions as connectorActions } from "ducks/connectors";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
 
 import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -150,7 +150,7 @@ export default function DiscoveryForm() {
    const optionsForKinds = useMemo(
 
       () => discoveryProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "discoveryProvider"
+         fg => fg.functionGroupCode === FunctionGroupCode.DiscoveryProvider
       )?.kinds.map(
          kind => ({
             label: kind,

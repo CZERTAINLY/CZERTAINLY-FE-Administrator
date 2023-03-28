@@ -1,5 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { CertificateDetailResponseModel } from "types/certificate";
 import { dateFormatter } from "utils/dateUtil";
 

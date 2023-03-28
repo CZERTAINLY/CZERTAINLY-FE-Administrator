@@ -17,22 +17,18 @@ export default function Asn1Dialog({ certificateContent }: Props) {
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
     const isFetchingDetail = useSelector(utilsCertificateSelectors.isFetchingDetail);
     const [asn1, setAsn1] = useState<string | undefined>(undefined);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const health = useSelector(utilsActuatorSelectors.health);
+
+    useEffect(() => {
+        dispatch(utilsCertificateActions.reset());
+    }, [dispatch]);
 
     useEffect(() => {
         if (!health) {
             dispatch(utilsActuatorActions.health());
         }
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (certificateContent && health && isOpen) {
-            dispatch(utilsCertificateActions.reset());
-            dispatch(utilsCertificateActions.parseCertificate({ certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1 }));
-        }
-    }, [dispatch, certificateContent, health, isOpen]);
+    }, [dispatch, health]);
 
     useEffect(() => {
         if (parsedCertificate) {
@@ -44,24 +40,23 @@ export default function Asn1Dialog({ certificateContent }: Props) {
         <Spinner active={isFetchingDetail} />
         <Button
             className="btn btn-link p-0"
-            disabled={isFetchingDetail}
+            disabled={!health || isFetchingDetail}
             size="sm"
             color="primary"
             onClick={() => {
-                if (certificateContent) {
-                    setIsOpen(true);
+                if (certificateContent && health) {
                     dispatch(utilsCertificateActions.parseCertificate({ certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1 }));
                 }
             }}
             title="Show ASN.1 Structure"
         >Show</Button>
         <Dialog
-            isOpen={isOpen}
+            isOpen={!!asn1}
             size={"lg"}
             caption="ASN.1 Structure"
             body={<pre>{asn1}</pre>}
-            toggle={() => setIsOpen(false)}
-            buttons={[{ color: "primary", onClick: () => setIsOpen(false), body: "Close" }]}
+            toggle={() => setAsn1(undefined)}
+            buttons={[{ color: "primary", onClick: () => setAsn1(undefined), body: "Close" }]}
         />
     </>
 }

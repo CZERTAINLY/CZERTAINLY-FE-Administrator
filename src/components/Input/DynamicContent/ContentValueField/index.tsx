@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Field, useForm } from "react-final-form";
-import Select from "react-select/";
+import Select from "react-select";
 import { Col, FormFeedback, FormGroup, Input, InputGroup } from "reactstrap";
 import { BaseAttributeContentModel, CustomAttributeModel } from "../../../../types/attributes";
 import { AttributeContentType } from "../../../../types/openapi";

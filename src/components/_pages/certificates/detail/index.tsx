@@ -633,7 +633,7 @@ export default function CertificateDetail() {
             </div>
 
         ),
-        [buttons],
+        [buttons, certificate?.status],
     );
 
     const metaTitle = (
