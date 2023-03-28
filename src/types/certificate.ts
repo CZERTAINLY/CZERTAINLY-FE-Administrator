@@ -5,10 +5,10 @@ import {
     BulkOperationResponse,
     CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
+    CertificateContentDto,
+    CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
     CertificateDto,
     CertificateEventHistoryDto,
-    CertificateResponseDto as CertificateResponseDtoOpenApi,
-    CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
     CertificateUpdateObjectsDto,
     CertificateValidationDto as CertificateValidationDtoOpenApi,
     ClientCertificateRekeyRequestDto,
@@ -17,12 +17,12 @@ import {
     ClientCertificateSignRequestDto,
     MultipleCertificateObjectUpdateDto,
     RemoveCertificateDto,
+    SearchFieldDataByGroupDto,
     SearchFieldDataDto,
     SearchFilterRequestDto,
     SearchRequestDto as SearchRequestDtoOpenApi,
     SimplifiedRaProfileDto,
-    UploadCertificateRequestDto,
-    CertificateContentDto,
+    UploadCertificateRequestDto
 } from "./openapi";
 
 export type SearchFilterDto = SearchFilterRequestDto;
@@ -67,6 +67,9 @@ export type CertificateRekeyRequestModel = CertificateRekeyRequestDto;
 
 export type SearchFieldDto = SearchFieldDataDto;
 export type SearchFieldModel = SearchFieldDto;
+
+export type SearchFieldListDto = SearchFieldDataByGroupDto;
+export type SearchFieldListModel = Omit<SearchFieldListDto, "searchFieldData"> & { searchFieldData?: Array<SearchFieldModel> };
 
 export type CertificateHistoryDto = CertificateEventHistoryDto;
 export type CertificateHistoryModel = CertificateHistoryDto;

@@ -1,7 +1,7 @@
 import { selectors } from "ducks/auth";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import AcmeAccountDetail from "./_pages/acme-accounts/detail";
 
 import AcmeAccountsList from "./_pages/acme-accounts/list";
@@ -46,12 +46,15 @@ import EntityDetail from "./_pages/entities/detail";
 import EntityEdit from "./_pages/entities/form";
 
 import EntitiesList from "./_pages/entities/list";
+import GlobalMetadataDetail from "./_pages/global-metadata/detail";
+import GlobalMetadataEdit from "./_pages/global-metadata/form";
+
+import GlobalMetadataList from "./_pages/global-metadata/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
 
 import GroupList from "./_pages/group/list";
 
-import Home from "./_pages/home";
 import LocationDetail from "./_pages/locations/detail";
 import LocationEdit from "./_pages/locations/form";
 
@@ -62,6 +65,8 @@ import RaProfileEdit from "./_pages/ra-profiles/form";
 import RaProfilesList from "./_pages/ra-profiles/list";
 import RoleDetail from "./_pages/roles/detail";
 
+import PlatformSettingsDetail from "./_pages/platform-settings/detail";
+import PlatformSettingsEdit from "./_pages/platform-settings/form";
 import RolesList from "./_pages/roles/list";
 import RoleEdit from "./_pages/roles/RoleForm";
 import RolePermissions from "./_pages/roles/RolePermissionsForm";
@@ -79,8 +84,8 @@ import UserProfileEdit from "./_pages/user-profile/form";
 import UserDetail from "./_pages/users/detail";
 import UserEdit from "./_pages/users/form";
 
-import UsersList from "./_pages/users/list";
 import AppLogin from "./AppLogin/AppLogin";
+import UsersList from "./_pages/users/list";
 
 import AppRedirect from "./AppRedirect";
 
@@ -88,7 +93,6 @@ import Layout from "./Layout";
 import Spinner from "./Spinner";
 
 export default function AppRouter() {
-
    const profile = useSelector(selectors.profile);
 
    const appRoutes = useMemo(
@@ -98,10 +102,9 @@ export default function AppRouter() {
          <>
             <Route element={< Layout />}>
 
-               <Route path="" element={<Navigate to="/home" />} />
-               <Route path="/" element={<Navigate to="/home" />} />
+               <Route path="" element={<Navigate to="/dashboard" />} />
+               <Route path="/" element={<Navigate to="/dashboard" />} />
 
-               <Route path="/home" element={<Home />} />
                <Route path="/dashboard" element={<Dashboard />} />
 
                <Route path="/users" element={<UsersList />} />
@@ -196,6 +199,12 @@ export default function AppRouter() {
                <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
                <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
 
+               <Route path="/globalmetadata" element={<GlobalMetadataList />} />
+               <Route path="/globalmetadata/list" element={<Navigate to="/globalmetadata" />} />
+               <Route path="/globalmetadata/detail/:id" element={<GlobalMetadataDetail />} />
+               <Route path="/globalmetadata/add" element={<GlobalMetadataEdit />} />
+               <Route path="/globalmetadata/edit/:id" element={<GlobalMetadataEdit />} />
+
                <Route path="/tokens" element={<TokenList />} />
                <Route path="/tokens/list" element={<Navigate to="/tokens" />} />
                <Route path="/tokens/detail/:id" element={<TokenDetail />} />
@@ -213,6 +222,9 @@ export default function AppRouter() {
                <Route path="/cryptographickeys/detail/:tokenId/:id" element={<CryptographicKeyDetail />} />
                <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
                <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
+
+               <Route path="/platform" element={<PlatformSettingsDetail />} />
+               <Route path="/platform/edit" element={<PlatformSettingsEdit />} />
 
             </Route >
 
@@ -233,7 +245,7 @@ export default function AppRouter() {
 
    return (
 
-      <BrowserRouter basename={(window as any).__ENV__.BASE_URL}>
+      <HashRouter>
 
          <AppRedirect />
 
@@ -247,7 +259,7 @@ export default function AppRouter() {
 
          </Routes>
 
-      </BrowserRouter >
+      </HashRouter >
 
    );
 

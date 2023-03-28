@@ -7,18 +7,18 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchFieldDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
+import { transformSearchFieldListDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
 
 import {
-    transformCryptographicKeyAddRequestModelToDto,
-    transformCryptographicKeyBulkCompromiseModelToDto,
-    transformCryptographicKeyCompromiseModelToDto,
-    transformCryptographicKeyDetailResponseDtoToModel,
-    transformCryptographicKeyEditRequestModelToDto,
-    transformCryptographicKeyItemBulkCompromiseModelToDto,
-    transformCryptographicKeyPairResponseDtoToModel,
-    transformCryptographicKeyResponseDtoToModel,
-    transformKeyHistoryDtoToModel,
+   transformCryptographicKeyAddRequestModelToDto,
+   transformCryptographicKeyBulkCompromiseModelToDto,
+   transformCryptographicKeyCompromiseModelToDto,
+   transformCryptographicKeyDetailResponseDtoToModel,
+   transformCryptographicKeyEditRequestModelToDto,
+   transformCryptographicKeyItemBulkCompromiseModelToDto,
+   transformCryptographicKeyPairResponseDtoToModel,
+   transformCryptographicKeyResponseDtoToModel,
+   transformKeyHistoryDtoToModel
 } from "./transform/cryptographic-keys";
 
 const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
@@ -856,7 +856,7 @@ const getAvailableKeyFilters: AppEpic = (action$, state, deps) => {
 
                 map(
                     filters => slice.actions.getAvailableKeyFiltersSuccess({
-                        availableKeyFilters: filters.map(filter => transformSearchFieldDtoToModel(filter))
+                        availableKeyFilters: filters.map(filter => transformSearchFieldListDtoToModel(filter))
                     })
                 ),
 

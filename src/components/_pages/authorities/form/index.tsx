@@ -7,13 +7,13 @@ import { actions as alertActions } from "ducks/alerts";
 import { actions as authorityActions, selectors as authoritySelectors } from "ducks/authorities";
 import { actions as connectorActions } from "ducks/connectors";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Select, { SingleValue } from "react-select/";
+import Select, { SingleValue } from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { AuthorityResponseModel } from "types/authorities";
@@ -248,7 +248,7 @@ export default function AuthorityForm() {
    const optionsForKinds = useMemo(
 
       () => authorityProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "authorityProvider"
+         fg => fg.functionGroupCode === FunctionGroupCode.AuthorityProvider || fg.functionGroupCode === FunctionGroupCode.LegacyAuthorityProvider
       )?.kinds.map(
          kind => ({
             label: kind,

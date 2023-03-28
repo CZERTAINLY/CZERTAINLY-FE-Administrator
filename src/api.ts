@@ -17,14 +17,18 @@ import {
    CustomAttributesApi,
    DiscoveryManagementApi,
    EntityManagementApi,
+   GlobalMetadataApi,
    LocationManagementApi,
    RAProfileManagementApi,
    RoleManagementApi,
+   SettingsApi,
    StatisticsDashboardApi,
    TokenProfileManagementApi,
-   UserManagementApi,
+   UserManagementApi
 } from "types/openapi";
 import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
+import { ActuatorApi, CertificateUtilsAPIApi, CertificationRequestUtilsAPIApi, Configuration as ConfigurationUtils } from "types/openapi/utils";
+import { OIDUtilsAPIApi } from "./types/openapi/utils";
 
 const configuration = new Configuration({ basePath: ((window as any).__ENV__.API_URL) });
 
@@ -49,10 +53,16 @@ export interface ApiClients {
    discoveries: DiscoveryManagementApi;
    complianceProfile: ComplianceProfileManagementApi;
    customAttributes: CustomAttributesApi;
+   globalMetadata: GlobalMetadataApi;
+   settings: SettingsApi;
    tokenInstances: TokenInstanceControllerApi;
    tokenProfiles: TokenProfileManagementApi;
    cryptographicKeys: CryptographicKeyControllerApi;
    cryptographicOperations: CryptographicOperationsControllerApi;
+   utilsOid?: OIDUtilsAPIApi;
+   utilsActuator?: ActuatorApi;
+   utilsCertificate?: CertificateUtilsAPIApi;
+   utilsCertificateRequest?: CertificationRequestUtilsAPIApi;
 }
 
 
@@ -77,8 +87,25 @@ export const backendClient: ApiClients = {
    discoveries: new DiscoveryManagementApi(configuration),
    complianceProfile: new ComplianceProfileManagementApi(configuration),
    customAttributes: new CustomAttributesApi(configuration),
+   globalMetadata: new GlobalMetadataApi(configuration),
+   settings: new SettingsApi(configuration),
    tokenInstances: new TokenInstanceControllerApi(configuration),
    tokenProfiles: new TokenProfileManagementApi(configuration),
    cryptographicKeys: new CryptographicKeyControllerApi(configuration),
    cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
 };
+
+export const updateBackendUtilsClients = (url: string | undefined) => {
+   if (url && url !== "") {
+      const configuration = new ConfigurationUtils({basePath: url});
+      backendClient.utilsCertificate = new CertificateUtilsAPIApi(configuration);
+      backendClient.utilsOid = new OIDUtilsAPIApi(configuration);
+      backendClient.utilsCertificateRequest = new CertificationRequestUtilsAPIApi(configuration);
+      backendClient.utilsActuator = new ActuatorApi(configuration);
+   } else {
+      backendClient.utilsCertificate = undefined;
+      backendClient.utilsOid = undefined;
+      backendClient.utilsCertificateRequest = undefined;
+      backendClient.utilsActuator = undefined;
+   }
+}

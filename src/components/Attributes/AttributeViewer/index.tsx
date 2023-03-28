@@ -2,7 +2,14 @@ import CustomTable, { TableDataRow } from "components/CustomTable";
 import React, { useCallback, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { Form as BootstrapForm } from "reactstrap";
-import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "types/attributes";
+import {
+    AttributeDescriptorModel,
+    AttributeResponseModel,
+    BaseAttributeContentModel,
+    CustomAttributeModel,
+    isCustomAttributeModelArray,
+    isDataAttributeModel,
+} from "types/attributes";
 import { MetadataItemModel, MetadataModel } from "types/locations";
 import { getAttributeContent } from "utils/attributes/attributes";
 import ContentValueField from "../../Input/DynamicContent/ContentValueField";
@@ -10,6 +17,7 @@ import WidgetButtons, { IconName } from "../../WidgetButtons";
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
+    ATTRIBUTES_WITH_DESCRIPTORS,
     METADATA,
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
@@ -17,7 +25,7 @@ export enum ATTRIBUTE_VIEWER_TYPE {
 
 export interface Props {
     attributes?: AttributeResponseModel[] | undefined;
-    descriptors?: CustomAttributeModel[];
+    descriptors?: AttributeDescriptorModel[] | CustomAttributeModel[];
     metadata?: MetadataModel[] | undefined;
     viewerType?: ATTRIBUTE_VIEWER_TYPE;
     hasHeader?: boolean;
@@ -48,7 +56,7 @@ export default function AttributeViewer({
                 },
             );
         }
-        if (viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT || viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT) {
+        if (viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE || viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT || viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT) {
             result.push(
                 {
                     id: "name",
@@ -91,6 +99,18 @@ export default function AttributeViewer({
             getContent(attribute.contentType, attribute.content),
         ],
     }), [getContent]);
+
+    const getDescriptorsTableData = useCallback((descriptor: AttributeDescriptorModel) => {
+        const attribute = attributes?.find(a => a.name === descriptor.name);
+        return {
+            id: descriptor.uuid || "",
+            columns: [
+                isDataAttributeModel(descriptor) ? descriptor.properties.label : descriptor.name,
+                isDataAttributeModel(descriptor) ? descriptor.contentType : "n/a",
+                isDataAttributeModel(descriptor) ? (attribute ? getContent(attribute.contentType, attribute.content) : getContent(descriptor.contentType, descriptor.content)) : "",
+            ],
+        };
+    }, [getContent, attributes]);
 
     const getMetadataTableData = useCallback((attribute: MetadataModel) => ({
         id: attribute.connectorUuid || "",
@@ -167,8 +187,10 @@ export default function AttributeViewer({
         switch (viewerType) {
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE:
                 return attributes?.map(getAttributesTableData);
+            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS:
+                return descriptors?.map(getDescriptorsTableData);
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT:
-                return getAttributesEditTableData(attributes, descriptors);
+                return isCustomAttributeModelArray(descriptors) ? getAttributesEditTableData(attributes, descriptors) : [];
             case ATTRIBUTE_VIEWER_TYPE.METADATA:
                 return metadata?.map(getMetadataTableData);
             case ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT:
@@ -179,7 +201,7 @@ export default function AttributeViewer({
             default:
                 return [];
         }
-    }, [attributes, metadata, getAttributesTableData, getAttributesEditTableData, getMetadataTableData, viewerType, descriptors]);
+    }, [attributes, metadata, getAttributesTableData, getAttributesEditTableData, getMetadataTableData, viewerType, descriptors, getDescriptorsTableData]);
 
     return (tableData) ? (
         <CustomTable

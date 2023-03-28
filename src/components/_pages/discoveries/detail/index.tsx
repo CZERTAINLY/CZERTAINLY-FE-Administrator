@@ -16,6 +16,7 @@ import { dateFormatter } from "utils/dateUtil";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import DiscoveryStatus from "../DiscoveryStatus";
+import DiscoveryCertificates from "./DiscoveryCertificates";
 
 export default function DiscoveryDetail() {
 
@@ -102,13 +103,6 @@ export default function DiscoveryDetail() {
       </h5>
     );
 
-    const certificatesTitle = (
-      <h5>
-        <span className="fw-semi-bold">Discovered Certificates</span>
-      </h5>
-    );
-
-
    const detailHeaders: TableHeader[] = useMemo(
 
       () => [
@@ -124,58 +118,6 @@ export default function DiscoveryDetail() {
       []
 
    );
-
-   const certificateHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "commonName",
-            content: "Common Name",
-         },
-         {
-            id: "serialNumber",
-            content: "Serial Number",
-         },
-         {
-            id: "notAfter",
-            content: "Not After",
-         },
-         {
-            id: "notBefore",
-            content: "Not Before",
-         },
-         {
-            id: "issuerCommonName",
-            content: "Issuer Common Name",
-         },
-         {
-            id: "fingerprint",
-            content: "Fingerprint",
-         },
-      ],
-      []
-
-   );
-
-   const certificateData: TableDataRow[] = useMemo(
-
-      () => !discovery?.certificate ? [] : discovery.certificate.map(r => (
-            {
-               id: r.serialNumber + r.fingerprint,
-               columns: [
-                  r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
-                  r.serialNumber,
-                  <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notAfter)}</span>,
-                  <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notBefore)}</span>,
-                  r.issuerCommonName,
-                  r.fingerprint,
-               ],
-            }
-         )
-      ),
-      [discovery?.certificate]
-   )
-
 
    const detailData: TableDataRow[] = useMemo(
 
@@ -261,18 +203,7 @@ export default function DiscoveryDetail() {
             </Col>
          </Row>
 
-         <Widget title={certificatesTitle} busy={isBusy}>
-
-            <br />
-
-            <CustomTable
-               hasPagination={true}
-               headers={certificateHeaders}
-               data={certificateData}
-            />
-
-         </Widget>
-
+          {id && <DiscoveryCertificates id={id} />}
 
          <Dialog
             isOpen={confirmDelete}

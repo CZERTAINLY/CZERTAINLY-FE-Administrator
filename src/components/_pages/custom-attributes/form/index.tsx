@@ -89,7 +89,7 @@ export default function CustomAttributeForm() {
 
                         <TextField label={"Name"} id={"name"} disabled={editMode} validators={[validateRequired(), validateAlphaNumeric()]}/>
                         <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumeric()]}/>
-                        <TextField label={"Description"} id={"description"} validators={[validateRequired(), validateAlphaNumeric()]}/>
+                        <TextField label={"Description"} id={"description"} validators={[validateAlphaNumeric()]}/>
                         <TextField label={"Group"} id={"group"} validators={[validateAlphaNumeric()]}/>
 
                         <Field name="resources" type={"text"}>

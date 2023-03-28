@@ -1,17 +1,18 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
+import Widget from "components/Widget";
 
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/cryptographic-keys";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 
-import { Badge, Button, Col, Label, Row } from "reactstrap";
+import { Badge, Button, Col, Row } from "reactstrap";
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
 import { KeyCompromiseReason, KeyState, KeyType, KeyUsage } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
@@ -118,7 +119,7 @@ export default function CryptographicKeyItem({
          dispatch(actions.updateKeyUsage({ tokenInstanceUuid: tokenInstanceUuid, uuid: keyUuid, usage: {usage: keyUsages, uuids: [keyItem.uuid]} }));
          setKeyUsageUpdate(false);
       },
-      [dispatch, keyUsages, keyItem]
+      [dispatch, keyUsages, keyItem, keyUuid, tokenInstanceUuid]
 
    );
 
@@ -444,23 +445,24 @@ export default function CryptographicKeyItem({
 
             {
                keyItem.metadata && keyItem.metadata.length > 0 ? <Col>
+                     <Widget title="Metadata" className="mt-3">
                      
-                     <Label>Meta Data</Label>
-                     
-                     <AttributeViewer metadata={keyItem.metadata} />
+                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={keyItem.metadata} />
+
+                     </Widget>
                
                </Col>
                
                : null
             }
          </Row>
-
-         <br />
-         <CustomTable
-            headers={historyHeaders}
-            data={historyEntry}
-            hasPagination={true}
-         />
+         <Widget title="Event History" className="mt-3">
+            <CustomTable
+               headers={historyHeaders}
+               data={historyEntry}
+               hasPagination={true}
+            />
+         </Widget>
 
          <Dialog
             isOpen={confirmDelete}

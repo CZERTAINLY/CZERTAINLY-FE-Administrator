@@ -134,7 +134,7 @@ export default function CertificateList({
 
    const onUploadClick = useCallback(
 
-      (data: { fileName: string, contentType: string, fileContent: string, customAttributes?: Array<AttributeRequestModel> }) => {
+      (data: { fileContent: string, customAttributes?: Array<AttributeRequestModel> }) => {
 
          if (data.fileContent) {
 
@@ -357,9 +357,9 @@ export default function CertificateList({
 
                   selectCertsOnly ? certificate.commonName || "(empty)" : <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>,
 
-                  <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span>,
+                  certificate.notBefore ? <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span> : "",
 
-                  <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span>,
+                  certificate.notAfter ? <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span> : "",
 
                   certificate.group?.name || "Unassigned",
 
@@ -367,13 +367,13 @@ export default function CertificateList({
 
                   certificate.owner || "Unassigned",
 
-                  certificate.serialNumber,
+                  certificate.serialNumber || "",
 
                   certificate.signatureAlgorithm,
 
                   certificate.publicKeyAlgorithm,
 
-                  certificate.issuerCommonName,
+                  certificate.issuerCommonName || "",
 
                   certificate.certificateType ? <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>{certificate.certificateType}</Badge> : "",
 

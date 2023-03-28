@@ -186,6 +186,10 @@ export const isCustomAttributeModel = (attribute: AttributeDescriptorModel): att
    return attribute.type === AttributeType.Custom;
 }
 
+export const isCustomAttributeModelArray = (attributes: AttributeDescriptorModel[]): attributes is CustomAttributeModel[] => {
+   return attributes.every(isCustomAttributeModel);
+}
+
 export const isAttributeDescriptorModel = (attribute: object): attribute is AttributeDescriptorModel => {
    return ((attribute as AttributeDescriptorModel).name !== undefined) && ((attribute as AttributeDescriptorModel).uuid !== undefined) && ((attribute as AttributeDescriptorModel).type !== undefined);
 }

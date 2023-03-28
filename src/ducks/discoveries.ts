@@ -1,9 +1,9 @@
-import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DiscoveryRequestModel, DiscoveryResponseDetailModel, DiscoveryResponseModel } from "types/discoveries";
-import { ConnectorResponseModel } from "types/connectors";
 import { AttributeDescriptorModel } from "types/attributes";
-
+import { ConnectorResponseModel } from "types/connectors";
+import { DiscoveryCertificateListModel, DiscoveryRequestModel, DiscoveryResponseDetailModel, DiscoveryResponseModel } from "types/discoveries";
+import { createFeatureSelector } from "utils/ducks";
+import { GetDiscoveryCertificatesRequest } from "../types/openapi";
 
 export type State = {
 
@@ -15,8 +15,11 @@ export type State = {
    discoveryProviders?: ConnectorResponseModel[];
    discoveryProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
+   discoveryCertificates?: DiscoveryCertificateListModel;
+
    isFetchingDiscoveryProviders: boolean;
    isFetchingDiscoveryProviderAttributeDescriptors: boolean;
+   isFetchingDiscoveryCertificates: boolean;
 
    isFetchingList: boolean;
    isFetchingDetail: boolean;
@@ -35,6 +38,7 @@ export const initialState: State = {
 
    isFetchingDiscoveryProviders: false,
    isFetchingDiscoveryProviderAttributeDescriptors: false,
+   isFetchingDiscoveryCertificates: false,
 
    isFetchingList: false,
    isFetchingDetail: false,
@@ -127,6 +131,19 @@ export const slice = createSlice({
 
       },
 
+      getDiscoveryCertificates: (state, action: PayloadAction<GetDiscoveryCertificatesRequest>) => {
+         state.discoveryCertificates = undefined;
+         state.isFetchingDiscoveryCertificates = true;
+      },
+
+      getDiscoveryCertificatesSuccess: (state, action: PayloadAction<DiscoveryCertificateListModel>) => {
+         state.discoveryCertificates = action.payload;
+         state.isFetchingDiscoveryCertificates = false;
+      },
+
+      getDiscoveryCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+         state.isFetchingDiscoveryCertificates = false;
+      },
 
       listDiscoveries: (state, action: PayloadAction<void>) => {
 
@@ -274,11 +291,14 @@ const checkedRows = createSelector(state, state=> state.checkedRows);
 const discoveryProviders = createSelector(state, state => state.discoveryProviders);
 const discoveryProviderAttributeDescriptors = createSelector(state, state => state.discoveryProviderAttributeDescriptors);
 
+const discoveryCertificates = createSelector(state, state => state.discoveryCertificates);
+
 const discovery = createSelector(state, state => state.discovery);
 const discoveries = createSelector(state, state => state.discoveries);
 
 const isFetchingDiscoveryProviders = createSelector(state, state => state.isFetchingDiscoveryProviders);
 const isFetchingDiscoveryProviderAttributeDescriptors = createSelector(state, state => state.isFetchingDiscoveryProviderAttributeDescriptors);
+const isFetchingDiscoveryCertificates = createSelector(state, state => state.isFetchingDiscoveryCertificates);
 
 const isFetchingList = createSelector(state, state => state.isFetchingList);
 const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
@@ -295,11 +315,14 @@ export const selectors = {
    discoveryProviders,
    discoveryProviderAttributeDescriptors,
 
+   discoveryCertificates,
+
    discovery,
    discoveries,
 
    isFetchingDiscoveryProviders,
    isFetchingDiscoveryProviderAttributeDescriptors,
+   isFetchingDiscoveryCertificates,
 
    isFetchingList,
    isFetchingDetail,

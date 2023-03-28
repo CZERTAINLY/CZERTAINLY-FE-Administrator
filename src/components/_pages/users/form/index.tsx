@@ -20,10 +20,9 @@ import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGr
 import { UserDetailModel } from "types/auth";
 import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
-import { emptyCertificate } from "utils/certificate";
 import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { Resource } from "../../../../types/openapi";
+import { Resource, CertificateStatus as CertStatus } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
@@ -74,7 +73,7 @@ function UserForm() {
 
    const [userRoles, setUserRoles] = useState<string[]>([]);
 
-   const [optionsForCertificate, setOptionsForCertificte] = useState<{ label: string, value: string }[]>([]);
+   const [optionsForCertificate, setOptionsForCertificate] = useState<{ label: string, value: string }[]>([]);
 
    const optionsForInput: {label: string, value: "upload" | "select"}[] = useMemo(
       () => [
@@ -149,7 +148,6 @@ function UserForm() {
             if (userSelector.certificate) dispatch(certActions.getCertificateDetail({ uuid: userSelector.certificate.uuid }));
 
          } else {
-
             if (!user) setUser({
                uuid: "",
                description: "",
@@ -158,7 +156,6 @@ function UserForm() {
                lastName: "",
                email: "",
                enabled: false,
-               certificate: emptyCertificate,
                roles: [],
                systemUser: false
             });
@@ -229,11 +226,11 @@ function UserForm() {
 
       () => {
 
-         setOptionsForCertificte(
+         setOptionsForCertificate(
 
-            loadedCerts.map(
+            loadedCerts.filter(e => e.status !== CertStatus.New).map(
                loadedCert => ({
-                  label: `${loadedCert.commonName} (${loadedCert.fingerprint})` || `( empty ) ( ${loadedCert.serialNumber} )`,
+                  label: `${loadedCert.commonName} (${loadedCert.serialNumber})` || `( empty ) ( ${loadedCert.serialNumber} )`,
                   value: loadedCert.uuid,
                })
             )

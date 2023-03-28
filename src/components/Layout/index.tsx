@@ -20,12 +20,10 @@ function Layout() {
    return (
 
       <div className={style.root}>
-
+         <Header sidebarToggle={toggleSidebar} />
          <Sidebar />
 
          <div className={cx(style.wrap, { [style.sidebarOpen]: sidebarOpen })}>
-
-            <Header sidebarToggle={toggleSidebar} />
 
             <main className={style.content}>
                <Outlet />

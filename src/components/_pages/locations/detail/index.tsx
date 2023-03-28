@@ -1,4 +1,3 @@
-import CertificateList from "components/_pages/certificates/list";
 import AttributeEditor from "components/Attributes/AttributeEditor";
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
@@ -6,13 +5,14 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
+import CertificateList from "components/_pages/certificates/list";
 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/locations";
 import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -23,6 +23,7 @@ import { AttributeDescriptorModel } from "types/attributes";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 
 import { validateRequired } from "utils/validators";
 import { Resource } from "../../../../types/openapi";
@@ -41,6 +42,9 @@ export default function LocationDetail() {
    const csrAttributeDescriptors = useSelector(selectors.csrAttributeDescriptors);
    const raProfiles = useSelector(raSelectors.raProfiles);
    const issuanceAttributeDescriptors = useSelector(raSelectors.issuanceAttributes);
+
+   const resourceCustomAttributes = useSelector(customAttributesSelectors.secondaryResourceCustomAttributes);
+   const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
    const isFetching = useSelector(selectors.isFetchingDetail);
    const isDeleting = useSelector(selectors.isDeleting);
@@ -70,14 +74,16 @@ export default function LocationDetail() {
    const [selectedCerts, setSelectedCerts] = useState<string[]>([]);
 
    const isBusy = useMemo(
-      () => isFetching || isDeleting || isFetchingPushAttributeDescriptors || isFetchingCSRAttributeDescriptors,
-      [isFetching, isDeleting, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors]
+      () => isFetching || isDeleting || isFetchingPushAttributeDescriptors || isFetchingCSRAttributeDescriptors || isFetchingResourceCustomAttributes,
+      [isFetching, isDeleting, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors, isFetchingResourceCustomAttributes]
    );
 
 
    useEffect(
 
       () => {
+
+         dispatch(customAttributesActions.listSecondaryResourceCustomAttributes(Resource.Certificates));
 
          if (!id || !entityId) return;
          dispatch(actions.getLocationDetail({ entityUuid: entityId!, uuid: id! }));
@@ -86,6 +92,7 @@ export default function LocationDetail() {
       [dispatch, id, entityId]
 
    )
+
 
    useEffect(
 
@@ -249,20 +256,21 @@ export default function LocationDetail() {
 
          const issueAttrs = collectFormAttributes("issueAttributes", [...(issuanceAttributeDescriptors ?? []), ...issueGroupAttributesCallbackAttributes], values);
          const csrAttrs = collectFormAttributes("csrAttributes", [...(csrAttributeDescriptors ?? []), ...csrGroupAttributesCallbackAttributes], values);
-
+         const certificateCustomAttributes = collectFormAttributes("customCertificate", resourceCustomAttributes, values);
          dispatch(actions.issueCertificate({
             entityUuid: location.entityInstanceUuid,
             locationUuid: location.uuid,
              issueRequest: {
                  raProfileUuid: values.raProfile.value.split(":#")[0],
                  csrAttributes: csrAttrs,
-                 issueAttributes: issueAttrs
+                 issueAttributes: issueAttrs,
+                 certificateCustomAttributes: certificateCustomAttributes
              }
          }));
          setIssueDialog(false);
 
       },
-      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, issueGroupAttributesCallbackAttributes, csrGroupAttributesCallbackAttributes]
+      [csrAttributeDescriptors, dispatch, issuanceAttributeDescriptors, location, issueGroupAttributesCallbackAttributes, csrGroupAttributesCallbackAttributes, resourceCustomAttributes]
 
    )
 
@@ -685,6 +693,13 @@ export default function LocationDetail() {
                                         setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
                                     />) : <></>
                                 },
+                                {
+                                 title: "Certificate Custom Attributes",
+                                 content: <AttributeEditor
+                                     id="customCertificate"
+                                     attributeDescriptors={resourceCustomAttributes}
+                                 />
+                             },
                             ]} />
 
                            <div style={{ textAlign: "right" }}>

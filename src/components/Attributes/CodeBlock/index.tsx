@@ -1,8 +1,7 @@
 import * as DOMPurify from "dompurify";
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
 import parse from "html-react-parser";
-import Prism from "prismjs";
-import "prismjs/components";
-import "prismjs/themes/prism.css";
 import React, { useState } from "react";
 import { Button } from "reactstrap";
 import { CodeBlockAttributeContentModel } from "../../../types/attributes";
@@ -15,7 +14,7 @@ type Props = {
 
 export const getHighLightedCode = (code: string, language: ProgrammingLanguageEnum) => {
     try {
-        return Prism.highlight(code, Prism.languages[language], language);
+        return hljs.highlight(language, code).value;
     } catch (e) {
         console.error(e);
         return code;

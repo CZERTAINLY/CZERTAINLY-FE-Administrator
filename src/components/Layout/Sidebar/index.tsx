@@ -1,7 +1,3 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import logo from "resources/images/czertainly_white_H.svg";
-
 import LinksGroup from "./LinksGroup";
 import style from "./Sidebar.module.scss";
 
@@ -11,17 +7,10 @@ export default function Sidebar() {
 
       <nav className={style.root}>
 
-         <header className={style.logo}>
-            <Link to="/home">
-               <img src={logo} alt="CZERTAINLY Logo" />
-            </Link>
-         </header>
-
          <div className={style.nav}>
 
             <ul>
 
-               <LinksGroup _key="/home" header="Home" headerLink="/home" />
                <LinksGroup _key="/dashboard" header="Dashboard" headerLink="/dashboard" />
                <LinksGroup _key="/certificates" header="Certificates" headerLink="/certificates" />
                <LinksGroup _key="/cryptographickeys" header="Keys" headerLink="/cryptographickeys" />
@@ -73,7 +62,9 @@ export default function Sidebar() {
                     _key="settings"
                     header="Settings"
                     childrenLinks={[
+                        { _key: "/platform", name: "Platform", link: "/platform" },
                         { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
+                        { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
                     ]}
                 />
 

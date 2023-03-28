@@ -7,13 +7,13 @@ import { actions as alertActions } from "ducks/alerts";
 import { actions as connectorActions } from "ducks/connectors";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
 import { actions as tokenActions, selectors as tokenSelectors } from "ducks/tokens";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Select, { SingleValue } from "react-select/";
+import Select, { SingleValue } from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
@@ -252,7 +252,7 @@ export default function TokenForm() {
    const optionsForKinds = useMemo(
 
       () => tokenProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "cryptographyProvider"
+         fg => fg.functionGroupCode === FunctionGroupCode.CryptographyProvider
       )?.kinds.map(
          kind => ({
             label: kind,

@@ -5,13 +5,13 @@ import Widget from "components/Widget";
 import { actions as alertActions } from "ducks/alerts";
 import { actions as connectorActions } from "ducks/connectors";
 import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Select from "react-select/";
+import Select from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
@@ -220,7 +220,7 @@ export default function EntityForm() {
    const optionsForKinds = useMemo(
 
       () => entityProvider?.functionGroups.find(
-         fg => fg.functionGroupCode === "entityProvider"
+         fg => fg.functionGroupCode === FunctionGroupCode.EntityProvider
       )?.kinds.map(
          kind => ({
             label: kind,

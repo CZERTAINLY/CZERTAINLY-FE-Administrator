@@ -1,4 +1,3 @@
-import React from "react";
 import { Field } from "react-final-form";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { composeValidators } from "utils/validators";
@@ -7,7 +6,7 @@ type Props = {
     id: string;
     label: string;
     disabled?: boolean;
-    validators: ((value: any) => string | undefined)[];
+    validators: ((value: any) => string | undefined | Promise<string | undefined>)[];
 }
 
 export default function TextField({id, label, disabled = false, validators}: Props) {

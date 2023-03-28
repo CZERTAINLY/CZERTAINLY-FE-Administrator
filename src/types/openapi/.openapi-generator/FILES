@@ -23,6 +23,7 @@ apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
 apis/RAProfileManagementApi.ts
 apis/RoleManagementApi.ts
+apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
 apis/TokenInstanceControllerApi.ts
 apis/TokenProfileManagementApi.ts
@@ -80,12 +81,14 @@ models/CertificateStatus.ts
 models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts
 models/CertificateValidationDto.ts
+models/CertificateValidationStatus.ts
 models/CipherDataRequestDto.ts
 models/CipherRequestData.ts
 models/CipherResponseData.ts
 models/ClientCertificateDataResponseDto.ts
 models/ClientCertificateRekeyRequestDto.ts
 models/ClientCertificateRenewRequestDto.ts
+models/ClientCertificateRequestDto.ts
 models/ClientCertificateRevocationDto.ts
 models/ClientCertificateSignRequestDto.ts
 models/CodeBlockAttributeContent.ts
@@ -138,7 +141,8 @@ models/DateTimeAttributeConstraint.ts
 models/DateTimeAttributeConstraintData.ts
 models/DateTimeAttributeContent.ts
 models/DecryptDataResponseDto.ts
-models/DiscoveryCertificatesDto.ts
+models/DiscoveryCertificateDto.ts
+models/DiscoveryCertificateResponseDto.ts
 models/DiscoveryDto.ts
 models/DiscoveryHistoryDetailDto.ts
 models/DiscoveryHistoryDto.ts
@@ -195,6 +199,7 @@ models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
 models/Pageable.ts
+models/PlatformSettingsDto.ts
 models/ProgrammingLanguageEnum.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
@@ -219,6 +224,7 @@ models/RoleDto.ts
 models/RolePermissionsRequestDto.ts
 models/RoleRequestDto.ts
 models/SearchCondition.ts
+models/SearchFieldDataByGroupDto.ts
 models/SearchFieldDataDto.ts
 models/SearchFilterRequestDto.ts
 models/SearchRequestDto.ts
@@ -252,6 +258,7 @@ models/UploadCertificateRequestDto.ts
 models/UserCertificateDto.ts
 models/UserDetailDto.ts
 models/UserDto.ts
+models/UtilsSettingsDto.ts
 models/UuidDto.ts
 models/VerificationResponseData.ts
 models/VerifyDataRequestDto.ts
