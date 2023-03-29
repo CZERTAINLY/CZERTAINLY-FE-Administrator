@@ -23,7 +23,7 @@ For more information, refer to the [CZERTAINLY documentation](https://docs.czert
 Admin Web Interface is provided as a Docker container. Use the `docker pull 3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
 
 | Variable     | Description                                            | Required                                      | Default value    |
-|--------------|--------------------------------------------------------|-----------------------------------------------|------------------|
+| ------------ | ------------------------------------------------------ | --------------------------------------------- | ---------------- |
 | `BASE_URL`   | URL Path of the frontend application                   | ![](https://img.shields.io/badge/-NO-red.svg) | `/administrator` |
 | `API_URL`    | URL Path of the CZERTAINLY API for the web application | ![](https://img.shields.io/badge/-NO-red.svg) | `/api`           |
 | `LOGIN_URL`  | URL Path of the login page                             | ![](https://img.shields.io/badge/-NO-red.svg) | `/login`         |

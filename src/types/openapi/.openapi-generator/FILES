@@ -23,6 +23,7 @@ apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
 apis/RAProfileManagementApi.ts
 apis/RoleManagementApi.ts
+apis/SCEPProfileManagementApi.ts
 apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
 apis/TokenInstanceControllerApi.ts
@@ -39,6 +40,7 @@ models/AcmeProfileListDto.ts
 models/AcmeProfileRequestDto.ts
 models/ActionDto.ts
 models/ActivateAcmeForRaProfileRequestDto.ts
+models/ActivateScepForRaProfileRequestDto.ts
 models/AddLocationRequestDto.ts
 models/AddRaProfileRequestDto.ts
 models/AddTokenProfileRequestDto.ts
@@ -205,6 +207,7 @@ models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts
 models/RaProfileDto.ts
+models/RaProfileScepDetailResponseDto.ts
 models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts
@@ -223,6 +226,10 @@ models/RoleDetailDto.ts
 models/RoleDto.ts
 models/RolePermissionsRequestDto.ts
 models/RoleRequestDto.ts
+models/ScepProfileDetailDto.ts
+models/ScepProfileDto.ts
+models/ScepProfileEditRequestDto.ts
+models/ScepProfileRequestDto.ts
 models/SearchCondition.ts
 models/SearchFieldDataByGroupDto.ts
 models/SearchFieldDataDto.ts
@@ -258,6 +265,7 @@ models/UploadCertificateRequestDto.ts
 models/UserCertificateDto.ts
 models/UserDetailDto.ts
 models/UserDto.ts
+models/UserIdentificationRequestDto.ts
 models/UtilsSettingsDto.ts
 models/UuidDto.ts
 models/VerificationResponseData.ts

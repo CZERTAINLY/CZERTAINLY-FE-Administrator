@@ -1,4 +1,3 @@
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import {
     AcmeProfileAddRequestDto,
     AcmeProfileAddRequestModel,
@@ -7,8 +6,9 @@ import {
     AcmeProfileListResponseDto,
     AcmeProfileListResponseModel,
     AcmeProfileResponseDto,
-    AcmeProfileResponseModel
+    AcmeProfileResponseModel,
 } from "types/acme-profiles";
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformRaProfileResponseDtoToModel } from "./ra-profiles";
 
 export function transformAcmeProfileListResponseDtoToModel(acme: AcmeProfileListResponseDto): AcmeProfileListResponseModel {
@@ -21,7 +21,7 @@ export function transformAcmeProfileResponseDtoToModel(acme: AcmeProfileResponse
         raProfile: acme.raProfile ? transformRaProfileResponseDtoToModel(acme.raProfile) : undefined,
         issueCertificateAttributes: acme.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         revokeCertificateAttributes: acme.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
-        customAttributes: acme.customAttributes?.map(transformAttributeResponseDtoToModel)
+        customAttributes: acme.customAttributes?.map(transformAttributeResponseDtoToModel),
     };
 }
 

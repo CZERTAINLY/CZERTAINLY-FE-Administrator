@@ -1,68 +1,68 @@
 .customTable th {
-   font-weight: bold;
+    font-weight: bold;
 }
 
 .paginationContainer {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
 
 .detailRow {
-  max-height: 200px;
-  transition: all 0.3s;
+    max-height: 200px;
+    transition: all 0.3s;
 
-  td {
-    ul {
-      list-style-type: none;
+    td {
+        ul {
+            list-style-type: none;
 
-      li {
-        overflow-wrap: anywhere;
-      }
+            li {
+                overflow-wrap: anywhere;
+            }
+        }
     }
-  }
 }
 
 .hidden {
-  max-height: 0;
-  overflow: hidden;
+    max-height: 0;
+    overflow: hidden;
 
-  td {
-    padding: 0;
-    border: none;
-  }
+    td {
+        padding: 0;
+        border: none;
+    }
 }
 
 .showMore {
-  cursor: pointer;
-  color: #3754a5;
+    cursor: pointer;
+    color: #3754a5;
 }
 
 .detail {
-  margin-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .detail p {
-  margin: 0;
-  padding: 0.2em;
+    margin: 0;
+    padding: 0.2em;
 }
 
 .logs {
-  min-width: 712px;
+    min-width: 712px;
 }
 
 .logsTable {
-  min-width: 100%;
+    min-width: 100%;
 }
 
 .dataCell {
-  white-space: pre-wrap;
-  
-  text-overflow: ellipsis;
-  overflow: hidden;
+    white-space: pre-wrap;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .header {
-   white-space: nowrap;
-   text-overflow: ellipsis;
-   overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }

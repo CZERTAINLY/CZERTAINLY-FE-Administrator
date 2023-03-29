@@ -1,43 +1,34 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFeatureSelector } from 'utils/ducks';
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
 import { NameAndUuidModel } from "types/locations";
 import { Resource } from "types/openapi";
+import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
+    profile?: UserDetailModel;
+    resources?: ResourceModel[];
+    objects?: NameAndUuidModel[];
 
-   profile?: UserDetailModel;
-   resources?: ResourceModel[];
-   objects?: NameAndUuidModel[];
-
-   isFetchingProfile: boolean;
-   isUpdatingProfile: boolean;
-   isFetchingResources: boolean;
-   isFetchingObjects: boolean;
-
+    isFetchingProfile: boolean;
+    isUpdatingProfile: boolean;
+    isFetchingResources: boolean;
+    isFetchingObjects: boolean;
 };
-
 
 export const initialState: State = {
-
-   isFetchingProfile: false,
-   isUpdatingProfile: false,
-   isFetchingResources: false,
-   isFetchingObjects: false,
-
+    isFetchingProfile: false,
+    isUpdatingProfile: false,
+    isFetchingResources: false,
+    isFetchingObjects: false,
 };
 
-
 export const slice = createSlice({
+    name: "auth",
 
-   name: "auth",
+    initialState,
 
-   initialState,
-
-   reducers: {
-
-
-      /*resetState: (state, action: PayloadAction<void>) => {
+    reducers: {
+        /*resetState: (state, action: PayloadAction<void>) => {
 
          Object.keys(state).forEach(
             key => { if (!initialState.hasOwnProperty(key) && key !== "profile") (state as any)[key] = undefined; }
@@ -49,134 +40,88 @@ export const slice = createSlice({
 
       },*/
 
+        clearResources: (state, action: PayloadAction<void>) => {
+            state.resources = undefined;
+        },
 
-      clearResources: (state, action: PayloadAction<void>) => {
+        getProfile(state, action: PayloadAction<void>) {
+            state.isFetchingProfile = true;
+        },
 
-         state.resources = undefined;
+        getProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel }>) {
+            state.isFetchingProfile = false;
+            state.profile = action.payload.profile;
+        },
 
-      },
+        getProfileFailure(state, action: PayloadAction<void>) {
+            state.isFetchingProfile = false;
+        },
 
+        updateProfile(state, action: PayloadAction<{ profile: UserUpdateRequestModel; redirect?: string }>) {
+            state.isUpdatingProfile = true;
+        },
 
-      getProfile(state, action: PayloadAction<void>) {
+        updateProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel; redirect?: string }>) {
+            state.isUpdatingProfile = false;
+            state.profile = action.payload.profile;
+        },
 
-         state.isFetchingProfile = true;
+        updateProfileFailure(state, action: PayloadAction<void>) {
+            state.isUpdatingProfile = false;
+        },
 
-      },
+        getResources(state, action: PayloadAction<void>) {
+            state.isFetchingResources = true;
+            state.resources = undefined;
+        },
 
+        getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceModel[] }>) {
+            state.isFetchingResources = false;
+            state.resources = action.payload.resources;
+        },
 
-      getProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel }>) {
+        getResourcesFailure(state, action: PayloadAction<void>) {
+            state.isFetchingResources = false;
+        },
 
-         state.isFetchingProfile = false;
-         state.profile = action.payload.profile;
+        getObjectsForResource(state, action: PayloadAction<{ resource: Resource }>) {
+            state.objects = undefined;
+            state.isFetchingObjects = true;
+        },
 
-      },
+        getObjectsForResourceSuccess(state, action: PayloadAction<{ objects: NameAndUuidModel[] }>) {
+            state.isFetchingObjects = false;
+            state.objects = action.payload.objects;
+        },
 
-
-      getProfileFailure(state, action: PayloadAction<void>) {
-
-         state.isFetchingProfile = false;
-
-      },
-
-
-      updateProfile(state, action: PayloadAction<{ profile: UserUpdateRequestModel, redirect?: string }>) {
-
-         state.isUpdatingProfile = true;
-
-      },
-
-
-      updateProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel, redirect?: string }>) {
-
-         state.isUpdatingProfile = false;
-         state.profile = action.payload.profile;
-
-      },
-
-
-      updateProfileFailure(state, action: PayloadAction<void>) {
-
-         state.isUpdatingProfile = false;
-
-      },
-
-
-      getResources(state, action: PayloadAction<void>) {
-
-         state.isFetchingResources = true;
-         state.resources = undefined;
-
-      },
-
-
-      getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceModel[] }>) {
-
-         state.isFetchingResources = false;
-         state.resources = action.payload.resources;
-
-      },
-
-
-      getResourcesFailure(state, action: PayloadAction<void>) {
-
-         state.isFetchingResources = false;
-
-      },
-
-
-      getObjectsForResource(state, action: PayloadAction<{ resource: Resource }>) {
-
-         state.objects = undefined;
-         state.isFetchingObjects = true;
-
-      },
-
-
-      getObjectsForResourceSuccess(state, action: PayloadAction<{ objects: NameAndUuidModel[] }>) {
-
-         state.isFetchingObjects = false;
-         state.objects = action.payload.objects;
-
-      },
-
-
-      getObjectsForResourceFailure(state, action: PayloadAction<void>) {
-
-         state.isFetchingObjects = false;
-
-      }
-
-
-   }
-
+        getObjectsForResourceFailure(state, action: PayloadAction<void>) {
+            state.isFetchingObjects = false;
+        },
+    },
 });
-
 
 const selectState = createFeatureSelector<State>(slice.name);
 
-const profile = createSelector(selectState, state => state.profile);
-const resources = createSelector(selectState, state => state.resources);
-const objects = createSelector(selectState, state => state.objects);
+const profile = createSelector(selectState, (state) => state.profile);
+const resources = createSelector(selectState, (state) => state.resources);
+const objects = createSelector(selectState, (state) => state.objects);
 
-const isFetchingProfile = createSelector(selectState, state => state.isFetchingProfile);
-const isUpdatingProfile = createSelector(selectState, state => state.isUpdatingProfile);
-const isFetchingResources = createSelector(selectState, state => state.isFetchingResources);
-const isFetchingObjects = createSelector(selectState, state => state.isFetchingObjects);
-
+const isFetchingProfile = createSelector(selectState, (state) => state.isFetchingProfile);
+const isUpdatingProfile = createSelector(selectState, (state) => state.isUpdatingProfile);
+const isFetchingResources = createSelector(selectState, (state) => state.isFetchingResources);
+const isFetchingObjects = createSelector(selectState, (state) => state.isFetchingObjects);
 
 export const selectors = {
-   selectState,
-   profile,
-   resources,
-   objects,
-   isFetchingProfile,
-   isUpdatingProfile,
-   isFetchingResources,
-   isFetchingObjects
+    selectState,
+    profile,
+    resources,
+    objects,
+    isFetchingProfile,
+    isUpdatingProfile,
+    isFetchingResources,
+    isFetchingObjects,
 };
 
-
 export const actions = slice.actions;
-
 
 export default slice.reducer;

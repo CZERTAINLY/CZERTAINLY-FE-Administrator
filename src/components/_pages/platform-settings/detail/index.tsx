@@ -34,61 +34,87 @@ export default function PlatformSettingsDetail() {
         navigate(`./edit`);
     }, [navigate]);
 
-    const buttons: WidgetButtonProps[] = useMemo(() => [
-        {
-            icon: "pencil", disabled: false, tooltip: "Edit", onClick: () => {
-                onEditClick();
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: "pencil",
+                disabled: false,
+                tooltip: "Edit",
+                onClick: () => {
+                    onEditClick();
+                },
             },
-        },
-    ], [onEditClick]);
+        ],
+        [onEditClick],
+    );
 
-    const detailsTitle = useMemo(() => (
-        <div>
-            <div className="fa-pull-right mt-n-xs">
-                <WidgetButtons buttons={buttons} />
+    const detailsTitle = useMemo(
+        () => (
+            <div>
+                <div className="fa-pull-right mt-n-xs">
+                    <WidgetButtons buttons={buttons} />
+                </div>
+                <h5>Platform Settings</h5>
             </div>
-            <h5>
-                Platform Settings
-            </h5>
-        </div>
-    ), [buttons]);
+        ),
+        [buttons],
+    );
 
-    const headers: TableHeader[] = useMemo(() => [
-        {
-            id: "setting",
-            content: "Setting",
-        },
-        {
-            id: "value",
-            content: "Value",
-        }
-    ], []);
+    const headers: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "setting",
+                content: "Setting",
+            },
+            {
+                id: "value",
+                content: "Value",
+            },
+        ],
+        [],
+    );
 
-
-    const data: TableDataRow[] = useMemo(() => !platformSettings ? [] : [
-        {
-            id: "utilsUrl",
-            columns: [
-                "Utils Service URL",
-                (<>
-                    {platformSettings.utils.utilsServiceUrl}&nbsp;
-                    {health ? <i className="fa fa-check-circle" style={{ color: "green" }} aria-hidden="true" /> : <i className="fa fa-exclamation-circle" style={{ color: "red" }} aria-hidden="true" />}
-                </>) ?? "n/a"
-            ]
-        },
-    ], [platformSettings, health]);
+    const data: TableDataRow[] = useMemo(
+        () =>
+            !platformSettings
+                ? []
+                : [
+                      {
+                          id: "utilsUrl",
+                          columns: [
+                              "Utils Service URL",
+                              (
+                                  <>
+                                      {platformSettings.utils.utilsServiceUrl}&nbsp;
+                                      {health ? (
+                                          <i className="fa fa-check-circle" style={{ color: "green" }} aria-hidden="true" />
+                                      ) : (
+                                          <i className="fa fa-exclamation-circle" style={{ color: "red" }} aria-hidden="true" />
+                                      )}
+                                  </>
+                              ) ?? "n/a",
+                          ],
+                      },
+                  ],
+        [platformSettings, health],
+    );
 
     return (
         <Container className="themed-container" fluid>
             <Widget title={detailsTitle} busy={isFetchingPlatform}>
-                <TabLayout tabs={[{
-                    title: "Utils",
-                    content: <div style={{ paddingTop: "1.5em", paddingBottom: "1.5em" }}>
-                        <CustomTable headers={headers} data={data} />
-                    </div>
-                }]} />
+                <TabLayout
+                    tabs={[
+                        {
+                            title: "Utils",
+                            content: (
+                                <div style={{ paddingTop: "1.5em", paddingBottom: "1.5em" }}>
+                                    <CustomTable headers={headers} data={data} />
+                                </div>
+                            ),
+                        },
+                    ]}
+                />
             </Widget>
         </Container>
     );
 }
-
