@@ -50,8 +50,8 @@
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-local",
-        "generate-types-utils": "openapi-generator-cli generate --generator-key typescript-rxjs-utils"
+        "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
+        "generate-types-utils": "openapi-generator-cli generate --generator-key typescript-rxjs-utils && prettier --write \"src/types/openapi/utils/apis/*.ts\" && prettier --write \"src/types/openapi/utils/models/*.ts\""
     },
     "eslintConfig": {
         "extends": [
