@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestAttributeDto,
-} from './';
+import type { RequestAttributeDto } from "./";
 
 /**
  * Rules for new Compliance Profiles

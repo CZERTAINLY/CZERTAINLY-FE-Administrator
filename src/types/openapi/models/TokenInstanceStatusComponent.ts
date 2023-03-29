@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    TokenInstanceStatus,
-} from './';
+import type { TokenInstanceStatus } from "./";
 
 /**
  * Components of the Token instance status
@@ -31,7 +29,5 @@ export interface TokenInstanceStatusComponent {
      * @type {{ [key: string]: object; }}
      * @memberof TokenInstanceStatusComponent
      */
-    details?: { [key: string]: object; };
+    details?: { [key: string]: object };
 }
-
-

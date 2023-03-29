@@ -17,8 +17,7 @@
  * @enum {string}
  */
 export enum AccountStatus {
-    Valid = 'valid',
-    Deactivated = 'deactivated',
-    Revoked = 'revoked'
+    Valid = "valid",
+    Deactivated = "deactivated",
+    Revoked = "revoked",
 }
-

@@ -1,411 +1,293 @@
-import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-   TokenProfileAddRequestModel,
-   TokenProfileDetailResponseModel,
-   TokenProfileEditRequestModel,
-   TokenProfileKeyUsageBulkUpdateRequestModel,
-   TokenProfileKeyUsageUpdateRequestModel,
-   TokenProfileResponseModel
-} from "types/token-profiles";
 import { BulkActionModel } from "types/connectors";
 import { KeyUsage } from "types/openapi";
+import {
+    TokenProfileAddRequestModel,
+    TokenProfileDetailResponseModel,
+    TokenProfileEditRequestModel,
+    TokenProfileKeyUsageBulkUpdateRequestModel,
+    TokenProfileKeyUsageUpdateRequestModel,
+    TokenProfileResponseModel,
+} from "types/token-profiles";
+import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
+    checkedRows: string[];
 
-   checkedRows: string[];
+    deleteErrorMessage: string;
+    bulkDeleteErrorMessages: BulkActionModel[];
 
-   deleteErrorMessage: string;
-   bulkDeleteErrorMessages: BulkActionModel[];
+    tokenProfile?: TokenProfileDetailResponseModel;
+    tokenProfiles: TokenProfileResponseModel[];
 
-   tokenProfile?: TokenProfileDetailResponseModel;
-   tokenProfiles: TokenProfileResponseModel[];
+    isFetchingList: boolean;
+    isFetchingDetail: boolean;
+    isFetchingAttributes: boolean;
+    isUpdatingKeyUsage: boolean;
+    isBulkUpdatingKeyUsage: boolean;
 
-   isFetchingList: boolean;
-   isFetchingDetail: boolean;
-   isFetchingAttributes: boolean;
-   isUpdatingKeyUsage: boolean;
-   isBulkUpdatingKeyUsage: boolean;
-
-   isCreating: boolean;
-   isDeleting: boolean;
-   isBulkDeleting: boolean;
-   isUpdating: boolean;
-   isEnabling: boolean;
-   isBulkEnabling: boolean;
-   isDisabling: boolean;
-   isBulkDisabling: boolean;
-
+    isCreating: boolean;
+    isDeleting: boolean;
+    isBulkDeleting: boolean;
+    isUpdating: boolean;
+    isEnabling: boolean;
+    isBulkEnabling: boolean;
+    isDisabling: boolean;
+    isBulkDisabling: boolean;
 };
 
 export const initialState: State = {
+    checkedRows: [],
 
-   checkedRows: [],
+    deleteErrorMessage: "",
+    bulkDeleteErrorMessages: [],
 
-   deleteErrorMessage: "",
-   bulkDeleteErrorMessages: [],
+    tokenProfiles: [],
 
-   tokenProfiles: [],
-
-   isFetchingList: false,
-   isFetchingDetail: false,
-   isFetchingAttributes: false,
-   isUpdatingKeyUsage: false,
-   isBulkUpdatingKeyUsage: false,
-   isCreating: false,
-   isDeleting: false,
-   isBulkDeleting: false,
-   isUpdating: false,
-   isEnabling: false,
-   isDisabling: false,
-   isBulkEnabling: false,
-   isBulkDisabling: false,
-
+    isFetchingList: false,
+    isFetchingDetail: false,
+    isFetchingAttributes: false,
+    isUpdatingKeyUsage: false,
+    isBulkUpdatingKeyUsage: false,
+    isCreating: false,
+    isDeleting: false,
+    isBulkDeleting: false,
+    isUpdating: false,
+    isEnabling: false,
+    isDisabling: false,
+    isBulkEnabling: false,
+    isBulkDisabling: false,
 };
 
-
 export const slice = createSlice({
+    name: "tokenprofiles",
+
+    initialState,
+
+    reducers: {
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
+
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
+        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+            state.checkedRows = action.payload.checkedRows;
+        },
+
+        clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+            state.deleteErrorMessage = "";
+            state.bulkDeleteErrorMessages = [];
+        },
+
+        listTokenProfiles: (state, action: PayloadAction<{ enabled?: boolean }>) => {
+            state.tokenProfiles = [];
+            state.isFetchingList = true;
+        },
+
+        listTokenProfilesSuccess: (state, action: PayloadAction<{ tokenProfiles: TokenProfileResponseModel[] }>) => {
+            state.tokenProfiles = action.payload.tokenProfiles;
+            state.isFetchingList = false;
+        },
+
+        listTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingList = false;
+        },
+
+        getTokenProfileDetail: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string }>) => {
+            state.tokenProfile = undefined;
+            state.isFetchingDetail = true;
+        },
+
+        getTokenProfileDetailSuccess: (state, action: PayloadAction<{ tokenProfile: TokenProfileDetailResponseModel }>) => {
+            state.isFetchingDetail = false;
+            state.tokenProfile = action.payload.tokenProfile;
+        },
+
+        getTokenProfileDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingDetail = false;
+        },
+
+        createTokenProfile: (
+            state,
+            action: PayloadAction<{
+                tokenInstanceUuid: string;
+                tokenProfileAddRequest: TokenProfileAddRequestModel;
+            }>,
+        ) => {
+            state.isCreating = true;
+        },
+
+        createTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string; tokenInstanceUuid: string }>) => {
+            state.isCreating = false;
+        },
+
+        createTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreating = false;
+        },
+
+        updateTokenProfile: (
+            state,
+            action: PayloadAction<{
+                profileUuid: string;
+                tokenInstanceUuid: string;
+                tokenProfileEditRequest: TokenProfileEditRequestModel;
+                redirect?: string;
+            }>,
+        ) => {
+            state.isUpdating = true;
+        },
+
+        updateTokenProfileSuccess: (state, action: PayloadAction<{ tokenProfile: TokenProfileDetailResponseModel; redirect?: string }>) => {
+            state.isUpdating = false;
+            state.tokenProfile = action.payload.tokenProfile;
+        },
+
+        updateTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
+
+        enableTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string }>) => {
+            state.isEnabling = true;
+        },
+
+        enableTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isEnabling = false;
+
+            const tokenProfile = state.tokenProfiles.find((tokenProfile) => tokenProfile.uuid === action.payload.uuid);
+            if (tokenProfile) tokenProfile.enabled = true;
+
+            if (state.tokenProfile?.uuid === action.payload.uuid) state.tokenProfile.enabled = true;
+        },
 
-   name: "tokenprofiles",
+        enableTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEnabling = false;
+        },
 
-   initialState,
+        disableTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string }>) => {
+            state.isDisabling = true;
+        },
 
-   reducers: {
+        disableTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDisabling = false;
 
-      resetState: (state, action: PayloadAction<void>) => {
+            const tokenProfile = state.tokenProfiles.find((tokenProfile) => tokenProfile.uuid === action.payload.uuid);
+            if (tokenProfile) tokenProfile.enabled = false;
 
-         Object.keys(state).forEach(
-            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
-         );
+            if (state.tokenProfile?.uuid === action.payload.uuid) state.tokenProfile.enabled = false;
+        },
 
-         Object.keys(initialState).forEach(
-            key => (state as any)[key] = (initialState as any)[key]
-         );
+        disableTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDisabling = false;
+        },
 
-      },
+        deleteTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; redirect?: string }>) => {
+            state.isDeleting = true;
+        },
 
+        deleteTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
+            state.isDeleting = false;
 
-      setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+            const index = state.tokenProfiles.findIndex((tokenProfile) => tokenProfile.uuid === action.payload.uuid);
+            if (index !== -1) state.tokenProfiles.splice(index, 1);
 
-         state.checkedRows = action.payload.checkedRows;
+            if (state.tokenProfile?.uuid === action.payload.uuid) state.tokenProfile = undefined;
+        },
 
-      },
+        deleteTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeleting = false;
+        },
 
+        bulkDeleteTokenProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.bulkDeleteErrorMessages = [];
+            state.isBulkDeleting = true;
+        },
 
-      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+        bulkDeleteTokenProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDeleting = false;
 
-         state.deleteErrorMessage = "";
-         state.bulkDeleteErrorMessages = [];
+            action.payload.uuids.forEach((uuid) => {
+                const index = state.tokenProfiles.findIndex((tokenProfile) => tokenProfile.uuid === uuid);
+                if (index >= 0) state.tokenProfiles.splice(index, 1);
+            });
 
-      },
+            if (state.tokenProfile && action.payload.uuids.includes(state.tokenProfile.uuid)) state.tokenProfile = undefined;
+        },
 
+        bulkDeleteTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDeleting = false;
+        },
 
-      listTokenProfiles: (state, action: PayloadAction<{enabled?: boolean}>) => {
+        bulkEnableTokenProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkEnabling = true;
+        },
 
-         state.tokenProfiles = [];
-         state.isFetchingList = true;
+        bulkEnableTokenProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkEnabling = false;
 
-      },
+            state.tokenProfiles = state.tokenProfiles.map((tokenProfile) => ({
+                ...tokenProfile,
+                enabled: action.payload.uuids.includes(tokenProfile.uuid) ? true : tokenProfile.enabled,
+            }));
 
+            if (state.tokenProfile && action.payload.uuids.includes(state.tokenProfile.uuid)) state.tokenProfile.enabled = true;
+        },
 
-      listTokenProfilesSuccess: (state, action: PayloadAction<{ tokenProfiles: TokenProfileResponseModel[] }>) => {
+        bulkEnableTokenProfilesFailure: (state, action: PayloadAction<{ error: string }>) => {
+            state.isBulkEnabling = false;
+        },
 
-         state.tokenProfiles = action.payload.tokenProfiles;
-         state.isFetchingList = false;
+        bulkDisableTokenProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDisabling = true;
+        },
 
-      },
+        bulkDisableTokenProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDisabling = false;
 
+            state.tokenProfiles = state.tokenProfiles.map((tokenProfile) => ({
+                ...tokenProfile,
+                enabled: action.payload.uuids.includes(tokenProfile.uuid) ? false : tokenProfile.enabled,
+            }));
 
-      listTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            if (state.tokenProfile && action.payload.uuids.includes(state.tokenProfile.uuid)) state.tokenProfile.enabled = false;
+        },
 
-         state.isFetchingList = false;
+        bulkDisableTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkDisabling = false;
+        },
 
-      },
+        updateKeyUsage: (
+            state,
+            action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; usage: TokenProfileKeyUsageUpdateRequestModel }>,
+        ) => {
+            state.isUpdatingKeyUsage = true;
+        },
 
-      getTokenProfileDetail: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string }>) => {
+        updateKeyUsageSuccess: (state, action: PayloadAction<{ uuid: string; usage: Array<KeyUsage> }>) => {
+            state.isUpdatingKeyUsage = false;
 
-         state.tokenProfile = undefined;
-         state.isFetchingDetail = true;
+            state.tokenProfile!.usages = action.payload.usage;
+        },
 
-      },
+        updateKeyUsageFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingKeyUsage = false;
+        },
 
+        bulkUpdateKeyUsage: (state, action: PayloadAction<{ usage: TokenProfileKeyUsageBulkUpdateRequestModel }>) => {
+            state.isBulkUpdatingKeyUsage = true;
+        },
 
-      getTokenProfileDetailSuccess: (state, action: PayloadAction<{ tokenProfile: TokenProfileDetailResponseModel }>) => {
+        bulkUpdateKeyUsageSuccess: (state, action: PayloadAction<{}>) => {
+            state.isBulkUpdatingKeyUsage = false;
+        },
 
-         state.isFetchingDetail = false;
-         state.tokenProfile = action.payload.tokenProfile;
-
-      },
-
-
-      getTokenProfileDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isFetchingDetail = false;
-
-      },
-
-
-      createTokenProfile: (state, action: PayloadAction<{
-         tokenInstanceUuid: string,
-         tokenProfileAddRequest: TokenProfileAddRequestModel
-      }>) => {
-
-         state.isCreating = true;
-
-      },
-
-
-      createTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string , tokenInstanceUuid: string}>) => {
-
-         state.isCreating = false;
-
-      },
-
-
-      createTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isCreating = false;
-
-      },
-
-
-      updateTokenProfile: (state, action: PayloadAction<{
-         profileUuid: string,
-         tokenInstanceUuid: string,
-         tokenProfileEditRequest: TokenProfileEditRequestModel,
-         redirect?: string
-      }>) => {
-
-         state.isUpdating = true;
-
-      },
-
-
-      updateTokenProfileSuccess: (state, action: PayloadAction<{ tokenProfile: TokenProfileDetailResponseModel, redirect?: string }>) => {
-
-         state.isUpdating = false;
-         state.tokenProfile = action.payload.tokenProfile;
-
-      },
-
-
-      updateTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isUpdating = false;
-
-      },
-
-
-      enableTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string }>) => {
-
-         state.isEnabling = true;
-
-      },
-
-
-      enableTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isEnabling = false;
-
-         const tokenProfile = state.tokenProfiles.find(tokenProfile => tokenProfile.uuid === action.payload.uuid);
-         if (tokenProfile) tokenProfile.enabled = true;
-
-         if (state.tokenProfile?.uuid === action.payload.uuid) state.tokenProfile.enabled = true;
-
-      },
-
-
-      enableTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isEnabling = false;
-
-      },
-
-
-      disableTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string }>) => {
-
-         state.isDisabling = true;
-
-      },
-
-
-      disableTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isDisabling = false;
-
-         const tokenProfile = state.tokenProfiles.find(tokenProfile => tokenProfile.uuid === action.payload.uuid);
-         if (tokenProfile) tokenProfile.enabled = false;
-
-         if (state.tokenProfile?.uuid === action.payload.uuid) state.tokenProfile.enabled = false;
-
-      },
-
-
-      disableTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isDisabling = false;
-
-      },
-
-
-      deleteTokenProfile: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string, redirect?:string }>) => {
-
-         state.isDeleting = true;
-
-      },
-
-
-      deleteTokenProfileSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
-
-         state.isDeleting = false;
-
-         const index = state.tokenProfiles.findIndex(tokenProfile => tokenProfile.uuid === action.payload.uuid);
-         if (index !== -1) state.tokenProfiles.splice(index, 1);
-
-         if (state.tokenProfile?.uuid === action.payload.uuid) state.tokenProfile = undefined;
-
-      },
-
-
-      deleteTokenProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isDeleting = false;
-
-      },
-
-
-      bulkDeleteTokenProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.bulkDeleteErrorMessages = [];
-         state.isBulkDeleting = true;
-
-      },
-
-
-      bulkDeleteTokenProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkDeleting = false;
-
-         action.payload.uuids.forEach(
-
-            uuid => {
-               const index = state.tokenProfiles.findIndex(tokenProfile => tokenProfile.uuid === uuid);
-               if (index >= 0) state.tokenProfiles.splice(index, 1);
-            }
-
-         );
-
-         if (state.tokenProfile && action.payload.uuids.includes(state.tokenProfile.uuid)) state.tokenProfile = undefined;
-
-      },
-
-
-      bulkDeleteTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isBulkDeleting = false;
-
-      },
-
-
-      bulkEnableTokenProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkEnabling = true;
-
-      },
-
-
-      bulkEnableTokenProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkEnabling = false;
-
-         state.tokenProfiles = state.tokenProfiles.map(
-            tokenProfile => ({ ...tokenProfile, enabled: action.payload.uuids.includes(tokenProfile.uuid) ? true : tokenProfile.enabled })
-         );
-
-         if (state.tokenProfile && action.payload.uuids.includes(state.tokenProfile.uuid)) state.tokenProfile.enabled = true;
-
-      },
-
-
-      bulkEnableTokenProfilesFailure: (state, action: PayloadAction<{ error: string }>) => {
-
-         state.isBulkEnabling = false;
-
-      },
-
-
-      bulkDisableTokenProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkDisabling = true;
-
-      },
-
-
-      bulkDisableTokenProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-
-         state.isBulkDisabling = false;
-
-         state.tokenProfiles = state.tokenProfiles.map(
-            tokenProfile => ({ ...tokenProfile, enabled: action.payload.uuids.includes(tokenProfile.uuid) ? false : tokenProfile.enabled })
-         );
-
-         if (state.tokenProfile && action.payload.uuids.includes(state.tokenProfile.uuid)) state.tokenProfile.enabled = false;
-
-      },
-
-
-      bulkDisableTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isBulkDisabling = false;
-
-      },
-      
-      updateKeyUsage: (state, action: PayloadAction<{ tokenInstanceUuid: string, uuid: string, usage: TokenProfileKeyUsageUpdateRequestModel }>) => {
-
-         state.isUpdatingKeyUsage = true;
-
-      },
-
-
-      updateKeyUsageSuccess: (state, action: PayloadAction<{ uuid: string, usage: Array<KeyUsage> }>) => {
-
-         state.isUpdatingKeyUsage = false;
-
-         state.tokenProfile!.usages = action.payload.usage;
-
-      },
-
-
-      updateKeyUsageFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isUpdatingKeyUsage = false;
-
-      },
-
-
-      bulkUpdateKeyUsage: (state, action: PayloadAction<{ usage: TokenProfileKeyUsageBulkUpdateRequestModel }>) => {
-
-         state.isBulkUpdatingKeyUsage = true;
-
-      },
-
-
-      bulkUpdateKeyUsageSuccess: (state, action: PayloadAction<{ }>) => {
-
-         state.isBulkUpdatingKeyUsage = false;
-
-      },
-
-
-      bulkUpdateKeyUsageFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isBulkUpdatingKeyUsage = false;
-
-      },
-
-   }
+        bulkUpdateKeyUsageFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUpdatingKeyUsage = false;
+        },
+    },
 });
-
 
 const state = createFeatureSelector<State>(slice.name);
 
@@ -429,32 +311,28 @@ const isUpdatingKeyUsage = createSelector(state, (state: State) => state.isUpdat
 const isBulkUpdatingKeyUsage = createSelector(state, (state: State) => state.isBulkUpdatingKeyUsage);
 
 export const selectors = {
+    state,
 
-   state,
+    checkedRows,
 
-   checkedRows,
+    tokenProfile,
+    tokenProfiles,
 
-   tokenProfile,
-   tokenProfiles,
-
-   isFetchingList,
-   isFetchingDetail,
-   isFetchingAttributes,
-   isCreating,
-   isDeleting,
-   isBulkDeleting,
-   isUpdating,
-   isEnabling,
-   isBulkEnabling,
-   isDisabling,
-   isBulkDisabling,
-   isUpdatingKeyUsage,
-   isBulkUpdatingKeyUsage,
-
+    isFetchingList,
+    isFetchingDetail,
+    isFetchingAttributes,
+    isCreating,
+    isDeleting,
+    isBulkDeleting,
+    isUpdating,
+    isEnabling,
+    isBulkEnabling,
+    isDisabling,
+    isBulkDisabling,
+    isUpdatingKeyUsage,
+    isBulkUpdatingKeyUsage,
 };
 
-
 export const actions = slice.actions;
-
 
 export default slice.reducer;

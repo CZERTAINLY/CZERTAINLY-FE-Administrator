@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    KeyUsage,
-    ResponseAttributeDto,
-    TokenInstanceStatus,
-} from './';
+import type { KeyUsage, ResponseAttributeDto, TokenInstanceStatus } from "./";
 
 /**
  * @export
@@ -82,5 +78,3 @@ export interface TokenProfileDetailDto {
      */
     usages: Array<KeyUsage>;
 }
-
-

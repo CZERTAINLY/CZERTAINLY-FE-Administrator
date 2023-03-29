@@ -72,17 +72,17 @@ $czertainly-green-light: #d8efdb !default;
 $czertainly-black: #000000 !default;
 
 $theme-colors: (
-  primary: $brand-primary,
-  secondary: $brand-secondary,
-  success: $brand-success,
-  info: $brand-info,
-  warning: $brand-warning,
-  danger: $brand-danger,
-  light: $gray-300,
-  dark: $gray-800,
-  inverse: $gray-700,
-  gray: $gray-400,
-  default: #f8f8f8,
+    primary: $brand-primary,
+    secondary: $brand-secondary,
+    success: $brand-success,
+    info: $brand-info,
+    warning: $brand-warning,
+    danger: $brand-danger,
+    light: $gray-300,
+    dark: $gray-800,
+    inverse: $gray-700,
+    gray: $gray-400,
+    default: #f8f8f8,
 );
 
 $text-color: $gray-700;

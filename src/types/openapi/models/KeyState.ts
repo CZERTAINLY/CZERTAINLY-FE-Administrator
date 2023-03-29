@@ -17,11 +17,10 @@
  * @enum {string}
  */
 export enum KeyState {
-    PreActive = 'pre-active',
-    Active = 'active',
-    Deactivated = 'deactivated',
-    Compromised = 'compromised',
-    Destroyed = 'destroyed',
-    CompromisedDestroyed = 'compromisedDestroyed'
+    PreActive = "pre-active",
+    Active = "active",
+    Deactivated = "deactivated",
+    Compromised = "compromised",
+    Destroyed = "destroyed",
+    CompromisedDestroyed = "compromisedDestroyed",
 }
-

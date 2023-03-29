@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ResponseMetadataDto,
-} from './';
+import type { ResponseMetadataDto } from "./";
 
 /**
  * Metadata response attributes with their source connector

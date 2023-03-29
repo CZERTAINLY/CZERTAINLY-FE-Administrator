@@ -17,7 +17,6 @@
  * @enum {string}
  */
 export enum CertificateType {
-    X509 = 'X509',
-    Ssh = 'SSH'
+    X509 = "X509",
+    Ssh = "SSH",
 }
-

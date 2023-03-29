@@ -18,20 +18,19 @@ import FileUpload from "../../../Input/FileUpload/FileUpload";
 import TabLayout from "../../../Layout/TabLayout";
 import ProgressButton from "../../../ProgressButton";
 
-interface FormValues {
-}
+interface FormValues {}
 
 interface Props {
     onCancel: () => void;
-    onUpload: (data: { fileContent: string, customAttributes?: Array<AttributeRequestModel>, certificate: CertificateDetailResponseModel }) => void;
+    onUpload: (data: {
+        fileContent: string;
+        customAttributes?: Array<AttributeRequestModel>;
+        certificate: CertificateDetailResponseModel;
+    }) => void;
     okButtonTitle?: string;
 }
 
-export default function CertificateUploadDialog({
-                                                    onCancel,
-                                                    onUpload,
-                                                    okButtonTitle = "Upload",
-                                                }: Props) {
+export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTitle = "Upload" }: Props) {
     const dispatch = useDispatch();
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
@@ -48,42 +47,61 @@ export default function CertificateUploadDialog({
     }, [dispatch]);
 
     useEffect(() => {
-        setCertificate(parsedCertificate ? transformParseCertificateResponseDtoToCertificateResponseDetailModel(parsedCertificate) : undefined);
+        setCertificate(
+            parsedCertificate ? transformParseCertificateResponseDtoToCertificateResponseDetailModel(parsedCertificate) : undefined,
+        );
     }, [parsedCertificate]);
 
     return (
-
-        <Form onSubmit={(values) => onUpload({
-            fileContent: fileContent,
-            customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values),
-            certificate: certificate!,
-        })} mutators={{...mutators<FormValues>()}}>
-            {({handleSubmit, valid, submitting}) => (
+        <Form
+            onSubmit={(values) =>
+                onUpload({
+                    fileContent: fileContent,
+                    customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values),
+                    certificate: certificate!,
+                })
+            }
+            mutators={{ ...mutators<FormValues>() }}
+        >
+            {({ handleSubmit, valid, submitting }) => (
                 <BootstrapForm onSubmit={handleSubmit}>
                     <div>
+                        <FileUpload
+                            fileType={"certificate"}
+                            onFileContentLoaded={(fileContent) => {
+                                setFileContent(fileContent);
+                                if (health) {
+                                    dispatch(
+                                        utilsCertificateActions.parseCertificate({
+                                            certificate: fileContent,
+                                            parseType: ParseCertificateRequestDtoParseTypeEnum.Basic,
+                                        }),
+                                    );
+                                }
+                            }}
+                        />
 
-                        <FileUpload fileType={"certificate"} onFileContentLoaded={(fileContent) => {
-                            setFileContent(fileContent);
-                            if (health) {
-                                dispatch(utilsCertificateActions.parseCertificate({certificate: fileContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Basic}));
-                            }
-                        }}/>
+                        {certificate && (
+                            <>
+                                <br />
+                                <CertificateAttributes certificate={certificate} />
+                            </>
+                        )}
 
-                        {certificate && <><br/><CertificateAttributes certificate={certificate}/></>}
+                        <br />
 
-                        <br/>
+                        <TabLayout
+                            tabs={[
+                                {
+                                    title: "Custom Attributes",
+                                    content: (
+                                        <AttributeEditor id="customUploadCertificate" attributeDescriptors={resourceCustomAttributes} />
+                                    ),
+                                },
+                            ]}
+                        />
 
-                        <TabLayout tabs={[
-                            {
-                                title: "Custom Attributes",
-                                content: (<AttributeEditor
-                                    id="customUploadCertificate"
-                                    attributeDescriptors={resourceCustomAttributes}
-                                />),
-                            },
-                        ]}/>
-
-                        <br/>
+                        <br />
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -93,16 +111,11 @@ export default function CertificateUploadDialog({
                                     inProgress={submitting}
                                     disabled={!valid || !fileContent}
                                 />
-                                <Button
-                                    color="default"
-                                    onClick={onCancel}
-                                    disabled={submitting}
-                                >
+                                <Button color="default" onClick={onCancel} disabled={submitting}>
                                     Cancel
                                 </Button>
                             </ButtonGroup>
                         </div>
-
                     </div>
                 </BootstrapForm>
             )}

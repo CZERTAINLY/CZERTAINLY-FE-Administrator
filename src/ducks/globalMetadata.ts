@@ -72,7 +72,10 @@ export const slice = createSlice({
             state.isCreating = false;
         },
 
-        updateGlobalMetadata: (state, action: PayloadAction<{ uuid: string, globalMetadataUpdateRequest: GlobalMetadataUpdateRequestModel }>) => {
+        updateGlobalMetadata: (
+            state,
+            action: PayloadAction<{ uuid: string; globalMetadataUpdateRequest: GlobalMetadataUpdateRequestModel }>,
+        ) => {
             state.isUpdating = true;
         },
 
@@ -126,17 +129,18 @@ export const slice = createSlice({
             state.isFetchingConnectorMetadata = false;
         },
 
-        promoteConnectorMetadata: (state, action: PayloadAction<{uuid: string, connectorUuid: string}>) => {
-        },
+        promoteConnectorMetadata: (state, action: PayloadAction<{ uuid: string; connectorUuid: string }>) => {},
 
-        promoteConnectorMetadataSuccess: (state, action: PayloadAction<{uuid: string, globalMetadata: GlobalMetadataDetailResponseModel}>) => {
+        promoteConnectorMetadataSuccess: (
+            state,
+            action: PayloadAction<{ uuid: string; globalMetadata: GlobalMetadataDetailResponseModel }>,
+        ) => {
             state.globalMetadataList = [...state.globalMetadataList, action.payload.globalMetadata];
-            const index = state.connectorMetadata?.findIndex(metadata => metadata.uuid === action.payload.uuid) ?? -1;
+            const index = state.connectorMetadata?.findIndex((metadata) => metadata.uuid === action.payload.uuid) ?? -1;
             if (index !== -1) state.connectorMetadata!.splice(index, 1);
         },
 
-        promoteConnectorMetadataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        },
+        promoteConnectorMetadataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {},
 
         deleteGlobalMetadata: (state, action: PayloadAction<string>) => {
             state.isDeleting = true;
@@ -144,7 +148,7 @@ export const slice = createSlice({
 
         deleteGlobalMetadataSuccess: (state, action: PayloadAction<string>) => {
             state.isDeleting = false;
-            const index = state.globalMetadataList.findIndex(metadata => metadata.uuid === action.payload);
+            const index = state.globalMetadataList.findIndex((metadata) => metadata.uuid === action.payload);
             if (index !== -1) state.globalMetadataList.splice(index, 1);
         },
 
@@ -158,14 +162,12 @@ export const slice = createSlice({
 
         bulkDeleteGlobalMetadataSuccess: (state, action: PayloadAction<string[]>) => {
             state.isBulkDeleting = false;
-            action.payload.forEach(
-                uuid => {
-                    const index = state.globalMetadataList.findIndex(metadata => metadata.uuid === uuid);
-                    if (index >= 0) {
-                        state.globalMetadataList.splice(index, 1);
-                    }
-                },
-            );
+            action.payload.forEach((uuid) => {
+                const index = state.globalMetadataList.findIndex((metadata) => metadata.uuid === uuid);
+                if (index >= 0) {
+                    state.globalMetadataList.splice(index, 1);
+                }
+            });
             if (state.globalMetadata && action.payload.includes(state.globalMetadata.uuid)) {
                 state.globalMetadata = undefined;
             }
@@ -175,7 +177,6 @@ export const slice = createSlice({
         bulkDeleteGlobalMetadataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkDeleting = false;
         },
-
     },
 });
 
@@ -197,7 +198,6 @@ const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDelet
 const isUpdating = createSelector(state, (state: State) => state.isUpdating);
 
 export const selectors = {
-
     state,
 
     checkedRows,

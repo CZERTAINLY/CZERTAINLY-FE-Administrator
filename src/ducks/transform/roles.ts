@@ -8,41 +8,44 @@ import {
     RoleRequestDto,
     RoleRequestModel,
     SubjectPermissionsDto,
-    SubjectPermissionsModel
+    SubjectPermissionsModel,
 } from "types/roles";
-import { transformUserResponseDtoToModel } from "./users";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-
+import { transformUserResponseDtoToModel } from "./users";
 
 export function transformRoleDetailDtoToModel(role: RoleDetailDto): RoleDetailModel {
-   return {
-      ...role,
-      users: role.users.map(user => transformUserResponseDtoToModel(user)),
-      customAttributes: role.customAttributes?.map(transformAttributeResponseDtoToModel)
-   };
+    return {
+        ...role,
+        users: role.users.map((user) => transformUserResponseDtoToModel(user)),
+        customAttributes: role.customAttributes?.map(transformAttributeResponseDtoToModel),
+    };
 }
 
 export function transformRoleRequestModelToDto(role: RoleRequestModel): RoleRequestDto {
     return {
         ...role,
-        customAttributes: role.customAttributes?.map(transformAttributeRequestModelToDto)
+        customAttributes: role.customAttributes?.map(transformAttributeRequestModelToDto),
     };
 }
 
-export function transformObjectPermissionsResponseDtoToModel(objectPermissions: ObjectPermissionsResponseDto): ObjectPermissionsResponseModel {
+export function transformObjectPermissionsResponseDtoToModel(
+    objectPermissions: ObjectPermissionsResponseDto,
+): ObjectPermissionsResponseModel {
     return { ...objectPermissions };
 }
 
-export function transformResourcePermissionsResponseDtoToModel(resourcePermission: ResourcePermissionsResponseDto): ResourcePermissionsResponseModel {
+export function transformResourcePermissionsResponseDtoToModel(
+    resourcePermission: ResourcePermissionsResponseDto,
+): ResourcePermissionsResponseModel {
     return {
         ...resourcePermission,
-        objects: resourcePermission.objects.map(transformObjectPermissionsResponseDtoToModel)
+        objects: resourcePermission.objects.map(transformObjectPermissionsResponseDtoToModel),
     };
 }
 
 export function transformSubjectPermissionsDtoToModel(permissions: SubjectPermissionsDto): SubjectPermissionsModel {
-   return {
+    return {
         ...permissions,
-        resources: permissions.resources.map(transformResourcePermissionsResponseDtoToModel)
-   };
+        resources: permissions.resources.map(transformResourcePermissionsResponseDtoToModel),
+    };
 }

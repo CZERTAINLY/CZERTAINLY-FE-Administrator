@@ -12,33 +12,40 @@ type Props = {
     descriptor: CustomAttributeModel;
     initialContent?: BaseAttributeContentModel[];
     onSubmit: (attributeUuid: string, content: BaseAttributeContentModel[]) => void;
-}
+};
 
-export default function ContentValueField({descriptor, initialContent, onSubmit}: Props) {
+export default function ContentValueField({ descriptor, initialContent, onSubmit }: Props) {
     const form = useForm();
 
-    const options = useMemo(() => descriptor.content?.map(a => ({label: a.reference ?? a.data.toString(), value: a})), [descriptor]);
+    const options = useMemo(() => descriptor.content?.map((a) => ({ label: a.reference ?? a.data.toString(), value: a })), [descriptor]);
 
     useEffect(() => {
-        const initialValue = initialContent && initialContent.length > 0 ?
-            (descriptor.properties.list ? options?.filter(o => initialContent.find(i => i.data === o.value.data)) : initialContent[0].data)
-            : undefined;
+        const initialValue =
+            initialContent && initialContent.length > 0
+                ? descriptor.properties.list
+                    ? options?.filter((o) => initialContent.find((i) => i.data === o.value.data))
+                    : initialContent[0].data
+                : undefined;
 
-        const descriptorValue = !descriptor.properties.list ? (descriptor.content && descriptor.content.length > 0 ? descriptor.content[0].data : undefined) : undefined;
+        const descriptorValue = !descriptor.properties.list
+            ? descriptor.content && descriptor.content.length > 0
+                ? descriptor.content[0].data
+                : undefined
+            : undefined;
 
         form.change(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
     }, [descriptor, form, initialContent, options]);
 
     const transformObjectContent = (contentType: AttributeContentType, value: BaseAttributeContentModel) => {
         if (contentType === AttributeContentType.Datetime || contentType === AttributeContentType.Date) {
-            return {...value, data: new Date(value.data as string).toISOString()};
+            return { ...value, data: new Date(value.data as string).toISOString() };
         }
         return value;
     };
 
     const getFieldContent = (input: any) => {
         if (ContentFieldConfiguration[descriptor.contentType].type === "checkbox") {
-            return [{data: input.checked}];
+            return [{ data: input.checked }];
         }
         if (!input.value) {
             return undefined;
@@ -50,7 +57,7 @@ export default function ContentValueField({descriptor, initialContent, onSubmit}
                 return [transformObjectContent(descriptor.contentType, input.value.value)];
             }
         }
-        return [transformObjectContent(descriptor.contentType, {data: input.value})];
+        return [transformObjectContent(descriptor.contentType, { data: input.value })];
     };
 
     const validators = useMemo(() => {
@@ -64,44 +71,68 @@ export default function ContentValueField({descriptor, initialContent, onSubmit}
         return result.length === 0 ? undefined : composeValidators(...result);
     }, [descriptor]);
 
-    return ContentFieldConfiguration[descriptor.contentType].type ?
-        (<Field key={descriptor.name}
-                name={descriptor.name}
-                validate={validators ?? undefined}
-                type={ContentFieldConfiguration[descriptor.contentType].type}
+    return ContentFieldConfiguration[descriptor.contentType].type ? (
+        <Field
+            key={descriptor.name}
+            name={descriptor.name}
+            validate={validators ?? undefined}
+            type={ContentFieldConfiguration[descriptor.contentType].type}
         >
-            {({input, meta}) => {
+            {({ input, meta }) => {
                 const inputContent = getFieldContent(input);
-                const inputComponent = descriptor.properties.list
-                    ? <Col xs="10" sm="10" md="10" lg="10" xl="10">
+                const inputComponent = descriptor.properties.list ? (
+                    <Col xs="10" sm="10" md="10" lg="10" xl="10">
                         <Select
                             {...input}
                             options={options}
                             menuPortalTarget={document.body}
                             styles={{
-                                control: (provided) => (meta.touched && meta.invalid ? {
-                                    ...provided,
-                                    border: "solid 1px red",
-                                    "&:hover": {border: "solid 1px red"},
-                                } : {...provided}),
+                                control: (provided) =>
+                                    meta.touched && meta.invalid
+                                        ? {
+                                              ...provided,
+                                              border: "solid 1px red",
+                                              "&:hover": { border: "solid 1px red" },
+                                          }
+                                        : { ...provided },
                             }}
                             isMulti={descriptor.properties.multiSelect}
                             isDisabled={descriptor.properties.readOnly}
                             isClearable={!descriptor.properties.required}
                         />
                     </Col>
-                    : <Input
+                ) : (
+                    <Input
                         {...input}
                         valid={!meta.error && meta.touched}
                         invalid={!!meta.error && meta.touched}
                         type={ContentFieldConfiguration[descriptor.contentType].type}
                         id={descriptor.name}
-                    />;
+                    />
+                );
                 const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;
 
-                return <FormGroup><InputGroup>{inputComponent}<WidgetButtons buttons={[{
-                    icon: "plus", disabled: (!inputContent || !meta.valid), tooltip: "Save", onClick: () => onSubmit(descriptor.uuid, inputContent),
-                }]}/>{feedbackComponent}</InputGroup></FormGroup>;
+                return (
+                    <FormGroup>
+                        <InputGroup>
+                            {inputComponent}
+                            <WidgetButtons
+                                buttons={[
+                                    {
+                                        icon: "plus",
+                                        disabled: !inputContent || !meta.valid,
+                                        tooltip: "Save",
+                                        onClick: () => onSubmit(descriptor.uuid, inputContent),
+                                    },
+                                ]}
+                            />
+                            {feedbackComponent}
+                        </InputGroup>
+                    </FormGroup>
+                );
             }}
-        </Field>) : <></>;
+        </Field>
+    ) : (
+        <></>
+    );
 }

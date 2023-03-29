@@ -40,7 +40,7 @@ import {
     Input,
     Label,
     Row,
-    UncontrolledButtonDropdown
+    UncontrolledButtonDropdown,
 } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus, Resource } from "types/openapi";
@@ -58,10 +58,9 @@ import CertificateRenewDialog from "../CertificateRenewDialog";
 import CertificateStatus from "../CertificateStatus";
 
 export default function CertificateDetail() {
-
     const dispatch = useDispatch();
 
-    const {id} = useParams();
+    const { id } = useParams();
 
     const certificate = useSelector(selectors.certificateDetail);
 
@@ -77,8 +76,8 @@ export default function CertificateDetail() {
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    const [groupOptions, setGroupOptions] = useState<{ label: string, value: string }[]>([]);
-    const [raProfileOptions, setRaProfileOptions] = useState<{ label: string, value: string }[]>([]);
+    const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+    const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -124,257 +123,180 @@ export default function CertificateDetail() {
     const isFetchingLocationPushAttributeDescriptors = useSelector(locationSelectors.isFetchingPushAttributeDescriptors);
 
     const isBusy = useMemo(
-        () => isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
+        () =>
+            isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
 
     const health = useSelector(utilsActuatorSelectors.health);
-    const settings = useSelector(settingSelectors.platformSettings)
+    const settings = useSelector(settingSelectors.platformSettings);
 
     useEffect(() => {
-        if(!settings?.utils.utilsServiceUrl) return;
+        if (!settings?.utils.utilsServiceUrl) return;
         dispatch(utilsActuatorActions.health());
     }, [dispatch, settings]);
 
-    useEffect(
-        () => {
+    useEffect(() => {
+        if (!id) return;
+        dispatch(actions.resetState());
+        dispatch(actions.getCertificateDetail({ uuid: id }));
+        dispatch(actions.getCertificateHistory({ uuid: id }));
+    }, [dispatch, id]);
 
-            if (!id) return;
-            dispatch(actions.resetState());
-            dispatch(actions.getCertificateDetail({uuid: id}));
-            dispatch(actions.getCertificateHistory({uuid: id}));
-        },
-        [dispatch, id],
-    );
+    useEffect(() => {
+        if (!certificate) return;
+        if (certificate.status === CertStatus.New) return;
+        dispatch(actions.getCertificateValidationResult({ uuid: certificate.uuid }));
+    }, [dispatch, certificate]);
 
-    useEffect(
-        () => {
+    useEffect(() => {
+        if (!certificate || !locations || locations.length === 0) return;
 
-            if (!certificate) return;
-            if (certificate.status === CertStatus.New) return;
-            dispatch(actions.getCertificateValidationResult({uuid: certificate.uuid}));
+        let locationToEntityMapLocal: { [key: string]: string } = {};
 
-        },
-        [dispatch, certificate],
-    );
+        for (const location of locations) {
+            locationToEntityMapLocal[location.uuid] = location.entityInstanceUuid;
+        }
 
-    useEffect(
-        () => {
+        setLocationToEntityMap(locationToEntityMapLocal);
+    }, [certificate, locations]);
 
-            if (!certificate || !locations || locations.length === 0) return;
+    useEffect(() => {
+        setGroupOptions(groups.map((group) => ({ value: group.uuid, label: group.name })));
+    }, [dispatch, groups]);
 
-            let locationToEntityMapLocal: { [key: string]: string } = {};
+    useEffect(() => {
+        setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ":#" + group.authorityInstanceUuid, label: group.name })));
+    }, [dispatch, raProfiles]);
 
-            for (const location of locations) {
-                locationToEntityMapLocal[location.uuid] = location.entityInstanceUuid;
-            }
+    useEffect(() => {
+        if (!id || !updateGroup) return;
+        dispatch(groupAction.listGroups());
+    }, [dispatch, updateGroup, id]);
 
-            setLocationToEntityMap(locationToEntityMapLocal);
-
-        },
-        [certificate, locations],
-    );
-
-    useEffect(
-        () => {
-
-            setGroupOptions(groups.map(group => ({value: group.uuid, label: group.name})));
-
-        },
-        [dispatch, groups],
-    );
-
-    useEffect(
-        () => {
-
-            setRaProfileOptions(raProfiles.map(group => ({value: group.uuid + ":#" + group.authorityInstanceUuid, label: group.name})));
-
-        },
-        [dispatch, raProfiles],
-    );
-
-    useEffect(
-        () => {
-
-            if (!id || !updateGroup) return;
-            dispatch(groupAction.listGroups());
-
-        },
-        [dispatch, updateGroup, id],
-    );
-
-    useEffect(
-        () => {
-
-            if (!id || !revoke) return;
-            dispatch(actions.getRevocationAttributes({
+    useEffect(() => {
+        if (!id || !revoke) return;
+        dispatch(
+            actions.getRevocationAttributes({
                 raProfileUuid: certificate?.raProfile?.uuid || "",
                 authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "",
-            }));
+            }),
+        );
+    }, [dispatch, revoke, id, certificate?.raProfile?.uuid, certificate?.raProfile?.authorityInstanceUuid]);
 
-        },
-        [dispatch, revoke, id, certificate?.raProfile?.uuid, certificate?.raProfile?.authorityInstanceUuid],
-    );
+    useEffect(() => {
+        if (!id || !updateRaProfile) return;
+        dispatch(raProfileAction.listRaProfiles());
+    }, [dispatch, updateRaProfile, id]);
 
-    useEffect(
-        () => {
+    useEffect(() => {
+        dispatch(connectorActions.clearCallbackData());
+        setGroupAttributesCallbackAttributes([]);
 
-            if (!id || !updateRaProfile) return;
-            dispatch(raProfileAction.listRaProfiles());
+        selectLocationsCheckedRows.length === 0
+            ? dispatch(locationActions.clearPushAttributeDescriptors())
+            : dispatch(
+                  locationActions.getPushAttributes({
+                      uuid: selectLocationsCheckedRows[0],
+                      entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]],
+                  }),
+              );
+    }, [dispatch, locationToEntityMap, selectLocationsCheckedRows]);
 
-        },
-        [dispatch, updateRaProfile, id],
-    );
+    useEffect(() => {
+        if (!id || isPushingCertificate || isRemovingCertificate) return;
 
-    useEffect(
-        () => {
+        dispatch(actions.listCertificateLocations({ uuid: id }));
+        dispatch(locationActions.listLocations());
+    }, [dispatch, isPushingCertificate, isRemovingCertificate, id]);
 
-            dispatch(connectorActions.clearCallbackData());
-            setGroupAttributesCallbackAttributes([]);
+    const onDeleteConfirmed = useCallback(() => {
+        if (!certificate) return;
 
-            selectLocationsCheckedRows.length === 0 ?
+        dispatch(actions.deleteCertificate({ uuid: certificate.uuid }));
+        setConfirmDelete(false);
+    }, [certificate, dispatch]);
 
-                dispatch(locationActions.clearPushAttributeDescriptors())
-                :
-                dispatch(locationActions.getPushAttributes({uuid: selectLocationsCheckedRows[0], entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]]}));
+    const onCancelGroupUpdate = useCallback(() => {
+        setUpdateGroup(false);
+        setGroup(undefined);
+    }, [setUpdateGroup, setGroup]);
 
-        },
-        [dispatch, locationToEntityMap, selectLocationsCheckedRows],
-    );
+    const onCancelOwnerUpdate = useCallback(() => {
+        setUpdateOwner(false);
+        setOwner(undefined);
+    }, [setUpdateOwner, setOwner]);
 
-    useEffect(
-        () => {
+    const onCancelRaProfileUpdate = useCallback(() => {
+        setUpdateRaProfile(false);
+        setRaProfile(undefined);
+    }, [setUpdateRaProfile, setRaProfile]);
 
-            if (!id || isPushingCertificate || isRemovingCertificate) return;
+    const onComplianceCheck = useCallback(() => {
+        if (!certificate?.uuid) return;
 
-            dispatch(actions.listCertificateLocations({uuid: id}));
-            dispatch(locationActions.listLocations());
+        dispatch(actions.checkCompliance({ certificateUuids: [certificate.uuid] }));
+    }, [dispatch, certificate?.uuid]);
 
-        },
-        [dispatch, isPushingCertificate, isRemovingCertificate, id],
-    );
+    const onUpdateGroup = useCallback(() => {
+        if (!certificate || !group) return;
 
-    const onDeleteConfirmed = useCallback(
-        () => {
+        dispatch(actions.updateGroup({ uuid: certificate.uuid, updateGroupRequest: { groupUuid: group } }));
+        setUpdateGroup(false);
+    }, [certificate, dispatch, group]);
 
-            if (!certificate) return;
+    const onUpdateOwner = useCallback(() => {
+        if (!certificate || !owner) return;
 
-            dispatch(actions.deleteCertificate({uuid: certificate.uuid}));
-            setConfirmDelete(false);
+        dispatch(actions.updateOwner({ uuid: certificate.uuid, updateOwnerRequest: { owner: owner } }));
+        setUpdateOwner(false);
+    }, [certificate, dispatch, owner]);
 
-        },
-        [certificate, dispatch],
-    );
+    const onUpdateRaProfile = useCallback(() => {
+        if (!certificate || !raProfile) return;
 
-    const onCancelGroupUpdate = useCallback(
-        () => {
-            setUpdateGroup(false);
-            setGroup(undefined);
-
-        },
-        [setUpdateGroup, setGroup],
-    );
-
-    const onCancelOwnerUpdate = useCallback(
-        () => {
-            setUpdateOwner(false);
-            setOwner(undefined);
-
-        },
-        [setUpdateOwner, setOwner],
-    );
-
-    const onCancelRaProfileUpdate = useCallback(
-        () => {
-            setUpdateRaProfile(false);
-            setRaProfile(undefined);
-
-        },
-        [setUpdateRaProfile, setRaProfile],
-    );
-
-    const onComplianceCheck = useCallback(
-        () => {
-
-            if (!certificate?.uuid) return;
-
-            dispatch(actions.checkCompliance({certificateUuids: [certificate.uuid]}));
-        },
-        [dispatch, certificate?.uuid],
-    );
-
-    const onUpdateGroup = useCallback(
-        () => {
-
-            if (!certificate || !group) return;
-
-            dispatch(actions.updateGroup({uuid: certificate.uuid, updateGroupRequest: {groupUuid: group}}));
-            setUpdateGroup(false);
-
-        },
-        [certificate, dispatch, group],
-    );
-
-    const onUpdateOwner = useCallback(
-        () => {
-
-            if (!certificate || !owner) return;
-
-            dispatch(actions.updateOwner({uuid: certificate.uuid, updateOwnerRequest: {owner: owner}}));
-            setUpdateOwner(false);
-
-        },
-        [certificate, dispatch, owner],
-    );
-
-    const onUpdateRaProfile = useCallback(
-        () => {
-
-            if (!certificate || !raProfile) return;
-
-            dispatch(actions.updateRaProfile({uuid: certificate.uuid, updateRaProfileRequest: {raProfileUuid: raProfile}, authorityUuid: raProfileAuthorityUuid || ""}));
-            setUpdateRaProfile(false);
-
-        },
-        [certificate, dispatch, raProfile, raProfileAuthorityUuid],
-    );
-
-    const onRevoke = useCallback(
-        () => {
-
-            if (!certificate) return;
-
-            dispatch(actions.revokeCertificate({
+        dispatch(
+            actions.updateRaProfile({
                 uuid: certificate.uuid,
-                revokeRequest: {reason: revokeReason || ClientCertificateRevocationDtoReasonEnum.Unspecified, attributes: []},
+                updateRaProfileRequest: { raProfileUuid: raProfile },
+                authorityUuid: raProfileAuthorityUuid || "",
+            }),
+        );
+        setUpdateRaProfile(false);
+    }, [certificate, dispatch, raProfile, raProfileAuthorityUuid]);
+
+    const onRevoke = useCallback(() => {
+        if (!certificate) return;
+
+        dispatch(
+            actions.revokeCertificate({
+                uuid: certificate.uuid,
+                revokeRequest: { reason: revokeReason || ClientCertificateRevocationDtoReasonEnum.Unspecified, attributes: [] },
                 raProfileUuid: certificate.raProfile?.uuid || "",
                 authorityUuid: certificate.raProfile?.authorityInstanceUuid || "",
-            }));
-            setRevoke(false);
-
-        },
-        [certificate, dispatch, revokeReason],
-    );
+            }),
+        );
+        setRevoke(false);
+    }, [certificate, dispatch, revokeReason]);
 
     const onRenew = useCallback(
         (data: { fileContent?: string }) => {
-
-            dispatch(actions.renewCertificate({
-                uuid: certificate?.uuid || "",
-                renewRequest: {pkcs10: data.fileContent ? data.fileContent : undefined},
-                raProfileUuid: certificate?.raProfile?.uuid || "",
-                authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "",
-            }));
+            dispatch(
+                actions.renewCertificate({
+                    uuid: certificate?.uuid || "",
+                    renewRequest: { pkcs10: data.fileContent ? data.fileContent : undefined },
+                    raProfileUuid: certificate?.raProfile?.uuid || "",
+                    authorityUuid: certificate?.raProfile?.authorityInstanceUuid || "",
+                }),
+            );
 
             setRenew(false);
-
         },
         [dispatch, certificate],
     );
 
     const onAddCertToLocations = useCallback(
         (values: { locationAttributes: Record<string, any> }) => {
-
             setAddCertToLocation(false);
 
             if (selectLocationsCheckedRows.length === 0 || !certificate) return;
@@ -385,50 +307,51 @@ export default function CertificateDetail() {
                     locationUuid: selectLocationsCheckedRows[0],
                     entityUuid: locationToEntityMap[selectLocationsCheckedRows[0]],
                     pushRequest: {
-                        attributes: collectFormAttributes("locationAttributes", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
+                        attributes: collectFormAttributes(
+                            "locationAttributes",
+                            [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                            values,
+                        ),
                     },
                 }),
             );
-
         },
-        [selectLocationsCheckedRows, certificate, dispatch, locationAttributeDescriptors, locationToEntityMap, groupAttributesCallbackAttributes],
+        [
+            selectLocationsCheckedRows,
+            certificate,
+            dispatch,
+            locationAttributeDescriptors,
+            locationToEntityMap,
+            groupAttributesCallbackAttributes,
+        ],
     );
 
-    const onRemove = useCallback(
-        () => {
+    const onRemove = useCallback(() => {
+        if (locationsCheckedRows.length === 0 || !certificate) return;
 
-            if (locationsCheckedRows.length === 0 || !certificate) return;
+        setConfirmRemove(false);
 
-            setConfirmRemove(false);
-
-            locationsCheckedRows.forEach(
-                uuid => {
-                    dispatch(locationActions.removeCertificate({certificateUuid: certificate.uuid, locationUuid: uuid, entityUuid: locationToEntityMap[uuid]}));
-                },
+        locationsCheckedRows.forEach((uuid) => {
+            dispatch(
+                locationActions.removeCertificate({
+                    certificateUuid: certificate.uuid,
+                    locationUuid: uuid,
+                    entityUuid: locationToEntityMap[uuid],
+                }),
             );
-
-        },
-        [dispatch, certificate, locationsCheckedRows, locationToEntityMap],
-    );
+        });
+    }, [dispatch, certificate, locationsCheckedRows, locationToEntityMap]);
 
     const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
 
     const downloadDropDown = useMemo(
         () => (
-
             <UncontrolledButtonDropdown>
-
-                <DropdownToggle
-                    color="light"
-                    caret
-                    className="btn btn-link"
-                    title="Download"
-                >
-                    <i className="fa fa-download" aria-hidden="true"/>
+                <DropdownToggle color="light" caret className="btn btn-link" title="Download">
+                    <i className="fa fa-download" aria-hidden="true" />
                 </DropdownToggle>
 
                 <DropdownMenu>
-
                     <DropdownItem
                         key="pem"
                         onClick={() => downloadFile(formatPEM(certificate?.certificateContent || ""), fileNameToDownload + ".pem")}
@@ -438,15 +361,14 @@ export default function CertificateDetail() {
 
                     <DropdownItem
                         key="der"
-                        onClick={() => downloadFile(Buffer.from(certificate?.certificateContent || "", "base64"), fileNameToDownload + ".cer")}
+                        onClick={() =>
+                            downloadFile(Buffer.from(certificate?.certificateContent || "", "base64"), fileNameToDownload + ".cer")
+                        }
                     >
                         DER (.cer)
                     </DropdownItem>
-
                 </DropdownMenu>
-
             </UncontrolledButtonDropdown>
-
         ),
         [certificate, fileNameToDownload],
     );
@@ -454,33 +376,51 @@ export default function CertificateDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "trash", disabled: false, tooltip: "Delete", onClick: () => {
+                icon: "trash",
+                disabled: false,
+                tooltip: "Delete",
+                onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "retweet", disabled: !certificate?.raProfile || certificate?.status === "revoked", tooltip: "Renew", onClick: () => {
+                icon: "retweet",
+                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                tooltip: "Renew",
+                onClick: () => {
                     setRenew(true);
                 },
             },
             {
-                icon: "rekey", disabled: !certificate?.raProfile || certificate?.status === "revoked", tooltip: "Rekey", onClick: () => {
+                icon: "rekey",
+                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                tooltip: "Rekey",
+                onClick: () => {
                     setRekey(true);
                 },
             },
             {
-                icon: "minus-square", disabled: !certificate?.raProfile || certificate?.status === "revoked", tooltip: "Revoke", onClick: () => {
+                icon: "minus-square",
+                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                tooltip: "Revoke",
+                onClick: () => {
                     setRevoke(true);
                 },
             },
             {
-                icon: "gavel", disabled: !certificate?.raProfile || certificate?.status === "revoked", tooltip: "Check Compliance", onClick: () => {
+                icon: "gavel",
+                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                tooltip: "Check Compliance",
+                onClick: () => {
                     onComplianceCheck();
                 },
             },
             {
-                icon: "download", disabled: false, tooltip: "Download", custom: downloadDropDown, onClick: () => {
-                },
+                icon: "download",
+                disabled: false,
+                tooltip: "Download",
+                custom: downloadDropDown,
+                onClick: () => {},
             },
         ],
         [certificate, downloadDropDown, onComplianceCheck],
@@ -489,13 +429,19 @@ export default function CertificateDetail() {
     const buttonsLocations: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus", disabled: false, tooltip: "Push to location", onClick: () => {
+                icon: "plus",
+                disabled: false,
+                tooltip: "Push to location",
+                onClick: () => {
                     setSelectLocationCheckedRows([]);
                     setAddCertToLocation(true);
                 },
             },
             {
-                icon: "trash", disabled: locationsCheckedRows.length === 0, tooltip: "Remove", onClick: () => {
+                icon: "trash",
+                disabled: locationsCheckedRows.length === 0,
+                tooltip: "Remove",
+                onClick: () => {
                     setConfirmRemove(true);
                 },
             },
@@ -505,193 +451,139 @@ export default function CertificateDetail() {
 
     const updateOwnerBody = useMemo(
         () => (
-
             <div>
                 <Label for="Owner Name">Owner</Label>
-                <Input
-                    type="text"
-                    placeholder="Enter the owner name / Email"
-                    onChange={(event) => setOwner(event.target.value)}
-                ></Input>
+                <Input type="text" placeholder="Enter the owner name / Email" onChange={(event) => setOwner(event.target.value)}></Input>
             </div>
-
         ),
         [setOwner],
     );
 
-    const updateGroupBody = useMemo(
-        () => {
-            return (<div>
-                    <Select
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
-                        options={groupOptions}
-                        placeholder={`Select Group`}
-                        onChange={(event) => setGroup(event?.value)}
-                    />
-                </div>
-            );
-        },
-        [setGroup, groupOptions],
-    );
+    const updateGroupBody = useMemo(() => {
+        return (
+            <div>
+                <Select
+                    maxMenuHeight={140}
+                    menuPlacement="auto"
+                    options={groupOptions}
+                    placeholder={`Select Group`}
+                    onChange={(event) => setGroup(event?.value)}
+                />
+            </div>
+        );
+    }, [setGroup, groupOptions]);
 
     const updateRaAndAuthorityState = useCallback((value: string) => {
-            setRaProfile(value.split(":#")[0]);
-            setRaProfileAuthorityUuid(value.split(":#")[1]);
-        }, [],
-    );
+        setRaProfile(value.split(":#")[0]);
+        setRaProfileAuthorityUuid(value.split(":#")[1]);
+    }, []);
 
-    const updateRaProfileBody = useMemo(
-        () => {
-            return (<div>
-                    <Select
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
-                        options={raProfileOptions}
-                        placeholder={`Select RA Profile`}
-                        onChange={(event) => updateRaAndAuthorityState(event?.value || "")}
-                    />
-                </div>
-            );
-        },
-        [raProfileOptions, updateRaAndAuthorityState],
-    );
+    const updateRaProfileBody = useMemo(() => {
+        return (
+            <div>
+                <Select
+                    maxMenuHeight={140}
+                    menuPlacement="auto"
+                    options={raProfileOptions}
+                    placeholder={`Select RA Profile`}
+                    onChange={(event) => updateRaAndAuthorityState(event?.value || "")}
+                />
+            </div>
+        );
+    }, [raProfileOptions, updateRaAndAuthorityState]);
 
-    const revokeBody = useMemo(
-        () => {
-            let options = [
-                {
-                    "label": "UNSPECIFIED",
-                    "value": "UNSPECIFIED",
-                },
-                {
-                    "label": "KEY_COMPROMISE",
-                    "value": "KEY_COMPROMISE",
-                },
-                {
-                    "label": "CA_COMPROMISE",
-                    "value": "CA_COMPROMISE",
-                },
-                {
-                    "label": "AFFILIATION_CHANGED",
-                    "value": "AFFILIATION_CHANGED",
-                },
-                {
-                    "label": "SUPERSEDED",
-                    "value": "SUPERSEDED",
-                },
-                {
-                    "label": "CESSATION_OF_OPERATION",
-                    "value": "CESSATION_OF_OPERATION",
-                },
-                {
-                    "label": "CERTIFICATE_HOLD",
-                    "value": "CERTIFICATE_HOLD",
-                },
-                {
-                    "label": "PRIVILEGE_WITHDRAWN",
-                    "value": "PRIVILEGE_WITHDRAWN",
-                },
-                {
-                    "label": "A_A_COMPROMISE",
-                    "value": "A_A_COMPROMISE",
-                },
-                {
-                    "label": "REMOVE_FROM_CRL",
-                    "value": "REMOVE_FROM_CRL",
-                },
-            ];
+    const revokeBody = useMemo(() => {
+        let options = [
+            {
+                label: "UNSPECIFIED",
+                value: "UNSPECIFIED",
+            },
+            {
+                label: "KEY_COMPROMISE",
+                value: "KEY_COMPROMISE",
+            },
+            {
+                label: "CA_COMPROMISE",
+                value: "CA_COMPROMISE",
+            },
+            {
+                label: "AFFILIATION_CHANGED",
+                value: "AFFILIATION_CHANGED",
+            },
+            {
+                label: "SUPERSEDED",
+                value: "SUPERSEDED",
+            },
+            {
+                label: "CESSATION_OF_OPERATION",
+                value: "CESSATION_OF_OPERATION",
+            },
+            {
+                label: "CERTIFICATE_HOLD",
+                value: "CERTIFICATE_HOLD",
+            },
+            {
+                label: "PRIVILEGE_WITHDRAWN",
+                value: "PRIVILEGE_WITHDRAWN",
+            },
+            {
+                label: "A_A_COMPROMISE",
+                value: "A_A_COMPROMISE",
+            },
+            {
+                label: "REMOVE_FROM_CRL",
+                value: "REMOVE_FROM_CRL",
+            },
+        ];
 
-            return (<div>
-                    <Select
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
-                        options={options}
-                        placeholder={`Select Revocation Reason`}
-                        onChange={(event: any) => setRevokeReason(event?.value as ClientCertificateRevocationDtoReasonEnum)}
-                    />
-
-                </div>
-            );
-        },
-        [setRevokeReason],
-    );
+        return (
+            <div>
+                <Select
+                    maxMenuHeight={140}
+                    menuPlacement="auto"
+                    options={options}
+                    placeholder={`Select Revocation Reason`}
+                    onChange={(event: any) => setRevokeReason(event?.value as ClientCertificateRevocationDtoReasonEnum)}
+                />
+            </div>
+        );
+    }, [setRevokeReason]);
 
     const certificateTitle = useMemo(
         () => (
-
             <div>
-
                 <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons}/>
+                    <WidgetButtons buttons={buttons} />
                 </div>
 
-                <h5>
-                    {certificate?.status === CertStatus.New ? "CSR" : "Certificate"} Properties
-                </h5>
-
+                <h5>{certificate?.status === CertStatus.New ? "CSR" : "Certificate"} Properties</h5>
             </div>
-
         ),
         [buttons, certificate?.status],
     );
 
-    const metaTitle = (
-        <h5>
-            Metadata
-        </h5>
-    );
+    const metaTitle = <h5>Metadata</h5>;
 
-    const validationTitle = (
-        <h5>
-            Validation Status
-        </h5>
-    );
+    const validationTitle = <h5>Validation Status</h5>;
 
-    const sanTitle = (
-        <h5>
-            Subject Alternative Names
-        </h5>
-    );
+    const sanTitle = <h5>Subject Alternative Names</h5>;
 
-    const propertiesTitle = (
-        <h5>
-            Other Properties
-        </h5>
-    );
+    const propertiesTitle = <h5>Other Properties</h5>;
 
-    const historyTitle = (
-        <h5>
-            Event History
-        </h5>
-    );
+    const historyTitle = <h5>Event History</h5>;
 
-    const complianceTitle = (
-        <h5>
-            Compliance Status
-        </h5>
-    );
+    const complianceTitle = <h5>Compliance Status</h5>;
 
-    const csrTitle = (
-        <h5>
-            CSR
-        </h5>
-    );
+    const csrTitle = <h5>CSR</h5>;
 
     const locationsTitle = (
-
         <div>
-
             <div className="fa-pull-right mt-n-xs">
-                <WidgetButtons buttons={buttonsLocations}/>
+                <WidgetButtons buttons={buttonsLocations} />
             </div>
 
-            <h5>
-                Certificate Locations
-            </h5>
-
+            <h5>Certificate Locations</h5>
         </div>
-
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -739,55 +631,48 @@ export default function CertificateDetail() {
     );
 
     const historyEntry: TableDataRow[] = useMemo(
-        () => !eventHistory ? [] : eventHistory.map(function(history) {
+        () =>
+            !eventHistory
+                ? []
+                : eventHistory.map(function (history) {
+                      return {
+                          id: history.uuid,
+                          columns: [
+                              <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(history.created)}</span>,
 
-            return (
+                              history.createdBy,
 
-                {
-                    "id": history.uuid,
-                    "columns": [<span style={{whiteSpace: "nowrap"}}>{dateFormatter(history.created)}</span>,
+                              history.event,
 
-                        history.createdBy,
+                              <CertificateStatus status={history.status} />,
 
-                        history.event,
+                              <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
 
-                        <CertificateStatus status={history.status}/>,
-
-                        <div style={{wordBreak: "break-all"}}>{history.message}</div>,
-
-                        history.additionalInformation ? (
-                            <Button
-                                color="white"
-                                onClick={() => setCurrentInfoId(history.uuid)}
-                                title="Show Additional Information"
-                            >
-                                <i className="fa fa-info-circle" aria-hidden="true"></i>
-                            </Button>
-                        ) : "",
-                    ],
-                }
-
-            );
-
-        }), [eventHistory],
+                              history.additionalInformation ? (
+                                  <Button color="white" onClick={() => setCurrentInfoId(history.uuid)} title="Show Additional Information">
+                                      <i className="fa fa-info-circle" aria-hidden="true"></i>
+                                  </Button>
+                              ) : (
+                                  ""
+                              ),
+                          ],
+                      };
+                  }),
+        [eventHistory],
     );
 
     const additionalInfoEntry = (): any => {
-
         let returnList = [];
 
         if (!currentInfoId) return;
 
-        const currentHistory = eventHistory?.filter(
-            (history) => history.uuid === currentInfoId,
-        );
+        const currentHistory = eventHistory?.filter((history) => history.uuid === currentInfoId);
 
         for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
-
             returnList.push(
                 <tr>
-                    <td style={{padding: "0.25em"}}>{key}</td>
-                    <td style={{padding: "0.25em"}}>
+                    <td style={{ padding: "0.25em" }}>{key}</td>
+                    <td style={{ padding: "0.25em" }}>
                         <p
                             style={{
                                 whiteSpace: "pre-wrap",
@@ -799,11 +684,9 @@ export default function CertificateDetail() {
                     </td>
                 </tr>,
             );
-
         }
 
         return returnList;
-
     };
 
     const propertiesHeaders: TableHeader[] = useMemo(
@@ -857,230 +740,254 @@ export default function CertificateDetail() {
     );
 
     const complianceData: TableDataRow[] = useMemo(
-        () => !certificate ? [] : (certificate.nonCompliantRules || []).map(
-            e => ({
-                id: e.ruleDescription,
-                columns: [<CertificateStatus status={e.status}/>, e.ruleDescription],
-                detailColumns: !e.attributes || e.attributes.length === 0 ? undefined : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false}/>],
-
-            }),
-        ),
+        () =>
+            !certificate
+                ? []
+                : (certificate.nonCompliantRules || []).map((e) => ({
+                      id: e.ruleDescription,
+                      columns: [<CertificateStatus status={e.status} />, e.ruleDescription],
+                      detailColumns:
+                          !e.attributes || e.attributes.length === 0
+                              ? undefined
+                              : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false} />],
+                  })),
         [certificate],
     );
 
     const propertiesData: TableDataRow[] = useMemo(
-        () => !certificate ? [] : [
-            {
-                id: "uuid",
-                columns: ["UUID", certificate.uuid, ""],
-            },
-            {
-                id: "owner",
-                columns: ["Owner", certificate.owner || "Unassigned",
-                    <Button
-                        className="btn btn-link"
-                        size="sm"
-                        color="secondary"
-                        onClick={() => setUpdateOwner(true)}
-                        title="Update Owner"
-                    >
-                        <i className="fa fa-pencil-square-o"/>
-                    </Button>,
-                ],
-            },
-            {
-                id: "group",
-                columns: ["Group", certificate?.group?.name ? (
-                    <Link to={`../../groups/detail/${certificate?.group.uuid}`}>
-                        {certificate?.group.name}
-                    </Link>
-                ) : "Unassigned",
-                    <Button
-                        className="btn btn-link"
-                        size="sm"
-                        color="secondary"
-                        onClick={() => setUpdateGroup(true)}
-                        title="Update Group"
-                    >
-                        <i className="fa fa-pencil-square-o"/>
-                    </Button>,
-                ],
-            },
-            {
-                id: "raProfile",
-                columns: ["RA Profile", certificate?.raProfile?.name ? (
-                    <Link to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}>
-                        {certificate?.raProfile.name}
-                    </Link>
-                ) : "Unassigned",
-                    <Button
-                        className="btn btn-link"
-                        size="sm"
-                        color="secondary"
-                        onClick={() => setUpdateRaProfile(true)}
-                        title="Update RA Profile"
-                    >
-                        <i className="fa fa-pencil-square-o"/>
-                    </Button>,
-                ],
-            },
-            {
-                id: "type",
-                columns: ["Type", certificate.certificateType || "", ""],
-            },
-        ],
+        () =>
+            !certificate
+                ? []
+                : [
+                      {
+                          id: "uuid",
+                          columns: ["UUID", certificate.uuid, ""],
+                      },
+                      {
+                          id: "owner",
+                          columns: [
+                              "Owner",
+                              certificate.owner || "Unassigned",
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  onClick={() => setUpdateOwner(true)}
+                                  title="Update Owner"
+                              >
+                                  <i className="fa fa-pencil-square-o" />
+                              </Button>,
+                          ],
+                      },
+                      {
+                          id: "group",
+                          columns: [
+                              "Group",
+                              certificate?.group?.name ? (
+                                  <Link to={`../../groups/detail/${certificate?.group.uuid}`}>{certificate?.group.name}</Link>
+                              ) : (
+                                  "Unassigned"
+                              ),
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  onClick={() => setUpdateGroup(true)}
+                                  title="Update Group"
+                              >
+                                  <i className="fa fa-pencil-square-o" />
+                              </Button>,
+                          ],
+                      },
+                      {
+                          id: "raProfile",
+                          columns: [
+                              "RA Profile",
+                              certificate?.raProfile?.name ? (
+                                  <Link
+                                      to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
+                                  >
+                                      {certificate?.raProfile.name}
+                                  </Link>
+                              ) : (
+                                  "Unassigned"
+                              ),
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  onClick={() => setUpdateRaProfile(true)}
+                                  title="Update RA Profile"
+                              >
+                                  <i className="fa fa-pencil-square-o" />
+                              </Button>,
+                          ],
+                      },
+                      {
+                          id: "type",
+                          columns: ["Type", certificate.certificateType || "", ""],
+                      },
+                  ],
         [certificate],
     );
 
-    const sanData: TableDataRow[] = useMemo(
-        () => {
-            let sanList: TableDataRow[] = [];
-            for (let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
-                if (value && Array.isArray(value) && value.length > 0) {
-                    sanList.push({
-                        id: key,
-                        columns: [key, value.join(", ")],
-                    });
-                }
+    const sanData: TableDataRow[] = useMemo(() => {
+        let sanList: TableDataRow[] = [];
+        for (let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
+            if (value && Array.isArray(value) && value.length > 0) {
+                sanList.push({
+                    id: key,
+                    columns: [key, value.join(", ")],
+                });
             }
-            return sanList;
-        },
-        [certificate],
-    );
+        }
+        return sanList;
+    }, [certificate]);
 
     const validationData: TableDataRow[] = useMemo(
-        () => !certificate ? [] : Object.entries(validationResult || {}).map(function([key, value]) {
-                return (
-                    {
-                        id: key,
-                        columns: [
-                            key,
-                            <CertificateStatus status={value.status}/>,
-                            <div style={{wordBreak: "break-all"}}>
-                                {value.message?.split("\n").map((str: string) => (
-                                    <div key={str}>
-                                        {str}
-                                        <br/>
-                                    </div>
-                                ))}
-                            </div>,
-                        ],
-                    }
-                );
-            },
-        ),
+        () =>
+            !certificate
+                ? []
+                : Object.entries(validationResult || {}).map(function ([key, value]) {
+                      return {
+                          id: key,
+                          columns: [
+                              key,
+                              <CertificateStatus status={value.status} />,
+                              <div style={{ wordBreak: "break-all" }}>
+                                  {value.message?.split("\n").map((str: string) => (
+                                      <div key={str}>
+                                          {str}
+                                          <br />
+                                      </div>
+                                  ))}
+                              </div>,
+                          ],
+                      };
+                  }),
         [certificate, validationResult],
     );
 
-    const detailData: TableDataRow[] = useMemo(
-        () => {
-            const certDetail = !certificate ? [] : [
-            {
-                id: "commonName",
-                columns: [<span style={{whiteSpace: "nowrap"}}>Common Name</span>, certificate.commonName],
-
-            },
-            {
-                id: "serialNumber",
-                columns: ["Serial Number", certificate.serialNumber || ""],
-            },
-            {
-                id: "key",
-                columns: ["Key", certificate.key && certificate.key.tokenInstanceUuid ?
-                    <Link to={`../cryptographicKeys/detail/${certificate.key?.tokenInstanceUuid}/${certificate.key?.uuid}`}>{certificate.key?.name}</Link> : ""],
-            },
-            {
-                id: "issuerCommonName",
-                columns: ["Issuer Common Name", certificate.issuerCommonName || ""],
-            },
-            {
-                id: "issuerDN",
-                columns: ["Issuer DN", certificate.issuerDn || ""],
-            },
-            {
-                id: "subjectDN",
-                columns: ["Subject DN", certificate.subjectDn],
-            },
-            {
-                id: "expiresAt",
-                columns: ["Expires At", certificate.notAfter ? <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notAfter)}</span> : ""],
-            },
-            {
-                id: "validFrom",
-                columns: ["Valid From", certificate.notBefore ? <span style={{whiteSpace: "nowrap"}}>{dateFormatter(certificate.notBefore)}</span> : ""],
-            },
-            {
-                id: "publicKeyAlgorithm",
-                columns: ["Public Key Algorithm", certificate.publicKeyAlgorithm],
-            },
-            {
-                id: "signatureAlgorithm",
-                columns: ["Signature Algorithm", certificate.signatureAlgorithm],
-            },
-            {
-                id: "certStatus",
-                columns: ["Status", <CertificateStatus status={certificate.status}/>],
-            },
-            {
-                id: "complianceStatus",
-                columns: ["Compliance Status", <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na}/>],
-            },
-            {
-                id: "fingerprint",
-                columns: ["Fingerprint", certificate.fingerprint || ""],
-            },
-            {
-                id: "fingerprintAlgorithm",
-                columns: ["Fingerprint Algorithm", "SHA256"],
-            },
-            {
-                id: "keySize",
-                columns: ["Key Size", certificate.keySize.toString()],
-            },
-            {
-                id: "keyUsage",
-                columns: ["Key Usage",
-                    (certificate?.keyUsage?.map(function(name) {
-                        return (
-                            <div key={name} style={{margin: "1px"}}>
-                                <Badge>
-                                    {name}
-                                </Badge>
-                                &nbsp;
-                            </div>
-                        );
-                    })) || "",
-                ],
-            },
-            {
-                id: "extendedKeyUsage",
-                columns: ["Extended Key Usage",
-                    (certificate?.extendedKeyUsage?.map(function(name) {
-                        return (
-                            <div key={name} style={{margin: "1px"}}>
-                                <Badge>
-                                    {name}
-                                </Badge>
-                                &nbsp;
-                            </div>
-                        );
-                    })) || "",
-                ],
-            },
-            {
-                id: "basicConstraint",
-                columns: ["Basic Constraint", certificate.basicConstraints],
-            }];
-            if (health && certificate?.status !== CertStatus.New) {
-                certDetail.push({
-                    id: "asn1structure",
-                    columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent}/> : <>n/a</>],
-                });
-            }
-            return certDetail;
-        },
-        [certificate, health],
-    );
+    const detailData: TableDataRow[] = useMemo(() => {
+        const certDetail = !certificate
+            ? []
+            : [
+                  {
+                      id: "commonName",
+                      columns: [<span style={{ whiteSpace: "nowrap" }}>Common Name</span>, certificate.commonName],
+                  },
+                  {
+                      id: "serialNumber",
+                      columns: ["Serial Number", certificate.serialNumber || ""],
+                  },
+                  {
+                      id: "key",
+                      columns: [
+                          "Key",
+                          certificate.key && certificate.key.tokenInstanceUuid ? (
+                              <Link to={`../cryptographicKeys/detail/${certificate.key?.tokenInstanceUuid}/${certificate.key?.uuid}`}>
+                                  {certificate.key?.name}
+                              </Link>
+                          ) : (
+                              ""
+                          ),
+                      ],
+                  },
+                  {
+                      id: "issuerCommonName",
+                      columns: ["Issuer Common Name", certificate.issuerCommonName || ""],
+                  },
+                  {
+                      id: "issuerDN",
+                      columns: ["Issuer DN", certificate.issuerDn || ""],
+                  },
+                  {
+                      id: "subjectDN",
+                      columns: ["Subject DN", certificate.subjectDn],
+                  },
+                  {
+                      id: "expiresAt",
+                      columns: [
+                          "Expires At",
+                          certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
+                      ],
+                  },
+                  {
+                      id: "validFrom",
+                      columns: [
+                          "Valid From",
+                          certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
+                      ],
+                  },
+                  {
+                      id: "publicKeyAlgorithm",
+                      columns: ["Public Key Algorithm", certificate.publicKeyAlgorithm],
+                  },
+                  {
+                      id: "signatureAlgorithm",
+                      columns: ["Signature Algorithm", certificate.signatureAlgorithm],
+                  },
+                  {
+                      id: "certStatus",
+                      columns: ["Status", <CertificateStatus status={certificate.status} />],
+                  },
+                  {
+                      id: "complianceStatus",
+                      columns: ["Compliance Status", <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na} />],
+                  },
+                  {
+                      id: "fingerprint",
+                      columns: ["Fingerprint", certificate.fingerprint || ""],
+                  },
+                  {
+                      id: "fingerprintAlgorithm",
+                      columns: ["Fingerprint Algorithm", "SHA256"],
+                  },
+                  {
+                      id: "keySize",
+                      columns: ["Key Size", certificate.keySize.toString()],
+                  },
+                  {
+                      id: "keyUsage",
+                      columns: [
+                          "Key Usage",
+                          certificate?.keyUsage?.map(function (name) {
+                              return (
+                                  <div key={name} style={{ margin: "1px" }}>
+                                      <Badge>{name}</Badge>
+                                      &nbsp;
+                                  </div>
+                              );
+                          }) || "",
+                      ],
+                  },
+                  {
+                      id: "extendedKeyUsage",
+                      columns: [
+                          "Extended Key Usage",
+                          certificate?.extendedKeyUsage?.map(function (name) {
+                              return (
+                                  <div key={name} style={{ margin: "1px" }}>
+                                      <Badge>{name}</Badge>
+                                      &nbsp;
+                                  </div>
+                              );
+                          }) || "",
+                      ],
+                  },
+                  {
+                      id: "basicConstraint",
+                      columns: ["Basic Constraint", certificate.basicConstraints],
+                  },
+              ];
+        if (health && certificate?.status !== CertStatus.New) {
+            certDetail.push({
+                id: "asn1structure",
+                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent} /> : <>n/a</>],
+            });
+        }
+        return certDetail;
+    }, [certificate, health]);
 
     const locationsHeaders: TableHeader[] = useMemo(
         () => [
@@ -1129,29 +1036,26 @@ export default function CertificateDetail() {
     );
 
     const locationsData: TableDataRow[] = useMemo(
-        () => !certLocations ? [] : certLocations.map(
-            location => ({
+        () =>
+            !certLocations
+                ? []
+                : certLocations.map((location) => ({
+                      id: location.uuid,
 
-                id: location.uuid,
+                      columns: [
+                          <Link to={`../../locations/detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
 
-                columns: [
+                          location.description || "",
 
-                    <Link to={`../../locations/detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
+                          <Badge color="primary">{location.entityInstanceName}</Badge>,
 
-                    location.description || "",
+                          location.supportMultipleEntries ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
-                    <Badge color="primary">{location.entityInstanceName}</Badge>,
+                          location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
-                    location.supportMultipleEntries ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-
-                    location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-
-                    <StatusBadge enabled={location.enabled}/>,
-
-                ],
-
-            }),
-        ),
+                          <StatusBadge enabled={location.enabled} />,
+                      ],
+                  })),
         [certLocations],
     );
 
@@ -1202,153 +1106,137 @@ export default function CertificateDetail() {
     );
 
     const selectLocationsData: TableDataRow[] = useMemo(
-        () => !locations ? [] : locations.map(
-            location => {
+        () =>
+            !locations
+                ? []
+                : (locations
+                      .map((location) => {
+                          if (certLocations?.find((cl) => cl.uuid === location.uuid)) return undefined;
 
-                if (certLocations?.find(cl => cl.uuid === location.uuid)) return undefined;
+                          return {
+                              id: location.uuid,
 
-                return {
+                              columns: [
+                                  location.name,
 
-                    id: location.uuid,
+                                  location.description || "",
 
-                    columns: [
+                                  <Badge color="primary">{location.entityInstanceName}</Badge>,
 
-                        location.name,
+                                  location.supportMultipleEntries ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
-                        location.description || "",
+                                  location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
-                        <Badge color="primary">{location.entityInstanceName}</Badge>,
-
-                        location.supportMultipleEntries ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-
-                        location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-
-                        <StatusBadge enabled={location.enabled}/>,
-
-                    ],
-
-                };
-            },
-        ).filter(
-            location => location !== undefined,
-        ) as TableDataRow[],
+                                  <StatusBadge enabled={location.enabled} />,
+                              ],
+                          };
+                      })
+                      .filter((location) => location !== undefined) as TableDataRow[]),
         [certLocations, locations],
     );
 
     return (
-
         <Container className="themed-container" fluid>
-            <TabLayout tabs={[
-                {
-                    title: "Details",
-                    content: <Widget><Row xs="1" sm="1" md="2" lg="2" xl="2">
+            <TabLayout
+                tabs={[
+                    {
+                        title: "Details",
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget title={certificateTitle} busy={isBusy}>
+                                            <br />
+                                            <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
+                                        </Widget>
+                                    </Col>
 
-                        <Col>
-                            <Widget title={certificateTitle} busy={isBusy}>
-                                <br/>
-                                <CustomTable
-                                    hasPagination={false}
-                                    headers={detailHeaders}
-                                    data={detailData}
-                                />
+                                    <Col>
+                                        <Widget title={sanTitle} busy={isBusy}>
+                                            <br />
+                                            <CustomTable headers={detailHeaders} data={sanData} />
+                                        </Widget>
+
+                                        <Widget title={propertiesTitle}>
+                                            <br />
+                                            <CustomTable headers={propertiesHeaders} data={propertiesData} />
+                                        </Widget>
+                                    </Col>
+                                </Row>
                             </Widget>
-                        </Col>
+                        ),
+                    },
+                    {
+                        title: "Attributes",
+                        content: (
+                            <Widget>
+                                <Widget title={metaTitle}>
+                                    <br />
+                                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
+                                </Widget>
 
-                        <Col>
-                            <Widget title={sanTitle} busy={isBusy}>
-                                <br/>
-                                <CustomTable
-                                    headers={detailHeaders}
-                                    data={sanData}
-                                />
+                                {certificate?.csrAttributes && certificate.csrAttributes.length > 0 ? (
+                                    <Widget title={csrTitle} busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.csrAttributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate && (
+                                    <CustomAttributeWidget
+                                        resource={Resource.Certificates}
+                                        resourceUuid={certificate.uuid}
+                                        attributes={certificate.customAttributes}
+                                    />
+                                )}
                             </Widget>
-
-                            <Widget title={propertiesTitle}>
-                                <br/>
-                                <CustomTable
-                                    headers={propertiesHeaders}
-                                    data={propertiesData}
-                                />
+                        ),
+                    },
+                    {
+                        title: "Validation",
+                        hidden: certificate?.status === CertStatus.New,
+                        content: (
+                            <Widget>
+                                <Widget title={validationTitle} busy={isFetchingValidationResult}>
+                                    <br />
+                                    <CustomTable headers={validationHeaders} data={validationData} />
+                                </Widget>
+                                <Widget title={complianceTitle} busy={isFetching}>
+                                    <br />
+                                    <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
+                                </Widget>
                             </Widget>
-
-                        </Col>
-                    </Row>
-                    </Widget>,
-
-                },
-                {
-                    title: "Attributes",
-                    content: <Widget>
-                        <Widget title={metaTitle}>
-                            <br/>
-                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata}/>
-                        </Widget>
-
-                        {certificate?.csrAttributes && certificate.csrAttributes.length > 0 ?
-
-                            <Widget title={csrTitle} busy={isBusy}>
-
-                                <AttributeViewer attributes={certificate.csrAttributes}/>
-
+                        ),
+                    },
+                    {
+                        title: "Locations",
+                        hidden: certificate?.status === CertStatus.New,
+                        content: (
+                            <Widget>
+                                <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
+                                    <br />
+                                    <CustomTable
+                                        headers={locationsHeaders}
+                                        data={locationsData}
+                                        hasCheckboxes={true}
+                                        onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
+                                    />
+                                </Widget>
                             </Widget>
-                            : null}
-
-                        {certificate &&
-                            <CustomAttributeWidget resource={Resource.Certificates} resourceUuid={certificate.uuid} attributes={certificate.customAttributes}/>}
-
-                    </Widget>,
-                },
-                {
-                    title: "Validation",
-                    hidden: certificate?.status === CertStatus.New,
-                    content: <Widget><Widget title={validationTitle} busy={isFetchingValidationResult}>
-                        <br/>
-                        <CustomTable
-                            headers={validationHeaders}
-                            data={validationData}
-                        />
-                    </Widget>
-                        <Widget title={complianceTitle} busy={isFetching}>
-                            <br/>
-                            <CustomTable
-                                headers={complianceHeaders}
-                                data={complianceData}
-                                hasDetails={true}
-                            />
-                        </Widget>
-
-                    </Widget>,
-
-                },
-                {
-                    title: "Locations",
-                    hidden: certificate?.status === CertStatus.New,
-                    content: <Widget>
-                        <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
-                            <br/>
-                            <CustomTable
-                                headers={locationsHeaders}
-                                data={locationsData}
-                                hasCheckboxes={true}
-                                onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
-                            />
-                        </Widget>
-                    </Widget>,
-                },
-                {
-                    title: "History",
-                    content: <Widget>
-                        <Widget title={historyTitle} busy={isFetchingHistory}>
-                            <br/>
-                            <CustomTable
-                                headers={historyHeaders}
-                                data={historyEntry}
-                                hasPagination={true}
-                            />
-                        </Widget>
-                    </Widget>,
-                },
-            ]}/>
+                        ),
+                    },
+                    {
+                        title: "History",
+                        content: (
+                            <Widget>
+                                <Widget title={historyTitle} busy={isFetchingHistory}>
+                                    <br />
+                                    <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={confirmDelete}
@@ -1356,8 +1244,8 @@ export default function CertificateDetail() {
                 body="You are about to delete a Certificate. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    {color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete"},
-                    {color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel"},
+                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
                 ]}
             />
 
@@ -1367,11 +1255,10 @@ export default function CertificateDetail() {
                 body={updateGroupBody}
                 toggle={() => onCancelGroupUpdate()}
                 buttons={[
-                    {color: "primary", onClick: () => onUpdateGroup(), body: "Update", disabled: true ? group === undefined : false},
-                    {color: "secondary", onClick: () => onCancelGroupUpdate(), body: "Cancel"},
+                    { color: "primary", onClick: () => onUpdateGroup(), body: "Update", disabled: true ? group === undefined : false },
+                    { color: "secondary", onClick: () => onCancelGroupUpdate(), body: "Cancel" },
                 ]}
             />
-
 
             <Dialog
                 isOpen={updateOwner}
@@ -1379,8 +1266,8 @@ export default function CertificateDetail() {
                 body={updateOwnerBody}
                 toggle={() => onCancelOwnerUpdate()}
                 buttons={[
-                    {color: "primary", onClick: onUpdateOwner, body: "Update", disabled: true ? owner === undefined : false},
-                    {color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel"},
+                    { color: "primary", onClick: onUpdateOwner, body: "Update", disabled: true ? owner === undefined : false },
+                    { color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel" },
                 ]}
             />
 
@@ -1390,25 +1277,30 @@ export default function CertificateDetail() {
                 body={updateRaProfileBody}
                 toggle={() => onCancelRaProfileUpdate()}
                 buttons={[
-                    {color: "primary", onClick: onUpdateRaProfile, body: "Update", disabled: true ? raProfile === undefined : false},
-                    {color: "secondary", onClick: () => onCancelRaProfileUpdate(), body: "Cancel"},
+                    { color: "primary", onClick: onUpdateRaProfile, body: "Update", disabled: true ? raProfile === undefined : false },
+                    { color: "secondary", onClick: () => onCancelRaProfileUpdate(), body: "Cancel" },
                 ]}
             />
 
             <Dialog
                 isOpen={renew}
                 caption={`Renew Certificate`}
-                body={<CertificateRenewDialog onCancel={() => setRenew(false)} onRenew={onRenew} allowWithoutFile={certificate?.privateKeyAvailability || false}/>}
+                body={
+                    <CertificateRenewDialog
+                        onCancel={() => setRenew(false)}
+                        onRenew={onRenew}
+                        allowWithoutFile={certificate?.privateKeyAvailability || false}
+                    />
+                }
                 toggle={() => setRenew(false)}
                 buttons={[]}
             />
-
 
             <Dialog
                 size="lg"
                 isOpen={rekey}
                 caption={`Rekey Certificate`}
-                body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate}/>}
+                body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate} />}
                 toggle={() => setRekey(false)}
                 buttons={[]}
             />
@@ -1419,8 +1311,8 @@ export default function CertificateDetail() {
                 body={revokeBody}
                 toggle={() => setRevoke(false)}
                 buttons={[
-                    {color: "primary", onClick: onRevoke, body: "Revoke"},
-                    {color: "secondary", onClick: () => setRevoke(false), body: "Cancel"},
+                    { color: "primary", onClick: onRevoke, body: "Revoke" },
+                    { color: "secondary", onClick: () => setRevoke(false), body: "Cancel" },
                 ]}
             />
 
@@ -1438,20 +1330,16 @@ export default function CertificateDetail() {
                 caption={`Push certificate to the Location`}
                 toggle={() => setAddCertToLocation(false)}
                 buttons={[]}
-                body={(
+                body={
                     <>
-
                         <Form
                             onSubmit={(values: any) => {
                                 onAddCertToLocations(values);
                             }}
-                            mutators={{...mutators()}}
+                            mutators={{ ...mutators() }}
                         >
-
-                            {({handleSubmit, submitting, valid}) => (
-
+                            {({ handleSubmit, submitting, valid }) => (
                                 <BootstrapForm onSubmit={handleSubmit}>
-
                                     <Label>Locations</Label>
 
                                     <CustomTable
@@ -1463,25 +1351,28 @@ export default function CertificateDetail() {
                                         onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
                                     />
 
-                                    <br/>
+                                    <br />
 
-                                    <TabLayout tabs={[
-                                        {
-                                            title: "Location Attributes",
-                                            content: locationAttributeDescriptors ? (<AttributeEditor
-                                                id="locationAttributes"
-                                                attributeDescriptors={locationAttributeDescriptors}
-                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                            />) : <></>,
-                                        },
-                                    ]}/>
-
+                                    <TabLayout
+                                        tabs={[
+                                            {
+                                                title: "Location Attributes",
+                                                content: locationAttributeDescriptors ? (
+                                                    <AttributeEditor
+                                                        id="locationAttributes"
+                                                        attributeDescriptors={locationAttributeDescriptors}
+                                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                                    />
+                                                ) : (
+                                                    <></>
+                                                ),
+                                            },
+                                        ]}
+                                    />
 
                                     <div className="d-flex justify-content-end">
-
                                         <ButtonGroup>
-
                                             <ProgressButton
                                                 title="Push"
                                                 inProgressTitle="Pushing..."
@@ -1489,59 +1380,49 @@ export default function CertificateDetail() {
                                                 disabled={selectLocationsCheckedRows.length === 0 || !valid}
                                             />
 
-                                            <Button
-                                                color="default"
-                                                onClick={() => setAddCertToLocation(false)}
-                                                disabled={submitting}
-                                            >
+                                            <Button color="default" onClick={() => setAddCertToLocation(false)} disabled={submitting}>
                                                 Cancel
                                             </Button>
-
                                         </ButtonGroup>
-
                                     </div>
-
-
                                 </BootstrapForm>
-
                             )}
-
                         </Form>
 
-                        <Spinner active={isPushingCertificate || isFetchingLocationPushAttributeDescriptors}/>
-
+                        <Spinner active={isPushingCertificate || isFetchingLocationPushAttributeDescriptors} />
                     </>
-
-                )}
+                }
             />
 
             <Dialog
                 isOpen={confirmRemove}
                 caption={`Remove Certificate from Location`}
-                body={(
+                body={
                     <>
-                        You are about to remove a Certificate from selected locations:<br/><br/>
-                        {
-                            locationsCheckedRows.map(
-                                uuid => {
-                                    const loc = certLocations?.find(l => l.uuid === uuid);
-                                    return loc ? <>{loc.name}<br/></> : <></>;
-                                },
-                            )
-                        }
-                        <br/>
+                        You are about to remove a Certificate from selected locations:
+                        <br />
+                        <br />
+                        {locationsCheckedRows.map((uuid) => {
+                            const loc = certLocations?.find((l) => l.uuid === uuid);
+                            return loc ? (
+                                <>
+                                    {loc.name}
+                                    <br />
+                                </>
+                            ) : (
+                                <></>
+                            );
+                        })}
+                        <br />
                         Is this what you want to do?
                     </>
-                )}
+                }
                 toggle={() => setConfirmRemove(false)}
                 buttons={[
-                    {color: "primary", onClick: onRemove, body: "Remove"},
-                    {color: "secondary", onClick: () => setConfirmRemove(false), body: "Cancel"},
+                    { color: "primary", onClick: onRemove, body: "Remove" },
+                    { color: "secondary", onClick: () => setConfirmRemove(false), body: "Cancel" },
                 ]}
             />
-
         </Container>
-
     );
-
 }

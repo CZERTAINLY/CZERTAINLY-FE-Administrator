@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CodeBlockAttributeContentData,
-} from './';
+import type { CodeBlockAttributeContentData } from "./";
 
 /**
  * @export

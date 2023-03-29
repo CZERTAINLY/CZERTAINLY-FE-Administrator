@@ -17,9 +17,8 @@
  * @enum {string}
  */
 export enum DiscoveryStatus {
-    InProgress = 'inProgress',
-    Failed = 'failed',
-    Completed = 'completed',
-    Warning = 'warning'
+    InProgress = "inProgress",
+    Failed = "failed",
+    Completed = "completed",
+    Warning = "warning",
 }
-

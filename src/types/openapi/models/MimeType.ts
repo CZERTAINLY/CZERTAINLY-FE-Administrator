@@ -31,7 +31,7 @@ export interface MimeType {
      * @type {{ [key: string]: string; }}
      * @memberof MimeType
      */
-    parameters?: { [key: string]: string; };
+    parameters?: { [key: string]: string };
     /**
      * @type {boolean}
      * @memberof MimeType

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -6,135 +6,102 @@ import { Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/auth";
 
+import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-
 
 export default function UserProfileDetail() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-   const dispatch = useDispatch();
-   const navigate = useNavigate();
+    const profile = useSelector(selectors.profile);
+    const isFetchingDetail = useSelector(selectors.isFetchingProfile);
 
-   const profile = useSelector(selectors.profile);
-   const isFetchingDetail = useSelector(selectors.isFetchingProfile);
+    useEffect(() => {
+        dispatch(actions.getProfile());
+    }, [dispatch]);
 
-   useEffect(
+    const onEditClick = useCallback(() => {
+        navigate(`./edit`);
+    }, [navigate]);
 
-      () => {
-         dispatch(actions.getProfile());
-      },
-      [dispatch]
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: "pencil",
+                disabled: profile?.systemUser || false,
+                tooltip: "Edit",
+                onClick: () => {
+                    onEditClick();
+                },
+            },
+        ],
+        [profile, onEditClick],
+    );
 
-   );
+    const attributesTitle = useMemo(
+        () => (
+            <div>
+                <div className="fa-pull-right mt-n-xs">
+                    <WidgetButtons buttons={buttons} />
+                </div>
 
-
-   const onEditClick = useCallback(
-
-      () => {
-
-         navigate(`./edit`);
-
-      },
-      [navigate]
-
-   );
-
-
-   const buttons: WidgetButtonProps[] = useMemo(
-
-      () => [
-         { icon: "pencil", disabled: profile?.systemUser || false, tooltip: "Edit", onClick: () => { onEditClick(); } },
-      ],
-      [profile, onEditClick]
-
-   );
-
-
-   const attributesTitle = useMemo(
-
-      () => (
-
-         <div>
-
-            <div className="fa-pull-right mt-n-xs">
-               <WidgetButtons buttons={buttons} />
+                <h5>
+                    User <span className="fw-semi-bold">Details</span>
+                </h5>
             </div>
+        ),
+        [buttons],
+    );
 
-            <h5>
-               User <span className="fw-semi-bold">Details</span>
-            </h5>
+    const detailHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "property",
+                content: "Property",
+            },
+            {
+                id: "value",
+                content: "Value",
+            },
+        ],
+        [],
+    );
 
-         </div>
+    const detailData: TableDataRow[] = useMemo(
+        () =>
+            !profile
+                ? []
+                : [
+                      {
+                          id: "username",
+                          columns: ["Username", profile.username],
+                      },
+                      {
+                          id: "description",
+                          columns: ["Description", profile.description || ""],
+                      },
+                      {
+                          id: "firstName",
+                          columns: ["First name", profile.firstName || ""],
+                      },
+                      {
+                          id: "lastName",
+                          columns: ["Last name", profile.lastName || ""],
+                      },
+                      {
+                          id: "email",
+                          columns: ["Email", profile.email || ""],
+                      },
+                  ],
+        [profile],
+    );
 
-      ), [buttons]
-
-   );
-
-
-   const detailHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "property",
-            content: "Property",
-         },
-         {
-            id: "value",
-            content: "Value",
-         },
-      ],
-      []
-
-   );
-
-
-   const detailData: TableDataRow[] = useMemo(
-
-      () => !profile ? [] : [
-         {
-            id: "username",
-            columns: ["Username", profile.username]
-         },
-         {
-            id: "description",
-            columns: ["Description", profile.description || ""]
-         },
-         {
-            id: "firstName",
-            columns: ["First name", profile.firstName || ""]
-         },
-         {
-            id: "lastName",
-            columns: ["Last name", profile.lastName || ""]
-         },
-         {
-            id: "email",
-            columns: ["Email", profile.email || ""]
-         }
-      ],
-      [profile]
-
-   );
-
-
-   return (
-
-      <Container className="themed-container" fluid>
-
-         <Widget title={attributesTitle} busy={isFetchingDetail}>
-
-            <CustomTable
-               headers={detailHeaders}
-               data={detailData}
-            />
-
-         </Widget>
-
-      </Container>
-
-   );
-
-
+    return (
+        <Container className="themed-container" fluid>
+            <Widget title={attributesTitle} busy={isFetchingDetail}>
+                <CustomTable headers={detailHeaders} data={detailData} />
+            </Widget>
+        </Container>
+    );
 }
-

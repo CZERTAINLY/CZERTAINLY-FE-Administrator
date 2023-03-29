@@ -17,8 +17,7 @@
  * @enum {string}
  */
 export enum HealthStatus {
-    Ok = 'ok',
-    Nok = 'nok',
-    Unknown = 'unknown'
+    Ok = "ok",
+    Nok = "nok",
+    Unknown = "unknown",
 }
-

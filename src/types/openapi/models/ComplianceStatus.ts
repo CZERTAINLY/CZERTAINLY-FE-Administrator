@@ -17,8 +17,7 @@
  * @enum {string}
  */
 export enum ComplianceStatus {
-    Ok = 'ok',
-    Nok = 'nok',
-    Na = 'na'
+    Ok = "ok",
+    Nok = "nok",
+    Na = "na",
 }
-

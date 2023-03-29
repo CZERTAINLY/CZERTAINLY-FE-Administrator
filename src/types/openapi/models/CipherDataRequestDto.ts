@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CipherRequestData,
-    RequestAttributeDto,
-} from './';
+import type { CipherRequestData, RequestAttributeDto } from "./";
 
 /**
  * @export

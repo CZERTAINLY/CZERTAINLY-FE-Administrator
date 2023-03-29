@@ -11,22 +11,20 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
-import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
 import type {
     ActivateAcmeForRaProfileRequestDto,
     AddRaProfileRequestDto,
-    AuthenticationServiceExceptionDto,
     BaseAttributeDto,
     EditRaProfileRequestDto,
-    ErrorMessageDto,
     RaProfileAcmeDetailResponseDto,
     RaProfileDto,
     SimplifiedComplianceProfileDto,
     UuidDto,
-} from '../models';
+} from "../models";
+import type { HttpHeaders, HttpQuery, OperationOpts } from "../runtime";
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
 
 export interface ActivateAcmeForRaProfileRequest {
     authorityUuid: string;
@@ -123,332 +121,500 @@ export interface ListRaProfilesRequest {
  * no description
  */
 export class RAProfileManagementApi extends BaseAPI {
-
     /**
      * Activate ACME for RA Profile
      */
-    activateAcmeForRaProfile({ authorityUuid, raProfileUuid, acmeProfileUuid, activateAcmeForRaProfileRequestDto }: ActivateAcmeForRaProfileRequest): Observable<RaProfileAcmeDetailResponseDto>
-    activateAcmeForRaProfile({ authorityUuid, raProfileUuid, acmeProfileUuid, activateAcmeForRaProfileRequestDto }: ActivateAcmeForRaProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileAcmeDetailResponseDto>>
-    activateAcmeForRaProfile({ authorityUuid, raProfileUuid, acmeProfileUuid, activateAcmeForRaProfileRequestDto }: ActivateAcmeForRaProfileRequest, opts?: OperationOpts): Observable<RaProfileAcmeDetailResponseDto | AjaxResponse<RaProfileAcmeDetailResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'activateAcmeForRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'activateAcmeForRaProfile');
-        throwIfNullOrUndefined(acmeProfileUuid, 'acmeProfileUuid', 'activateAcmeForRaProfile');
-        throwIfNullOrUndefined(activateAcmeForRaProfileRequestDto, 'activateAcmeForRaProfileRequestDto', 'activateAcmeForRaProfile');
+    activateAcmeForRaProfile({
+        authorityUuid,
+        raProfileUuid,
+        acmeProfileUuid,
+        activateAcmeForRaProfileRequestDto,
+    }: ActivateAcmeForRaProfileRequest): Observable<RaProfileAcmeDetailResponseDto>;
+    activateAcmeForRaProfile(
+        { authorityUuid, raProfileUuid, acmeProfileUuid, activateAcmeForRaProfileRequestDto }: ActivateAcmeForRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<RaProfileAcmeDetailResponseDto>>;
+    activateAcmeForRaProfile(
+        { authorityUuid, raProfileUuid, acmeProfileUuid, activateAcmeForRaProfileRequestDto }: ActivateAcmeForRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<RaProfileAcmeDetailResponseDto | AjaxResponse<RaProfileAcmeDetailResponseDto>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "activateAcmeForRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "activateAcmeForRaProfile");
+        throwIfNullOrUndefined(acmeProfileUuid, "acmeProfileUuid", "activateAcmeForRaProfile");
+        throwIfNullOrUndefined(activateAcmeForRaProfileRequestDto, "activateAcmeForRaProfileRequestDto", "activateAcmeForRaProfile");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<RaProfileAcmeDetailResponseDto>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/acme/activate/{acmeProfileUuid}'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)).replace('{acmeProfileUuid}', encodeURI(acmeProfileUuid)),
-            method: 'PATCH',
-            headers,
-            body: activateAcmeForRaProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<RaProfileAcmeDetailResponseDto>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/acme/activate/{acmeProfileUuid}"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
+                    .replace("{acmeProfileUuid}", encodeURI(acmeProfileUuid)),
+                method: "PATCH",
+                headers,
+                body: activateAcmeForRaProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete multiple RA Profiles
      */
-    bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest): Observable<void>
-    bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest): Observable<void>;
+    bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteRaProfile');
+        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteRaProfile");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<void>({
-            url: '/v1/raProfiles',
-            method: 'DELETE',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/raProfiles",
+                method: "DELETE",
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable multiple RA Profiles
      */
-    bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest): Observable<void>
-    bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest): Observable<void>;
+    bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableRaProfile');
+        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDisableRaProfile");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<void>({
-            url: '/v1/raProfiles/disable',
-            method: 'PATCH',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/raProfiles/disable",
+                method: "PATCH",
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable multiple RA Profiles
      */
-    bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest): Observable<void>
-    bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest): Observable<void>;
+    bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableRaProfile');
+        throwIfNullOrUndefined(requestBody, "requestBody", "bulkEnableRaProfile");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<void>({
-            url: '/v1/raProfiles/enable',
-            method: 'PATCH',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/raProfiles/enable",
+                method: "PATCH",
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Initiate Certificate Compliance Check
      */
-    checkRaProfileCompliance({ requestBody }: CheckRaProfileComplianceRequest): Observable<void>
-    checkRaProfileCompliance({ requestBody }: CheckRaProfileComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    checkRaProfileCompliance({ requestBody }: CheckRaProfileComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, 'requestBody', 'checkRaProfileCompliance');
+    checkRaProfileCompliance({ requestBody }: CheckRaProfileComplianceRequest): Observable<void>;
+    checkRaProfileCompliance({ requestBody }: CheckRaProfileComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    checkRaProfileCompliance(
+        { requestBody }: CheckRaProfileComplianceRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, "requestBody", "checkRaProfileCompliance");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<void>({
-            url: '/v1/raProfiles/compliance',
-            method: 'POST',
-            headers,
-            body: requestBody,
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/raProfiles/compliance",
+                method: "POST",
+                headers,
+                body: requestBody,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Create RA Profile
      */
-    createRaProfile({ authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest): Observable<UuidDto>
-    createRaProfile({ authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
-    createRaProfile({ authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'createRaProfile');
-        throwIfNullOrUndefined(addRaProfileRequestDto, 'addRaProfileRequestDto', 'createRaProfile');
+    createRaProfile({ authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest): Observable<UuidDto>;
+    createRaProfile(
+        { authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<UuidDto>>;
+    createRaProfile(
+        { authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<UuidDto | AjaxResponse<UuidDto>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "createRaProfile");
+        throwIfNullOrUndefined(addRaProfileRequestDto, "addRaProfileRequestDto", "createRaProfile");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles'.replace('{authorityUuid}', encodeURI(authorityUuid)),
-            method: 'POST',
-            headers,
-            body: addRaProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<UuidDto>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles".replace("{authorityUuid}", encodeURI(authorityUuid)),
+                method: "POST",
+                headers,
+                body: addRaProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Deactivate ACME for RA Profile
      */
-    deactivateAcmeForRaProfile({ authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest): Observable<void>
-    deactivateAcmeForRaProfile({ authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    deactivateAcmeForRaProfile({ authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'deactivateAcmeForRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deactivateAcmeForRaProfile');
+    deactivateAcmeForRaProfile({ authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest): Observable<void>;
+    deactivateAcmeForRaProfile(
+        { authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    deactivateAcmeForRaProfile(
+        { authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "deactivateAcmeForRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deactivateAcmeForRaProfile");
 
-        return this.request<void>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/acme/deactivate'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/acme/deactivate"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "PATCH",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete RA Profile
      */
-    deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest): Observable<void>
-    deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest): Observable<void>;
+    deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'deleteRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deleteRaProfile');
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "deleteRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deleteRaProfile");
 
-        return this.request<void>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "DELETE",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Delete RA Profile
      */
-    deleteRaProfileWithoutAuthority({ raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest): Observable<void>
-    deleteRaProfileWithoutAuthority({ raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    deleteRaProfileWithoutAuthority({ raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deleteRaProfileWithoutAuthority');
+    deleteRaProfileWithoutAuthority({ raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest): Observable<void>;
+    deleteRaProfileWithoutAuthority(
+        { raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    deleteRaProfileWithoutAuthority(
+        { raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deleteRaProfileWithoutAuthority");
 
-        return this.request<void>({
-            url: '/v1/raProfiles/{raProfileUuid}'.replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'DELETE',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/raProfiles/{raProfileUuid}".replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "DELETE",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Disable RA Profiles
      */
-    disableRaProfile({ authorityUuid, raProfileUuid }: DisableRaProfileRequest): Observable<void>
-    disableRaProfile({ authorityUuid, raProfileUuid }: DisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    disableRaProfile({ authorityUuid, raProfileUuid }: DisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'disableRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'disableRaProfile');
+    disableRaProfile({ authorityUuid, raProfileUuid }: DisableRaProfileRequest): Observable<void>;
+    disableRaProfile(
+        { authorityUuid, raProfileUuid }: DisableRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    disableRaProfile(
+        { authorityUuid, raProfileUuid }: DisableRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "disableRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "disableRaProfile");
 
-        return this.request<void>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/disable'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/disable"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "PATCH",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Edit RA Profile
      */
-    editRaProfile({ authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest): Observable<RaProfileDto>
-    editRaProfile({ authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileDto>>
-    editRaProfile({ authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest, opts?: OperationOpts): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'editRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'editRaProfile');
-        throwIfNullOrUndefined(editRaProfileRequestDto, 'editRaProfileRequestDto', 'editRaProfile');
+    editRaProfile({ authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest): Observable<RaProfileDto>;
+    editRaProfile(
+        { authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<RaProfileDto>>;
+    editRaProfile(
+        { authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "editRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "editRaProfile");
+        throwIfNullOrUndefined(editRaProfileRequestDto, "editRaProfileRequestDto", "editRaProfile");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<RaProfileDto>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'PUT',
-            headers,
-            body: editRaProfileRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<RaProfileDto>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "PUT",
+                headers,
+                body: editRaProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Enable RA Profiles
      */
-    enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest): Observable<void>
-    enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest): Observable<void>;
+    enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'enableRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'enableRaProfile');
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "enableRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "enableRaProfile");
 
-        return this.request<void>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/enable'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'PATCH',
-        }, opts?.responseOpts);
-    };
+        return this.request<void>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/enable"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "PATCH",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get ACME details for RA Profile
      */
-    getAcmeForRaProfile({ authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest): Observable<RaProfileAcmeDetailResponseDto>
-    getAcmeForRaProfile({ authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileAcmeDetailResponseDto>>
-    getAcmeForRaProfile({ authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest, opts?: OperationOpts): Observable<RaProfileAcmeDetailResponseDto | AjaxResponse<RaProfileAcmeDetailResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getAcmeForRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getAcmeForRaProfile');
+    getAcmeForRaProfile({ authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest): Observable<RaProfileAcmeDetailResponseDto>;
+    getAcmeForRaProfile(
+        { authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<RaProfileAcmeDetailResponseDto>>;
+    getAcmeForRaProfile(
+        { authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<RaProfileAcmeDetailResponseDto | AjaxResponse<RaProfileAcmeDetailResponseDto>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAcmeForRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAcmeForRaProfile");
 
-        return this.request<RaProfileAcmeDetailResponseDto>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/acme'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<RaProfileAcmeDetailResponseDto>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/acme"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get Compliance Profiles for an RA Profile
      */
-    getAssociatedComplianceProfiles({ authorityUuid, raProfileUuid }: GetAssociatedComplianceProfilesRequest): Observable<Array<SimplifiedComplianceProfileDto>>
-    getAssociatedComplianceProfiles({ authorityUuid, raProfileUuid }: GetAssociatedComplianceProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<SimplifiedComplianceProfileDto>>>
-    getAssociatedComplianceProfiles({ authorityUuid, raProfileUuid }: GetAssociatedComplianceProfilesRequest, opts?: OperationOpts): Observable<Array<SimplifiedComplianceProfileDto> | AjaxResponse<Array<SimplifiedComplianceProfileDto>>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getAssociatedComplianceProfiles');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getAssociatedComplianceProfiles');
+    getAssociatedComplianceProfiles({
+        authorityUuid,
+        raProfileUuid,
+    }: GetAssociatedComplianceProfilesRequest): Observable<Array<SimplifiedComplianceProfileDto>>;
+    getAssociatedComplianceProfiles(
+        { authorityUuid, raProfileUuid }: GetAssociatedComplianceProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<SimplifiedComplianceProfileDto>>>;
+    getAssociatedComplianceProfiles(
+        { authorityUuid, raProfileUuid }: GetAssociatedComplianceProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<SimplifiedComplianceProfileDto> | AjaxResponse<Array<SimplifiedComplianceProfileDto>>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAssociatedComplianceProfiles");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAssociatedComplianceProfiles");
 
-        return this.request<Array<SimplifiedComplianceProfileDto>>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/complianceProfiles'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<SimplifiedComplianceProfileDto>>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/complianceProfiles"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Details of RA Profile
      */
-    getRaProfile({ authorityUuid, raProfileUuid }: GetRaProfileRequest): Observable<RaProfileDto>
-    getRaProfile({ authorityUuid, raProfileUuid }: GetRaProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileDto>>
-    getRaProfile({ authorityUuid, raProfileUuid }: GetRaProfileRequest, opts?: OperationOpts): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getRaProfile');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getRaProfile');
+    getRaProfile({ authorityUuid, raProfileUuid }: GetRaProfileRequest): Observable<RaProfileDto>;
+    getRaProfile({ authorityUuid, raProfileUuid }: GetRaProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileDto>>;
+    getRaProfile(
+        { authorityUuid, raProfileUuid }: GetRaProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getRaProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getRaProfile");
 
-        return this.request<RaProfileDto>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<RaProfileDto>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Details of RA Profile
      */
-    getRaProfileWithoutAuthority({ raProfileUuid }: GetRaProfileWithoutAuthorityRequest): Observable<RaProfileDto>
-    getRaProfileWithoutAuthority({ raProfileUuid }: GetRaProfileWithoutAuthorityRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileDto>>
-    getRaProfileWithoutAuthority({ raProfileUuid }: GetRaProfileWithoutAuthorityRequest, opts?: OperationOpts): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getRaProfileWithoutAuthority');
+    getRaProfileWithoutAuthority({ raProfileUuid }: GetRaProfileWithoutAuthorityRequest): Observable<RaProfileDto>;
+    getRaProfileWithoutAuthority(
+        { raProfileUuid }: GetRaProfileWithoutAuthorityRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<RaProfileDto>>;
+    getRaProfileWithoutAuthority(
+        { raProfileUuid }: GetRaProfileWithoutAuthorityRequest,
+        opts?: OperationOpts,
+    ): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getRaProfileWithoutAuthority");
 
-        return this.request<RaProfileDto>({
-            url: '/v1/raProfiles/{raProfileUuid}'.replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<RaProfileDto>(
+            {
+                url: "/v1/raProfiles/{raProfileUuid}".replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get issue Certificate Attributes
      */
-    listRaProfileIssueCertificateAttributes({ authorityUuid, raProfileUuid }: ListRaProfileIssueCertificateAttributesRequest): Observable<Array<BaseAttributeDto>>
-    listRaProfileIssueCertificateAttributes({ authorityUuid, raProfileUuid }: ListRaProfileIssueCertificateAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listRaProfileIssueCertificateAttributes({ authorityUuid, raProfileUuid }: ListRaProfileIssueCertificateAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'listRaProfileIssueCertificateAttributes');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'listRaProfileIssueCertificateAttributes');
+    listRaProfileIssueCertificateAttributes({
+        authorityUuid,
+        raProfileUuid,
+    }: ListRaProfileIssueCertificateAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listRaProfileIssueCertificateAttributes(
+        { authorityUuid, raProfileUuid }: ListRaProfileIssueCertificateAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listRaProfileIssueCertificateAttributes(
+        { authorityUuid, raProfileUuid }: ListRaProfileIssueCertificateAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "listRaProfileIssueCertificateAttributes");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "listRaProfileIssueCertificateAttributes");
 
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Get revocation Attributes
      */
-    listRaProfileRevokeCertificateAttributes({ authorityUuid, raProfileUuid }: ListRaProfileRevokeCertificateAttributesRequest): Observable<Array<BaseAttributeDto>>
-    listRaProfileRevokeCertificateAttributes({ authorityUuid, raProfileUuid }: ListRaProfileRevokeCertificateAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
-    listRaProfileRevokeCertificateAttributes({ authorityUuid, raProfileUuid }: ListRaProfileRevokeCertificateAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'listRaProfileRevokeCertificateAttributes');
-        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'listRaProfileRevokeCertificateAttributes');
+    listRaProfileRevokeCertificateAttributes({
+        authorityUuid,
+        raProfileUuid,
+    }: ListRaProfileRevokeCertificateAttributesRequest): Observable<Array<BaseAttributeDto>>;
+    listRaProfileRevokeCertificateAttributes(
+        { authorityUuid, raProfileUuid }: ListRaProfileRevokeCertificateAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
+    listRaProfileRevokeCertificateAttributes(
+        { authorityUuid, raProfileUuid }: ListRaProfileRevokeCertificateAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "listRaProfileRevokeCertificateAttributes");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "listRaProfileRevokeCertificateAttributes");
 
-        return this.request<Array<BaseAttributeDto>>({
-            url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<Array<BaseAttributeDto>>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * List of available RA Profiles
      */
-    listRaProfiles({ enabled }: ListRaProfilesRequest): Observable<Array<RaProfileDto>>
-    listRaProfiles({ enabled }: ListRaProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<RaProfileDto>>>
-    listRaProfiles({ enabled }: ListRaProfilesRequest, opts?: OperationOpts): Observable<Array<RaProfileDto> | AjaxResponse<Array<RaProfileDto>>> {
-
+    listRaProfiles({ enabled }: ListRaProfilesRequest): Observable<Array<RaProfileDto>>;
+    listRaProfiles({ enabled }: ListRaProfilesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<RaProfileDto>>>;
+    listRaProfiles(
+        { enabled }: ListRaProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<RaProfileDto> | AjaxResponse<Array<RaProfileDto>>> {
         const query: HttpQuery = {};
 
-        if (enabled != null) { query['enabled'] = enabled; }
+        if (enabled != null) {
+            query["enabled"] = enabled;
+        }
 
-        return this.request<Array<RaProfileDto>>({
-            url: '/v1/raProfiles',
-            method: 'GET',
-            query,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<Array<RaProfileDto>>(
+            {
+                url: "/v1/raProfiles",
+                method: "GET",
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

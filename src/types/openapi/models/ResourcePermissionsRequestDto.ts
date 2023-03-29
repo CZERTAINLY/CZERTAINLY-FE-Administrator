@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ObjectPermissionsRequestDto,
-} from './';
+import type { ObjectPermissionsRequestDto } from "./";
 
 /**
  * Resources

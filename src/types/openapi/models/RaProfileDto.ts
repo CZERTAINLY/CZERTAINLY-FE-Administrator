@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ResponseAttributeDto,
-} from './';
+import type { ResponseAttributeDto } from "./";
 
 /**
  * @export

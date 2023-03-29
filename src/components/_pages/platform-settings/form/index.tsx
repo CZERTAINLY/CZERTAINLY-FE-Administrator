@@ -21,13 +21,15 @@ export default function PlatformSettingsForm() {
 
     const isBusy = useMemo(() => isFetchingPlatform || isUpdatingPlatform, [isFetchingPlatform, isUpdatingPlatform]);
 
-    const emptySettings = useMemo(() => ({ utils: { } }), []);
+    const emptySettings = useMemo(() => ({ utils: {} }), []);
 
-    const onSubmit = useCallback((values: SettingsPlatformModel) => {
-        const requestSettings = values.utils ? values : emptySettings;
-        dispatch(actions.updatePlatformSettings(requestSettings));
-    }, [dispatch, emptySettings]);
-
+    const onSubmit = useCallback(
+        (values: SettingsPlatformModel) => {
+            const requestSettings = values.utils ? values : emptySettings;
+            dispatch(actions.updatePlatformSettings(requestSettings));
+        },
+        [dispatch, emptySettings],
+    );
 
     useEffect(() => {
         if (!platformSettings) {
@@ -40,7 +42,7 @@ export default function PlatformSettingsForm() {
             return undefined;
         }
         return "Please enter valid URL.";
-    }
+    };
 
     const validateHealthUrl = async (url?: string): Promise<string | undefined> => {
         if (!url) {
@@ -54,12 +56,12 @@ export default function PlatformSettingsForm() {
         } catch {
             return error;
         }
-    }
+    };
 
     class DebouncingHealthValidation {
-        clearTimeout = () => { };
+        clearTimeout = () => {};
         validateHealth = (url?: string) => {
-            return new Promise<string | undefined>(resolve => {
+            return new Promise<string | undefined>((resolve) => {
                 this.clearTimeout();
 
                 const timerId = setTimeout(() => {
@@ -71,44 +73,51 @@ export default function PlatformSettingsForm() {
                     resolve(undefined);
                 };
             });
-        }
+        };
     }
 
     const debouncingHealthValidation = new DebouncingHealthValidation();
 
     return (
         <Widget title="Platform Settings" busy={isBusy}>
+            <TabLayout
+                tabs={[
+                    {
+                        title: "Utils",
+                        content: (
+                            <div style={{ paddingTop: "1.5em", paddingBottom: "1.5em" }}>
+                                <Form<SettingsPlatformModel> initialValues={platformSettings ?? emptySettings} onSubmit={onSubmit}>
+                                    {({ handleSubmit, pristine, submitting, valid }) => {
+                                        return (
+                                            <BootstrapForm onSubmit={handleSubmit}>
+                                                <TextField
+                                                    label={"Utils Service URL"}
+                                                    id={"utils.utilsServiceUrl"}
+                                                    validators={[validateUrl, debouncingHealthValidation.validateHealth]}
+                                                />
 
-            <TabLayout tabs={[{
-                title: "Utils",
-                content: <div style={{ paddingTop: "1.5em", paddingBottom: "1.5em" }}>
-                    <Form<SettingsPlatformModel> initialValues={platformSettings ?? emptySettings} onSubmit={onSubmit}>
-                        {({ handleSubmit, pristine, submitting, valid }) => {
-                            return (
-                                <BootstrapForm onSubmit={handleSubmit}>
-
-                                    <TextField label={"Utils Service URL"} id={"utils.utilsServiceUrl"} validators={[validateUrl, debouncingHealthValidation.validateHealth]} />
-
-                                    <div className="d-flex justify-content-end">
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                title={"Save"}
-                                                inProgressTitle={"Saving..."}
-                                                inProgress={submitting}
-                                                disabled={pristine || submitting || !valid}
-                                            />
-                                            <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
-
-                                </BootstrapForm>
-                            )
-                        }}
-                    </Form>
-                </div>
-            }]} />
+                                                <div className="d-flex justify-content-end">
+                                                    <ButtonGroup>
+                                                        <ProgressButton
+                                                            title={"Save"}
+                                                            inProgressTitle={"Saving..."}
+                                                            inProgress={submitting}
+                                                            disabled={pristine || submitting || !valid}
+                                                        />
+                                                        <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
+                                                            Cancel
+                                                        </Button>
+                                                    </ButtonGroup>
+                                                </div>
+                                            </BootstrapForm>
+                                        );
+                                    }}
+                                </Form>
+                            </div>
+                        ),
+                    },
+                ]}
+            />
         </Widget>
     );
 }

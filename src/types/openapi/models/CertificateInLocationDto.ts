@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    MetadataResponseDto,
-    ResponseAttributeDto,
-} from './';
+import type { MetadataResponseDto, ResponseAttributeDto } from "./";
 
 /**
  * List of Certificates in Location

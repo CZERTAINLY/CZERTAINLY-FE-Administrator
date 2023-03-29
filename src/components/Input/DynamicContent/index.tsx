@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Field, useForm, useFormState } from "react-final-form";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
@@ -7,14 +5,25 @@ import { AttributeContentType } from "types/openapi";
 import { composeValidators, validateAlphaNumeric, validateFloat, validateInteger, validateRequired } from "utils/validators";
 import ContentDescriptorField from "./ContentDescriptorField";
 
-const AllowedAttributeContentType = [AttributeContentType.String, AttributeContentType.Integer, AttributeContentType.Boolean, AttributeContentType.Date, AttributeContentType.Float, AttributeContentType.Text, AttributeContentType.Time, AttributeContentType.Datetime];
+const AllowedAttributeContentType = [
+    AttributeContentType.String,
+    AttributeContentType.Integer,
+    AttributeContentType.Boolean,
+    AttributeContentType.Date,
+    AttributeContentType.Float,
+    AttributeContentType.Text,
+    AttributeContentType.Time,
+    AttributeContentType.Datetime,
+];
 
 type Props = {
     editable: boolean;
     isList: boolean;
-}
+};
 
-export const ContentFieldConfiguration: ({ [key: string]: { validators?: ((value: any) => (undefined | string))[], type: InputType, initial: string | boolean | number } }) = {
+export const ContentFieldConfiguration: {
+    [key: string]: { validators?: ((value: any) => undefined | string)[]; type: InputType; initial: string | boolean | number };
+} = {
     [AttributeContentType.Text]: {
         validators: [validateAlphaNumeric()],
         type: "textarea",
@@ -53,7 +62,7 @@ export const ContentFieldConfiguration: ({ [key: string]: { validators?: ((value
     },
 };
 
-export default function DynamicContent({editable, isList}: Props) {
+export default function DynamicContent({ editable, isList }: Props) {
     const form = useForm();
     const formState = useFormState();
     const contentTypeValue = formState.values["contentType"];
@@ -61,7 +70,7 @@ export default function DynamicContent({editable, isList}: Props) {
     return (
         <>
             <Field name="contentType" validate={composeValidators(validateRequired())}>
-                {({input, meta}) => (
+                {({ input, meta }) => (
                     <FormGroup>
                         <Label for="contentType">Content Type</Label>
                         <Input
@@ -77,7 +86,7 @@ export default function DynamicContent({editable, isList}: Props) {
                                 form.change("content", []);
                             }}
                         >
-                            {AllowedAttributeContentType.map(contentType => (
+                            {AllowedAttributeContentType.map((contentType) => (
                                 <option key={contentType} value={contentType}>
                                     {contentType}
                                 </option>

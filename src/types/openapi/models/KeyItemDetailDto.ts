@@ -11,15 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CryptographicAlgorithm,
-    KeyCompromiseReason,
-    KeyFormat,
-    KeyState,
-    KeyType,
-    KeyUsage,
-    MetadataResponseDto,
-} from './';
+import type { CryptographicAlgorithm, KeyCompromiseReason, KeyFormat, KeyState, KeyType, KeyUsage, MetadataResponseDto } from "./";
 
 /**
  * Key Objects
@@ -101,5 +93,3 @@ export interface KeyItemDetailDto {
      */
     reason?: KeyCompromiseReason;
 }
-
-

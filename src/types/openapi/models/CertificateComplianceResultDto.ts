@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceRuleStatus,
-    ResponseAttributeDto,
-} from './';
+import type { ComplianceRuleStatus, ResponseAttributeDto } from "./";
 
 /**
  * Certificate compliance check result
@@ -52,5 +49,3 @@ export interface CertificateComplianceResultDto {
      */
     attributes?: Array<ResponseAttributeDto>;
 }
-
-

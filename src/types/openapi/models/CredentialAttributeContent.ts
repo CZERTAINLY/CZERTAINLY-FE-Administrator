@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CredentialAttributeContentData,
-} from './';
+import type { CredentialAttributeContentData } from "./";
 
 /**
  * @export

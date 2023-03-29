@@ -1,4 +1,4 @@
-import { AuditLogFilter, AuditLogDto as AuditLogDtoOpenApi, AuditLogResponseDto, Pageable } from "./openapi";
+import { AuditLogDto as AuditLogDtoOpenApi, AuditLogFilter, AuditLogResponseDto, Pageable } from "./openapi";
 
 export type PageableDto = Pageable;
 export type PageableModel = PageableDto;

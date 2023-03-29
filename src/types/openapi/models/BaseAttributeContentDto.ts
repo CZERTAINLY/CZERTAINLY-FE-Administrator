@@ -25,11 +25,24 @@ import type {
     StringAttributeContent,
     TextAttributeContent,
     TimeAttributeContent,
-} from './';
+} from "./";
 
 /**
  * @type BaseAttributeContentDto
  * Base Attribute content definition
  * @export
  */
-export type BaseAttributeContentDto = BooleanAttributeContent | CodeBlockAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;
+export type BaseAttributeContentDto =
+    | BooleanAttributeContent
+    | CodeBlockAttributeContent
+    | CredentialAttributeContent
+    | DateAttributeContent
+    | DateTimeAttributeContent
+    | FileAttributeContent
+    | FloatAttributeContent
+    | IntegerAttributeContent
+    | ObjectAttributeContent
+    | SecretAttributeContent
+    | StringAttributeContent
+    | TextAttributeContent
+    | TimeAttributeContent;

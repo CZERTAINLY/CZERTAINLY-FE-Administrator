@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestAttributeDto,
-} from './';
+import type { RequestAttributeDto } from "./";
 
 /**
  * @export
@@ -45,15 +43,14 @@ export interface ClientCertificateRevocationDto {
  * @enum {string}
  */
 export enum ClientCertificateRevocationDtoReasonEnum {
-    Unspecified = 'UNSPECIFIED',
-    KeyCompromise = 'KEY_COMPROMISE',
-    CaCompromise = 'CA_COMPROMISE',
-    AffiliationChanged = 'AFFILIATION_CHANGED',
-    Superseded = 'SUPERSEDED',
-    CessationOfOperation = 'CESSATION_OF_OPERATION',
-    CertificateHold = 'CERTIFICATE_HOLD',
-    RemoveFromCrl = 'REMOVE_FROM_CRL',
-    PrivilegesWithdrawn = 'PRIVILEGES_WITHDRAWN',
-    AaCompromise = 'AA_COMPROMISE'
+    Unspecified = "UNSPECIFIED",
+    KeyCompromise = "KEY_COMPROMISE",
+    CaCompromise = "CA_COMPROMISE",
+    AffiliationChanged = "AFFILIATION_CHANGED",
+    Superseded = "SUPERSEDED",
+    CessationOfOperation = "CESSATION_OF_OPERATION",
+    CertificateHold = "CERTIFICATE_HOLD",
+    RemoveFromCrl = "REMOVE_FROM_CRL",
+    PrivilegesWithdrawn = "PRIVILEGES_WITHDRAWN",
+    AaCompromise = "AA_COMPROMISE",
 }
-

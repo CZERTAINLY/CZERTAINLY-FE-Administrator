@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ComplianceProviderSummaryDto,
-} from './';
+import type { ComplianceProviderSummaryDto } from "./";
 
 /**
  * @export

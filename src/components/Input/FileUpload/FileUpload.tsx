@@ -8,7 +8,7 @@ interface Props {
     showContent?: boolean;
 }
 
-export default function FileUpload({id = "", fileType = "", onFileContentLoaded, showContent = true}: Props) {
+export default function FileUpload({ id = "", fileType = "", onFileContentLoaded, showContent = true }: Props) {
     const [fileContent, setFileContent] = useState("");
     const [fileName, setFileName] = useState("");
     const [contentType, setContentType] = useState("");
@@ -23,13 +23,18 @@ export default function FileUpload({id = "", fileType = "", onFileContentLoaded,
             setFileName(fileName);
             setContentType(contentType);
             onFileContentLoaded(fileContent);
-        }, [onFileContentLoaded]);
+        },
+        [onFileContentLoaded],
+    );
 
-    const createReader = useCallback((file: File) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (data) => onFileLoaded(data, file.name);
-    }, [onFileLoaded]);
+    const createReader = useCallback(
+        (file: File) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (data) => onFileLoaded(data, file.name);
+        },
+        [onFileLoaded],
+    );
 
     const onFileChanged = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,11 +62,12 @@ export default function FileUpload({id = "", fileType = "", onFileContentLoaded,
     const onFileDragOver = useCallback((e: React.DragEvent<HTMLInputElement>) => e.preventDefault(), []);
 
     return (
-        <div className="border border-light rounded mb-0"
-             style={{padding: "1em", borderStyle: "dashed", borderWidth: "2px"}}
-             onDrop={onFileDrop}
-             onDragOver={onFileDragOver}>
-
+        <div
+            className="border border-light rounded mb-0"
+            style={{ padding: "1em", borderStyle: "dashed", borderWidth: "2px" }}
+            onDrop={onFileDrop}
+            onDragOver={onFileDragOver}
+        >
             <Row>
                 <Col>
                     <FormGroup>
@@ -71,7 +77,7 @@ export default function FileUpload({id = "", fileType = "", onFileContentLoaded,
                             type="text"
                             placeholder="File not selected"
                             disabled={true}
-                            style={{textAlign: "center"}}
+                            style={{ textAlign: "center" }}
                             value={fileName}
                         />
                     </FormGroup>
@@ -85,14 +91,14 @@ export default function FileUpload({id = "", fileType = "", onFileContentLoaded,
                             type="text"
                             placeholder="File not selected"
                             disabled={true}
-                            style={{textAlign: "center"}}
+                            style={{ textAlign: "center" }}
                             value={contentType}
                         />
                     </FormGroup>
                 </Col>
             </Row>
 
-            {showContent &&
+            {showContent && (
                 <FormGroup>
                     <Label for={`${id}__fileUpload__fileContent`}>File content</Label>
                     <Input
@@ -104,14 +110,16 @@ export default function FileUpload({id = "", fileType = "", onFileContentLoaded,
                         value={fileContent}
                     />
                 </FormGroup>
-            }
+            )}
 
-            <FormGroup style={{textAlign: "right"}}>
-                <Label className="btn btn-default" for={`${id}__fileUpload__file`} style={{margin: 0}}>Select file...</Label>
-                <Input id={`${id}__fileUpload__file`} type="file" style={{display: "none"}} onChange={onFileChanged}/>
+            <FormGroup style={{ textAlign: "right" }}>
+                <Label className="btn btn-default" for={`${id}__fileUpload__file`} style={{ margin: 0 }}>
+                    Select file...
+                </Label>
+                <Input id={`${id}__fileUpload__file`} type="file" style={{ display: "none" }} onChange={onFileChanged} />
             </FormGroup>
 
-            <div className="text-muted" style={{textAlign: "center", flexBasis: "100%", marginTop: "1rem"}}>
+            <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
                 Select or drag &amp; drop {fileType} file to drop zone.
             </div>
         </div>

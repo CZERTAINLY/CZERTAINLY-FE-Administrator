@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    BaseAttributeContentDto,
-    NameAndUuidDto,
-} from './';
+import type { AttributeContentType, AttributeType, BaseAttributeContentDto, NameAndUuidDto } from "./";
 
 /**
  * Response metadata attribute instance with content
@@ -71,5 +66,3 @@ export interface ResponseMetadataDto {
      */
     sourceObjects?: Array<NameAndUuidDto>;
 }
-
-

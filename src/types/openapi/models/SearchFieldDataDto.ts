@@ -54,5 +54,3 @@ export interface SearchFieldDataDto {
      */
     multiValue?: boolean;
 }
-
-

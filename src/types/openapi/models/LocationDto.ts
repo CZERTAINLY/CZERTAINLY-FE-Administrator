@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateInLocationDto,
-    MetadataResponseDto,
-    ResponseAttributeDto,
-} from './';
+import type { CertificateInLocationDto, MetadataResponseDto, ResponseAttributeDto } from "./";
 
 /**
  * @export

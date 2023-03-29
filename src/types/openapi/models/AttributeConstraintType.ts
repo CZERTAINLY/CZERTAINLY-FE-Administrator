@@ -17,8 +17,7 @@
  * @enum {string}
  */
 export enum AttributeConstraintType {
-    RegExp = 'regExp',
-    Range = 'range',
-    DateTime = 'dateTime'
+    RegExp = "regExp",
+    Range = "range",
+    DateTime = "dateTime",
 }
-

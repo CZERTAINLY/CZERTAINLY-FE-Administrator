@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-} from './';
+import type { AttributeContentType, AttributeType } from "./";
 
 /**
  * @export
@@ -74,5 +71,3 @@ export interface GlobalMetadataDefinitionDetailDto {
      */
     group?: string;
 }
-
-

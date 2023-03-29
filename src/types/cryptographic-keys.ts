@@ -1,27 +1,32 @@
 import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import { CertificateGroupResponseModel } from "./certificateGroups";
 import { MetadataModel } from "./locations";
-import { 
+import {
     BulkCompromiseKeyItemRequestDto,
     BulkCompromiseKeyRequestDto,
-    BulkKeyUsageRequestDto, 
-    CompromiseKeyRequestDto, 
-    EditKeyRequestDto, 
-    KeyDetailDto, 
-    KeyDto, 
-    KeyEventHistoryDto, 
-    KeyFormat, 
-    KeyItemDetailDto, 
-    KeyItemDto, 
-    KeyRequestDto, 
+    BulkKeyUsageRequestDto,
+    CompromiseKeyRequestDto,
+    EditKeyRequestDto,
+    KeyDetailDto,
+    KeyDto,
+    KeyEventHistoryDto,
+    KeyFormat,
+    KeyItemDetailDto,
+    KeyItemDto,
+    KeyRequestDto,
     UpdateKeyUsageRequestDto,
 } from "./openapi";
 
 export type CryptographicKeyAddRequestDto = KeyRequestDto;
-export type CryptographicKeyAddRequestModel = Omit<CryptographicKeyAddRequestDto, "attributes | customAttributes"> & { attributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel> };
+export type CryptographicKeyAddRequestModel = Omit<CryptographicKeyAddRequestDto, "attributes | customAttributes"> & {
+    attributes: Array<AttributeRequestModel>;
+    customAttributes?: Array<AttributeRequestModel>;
+};
 
 export type CryptographicKeyEditRequestDto = EditKeyRequestDto;
-export type CryptographicKeyEditRequestModel = Omit<CryptographicKeyEditRequestDto, "customAttributes"> & { customAttributes?: Array<AttributeRequestModel> };
+export type CryptographicKeyEditRequestModel = Omit<CryptographicKeyEditRequestDto, "customAttributes"> & {
+    customAttributes?: Array<AttributeRequestModel>;
+};
 
 export type CryptographicKeyResponseDto = KeyItemDto;
 export type CryptographicKeyResponseModel = CryptographicKeyResponseDto;
@@ -30,13 +35,20 @@ export type CryptographicKeyPairResponseDto = KeyDto;
 export type CryptographicKeyPairResponseModel = CryptographicKeyPairResponseDto;
 
 export type CryptographicKeyDetailResponseDto = KeyDetailDto;
-export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, "attributes | customAttributes | group"> & { attributes: Array<AttributeResponseModel>, customAttributes?: Array<AttributeResponseModel>, group?: CertificateGroupResponseModel};
+export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, "attributes | customAttributes | group"> & {
+    attributes: Array<AttributeResponseModel>;
+    customAttributes?: Array<AttributeResponseModel>;
+    group?: CertificateGroupResponseModel;
+};
 
 export type CryptographicKeyItemDetailResponseDto = KeyItemDetailDto;
-export type CryptographicKeyItemDetailResponseModel = Omit<CryptographicKeyItemDetailResponseDto, "metadata | format"> & { metadata?: Array<MetadataModel>, format?: KeyFormat};
+export type CryptographicKeyItemDetailResponseModel = Omit<CryptographicKeyItemDetailResponseDto, "metadata | format"> & {
+    metadata?: Array<MetadataModel>;
+    format?: KeyFormat;
+};
 
 export type CryptographicKeyItemDto = KeyItemDto;
-export type CryptographicKeyItemModel = Omit<CryptographicKeyItemDto, "format"> & { format?: KeyFormat};
+export type CryptographicKeyItemModel = Omit<CryptographicKeyItemDto, "format"> & { format?: KeyFormat };
 
 export type CryptographicKeyKeyUsageUpdateRequestDto = UpdateKeyUsageRequestDto;
 export type CryptographicKeyKeyUsageUpdateRequestModel = CryptographicKeyKeyUsageUpdateRequestDto;

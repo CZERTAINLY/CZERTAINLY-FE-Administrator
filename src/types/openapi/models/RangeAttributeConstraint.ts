@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-    RangeAttributeConstraintData,
-} from './';
+import type { AttributeConstraintType, RangeAttributeConstraintData } from "./";
 
 /**
  * @export
@@ -44,5 +41,3 @@ export interface RangeAttributeConstraint {
      */
     data?: RangeAttributeConstraintData;
 }
-
-

@@ -11,14 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CryptographicAlgorithm,
-    GroupDto,
-    KeyFormat,
-    KeyState,
-    KeyType,
-    KeyUsage,
-} from './';
+import type { CryptographicAlgorithm, GroupDto, KeyFormat, KeyState, KeyType, KeyUsage } from "./";
 
 /**
  * Cryptographic Keys
@@ -142,5 +135,3 @@ export interface KeyItemDto {
      */
     state: KeyState;
 }
-
-

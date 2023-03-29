@@ -17,10 +17,9 @@
  * @enum {string}
  */
 export enum CryptographicAlgorithm {
-    Rsa = 'RSA',
-    Ecdsa = 'ECDSA',
-    Falcon = 'FALCON',
-    CrystalsDilithium = 'CRYSTALS-Dilithium',
-    Sphincs = 'SPHINCS+'
+    Rsa = "RSA",
+    Ecdsa = "ECDSA",
+    Falcon = "FALCON",
+    CrystalsDilithium = "CRYSTALS-Dilithium",
+    Sphincs = "SPHINCS+",
 }
-

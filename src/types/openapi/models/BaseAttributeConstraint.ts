@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-    DateTimeAttributeConstraint,
-    DateTimeAttributeConstraintData,
-    RangeAttributeConstraint,
-    RegexpAttributeConstraint,
-} from './';
+import type { DateTimeAttributeConstraint, RangeAttributeConstraint, RegexpAttributeConstraint } from "./";
 
 /**
  * @type BaseAttributeConstraint

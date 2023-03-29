@@ -11,7 +11,14 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeCallback, AttributeContentType, AttributeType, BaseAttributeConstraint, BaseAttributeContentDto, DataAttributeProperties } from "./";
+import type {
+    AttributeCallback,
+    AttributeContentType,
+    AttributeType,
+    BaseAttributeConstraint,
+    BaseAttributeContentDto,
+    DataAttributeProperties,
+} from "./";
 
 /**
  * Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
@@ -70,5 +77,3 @@ export interface DataAttribute {
      */
     attributeCallback?: AttributeCallback;
 }
-
-

@@ -35,8 +35,7 @@ export interface ParseRequestRequestDto {
  * @enum {string}
  */
 export enum ParseRequestRequestDtoParseTypeEnum {
-    Basic = 'BASIC',
-    Extended = 'EXTENDED',
-    Asn1 = 'ASN1'
+    Basic = "BASIC",
+    Extended = "EXTENDED",
+    Asn1 = "ASN1",
 }
-

@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    SignatureResponseData,
-} from './';
+import type { SignatureResponseData } from "./";
 
 /**
  * @export

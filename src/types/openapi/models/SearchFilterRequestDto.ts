@@ -43,5 +43,3 @@ export interface SearchFilterRequestDto {
      */
     value?: object;
 }
-
-

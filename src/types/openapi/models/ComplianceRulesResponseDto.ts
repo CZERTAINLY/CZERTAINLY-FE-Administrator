@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    BaseAttributeDto,
-    CertificateType,
-} from './';
+import type { BaseAttributeDto, CertificateType } from "./";
 
 /**
  * Rules from Compliance Provider
@@ -58,5 +55,3 @@ export interface ComplianceRulesResponseDto {
      */
     description?: string;
 }
-
-

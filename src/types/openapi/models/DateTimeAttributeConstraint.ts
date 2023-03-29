@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-    DateTimeAttributeConstraintData,
-} from './';
+import type { AttributeConstraintType, DateTimeAttributeConstraintData } from "./";
 
 /**
  * @export
@@ -44,5 +41,3 @@ export interface DateTimeAttributeConstraint {
      */
     data?: DateTimeAttributeConstraintData;
 }
-
-

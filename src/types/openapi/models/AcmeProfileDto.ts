@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RaProfileDto,
-    ResponseAttributeDto,
-} from './';
+import type { RaProfileDto, ResponseAttributeDto } from "./";
 
 /**
  * @export

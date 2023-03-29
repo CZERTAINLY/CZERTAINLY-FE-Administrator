@@ -22,7 +22,7 @@ import type {
     MetadataResponseDto,
     ResponseAttributeDto,
     SimplifiedRaProfileDto,
-} from './';
+} from "./";
 
 /**
  * @export
@@ -179,7 +179,7 @@ export interface CertificateDetailDto {
      * @type {{ [key: string]: object; }}
      * @memberof CertificateDetailDto
      */
-    subjectAlternativeNames?: { [key: string]: object; };
+    subjectAlternativeNames?: { [key: string]: object };
     /**
      * Locations associated to the Certificate
      * @type {Array<LocationDto>}
@@ -222,5 +222,3 @@ export interface CertificateDetailDto {
      */
     key?: KeyDto;
 }
-
-

@@ -25,338 +25,292 @@ import { Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
-   name: string | undefined;
-   description: string | undefined;
-   entity: { value: string; label: string } | undefined;
+    name: string | undefined;
+    description: string | undefined;
+    entity: { value: string; label: string } | undefined;
 }
 
-
 export default function LocationForm() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-   const dispatch = useDispatch();
-   const navigate = useNavigate();
+    const { entityId, id } = useParams();
 
-   const { entityId, id } = useParams();
+    const editMode = useMemo(() => (id && entityId ? true : false), [entityId, id]);
 
-   const editMode = useMemo( () => id && entityId ? true : false, [entityId, id] );
-
-   const entities = useSelector(entitySelectors.entities);
-   const locationAttributeDescriptors = useSelector(entitySelectors.locationAttributeDescriptors);
+    const entities = useSelector(entitySelectors.entities);
+    const locationAttributeDescriptors = useSelector(entitySelectors.locationAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
-   const locationSelector = useSelector(locationSelectors.location);
+    const locationSelector = useSelector(locationSelectors.location);
 
-   const isFetchingLocationDetail = useSelector(locationSelectors.isFetchingDetail);
+    const isFetchingLocationDetail = useSelector(locationSelectors.isFetchingDetail);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
-   const isCreating = useSelector(locationSelectors.isCreating);
-   const isUpdating = useSelector(locationSelectors.isUpdating);
+    const isCreating = useSelector(locationSelectors.isCreating);
+    const isUpdating = useSelector(locationSelectors.isUpdating);
 
-   const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
-   const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
+    const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
+    const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-   const [init, setInit] = useState(true);
+    const [init, setInit] = useState(true);
 
-   const [location, setLocation] = useState<LocationResponseModel>();
+    const [location, setLocation] = useState<LocationResponseModel>();
 
-   const isBusy = useMemo(
-      () => isFetchingLocationDetail || isCreating || isUpdating || isFetchingEntities || isFetchingLocationAttributeDescriptors || isFetchingResourceCustomAttributes,
-      [isFetchingLocationDetail, isCreating, isUpdating, isFetchingEntities, isFetchingLocationAttributeDescriptors, isFetchingResourceCustomAttributes]
-   );
+    const isBusy = useMemo(
+        () =>
+            isFetchingLocationDetail ||
+            isCreating ||
+            isUpdating ||
+            isFetchingEntities ||
+            isFetchingLocationAttributeDescriptors ||
+            isFetchingResourceCustomAttributes,
+        [
+            isFetchingLocationDetail,
+            isCreating,
+            isUpdating,
+            isFetchingEntities,
+            isFetchingLocationAttributeDescriptors,
+            isFetchingResourceCustomAttributes,
+        ],
+    );
 
+    useEffect(() => {
+        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Locations));
 
-   useEffect(
-
-      () => {
-
-          dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Locations));
-
-          if (init) {
+        if (init) {
             dispatch(locationActions.resetState());
             dispatch(entityActions.resetState());
             dispatch(entityActions.listEntities());
             setInit(false);
-         }
+        }
 
-         if (editMode && (!locationSelector || locationSelector.uuid !== id)) {
+        if (editMode && (!locationSelector || locationSelector.uuid !== id)) {
             dispatch(locationActions.getLocationDetail({ entityUuid: entityId!, uuid: id! }));
-         }
+        }
 
-
-         if (editMode && locationSelector?.uuid === id) {
+        if (editMode && locationSelector?.uuid === id) {
             setLocation(locationSelector);
-         }
+        }
+    }, [dispatch, editMode, locationSelector, id, init, entityId]);
 
-      },
-      [dispatch, editMode, locationSelector, id, init,  entityId]
-
-   );
-
-
-   useEffect(
-
-      () => {
-
-         if (editMode && location?.uuid === id && entities && entities.length > 0) {
+    useEffect(() => {
+        if (editMode && location?.uuid === id && entities && entities.length > 0) {
             dispatch(entityActions.listLocationAttributeDescriptors({ entityUuid: location!.entityInstanceUuid }));
-         }
-
-      },
-      [dispatch, editMode, location, id, entities]
-
-   );
-
-
-   const onEntityChange = useCallback(
-
-      (event: { value: string }) => {
-
-         if (!event.value) return;
-          dispatch(connectorActions.clearCallbackData());
-          setGroupAttributesCallbackAttributes([]);
-         dispatch(entityActions.listLocationAttributeDescriptors({ entityUuid: event.value }));
-
-      },
-      [dispatch]
-
-   );
-
-
-   const onSubmit = useCallback(
-
-      (values: FormValues, form: any) => {
-
-         if (editMode) {
-
-            dispatch(locationActions.editLocation({
-               uuid: id!,
-               entityUuid: values.entity!.value,
-                editLocationRequest: {
-                   description: values.description || "",
-                   enabled: location!.enabled,
-                   attributes: collectFormAttributes("location", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
-                   customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
-                }
-            }));
-
-         } else {
-
-            dispatch(locationActions.addLocation({
-                entityUuid: values.entity!.value,
-                addLocationRequest: {
-                    name: values.name!,
-                    description: values.description || "",
-                    enabled: true,
-                    attributes: collectFormAttributes("location", [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes], values),
-                    customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
-                },
-            }));
-
-         }
-
-      },
-      [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes, resourceCustomAttributes]
-
-   );
-
-
-   const onCancel = useCallback(
-      () => {
-         navigate(-1);
-      },
-      [navigate]
-   )
-
-
-   const submitTitle = useMemo(
-      () => editMode ? "Save" : "Create",
-      [editMode]
-   )
-
-
-   const inProgressTitle = useMemo(
-      () => editMode ? "Saving..." : "Creating...",
-      [editMode]
-   )
-
-
-   const optionsForEntities = useMemo(
-
-      () => entities?.map(
-         entity => ({
-            label: entity.name,
-            value: entity.uuid,
-         })
-      ),
-      [entities]
-
-   );
-
-
-   const defaultValues: FormValues = useMemo(
-      () => ({
-         name: editMode ? location?.name || undefined : undefined,
-         description: editMode ? location?.description || undefined : undefined,
-         entity: editMode ? location ? { value: location.entityInstanceUuid, label: location.entityInstanceName } : undefined : undefined,
-      }),
-      [editMode, location]
-   );
-
-
-   const title = useMemo(
-
-      () => editMode ? `Edit Location: ${location?.name}` : "Add Location",
-      [editMode, location]
-
-   );
-
-
-   return (
-
-      <Widget title={title} busy={isBusy}>
-
-         <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }} >
-
-            {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-
-               <BootstrapForm onSubmit={handleSubmit}>
-
-                  <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
-
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="name">Location Name</Label>
-
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              type="text"
-                              placeholder="Enter the Location Name"
-                              disabled={editMode}
-                           />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
-
-                        </FormGroup>
-                     )}
-
-                  </Field>
-
-
-                  <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
-
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="name">Location Description</Label>
-
-                           <Input
-                              {...input}
-                              valid={!meta.error && meta.touched}
-                              invalid={!!meta.error && meta.touched}
-                              type="text"
-                              placeholder="Enter the location description"
-                           />
-
-                           <FormFeedback>{meta.error}</FormFeedback>
-
-                        </FormGroup>
-                     )}
-
-                  </Field>
-
-
-                  <Field name="entity" validate={validateRequired()}>
-
-                     {({ input, meta }) => (
-
-                        <FormGroup>
-
-                           <Label for="entity">Entity</Label>
-
-                           <Select
-                              {...input}
-                              maxMenuHeight={140}
-                              menuPlacement="auto"
-                              options={optionsForEntities}
-                              placeholder="Select Entity"
-                              onChange={(event) => { onEntityChange(event); form.mutators.clearAttributes("location"); form.mutators.setAttribute("storeKind", undefined); input.onChange(event); }}
-                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                           />
-
-                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>{meta.error}</div>
-
-                        </FormGroup>
-
-                     )}
-
-                  </Field>
-
-
-                     <>
-                        <br />
-
-                         <TabLayout tabs={[
-                             {
-                                 title: "Connector Attributes",
-                                 content: values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
-                                     <AttributeEditor
-                                         id="location"
-                                         attributeDescriptors={locationAttributeDescriptors}
-                                         attributes={location?.attributes}
-                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                     />
-                                 ): <></>
-                             },
-                             {
-                                 title: "Custom Attributes",
-                                 content: <AttributeEditor
-                                     id="customLocation"
-                                     attributeDescriptors={resourceCustomAttributes}
-                                     attributes={location?.customAttributes}
-                                 />
-                             }
-                         ]} />
-                     </>
-
-                  {
-
-                     <div className="d-flex justify-content-end">
-
-                        <ButtonGroup>
-
-                           <ProgressButton
-                              title={submitTitle}
-                              inProgressTitle={inProgressTitle}
-                              inProgress={submitting}
-                              disabled={(editMode ? pristine : false) || !valid}
-                           />
-
-                           <Button
-                              color="default"
-                              onClick={onCancel}
-                              disabled={submitting}
-                           >
-                              Cancel
-                           </Button>
-
-                        </ButtonGroup>
-
-                     </div>
-                  }
-
-               </BootstrapForm>
-            )}
-         </Form>
-
-      </Widget>
-
-   );
-
+        }
+    }, [dispatch, editMode, location, id, entities]);
+
+    const onEntityChange = useCallback(
+        (event: { value: string }) => {
+            if (!event.value) return;
+            dispatch(connectorActions.clearCallbackData());
+            setGroupAttributesCallbackAttributes([]);
+            dispatch(entityActions.listLocationAttributeDescriptors({ entityUuid: event.value }));
+        },
+        [dispatch],
+    );
+
+    const onSubmit = useCallback(
+        (values: FormValues, form: any) => {
+            if (editMode) {
+                dispatch(
+                    locationActions.editLocation({
+                        uuid: id!,
+                        entityUuid: values.entity!.value,
+                        editLocationRequest: {
+                            description: values.description || "",
+                            enabled: location!.enabled,
+                            attributes: collectFormAttributes(
+                                "location",
+                                [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                values,
+                            ),
+                            customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
+                        },
+                    }),
+                );
+            } else {
+                dispatch(
+                    locationActions.addLocation({
+                        entityUuid: values.entity!.value,
+                        addLocationRequest: {
+                            name: values.name!,
+                            description: values.description || "",
+                            enabled: true,
+                            attributes: collectFormAttributes(
+                                "location",
+                                [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                values,
+                            ),
+                            customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
+                        },
+                    }),
+                );
+            }
+        },
+        [dispatch, editMode, location, locationAttributeDescriptors, id, groupAttributesCallbackAttributes, resourceCustomAttributes],
+    );
+
+    const onCancel = useCallback(() => {
+        navigate(-1);
+    }, [navigate]);
+
+    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+
+    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+
+    const optionsForEntities = useMemo(
+        () =>
+            entities?.map((entity) => ({
+                label: entity.name,
+                value: entity.uuid,
+            })),
+        [entities],
+    );
+
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? location?.name || undefined : undefined,
+            description: editMode ? location?.description || undefined : undefined,
+            entity: editMode
+                ? location
+                    ? { value: location.entityInstanceUuid, label: location.entityInstanceName }
+                    : undefined
+                : undefined,
+        }),
+        [editMode, location],
+    );
+
+    const title = useMemo(() => (editMode ? `Edit Location: ${location?.name}` : "Add Location"), [editMode, location]);
+
+    return (
+        <Widget title={title} busy={isBusy}>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
+                    <BootstrapForm onSubmit={handleSubmit}>
+                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="name">Location Name</Label>
+
+                                    <Input
+                                        {...input}
+                                        valid={!meta.error && meta.touched}
+                                        invalid={!!meta.error && meta.touched}
+                                        type="text"
+                                        placeholder="Enter the Location Name"
+                                        disabled={editMode}
+                                    />
+
+                                    <FormFeedback>{meta.error}</FormFeedback>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="name">Location Description</Label>
+
+                                    <Input
+                                        {...input}
+                                        valid={!meta.error && meta.touched}
+                                        invalid={!!meta.error && meta.touched}
+                                        type="text"
+                                        placeholder="Enter the location description"
+                                    />
+
+                                    <FormFeedback>{meta.error}</FormFeedback>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        <Field name="entity" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="entity">Entity</Label>
+
+                                    <Select
+                                        {...input}
+                                        maxMenuHeight={140}
+                                        menuPlacement="auto"
+                                        options={optionsForEntities}
+                                        placeholder="Select Entity"
+                                        onChange={(event) => {
+                                            onEntityChange(event);
+                                            form.mutators.clearAttributes("location");
+                                            form.mutators.setAttribute("storeKind", undefined);
+                                            input.onChange(event);
+                                        }}
+                                        styles={{
+                                            control: (provided) =>
+                                                meta.touched && meta.invalid
+                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    : { ...provided },
+                                        }}
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        {meta.error}
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        <>
+                            <br />
+
+                            <TabLayout
+                                tabs={[
+                                    {
+                                        title: "Connector Attributes",
+                                        content:
+                                            values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
+                                                <AttributeEditor
+                                                    id="location"
+                                                    attributeDescriptors={locationAttributeDescriptors}
+                                                    attributes={location?.attributes}
+                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                                />
+                                            ) : (
+                                                <></>
+                                            ),
+                                    },
+                                    {
+                                        title: "Custom Attributes",
+                                        content: (
+                                            <AttributeEditor
+                                                id="customLocation"
+                                                attributeDescriptors={resourceCustomAttributes}
+                                                attributes={location?.customAttributes}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
+                        </>
+
+                        {
+                            <div className="d-flex justify-content-end">
+                                <ButtonGroup>
+                                    <ProgressButton
+                                        title={submitTitle}
+                                        inProgressTitle={inProgressTitle}
+                                        inProgress={submitting}
+                                        disabled={(editMode ? pristine : false) || !valid}
+                                    />
+
+                                    <Button color="default" onClick={onCancel} disabled={submitting}>
+                                        Cancel
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
+                        }
+                    </BootstrapForm>
+                )}
+            </Form>
+        </Widget>
+    );
 }

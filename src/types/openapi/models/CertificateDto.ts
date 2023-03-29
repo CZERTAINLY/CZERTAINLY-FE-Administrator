@@ -11,13 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateStatus,
-    CertificateType,
-    ComplianceStatus,
-    GroupDto,
-    SimplifiedRaProfileDto,
-} from './';
+import type { CertificateStatus, CertificateType, ComplianceStatus, GroupDto, SimplifiedRaProfileDto } from "./";
 
 /**
  * Certificates
@@ -141,5 +135,3 @@ export interface CertificateDto {
      */
     privateKeyAvailability: boolean;
 }
-
-

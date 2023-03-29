@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    KeyUsage,
-} from './';
+import type { KeyUsage } from "./";
 
 /**
  * @export

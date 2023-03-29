@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    ResourcePermissionsRequestDto,
-} from './';
+import type { ResourcePermissionsRequestDto } from "./";
 
 /**
  * @export

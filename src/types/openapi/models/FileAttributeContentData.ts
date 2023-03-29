@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    MimeType,
-} from './';
+import type { MimeType } from "./";
 
 /**
  * File attribute content data

@@ -17,11 +17,10 @@
  * @enum {string}
  */
 export enum TokenInstanceStatus {
-    Connected = 'Connected',
-    Disconnected = 'Disconnected',
-    Activated = 'Activated',
-    Deactivated = 'Deactivated',
-    Warning = 'Warning',
-    Unknown = 'Unknown'
+    Connected = "Connected",
+    Disconnected = "Disconnected",
+    Activated = "Activated",
+    Deactivated = "Deactivated",
+    Warning = "Warning",
+    Unknown = "Unknown",
 }
-

@@ -1,23 +1,18 @@
-import React from 'react';
-import cx from 'classnames';
-import { Spinner as StrapSpinner } from 'reactstrap';
+import cx from "classnames";
+import { Spinner as StrapSpinner } from "reactstrap";
 
-import style from './Spinner.module.scss';
+import style from "./Spinner.module.scss";
 
 interface Props {
-   active?: boolean;
+    active?: boolean;
 }
 
-function Spinner({
-   active = false
-}: Props) {
-
-   return (
-      <div className={cx(style.container, { [style.active]: active })}>
-         <StrapSpinner className={style.spinner} color="dark" />
-      </div>
-   );
-
+function Spinner({ active = false }: Props) {
+    return (
+        <div className={cx(style.container, { [style.active]: active })}>
+            <StrapSpinner className={style.spinner} color="dark" />
+        </div>
+    );
 }
 
 export default Spinner;

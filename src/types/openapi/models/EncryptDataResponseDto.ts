@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CipherResponseData,
-} from './';
+import type { CipherResponseData } from "./";
 
 /**
  * @export

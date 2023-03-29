@@ -11,15 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
-import type { OperationOpts, HttpHeaders } from '../runtime';
-import type {
-    ConnectorRequestDto,
-    ErrorMessageDto,
-    UuidDto,
-} from '../models';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
+import type { ConnectorRequestDto, UuidDto } from "../models";
+import type { HttpHeaders, OperationOpts } from "../runtime";
+import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
 
 export interface RegisterRequest {
     connectorRequestDto: ConnectorRequestDto;
@@ -29,25 +25,26 @@ export interface RegisterRequest {
  * no description
  */
 export class ConnectorRegistrationApi extends BaseAPI {
-
     /**
      * Register a Connector
      */
-    register({ connectorRequestDto }: RegisterRequest): Observable<UuidDto>
-    register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
+    register({ connectorRequestDto }: RegisterRequest): Observable<UuidDto>;
+    register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
     register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(connectorRequestDto, 'connectorRequestDto', 'register');
+        throwIfNullOrUndefined(connectorRequestDto, "connectorRequestDto", "register");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<UuidDto>({
-            url: '/v1/connector/register',
-            method: 'POST',
-            headers,
-            body: connectorRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<UuidDto>(
+            {
+                url: "/v1/connector/register",
+                method: "POST",
+                headers,
+                body: connectorRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

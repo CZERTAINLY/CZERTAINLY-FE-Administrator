@@ -11,10 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    BaseAttributeContentDto,
-    Resource,
-} from './';
+import type { BaseAttributeContentDto, Resource } from "./";
 
 /**
  * @export

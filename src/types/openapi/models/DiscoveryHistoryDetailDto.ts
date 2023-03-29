@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    DiscoveryStatus,
-    MetadataResponseDto,
-    ResponseAttributeDto,
-} from './';
+import type { DiscoveryStatus, MetadataResponseDto, ResponseAttributeDto } from "./";
 
 /**
  * @export
@@ -100,5 +96,3 @@ export interface DiscoveryHistoryDetailDto {
      */
     metadata?: Array<MetadataResponseDto>;
 }
-
-

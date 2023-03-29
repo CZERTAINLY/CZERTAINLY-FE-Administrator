@@ -11,31 +11,28 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI } from '../runtime';
-import type { OperationOpts } from '../runtime';
-import type {
-    AuthenticationServiceExceptionDto,
-    ErrorMessageDto,
-    StatisticsDto,
-} from '../models';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
+import type { StatisticsDto } from "../models";
+import type { OperationOpts } from "../runtime";
+import { BaseAPI } from "../runtime";
 
 /**
  * no description
  */
 export class StatisticsDashboardApi extends BaseAPI {
-
     /**
      * Get Dashboard/Statistics Details
      */
-    getStatistics(): Observable<StatisticsDto>
-    getStatistics(opts?: OperationOpts): Observable<AjaxResponse<StatisticsDto>>
+    getStatistics(): Observable<StatisticsDto>;
+    getStatistics(opts?: OperationOpts): Observable<AjaxResponse<StatisticsDto>>;
     getStatistics(opts?: OperationOpts): Observable<StatisticsDto | AjaxResponse<StatisticsDto>> {
-        return this.request<StatisticsDto>({
-            url: '/v1/statistics',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<StatisticsDto>(
+            {
+                url: "/v1/statistics",
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 }

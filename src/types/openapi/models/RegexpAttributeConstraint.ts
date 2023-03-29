@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeConstraintType,
-} from './';
+import type { AttributeConstraintType } from "./";
 
 /**
  * @export
@@ -44,5 +42,3 @@ export interface RegexpAttributeConstraint {
      */
     data?: string;
 }
-
-

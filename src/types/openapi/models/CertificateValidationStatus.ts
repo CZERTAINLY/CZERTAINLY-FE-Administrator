@@ -12,18 +12,17 @@
  */
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 export enum CertificateValidationStatus {
-    Success = 'success',
-    Failed = 'failed',
-    Warning = 'warning',
-    Revoked = 'revoked',
-    NotChecked = 'not_checked',
-    Invalid = 'invalid',
-    Expiring = 'expiring',
-    Expired = 'expired'
+    Success = "success",
+    Failed = "failed",
+    Warning = "warning",
+    Revoked = "revoked",
+    NotChecked = "not_checked",
+    Invalid = "invalid",
+    Expiring = "expiring",
+    Expired = "expired",
 }
-

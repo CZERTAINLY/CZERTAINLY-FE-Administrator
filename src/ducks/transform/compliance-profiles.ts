@@ -34,49 +34,57 @@ import {
     ComplianceProfileRuleListResponseDto,
     ComplianceProfileRuleListResponseModel,
     ComplianceProfileRuleListResponseRuleDto,
-    ComplianceProfileRuleListResponseRuleModel
+    ComplianceProfileRuleListResponseRuleModel,
 } from "types/complianceProfiles";
 import {
     transformAttributeDescriptorDtoToModel,
     transformAttributeRequestModelToDto,
-    transformAttributeResponseDtoToModel
+    transformAttributeResponseDtoToModel,
 } from "./attributes";
 import { transformRaProfileSimplifiedDtoToModel } from "./certificates";
 
 export function transformComplianceProfileListRuleModelToDto(profileRule: ComplianceProfileListRuleModel): ComplianceProfileListRuleDto {
-    return { ...profileRule }
+    return { ...profileRule };
 }
 
 export function transformComplianceProfileListModelToDto(list: ComplianceProfileListModel): ComplianceProfileListDto {
     return {
         ...list,
-        rules: list.rules.map(transformComplianceProfileListRuleModelToDto)
-    }
+        rules: list.rules.map(transformComplianceProfileListRuleModelToDto),
+    };
 }
 
-export function transformComplianceProfileResponseRuleRuleDtoToModel(rule: ComplianceProfileResponseRuleRuleDto): ComplianceProfileResponseRuleRuleModel {
+export function transformComplianceProfileResponseRuleRuleDtoToModel(
+    rule: ComplianceProfileResponseRuleRuleDto,
+): ComplianceProfileResponseRuleRuleModel {
     return {
         ...rule,
-        attributes: rule.attributes?.map(transformAttributeResponseDtoToModel)
-    }
+        attributes: rule.attributes?.map(transformAttributeResponseDtoToModel),
+    };
 }
 
-export function transformComplianceProfileResponseRuleDtoToModel(rule: ComplianceProfileResponseRuleDto): ComplianceProfileResponseRuleModel {
+export function transformComplianceProfileResponseRuleDtoToModel(
+    rule: ComplianceProfileResponseRuleDto,
+): ComplianceProfileResponseRuleModel {
     return {
         ...rule,
-        rules: rule.rules?.map(transformComplianceProfileResponseRuleRuleDtoToModel)
-    }
+        rules: rule.rules?.map(transformComplianceProfileResponseRuleRuleDtoToModel),
+    };
 }
 
-export function transformComplianceProfileResponseGroupGroupDtoToModel(group: ComplianceProfileResponseGroupGroupDto): ComplianceProfileResponseGroupGroupModel {
+export function transformComplianceProfileResponseGroupGroupDtoToModel(
+    group: ComplianceProfileResponseGroupGroupDto,
+): ComplianceProfileResponseGroupGroupModel {
     return { ...group };
 }
 
-export function transformComplianceProfileResponseGroupDtoToModel(group: ComplianceProfileResponseGroupDto): ComplianceProfileResponseGroupModel {
+export function transformComplianceProfileResponseGroupDtoToModel(
+    group: ComplianceProfileResponseGroupDto,
+): ComplianceProfileResponseGroupModel {
     return {
         ...group,
-        groups: group.groups?.map(transformComplianceProfileResponseGroupGroupDtoToModel)
-    }
+        groups: group.groups?.map(transformComplianceProfileResponseGroupGroupDtoToModel),
+    };
 }
 
 export function transformComplianceProfileResponseDtoToModel(profile: ComplianceProfileResponseDto): ComplianceProfileResponseModel {
@@ -85,75 +93,93 @@ export function transformComplianceProfileResponseDtoToModel(profile: Compliance
         rules: profile.rules.map(transformComplianceProfileResponseRuleDtoToModel),
         groups: profile.groups.map(transformComplianceProfileResponseGroupDtoToModel),
         raProfiles: profile.raProfiles?.map(transformRaProfileSimplifiedDtoToModel),
-        customAttributes: profile.customAttributes?.map(transformAttributeResponseDtoToModel)
-    }
+        customAttributes: profile.customAttributes?.map(transformAttributeResponseDtoToModel),
+    };
 }
 
-export function transformComplianceProfileRequestRuleRuleModelToDto(rule: ComplianceProfileRequestRuleRuleModel): ComplianceProfileRequestRuleRuleDto {
+export function transformComplianceProfileRequestRuleRuleModelToDto(
+    rule: ComplianceProfileRequestRuleRuleModel,
+): ComplianceProfileRequestRuleRuleDto {
     return {
         ...rule,
-        attributes: rule.attributes?.map(transformAttributeRequestModelToDto)
-    }
+        attributes: rule.attributes?.map(transformAttributeRequestModelToDto),
+    };
 }
 
 export function transformComplianceProfileRequestRuleModel(rule: ComplianceProfileRequestRuleModel): ComplianceProfileRequestRuleDto {
     return {
         ...rule,
-        rules: rule.rules?.map(transformComplianceProfileRequestRuleRuleModelToDto)
-    }
+        rules: rule.rules?.map(transformComplianceProfileRequestRuleRuleModelToDto),
+    };
 }
 
 export function transformComplianceProfileRequestModelToDto(profile: ComplianceProfileRequestModel): ComplianceProfileRequestDto {
     return {
         ...profile,
         rules: profile.rules?.map(transformComplianceProfileRequestRuleModel),
-        customAttributes: profile.customAttributes?.map(transformAttributeRequestModelToDto)
-    }
+        customAttributes: profile.customAttributes?.map(transformAttributeRequestModelToDto),
+    };
 }
 
-export function transformComplianceProfileRuleAddRequestModelToDto(addRule: ComplianceProfileRuleAddRequestModel): ComplianceProfileRuleAddRequestDto {
+export function transformComplianceProfileRuleAddRequestModelToDto(
+    addRule: ComplianceProfileRuleAddRequestModel,
+): ComplianceProfileRuleAddRequestDto {
     return {
         ...addRule,
-        attributes: addRule.attributes?.map(transformAttributeRequestModelToDto)
-    }
+        attributes: addRule.attributes?.map(transformAttributeRequestModelToDto),
+    };
 }
 
-export function transformComplianceProfileRuleAddResponseDtoToModel(rule: ComplianceProfileRuleAddResponseDto): ComplianceProfileRuleAddResponseModel {
+export function transformComplianceProfileRuleAddResponseDtoToModel(
+    rule: ComplianceProfileRuleAddResponseDto,
+): ComplianceProfileRuleAddResponseModel {
     return {
         ...rule,
-        attributes: rule.attributes.map(transformAttributeResponseDtoToModel)
-    }
+        attributes: rule.attributes.map(transformAttributeResponseDtoToModel),
+    };
 }
 
-export function transformComplianceProfileGroupRequestModelToDto(addGroup: ComplianceProfileGroupRequestModel): ComplianceProfileGroupRequestDto {
+export function transformComplianceProfileGroupRequestModelToDto(
+    addGroup: ComplianceProfileGroupRequestModel,
+): ComplianceProfileGroupRequestDto {
     return { ...addGroup };
 }
 
-export function transformComplianceProfileRuleDeleteRequestModelToDto(deleteRule: ComplianceProfileRuleDeleteRequestModel): ComplianceProfileRuleDeleteRequestDto {
+export function transformComplianceProfileRuleDeleteRequestModelToDto(
+    deleteRule: ComplianceProfileRuleDeleteRequestModel,
+): ComplianceProfileRuleDeleteRequestDto {
     return { ...deleteRule };
 }
 
-export function transformComplianceProfileRuleListResponseRuleDtoToModel(rule: ComplianceProfileRuleListResponseRuleDto): ComplianceProfileRuleListResponseRuleModel {
+export function transformComplianceProfileRuleListResponseRuleDtoToModel(
+    rule: ComplianceProfileRuleListResponseRuleDto,
+): ComplianceProfileRuleListResponseRuleModel {
     return {
         ...rule,
-        attributes: rule.attributes?.map(transformAttributeDescriptorDtoToModel)
-    }
+        attributes: rule.attributes?.map(transformAttributeDescriptorDtoToModel),
+    };
 }
 
-export function transformComplianceProfileRuleListResponseDtoToModel(ruleList: ComplianceProfileRuleListResponseDto): ComplianceProfileRuleListResponseModel {
+export function transformComplianceProfileRuleListResponseDtoToModel(
+    ruleList: ComplianceProfileRuleListResponseDto,
+): ComplianceProfileRuleListResponseModel {
     return {
         ...ruleList,
-        rules: ruleList.rules.map(transformComplianceProfileRuleListResponseRuleDtoToModel)
-    }
+        rules: ruleList.rules.map(transformComplianceProfileRuleListResponseRuleDtoToModel),
+    };
 }
 
-export function transformComplianceProfileGroupListResponseGroupDtoToModel(group: ComplianceProfileGroupListResponseGroupDto): ComplianceProfileGroupListResponseGroupModel {
-    return { ...group }
+export function transformComplianceProfileGroupListResponseGroupDtoToModel(
+    group: ComplianceProfileGroupListResponseGroupDto,
+): ComplianceProfileGroupListResponseGroupModel {
+    return { ...group };
 }
 
-export function transformComplianceProfileGroupListResponseDtoToModel(groupList: ComplianceProfileGroupListResponseDto): ComplianceProfileGroupListResponseModel {
+export function transformComplianceProfileGroupListResponseDtoToModel(
+    groupList: ComplianceProfileGroupListResponseDto,
+): ComplianceProfileGroupListResponseModel {
     return {
         ...groupList,
-        groups: groupList.groups.map(transformComplianceProfileGroupListResponseGroupDtoToModel)
-    }
+        groups: groupList.groups.map(transformComplianceProfileGroupListResponseGroupDtoToModel),
+    };
 }

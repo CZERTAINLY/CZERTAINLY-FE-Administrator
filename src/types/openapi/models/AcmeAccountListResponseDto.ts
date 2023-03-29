@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AccountStatus,
-} from './';
+import type { AccountStatus } from "./";
 
 /**
  * @export
@@ -68,5 +66,3 @@ export interface AcmeAccountListResponseDto {
      */
     acmeProfileUuid: string;
 }
-
-

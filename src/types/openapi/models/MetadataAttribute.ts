@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    BaseAttributeContentDto,
-    MetadataAttributeProperties,
-} from './';
+import type { AttributeContentType, AttributeType, BaseAttributeContentDto, MetadataAttributeProperties } from "./";
 
 /**
  * Info attribute contains content that is for metadata. Its content can not be edited and is not send in requests to store.
@@ -64,5 +59,3 @@ export interface MetadataAttribute {
      */
     properties: MetadataAttributeProperties;
 }
-
-

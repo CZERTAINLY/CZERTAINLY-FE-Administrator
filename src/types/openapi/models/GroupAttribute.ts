@@ -11,11 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeCallback,
-    AttributeType,
-    BaseAttributeDto,
-} from './';
+import type { AttributeCallback, AttributeType, BaseAttributeDto } from "./";
 
 /**
  * Group attribute and its content represents dynamic list of additional attributes retrieved by callback. Its content can not be edited and is not send in requests to store.
@@ -58,5 +54,3 @@ export interface GroupAttribute {
      */
     attributeCallback?: AttributeCallback;
 }
-
-

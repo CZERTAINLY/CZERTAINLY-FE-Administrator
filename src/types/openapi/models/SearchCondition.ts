@@ -17,19 +17,18 @@
  * @enum {string}
  */
 export enum SearchCondition {
-    Equals = 'EQUALS',
-    NotEquals = 'NOT_EQUALS',
-    Greater = 'GREATER',
-    Lesser = 'LESSER',
-    Contains = 'CONTAINS',
-    NotContains = 'NOT_CONTAINS',
-    StartsWith = 'STARTS_WITH',
-    EndsWith = 'ENDS_WITH',
-    Empty = 'EMPTY',
-    NotEmpty = 'NOT_EMPTY',
-    Success = 'SUCCESS',
-    Failed = 'FAILED',
-    Unknown = 'UNKNOWN',
-    NotChecked = 'NOT_CHECKED'
+    Equals = "EQUALS",
+    NotEquals = "NOT_EQUALS",
+    Greater = "GREATER",
+    Lesser = "LESSER",
+    Contains = "CONTAINS",
+    NotContains = "NOT_CONTAINS",
+    StartsWith = "STARTS_WITH",
+    EndsWith = "ENDS_WITH",
+    Empty = "EMPTY",
+    NotEmpty = "NOT_EMPTY",
+    Success = "SUCCESS",
+    Failed = "FAILED",
+    Unknown = "UNKNOWN",
+    NotChecked = "NOT_CHECKED",
 }
-

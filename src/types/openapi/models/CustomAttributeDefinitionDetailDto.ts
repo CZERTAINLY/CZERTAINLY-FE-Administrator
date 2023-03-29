@@ -11,12 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    AttributeContentType,
-    AttributeType,
-    BaseAttributeContentDto,
-    Resource,
-} from './';
+import type { AttributeContentType, AttributeType, BaseAttributeContentDto, Resource } from "./";
 
 /**
  * @export
@@ -112,5 +107,3 @@ export interface CustomAttributeDefinitionDetailDto {
      */
     resources?: Array<Resource>;
 }
-
-

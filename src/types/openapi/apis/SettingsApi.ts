@@ -11,15 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
-import type { OperationOpts, HttpHeaders } from '../runtime';
-import type {
-    AuthenticationServiceExceptionDto,
-    ErrorMessageDto,
-    PlatformSettingsDto,
-} from '../models';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
+import type { PlatformSettingsDto } from "../models";
+import type { HttpHeaders, OperationOpts } from "../runtime";
+import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
 
 export interface UpdatePlatformSettingsRequest {
     platformSettingsDto: PlatformSettingsDto;
@@ -29,37 +25,47 @@ export interface UpdatePlatformSettingsRequest {
  * no description
  */
 export class SettingsApi extends BaseAPI {
-
     /**
      * Get platform settings
      */
-    getPlatformSettings(): Observable<PlatformSettingsDto>
-    getPlatformSettings(opts?: OperationOpts): Observable<AjaxResponse<PlatformSettingsDto>>
+    getPlatformSettings(): Observable<PlatformSettingsDto>;
+    getPlatformSettings(opts?: OperationOpts): Observable<AjaxResponse<PlatformSettingsDto>>;
     getPlatformSettings(opts?: OperationOpts): Observable<PlatformSettingsDto | AjaxResponse<PlatformSettingsDto>> {
-        return this.request<PlatformSettingsDto>({
-            url: '/v1/settings/platform',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<PlatformSettingsDto>(
+            {
+                url: "/v1/settings/platform",
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Update platform setting
      */
-    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest): Observable<void>
-    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(platformSettingsDto, 'platformSettingsDto', 'updatePlatformSettings');
+    updatePlatformSettings({ platformSettingsDto }: UpdatePlatformSettingsRequest): Observable<void>;
+    updatePlatformSettings(
+        { platformSettingsDto }: UpdatePlatformSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updatePlatformSettings(
+        { platformSettingsDto }: UpdatePlatformSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(platformSettingsDto, "platformSettingsDto", "updatePlatformSettings");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<void>({
-            url: '/v1/settings/platform',
-            method: 'PUT',
-            headers,
-            body: platformSettingsDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<void>(
+            {
+                url: "/v1/settings/platform",
+                method: "PUT",
+                headers,
+                body: platformSettingsDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }

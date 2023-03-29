@@ -4,185 +4,138 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { actions, selectors } from "ducks/certificateGroups";
 
-import { Container } from "reactstrap";
-import Widget from "components/Widget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import Dialog from "components/Dialog";
-
+import Widget from "components/Widget";
+import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { Container } from "reactstrap";
 
 export default function GroupList() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-   const dispatch = useDispatch();
-   const navigate = useNavigate();
+    const checkedRows = useSelector(selectors.checkedRows);
+    const groups = useSelector(selectors.certificateGroups);
 
-   const checkedRows = useSelector(selectors.checkedRows);
-   const groups = useSelector(selectors.certificateGroups);
+    const isFetching = useSelector(selectors.isFetchingList);
+    const isDeleting = useSelector(selectors.isDeleting);
+    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+    const isUpdating = useSelector(selectors.isUpdating);
 
-   const isFetching = useSelector(selectors.isFetchingList);
-   const isDeleting = useSelector(selectors.isDeleting);
-   const isBulkDeleting = useSelector(selectors.isBulkDeleting);
-   const isUpdating = useSelector(selectors.isUpdating);
+    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
 
-   const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
+    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    useEffect(() => {
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
+        dispatch(actions.listGroups());
+    }, [dispatch]);
 
+    const onAddClick = useCallback(() => {
+        navigate(`./add`);
+    }, [navigate]);
 
-   useEffect(
+    const onDeleteConfirmed = useCallback(() => {
+        dispatch(actions.bulkDeleteGroups({ uuids: checkedRows }));
+        setConfirmDelete(false);
+    }, [checkedRows, dispatch]);
 
-      () => {
+    const setCheckedRows = useCallback(
+        (rows: (string | number)[]) => {
+            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
+        },
+        [dispatch],
+    );
 
-         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-         dispatch(actions.listGroups());
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: "plus",
+                disabled: false,
+                tooltip: "Create",
+                onClick: () => {
+                    onAddClick();
+                },
+            },
+            {
+                icon: "trash",
+                disabled: checkedRows.length === 0,
+                tooltip: "Delete",
+                onClick: () => {
+                    setConfirmDelete(true);
+                },
+            },
+        ],
+        [checkedRows, onAddClick],
+    );
 
-      },
-      [dispatch]
+    const title = useMemo(
+        () => (
+            <div>
+                <div className="fa-pull-right mt-n-xs">
+                    <WidgetButtons buttons={buttons} />
+                </div>
 
-   );
-
-
-   const onAddClick = useCallback(
-
-      () => {
-
-         navigate(`./add`);
-
-      },
-      [navigate]
-
-   );
-
-
-   const onDeleteConfirmed = useCallback(
-
-      () => {
-
-         dispatch(actions.bulkDeleteGroups({ uuids: checkedRows }));
-         setConfirmDelete(false);
-
-      },
-      [checkedRows, dispatch]
-
-   );
-
-
-   const setCheckedRows = useCallback(
-
-      (rows: (string | number)[]) => {
-         dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
-      },
-      [dispatch]
-
-   );
-
-
-   const buttons: WidgetButtonProps[] = useMemo(
-
-      () => [
-         { icon: "plus", disabled: false, tooltip: "Create", onClick: () => { onAddClick(); } },
-         { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => { setConfirmDelete(true); } },
-      ],
-      [checkedRows, onAddClick]
-
-   );
-
-
-   const title = useMemo(
-
-      () => (
-         <div>
-
-            <div className="fa-pull-right mt-n-xs">
-               <WidgetButtons buttons={buttons} />
+                <h5 className="mt-0">
+                    List of <span className="fw-semi-bold">Groups</span>
+                </h5>
             </div>
+        ),
+        [buttons],
+    );
 
-            <h5 className="mt-0">
-               List of <span className="fw-semi-bold">Groups</span>
-            </h5>
+    const groupsTableHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "name",
+                content: "Name",
+                sortable: true,
+                sort: "asc",
+                width: "15%",
+            },
+            {
+                id: "description",
+                content: "Description",
+                sortable: true,
+            },
+        ],
+        [],
+    );
 
-         </div>
-      ),
-      [buttons]
+    const groupsTableData: TableDataRow[] = useMemo(
+        () =>
+            groups.map((group) => ({
+                id: group.uuid,
 
-   );
+                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || ""],
+            })),
+        [groups],
+    );
 
+    return (
+        <Container className="themed-container" fluid>
+            <Widget title={title} busy={isBusy}>
+                <br />
+                <CustomTable
+                    headers={groupsTableHeaders}
+                    data={groupsTableData}
+                    onCheckedRowsChanged={setCheckedRows}
+                    canSearch={true}
+                    hasCheckboxes={true}
+                    hasPagination={true}
+                />
+            </Widget>
 
-   const groupsTableHeaders: TableHeader[] = useMemo(
-
-      () => [
-         {
-            id: "name",
-            content: "Name",
-            sortable: true,
-            sort: "asc",
-            width: "15%",
-         },
-         {
-            id: "description",
-            content: "Description",
-            sortable: true,
-         }
-      ],
-      []
-
-   );
-
-
-   const groupsTableData: TableDataRow[] = useMemo(
-
-      () => groups.map(
-
-         group => ({
-
-            id: group.uuid,
-
-            columns: [
-
-               <Link to={`./detail/${group.uuid}`}>{group.name}</Link>,
-
-               group.description || ""
-
-            ]
-
-         })
-      ),
-      [groups]
-
-   )
-
-
-   return (
-
-      <Container className="themed-container" fluid>
-
-         <Widget title={title} busy={isBusy}>
-
-            <br />
-            <CustomTable
-               headers={groupsTableHeaders}
-               data={groupsTableData}
-               onCheckedRowsChanged={setCheckedRows}
-               canSearch={true}
-               hasCheckboxes={true}
-               hasPagination={true}
+            <Dialog
+                isOpen={confirmDelete}
+                caption={`Delete ${checkedRows.length > 1 ? "Groups" : "Profile"}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? "a Group" : "Groups"}. Is this what you want to do?`}
+                toggle={() => setConfirmDelete(false)}
+                buttons={[
+                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                ]}
             />
-
-         </Widget>
-
-         <Dialog
-            isOpen={confirmDelete}
-            caption={`Delete ${checkedRows.length > 1 ? "Groups" : "Profile"}`}
-            body={`You are about to delete ${checkedRows.length > 1 ? "a Group" : "Groups"}. Is this what you want to do?`}
-            toggle={() => setConfirmDelete(false)}
-            buttons={[
-               { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-               { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-            ]}
-         />
-
-      </Container>
-
-   );
-
+        </Container>
+    );
 }

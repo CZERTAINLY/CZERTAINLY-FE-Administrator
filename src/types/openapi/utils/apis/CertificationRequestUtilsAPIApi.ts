@@ -11,15 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
-import type { OperationOpts, HttpHeaders } from '../runtime';
-import type {
-    ApiErrorResponseDto,
-    ParseRequestRequestDto,
-    ParseRequestResponseDto,
-} from '../models';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
+import type { ParseRequestRequestDto, ParseRequestResponseDto } from "../models";
+import type { HttpHeaders, OperationOpts } from "../runtime";
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
 
 export interface ParseRequestRequest {
     requestType: ParseRequestRequestTypeEnum;
@@ -30,28 +26,35 @@ export interface ParseRequestRequest {
  * no description
  */
 export class CertificationRequestUtilsAPIApi extends BaseAPI {
-
     /**
      * Parse the certification request and provides details about its attributes
      */
-    parseRequest({ requestType, parseRequestRequestDto }: ParseRequestRequest): Observable<ParseRequestResponseDto>
-    parseRequest({ requestType, parseRequestRequestDto }: ParseRequestRequest, opts?: OperationOpts): Observable<AjaxResponse<ParseRequestResponseDto>>
-    parseRequest({ requestType, parseRequestRequestDto }: ParseRequestRequest, opts?: OperationOpts): Observable<ParseRequestResponseDto | AjaxResponse<ParseRequestResponseDto>> {
-        throwIfNullOrUndefined(requestType, 'requestType', 'parseRequest');
-        throwIfNullOrUndefined(parseRequestRequestDto, 'parseRequestRequestDto', 'parseRequest');
+    parseRequest({ requestType, parseRequestRequestDto }: ParseRequestRequest): Observable<ParseRequestResponseDto>;
+    parseRequest(
+        { requestType, parseRequestRequestDto }: ParseRequestRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ParseRequestResponseDto>>;
+    parseRequest(
+        { requestType, parseRequestRequestDto }: ParseRequestRequest,
+        opts?: OperationOpts,
+    ): Observable<ParseRequestResponseDto | AjaxResponse<ParseRequestResponseDto>> {
+        throwIfNullOrUndefined(requestType, "requestType", "parseRequest");
+        throwIfNullOrUndefined(parseRequestRequestDto, "parseRequestRequestDto", "parseRequest");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<ParseRequestResponseDto>({
-            url: '/v1/request/{requestType}/parse'.replace('{requestType}', encodeURI(requestType)),
-            method: 'POST',
-            headers,
-            body: parseRequestRequestDto,
-        }, opts?.responseOpts);
-    };
-
+        return this.request<ParseRequestResponseDto>(
+            {
+                url: "/v1/request/{requestType}/parse".replace("{requestType}", encodeURI(requestType)),
+                method: "POST",
+                headers,
+                body: parseRequestRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 }
 
 /**
@@ -59,5 +62,5 @@ export class CertificationRequestUtilsAPIApi extends BaseAPI {
  * @enum {string}
  */
 export enum ParseRequestRequestTypeEnum {
-    Pkcs10 = 'PKCS10'
+    Pkcs10 = "PKCS10",
 }
