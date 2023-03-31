@@ -37,12 +37,6 @@ export interface ScepProfileEditRequestDto {
      */
     issueCertificateAttributes: Array<RequestAttributeDto>;
     /**
-     * List of Attributes to revoke Certificate
-     * @type {Array<RequestAttributeDto>}
-     * @memberof ScepProfileEditRequestDto
-     */
-    revokeCertificateAttributes: Array<RequestAttributeDto>;
-    /**
      * Require manual approval for SCEP requests
      * @type {boolean}
      * @memberof ScepProfileEditRequestDto

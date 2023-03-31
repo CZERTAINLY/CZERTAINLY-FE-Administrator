@@ -49,6 +49,11 @@ import EntitiesList from "./_pages/entities/list";
 import GlobalMetadataDetail from "./_pages/global-metadata/detail";
 import GlobalMetadataEdit from "./_pages/global-metadata/form";
 
+import ScepProfileDetail from "./_pages/scep-profiles/detail";
+import ScepProfileEdit from "./_pages/scep-profiles/form";
+
+import ScepProfilesList from "./_pages/scep-profiles/list";
+
 import GlobalMetadataList from "./_pages/global-metadata/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
@@ -160,6 +165,12 @@ export default function AppRouter() {
                     <Route path="/acmeaccounts" element={<AcmeAccountsList />} />
                     <Route path="/acmeaccounts/list" element={<Navigate to="/acmeaccounts" />} />
                     <Route path="/acmeaccounts/detail/:acmeProfileId/:id" element={<AcmeAccountDetail />} />
+
+                    <Route path="/scepprofiles" element={<ScepProfilesList />} />
+                    <Route path="/scepprofiles/list" element={<Navigate to="/scepprofiles" />} />
+                    <Route path="/scepprofiles/detail/:id" element={<ScepProfileDetail />} />
+                    <Route path="/scepprofiles/edit/:id" element={<ScepProfileEdit />} />
+                    <Route path="/scepprofiles/add" element={<ScepProfileEdit />} />
 
                     <Route path="/groups" element={<GroupList />} />
                     <Route path="/groups/list" element={<Navigate to="/groups" />} />

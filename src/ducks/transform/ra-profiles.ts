@@ -5,12 +5,16 @@ import {
     RaProfileAcmeDetailResponseModel,
     RaProfileActivateAcmeRequestDto,
     RaProfileActivateAcmeRequestModel,
+    RaProfileActivateScepRequestDto,
+    RaProfileActivateScepRequestModel,
     RaProfileAddRequestDto,
     RaProfileAddRequestModel,
     RaProfileEditRequestDto,
     RaProfileEditRequestModel,
     RaProfileResponseDto,
     RaProfileResponseModel,
+    RaProfileScepDetailResponseDto,
+    RaProfileScepDetailResponseModel,
 } from "types/ra-profiles";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 
@@ -39,6 +43,24 @@ export function transformRaProfileAcmeDetailResponseDtoToModel(
         ...raAcmeResponse,
         issueCertificateAttributes: raAcmeResponse.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         revokeCertificateAttributes: raAcmeResponse.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+    };
+}
+
+export function transformRaProfileActivateScepRequestModelToDto(
+    raScepRequest: RaProfileActivateScepRequestModel,
+): RaProfileActivateScepRequestDto {
+    return {
+        ...raScepRequest,
+        issueCertificateAttributes: raScepRequest.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
+    };
+}
+
+export function transformRaProfileScepDetailResponseDtoToModel(
+    raScepResponse: RaProfileScepDetailResponseDto,
+): RaProfileScepDetailResponseModel {
+    return {
+        ...raScepResponse,
+        issueCertificateAttributes: raScepResponse.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
     };
 }
 

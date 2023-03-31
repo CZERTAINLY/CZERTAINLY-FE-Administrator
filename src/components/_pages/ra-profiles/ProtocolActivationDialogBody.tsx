@@ -3,12 +3,15 @@ import Spinner from "components/Spinner";
 
 import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from "ducks/acme-profiles";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
+import { actions as scepProfilesActions, selectors as scepProfilesSelectors } from "ducks/scep-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { AcmeProfileListResponseModel } from "types/acme-profiles";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { ScepProfileListResponseModel } from "types/scep-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -16,17 +19,25 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 import { validateRequired } from "utils/validators";
 import TabLayout from "../../Layout/TabLayout";
 
+export enum Protocol {
+    "ACME",
+    "SCEP",
+}
+
 interface Props {
+    protocol: Protocol;
     raProfileUuid?: string;
     authorityInstanceUuid?: string;
     visible: boolean;
     onClose: () => void;
 }
 
-export default function AcmeProtocolActivationDialogBody({ raProfileUuid, authorityInstanceUuid, visible, onClose }: Props) {
+export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, authorityInstanceUuid, visible, onClose }: Props) {
     const dispatch = useDispatch();
 
-    const acmeProfiles = useSelector(acmeProfilesSelectors.acmeProfiles);
+    let profiles: AcmeProfileListResponseModel[] | ScepProfileListResponseModel[] = useSelector(
+        protocol === Protocol.ACME ? acmeProfilesSelectors.acmeProfiles : scepProfilesSelectors.scepProfiles,
+    );
 
     const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
     const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
@@ -34,20 +45,22 @@ export default function AcmeProtocolActivationDialogBody({ raProfileUuid, author
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    const isFetchingAcmeProfiles = useSelector(acmeProfilesSelectors.isFetchingList);
+    const isFetchingProfiles = useSelector(
+        protocol === Protocol.ACME ? acmeProfilesSelectors.isFetchingList : scepProfilesSelectors.isFetchingList,
+    );
     const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
     const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
 
     const isBusy = useMemo(
-        () => isFetchingAcmeProfiles || isFetchingIssuanceAttributes || isFetchingRevocationAttributes,
-        [isFetchingAcmeProfiles, isFetchingIssuanceAttributes, isFetchingRevocationAttributes],
+        () => isFetchingProfiles || isFetchingIssuanceAttributes || isFetchingRevocationAttributes,
+        [isFetchingProfiles, isFetchingIssuanceAttributes, isFetchingRevocationAttributes],
     );
 
     useEffect(
         () => {
             if (!visible) return;
 
-            dispatch(acmeProfilesActions.listAcmeProfiles());
+            dispatch(protocol === Protocol.ACME ? acmeProfilesActions.listAcmeProfiles() : scepProfilesActions.listScepProfiles());
             if (!raProfileUuid) return;
             dispatch(
                 raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityInstanceUuid || "", uuid: raProfileUuid }),
@@ -60,16 +73,16 @@ export default function AcmeProtocolActivationDialogBody({ raProfileUuid, author
         [visible],
     );
 
-    const optionsForAcmeProfiles = useMemo(
+    const optionsForProfiles = useMemo(
         () =>
-            acmeProfiles.map((acmeProfile) => ({
-                value: acmeProfile.uuid,
-                label: acmeProfile.name,
+            profiles.map((profile) => ({
+                value: profile.uuid,
+                label: profile.name,
             })),
-        [acmeProfiles],
+        [profiles],
     );
 
-    const onActivateAcmeSubmit = useCallback(
+    const onActivateSubmit = useCallback(
         (values: any) => {
             if (!raProfileUuid) return;
 
@@ -90,15 +103,24 @@ export default function AcmeProtocolActivationDialogBody({ raProfileUuid, author
                       ) || []
                     : [];
             dispatch(
-                raProfilesActions.activateAcme({
-                    authorityUuid: authorityInstanceUuid || "",
-                    uuid: raProfileUuid,
-                    acmeProfileUuid: values.acmeProfiles.value,
-                    raProfileActivateAcmeRequest: {
-                        issueCertificateAttributes: issuanceAttribs,
-                        revokeCertificateAttributes: revocationAttribs,
-                    },
-                }),
+                protocol === Protocol.ACME
+                    ? raProfilesActions.activateAcme({
+                          authorityUuid: authorityInstanceUuid || "",
+                          uuid: raProfileUuid,
+                          acmeProfileUuid: values.profiles.value,
+                          raProfileActivateAcmeRequest: {
+                              issueCertificateAttributes: issuanceAttribs,
+                              revokeCertificateAttributes: revocationAttribs,
+                          },
+                      })
+                    : raProfilesActions.activateScep({
+                          authorityUuid: authorityInstanceUuid || "",
+                          uuid: raProfileUuid,
+                          scepProfileUuid: values.profiles.value,
+                          raProfileActivateScepRequest: {
+                              issueCertificateAttributes: issuanceAttribs,
+                          },
+                      }),
             );
 
             onClose();
@@ -112,27 +134,73 @@ export default function AcmeProtocolActivationDialogBody({ raProfileUuid, author
             authorityInstanceUuid,
             issueGroupAttributesCallbackAttributes,
             revokeGroupAttributesCallbackAttributes,
+            protocol,
         ],
     );
 
     if (!raProfileUuid) return <></>;
 
+    const attributeTabs = [
+        {
+            title: "Issuance attributes",
+            content:
+                !issuanceAttributes || issuanceAttributes.length === 0 ? (
+                    <></>
+                ) : (
+                    <Field name="IssuanceAttributes">
+                        {({ input, meta }) => (
+                            <FormGroup>
+                                <AttributeEditor
+                                    id="issuanceAttributes"
+                                    attributeDescriptors={issuanceAttributes}
+                                    groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                    setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                />
+                            </FormGroup>
+                        )}
+                    </Field>
+                ),
+        },
+    ];
+    if (protocol === Protocol.ACME) {
+        attributeTabs.push({
+            title: "Revocation attributes",
+            content:
+                !revocationAttributes || revocationAttributes.length === 0 ? (
+                    <></>
+                ) : (
+                    <Field name="RevocationAttributes">
+                        {({ input, meta }) => (
+                            <FormGroup>
+                                <AttributeEditor
+                                    id="revocationAttributes"
+                                    attributeDescriptors={revocationAttributes}
+                                    groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
+                                    setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
+                                />
+                            </FormGroup>
+                        )}
+                    </Field>
+                ),
+        });
+    }
+
     return (
         <>
-            <Form onSubmit={onActivateAcmeSubmit} mutators={{ ...mutators() }}>
+            <Form onSubmit={onActivateSubmit} mutators={{ ...mutators() }}>
                 {({ handleSubmit, pristine, submitting, valid }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="acmeProfiles" validate={validateRequired()}>
+                        <Field name="profiles" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="acmeProfiles">Select ACME profile</Label>
+                                    <Label for="profiles">{`Select ${protocol} profile`}</Label>
 
                                     <Select
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={optionsForAcmeProfiles}
-                                        placeholder="Select ACME profile to be activated"
+                                        options={optionsForProfiles}
+                                        placeholder={`Select ${protocol} profile to be activated`}
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
@@ -149,52 +217,7 @@ export default function AcmeProtocolActivationDialogBody({ raProfileUuid, author
                         </Field>
                         <br />
 
-                        <TabLayout
-                            tabs={[
-                                {
-                                    title: "Issuance attributes",
-                                    content:
-                                        !issuanceAttributes || issuanceAttributes.length === 0 ? (
-                                            <></>
-                                        ) : (
-                                            <Field name="IssuanceAttributes">
-                                                {({ input, meta }) => (
-                                                    <FormGroup>
-                                                        <AttributeEditor
-                                                            id="issuanceAttributes"
-                                                            attributeDescriptors={issuanceAttributes}
-                                                            groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                                        />
-                                                    </FormGroup>
-                                                )}
-                                            </Field>
-                                        ),
-                                },
-                                {
-                                    title: "Revocation attributes",
-                                    content:
-                                        !revocationAttributes || revocationAttributes.length === 0 ? (
-                                            <></>
-                                        ) : (
-                                            <Field name="RevocationAttributes">
-                                                {({ input, meta }) => (
-                                                    <FormGroup>
-                                                        <AttributeEditor
-                                                            id="revocationAttributes"
-                                                            attributeDescriptors={revocationAttributes}
-                                                            groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={
-                                                                setRevokeGroupAttributesCallbackAttributes
-                                                            }
-                                                        />
-                                                    </FormGroup>
-                                                )}
-                                            </Field>
-                                        ),
-                                },
-                            ]}
-                        />
+                        <TabLayout tabs={attributeTabs} />
 
                         <div style={{ textAlign: "right" }}>
                             <ButtonGroup>

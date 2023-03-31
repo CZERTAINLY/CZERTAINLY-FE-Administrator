@@ -5,9 +5,11 @@ import {
     ComplianceProfileSimplifiedModel,
     RaProfileAcmeDetailResponseModel,
     RaProfileActivateAcmeRequestModel,
+    RaProfileActivateScepRequestModel,
     RaProfileAddRequestModel,
     RaProfileEditRequestModel,
     RaProfileResponseModel,
+    RaProfileScepDetailResponseModel,
 } from "types/ra-profiles";
 import { createFeatureSelector } from "utils/ducks";
 
@@ -21,6 +23,7 @@ export type State = {
     raProfiles: RaProfileResponseModel[];
 
     acmeDetails?: RaProfileAcmeDetailResponseModel;
+    scepDetails?: RaProfileScepDetailResponseModel;
 
     issuanceAttributesDescriptors?: AttributeDescriptorModel[];
     revocationAttributesDescriptors?: AttributeDescriptorModel[];
@@ -32,6 +35,7 @@ export type State = {
     isFetchingRevocationAttributes: boolean;
 
     isFetchingAcmeDetails: boolean;
+    isFetchingScepDetails: boolean;
 
     isFetchingAssociatedComplianceProfiles: boolean;
 
@@ -45,6 +49,8 @@ export type State = {
     isBulkDisabling: boolean;
     isActivatingAcme: boolean;
     isDeactivatingAcme: boolean;
+    isActivatingScep: boolean;
+    isDeactivatingScep: boolean;
     isCheckingCompliance: boolean;
     isAssociatingComplianceProfile: boolean;
     isDissociatingComplianceProfile: boolean;
@@ -66,6 +72,7 @@ export const initialState: State = {
     isFetchingIssuanceAttributes: false,
     isFetchingRevocationAttributes: false,
     isFetchingAcmeDetails: false,
+    isFetchingScepDetails: false,
     isFetchingAssociatedComplianceProfiles: false,
     isCreating: false,
     isDeleting: false,
@@ -77,6 +84,8 @@ export const initialState: State = {
     isBulkDisabling: false,
     isActivatingAcme: false,
     isDeactivatingAcme: false,
+    isActivatingScep: false,
+    isDeactivatingScep: false,
     isCheckingCompliance: false,
     isAssociatingComplianceProfile: false,
     isDissociatingComplianceProfile: false,
@@ -279,6 +288,53 @@ export const slice = createSlice({
             state.isFetchingAcmeDetails = false;
         },
 
+        activateScep: (
+            state,
+            action: PayloadAction<{
+                authorityUuid: string;
+                uuid: string;
+                scepProfileUuid: string;
+                raProfileActivateScepRequest: RaProfileActivateScepRequestModel;
+            }>,
+        ) => {
+            state.isActivatingScep = true;
+        },
+
+        activateScepSuccess: (state, action: PayloadAction<{ raProfileScepDetailResponse: RaProfileScepDetailResponseModel }>) => {
+            state.isActivatingScep = false;
+            state.scepDetails = action.payload.raProfileScepDetailResponse;
+        },
+
+        activateScepFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isActivatingScep = false;
+        },
+
+        deactivateScep: (state, action: PayloadAction<{ authorityUuid: string; uuid: string }>) => {
+            state.isDeactivatingScep = true;
+        },
+
+        deactivateScepSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeactivatingScep = false;
+            state.scepDetails = undefined;
+        },
+
+        deactivateScepFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeactivatingScep = false;
+        },
+
+        getScepDetails: (state, action: PayloadAction<{ authorityUuid: string; uuid: string }>) => {
+            state.isFetchingScepDetails = true;
+        },
+
+        getScepDetailsSuccess: (state, action: PayloadAction<{ raScepLink: RaProfileScepDetailResponseModel }>) => {
+            state.isFetchingScepDetails = false;
+            state.scepDetails = action.payload.raScepLink;
+        },
+
+        getScepDetailsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingScepDetails = false;
+        },
+
         bulkDeleteRaProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.bulkDeleteErrorMessages = [];
             state.isBulkDeleting = true;
@@ -462,6 +518,7 @@ const raProfile = createSelector(state, (state: State) => state.raProfile);
 const raProfiles = createSelector(state, (state: State) => state.raProfiles);
 
 const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
+const scepDetails = createSelector(state, (state: State) => state.scepDetails);
 const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
 const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
@@ -471,6 +528,7 @@ const isFetchingAttributes = createSelector(state, (state: State) => state.isFet
 const isFetchingIssuanceAttributes = createSelector(state, (state: State) => state.isFetchingIssuanceAttributes);
 const isFetchingRevocationAttributes = createSelector(state, (state: State) => state.isFetchingRevocationAttributes);
 const isFetchingAcmeDetails = createSelector(state, (state: State) => state.isFetchingAcmeDetails);
+const isFetchingScepDetails = createSelector(state, (state: State) => state.isFetchingScepDetails);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
@@ -481,6 +539,8 @@ const isDisabling = createSelector(state, (state: State) => state.isDisabling);
 const isBulkDisabling = createSelector(state, (state: State) => state.isBulkDisabling);
 const isActivatingAcme = createSelector(state, (state: State) => state.isActivatingAcme);
 const isDeactivatingAcme = createSelector(state, (state: State) => state.isDeactivatingAcme);
+const isActivatingScep = createSelector(state, (state: State) => state.isActivatingScep);
+const isDeactivatingScep = createSelector(state, (state: State) => state.isDeactivatingScep);
 const isFetchingAssociatedComplianceProfiles = createSelector(state, (state: State) => state.isFetchingAssociatedComplianceProfiles);
 const associatedComplianceProfiles = createSelector(state, (state: State) => state.associatedComplianceProfiles);
 
@@ -493,6 +553,7 @@ export const selectors = {
     raProfiles,
 
     acmeDetails,
+    scepDetails,
     issuanceAttributes,
     revocationAttributes,
 
@@ -502,6 +563,7 @@ export const selectors = {
     isFetchingIssuanceAttributes,
     isFetchingRevocationAttributes,
     isFetchingAcmeDetails,
+    isFetchingScepDetails,
     isCreating,
     isDeleting,
     isBulkDeleting,
@@ -512,6 +574,8 @@ export const selectors = {
     isBulkDisabling,
     isActivatingAcme,
     isDeactivatingAcme,
+    isActivatingScep,
+    isDeactivatingScep,
     isFetchingAssociatedComplianceProfiles,
     associatedComplianceProfiles,
 };
