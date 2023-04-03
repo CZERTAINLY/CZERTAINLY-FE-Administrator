@@ -208,7 +208,12 @@ export default function ScepProfileForm() {
                         />
                         <TextField id="description" label="Description" validators={[validateAlphaNumeric()]} />
                         <TextField id="challengePassword" label="Challenge Password" inputType={"password"} validators={[]} />
-                        <TextField id="renewalThreshold" label="Renewal Threshold" validators={[validateInteger()]} />
+                        <TextField
+                            id="renewalThreshold"
+                            label="Renewal Threshold"
+                            description="Minimum expiry days to allow renewal of certificate."
+                            validators={[validateInteger()]}
+                        />
                         <CheckboxField id="requireManualApproval" label="Require Manual Approval" />
                         <CheckboxField id="includeCaCertificate" label="Include CA Certificate" />
                         <CheckboxField id="includeCaCertificateChain" label="Include CA Certificate Chain" />

@@ -22,11 +22,6 @@ export enum Protocol {
     "SCEP",
 }
 
-type Profile = {
-    uuid: string;
-    name: string;
-};
-
 interface Props {
     protocol: Protocol;
     raProfileUuid?: string;
@@ -38,9 +33,10 @@ interface Props {
 export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, authorityInstanceUuid, visible, onClose }: Props) {
     const dispatch = useDispatch();
 
-    const profiles: Profile[] = useSelector(
-        protocol === Protocol.ACME ? acmeProfilesSelectors.acmeProfiles : scepProfilesSelectors.scepProfiles,
-    );
+    const acmeProfiles = useSelector(acmeProfilesSelectors.acmeProfiles);
+    const scepProfiles = useSelector(scepProfilesSelectors.scepProfiles);
+
+    const profiles = protocol === Protocol.ACME ? acmeProfiles : scepProfiles;
 
     const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
     const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);

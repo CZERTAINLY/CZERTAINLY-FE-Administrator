@@ -1,5 +1,5 @@
 import { Field } from "react-final-form";
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
 import { composeValidators } from "utils/validators";
 
@@ -8,10 +8,11 @@ type Props = {
     label: string;
     disabled?: boolean;
     inputType?: InputType;
+    description?: string;
     validators: ((value: any) => string | undefined | Promise<string | undefined>)[];
 };
 
-export default function TextField({ id, label, inputType, disabled = false, validators }: Props) {
+export default function TextField({ id, label, inputType, disabled = false, validators, description }: Props) {
     return (
         <Field name={id} validate={composeValidators(...validators)}>
             {({ input, meta }) => (
@@ -26,6 +27,7 @@ export default function TextField({ id, label, inputType, disabled = false, vali
                         placeholder={label}
                         disabled={disabled}
                     />
+                    {description && <FormText>{description}</FormText>}
                     <FormFeedback>{meta.error}</FormFeedback>
                 </FormGroup>
             )}
