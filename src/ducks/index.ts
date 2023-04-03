@@ -5,6 +5,8 @@ import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } 
 import acmeAccountsEpics from "./acme-accounts-epics";
 import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
 import acmeProfilesEpics from "./acme-profiles-epics";
+import { initialState as initialScepProfilesState, slice as scepProfilesSlice } from "./scep-profiles";
+import scepProfilesEpics from "./scep-profiles-epics";
 
 import { initialState as initialAlertsState, slice as alertsSlice } from "./alerts";
 import { initialState as initialAppRedirectState, slice as appRedirectSlice } from "./app-redirect";
@@ -90,6 +92,7 @@ export const initialState = {
     [raProfilesSlice.name]: initialRaProfilesState,
     [acmeAccountsSlice.name]: initialAcmeAccountsState,
     [acmeProfilesSlice.name]: initialAcmeProfilesState,
+    [scepProfilesSlice.name]: initialScepProfilesState,
     [initialComplianceProfilesSlice.name]: initialComplianceProfilesState,
     [initialCredentialsSlice.name]: initialCredentialsState,
     [initialEntitiesSlice.name]: initialEntitiesState,
@@ -123,6 +126,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [raProfilesSlice.name]: raProfilesSlice.reducer,
     [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
     [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
+    [scepProfilesSlice.name]: scepProfilesSlice.reducer,
     [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
     [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
     [initialEntitiesSlice.name]: initialEntitiesSlice.reducer,
@@ -156,6 +160,7 @@ export const epics = combineEpics(
     ...raProfilesEpics,
     ...acmeAccountsEpics,
     ...acmeProfilesEpics,
+    ...scepProfilesEpics,
     ...complianceProfilesEpics,
     ...credentialsEpics,
     ...entitiesEpics,

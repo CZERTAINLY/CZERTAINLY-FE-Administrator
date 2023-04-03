@@ -21,6 +21,7 @@ import {
     LocationManagementApi,
     RAProfileManagementApi,
     RoleManagementApi,
+    SCEPProfileManagementApi,
     SettingsApi,
     StatisticsDashboardApi,
     TokenProfileManagementApi,
@@ -53,6 +54,7 @@ export interface ApiClients {
     certificates: CertificateInventoryApi;
     acmeAccounts: ACMEAccountManagementApi;
     acmeProfiles: ACMEProfileManagementApi;
+    scepProfiles: SCEPProfileManagementApi;
     certificateGroups: CertificateKeyGroupApi;
     clientOperations: ClientOperationsV2Api;
     discoveries: DiscoveryManagementApi;
@@ -86,6 +88,7 @@ export const backendClient: ApiClients = {
     statisticsDashboard: new StatisticsDashboardApi(configuration),
     acmeAccounts: new ACMEAccountManagementApi(configuration),
     acmeProfiles: new ACMEProfileManagementApi(configuration),
+    scepProfiles: new SCEPProfileManagementApi(configuration),
     certificateGroups: new CertificateKeyGroupApi(configuration),
     clientOperations: new ClientOperationsV2Api(configuration),
     discoveries: new DiscoveryManagementApi(configuration),

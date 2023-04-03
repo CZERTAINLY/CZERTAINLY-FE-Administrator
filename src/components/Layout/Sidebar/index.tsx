@@ -45,11 +45,12 @@ export default function Sidebar() {
                     />
 
                     <LinksGroup
-                        _key="acm1"
-                        header="ACME"
+                        _key="protocols"
+                        header="Protocols"
                         childrenLinks={[
                             { _key: "/acmeaccounts", name: "ACME Accounts", link: "/acmeaccounts" },
                             { _key: "/acmeprofiles", name: "ACME Profiles", link: "/acmeprofiles" },
+                            { _key: "/scepprofiles", name: "SCEP Profiles", link: "/scepprofiles" },
                         ]}
                     />
 

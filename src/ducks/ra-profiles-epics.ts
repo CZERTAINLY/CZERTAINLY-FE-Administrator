@@ -12,9 +12,11 @@ import {
     transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
     transformRaProfileActivateAcmeRequestModelToDto,
+    transformRaProfileActivateScepRequestModelToDto,
     transformRaProfileAddRequestModelToDto,
     transformRaProfileEditRequestModelToDto,
     transformRaProfileResponseDtoToModel,
+    transformRaProfileScepDetailResponseDtoToModel,
 } from "./transform/ra-profiles";
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
@@ -278,6 +280,81 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const activateScep: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.activateScep.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .activateScepForRaProfile({
+                    authorityUuid: action.payload.authorityUuid,
+                    raProfileUuid: action.payload.uuid,
+                    scepProfileUuid: action.payload.scepProfileUuid,
+                    activateScepForRaProfileRequestDto: transformRaProfileActivateScepRequestModelToDto(
+                        action.payload.raProfileActivateScepRequest,
+                    ),
+                })
+                .pipe(
+                    map((raProfileScepDetailResponse) =>
+                        slice.actions.activateScepSuccess({
+                            raProfileScepDetailResponse: transformRaProfileScepDetailResponseDtoToModel(raProfileScepDetailResponse),
+                        }),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.activateScepFailure({ error: extractError(err, "Failed to activate SCEP") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to activate SCEP" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const deactivateScep: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deactivateScep.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .deactivateScepForRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
+                .pipe(
+                    map(() => slice.actions.deactivateScepSuccess({ uuid: action.payload.uuid })),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deactivateScepFailure({ error: extractError(err, "Failed to deactivate SCEP") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to deactivate SCEP" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const getScepDetails: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getScepDetails.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .getScepForRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
+                .pipe(
+                    map((scepDetails) =>
+                        slice.actions.getScepDetailsSuccess({
+                            raScepLink: transformRaProfileScepDetailResponseDtoToModel(scepDetails),
+                        }),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.getScepDetailsFailure({ error: extractError(err, "Failed to get SCEP details") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to get SCEP details" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listIssuanceAttributeDescriptors.match),
@@ -521,6 +598,9 @@ const epics = [
     activateAcme,
     deactivateAcme,
     getAcmeDetails,
+    activateScep,
+    deactivateScep,
+    getScepDetails,
     listIssuanceAttributeDescriptors,
     listRevocationAttributeDescriptors,
     bulkEnableProfiles,

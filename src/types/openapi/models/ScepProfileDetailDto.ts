@@ -66,12 +66,6 @@ export interface ScepProfileDetailDto {
      */
     issueCertificateAttributes?: Array<ResponseAttributeDto>;
     /**
-     * List of Attributes to revoke a Certificate
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof ScepProfileDetailDto
-     */
-    revokeCertificateAttributes?: Array<ResponseAttributeDto>;
-    /**
      * List of Custom Attributes
      * @type {Array<ResponseAttributeDto>}
      * @memberof ScepProfileDetailDto

@@ -17,8 +17,8 @@ import { Col, Container, Label, Row } from "reactstrap";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
-import AcmeProtocolActivationDialogBody from "../AcmeProtocolActivationDialogBody";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
+import ProtocolActivationDialogBody, { Protocol } from "../ProtocolActivationDialogBody";
 
 export default function RaProfileDetail() {
     const dispatch = useDispatch();
@@ -28,23 +28,29 @@ export default function RaProfileDetail() {
 
     const raProfile = useSelector(raProfilesSelectors.raProfile);
     const acmeDetails = useSelector(raProfilesSelectors.acmeDetails);
+    const scepDetails = useSelector(raProfilesSelectors.scepDetails);
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
 
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
     const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
+    const isFetchingScepDetails = useSelector(raProfilesSelectors.isFetchingScepDetails);
 
     const isDeleting = useSelector(raProfilesSelectors.isDeleting);
     const isEnabling = useSelector(raProfilesSelectors.isEnabling);
     const isDisabling = useSelector(raProfilesSelectors.isDisabling);
     const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
     const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
+    const isActivatingScep = useSelector(raProfilesSelectors.isActivatingScep);
+    const isDeactivatingScep = useSelector(raProfilesSelectors.isDeactivatingScep);
     const isFetchingAssociatedComplianceProfiles = useSelector(raProfilesSelectors.isFetchingAssociatedComplianceProfiles);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const [activateAcmeDialog, setActivateAcmeDialog] = useState(false);
+    const [activateScepDialog, setActivateScepDialog] = useState(false);
 
     const [confirmDeactivateAcme, setConfirmDeactivateAcme] = useState<boolean>(false);
+    const [confirmDeactivateScep, setConfirmDeactivateScep] = useState<boolean>(false);
 
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
@@ -56,8 +62,14 @@ export default function RaProfileDetail() {
     );
 
     const isWorkingWithProtocol = useMemo(
-        () => isActivatingAcme || isDeactivatingAcme || isFetchingAcmeDetails,
-        [isActivatingAcme, isDeactivatingAcme, isFetchingAcmeDetails],
+        () =>
+            isActivatingAcme ||
+            isDeactivatingAcme ||
+            isFetchingAcmeDetails ||
+            isActivatingScep ||
+            isDeactivatingScep ||
+            isFetchingScepDetails,
+        [isActivatingAcme, isDeactivatingAcme, isFetchingAcmeDetails, isActivatingScep, isDeactivatingScep, isFetchingScepDetails],
     );
 
     useEffect(() => {
@@ -71,6 +83,7 @@ export default function RaProfileDetail() {
         dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
         dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
         dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: authorityId, uuid: id }));
+        dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
     const onEditClick = useCallback(() => {
@@ -108,6 +121,16 @@ export default function RaProfileDetail() {
 
     const openAcmeActivationDialog = useCallback(() => {
         setActivateAcmeDialog(true);
+    }, []);
+
+    const onDeactivateScepConfirmed = useCallback(() => {
+        if (!raProfile) return;
+        dispatch(raProfilesActions.deactivateScep({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
+        setConfirmDeactivateScep(false);
+    }, [dispatch, raProfile]);
+
+    const openScepActivationDialog = useCallback(() => {
+        setActivateScepDialog(true);
     }, []);
 
     const onComplianceCheck = useCallback(() => {
@@ -322,7 +345,7 @@ export default function RaProfileDetail() {
         [raProfile],
     );
 
-    const acmeProfileHeaders: TableHeader[] = useMemo(
+    const protocolProfileHeaders: TableHeader[] = useMemo(
         () => [
             {
                 id: "property",
@@ -355,6 +378,27 @@ export default function RaProfileDetail() {
                       },
                   ],
         [acmeDetails],
+    );
+
+    const scepProfileData: TableDataRow[] = useMemo(
+        () =>
+            !scepDetails
+                ? []
+                : [
+                      {
+                          id: "uuid",
+                          columns: ["UUID", scepDetails.uuid || ""],
+                      },
+                      {
+                          id: "name",
+                          columns: ["Name", scepDetails.name || ""],
+                      },
+                      {
+                          id: "URL",
+                          columns: ["URL", scepDetails.url || ""],
+                      },
+                  ],
+        [scepDetails],
     );
 
     const availableProtocolsHeaders: TableHeader[] = useMemo(
@@ -411,7 +455,7 @@ export default function RaProfileDetail() {
                             <b>Protocol settings</b>
                             <br />
                             <br />
-                            <CustomTable hasHeader={false} headers={acmeProfileHeaders} data={acmeProfileData} />
+                            <CustomTable hasHeader={false} headers={protocolProfileHeaders} data={acmeProfileData} />
 
                             {acmeDetails && acmeDetails.issueCertificateAttributes && acmeDetails.issueCertificateAttributes.length > 0 ? (
                                 <>
@@ -440,8 +484,62 @@ export default function RaProfileDetail() {
                     ),
                 ],
             },
+            {
+                id: "scep",
+                columns: [
+                    "SCEP",
+                    <StatusBadge enabled={scepDetails ? (scepDetails.scepAvailable ? true : false) : false} />,
+                    <ProgressButton
+                        className="btn btn-primary btn-sm"
+                        type="button"
+                        title={scepDetails?.scepAvailable ? "Deactivate" : "Activate"}
+                        inProgressTitle={scepDetails?.scepAvailable ? "Deactivating..." : "Activating..."}
+                        inProgress={isActivatingScep || isDeactivatingScep}
+                        onClick={() => (scepDetails?.scepAvailable ? setConfirmDeactivateScep(true) : openScepActivationDialog())}
+                    />,
+                ],
+                detailColumns: [
+                    <></>,
+                    <></>,
+                    <></>,
+
+                    !scepDetails || !scepDetails.scepAvailable ? (
+                        <>SCEP is not active</>
+                    ) : (
+                        <>
+                            <b>Protocol settings</b>
+                            <br />
+                            <br />
+                            <CustomTable hasHeader={false} headers={protocolProfileHeaders} data={scepProfileData} />
+
+                            {scepDetails && scepDetails.issueCertificateAttributes && scepDetails.issueCertificateAttributes.length > 0 ? (
+                                <>
+                                    <b>Settings for certificate issuing</b>
+                                    <br />
+                                    <br />
+                                    <AttributeViewer hasHeader={false} attributes={scepDetails?.issueCertificateAttributes} />
+                                </>
+                            ) : (
+                                <></>
+                            )}
+                        </>
+                    ),
+                ],
+            },
         ],
-        [acmeDetails, isActivatingAcme, isDeactivatingAcme, acmeProfileHeaders, acmeProfileData, openAcmeActivationDialog],
+        [
+            acmeDetails,
+            scepDetails,
+            isActivatingAcme,
+            isDeactivatingAcme,
+            isActivatingScep,
+            isDeactivatingScep,
+            protocolProfileHeaders,
+            acmeProfileData,
+            scepProfileData,
+            openAcmeActivationDialog,
+            openScepActivationDialog,
+        ],
     );
 
     return (
@@ -530,15 +628,41 @@ export default function RaProfileDetail() {
             />
 
             <Dialog
+                isOpen={confirmDeactivateScep}
+                caption="Deactivate SCEP"
+                body="You are about to deactivate SCEP protocol for the RA profile. Is this what you want to do?"
+                toggle={() => setConfirmDeactivateScep(false)}
+                buttons={[
+                    { color: "danger", onClick: onDeactivateScepConfirmed, body: "Yes, deactivate" },
+                    { color: "secondary", onClick: () => setConfirmDeactivateScep(false), body: "Cancel" },
+                ]}
+            />
+
+            <Dialog
                 isOpen={activateAcmeDialog}
                 caption="Activate ACME protocol"
-                body={AcmeProtocolActivationDialogBody({
+                body={ProtocolActivationDialogBody({
+                    protocol: Protocol.ACME,
                     visible: activateAcmeDialog,
                     onClose: () => setActivateAcmeDialog(false),
                     raProfileUuid: raProfile?.uuid,
                     authorityInstanceUuid: raProfile?.authorityInstanceUuid,
                 })}
                 toggle={() => setActivateAcmeDialog(false)}
+                buttons={[]}
+            />
+
+            <Dialog
+                isOpen={activateScepDialog}
+                caption="Activate SCEP protocol"
+                body={ProtocolActivationDialogBody({
+                    protocol: Protocol.SCEP,
+                    visible: activateScepDialog,
+                    onClose: () => setActivateScepDialog(false),
+                    raProfileUuid: raProfile?.uuid,
+                    authorityInstanceUuid: raProfile?.authorityInstanceUuid,
+                })}
+                toggle={() => setActivateScepDialog(false)}
                 buttons={[]}
             />
 
