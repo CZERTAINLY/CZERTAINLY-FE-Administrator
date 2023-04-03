@@ -15,7 +15,7 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
-import { Button, ButtonGroup, Col, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { AcmeProfileResponseModel } from "types/acme-profiles";
 import { AttributeDescriptorModel } from "types/attributes";
 import { RaProfileResponseModel } from "types/ra-profiles";
@@ -537,7 +537,7 @@ export default function AcmeProfileForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Issuance Attributes",
+                                        title: "Issue Attributes",
                                         content:
                                             !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
                                                 <></>
