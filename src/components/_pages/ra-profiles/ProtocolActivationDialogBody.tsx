@@ -8,10 +8,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
-import { AcmeProfileListResponseModel } from "types/acme-profiles";
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
-import { ScepProfileListResponseModel } from "types/scep-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -24,6 +22,11 @@ export enum Protocol {
     "SCEP",
 }
 
+type Profile = {
+    uuid: string;
+    name: string;
+};
+
 interface Props {
     protocol: Protocol;
     raProfileUuid?: string;
@@ -35,7 +38,7 @@ interface Props {
 export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, authorityInstanceUuid, visible, onClose }: Props) {
     const dispatch = useDispatch();
 
-    let profiles: AcmeProfileListResponseModel[] | ScepProfileListResponseModel[] = useSelector(
+    const profiles: Profile[] = useSelector(
         protocol === Protocol.ACME ? acmeProfilesSelectors.acmeProfiles : scepProfilesSelectors.scepProfiles,
     );
 

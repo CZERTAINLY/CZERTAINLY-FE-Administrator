@@ -35,10 +35,9 @@ interface FormValues {
     renewalThreshold: number;
     includeCaCertificate: boolean;
     includeCaCertificateChain: boolean;
-    caCertificateUuid: string; // TODO remove
     challengePassword: string;
     raProfile: { value: string; label: string } | undefined;
-    // certificate: { value: string; label: string } | undefined;
+    certificate: { value: string; label: string } | undefined;
 }
 
 export default function ScepProfileForm() {
@@ -54,6 +53,7 @@ export default function ScepProfileForm() {
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const certificates = useSelector(scepProfileSelectors.caCertificates);
 
     const isFetchingDetail = useSelector(scepProfileSelectors.isFetchingDetail);
     const isCreating = useSelector(scepProfileSelectors.isCreating);
@@ -67,7 +67,6 @@ export default function ScepProfileForm() {
 
     const [scepProfile, setScepProfile] = useState<ScepProfileResponseModel>();
     const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
-    // const [certificate, setCertificate] = useState<CertificateListResponseModel>();
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
 
@@ -79,14 +78,13 @@ export default function ScepProfileForm() {
         if (editMode && scepProfileSelector && scepProfileSelector.uuid === id) {
             setScepProfile(scepProfileSelector);
             setRaProfile(scepProfileSelector.raProfile);
-            // setCertificate(scepProfileSelector.caCertificate);
         }
     }, [dispatch, id, editMode, scepProfileSelector]);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.ScepProfiles));
         dispatch(raProfileActions.listRaProfiles());
-        // TODO load certificate list
+        dispatch(scepProfileActions.listScepCaCertificates());
     }, [dispatch]);
 
     useEffect(() => {
@@ -102,7 +100,7 @@ export default function ScepProfileForm() {
             const scepRequest = {
                 ...values,
                 raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-                // caCertificateUuid: values.certificate ? values.certificate.value : "NONE",
+                caCertificateUuid: values.certificate ? values.certificate.value : "NONE",
                 issueCertificateAttributes: collectFormAttributes(
                     "issuanceAttributes",
                     [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
@@ -154,13 +152,6 @@ export default function ScepProfileForm() {
         [dispatch, raProfiles, scepProfile, raProfile?.authorityInstanceUuid],
     );
 
-    // const onCertificateChange = useCallback(
-    //     (form: FormApi<FormValues>, value: string) => {
-    //         setCertificate(certificates.find((c) => c.uuid === value));
-    //     },
-    //     [dispatch, certificates],
-    // );
-
     const optionsForRaProfiles = useMemo(
         () =>
             raProfiles.map((raProfile) => ({
@@ -170,19 +161,18 @@ export default function ScepProfileForm() {
         [raProfiles],
     );
 
-    // const optionsForCertificates = useMemo(
-    //     () =>
-    //         certificates.map((certificate) => ({
-    //             value: certificate.uuid,
-    //             label: `${certificate.commonName} (${certificate.serialNumber})`,
-    //         })),
-    //     [certificates],
-    // );
+    const optionsForCertificates = useMemo(
+        () =>
+            certificates?.map((certificate) => ({
+                value: certificate.uuid,
+                label: `${certificate.commonName} (${certificate.serialNumber})`,
+            })),
+        [certificates],
+    );
 
     const defaultValues: FormValues = useMemo(
         () => ({
             name: editMode ? scepProfile?.name || "" : "",
-            caCertificateUuid: editMode ? scepProfile?.caCertificate?.uuid || "" : "", // TODO remove
             description: editMode ? scepProfile?.description || "" : "",
             requireManualApproval: editMode ? scepProfile?.requireManualApproval || false : false,
             renewalThreshold: editMode ? scepProfile?.renewThreshold || 0 : 0,
@@ -194,13 +184,13 @@ export default function ScepProfileForm() {
                     ? optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfile.raProfile?.uuid)
                     : undefined
                 : undefined,
-            // certificate: editMode
-            //     ? scepProfile?.caCertificate
-            //         ? optionsForCertificates.find((certificate) => certificate.value === scepProfile.caCertificate?.uuid)
-            //         : undefined
-            //     : undefined,
+            certificate: editMode
+                ? scepProfile?.caCertificate
+                    ? optionsForCertificates?.find((certificate) => certificate.value === scepProfile.caCertificate?.uuid)
+                    : undefined
+                : undefined,
         }),
-        [editMode, scepProfile, optionsForRaProfiles], //optionsForCertificates
+        [editMode, scepProfile, optionsForRaProfiles, optionsForCertificates],
     );
 
     const title = useMemo(() => (editMode ? "Edit SCEP Profile" : "Create SCEP Profile"), [editMode]);
@@ -216,7 +206,6 @@ export default function ScepProfileForm() {
                             validators={[validateRequired(), validateAlphaNumeric()]}
                             disabled={editMode}
                         />
-                        <TextField id="caCertificateUuid" label="CA Certificate UUID" validators={[validateAlphaNumeric()]} />
                         <TextField id="description" label="Description" validators={[validateAlphaNumeric()]} />
                         <TextField id="challengePassword" label="Challenge Password" inputType={"password"} validators={[]} />
                         <TextField id="renewalThreshold" label="Renewal Threshold" validators={[validateInteger()]} />
@@ -224,7 +213,7 @@ export default function ScepProfileForm() {
                         <CheckboxField id="includeCaCertificate" label="Include CA Certificate" />
                         <CheckboxField id="includeCaCertificateChain" label="Include CA Certificate Chain" />
 
-                        {/* <Field name="certificate">
+                        <Field name="certificate" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="certificate">CA Certificate</Label>
@@ -236,14 +225,10 @@ export default function ScepProfileForm() {
                                         options={optionsForCertificates}
                                         placeholder="Select to change CA Certificate if needed"
                                         isClearable={true}
-                                        onChange={(event: any) => {
-                                            onCertificateChange(form, event ? event.value : undefined);
-                                            input.onChange(event);
-                                        }}
                                     />
                                 </FormGroup>
                             )}
-                        </Field> */}
+                        </Field>
 
                         <Widget
                             title="RA Profile Configuration"

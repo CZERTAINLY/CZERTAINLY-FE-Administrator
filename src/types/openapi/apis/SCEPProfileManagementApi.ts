@@ -18,6 +18,7 @@ import type { OperationOpts, HttpHeaders } from "../runtime";
 import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
+    CertificateDto,
     ErrorMessageDto,
     ScepProfileDetailDto,
     ScepProfileDto,
@@ -303,6 +304,21 @@ export class SCEPProfileManagementApi extends BaseAPI {
         return this.request<ScepProfileDetailDto>(
             {
                 url: "/v1/scepProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Get list of certificates eligible for CA certificate of SCEP requests
+     */
+    listScepCaCertificates(): Observable<Array<CertificateDto>>;
+    listScepCaCertificates(opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>;
+    listScepCaCertificates(opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
+        return this.request<Array<CertificateDto>>(
+            {
+                url: "/v1/scepProfiles/caCertificates",
                 method: "GET",
             },
             opts?.responseOpts,

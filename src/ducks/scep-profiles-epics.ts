@@ -3,9 +3,10 @@ import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 
-import { slice } from "./scep-profiles";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { slice } from "./scep-profiles";
+import { transformCertificateListResponseDtoToModel } from "./transform/certificates";
 import {
     transformScepProfileAddRequestModelToDto,
     transformScepProfileEditRequestModelToDto,
@@ -28,6 +29,30 @@ const listScepProfiles: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listScepProfilesFailure({ error: extractError(error, "Failed to get SCEP Profiles list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get SCEP Profiles list" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const listScepCaCertificates: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listScepCaCertificates.match),
+        switchMap(() =>
+            deps.apiClients.scepProfiles.listScepCaCertificates().pipe(
+                map((scepProfiles) =>
+                    slice.actions.listScepCaCertificatesSuccess({
+                        certificates: scepProfiles.map(transformCertificateListResponseDtoToModel),
+                    }),
+                ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.listScepCaCertificatesFailure({
+                            error: extractError(error, "Failed to get SCEP CA Certificates list"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to get SCEP CA Certificates list" }),
                     ),
                 ),
             ),
@@ -266,6 +291,7 @@ const bulkDisableScepProfiles: AppEpic = (action$, state$, deps) => {
 
 const epics = [
     listScepProfiles,
+    listScepCaCertificates,
     getScepProfileDetail,
     updateScepProfile,
     createScepProfile,

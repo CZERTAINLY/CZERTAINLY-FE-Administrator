@@ -1,11 +1,12 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CertificateListResponseDto } from "types/certificate";
+import { BulkActionModel } from "types/connectors";
 import {
     ScepProfileAddRequestModel,
     ScepProfileEditRequestModel,
     ScepProfileListResponseModel,
     ScepProfileResponseModel,
 } from "types/scep-profiles";
-import { BulkActionModel } from "types/connectors";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
@@ -16,8 +17,10 @@ export type State = {
 
     scepProfile?: ScepProfileResponseModel;
     scepProfiles: ScepProfileListResponseModel[];
+    caCertificates?: CertificateListResponseDto[];
 
     isFetchingList: boolean;
+    isFetchingCertificates: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
     isDeleting: boolean;
@@ -39,6 +42,7 @@ export const initialState: State = {
     bulkDeleteErrorMessages: [],
 
     isFetchingList: false,
+    isFetchingCertificates: false,
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
@@ -85,6 +89,19 @@ export const slice = createSlice({
 
         listScepProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingList = false;
+        },
+
+        listScepCaCertificates: (state, action: PayloadAction<void>) => {
+            state.isFetchingCertificates = true;
+        },
+
+        listScepCaCertificatesSuccess: (state, action: PayloadAction<{ certificates: CertificateListResponseDto[] }>) => {
+            state.caCertificates = action.payload.certificates;
+            state.isFetchingCertificates = false;
+        },
+
+        listScepCaCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingCertificates = false;
         },
 
         getScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -293,6 +310,7 @@ const state = createFeatureSelector<State>(slice.name);
 
 const scepProfile = createSelector(state, (state) => state.scepProfile);
 const scepProfiles = createSelector(state, (state) => state.scepProfiles);
+const caCertificates = createSelector(state, (state) => state.caCertificates);
 
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const bulkDeleteErrorMessages = createSelector(state, (state) => state.bulkDeleteErrorMessages);
@@ -300,6 +318,7 @@ const bulkDeleteErrorMessages = createSelector(state, (state) => state.bulkDelet
 const checkedRows = createSelector(state, (state) => state.checkedRows);
 
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
+const isFetchingCertificates = createSelector(state, (state) => state.isFetchingCertificates);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
@@ -321,8 +340,10 @@ export const selectors = {
 
     scepProfile,
     scepProfiles,
+    caCertificates,
 
     isFetchingList,
+    isFetchingCertificates,
     isFetchingDetail,
     isCreating,
     isDeleting,
