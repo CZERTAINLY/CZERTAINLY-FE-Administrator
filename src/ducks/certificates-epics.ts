@@ -617,8 +617,8 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getIssuanceAttributesFailure({ error: extractError(err, "Failed to get issuance attributes") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get issuance attributes" }),
+                            slice.actions.getIssuanceAttributesFailure({ error: extractError(err, "Failed to get issue attributes") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to get issue attributes" }),
                         ),
                     ),
                 ),

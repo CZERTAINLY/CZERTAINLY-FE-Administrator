@@ -141,7 +141,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
 
     const attributeTabs = [
         {
-            title: "Issuance attributes",
+            title: "Issue attributes",
             content:
                 !issuanceAttributes || issuanceAttributes.length === 0 ? (
                     <></>

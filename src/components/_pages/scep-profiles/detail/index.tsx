@@ -167,6 +167,10 @@ export default function ScepProfileDetail() {
                           columns: ["Include CA Certificate", scepProfile.includeCaCertificate ? "true" : "false"],
                       },
                       {
+                          id: "includeCaCertificateChain",
+                          columns: ["Include CA Certificate Chain", scepProfile.includeCaCertificateChain ? "true" : "false"],
+                      },
+                      {
                           id: "scepUrl",
                           columns: ["URL", scepProfile.scepUrl || "N/A"],
                       },

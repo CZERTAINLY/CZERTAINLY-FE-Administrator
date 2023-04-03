@@ -5,7 +5,7 @@ import { actions, selectors } from "ducks/tokens";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup } from "reactstrap";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
@@ -77,7 +77,7 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Issuance attributes",
+                                    title: "Issue attributes",
                                     content:
                                         !activationAttributes || activationAttributes.length === 0 ? (
                                             <></>

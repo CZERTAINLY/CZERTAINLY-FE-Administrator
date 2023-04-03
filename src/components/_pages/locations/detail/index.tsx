@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { Badge, Button, ButtonGroup, Container, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
@@ -677,7 +677,7 @@ export default function LocationDetail() {
                                                 ),
                                             },
                                             {
-                                                title: "RA Profile Issuance Attributes",
+                                                title: "RA Profile Issue Attributes",
                                                 content: issuanceAttributeDescriptors ? (
                                                     <AttributeEditor
                                                         id="issueAttributes"

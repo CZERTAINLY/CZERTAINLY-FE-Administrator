@@ -374,8 +374,8 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.listIssuanceAttributesFailure({ error: extractError(err, "Failed to list issuance attributes") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to list issuance attributes" }),
+                            slice.actions.listIssuanceAttributesFailure({ error: extractError(err, "Failed to list issue attributes") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to list issue attributes" }),
                         ),
                     ),
                 ),

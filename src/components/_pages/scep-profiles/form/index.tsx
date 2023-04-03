@@ -264,7 +264,7 @@ export default function ScepProfileForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Issuance Attributes",
+                                        title: "Issue Attributes",
                                         content:
                                             !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
                                                 <></>
