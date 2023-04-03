@@ -188,7 +188,11 @@ export default function ScepProfileDetail() {
                           columns: [
                               "Name",
                               scepProfile.raProfile?.uuid ? (
-                                  <Link to={`../../raprofiles/detail/${scepProfile.raProfile.uuid}`}>{scepProfile.raProfile.name}</Link>
+                                  <Link
+                                      to={`../../raprofiles/detail/${scepProfile.raProfile.authorityInstanceUuid}/${scepProfile.raProfile.uuid}`}
+                                  >
+                                      {scepProfile.raProfile.name}
+                                  </Link>
                               ) : (
                                   ""
                               ),

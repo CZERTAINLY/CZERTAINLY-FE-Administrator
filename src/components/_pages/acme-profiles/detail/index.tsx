@@ -187,7 +187,11 @@ export default function AdministratorDetail() {
                           columns: [
                               "Name",
                               acmeProfile.raProfile?.uuid ? (
-                                  <Link to={`../../raprofiles/detail/${acmeProfile.raProfile.uuid}`}>{acmeProfile.raProfile.name}</Link>
+                                  <Link
+                                      to={`../../raprofiles/detail/${acmeProfile.raProfile.authorityInstanceUuid}/${acmeProfile.raProfile.uuid}`}
+                                  >
+                                      {acmeProfile.raProfile.name}
+                                  </Link>
                               ) : (
                                   ""
                               ),
