@@ -543,14 +543,13 @@ export default function AttributeEditor({
                 };
 
                 setOptions({ ...options, ...opts });
-                continue;
-            }
 
-            // // here should be updating of the other form values based on the callback data, but currently it is not necessary as there is no usecase for that
-            // if (callbackData[callbackId].value) {
-            //    form.mutators.setAttribute(callbackId, callbackData[callbackId].value);
-            //    continue;
-            // }
+                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+                const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
+                if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
+                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+                }
+            }
         }
 
         setPreviousCallbackData(callbackData);
