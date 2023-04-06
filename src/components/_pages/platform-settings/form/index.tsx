@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Button, ButtonGroup, Form as BootstrapForm } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup } from "reactstrap";
 import { SettingsPlatformModel } from "types/settings";
 
 export default function PlatformSettingsForm() {
@@ -66,7 +66,7 @@ export default function PlatformSettingsForm() {
 
                 const timerId = setTimeout(() => {
                     resolve(validateHealthUrl(url));
-                }, 400);
+                }, 600);
 
                 this.clearTimeout = () => {
                     clearTimeout(timerId);

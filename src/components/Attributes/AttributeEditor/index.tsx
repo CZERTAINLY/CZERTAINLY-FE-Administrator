@@ -253,7 +253,7 @@ export default function AttributeEditor({
             debounce((mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
                 form.mutators.setAttribute(formAttributeName, undefined);
                 executeCallback(mappings, descriptor, formAttributeName);
-            }, 400),
+            }, 600),
         [executeCallback, form.mutators],
     );
 
