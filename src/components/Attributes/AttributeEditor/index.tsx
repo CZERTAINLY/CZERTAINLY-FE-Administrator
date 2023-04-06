@@ -1,6 +1,7 @@
 import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
+import debounce from "lodash.debounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, useFormState } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -247,6 +248,15 @@ export default function AttributeEditor({
         [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind],
     );
 
+    const callCallback = useMemo(
+        () =>
+            debounce((mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
+                form.mutators.setAttribute(formAttributeName, undefined);
+                executeCallback(mappings, descriptor, formAttributeName);
+            }, 600),
+        [executeCallback, form.mutators],
+    );
+
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
      */
@@ -479,8 +489,7 @@ export default function AttributeEditor({
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                            form.mutators.setAttribute(formAttributeName, undefined);
-                            executeCallback(mappings, descriptor, formAttributeName);
+                            callCallback(mappings, descriptor, formAttributeName);
                         }
                     }
                 }
@@ -496,7 +505,7 @@ export default function AttributeEditor({
         id,
         isRunningCb,
         previousFormValues,
-        executeCallback,
+        callCallback,
     ]);
 
     /**
