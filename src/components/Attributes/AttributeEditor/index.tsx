@@ -353,8 +353,8 @@ export default function AttributeEditor({
                                 (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown",
                             );
                             form.mutators.setAttribute(
-                                `${formAttributeName}.mimeType.type`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown",
+                                `${formAttributeName}.mimeType`,
+                                (attribute.content as FileAttributeContentModel[])[0].data.mimeType || "unknown",
                             );
                         } else if (descriptor.content) {
                             form.mutators.setAttribute(
@@ -366,8 +366,8 @@ export default function AttributeEditor({
                                 (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown",
                             );
                             form.mutators.setAttribute(
-                                `${formAttributeName}.mimeType.type`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown",
+                                `${formAttributeName}.mimeType`,
+                                (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || "unknown",
                             );
                         }
                         return;

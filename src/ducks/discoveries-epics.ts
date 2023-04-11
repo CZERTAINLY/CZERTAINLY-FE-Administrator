@@ -20,10 +20,10 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listDiscoveries.match),
         switchMap(() =>
-            deps.apiClients.discoveries.listDiscoveries().pipe(
-                map((discoveries) =>
+            deps.apiClients.discoveries.listDiscoveries({ searchRequestDto: {} }).pipe(
+                map((discoveryResponse) =>
                     slice.actions.listDiscoveriesSuccess({
-                        discoveryList: discoveries.map(transformDiscoveryResponseDtoToModel),
+                        discoveryList: discoveryResponse.discoveries.map(transformDiscoveryResponseDtoToModel),
                     }),
                 ),
 
