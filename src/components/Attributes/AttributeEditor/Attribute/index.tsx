@@ -51,7 +51,7 @@ export function Attribute({
 
          form.mutators.setAttribute(`${name}.content`, fileContent);
          form.mutators.setAttribute(`${name}.fileName`, fileName);
-         form.mutators.setAttribute(`${name}.mimeType.type`, contentType);
+         form.mutators.setAttribute(`${name}.mimeType`, contentType);
 
       },
       [form.mutators, name]
@@ -271,15 +271,15 @@ export function Attribute({
 
                   <div style={{ width: "13rem" }}>
 
-                     <Label for={`${name}-mimeType.type`}>Content type</Label>
+                     <Label for={`${name}-mimeType`}>Content type</Label>
 
-                     <Field name={`${name}.mimeType.type`}>
+                     <Field name={`${name}.mimeType`}>
 
                         {({ input, meta }) => (
 
                            <Input
                               {...input}
-                              id={`${name}-mimeType.type`}
+                              id={`${name}-mimeType`}
                               type={descriptor.properties.visible ? "text" : "hidden"}
                               placeholder="File not selected"
                               disabled={true}

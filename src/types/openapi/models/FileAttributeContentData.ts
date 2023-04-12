@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    MimeType,
-} from './';
-
 /**
  * File attribute content data
  * @export
@@ -34,8 +30,8 @@ export interface FileAttributeContentData {
      */
     fileName: string;
     /**
-     * @type {MimeType}
+     * @type {string}
      * @memberof FileAttributeContentData
      */
-    mimeType: MimeType;
+    mimeType: string;
 }

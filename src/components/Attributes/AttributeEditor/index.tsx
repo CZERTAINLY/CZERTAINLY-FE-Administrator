@@ -363,11 +363,11 @@ export default function AttributeEditor({
                             if (attribute?.content) {
                                 form.mutators.setAttribute(`${formAttributeName}.content`, (attribute.content as FileAttributeContentModel[])[0].reference);
                                 form.mutators.setAttribute(`${formAttributeName}.fileName`, (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
-                                form.mutators.setAttribute(`${formAttributeName}.mimeType.type`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                                form.mutators.setAttribute(`${formAttributeName}.mimeType`, (attribute.content as FileAttributeContentModel[])[0].data.mimeType || "unknown");
                             } else if (descriptor.content) {
                                 form.mutators.setAttribute(`${formAttributeName}.content`, (descriptor.content as FileAttributeContentModel[])[0].reference);
                                 form.mutators.setAttribute(`${formAttributeName}.fileName`, (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown");
-                                form.mutators.setAttribute(`${formAttributeName}.mimeType.type`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType.type || "unknown");
+                                form.mutators.setAttribute(`${formAttributeName}.mimeType`, (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || "unknown");
                             }
                             return;
                         }
