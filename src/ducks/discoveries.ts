@@ -1,5 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeDescriptorModel } from "types/attributes";
+import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
 import { ConnectorResponseModel } from "types/connectors";
 import {
     DiscoveryCertificateListModel,
@@ -21,6 +22,12 @@ export type State = {
 
     discoveryCertificates?: DiscoveryCertificateListModel;
 
+    availableFilters: SearchFieldListModel[];
+    currentFilters: SearchFilterModel[];
+    isFetchingFilters: boolean;
+    totalPages: number;
+    totalItems: number;
+
     isFetchingDiscoveryProviders: boolean;
     isFetchingDiscoveryProviderAttributeDescriptors: boolean;
     isFetchingDiscoveryCertificates: boolean;
@@ -36,6 +43,12 @@ export const initialState: State = {
     checkedRows: [],
 
     discoveries: [],
+
+    availableFilters: [],
+    currentFilters: [],
+    totalPages: 0,
+    totalItems: 0,
+    isFetchingFilters: false,
 
     isFetchingDiscoveryProviders: false,
     isFetchingDiscoveryProviderAttributeDescriptors: false,
@@ -55,15 +68,21 @@ export const slice = createSlice({
 
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
+            let currentFilterRef = state.currentFilters;
             Object.keys(state).forEach((key) => {
                 if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+            state.currentFilters = currentFilterRef;
         },
 
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
             state.checkedRows = action.payload.checkedRows;
+        },
+
+        setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
+            state.currentFilters = action.payload;
         },
 
         clearDiscoveryProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
@@ -82,6 +101,20 @@ export const slice = createSlice({
 
         listDiscoveryProvidersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDiscoveryProviders = false;
+        },
+
+        getAvailableFilters: (state, action: PayloadAction<void>) => {
+            state.availableFilters = [];
+            state.isFetchingFilters = true;
+        },
+
+        getAvailableFiltersSuccess: (state, action: PayloadAction<{ availableFilters: SearchFieldListModel[] }>) => {
+            state.isFetchingFilters = false;
+            state.availableFilters = action.payload.availableFilters;
+        },
+
+        getAvailableFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingFilters = false;
         },
 
         getDiscoveryProviderAttributesDescriptors: (state, action: PayloadAction<{ uuid: string; kind: string }>) => {
@@ -115,14 +148,19 @@ export const slice = createSlice({
             state.isFetchingDiscoveryCertificates = false;
         },
 
-        listDiscoveries: (state, action: PayloadAction<void>) => {
+        listDiscoveries: (state, action: PayloadAction<SearchRequestModel>) => {
             state.discoveries = [];
             state.isFetchingList = true;
         },
 
-        listDiscoveriesSuccess: (state, action: PayloadAction<{ discoveryList: DiscoveryResponseModel[] }>) => {
+        listDiscoveriesSuccess: (
+            state,
+            action: PayloadAction<{ discoveryList: DiscoveryResponseModel[]; totalPages: number; totalItems: number }>,
+        ) => {
             state.discoveries = action.payload.discoveryList;
             state.isFetchingList = false;
+            state.totalItems = action.payload.totalItems;
+            state.totalPages = action.payload.totalPages;
         },
 
         listDiscoveriesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -215,6 +253,12 @@ const discoveryCertificates = createSelector(state, (state) => state.discoveryCe
 const discovery = createSelector(state, (state) => state.discovery);
 const discoveries = createSelector(state, (state) => state.discoveries);
 
+const availableFilters = createSelector(state, (state) => state.availableFilters);
+const currentFilters = createSelector(state, (state) => state.currentFilters);
+const totalItems = createSelector(state, (state) => state.totalItems);
+const totalPages = createSelector(state, (state) => state.totalPages);
+const isFetchingFilters = createSelector(state, (state) => state.isFetchingFilters);
+
 const isFetchingDiscoveryProviders = createSelector(state, (state) => state.isFetchingDiscoveryProviders);
 const isFetchingDiscoveryProviderAttributeDescriptors = createSelector(
     state,
@@ -240,6 +284,12 @@ export const selectors = {
 
     discovery,
     discoveries,
+
+    availableFilters,
+    currentFilters,
+    totalItems,
+    totalPages,
+    isFetchingFilters,
 
     isFetchingDiscoveryProviders,
     isFetchingDiscoveryProviderAttributeDescriptors,
