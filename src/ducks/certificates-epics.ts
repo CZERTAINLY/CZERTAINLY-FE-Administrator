@@ -220,7 +220,7 @@ const getAvailableCertificateFilters: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getAvailableCertificateFilters.match),
         switchMap((action) =>
-            deps.apiClients.certificates.getSearchableFieldInformation1().pipe(
+            deps.apiClients.certificates.getSearchableFieldInformation4().pipe(
                 map((filters) =>
                     slice.actions.getAvailableCertificateFiltersSuccess({
                         availableCertificateFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),

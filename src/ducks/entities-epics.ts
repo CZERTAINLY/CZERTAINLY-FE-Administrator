@@ -68,8 +68,8 @@ const listEntities: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listEntities.match),
         switchMap(() =>
-            deps.apiClients.entities.listEntityInstances().pipe(
-                map((entities) => slice.actions.listEntitiesSuccess(entities.map(transformEntityResponseDtoToModel))),
+            deps.apiClients.entities.listEntityInstances({ searchRequestDto: {} }).pipe(
+                map((entityResponse) => slice.actions.listEntitiesSuccess(entityResponse.entities.map(transformEntityResponseDtoToModel))),
 
                 catchError((error) =>
                     of(

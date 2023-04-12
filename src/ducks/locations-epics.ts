@@ -19,10 +19,10 @@ const listLocations: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listLocations.match),
         switchMap(() =>
-            deps.apiClients.locations.listLocations({}).pipe(
-                map((locations) =>
+            deps.apiClients.locations.listLocations({ searchRequestDto: {} }).pipe(
+                map((locationResponse) =>
                     slice.actions.listLocationsSuccess({
-                        locations: locations.map(transformLocationResponseDtoToModel),
+                        locations: locationResponse.locations.map(transformLocationResponseDtoToModel),
                     }),
                 ),
 

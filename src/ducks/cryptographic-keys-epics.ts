@@ -659,7 +659,7 @@ const getAvailableKeyFilters: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getAvailableKeyFilters.match),
         switchMap((action) =>
-            deps.apiClients.cryptographicKeys.getSearchableFieldInformation().pipe(
+            deps.apiClients.cryptographicKeys.getSearchableFieldInformation1().pipe(
                 map((filters) =>
                     slice.actions.getAvailableKeyFiltersSuccess({
                         availableKeyFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),

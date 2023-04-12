@@ -11,41 +11,41 @@
  * Do not edit the class manually.
  */
 
-import type { DiscoveryCertificateDto } from "./";
+import type { EntityInstanceDto } from "./";
 
 /**
  * @export
- * @interface DiscoveryCertificateResponseDto
+ * @interface EntityInstanceResponseDto
  */
-export interface DiscoveryCertificateResponseDto {
+export interface EntityInstanceResponseDto {
     /**
-     * Certificates
-     * @type {Array<DiscoveryCertificateDto>}
-     * @memberof DiscoveryCertificateResponseDto
+     * Entities
+     * @type {Array<EntityInstanceDto>}
+     * @memberof EntityInstanceResponseDto
      */
-    certificates: Array<DiscoveryCertificateDto>;
+    entities: Array<EntityInstanceDto>;
     /**
      * Number of entries per page
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof EntityInstanceResponseDto
      */
     itemsPerPage: number;
     /**
      * Page number for the request
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof EntityInstanceResponseDto
      */
     pageNumber: number;
     /**
      * Number of pages available
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof EntityInstanceResponseDto
      */
     totalPages: number;
     /**
      * Number of items available
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof EntityInstanceResponseDto
      */
     totalItems: number;
 }

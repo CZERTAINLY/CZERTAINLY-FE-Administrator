@@ -11,41 +11,41 @@
  * Do not edit the class manually.
  */
 
-import type { DiscoveryCertificateDto } from "./";
+import type { LocationDto } from "./";
 
 /**
  * @export
- * @interface DiscoveryCertificateResponseDto
+ * @interface LocationsResponseDto
  */
-export interface DiscoveryCertificateResponseDto {
+export interface LocationsResponseDto {
     /**
-     * Certificates
-     * @type {Array<DiscoveryCertificateDto>}
-     * @memberof DiscoveryCertificateResponseDto
+     * Locations
+     * @type {Array<LocationDto>}
+     * @memberof LocationsResponseDto
      */
-    certificates: Array<DiscoveryCertificateDto>;
+    locations: Array<LocationDto>;
     /**
-     * Number of entries per page
+     * Number of locations per page
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof LocationsResponseDto
      */
     itemsPerPage: number;
     /**
      * Page number for the request
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof LocationsResponseDto
      */
     pageNumber: number;
     /**
      * Number of pages available
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof LocationsResponseDto
      */
     totalPages: number;
     /**
      * Number of items available
      * @type {number}
-     * @memberof DiscoveryCertificateResponseDto
+     * @memberof LocationsResponseDto
      */
     totalItems: number;
 }
