@@ -1,5 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
 import { ConnectorResponseModel } from "types/connectors";
 import { EntityRequestModel, EntityResponseModel } from "types/entities";
 import { createFeatureSelector } from "utils/ducks";
@@ -9,6 +10,12 @@ export type State = {
 
     entity?: EntityResponseModel;
     entities: EntityResponseModel[];
+
+    availableFilters: SearchFieldListModel[];
+    currentFilters: SearchFilterModel[];
+    isFetchingFilters: boolean;
+    totalPages: number;
+    totalItems: number;
 
     locationAttributeDescriptors?: AttributeDescriptorModel[];
 
@@ -31,6 +38,12 @@ export const initialState: State = {
 
     entities: [],
 
+    availableFilters: [],
+    currentFilters: [],
+    totalPages: 0,
+    totalItems: 0,
+    isFetchingFilters: false,
+
     isFetchingEntityProviders: false,
     isFetchingEntityProviderAttributeDescriptors: false,
 
@@ -49,11 +62,31 @@ export const slice = createSlice({
 
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
+            let currentFilterRef = state.currentFilters;
             Object.keys(state).forEach((key) => {
                 if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+            state.currentFilters = currentFilterRef;
+        },
+
+        setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
+            state.currentFilters = action.payload;
+        },
+
+        getAvailableFilters: (state, action: PayloadAction<void>) => {
+            state.availableFilters = [];
+            state.isFetchingFilters = true;
+        },
+
+        getAvailableFiltersSuccess: (state, action: PayloadAction<{ availableFilters: SearchFieldListModel[] }>) => {
+            state.isFetchingFilters = false;
+            state.availableFilters = action.payload.availableFilters;
+        },
+
+        getAvailableFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingFilters = false;
         },
 
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
@@ -94,14 +127,19 @@ export const slice = createSlice({
             state.isFetchingEntityProviderAttributeDescriptors = false;
         },
 
-        listEntities: (state, action: PayloadAction<void>) => {
+        listEntities: (state, action: PayloadAction<SearchRequestModel>) => {
             state.entities = [];
             state.isFetchingList = true;
         },
 
-        listEntitiesSuccess: (state, action: PayloadAction<EntityResponseModel[]>) => {
-            state.entities = action.payload;
+        listEntitiesSuccess: (
+            state,
+            action: PayloadAction<{ entities: EntityResponseModel[]; totalPages: number; totalItems: number }>,
+        ) => {
+            state.entities = action.payload.entities;
             state.isFetchingList = false;
+            state.totalItems = action.payload.totalItems;
+            state.totalPages = action.payload.totalPages;
         },
 
         listEntitiesFailure: (state, action: PayloadAction<{ error: string }>) => {
@@ -193,6 +231,12 @@ const locationAttributeDescriptors = createSelector(state, (state) => state.loca
 const entity = createSelector(state, (state) => state.entity);
 const entities = createSelector(state, (state) => state.entities);
 
+const availableFilters = createSelector(state, (state) => state.availableFilters);
+const currentFilters = createSelector(state, (state) => state.currentFilters);
+const totalItems = createSelector(state, (state) => state.totalItems);
+const totalPages = createSelector(state, (state) => state.totalPages);
+const isFetchingFilters = createSelector(state, (state) => state.isFetchingFilters);
+
 const isFetchingEntityProviders = createSelector(state, (state) => state.isFetchingEntityProviders);
 const isFetchingEntityProviderAttributeDescriptors = createSelector(state, (state) => state.isFetchingEntityProviderAttributeDescriptors);
 
@@ -214,6 +258,12 @@ export const selectors = {
 
     entity,
     entities,
+
+    availableFilters,
+    currentFilters,
+    totalItems,
+    totalPages,
+    isFetchingFilters,
 
     isFetchingEntityProviders,
     isFetchingEntityProviderAttributeDescriptors,

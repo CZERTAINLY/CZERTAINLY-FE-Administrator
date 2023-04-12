@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Select from "react-select";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { LocationResponseModel } from "types/locations";
 
@@ -82,7 +82,7 @@ export default function LocationForm() {
         if (init) {
             dispatch(locationActions.resetState());
             dispatch(entityActions.resetState());
-            dispatch(entityActions.listEntities());
+            dispatch(entityActions.listEntities({}));
             setInit(false);
         }
 

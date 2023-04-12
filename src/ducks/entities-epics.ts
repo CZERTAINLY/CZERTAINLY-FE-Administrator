@@ -9,6 +9,7 @@ import { slice } from "./entities";
 
 import { FunctionGroupCode } from "types/openapi";
 import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
+import { transformSearchFieldListDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { transformEntityRequestModelToDto, transformEntityResponseDtoToModel } from "./transform/entities";
 
@@ -67,14 +68,44 @@ const getEntityProviderAttributesDescriptors: AppEpic = (action$, state, deps) =
 const listEntities: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listEntities.match),
-        switchMap(() =>
-            deps.apiClients.entities.listEntityInstances({ searchRequestDto: {} }).pipe(
-                map((entityResponse) => slice.actions.listEntitiesSuccess(entityResponse.entities.map(transformEntityResponseDtoToModel))),
+        switchMap((action) =>
+            deps.apiClients.entities.listEntityInstances({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }).pipe(
+                map((entityResponse) =>
+                    slice.actions.listEntitiesSuccess({
+                        entities: entityResponse.entities.map(transformEntityResponseDtoToModel),
+                        totalItems: entityResponse.totalItems,
+                        totalPages: entityResponse.totalPages,
+                    }),
+                ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listEntitiesFailure({ error: extractError(error, "Failed to get list of Entities") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get list of Entities" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const getAvailableFilters: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAvailableFilters.match),
+        switchMap((action) =>
+            deps.apiClients.entities.getSearchableFieldInformation2().pipe(
+                map((filters) =>
+                    slice.actions.getAvailableFiltersSuccess({
+                        availableFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),
+                    }),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.getAvailableFiltersFailure({
+                            error: extractError(err, "Failed to get available filters"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get available filters" }),
                     ),
                 ),
             ),
@@ -211,6 +242,7 @@ const epics = [
     listEntityProviders,
     getEntityProviderAttributesDescriptors,
     listEntities,
+    getAvailableFilters,
     getEntityDetail,
     addEntity,
     updateEntity,

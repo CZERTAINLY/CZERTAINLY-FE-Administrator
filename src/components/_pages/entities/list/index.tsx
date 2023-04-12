@@ -9,6 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import EntitiesFilter from "../EntitiesFilter";
 
 function EntityList() {
     const dispatch = useDispatch();
@@ -16,6 +17,11 @@ function EntityList() {
 
     const checkedRows = useSelector(selectors.checkedRows);
     const entities = useSelector(selectors.entities);
+
+    const totalItems = useSelector(selectors.totalItems);
+    const currentFilters = useSelector(selectors.currentFilters);
+    const [pageSize, setPageSize] = useState(10);
+    const [pageNumber, setPageNumber] = useState(1);
 
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -26,9 +32,26 @@ function EntityList() {
     const isBusy = isFetching || isDeleting || isUpdating;
 
     useEffect(() => {
-        dispatch(actions.resetState());
-        dispatch(actions.listEntities());
+        setPageNumber(1);
+    }, [currentFilters]);
+
+    useEffect(() => {
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
     }, [dispatch]);
+
+    useEffect(() => {
+        if (!currentFilters) return;
+        dispatch(actions.listEntities({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
+    }, [dispatch, currentFilters, pageSize, pageNumber]);
+
+    const onPageSizeChanged = useCallback(
+        (pageSize: number) => {
+            setPageSize(pageSize);
+            setPageNumber(1);
+        },
+        [setPageSize, setPageNumber],
+    );
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -127,10 +150,24 @@ function EntityList() {
         [entities],
     );
 
+    const paginationData = useMemo(
+        () => ({
+            page: pageNumber,
+            totalItems: totalItems,
+            pageSize: pageSize,
+            loadedPageSize: pageSize,
+            totalPages: Math.ceil(totalItems / pageSize),
+            itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+        }),
+        [pageNumber, totalItems, pageSize],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <Widget title={title} busy={isBusy}>
                 <br />
+
+                <EntitiesFilter />
 
                 <CustomTable
                     headers={entitiesRowHeaders}
@@ -138,7 +175,9 @@ function EntityList() {
                     onCheckedRowsChanged={setCheckedRows}
                     hasCheckboxes={true}
                     hasPagination={true}
-                    canSearch={true}
+                    paginationData={paginationData}
+                    onPageChanged={setPageNumber}
+                    onPageSizeChanged={onPageSizeChanged}
                 />
             </Widget>
 

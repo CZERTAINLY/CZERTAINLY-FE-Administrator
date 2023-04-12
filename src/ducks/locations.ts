@@ -1,5 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeDescriptorModel } from "types/attributes";
+import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
 import {
     LocationAddRequestModel,
     LocationEditRequestModel,
@@ -14,6 +15,12 @@ export type State = {
 
     location?: LocationResponseModel;
     locations: LocationResponseModel[];
+
+    availableFilters: SearchFieldListModel[];
+    currentFilters: SearchFilterModel[];
+    isFetchingFilters: boolean;
+    totalPages: number;
+    totalItems: number;
 
     pushAttributeDescriptors?: AttributeDescriptorModel[];
     csrAttributeDescriptors?: AttributeDescriptorModel[];
@@ -44,6 +51,12 @@ export const initialState: State = {
 
     locations: [],
 
+    availableFilters: [],
+    currentFilters: [],
+    totalPages: 0,
+    totalItems: 0,
+    isFetchingFilters: false,
+
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
@@ -72,11 +85,31 @@ export const slice = createSlice({
 
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
+            let currentFilterRef = state.currentFilters;
             Object.keys(state).forEach((key) => {
                 if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+            state.currentFilters = currentFilterRef;
+        },
+
+        setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
+            state.currentFilters = action.payload;
+        },
+
+        getAvailableFilters: (state, action: PayloadAction<void>) => {
+            state.availableFilters = [];
+            state.isFetchingFilters = true;
+        },
+
+        getAvailableFiltersSuccess: (state, action: PayloadAction<{ availableFilters: SearchFieldListModel[] }>) => {
+            state.isFetchingFilters = false;
+            state.availableFilters = action.payload.availableFilters;
+        },
+
+        getAvailableFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingFilters = false;
         },
 
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
@@ -87,13 +120,18 @@ export const slice = createSlice({
             state.pushAttributeDescriptors = undefined;
         },
 
-        listLocations: (state, action: PayloadAction<void>) => {
+        listLocations: (state, action: PayloadAction<SearchRequestModel>) => {
             state.isFetchingList = true;
         },
 
-        listLocationsSuccess: (state, action: PayloadAction<{ locations: LocationResponseModel[] }>) => {
+        listLocationsSuccess: (
+            state,
+            action: PayloadAction<{ locations: LocationResponseModel[]; totalPages: number; totalItems: number }>,
+        ) => {
             state.isFetchingList = false;
             state.locations = action.payload.locations;
+            state.totalItems = action.payload.totalItems;
+            state.totalPages = action.payload.totalPages;
         },
 
         listLocationsFailure: (state, action: PayloadAction<{ error: string }>) => {
@@ -332,6 +370,12 @@ export const checkedRows = createSelector(state, (state) => state.checkedRows);
 export const location = createSelector(state, (state) => state.location);
 export const locations = createSelector(state, (state) => state.locations);
 
+const availableFilters = createSelector(state, (state) => state.availableFilters);
+const currentFilters = createSelector(state, (state) => state.currentFilters);
+const totalItems = createSelector(state, (state) => state.totalItems);
+const totalPages = createSelector(state, (state) => state.totalPages);
+const isFetchingFilters = createSelector(state, (state) => state.isFetchingFilters);
+
 export const pushAttributeDescriptors = createSelector(state, (state) => state.pushAttributeDescriptors);
 export const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttributeDescriptors);
 
@@ -362,6 +406,12 @@ export const selectors = {
 
     location,
     locations,
+
+    availableFilters,
+    currentFilters,
+    totalItems,
+    totalPages,
+    isFetchingFilters,
 
     pushAttributeDescriptors,
     csrAttributeDescriptors,
