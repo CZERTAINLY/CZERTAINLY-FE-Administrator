@@ -29,6 +29,7 @@ import Select from "react-select";
 
 import {
     Badge,
+    Form as BootstrapForm,
     Button,
     ButtonGroup,
     Col,
@@ -36,7 +37,6 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownToggle,
-    Form as BootstrapForm,
     Input,
     Label,
     Row,
@@ -207,7 +207,7 @@ export default function CertificateDetail() {
         if (!id || isPushingCertificate || isRemovingCertificate) return;
 
         dispatch(actions.listCertificateLocations({ uuid: id }));
-        dispatch(locationActions.listLocations());
+        dispatch(locationActions.listLocations({}));
     }, [dispatch, isPushingCertificate, isRemovingCertificate, id]);
 
     const onDeleteConfirmed = useCallback(() => {

@@ -10,6 +10,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import LocationsFilter from "../LocationsFilter";
 
 function LocationList() {
     const dispatch = useDispatch();
@@ -17,6 +18,11 @@ function LocationList() {
 
     const checkedRows = useSelector(selectors.checkedRows);
     const locations = useSelector(selectors.locations);
+
+    const totalItems = useSelector(selectors.totalItems);
+    const currentFilters = useSelector(selectors.currentFilters);
+    const [pageSize, setPageSize] = useState(10);
+    const [pageNumber, setPageNumber] = useState(1);
 
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -27,9 +33,26 @@ function LocationList() {
     const isBusy = isFetching || isDeleting || isUpdating;
 
     useEffect(() => {
-        dispatch(actions.resetState());
-        dispatch(actions.listLocations());
+        setPageNumber(1);
+    }, [currentFilters]);
+
+    useEffect(() => {
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
     }, [dispatch]);
+
+    useEffect(() => {
+        if (!currentFilters) return;
+        dispatch(actions.listLocations({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
+    }, [dispatch, currentFilters, pageSize, pageNumber]);
+
+    const onPageSizeChanged = useCallback(
+        (pageSize: number) => {
+            setPageSize(pageSize);
+            setPageNumber(1);
+        },
+        [setPageSize, setPageNumber],
+    );
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -183,10 +206,24 @@ function LocationList() {
         [locations],
     );
 
+    const paginationData = useMemo(
+        () => ({
+            page: pageNumber,
+            totalItems: totalItems,
+            pageSize: pageSize,
+            loadedPageSize: pageSize,
+            totalPages: Math.ceil(totalItems / pageSize),
+            itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
+        }),
+        [pageNumber, totalItems, pageSize],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <Widget title={title} busy={isBusy}>
                 <br />
+
+                <LocationsFilter />
 
                 <CustomTable
                     headers={locationsRowHeaders}
@@ -194,7 +231,9 @@ function LocationList() {
                     onCheckedRowsChanged={setCheckedRows}
                     hasCheckboxes={true}
                     hasPagination={true}
-                    canSearch={true}
+                    paginationData={paginationData}
+                    onPageChanged={setPageNumber}
+                    onPageSizeChanged={onPageSizeChanged}
                 />
             </Widget>
 
