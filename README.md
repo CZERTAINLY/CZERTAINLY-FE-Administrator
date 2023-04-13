@@ -16,7 +16,7 @@ For the ease of understanding and usage, the icons are added with tooltip to und
 
 Bulk operations can be performed on most of the objects from their list page. To perform any operation on a single object (for example - a connector), the user can do it either from the list page or the details page.
 
-For more information, refer to the [CZERTAINLY documentation](https://docs.czertainly.com).
+For more information, please refer to the [CZERTAINLY documentation](https://docs.czertainly.com).
 
 ## Docker container
 
