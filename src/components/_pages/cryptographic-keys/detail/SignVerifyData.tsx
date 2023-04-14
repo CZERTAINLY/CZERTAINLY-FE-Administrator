@@ -92,7 +92,7 @@ export default function SignVerifyData({
                tokenProfileUuid: tokenProfileUuid || "",
                request: {
                   signatureAttributes: attribs,
-                  data: [{data: btoa(fileContent)}],
+                  data: [{data: fileContent}],
                }
             }));
          } else {
@@ -103,8 +103,8 @@ export default function SignVerifyData({
                tokenProfileUuid: tokenProfileUuid || "",
                request: {
                   signatureAttributes: attribs,
-                  signatures: [{data: btoa(signatureContent)}],
-                  data: [{data: btoa(fileContent)}],
+                  signatures: [{data: signatureContent}],
+                  data: [{data: fileContent}],
                }
             }));
          }

@@ -169,7 +169,7 @@ export const slice = createSlice({
       signDataSuccess: (state, action: PayloadAction<{ uuid: string, signature: CryptographicKeySignResponseModel }>) => {
             
          state.isSigning = false;
-         downloadFile(btoa(action.payload.signature?.signatures[0]?.data[0]), "signature");
+         downloadFile(atob(action.payload.signature?.signatures[0]?.data), "signature.sign", "application/octet-stream");
 
       },
 

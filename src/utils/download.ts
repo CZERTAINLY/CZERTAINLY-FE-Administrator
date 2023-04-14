@@ -8,11 +8,20 @@ import { CertificateContentResponseModel, CertificateDetailResponseModel } from 
 
 
 
-export function downloadFile(content: any, fileName: string) {
-
+export function downloadFile(content: any, fileName: string, type?: string) {
    const element = document.createElement("a");
 
-   const file = new Blob([content], { type: "text/plain" });
+   var byteNumbers = new Array(content.length);
+   for (var i = 0; i < content.length; i++) {
+       byteNumbers[i] = content.charCodeAt(i);
+   }
+   var byteArray = new Uint8Array(byteNumbers);
+
+   if(!type) {
+       type = "text/plain";
+   } 
+
+   const file = new Blob([byteArray], { type: type });
    element.href = URL.createObjectURL(file);
    element.download = fileName;
    document.body.appendChild(element); // Required for this to work in FireFox
