@@ -27,7 +27,6 @@ import {
    IntegerAttributeContent,
    MetadataAttribute,
    MetadataAttributeProperties,
-   MimeType,
    ObjectAttributeContent,
    RangeAttributeConstraint,
    RangeAttributeConstraintData,
@@ -56,11 +55,8 @@ export type DateAttributeContentModel = DateAttributeContentDto;
 export type DateTimeAttributeContentDto = DateTimeAttributeContent;
 export type DateTimeAttributeContentModel = DateTimeAttributeContentDto;
 
-export type MimeTypeDto = MimeType;
-export type MimeTypeModel = MimeTypeDto;
-
 export type FileAttributeContentDataDto = FileAttributeContentData;
-export type FileAttributeContentDataModel = Omit<FileAttributeContentDataDto, "mimeType"> & { mimeType: MimeTypeModel };
+export type FileAttributeContentDataModel = FileAttributeContentDataDto;
 
 export type FileAttributeContentDto = FileAttributeContent;
 export type FileAttributeContentModel = Omit<FileAttributeContentDto, "data"> & { data: FileAttributeContentDataModel };

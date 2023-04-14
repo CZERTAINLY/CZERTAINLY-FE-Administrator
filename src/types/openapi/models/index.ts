@@ -159,7 +159,6 @@ export * from './LocationDto';
 export * from './MetadataAttribute';
 export * from './MetadataAttributeProperties';
 export * from './MetadataResponseDto';
-export * from './MimeType';
 export * from './MultipleCertificateObjectUpdateDto';
 export * from './NameAndIdDto';
 export * from './NameAndUuidDto';

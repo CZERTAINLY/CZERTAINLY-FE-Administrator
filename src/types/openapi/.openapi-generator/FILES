@@ -191,7 +191,6 @@ models/LocationDto.ts
 models/MetadataAttribute.ts
 models/MetadataAttributeProperties.ts
 models/MetadataResponseDto.ts
-models/MimeType.ts
 models/MultipleCertificateObjectUpdateDto.ts
 models/NameAndIdDto.ts
 models/NameAndUuidDto.ts
