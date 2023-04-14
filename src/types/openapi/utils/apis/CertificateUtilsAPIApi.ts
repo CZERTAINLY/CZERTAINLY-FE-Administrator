@@ -11,18 +11,17 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
-import type { OperationOpts, HttpHeaders } from '../runtime';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
 import type {
-    ApiErrorResponseDto,
     IdentifyCertificateRequestDto,
     IdentifyCertificateResponseDto,
     ParseCertificateRequestDto,
     ParseCertificateResponseDto,
     RandomCertificateResponseDto,
-} from '../models';
+} from "../models";
+import type { HttpHeaders, OperationOpts } from "../runtime";
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
 
 export interface IdentifyCertificateRequest {
     identifyCertificateRequestDto: IdentifyCertificateRequestDto;
@@ -41,62 +40,87 @@ export interface RandomCertificateRequest {
  * no description
  */
 export class CertificateUtilsAPIApi extends BaseAPI {
-
     /**
      * Identify certificate type
      */
-    identifyCertificate({ identifyCertificateRequestDto }: IdentifyCertificateRequest): Observable<IdentifyCertificateResponseDto>
-    identifyCertificate({ identifyCertificateRequestDto }: IdentifyCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<IdentifyCertificateResponseDto>>
-    identifyCertificate({ identifyCertificateRequestDto }: IdentifyCertificateRequest, opts?: OperationOpts): Observable<IdentifyCertificateResponseDto | AjaxResponse<IdentifyCertificateResponseDto>> {
-        throwIfNullOrUndefined(identifyCertificateRequestDto, 'identifyCertificateRequestDto', 'identifyCertificate');
+    identifyCertificate({ identifyCertificateRequestDto }: IdentifyCertificateRequest): Observable<IdentifyCertificateResponseDto>;
+    identifyCertificate(
+        { identifyCertificateRequestDto }: IdentifyCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<IdentifyCertificateResponseDto>>;
+    identifyCertificate(
+        { identifyCertificateRequestDto }: IdentifyCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<IdentifyCertificateResponseDto | AjaxResponse<IdentifyCertificateResponseDto>> {
+        throwIfNullOrUndefined(identifyCertificateRequestDto, "identifyCertificateRequestDto", "identifyCertificate");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<IdentifyCertificateResponseDto>({
-            url: '/v1/certificate/identify',
-            method: 'POST',
-            headers,
-            body: identifyCertificateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<IdentifyCertificateResponseDto>(
+            {
+                url: "/v1/certificate/identify",
+                method: "POST",
+                headers,
+                body: identifyCertificateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Parse the certificate and provides details about the certificate attributes
      */
-    parseCertificate({ certificateType, parseCertificateRequestDto }: ParseCertificateRequest): Observable<ParseCertificateResponseDto>
-    parseCertificate({ certificateType, parseCertificateRequestDto }: ParseCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<ParseCertificateResponseDto>>
-    parseCertificate({ certificateType, parseCertificateRequestDto }: ParseCertificateRequest, opts?: OperationOpts): Observable<ParseCertificateResponseDto | AjaxResponse<ParseCertificateResponseDto>> {
-        throwIfNullOrUndefined(certificateType, 'certificateType', 'parseCertificate');
-        throwIfNullOrUndefined(parseCertificateRequestDto, 'parseCertificateRequestDto', 'parseCertificate');
+    parseCertificate({ certificateType, parseCertificateRequestDto }: ParseCertificateRequest): Observable<ParseCertificateResponseDto>;
+    parseCertificate(
+        { certificateType, parseCertificateRequestDto }: ParseCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ParseCertificateResponseDto>>;
+    parseCertificate(
+        { certificateType, parseCertificateRequestDto }: ParseCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<ParseCertificateResponseDto | AjaxResponse<ParseCertificateResponseDto>> {
+        throwIfNullOrUndefined(certificateType, "certificateType", "parseCertificate");
+        throwIfNullOrUndefined(parseCertificateRequestDto, "parseCertificateRequestDto", "parseCertificate");
 
         const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
 
-        return this.request<ParseCertificateResponseDto>({
-            url: '/v1/certificate/{certificateType}/parse'.replace('{certificateType}', encodeURI(certificateType)),
-            method: 'POST',
-            headers,
-            body: parseCertificateRequestDto,
-        }, opts?.responseOpts);
-    };
+        return this.request<ParseCertificateResponseDto>(
+            {
+                url: "/v1/certificate/{certificateType}/parse".replace("{certificateType}", encodeURI(certificateType)),
+                method: "POST",
+                headers,
+                body: parseCertificateRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Generate random certificate
      */
-    randomCertificate({ certificateType }: RandomCertificateRequest): Observable<RandomCertificateResponseDto>
-    randomCertificate({ certificateType }: RandomCertificateRequest, opts?: OperationOpts): Observable<AjaxResponse<RandomCertificateResponseDto>>
-    randomCertificate({ certificateType }: RandomCertificateRequest, opts?: OperationOpts): Observable<RandomCertificateResponseDto | AjaxResponse<RandomCertificateResponseDto>> {
-        throwIfNullOrUndefined(certificateType, 'certificateType', 'randomCertificate');
+    randomCertificate({ certificateType }: RandomCertificateRequest): Observable<RandomCertificateResponseDto>;
+    randomCertificate(
+        { certificateType }: RandomCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<RandomCertificateResponseDto>>;
+    randomCertificate(
+        { certificateType }: RandomCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<RandomCertificateResponseDto | AjaxResponse<RandomCertificateResponseDto>> {
+        throwIfNullOrUndefined(certificateType, "certificateType", "randomCertificate");
 
-        return this.request<RandomCertificateResponseDto>({
-            url: '/v1/certificate/{certificateType}/random'.replace('{certificateType}', encodeURI(certificateType)),
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<RandomCertificateResponseDto>(
+            {
+                url: "/v1/certificate/{certificateType}/random".replace("{certificateType}", encodeURI(certificateType)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 }
 
 /**
@@ -104,14 +128,14 @@ export class CertificateUtilsAPIApi extends BaseAPI {
  * @enum {string}
  */
 export enum ParseCertificateCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
+    X509 = "X509",
+    Ssh = "SSH",
 }
 /**
  * @export
  * @enum {string}
  */
 export enum RandomCertificateCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
+    X509 = "X509",
+    Ssh = "SSH",
 }

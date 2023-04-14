@@ -1,10 +1,12 @@
 import {
     AuditLogDto,
     AuditLogFilterDto,
-    AuditLogFilterModel, AuditLogItemDto, AuditLogItemModel,
+    AuditLogFilterModel,
+    AuditLogItemDto,
+    AuditLogItemModel,
     AuditLogModel,
     PageableDto,
-    PageableModel
+    PageableModel,
 } from "types/auditLogs";
 
 export function transformPageableModelToDto(pageable: PageableModel): PageableDto {
@@ -22,6 +24,6 @@ export function transformAuditLogItemDtoToModel(auditLog: AuditLogItemDto): Audi
 export function transformAuditLogDtoToModel(auditLog: AuditLogDto): AuditLogModel {
     return {
         ...auditLog,
-        items: auditLog.items.map(transformAuditLogItemDtoToModel)
-    }
+        items: auditLog.items.map(transformAuditLogItemDtoToModel),
+    };
 }

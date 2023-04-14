@@ -6,281 +6,182 @@ import { extractError } from "utils/net";
 
 import { slice } from "./acme-accounts";
 import { actions as appRedirectActions } from "./app-redirect";
-import {
-    transformAcmeAccountListResponseDtoToModel,
-    transformAcmeAccountResponseDtoToModel
-} from "./transform/acme-accounts";
-
+import { transformAcmeAccountListResponseDtoToModel, transformAcmeAccountResponseDtoToModel } from "./transform/acme-accounts";
 
 const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listAcmeAccounts.match),
+        switchMap(() =>
+            deps.apiClients.acmeAccounts.listAcmeAccounts().pipe(
+                map((accounts) =>
+                    slice.actions.listAcmeAccountsSuccess({
+                        acmeAccounts: accounts.map(transformAcmeAccountListResponseDtoToModel),
+                    }),
+                ),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.listAcmeAccounts.match
-      ),
-      switchMap(
-
-         () => deps.apiClients.acmeAccounts.listAcmeAccounts().pipe(
-
-            map(
-               accounts => slice.actions.listAcmeAccountsSuccess({
-                  acmeAccounts: accounts.map(transformAcmeAccountListResponseDtoToModel)
-               })
+                catchError((error) =>
+                    of(
+                        slice.actions.listAcmeAccountsFailed({ error: extractError(error, "Failed to get ACME Accounts list") }),
+                        appRedirectActions.fetchError({ error, message: "Failed to get ACME Accounts list" }),
+                    ),
+                ),
             ),
-
-            catchError(
-               error => of(
-                  slice.actions.listAcmeAccountsFailed({ error: extractError(error, "Failed to get ACME Accounts list") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to get ACME Accounts list" })
-               )
-            )
-
-
-         )
-
-      )
-
-   );
-
-}
-
+        ),
+    );
+};
 
 const getAccountDetail: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAcmeAccount.match),
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts
+                .getAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid })
+                .pipe(
+                    map((detail) => slice.actions.getAcmeAccountSuccess({ acmeAccount: transformAcmeAccountResponseDtoToModel(detail) })),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.getAcmeAccount.match
-      ),
-      switchMap(
-
-         action =>
-
-            deps.apiClients.acmeAccounts.getAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid }).pipe(
-
-               map(
-                  detail => slice.actions.getAcmeAccountSuccess({ acmeAccount: transformAcmeAccountResponseDtoToModel(detail) })
-               ),
-
-               catchError(
-                  error => of(
-                     slice.actions.getAcmeAccountFailed({ error: extractError(error, "Failed to get ACME Account details") }),
-                     appRedirectActions.fetchError({ error, message: "Failed to get ACME Account details" })
-                  )
-               )
-
-            )
-
-      )
-
-   );
-
-}
-
+                    catchError((error) =>
+                        of(
+                            slice.actions.getAcmeAccountFailed({ error: extractError(error, "Failed to get ACME Account details") }),
+                            appRedirectActions.fetchError({ error, message: "Failed to get ACME Account details" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
 
 const revokeAcmeAccount: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.revokeAcmeAccount.match),
 
-   return action$.pipe(
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts
+                .revokeAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.revokeAcmeAccountSuccess({
+                                acmeProfileUuid: action.payload.acmeProfileUuid,
+                                uuid: action.payload.uuid,
+                            }),
+                            slice.actions.getAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, uuid: action.payload.uuid }),
+                        ),
+                    ),
 
-      filter(
-         slice.actions.revokeAcmeAccount.match
-      ),
-
-      switchMap(
-
-         action => deps.apiClients.acmeAccounts.revokeAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid }).pipe(
-
-            mergeMap(
-
-               () => of(
-                  slice.actions.revokeAcmeAccountSuccess({ acmeProfileUuid: action.payload.acmeProfileUuid, uuid: action.payload.uuid }),
-                  slice.actions.getAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, uuid: action.payload.uuid })
-               )
-
-            ),
-
-            catchError(
-               error => of(
-                  slice.actions.revokeAcmeAccountFailed({ error: extractError(error, "Failed to revoke ACME Account") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to revoke ACME Account" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
+                    catchError((error) =>
+                        of(
+                            slice.actions.revokeAcmeAccountFailed({ error: extractError(error, "Failed to revoke ACME Account") }),
+                            appRedirectActions.fetchError({ error, message: "Failed to revoke ACME Account" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
 
 const enableAcmeAccount: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.enableAcmeAccount.match),
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts
+                .enableAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid })
+                .pipe(
+                    map(() => slice.actions.enableAcmeAccountSuccess({ uuid: action.payload.uuid })),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.enableAcmeAccount.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.acmeAccounts.enableAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid }).pipe(
-
-            map(
-               () => slice.actions.enableAcmeAccountSuccess({ uuid: action.payload.uuid })
-            ),
-
-            catchError(
-               error => of(
-                  slice.actions.enableAcmeAccountFailed({ error: extractError(error, "Failed to enable ACME Account") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to enable ACME Account" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
+                    catchError((error) =>
+                        of(
+                            slice.actions.enableAcmeAccountFailed({ error: extractError(error, "Failed to enable ACME Account") }),
+                            appRedirectActions.fetchError({ error, message: "Failed to enable ACME Account" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
 
 const disableAcmeAccount: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.disableAcmeAccount.match),
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts
+                .disableAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid })
+                .pipe(
+                    map(() => slice.actions.disableAcmeAccountSuccess({ uuid: action.payload.uuid })),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.disableAcmeAccount.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.acmeAccounts.disableAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid }).pipe(
-
-            map(
-               () => slice.actions.disableAcmeAccountSuccess({ uuid: action.payload.uuid })
-            ),
-
-            catchError(
-               error => of(
-                  slice.actions.disableAcmeAccountFailed({ error: extractError(error, "Failed to disable ACME Account") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to disable ACME Account" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
+                    catchError((error) =>
+                        of(
+                            slice.actions.disableAcmeAccountFailed({ error: extractError(error, "Failed to disable ACME Account") }),
+                            appRedirectActions.fetchError({ error, message: "Failed to disable ACME Account" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
 
 const bulkRevokeAcmeAccounts: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkRevokeAcmeAccounts.match),
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts.bulkRevokeAcmeAccount({ requestBody: action.payload.uuids }).pipe(
+                map(() => slice.actions.bulkRevokeAcmeAccountsSuccess({ uuids: action.payload.uuids })),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkRevokeAcmeAccounts.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.acmeAccounts.bulkRevokeAcmeAccount({ requestBody: action.payload.uuids }).pipe(
-
-            map(
-               () => slice.actions.bulkRevokeAcmeAccountsSuccess({ uuids: action.payload.uuids })
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkRevokeAcmeAccountsFailed({ error: extractError(error, "Failed to revoke ACME Accounts") }),
+                        appRedirectActions.fetchError({ error, message: "Failed to revoke ACME Accounts" }),
+                    ),
+                ),
             ),
-
-            catchError(
-               error => of(
-                  slice.actions.bulkRevokeAcmeAccountsFailed({ error: extractError(error, "Failed to revoke ACME Accounts") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to revoke ACME Accounts" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
+        ),
+    );
+};
 
 const bulkEnableAcmeAccounts: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkEnableAcmeAccounts.match),
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts.bulkEnableAcmeAccount({ requestBody: action.payload.uuids }).pipe(
+                map(() => slice.actions.bulkEnableAcmeAccountsSuccess({ uuids: action.payload.uuids })),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkEnableAcmeAccounts.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.acmeAccounts.bulkEnableAcmeAccount({ requestBody: action.payload.uuids }).pipe(
-
-            map(
-               () => slice.actions.bulkEnableAcmeAccountsSuccess({ uuids: action.payload.uuids })
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkEnableAcmeAccountsFailed({ error: extractError(error, "Failed to enable ACME Accounts") }),
+                        appRedirectActions.fetchError({ error, message: "Failed to enable ACME Accounts" }),
+                    ),
+                ),
             ),
-
-            catchError(
-               error => of(
-                  slice.actions.bulkEnableAcmeAccountsFailed({ error: extractError(error, "Failed to enable ACME Accounts") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to enable ACME Accounts" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
+        ),
+    );
+};
 
 const bulkDisableAcmeAccounts: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDisableAcmeAccounts.match),
+        switchMap((action) =>
+            deps.apiClients.acmeAccounts.bulkDisableAcmeAccount({ requestBody: action.payload.uuids }).pipe(
+                map(() => slice.actions.bulkDisableAcmeAccountsSuccess({ uuids: action.payload.uuids })),
 
-   return action$.pipe(
-
-      filter(
-         slice.actions.bulkDisableAcmeAccounts.match
-      ),
-      switchMap(
-
-         action => deps.apiClients.acmeAccounts.bulkDisableAcmeAccount({ requestBody: action.payload.uuids }).pipe(
-
-            map(
-               () => slice.actions.bulkDisableAcmeAccountsSuccess({ uuids: action.payload.uuids })
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDisableAcmeAccountsFailed({ error: extractError(error, "Failed to disable ACME Accounts") }),
+                        appRedirectActions.fetchError({ error, message: "Failed to disable ACME Accounts" }),
+                    ),
+                ),
             ),
-
-            catchError(
-               error => of(
-                  slice.actions.bulkDisableAcmeAccountsFailed({ error: extractError(error, "Failed to disable ACME Accounts") }),
-                  appRedirectActions.fetchError({ error, message: "Failed to disable ACME Accounts" })
-               )
-            )
-
-         )
-
-      )
-
-   );
-
-}
-
+        ),
+    );
+};
 
 const epics = [
-   listAcmeAccounts,
-   getAccountDetail,
-   revokeAcmeAccount,
-   enableAcmeAccount,
-   disableAcmeAccount,
-   bulkRevokeAcmeAccounts,
-   bulkEnableAcmeAccounts,
-   bulkDisableAcmeAccounts,
+    listAcmeAccounts,
+    getAccountDetail,
+    revokeAcmeAccount,
+    enableAcmeAccount,
+    disableAcmeAccount,
+    bulkRevokeAcmeAccounts,
+    bulkEnableAcmeAccounts,
+    bulkDisableAcmeAccounts,
 ];
-
 
 export default epics;

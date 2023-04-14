@@ -1,5 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Props {
     headers: TableHeader[];
@@ -8,23 +8,20 @@ interface Props {
     onReloadData: (pageSize: number, pageNumber: number) => void;
 }
 
-export default function PagedCustomTable({headers, data, totalItems, onReloadData}: Props) {
+export default function PagedCustomTable({ headers, data, totalItems, onReloadData }: Props) {
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
 
     const prevPageNumber = useRef(0);
 
-    useEffect(
-        () => {
-            if (pageNumber !== 1 && prevPageNumber.current === pageNumber) {
-                setPageNumber(1);
-            } else {
-                prevPageNumber.current = pageNumber;
-                onReloadData(pageSize, pageNumber);
-            }
-        },
-        [pageSize, pageNumber, onReloadData],
-    );
+    useEffect(() => {
+        if (pageNumber !== 1 && prevPageNumber.current === pageNumber) {
+            setPageNumber(1);
+        } else {
+            prevPageNumber.current = pageNumber;
+            onReloadData(pageSize, pageNumber);
+        }
+    }, [pageSize, pageNumber, onReloadData]);
 
     const paginationData = useMemo(
         () => ({

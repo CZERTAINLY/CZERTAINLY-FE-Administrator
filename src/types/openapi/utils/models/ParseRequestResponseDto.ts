@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RequestData,
-} from './';
+import type { RequestData } from "./";
 
 /**
  * @export
@@ -38,6 +36,5 @@ export interface ParseRequestResponseDto {
  * @enum {string}
  */
 export enum ParseRequestResponseDtoTypeEnum {
-    Pkcs10 = 'PKCS10'
+    Pkcs10 = "PKCS10",
 }
-

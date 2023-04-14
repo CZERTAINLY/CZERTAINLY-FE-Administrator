@@ -18,7 +18,7 @@ export const slice = createSlice({
         reset: (state) => {
             state.parsedCertificate = undefined;
         },
-        parseCertificate: (state, action: PayloadAction<{certificate: string, parseType: ParseCertificateRequestDtoParseTypeEnum}>) => {
+        parseCertificate: (state, action: PayloadAction<{ certificate: string; parseType: ParseCertificateRequestDtoParseTypeEnum }>) => {
             state.parsedCertificate = undefined;
             state.isFetchingDetail = true;
         },

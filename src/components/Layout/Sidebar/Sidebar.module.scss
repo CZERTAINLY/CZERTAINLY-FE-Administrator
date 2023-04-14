@@ -1,67 +1,66 @@
 @import "src/resources/styles/app";
 
 .root {
-   width: $sidebar-width-open;
-   position: fixed;
-   left: 0;
-   top: 0;
-   bottom: 0;
-   //background-color: $threekey-secondary;
-   //background-color: $sidebar-bg-color;
-   background-color: $white;
-   color: $sidebar-color;
-   margin-top: $navbar-height;
+    width: $sidebar-width-open;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    //background-color: $threekey-secondary;
+    //background-color: $sidebar-bg-color;
+    background-color: $white;
+    color: $sidebar-color;
+    margin-top: $navbar-height;
 
-   //box-shadow: -6px 0px 10px -10px rgba(0,0,0,0.5) inset;
-   //box-shadow: 0 -6px 10px 5px rgba(0,0,0,0.5);
+    //box-shadow: -6px 0px 10px -10px rgba(0,0,0,0.5) inset;
+    //box-shadow: 0 -6px 10px 5px rgba(0,0,0,0.5);
 }
 
 .logo {
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   height: $navbar-height;
-   width: 100%;
-   //background: $threekey-secondary;
-   background-color: $sidebar-bg-color;
-   text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: $navbar-height;
+    width: 100%;
+    //background: $threekey-secondary;
+    background-color: $sidebar-bg-color;
+    text-decoration: none;
 
-   a img {
-      width: $sidebar-width-open - 45px;
-   }
+    a img {
+        width: $sidebar-width-open - 45px;
+    }
 }
 
 .link {
-   text-decoration: none;
-   color: white;
+    text-decoration: none;
+    color: white;
 
-   &:hover {
-      text-decoration: none;
-   }
-
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .header {
-   display: flex;
-   justify-content: left;
-   align-items: center;
-   height: $navbar-height;
-   width: 100%;
-   background: $sidebar-bg-color;
-   color: $sidebar-color;
-   font-weight: $font-weight-bold;
-   text-decoration: none;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: $navbar-height;
+    width: 100%;
+    background: $sidebar-bg-color;
+    color: $sidebar-color;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
 }
 
 .nav {
-   overflow-y: auto;
-   max-height: calc(100vh - #{$navbar-height});
+    overflow-y: auto;
+    max-height: calc(100vh - #{$navbar-height});
 }
 
 .nav ul {
-   padding: 10px 0;
+    padding: 10px 0;
 }
 
 .nav ul li {
-   white-space: nowrap;
+    white-space: nowrap;
 }

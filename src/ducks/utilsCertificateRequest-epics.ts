@@ -10,33 +10,32 @@ import { slice } from "./utilsCertificateRequest";
 
 const parseCertificateRequest: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.parseCertificateRequest.match,
-        ),
+        filter(slice.actions.parseCertificateRequest.match),
         switchMap(
-            action => deps.apiClients.utilsCertificateRequest?.parseRequest({
-                requestType: ParseRequestRequestTypeEnum.Pkcs10,
-                parseRequestRequestDto: {
-                    request: action.payload,
-                    parseType: ParseRequestRequestDtoParseTypeEnum.Basic,
-                },
-            }).pipe(
-                map(
-                    request => slice.actions.parseCertificateRequestSuccess(request),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.parseCertificateRequestFailure({error: extractError(err, "Failed to get certificate request.")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get certificate request."}),
-                    ),
-                ),
-            ) ?? EMPTY,
+            (action) =>
+                deps.apiClients.utilsCertificateRequest
+                    ?.parseRequest({
+                        requestType: ParseRequestRequestTypeEnum.Pkcs10,
+                        parseRequestRequestDto: {
+                            request: action.payload,
+                            parseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                        },
+                    })
+                    .pipe(
+                        map((request) => slice.actions.parseCertificateRequestSuccess(request)),
+                        catchError((err) =>
+                            of(
+                                slice.actions.parseCertificateRequestFailure({
+                                    error: extractError(err, "Failed to get certificate request."),
+                                }),
+                                appRedirectActions.fetchError({ error: err, message: "Failed to get certificate request." }),
+                            ),
+                        ),
+                    ) ?? EMPTY,
         ),
     );
 };
 
-const epics = [
-    parseCertificateRequest,
-];
+const epics = [parseCertificateRequest];
 
 export default epics;

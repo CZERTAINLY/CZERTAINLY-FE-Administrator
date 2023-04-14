@@ -9,12 +9,7 @@ export interface Props {
     hasHeader?: boolean;
 }
 
-export default function ComplianceRuleAttributeViewer({
-                                                          attributes,
-                                                          descriptorAttributes,
-                                                          hasHeader = true,
-                                                      }: Props) {
-
+export default function ComplianceRuleAttributeViewer({ attributes, descriptorAttributes, hasHeader = true }: Props) {
     const getContent = useCallback(getAttributeContent, []);
 
     const tableHeaders: TableHeader[] = useMemo(
@@ -35,36 +30,17 @@ export default function ComplianceRuleAttributeViewer({
         [],
     );
 
-    const tableData: TableDataRow[] = useMemo(
-        () => {
-            const attributeRows = attributes?.map(attribute => ({
-                    id: attribute.uuid || attribute.name,
-                    columns: [
-                        attribute.name || "",
-                        getContent(attribute.contentType, attribute.content),
-                    ],
-                }),
-            );
-            const descriptorRows = descriptorAttributes?.filter(isDataAttributeModel).map(attribute => ({
-                    id: attribute.uuid || attribute.name,
-                    columns: [
-                        attribute.name || "",
-                        getContent(attribute.contentType, attribute.content),
-                    ],
-                }),
-            );
-            return [...attributeRows ?? [], ...descriptorRows ?? []];
-        },
-        [attributes, descriptorAttributes, getContent],
-    );
+    const tableData: TableDataRow[] = useMemo(() => {
+        const attributeRows = attributes?.map((attribute) => ({
+            id: attribute.uuid || attribute.name,
+            columns: [attribute.name || "", getContent(attribute.contentType, attribute.content)],
+        }));
+        const descriptorRows = descriptorAttributes?.filter(isDataAttributeModel).map((attribute) => ({
+            id: attribute.uuid || attribute.name,
+            columns: [attribute.name || "", getContent(attribute.contentType, attribute.content)],
+        }));
+        return [...(attributeRows ?? []), ...(descriptorRows ?? [])];
+    }, [attributes, descriptorAttributes, getContent]);
 
-    return (
-        <CustomTable
-            headers={tableHeaders}
-            data={tableData}
-            hasHeader={hasHeader}
-        />
-    );
-
+    return <CustomTable headers={tableHeaders} data={tableData} hasHeader={hasHeader} />;
 }
-

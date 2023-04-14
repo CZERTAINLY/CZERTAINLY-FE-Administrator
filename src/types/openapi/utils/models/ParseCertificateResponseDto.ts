@@ -11,9 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type {
-    CertificateData,
-} from './';
+import type { CertificateData } from "./";
 
 /**
  * @export
@@ -38,7 +36,6 @@ export interface ParseCertificateResponseDto {
  * @enum {string}
  */
 export enum ParseCertificateResponseDtoTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
+    X509 = "X509",
+    Ssh = "SSH",
 }
-

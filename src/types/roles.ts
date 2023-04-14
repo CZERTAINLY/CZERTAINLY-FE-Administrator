@@ -1,3 +1,4 @@
+import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 import {
     ObjectPermissionsDto,
     ObjectPermissionsRequestDto as ObjectPermissionsRequestDtoOpenApi,
@@ -9,10 +10,12 @@ import {
     SubjectPermissionsDto as SubjectPermissionsDtoOpenApi,
 } from "./openapi";
 import { UserResponseModel } from "./users";
-import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
 
 export type RoleDetailDto = RoleDetailDtoOpenApi;
-export type RoleDetailModel = Omit<RoleDetailDto, "users | customAttributes"> & { users: Array<UserResponseModel>, customAttributes?: Array<AttributeResponseModel> };
+export type RoleDetailModel = Omit<RoleDetailDto, "users | customAttributes"> & {
+    users: Array<UserResponseModel>;
+    customAttributes?: Array<AttributeResponseModel>;
+};
 
 export type RoleRequestDto = RoleRequestDtoOpenApi;
 export type RoleRequestModel = Omit<RoleRequestDto, "customAttributes"> & { customAttributes?: Array<AttributeRequestModel> };
@@ -24,10 +27,14 @@ export type ObjectPermissionsResponseDto = ObjectPermissionsDto;
 export type ObjectPermissionsResponseModel = ObjectPermissionsResponseDto;
 
 export type ResourcePermissionsRequestDto = ResourcePermissionsRequestDtoOpenApi;
-export type ResourcePermissionsRequestModel = Omit<ResourcePermissionsRequestDto, "objects"> & { objects?: Array<ObjectPermissionsRequestModel> };
+export type ResourcePermissionsRequestModel = Omit<ResourcePermissionsRequestDto, "objects"> & {
+    objects?: Array<ObjectPermissionsRequestModel>;
+};
 
 export type ResourcePermissionsResponseDto = ResourcePermissionsDto;
-export type ResourcePermissionsResponseModel = Omit<ResourcePermissionsResponseDto, "objects"> & { objects: Array<ObjectPermissionsResponseModel> };
+export type ResourcePermissionsResponseModel = Omit<ResourcePermissionsResponseDto, "objects"> & {
+    objects: Array<ObjectPermissionsResponseModel>;
+};
 
 export type SubjectPermissionsDto = SubjectPermissionsDtoOpenApi;
 export type SubjectPermissionsModel = Omit<SubjectPermissionsDto, "resources"> & { resources: Array<ResourcePermissionsResponseModel> };

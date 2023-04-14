@@ -4,7 +4,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/globalMetadata";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
@@ -25,40 +25,37 @@ export default function GlobalMetadataList() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [showPromote, setShowPromote] = useState<boolean>(false);
 
-    useEffect(
-        () => {
-            dispatch(actions.setCheckedRows({checkedRows: []}));
-            dispatch(actions.listGlobalMetadata());
-        },
-        [dispatch],
-    );
+    useEffect(() => {
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
+        dispatch(actions.listGlobalMetadata());
+    }, [dispatch]);
 
-    const onDeleteConfirmed = useCallback(
-        () => {
-            dispatch(actions.bulkDeleteGlobalMetadata(checkedRows));
-            setConfirmDelete(false);
-        },
-        [checkedRows, dispatch],
-    );
+    const onDeleteConfirmed = useCallback(() => {
+        dispatch(actions.bulkDeleteGlobalMetadata(checkedRows));
+        setConfirmDelete(false);
+    }, [checkedRows, dispatch]);
 
     const setCheckedRows = useCallback(
         (rows: (string | number)[]) => {
-            dispatch(actions.setCheckedRows({checkedRows: rows as string[]}));
+            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
         },
         [dispatch],
     );
 
-    const buttons: WidgetButtonProps[] = useMemo(() => [
-        {icon: "plus", disabled: false, tooltip: "Create", onClick: () => navigate(`./add`)},
-        {icon: "push", disabled: false, tooltip: "Promote", onClick: () => setShowPromote(true)},
-        {icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true)},
-    ], [checkedRows, navigate]);
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            { icon: "plus", disabled: false, tooltip: "Create", onClick: () => navigate(`./add`) },
+            { icon: "push", disabled: false, tooltip: "Promote", onClick: () => setShowPromote(true) },
+            { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true) },
+        ],
+        [checkedRows, navigate],
+    );
 
     const title = useMemo(
         () => (
             <div>
                 <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons}/>
+                    <WidgetButtons buttons={buttons} />
                 </div>
 
                 <h5 className="mt-0">
@@ -95,23 +92,18 @@ export default function GlobalMetadataList() {
     );
 
     const globalMetadataTableData: TableDataRow[] = useMemo(
-        () => globalMetadata.map(
-            metadata => ({
+        () =>
+            globalMetadata.map((metadata) => ({
                 id: metadata.uuid,
-                columns: [
-                    <Link to={`./detail/${metadata.uuid}`}>{metadata.name}</Link>,
-                    metadata.contentType,
-                    metadata.description,
-                ],
-            }),
-        ),
+                columns: [<Link to={`./detail/${metadata.uuid}`}>{metadata.name}</Link>, metadata.contentType, metadata.description],
+            })),
         [globalMetadata],
     );
 
     return (
         <Container className="themed-container" fluid>
             <Widget title={title} busy={isBusy}>
-                <br/>
+                <br />
                 <CustomTable
                     headers={globalMetadataTableHeaders}
                     data={globalMetadataTableData}
@@ -128,13 +120,12 @@ export default function GlobalMetadataList() {
                 body={`You are about to delete selected Global Metadata. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    {color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete"},
-                    {color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel"},
+                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
                 ]}
             />
 
-            <ConnectorMetadataDialog show={showPromote} setShow={setShowPromote}/>
-
+            <ConnectorMetadataDialog show={showPromote} setShow={setShowPromote} />
         </Container>
     );
 }
