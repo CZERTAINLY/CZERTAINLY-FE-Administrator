@@ -76,7 +76,7 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                         tokenProfileUuid: tokenProfileUuid || "",
                         request: {
                             signatureAttributes: attribs,
-                            data: [{ data: btoa(fileContent) }],
+                            data: [{ data: fileContent }],
                         },
                     }),
                 );
@@ -89,8 +89,8 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                         tokenProfileUuid: tokenProfileUuid || "",
                         request: {
                             signatureAttributes: attribs,
-                            signatures: [{ data: btoa(signatureContent) }],
-                            data: [{ data: btoa(fileContent) }],
+                            signatures: [{ data: signatureContent }],
+                            data: [{ data: fileContent }],
                         },
                     }),
                 );

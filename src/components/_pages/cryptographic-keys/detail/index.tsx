@@ -7,6 +7,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/cryptographic-keys";
+import { actions as connectorActions } from "ducks/connectors";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
