@@ -7,7 +7,7 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchFieldListDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
+import { transformSearchRequestModelToDto } from "./transform/certificates";
 
 import {
     transformCryptographicKeyAddRequestModelToDto,
@@ -655,28 +655,6 @@ const bulkDestroyCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const getAvailableKeyFilters: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getAvailableKeyFilters.match),
-        switchMap((action) =>
-            deps.apiClients.cryptographicKeys.getSearchableFieldInformation1().pipe(
-                map((filters) =>
-                    slice.actions.getAvailableKeyFiltersSuccess({
-                        availableKeyFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),
-                    }),
-                ),
-
-                catchError((err) =>
-                    of(
-                        slice.actions.getAvailableKeyFiltersFailure({ error: extractError(err, "Failed to get available key filters") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get available key filters" }),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
 const getKeyHistory: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getHistory.match),
@@ -732,7 +710,6 @@ const epics = [
     destroyCryptographicKey,
     bulkDestroyCryptographicKeys,
     bulkDestroyCryptographicKeyItems,
-    getAvailableKeyFilters,
     getKeyHistory,
 ];
 

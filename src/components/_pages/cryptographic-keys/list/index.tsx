@@ -4,7 +4,9 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
+import FilterWidget from "components/FilterWidget";
 import { actions, selectors } from "ducks/cryptographic-keys";
+import { FilterEntity, selectors as filterSelectors } from "ducks/filters";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,7 +14,6 @@ import Select from "react-select";
 import { Badge, Container } from "reactstrap";
 import { KeyCompromiseReason, KeyUsage } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
-import KeyFilter from "../KeyFilter";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
 
@@ -23,7 +24,7 @@ function CryptographicKeyList() {
     const checkedRows = useSelector(selectors.checkedRows);
     const cryptographicKeys = useSelector(selectors.cryptographicKeys);
 
-    const currentFilters = useSelector(selectors.currentKeyFilters);
+    const currentFilters = useSelector(filterSelectors.currentFilters(FilterEntity.KEY));
 
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
@@ -368,11 +369,9 @@ function CryptographicKeyList() {
 
     return (
         <Container className="themed-container" fluid>
-            <br />
-            <KeyFilter />
+            <FilterWidget entity={FilterEntity.KEY} title="Key Inventory Filter" />
 
             <Widget title={title} busy={isBusy}>
-                <br />
                 <CustomTable
                     headers={cryptographicKeysTableHeaders}
                     data={profilesTableData()}

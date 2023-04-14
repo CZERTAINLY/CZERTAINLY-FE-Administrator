@@ -4,12 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/entities";
+import { selectors as filterSelectors } from "ducks/filters";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import FilterWidget from "components/FilterWidget";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import EntitiesFilter from "../EntitiesFilter";
+import { FilterEntity } from "ducks/filters";
 
 function EntityList() {
     const dispatch = useDispatch();
@@ -19,7 +21,7 @@ function EntityList() {
     const entities = useSelector(selectors.entities);
 
     const totalItems = useSelector(selectors.totalItems);
-    const currentFilters = useSelector(selectors.currentFilters);
+    const currentFilters = useSelector(filterSelectors.currentFilters(FilterEntity.ENTITY));
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
 
@@ -164,11 +166,9 @@ function EntityList() {
 
     return (
         <Container className="themed-container" fluid>
+            <FilterWidget entity={FilterEntity.ENTITY} title="Entities Filter" />
+
             <Widget title={title} busy={isBusy}>
-                <br />
-
-                <EntitiesFilter />
-
                 <CustomTable
                     headers={entitiesRowHeaders}
                     data={entityList}

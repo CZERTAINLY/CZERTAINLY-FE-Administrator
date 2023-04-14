@@ -8,7 +8,7 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./discoveries";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchFieldListDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
+import { transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import {
     transformDiscoveryCertificateListDtoToModel,
@@ -34,30 +34,6 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listDiscoveriesFailure({ error: extractError(err, "Failed to get Discovery list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery list" }),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
-const getAvailableFilters: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getAvailableFilters.match),
-        switchMap((action) =>
-            deps.apiClients.discoveries.getSearchableFieldInformation3().pipe(
-                map((filters) =>
-                    slice.actions.getAvailableFiltersSuccess({
-                        availableFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),
-                    }),
-                ),
-
-                catchError((err) =>
-                    of(
-                        slice.actions.getAvailableFiltersFailure({
-                            error: extractError(err, "Failed to get available filters"),
-                        }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get available filters" }),
                     ),
                 ),
             ),
@@ -231,7 +207,6 @@ const epics = [
     listDiscoveryProviders,
     getDiscoveryProviderAttributesDescriptors,
     getDiscoveryCertificates,
-    getAvailableFilters,
     createDiscovery,
     deleteDiscovery,
     bulkDeleteDiscovery,

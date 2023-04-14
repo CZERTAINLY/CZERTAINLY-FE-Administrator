@@ -16,7 +16,7 @@ import {
 } from "types/cryptographic-keys";
 import { KeyRequestType, KeyState, KeyUsage } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
-import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "../types/certificate";
+import { SearchRequestModel } from "../types/certificate";
 
 export type State = {
     checkedRows: string[];
@@ -26,9 +26,6 @@ export type State = {
 
     keyAttributeDescriptors?: AttributeDescriptorModel[];
 
-    availableFilters: SearchFieldListModel[];
-    currentFilters: SearchFilterModel[];
-
     totalPages: number;
     totalItems: number;
 
@@ -36,7 +33,6 @@ export type State = {
     cryptographicKeys: CryptographicKeyResponseModel[];
     cryptographicKeyPairs: CryptographicKeyPairResponseModel[];
 
-    isFetchingAvailableFilters: boolean;
     isFetchingList: boolean;
     isFetchingKeyPairs: boolean;
     isFetchingDetail: boolean;
@@ -72,16 +68,12 @@ export const initialState: State = {
 
     keyAttributeDescriptors: [],
 
-    availableFilters: [],
-    currentFilters: [],
-
     totalPages: 0,
     totalItems: 0,
 
     cryptographicKeys: [],
     cryptographicKeyPairs: [],
 
-    isFetchingAvailableFilters: false,
     isFetchingList: false,
     isFetchingKeyPairs: false,
     isFetchingDetail: false,
@@ -115,17 +107,11 @@ export const slice = createSlice({
 
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
-            let currentFilterRef = state.currentFilters;
             Object.keys(state).forEach((key) => {
                 if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
-            state.currentFilters = currentFilterRef;
-        },
-
-        setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
-            state.currentFilters = action.payload;
         },
 
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
@@ -202,20 +188,6 @@ export const slice = createSlice({
 
         syncKeysFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isSyncing = false;
-        },
-
-        getAvailableKeyFilters: (state, action: PayloadAction<void>) => {
-            state.availableFilters = [];
-            state.isFetchingAvailableFilters = true;
-        },
-
-        getAvailableKeyFiltersSuccess: (state, action: PayloadAction<{ availableKeyFilters: SearchFieldListModel[] }>) => {
-            state.isFetchingAvailableFilters = false;
-            state.availableFilters = action.payload.availableKeyFilters;
-        },
-
-        getAvailableKeyFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingAvailableFilters = false;
         },
 
         createCryptographicKey: (
@@ -668,13 +640,9 @@ const cryptographicKey = createSelector(state, (state: State) => state.cryptogra
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);
 const cryptographicKeyPairs = createSelector(state, (state: State) => state.cryptographicKeyPairs);
 
-const availableKeyFilters = createSelector(state, (state) => state.availableFilters);
-const currentKeyFilters = createSelector(state, (state) => state.currentFilters);
-
 const totalItems = createSelector(state, (state) => state.totalItems);
 const totalPages = createSelector(state, (state) => state.totalPages);
 
-const isFetchingAvailableFilters = createSelector(state, (state) => state.isFetchingAvailableFilters);
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingKeyPairs = createSelector(state, (state: State) => state.isFetchingKeyPairs);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
@@ -710,13 +678,9 @@ export const selectors = {
     cryptographicKeys,
     cryptographicKeyPairs,
 
-    availableKeyFilters,
-    currentKeyFilters,
-
     totalItems,
     totalPages,
 
-    isFetchingAvailableFilters,
     isFetchingList,
     isFetchingKeyPairs,
     isFetchingDetail,

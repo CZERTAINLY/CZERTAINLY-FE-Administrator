@@ -4,12 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/discoveries";
+import { FilterEntity, selectors as filterSelectors } from "ducks/filters";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import FilterWidget from "components/FilterWidget";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import DiscoveriesFilter from "../DiscoveriesFilter";
 import DiscoveryStatus from "../DiscoveryStatus";
 
 function DiscoveryList() {
@@ -24,7 +25,7 @@ function DiscoveryList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
 
     const totalItems = useSelector(selectors.totalItems);
-    const currentFilters = useSelector(selectors.currentFilters);
+    const currentFilters = useSelector(filterSelectors.currentFilters(FilterEntity.DISCOVERY));
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
 
@@ -183,11 +184,9 @@ function DiscoveryList() {
 
     return (
         <Container className="themed-container" fluid>
-            <DiscoveriesFilter />
+            <FilterWidget entity={FilterEntity.DISCOVERY} title="Discoveries Filter" />
 
             <Widget title={title} busy={isBusy}>
-                <br />
-
                 <CustomTable
                     headers={discoveriesRowHeaders}
                     data={discoveryList}

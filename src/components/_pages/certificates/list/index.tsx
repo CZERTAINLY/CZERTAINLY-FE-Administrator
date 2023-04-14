@@ -5,18 +5,19 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/certificates";
+import { FilterEntity, selectors as filterSelectors } from "ducks/filters";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
+import FilterWidget from "components/FilterWidget";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType } from "../../../../types/openapi";
 import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
 import CertificateGroupDialog from "../CertificateGroupDialog";
-import CertificateInventoryFilter from "../CertificateInventoryFilter";
 import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateStatus from "../CertificateStatus";
@@ -38,7 +39,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
 
     const totalItems = useSelector(selectors.totalItems);
 
-    const currentFilters = useSelector(selectors.currentCertificateFilters);
+    const currentFilters = useSelector(filterSelectors.currentFilters(FilterEntity.CERTIFICATE));
 
     const isFetchingList = useSelector(selectors.isFetchingList);
     const isIssuing = useSelector(selectors.isIssuing);
@@ -408,9 +409,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
 
     return (
         <Container className="themed-container" fluid>
-            <br />
-
-            <CertificateInventoryFilter />
+            <FilterWidget entity={FilterEntity.CERTIFICATE} title="Certificate Inventory Filter" />
 
             <Widget title={title} busy={isBusy}>
                 <CustomTable

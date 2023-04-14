@@ -2,10 +2,12 @@ import Widget from "components/Widget";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
+import { FilterEntity, actions, selectors } from "ducks/filters";
+import { useDispatch, useSelector } from "react-redux";
 import Select, { MultiValue, SingleValue } from "react-select";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
-import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
-import { SearchableFieldType, SearchCondition } from "types/openapi";
+import { SearchFilterModel } from "types/certificate";
+import { SearchCondition, SearchableFieldType } from "types/openapi";
 import styles from "./FilterWidget.module.scss";
 
 const noValue: { [condition in SearchCondition]: boolean } = {
@@ -27,13 +29,16 @@ const noValue: { [condition in SearchCondition]: boolean } = {
 
 interface Props {
     title: string;
-    onFiltersChanged: (filters: SearchFilterModel[]) => void;
-    availableFilters: SearchFieldListModel[];
-    currentFilters: SearchFilterModel[];
-    isFetchingAvailableFilters: boolean;
+    entity: FilterEntity;
 }
 
-export default function FilterWidget({ title, onFiltersChanged, availableFilters, isFetchingAvailableFilters, currentFilters }: Props) {
+export default function FilterWidget({ title, entity }: Props) {
+    const dispatch = useDispatch();
+
+    const availableFilters = useSelector(selectors.availableFilters(entity));
+    const currentFilters = useSelector(selectors.currentFilters(entity));
+    const isFetchingAvailableFilters = useSelector(selectors.isFetchingFilters(entity));
+
     const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 
     const [filterGroup, setFilterGroup] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
@@ -55,8 +60,8 @@ export default function FilterWidget({ title, onFiltersChanged, availableFilters
     );
 
     useEffect(() => {
-        onFiltersChanged(currentFilters);
-    }, [currentFilters, onFiltersChanged]);
+        dispatch(actions.getAvailableFilters(entity));
+    }, [dispatch, entity]);
 
     useEffect(() => {
         if (selectedFilter >= currentFilters.length) {
@@ -140,15 +145,16 @@ export default function FilterWidget({ title, onFiltersChanged, availableFilters
             selectedFilter === -1
                 ? [...currentFilters, updatedFilterItem]
                 : [...currentFilters.slice(0, selectedFilter), updatedFilterItem, ...currentFilters.slice(selectedFilter + 1)];
-        onFiltersChanged(newFilters);
-    }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, onFiltersChanged]);
+
+        dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
+    }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity]);
 
     const onRemoveFilterClick = useCallback(
         (index: number) => {
             const newFilters = currentFilters.filter((_, i) => i !== index);
-            onFiltersChanged(newFilters);
+            dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
         },
-        [currentFilters, onFiltersChanged],
+        [currentFilters, dispatch, entity],
     );
 
     const toggleFilter = useCallback(

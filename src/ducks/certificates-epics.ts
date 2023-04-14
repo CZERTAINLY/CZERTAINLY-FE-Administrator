@@ -24,7 +24,6 @@ import {
     transformCertificateRevokeRequestModelToDto,
     transformCertificateSignRequestModelToDto,
     transformCertificateUploadModelToDto,
-    transformSearchFieldListDtoToModel,
     transformSearchRequestModelToDto,
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
@@ -212,30 +211,6 @@ const rekeyCertificate: AppEpic = (action$, state, deps) => {
                         ),
                     ),
                 ),
-        ),
-    );
-};
-
-const getAvailableCertificateFilters: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getAvailableCertificateFilters.match),
-        switchMap((action) =>
-            deps.apiClients.certificates.getSearchableFieldInformation4().pipe(
-                map((filters) =>
-                    slice.actions.getAvailableCertificateFiltersSuccess({
-                        availableCertificateFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),
-                    }),
-                ),
-
-                catchError((err) =>
-                    of(
-                        slice.actions.getAvailableCertificateFiltersFailure({
-                            error: extractError(err, "Failed to get available certificate filters"),
-                        }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get available certificate filters" }),
-                    ),
-                ),
-            ),
         ),
     );
 };
@@ -734,7 +709,6 @@ const epics = [
     revokeCertificate,
     renewCertificate,
     rekeyCertificate,
-    getAvailableCertificateFilters,
     getCertificateHistory,
     listCertificateLocations,
     deleteCertificate,

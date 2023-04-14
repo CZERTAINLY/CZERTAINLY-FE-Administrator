@@ -16,8 +16,6 @@ import {
     CertificateSignRequestModel,
     CertificateUploadModel,
     CertificateValidationModel,
-    SearchFieldListModel,
-    SearchFilterModel,
     SearchRequestModel,
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
@@ -36,9 +34,6 @@ export type State = {
 
     lastQuery?: SearchRequestModel;
 
-    availableFilters: SearchFieldListModel[];
-    currentFilters: SearchFilterModel[];
-
     certificates: CertificateListResponseModel[];
     totalPages: number;
     totalItems: number;
@@ -49,8 +44,6 @@ export type State = {
     issuanceAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
     revocationAttributes: AttributeDescriptorModel[];
     validationResult: { [key: string]: CertificateValidationModel };
-
-    isFetchingAvailableFilters: boolean;
 
     isFetchingValidationResult: boolean;
 
@@ -96,9 +89,6 @@ export const initialState: State = {
 
     deleteErrorMessage: "",
 
-    availableFilters: [],
-    currentFilters: [],
-
     certificates: [],
     totalPages: 0,
     totalItems: 0,
@@ -106,8 +96,6 @@ export const initialState: State = {
     issuanceAttributes: {},
     revocationAttributes: [],
     validationResult: {},
-
-    isFetchingAvailableFilters: false,
 
     isFetchingValidationResult: false,
 
@@ -153,13 +141,11 @@ export const slice = createSlice({
 
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
-            let currentFilterRef = state.currentFilters;
             Object.keys(state).forEach((key) => {
                 if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
-            state.currentFilters = currentFilterRef;
         },
 
         setForceRefreshList: (state, action: PayloadAction<{ forceRefreshList: boolean }>) => {
@@ -176,10 +162,6 @@ export const slice = createSlice({
 
         clearCertificateDetail: (state, action: PayloadAction<void>) => {
             state.certificateDetail = undefined;
-        },
-
-        setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
-            state.currentFilters = action.payload;
         },
 
         listCertificates: (state, action: PayloadAction<SearchRequestModel>) => {
@@ -333,20 +315,6 @@ export const slice = createSlice({
 
         rekeyCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isRekeying = false;
-        },
-
-        getAvailableCertificateFilters: (state, action: PayloadAction<void>) => {
-            state.availableFilters = [];
-            state.isFetchingAvailableFilters = true;
-        },
-
-        getAvailableCertificateFiltersSuccess: (state, action: PayloadAction<{ availableCertificateFilters: SearchFieldListModel[] }>) => {
-            state.isFetchingAvailableFilters = false;
-            state.availableFilters = action.payload.availableCertificateFilters;
-        },
-
-        getAvailableCertificateFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingAvailableFilters = false;
         },
 
         getCertificateHistory: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -628,9 +596,6 @@ const checkedRows = createSelector(state, (state) => state.checkedRows);
 
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 
-const availableCertificateFilters = createSelector(state, (state) => state.availableFilters);
-const currentCertificateFilters = createSelector(state, (state) => state.currentFilters);
-
 const certificates = createSelector(state, (state) => state.certificates);
 const totalItems = createSelector(state, (state) => state.totalItems);
 const totalPages = createSelector(state, (state) => state.totalPages);
@@ -640,8 +605,6 @@ const certificateHistory = createSelector(state, (state) => state.certificateHis
 const certificateLocations = createSelector(state, (state) => state.certificateLocations);
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
 const revocationAttributes = createSelector(state, (state) => state.revocationAttributes);
-
-const isFetchingAvailableFilters = createSelector(state, (state) => state.isFetchingAvailableFilters);
 
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
@@ -682,8 +645,6 @@ export const selectors = {
     forceRefreshList,
     checkedRows,
     deleteErrorMessage,
-    availableCertificateFilters,
-    currentCertificateFilters,
     certificates,
     totalItems,
     totalPages,
@@ -692,7 +653,6 @@ export const selectors = {
     certificateLocations,
     issuanceAttributes,
     revocationAttributes,
-    isFetchingAvailableFilters,
     isFetchingList,
     isFetchingDetail,
     isFetchingHistory,

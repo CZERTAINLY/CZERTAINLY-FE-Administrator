@@ -3,14 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 
+import { FilterEntity, selectors as filterSelectors } from "ducks/filters";
 import { actions, selectors } from "ducks/locations";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import FilterWidget from "components/FilterWidget";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import LocationsFilter from "../LocationsFilter";
 
 function LocationList() {
     const dispatch = useDispatch();
@@ -20,7 +21,7 @@ function LocationList() {
     const locations = useSelector(selectors.locations);
 
     const totalItems = useSelector(selectors.totalItems);
-    const currentFilters = useSelector(selectors.currentFilters);
+    const currentFilters = useSelector(filterSelectors.currentFilters(FilterEntity.LOCATION));
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
 
@@ -220,11 +221,9 @@ function LocationList() {
 
     return (
         <Container className="themed-container" fluid>
+            <FilterWidget entity={FilterEntity.LOCATION} title="Locations Filter" />
+
             <Widget title={title} busy={isBusy}>
-                <br />
-
-                <LocationsFilter />
-
                 <CustomTable
                     headers={locationsRowHeaders}
                     data={locationList}
