@@ -7,6 +7,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/cryptographic-keys";
+import { actions as connectorActions } from "ducks/connectors";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,6 +61,7 @@ export default function CryptographicKeyDetail() {
          if (!id || !tokenId) return;
 
          dispatch(actions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId, uuid: id }));
+         dispatch(connectorActions.clearCallbackData())
 
       },
       [id, dispatch, tokenId]
