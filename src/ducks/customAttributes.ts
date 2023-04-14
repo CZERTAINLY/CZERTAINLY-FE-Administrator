@@ -13,7 +13,7 @@ type ResourceCustomAttributesContents = {
     resource: Resource;
     resourceUuid: string;
     customAttributes: AttributeResponseModel[];
-}
+};
 
 export type State = {
     checkedRows: string[];
@@ -138,7 +138,10 @@ export const slice = createSlice({
             state.isCreating = false;
         },
 
-        updateCustomAttribute: (state, action: PayloadAction<{ uuid: string, customAttributeUpdateRequest: CustomAttributeUpdateRequestModel }>) => {
+        updateCustomAttribute: (
+            state,
+            action: PayloadAction<{ uuid: string; customAttributeUpdateRequest: CustomAttributeUpdateRequestModel }>,
+        ) => {
             state.isUpdating = true;
         },
 
@@ -151,13 +154,23 @@ export const slice = createSlice({
             state.isUpdating = false;
         },
 
-        updateCustomAttributeContent: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, attributeUuid: string, content: BaseAttributeContentModel[] }>) => {
+        updateCustomAttributeContent: (
+            state,
+            action: PayloadAction<{
+                resource: Resource;
+                resourceUuid: string;
+                attributeUuid: string;
+                content: BaseAttributeContentModel[];
+            }>,
+        ) => {
             state.isUpdatingContent = true;
         },
 
         updateCustomAttributeContentSuccess: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
             state.isUpdatingContent = false;
-            const index = state.resourceCustomAttributesContents.findIndex(r => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid);
+            const index = state.resourceCustomAttributesContents.findIndex(
+                (r) => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid,
+            );
             if (index !== -1) {
                 state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
             } else {
@@ -165,17 +178,25 @@ export const slice = createSlice({
             }
         },
 
-        updateCustomAttributeContentFailure: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, error: string | undefined }>) => {
+        updateCustomAttributeContentFailure: (
+            state,
+            action: PayloadAction<{ resource: Resource; resourceUuid: string; error: string | undefined }>,
+        ) => {
             state.isUpdatingContent = false;
         },
 
-        removeCustomAttributeContent: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, attributeUuid: string }>) => {
+        removeCustomAttributeContent: (
+            state,
+            action: PayloadAction<{ resource: Resource; resourceUuid: string; attributeUuid: string }>,
+        ) => {
             state.isUpdatingContent = true;
         },
 
         removeCustomAttributeContentSuccess: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
             state.isUpdatingContent = false;
-            const index = state.resourceCustomAttributesContents.findIndex(r => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid);
+            const index = state.resourceCustomAttributesContents.findIndex(
+                (r) => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid,
+            );
             if (index !== -1) {
                 state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
             } else {
@@ -183,7 +204,10 @@ export const slice = createSlice({
             }
         },
 
-        removeCustomAttributeContentFailure: (state, action: PayloadAction<{ resource: Resource, resourceUuid: string, error: string | undefined }>) => {
+        removeCustomAttributeContentFailure: (
+            state,
+            action: PayloadAction<{ resource: Resource; resourceUuid: string; error: string | undefined }>,
+        ) => {
             state.isUpdatingContent = false;
         },
 
@@ -207,7 +231,7 @@ export const slice = createSlice({
 
         deleteCustomAttributeSuccess: (state, action: PayloadAction<string>) => {
             state.isDeleting = false;
-            const index = state.customAttributes.findIndex(attr => attr.uuid === action.payload);
+            const index = state.customAttributes.findIndex((attr) => attr.uuid === action.payload);
             if (index !== -1) state.customAttributes.splice(index, 1);
         },
 
@@ -221,14 +245,12 @@ export const slice = createSlice({
 
         bulkDeleteCustomAttributesSuccess: (state, action: PayloadAction<string[]>) => {
             state.isBulkDeleting = false;
-            action.payload.forEach(
-                uuid => {
-                    const index = state.customAttributes.findIndex(attr => attr.uuid === uuid);
-                    if (index >= 0) {
-                        state.customAttributes.splice(index, 1);
-                    }
-                },
-            );
+            action.payload.forEach((uuid) => {
+                const index = state.customAttributes.findIndex((attr) => attr.uuid === uuid);
+                if (index >= 0) {
+                    state.customAttributes.splice(index, 1);
+                }
+            });
             if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) {
                 state.customAttribute = undefined;
             }
@@ -245,12 +267,12 @@ export const slice = createSlice({
 
         bulkEnableCustomAttributesSuccess: (state, action: PayloadAction<string[]>) => {
             state.isBulkEnabling = false;
-            action.payload.forEach(uuid => {
-                const attribute = state.customAttributes.find(a => a.uuid === uuid)
+            action.payload.forEach((uuid) => {
+                const attribute = state.customAttributes.find((a) => a.uuid === uuid);
                 if (attribute) {
                     attribute.enabled = true;
                 }
-            })
+            });
             if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) {
                 state.customAttribute.enabled = true;
             }
@@ -266,12 +288,12 @@ export const slice = createSlice({
 
         bulkDisableCustomAttributesSuccess: (state, action: PayloadAction<string[]>) => {
             state.isBulkDisabling = false;
-            action.payload.forEach(uuid => {
-                const attribute = state.customAttributes.find(a => a.uuid === uuid)
+            action.payload.forEach((uuid) => {
+                const attribute = state.customAttributes.find((a) => a.uuid === uuid);
                 if (attribute) {
                     attribute.enabled = false;
                 }
-            })
+            });
             if (state.customAttribute && action.payload.includes(state.customAttribute.uuid)) {
                 state.customAttribute.enabled = false;
             }
@@ -287,7 +309,7 @@ export const slice = createSlice({
 
         enableCustomAttributeSuccess: (state, action: PayloadAction<string>) => {
             state.isEnabling = false;
-            const attribute = state.customAttributes.find(a => a.uuid === action.payload)
+            const attribute = state.customAttributes.find((a) => a.uuid === action.payload);
             if (attribute) {
                 attribute.enabled = true;
             }
@@ -306,7 +328,7 @@ export const slice = createSlice({
 
         disableCustomAttributeSuccess: (state, action: PayloadAction<string>) => {
             state.isDisabling = false;
-            const attribute = state.customAttributes.find(a => a.uuid === action.payload)
+            const attribute = state.customAttributes.find((a) => a.uuid === action.payload);
             if (attribute) {
                 attribute.enabled = false;
             }
@@ -330,7 +352,13 @@ const customAttributes = createSelector(state, (state: State) => state.customAtt
 const resources = createSelector(state, (state: State) => state.resources);
 const resourceCustomAttributes = createSelector(state, (state: State) => state.resourceCustomAttributes);
 const secondaryResourceCustomAttributes = createSelector(state, (state: State) => state.secondaryResourceCustomAttributes);
-const resourceCustomAttributesContents = (resource: Resource, resourceUuid: string) => createSelector(state, (state: State) => state.resourceCustomAttributesContents.find(c => c.resource === resource && c.resourceUuid === resourceUuid)?.customAttributes);
+const resourceCustomAttributesContents = (resource: Resource, resourceUuid: string) =>
+    createSelector(
+        state,
+        (state: State) =>
+            state.resourceCustomAttributesContents.find((c) => c.resource === resource && c.resourceUuid === resourceUuid)
+                ?.customAttributes,
+    );
 
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
@@ -347,7 +375,6 @@ const isUpdating = createSelector(state, (state: State) => state.isUpdating);
 const isUpdatingContent = createSelector(state, (state: State) => state.isUpdatingContent);
 
 export const selectors = {
-
     state,
 
     checkedRows,

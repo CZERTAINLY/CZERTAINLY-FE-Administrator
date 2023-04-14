@@ -1,19 +1,15 @@
 export function acmeAccountStatus(status: string) {
+    switch (status) {
+        case "valid":
+            return ["Valid", "success"];
 
-   switch (status) {
+        case "deactivated":
+            return ["Deactivated", "danger"];
 
-      case "valid":
-         return ["Valid", "success"];
+        case "revoked":
+            return ["Revoked", "dark"];
 
-      case "deactivated":
-         return ["Deactivated", "danger"];
-
-      case "revoked":
-         return ["Revoked", "dark"];
-
-      default:
-         return [status || "Unknown", "dark"];
-
-   }
-
+        default:
+            return [status || "Unknown", "dark"];
+    }
 }

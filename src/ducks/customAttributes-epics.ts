@@ -18,215 +18,210 @@ import {
 
 const listCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.listCustomAttributes.match,
-        ),
-        switchMap(
-            () => deps.apiClients.customAttributes.listCustomAttributes().pipe(
-                map(
-                    list => slice.actions.listCustomAttributesSuccess(list.map(transformCustomAttributeResponseDtoToModel)),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.listCustomAttributesFailure({error: extractError(err, "Failed to get Custom Attributes list")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get Custom Attributes list"}),
+        filter(slice.actions.listCustomAttributes.match),
+        switchMap(() =>
+            deps.apiClients.customAttributes.listCustomAttributes().pipe(
+                map((list) => slice.actions.listCustomAttributesSuccess(list.map(transformCustomAttributeResponseDtoToModel))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listCustomAttributesFailure({ error: extractError(err, "Failed to get Custom Attributes list") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get Custom Attributes list" }),
                     ),
                 ),
             ),
         ),
     );
-
 };
 
 const listResources: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.listResources.match,
-        ),
-        switchMap(
-            () => deps.apiClients.customAttributes.getResources().pipe(
-                map(
-                    list => slice.actions.listResourcesSuccess(list),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.listResourcesFailure({error: extractError(err, "Failed to get list of resources")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get list of resources"}),
+        filter(slice.actions.listResources.match),
+        switchMap(() =>
+            deps.apiClients.customAttributes.getResources().pipe(
+                map((list) => slice.actions.listResourcesSuccess(list)),
+                catchError((err) =>
+                    of(
+                        slice.actions.listResourcesFailure({ error: extractError(err, "Failed to get list of resources") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get list of resources" }),
                     ),
                 ),
             ),
         ),
     );
-
 };
 
 const listResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.listResourceCustomAttributes.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
-                map(
-                    list => slice.actions.listResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel)),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.listResourceCustomAttributesFailure({error: extractError(err, "Failed to get Resource Custom Attributes list")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get Resource Custom Attributes list"}),
+        filter(slice.actions.listResourceCustomAttributes.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
+                map((list) => slice.actions.listResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listResourceCustomAttributesFailure({
+                            error: extractError(err, "Failed to get Resource Custom Attributes list"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get Resource Custom Attributes list" }),
                     ),
                 ),
             ),
         ),
     );
-
 };
-
 
 const listSecondaryResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.listSecondaryResourceCustomAttributes.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
-                map(
-                    list => slice.actions.listSecondaryResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel)),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.listSecondaryResourceCustomAttributesFailure({error: extractError(err, "Failed to get Resource Custom Attributes list")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get Resource Custom Attributes list"}),
+        filter(slice.actions.listSecondaryResourceCustomAttributes.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
+                map((list) => slice.actions.listSecondaryResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listSecondaryResourceCustomAttributesFailure({
+                            error: extractError(err, "Failed to get Resource Custom Attributes list"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get Resource Custom Attributes list" }),
                     ),
                 ),
             ),
         ),
     );
-
 };
 
 const createCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.createCustomAttribute.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.createCustomAttribute({customAttributeCreateRequestDto: transformCustomAttributeCreateRequestModelToDto(action.payload)},
-            ).pipe(
-                mergeMap(
-                    obj => of(
-                        slice.actions.createCustomAttributeSuccess({uuid: obj.uuid}),
-                        appRedirectActions.redirect({url: `../detail/${obj.uuid}`}),
+        filter(slice.actions.createCustomAttribute.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes
+                .createCustomAttribute({ customAttributeCreateRequestDto: transformCustomAttributeCreateRequestModelToDto(action.payload) })
+                .pipe(
+                    mergeMap((obj) =>
+                        of(
+                            slice.actions.createCustomAttributeSuccess({ uuid: obj.uuid }),
+                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.createCustomAttributeFailure({ error: extractError(err, "Failed to create custom attribute") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to create custom attribute" }),
+                        ),
                     ),
                 ),
-                catchError(
-                    err => of(
-                        slice.actions.createCustomAttributeFailure({error: extractError(err, "Failed to create custom attribute")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to create custom attribute"}),
-                    ),
-                ),
-            ),
         ),
     );
 };
 
 const updateCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.updateCustomAttribute.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.editCustomAttribute({
+        filter(slice.actions.updateCustomAttribute.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes
+                .editCustomAttribute({
                     uuid: action.payload.uuid,
-                    customAttributeUpdateRequestDto: transformCustomAttributeUpdateRequestModelToDto(action.payload.customAttributeUpdateRequest),
-                },
-            ).pipe(
-                mergeMap(
-                    customAttributeDetail => of(
-                        slice.actions.updateCustomAttributeSuccess(transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail)),
-                        appRedirectActions.redirect({url: `../../detail/${customAttributeDetail.uuid}`}),
+                    customAttributeUpdateRequestDto: transformCustomAttributeUpdateRequestModelToDto(
+                        action.payload.customAttributeUpdateRequest,
+                    ),
+                })
+                .pipe(
+                    mergeMap((customAttributeDetail) =>
+                        of(
+                            slice.actions.updateCustomAttributeSuccess(
+                                transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail),
+                            ),
+                            appRedirectActions.redirect({ url: `../../detail/${customAttributeDetail.uuid}` }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateCustomAttributeFailure({ error: extractError(err, "Failed to update custom attribute") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to update custom attribute" }),
+                        ),
                     ),
                 ),
-                catchError(
-                    err => of(
-                        slice.actions.updateCustomAttributeFailure({error: extractError(err, "Failed to update custom attribute")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to update custom attribute"}),
-                    ),
-                ),
-            ),
         ),
     );
 };
 
 const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.updateCustomAttributeContent.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.updateAttributeContentForResource({
+        filter(slice.actions.updateCustomAttributeContent.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes
+                .updateAttributeContentForResource({
                     resourceName: action.payload.resource,
                     objectUuid: action.payload.resourceUuid,
                     attributeUuid: action.payload.attributeUuid,
-                    baseAttributeContentDto: action.payload.content
-                },
-            ).pipe(
-                map(
-                    response =>
-                        slice.actions.updateCustomAttributeContentSuccess({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, customAttributes: response.map(transformAttributeResponseDtoToModel)}),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.updateCustomAttributeContentFailure({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, error: extractError(err, "Failed to update custom attribute content")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to update custom attribute content"}),
+                    baseAttributeContentDto: action.payload.content,
+                })
+                .pipe(
+                    map((response) =>
+                        slice.actions.updateCustomAttributeContentSuccess({
+                            resource: action.payload.resource,
+                            resourceUuid: action.payload.resourceUuid,
+                            customAttributes: response.map(transformAttributeResponseDtoToModel),
+                        }),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateCustomAttributeContentFailure({
+                                resource: action.payload.resource,
+                                resourceUuid: action.payload.resourceUuid,
+                                error: extractError(err, "Failed to update custom attribute content"),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to update custom attribute content" }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };
 
 const removeCustomAttributeContent: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.removeCustomAttributeContent.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.deleteAttributeContentForResource({
+        filter(slice.actions.removeCustomAttributeContent.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes
+                .deleteAttributeContentForResource({
                     resourceName: action.payload.resource,
                     objectUuid: action.payload.resourceUuid,
                     attributeUuid: action.payload.attributeUuid,
-                },
-            ).pipe(
-                map(
-                    response =>
-                        slice.actions.removeCustomAttributeContentSuccess({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, customAttributes: response.map(transformAttributeResponseDtoToModel)}),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.removeCustomAttributeContentFailure({resource: action.payload.resource, resourceUuid: action.payload.resourceUuid, error: extractError(err, "Failed to remove custom attribute content")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to remove custom attribute content"}),
+                })
+                .pipe(
+                    map((response) =>
+                        slice.actions.removeCustomAttributeContentSuccess({
+                            resource: action.payload.resource,
+                            resourceUuid: action.payload.resourceUuid,
+                            customAttributes: response.map(transformAttributeResponseDtoToModel),
+                        }),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.removeCustomAttributeContentFailure({
+                                resource: action.payload.resource,
+                                resourceUuid: action.payload.resourceUuid,
+                                error: extractError(err, "Failed to remove custom attribute content"),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to remove custom attribute content" }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };
 
 const getCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.getCustomAttribute.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.getCustomAttribute({uuid: action.payload}).pipe(
-                map(
-                    customAttributeDetail => slice.actions.getCustomAttributeSuccess(transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail)),
+        filter(slice.actions.getCustomAttribute.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.getCustomAttribute({ uuid: action.payload }).pipe(
+                map((customAttributeDetail) =>
+                    slice.actions.getCustomAttributeSuccess(transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail)),
                 ),
-                catchError(
-                    err => of(
-                        slice.actions.getCustomAttributeFailure({error: extractError(err, "Failed to get custom attribute detail")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to get custom attribute detail"}),
+                catchError((err) =>
+                    of(
+                        slice.actions.getCustomAttributeFailure({ error: extractError(err, "Failed to get custom attribute detail") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get custom attribute detail" }),
                     ),
                 ),
             ),
@@ -236,21 +231,16 @@ const getCustomAttribute: AppEpic = (action$, state$, deps) => {
 
 const deleteCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.deleteCustomAttribute.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.deleteCustomAttribute({uuid: action.payload}).pipe(
-                mergeMap(
-                    () => of(
-                        slice.actions.deleteCustomAttributeSuccess(action.payload),
-                        appRedirectActions.redirect({url: "../../"}),
-                    ),
+        filter(slice.actions.deleteCustomAttribute.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.deleteCustomAttribute({ uuid: action.payload }).pipe(
+                mergeMap(() =>
+                    of(slice.actions.deleteCustomAttributeSuccess(action.payload), appRedirectActions.redirect({ url: "../../" })),
                 ),
-                catchError(
-                    err => of(
-                        slice.actions.deleteCustomAttributeFailure({error: extractError(err, "Failed to delete custom attribute")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to delete custom attribute"}),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteCustomAttributeFailure({ error: extractError(err, "Failed to delete custom attribute") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to delete custom attribute" }),
                     ),
                 ),
             ),
@@ -260,21 +250,19 @@ const deleteCustomAttribute: AppEpic = (action$, state$, deps) => {
 
 const bulkDeleteCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.bulkDeleteCustomAttributes.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.bulkDeleteCustomAttributes({requestBody: action.payload}).pipe(
-                mergeMap(
-                    () => of(
+        filter(slice.actions.bulkDeleteCustomAttributes.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.bulkDeleteCustomAttributes({ requestBody: action.payload }).pipe(
+                mergeMap(() =>
+                    of(
                         slice.actions.bulkDeleteCustomAttributesSuccess(action.payload),
-                        alertActions.success("Selected custom attributes successfully deleted.")
-                    )
+                        alertActions.success("Selected custom attributes successfully deleted."),
+                    ),
                 ),
-                catchError(
-                    err => of(
-                        slice.actions.bulkDeleteCustomAttributesFailure({error: extractError(err, "Failed to delete custom attributes")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to delete custom attributes"}),
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDeleteCustomAttributesFailure({ error: extractError(err, "Failed to delete custom attributes") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to delete custom attributes" }),
                     ),
                 ),
             ),
@@ -284,18 +272,14 @@ const bulkDeleteCustomAttributes: AppEpic = (action$, state$, deps) => {
 
 const bulkEnableCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.bulkEnableCustomAttributes.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.bulkEnableCustomAttributes({requestBody: action.payload}).pipe(
-                map(
-                    errors => slice.actions.bulkEnableCustomAttributesSuccess(action.payload),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.bulkEnableCustomAttributesFailure({error: extractError(err, "Failed to enable custom attributes")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to enable custom attributes"}),
+        filter(slice.actions.bulkEnableCustomAttributes.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.bulkEnableCustomAttributes({ requestBody: action.payload }).pipe(
+                map((errors) => slice.actions.bulkEnableCustomAttributesSuccess(action.payload)),
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkEnableCustomAttributesFailure({ error: extractError(err, "Failed to enable custom attributes") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to enable custom attributes" }),
                     ),
                 ),
             ),
@@ -305,18 +289,16 @@ const bulkEnableCustomAttributes: AppEpic = (action$, state$, deps) => {
 
 const bulkDisableCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.bulkDisableCustomAttributes.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.bulkDisableCustomAttributes({requestBody: action.payload}).pipe(
-                map(
-                    errors => slice.actions.bulkDisableCustomAttributesSuccess(action.payload),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.bulkDisableCustomAttributesFailure({error: extractError(err, "Failed to disable custom attributes")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to disable custom attributes"}),
+        filter(slice.actions.bulkDisableCustomAttributes.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.bulkDisableCustomAttributes({ requestBody: action.payload }).pipe(
+                map((errors) => slice.actions.bulkDisableCustomAttributesSuccess(action.payload)),
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDisableCustomAttributesFailure({
+                            error: extractError(err, "Failed to disable custom attributes"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to disable custom attributes" }),
                     ),
                 ),
             ),
@@ -326,18 +308,14 @@ const bulkDisableCustomAttributes: AppEpic = (action$, state$, deps) => {
 
 const enableCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.enableCustomAttribute.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.enableCustomAttribute({uuid: action.payload}).pipe(
-                map(
-                    errors => slice.actions.enableCustomAttributeSuccess(action.payload),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.enableCustomAttributeFailure({error: extractError(err, "Failed to enable custom attribute")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to enable custom attribute"}),
+        filter(slice.actions.enableCustomAttribute.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.enableCustomAttribute({ uuid: action.payload }).pipe(
+                map((errors) => slice.actions.enableCustomAttributeSuccess(action.payload)),
+                catchError((err) =>
+                    of(
+                        slice.actions.enableCustomAttributeFailure({ error: extractError(err, "Failed to enable custom attribute") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to enable custom attribute" }),
                     ),
                 ),
             ),
@@ -347,18 +325,14 @@ const enableCustomAttribute: AppEpic = (action$, state$, deps) => {
 
 const disableCustomAttribute: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.disableCustomAttribute.match,
-        ),
-        switchMap(
-            action => deps.apiClients.customAttributes.disableCustomAttribute({uuid: action.payload}).pipe(
-                map(
-                    errors => slice.actions.disableCustomAttributeSuccess(action.payload),
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.disableCustomAttributeFailure({error: extractError(err, "Failed to disable custom attribute")}),
-                        appRedirectActions.fetchError({error: err, message: "Failed to disable custom attribute"}),
+        filter(slice.actions.disableCustomAttribute.match),
+        switchMap((action) =>
+            deps.apiClients.customAttributes.disableCustomAttribute({ uuid: action.payload }).pipe(
+                map((errors) => slice.actions.disableCustomAttributeSuccess(action.payload)),
+                catchError((err) =>
+                    of(
+                        slice.actions.disableCustomAttributeFailure({ error: extractError(err, "Failed to disable custom attribute") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to disable custom attribute" }),
                     ),
                 ),
             ),

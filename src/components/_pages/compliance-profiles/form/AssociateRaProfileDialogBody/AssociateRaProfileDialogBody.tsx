@@ -1,157 +1,128 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Form as BootstrapForm, FormGroup, Button, Label, ButtonGroup } from 'reactstrap';
 import { Field, Form } from "react-final-form";
-import Select from 'react-select';
+import Select from "react-select";
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 
-import { validateRequired } from 'utils/validators';
+import { validateRequired } from "utils/validators";
 
 import Spinner from "components/Spinner";
 
 import { actions } from "ducks/compliance-profiles";
 import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
 
-
 interface Props {
-   complianceProfileUuid?: string;
-   availableRaProfileUuids?: string[];
-   visible: boolean;
-   onClose: () => void;
+    complianceProfileUuid?: string;
+    availableRaProfileUuids?: string[];
+    visible: boolean;
+    onClose: () => void;
 }
 
+export default function AssociateRaProfileDialogBody({ complianceProfileUuid, availableRaProfileUuids, visible, onClose }: Props) {
+    const dispatch = useDispatch();
 
-export default function AssociateRaProfileDialogBody({
-   complianceProfileUuid,
-   availableRaProfileUuids,
-   visible,
-   onClose
-}: Props) {
+    const raProfiles = useSelector(raSelectors.raProfiles);
 
-   const dispatch = useDispatch();
+    const isFetchingRaProfiles = useSelector(raSelectors.isFetchingList);
 
-   const raProfiles = useSelector(raSelectors.raProfiles);
+    const isBusy = useMemo(() => isFetchingRaProfiles, [isFetchingRaProfiles]);
 
-   const isFetchingRaProfiles = useSelector(raSelectors.isFetchingList);
+    useEffect(
+        () => {
+            if (!visible) return;
 
-   const isBusy = useMemo(
-      () => isFetchingRaProfiles,
-      [isFetchingRaProfiles]
-   );
+            dispatch(raActions.listRaProfiles());
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [visible],
+    );
 
+    const optionsForRaProfiles = useMemo(
+        () =>
+            raProfiles
+                .filter((e) => !availableRaProfileUuids?.includes(e.uuid))
+                .map((raProfile) => ({
+                    value: raProfile,
+                    label: raProfile.name,
+                })),
+        [raProfiles, availableRaProfileUuids],
+    );
 
-   useEffect(
+    const onSubmit = useCallback(
+        (values: any) => {
+            if (!complianceProfileUuid) return;
 
-      () => {
-         if (!visible) return;
+            dispatch(
+                actions.associateRaProfile({
+                    uuid: complianceProfileUuid,
+                    raProfileUuids: [
+                        {
+                            uuid: values.raProfiles.value.uuid,
+                            name: values.raProfiles.value.name,
+                            enabled: values.raProfiles.value.enabled,
+                            authorityInstanceUuid: values.raProfiles.value.authorityInstanceUuid,
+                        },
+                    ],
+                }),
+            );
 
-         dispatch(raActions.listRaProfiles());
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [visible]
+            onClose();
+        },
+        [dispatch, onClose, complianceProfileUuid],
+    );
 
-   )
+    if (!complianceProfileUuid) return <></>;
 
+    return (
+        <>
+            <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
+                {({ handleSubmit, pristine, submitting, valid }) => (
+                    <BootstrapForm onSubmit={handleSubmit}>
+                        <Field name="raProfiles" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="raProfiles">Select RA profile</Label>
 
-   const optionsForRaProfiles = useMemo(
+                                    <Select
+                                        {...input}
+                                        maxMenuHeight={140}
+                                        menuPlacement="auto"
+                                        options={optionsForRaProfiles}
+                                        placeholder="Select RA profile to be associated"
+                                        styles={{
+                                            control: (provided) =>
+                                                meta.touched && meta.invalid
+                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    : { ...provided },
+                                        }}
+                                    />
 
-      () => raProfiles.filter(e => !availableRaProfileUuids?.includes(e.uuid)).map(
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        Required Field
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
 
-         raProfile => ({
-            value: raProfile,
-            label: raProfile.name
-         })
+                        <div style={{ textAlign: "right" }}>
+                            <ButtonGroup>
+                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
+                                    Associate
+                                </Button>
 
-      ),
-      [raProfiles, availableRaProfileUuids]
+                                <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
+                                    Cancel
+                                </Button>
+                            </ButtonGroup>
+                        </div>
+                    </BootstrapForm>
+                )}
+            </Form>
 
-   );
-
-
-   const onSubmit = useCallback(
-
-      (values: any) => {
-
-         if (!complianceProfileUuid) return;
-
-         dispatch(actions.associateRaProfile({
-            uuid: complianceProfileUuid,
-            raProfileUuids: [{uuid: values.raProfiles.value.uuid, name: values.raProfiles.value.name, enabled: values.raProfiles.value.enabled, authorityInstanceUuid: values.raProfiles.value.authorityInstanceUuid}]
-         }));
-
-         onClose();
-
-      },
-      [dispatch, onClose, complianceProfileUuid]
-
-   )
-
-
-   if (!complianceProfileUuid) return <></>;
-
-   return (
-      <>
-         <Form onSubmit={onSubmit} mutators={{ ...mutators() }} >
-
-            {({ handleSubmit, pristine, submitting, valid }) => (
-
-               <BootstrapForm onSubmit={handleSubmit}>
-
-                  <Field name="raProfiles" validate={validateRequired()}>
-
-                     {({ input, meta }) =>
-
-                        <FormGroup>
-
-                           <Label for="raProfiles">Select RA profile</Label>
-
-                           <Select
-                              {...input}
-                              maxMenuHeight={140}
-                              menuPlacement="auto"
-                              options={optionsForRaProfiles}
-                              placeholder="Select RA profile to be associated"
-                              styles={{ control: (provided) => (meta.touched && meta.invalid ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } } : { ...provided }) }}
-                           />
-
-                           <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>Required Field</div>
-
-                        </FormGroup>
-
-
-                     }
-
-                  </Field>
-
-
-                  <div style={{ textAlign: "right" }}>
-                     <ButtonGroup>
-
-                        <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
-                           Associate
-                        </Button>
-
-                        <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
-                           Cancel
-                        </Button>
-
-                     </ButtonGroup>
-                  </div>
-
-
-
-
-               </BootstrapForm>
-
-            )}
-
-         </Form>
-
-         <Spinner active={isBusy} />
-      </>
-
-   )
-
+            <Spinner active={isBusy} />
+        </>
+    );
 }

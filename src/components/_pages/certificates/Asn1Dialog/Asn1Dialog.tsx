@@ -36,27 +36,36 @@ export default function Asn1Dialog({ certificateContent }: Props) {
         }
     }, [parsedCertificate]);
 
-    return <>
-        <Spinner active={isFetchingDetail} />
-        <Button
-            className="btn btn-link p-0"
-            disabled={!health || isFetchingDetail}
-            size="sm"
-            color="primary"
-            onClick={() => {
-                if (certificateContent && health) {
-                    dispatch(utilsCertificateActions.parseCertificate({ certificate: certificateContent, parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1 }));
-                }
-            }}
-            title="Show ASN.1 Structure"
-        >Show</Button>
-        <Dialog
-            isOpen={!!asn1}
-            size={"lg"}
-            caption="ASN.1 Structure"
-            body={<pre>{asn1}</pre>}
-            toggle={() => setAsn1(undefined)}
-            buttons={[{ color: "primary", onClick: () => setAsn1(undefined), body: "Close" }]}
-        />
-    </>
+    return (
+        <>
+            <Spinner active={isFetchingDetail} />
+            <Button
+                className="btn btn-link p-0"
+                disabled={!health || isFetchingDetail}
+                size="sm"
+                color="primary"
+                onClick={() => {
+                    if (certificateContent && health) {
+                        dispatch(
+                            utilsCertificateActions.parseCertificate({
+                                certificate: certificateContent,
+                                parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1,
+                            }),
+                        );
+                    }
+                }}
+                title="Show ASN.1 Structure"
+            >
+                Show
+            </Button>
+            <Dialog
+                isOpen={!!asn1}
+                size={"lg"}
+                caption="ASN.1 Structure"
+                body={<pre>{asn1}</pre>}
+                toggle={() => setAsn1(undefined)}
+                buttons={[{ color: "primary", onClick: () => setAsn1(undefined), body: "Close" }]}
+            />
+        </>
+    );
 }

@@ -8,32 +8,25 @@ import { slice } from "./utilsActuator";
 
 const health: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(
-            slice.actions.health.match,
-        ),
+        filter(slice.actions.health.match),
         switchMap(
-            () => deps.apiClients.utilsActuator?.health().pipe(
-                map(
-                    result => {
-                        if (result.hasOwnProperty("status") && ((result as { status: string }).status === "UP")) {
+            () =>
+                deps.apiClients.utilsActuator?.health().pipe(
+                    map((result) => {
+                        if (result.hasOwnProperty("status") && (result as { status: string }).status === "UP") {
                             return slice.actions.healthSuccess(result);
                         } else {
                             return slice.actions.healthFailure({ error: "Failed to get utils service health status." });
                         }
-                    }
-                ),
-                catchError(
-                    err => of(
-                        slice.actions.healthFailure({ error: extractError(err, "Failed to get utils service health.") }),
+                    }),
+                    catchError((err) =>
+                        of(slice.actions.healthFailure({ error: extractError(err, "Failed to get utils service health.") })),
                     ),
-                ),
-            ) ?? EMPTY
+                ) ?? EMPTY,
         ),
     );
 };
 
-const epics = [
-    health,
-];
+const epics = [health];
 
 export default epics;
