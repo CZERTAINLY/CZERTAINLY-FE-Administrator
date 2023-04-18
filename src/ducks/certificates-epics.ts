@@ -9,6 +9,9 @@ import * as slice from "./certificates";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
+import { store } from "index";
+import { EntityType } from "./filters";
+import { actions as pagingActions } from "./paging";
 import {
     transformCertificateBulkDeleteRequestModelToDto,
     transformCertificateBulkDeleteResponseDtoToModel,
@@ -33,21 +36,20 @@ const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listCertificates.match),
         switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.CERTIFICATE));
             return deps.apiClients.certificates
                 .listCertificates({ searchRequestDto: transformSearchRequestModelToDto(action.payload) })
                 .pipe(
-                    map((list) => {
-                        const certificateList = list.certificates.map(transformCertificateListResponseDtoToModel);
-                        return slice.actions.listCertificatesSuccess({
-                            certificateList: certificateList,
-                            totalItems: list.totalItems,
-                            totalPages: list.totalPages,
-                        });
-                    }),
+                    mergeMap((list) =>
+                        of(
+                            slice.actions.listCertificatesSuccess(list.certificates.map(transformCertificateListResponseDtoToModel)),
+                            pagingActions.listSuccess({ entity: EntityType.CERTIFICATE, totalItems: list.totalItems }),
+                        ),
+                    ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.listCertificatesFailure({ error: extractError(err, "Failed to get certificates list") }),
+                            pagingActions.listFailure(EntityType.CERTIFICATE),
                             appRedirectActions.fetchError({ error: err, message: "Failed to get certificates list" }),
                         ),
                     ),

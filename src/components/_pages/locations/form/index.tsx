@@ -19,8 +19,10 @@ import { LocationResponseModel } from "types/locations";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { EntityType } from "ducks/filters";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { selectors as pagingSelectors } from "../../../../ducks/paging";
 import { Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
 
@@ -50,7 +52,7 @@ export default function LocationForm() {
     const isUpdating = useSelector(locationSelectors.isUpdating);
 
     const isFetchingLocationAttributeDescriptors = useSelector(entitySelectors.isFetchingLocationAttributeDescriptors);
-    const isFetchingEntities = useSelector(entitySelectors.isFetchingList);
+    const isFetchingEntities = useSelector(pagingSelectors.isFetchingList(EntityType.ENTITY));
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 

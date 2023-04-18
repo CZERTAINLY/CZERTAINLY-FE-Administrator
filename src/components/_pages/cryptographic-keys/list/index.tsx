@@ -1,15 +1,15 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
-import FilterWidget from "components/FilterWidget";
+import PagedList from "components/PagedList/PagedList";
 import { actions, selectors } from "ducks/cryptographic-keys";
-import { FilterEntity, selectors as filterSelectors } from "ducks/filters";
+import { EntityType } from "ducks/filters";
+import { selectors as pagingSelectors } from "ducks/paging";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Container } from "reactstrap";
 import { KeyCompromiseReason, KeyUsage } from "types/openapi";
@@ -19,18 +19,9 @@ import KeyStatusCircle from "../KeyStatusCircle";
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const checkedRows = useSelector(selectors.checkedRows);
+    const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.KEY));
     const cryptographicKeys = useSelector(selectors.cryptographicKeys);
-
-    const currentFilters = useSelector(filterSelectors.currentFilters(FilterEntity.KEY));
-
-    const [pageSize, setPageSize] = useState(10);
-    const [pageNumber, setPageNumber] = useState(1);
-    const totalItems = useSelector(selectors.totalItems);
-
-    const isFetching = useSelector(selectors.isFetchingList);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
@@ -38,16 +29,7 @@ function CryptographicKeyList() {
     const isBulkCompromising = useSelector(selectors.isBulkCompromising);
     const isBulkDestroying = useSelector(selectors.isBulkDestroying);
 
-    const isBusy =
-        isFetching ||
-        isBulkDeleting ||
-        isBulkEnabling ||
-        isBulkDisabling ||
-        isBulkUpdatingKeyUsage ||
-        isBulkCompromising ||
-        isBulkDestroying;
-
-    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const isBusy = isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkUpdatingKeyUsage || isBulkCompromising || isBulkDestroying;
 
     const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
 
@@ -60,26 +42,8 @@ function CryptographicKeyList() {
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
 
     useEffect(() => {
-        dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.clearDeleteErrorMessages());
-        dispatch(actions.listCryptographicKeys({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
-    }, [dispatch, currentFilters, pageNumber, pageSize]);
-
-    useEffect(() => {
-        setPageNumber(1);
-    }, [currentFilters]);
-
-    const onPageSizeChanged = useCallback(
-        (pageSize: number) => {
-            setPageSize(pageSize);
-            setPageNumber(1);
-        },
-        [setPageSize, setPageNumber],
-    );
-
-    const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+    }, [dispatch]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableCryptographicKeyItems({ uuids: checkedRows }));
@@ -87,11 +51,6 @@ function CryptographicKeyList() {
 
     const onDisableClick = useCallback(() => {
         dispatch(actions.bulkDisableCryptographicKeyItems({ uuids: checkedRows }));
-    }, [checkedRows, dispatch]);
-
-    const onDeleteConfirmed = useCallback(() => {
-        dispatch(actions.bulkDeleteCryptographicKeyItems({ uuids: checkedRows }));
-        setConfirmDelete(false);
     }, [checkedRows, dispatch]);
 
     const onUpdateKeyUsageConfirmed = useCallback(() => {
@@ -110,31 +69,8 @@ function CryptographicKeyList() {
         setConfirmDestroy(false);
     }, [checkedRows, dispatch]);
 
-    const setCheckedRows = useCallback(
-        (rows: (string | number)[]) => {
-            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
-        },
-        [dispatch],
-    );
-
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
-            {
-                icon: "plus",
-                disabled: false,
-                tooltip: "Create",
-                onClick: () => {
-                    onAddClick();
-                },
-            },
-            {
-                icon: "trash",
-                disabled: checkedRows.length === 0,
-                tooltip: "Delete",
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
             {
                 icon: "check",
                 disabled: checkedRows.length === 0,
@@ -176,7 +112,7 @@ function CryptographicKeyList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick, setKeyUsageUpdate],
+        [checkedRows, onEnableClick, onDisableClick, setKeyUsageUpdate],
     );
 
     const keyUsageOptions = () => {
@@ -186,21 +122,6 @@ function CryptographicKeyList() {
         }
         return options;
     };
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Keys</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
 
     const keyUsageBody = (
         <div>
@@ -308,9 +229,7 @@ function CryptographicKeyList() {
                 id: cryptographicKeys[key].uuid,
                 columns: [
                     <KeyStatusCircle status={cryptographicKeys[key].enabled} />,
-
                     <KeyStateCircle state={cryptographicKeys[key].state} />,
-
                     <span style={{ whiteSpace: "nowrap" }}>
                         <Link
                             to={`./detail/${cryptographicKeys[key].tokenInstanceUuid || "unknown"}/${
@@ -320,25 +239,15 @@ function CryptographicKeyList() {
                             {cryptographicKeys[key].name}
                         </Link>
                     </span>,
-
                     <Badge color="secondary">{cryptographicKeys[key].type}</Badge>,
-
                     cryptographicKeys[key].cryptographicAlgorithm,
-
                     cryptographicKeys[key].length?.toString() || "unknown",
-
                     cryptographicKeys[key].format || "unknown",
-
                     <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKeys[key].creationTime) || ""}</span>,
-
                     cryptographicKeys[key].group?.name || "",
-
                     cryptographicKeys[key].owner || "",
-
                     <Badge color="secondary">{cryptographicKeys[key].tokenProfileName}</Badge>,
-
                     <Badge color="primary">{cryptographicKeys[key].tokenInstanceName}</Badge>,
-
                     cryptographicKeys[key].associations?.toString() || "",
                 ],
             });
@@ -355,45 +264,21 @@ function CryptographicKeyList() {
         return options;
     };
 
-    const paginationData = useMemo(
-        () => ({
-            page: pageNumber,
-            totalItems: totalItems,
-            pageSize: pageSize,
-            loadedPageSize: pageSize,
-            totalPages: Math.ceil(totalItems / pageSize),
-            itemsPerPageOptions: [10, 20, 50, 100, 200, 500, 1000],
-        }),
-        [pageNumber, totalItems, pageSize],
-    );
-
     return (
         <Container className="themed-container" fluid>
-            <FilterWidget entity={FilterEntity.KEY} title="Key Inventory Filter" />
-
-            <Widget title={title} busy={isBusy}>
-                <CustomTable
-                    headers={cryptographicKeysTableHeaders}
-                    data={profilesTableData()}
-                    onCheckedRowsChanged={setCheckedRows}
-                    canSearch={false}
-                    hasCheckboxes={true}
-                    hasPagination={true}
-                    paginationData={paginationData}
-                    onPageChanged={setPageNumber}
-                    onPageSizeChanged={onPageSizeChanged}
-                />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Keys" : "Key"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "a Key" : "Keys"}. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, Delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-                ]}
+            <PagedList
+                entity={EntityType.KEY}
+                listAction={actions.listCryptographicKeys}
+                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteCryptographicKeys({ uuids }))}
+                getAvailableFiltersApi={useCallback((apiClients) => apiClients.cryptographicKeys.getSearchableFieldInformation1(), [])}
+                additionalButtons={buttons}
+                headers={cryptographicKeysTableHeaders}
+                data={profilesTableData()}
+                isBusy={isBusy}
+                title="List of Keys"
+                entityNameSingular="a Key"
+                entityNamePlural="Keys"
+                filterTitle="Key Inventory Filter"
             />
 
             <Dialog
@@ -424,10 +309,10 @@ function CryptographicKeyList() {
                 isOpen={confirmDestroy}
                 caption={`Destroy ${checkedRows.length > 1 ? "Keys" : "Key"}`}
                 body={`You are about to destroy ${checkedRows.length > 1 ? "a Key" : "Keys"}. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
+                toggle={() => setConfirmDestroy(false)}
                 buttons={[
                     { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
                 ]}
             />
 

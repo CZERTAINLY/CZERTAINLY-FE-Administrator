@@ -19,21 +19,15 @@ import { createFeatureSelector } from "utils/ducks";
 import { SearchRequestModel } from "../types/certificate";
 
 export type State = {
-    checkedRows: string[];
-
     deleteErrorMessage: string;
     bulkDeleteErrorMessages: BulkActionModel[];
 
     keyAttributeDescriptors?: AttributeDescriptorModel[];
 
-    totalPages: number;
-    totalItems: number;
-
     cryptographicKey?: CryptographicKeyDetailResponseModel;
     cryptographicKeys: CryptographicKeyResponseModel[];
     cryptographicKeyPairs: CryptographicKeyPairResponseModel[];
 
-    isFetchingList: boolean;
     isFetchingKeyPairs: boolean;
     isFetchingDetail: boolean;
     isUpdatingKeyUsage: boolean;
@@ -61,20 +55,14 @@ export type State = {
 };
 
 export const initialState: State = {
-    checkedRows: [],
-
     deleteErrorMessage: "",
     bulkDeleteErrorMessages: [],
 
     keyAttributeDescriptors: [],
 
-    totalPages: 0,
-    totalItems: 0,
-
     cryptographicKeys: [],
     cryptographicKeyPairs: [],
 
-    isFetchingList: false,
     isFetchingKeyPairs: false,
     isFetchingDetail: false,
     isUpdatingKeyUsage: false,
@@ -114,10 +102,6 @@ export const slice = createSlice({
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
         },
 
-        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
-            state.checkedRows = action.payload.checkedRows;
-        },
-
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
             state.deleteErrorMessage = "";
             state.bulkDeleteErrorMessages = [];
@@ -133,21 +117,10 @@ export const slice = createSlice({
 
         listCryptographicKeys: (state, action: PayloadAction<SearchRequestModel>) => {
             state.cryptographicKeys = [];
-            state.isFetchingList = true;
         },
 
-        listCryptographicKeysSuccess: (
-            state,
-            action: PayloadAction<{ cryptographicKeys: CryptographicKeyResponseModel[]; totalPages: number; totalItems: number }>,
-        ) => {
-            state.cryptographicKeys = action.payload.cryptographicKeys;
-            state.isFetchingList = false;
-            state.totalItems = action.payload.totalItems;
-            state.totalPages = action.payload.totalPages;
-        },
-
-        listCryptographicKeysFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingList = false;
+        listCryptographicKeysSuccess: (state, action: PayloadAction<CryptographicKeyResponseModel[]>) => {
+            state.cryptographicKeys = action.payload;
         },
 
         listCryptographicKeyPairs: (state, action: PayloadAction<{ tokenProfileUuid?: string }>) => {
@@ -634,16 +607,10 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const checkedRows = createSelector(state, (state: State) => state.checkedRows);
-
 const cryptographicKey = createSelector(state, (state: State) => state.cryptographicKey);
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);
 const cryptographicKeyPairs = createSelector(state, (state: State) => state.cryptographicKeyPairs);
 
-const totalItems = createSelector(state, (state) => state.totalItems);
-const totalPages = createSelector(state, (state) => state.totalPages);
-
-const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingKeyPairs = createSelector(state, (state: State) => state.isFetchingKeyPairs);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
@@ -672,16 +639,10 @@ const keyHistory = createSelector(state, (state: State) => state.keyHistory);
 export const selectors = {
     state,
 
-    checkedRows,
-
     cryptographicKey,
     cryptographicKeys,
     cryptographicKeyPairs,
 
-    totalItems,
-    totalPages,
-
-    isFetchingList,
     isFetchingKeyPairs,
     isFetchingDetail,
     isCreating,

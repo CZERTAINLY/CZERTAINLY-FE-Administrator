@@ -1,9 +1,11 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ApiClients } from "api";
 import { WritableDraft } from "immer/dist/internal";
+import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
 import { createFeatureSelector } from "utils/ducks";
 
-export const enum FilterEntity {
+export const enum EntityType {
     ENTITY,
     LOCATION,
     CERTIFICATE,
@@ -12,7 +14,7 @@ export const enum FilterEntity {
 }
 
 export type Filter = {
-    entity: FilterEntity;
+    entity: EntityType;
     filter: FilterObject;
 };
 
@@ -36,7 +38,7 @@ export const initialState: State = {
     filters: [],
 };
 
-const updateFilterState = (state: WritableDraft<State>, entity: FilterEntity, callback: (filterObject: FilterObject) => void) => {
+const updateFilterState = (state: WritableDraft<State>, entity: EntityType, callback: (filterObject: FilterObject) => void) => {
     const index = state.filters.findIndex((f) => f.entity === entity);
     const filter = index !== -1 ? state.filters[index] : { entity, filter: { ...EMPTY_FILTER } };
 
@@ -52,27 +54,33 @@ export const slice = createSlice({
     initialState,
 
     reducers: {
-        setCurrentFilters: (state, action: PayloadAction<{ entity: FilterEntity; currentFilters: SearchFilterModel[] }>) => {
+        setCurrentFilters: (state, action: PayloadAction<{ entity: EntityType; currentFilters: SearchFilterModel[] }>) => {
             updateFilterState(state, action.payload.entity, (filter) => {
                 filter.currentFilters = action.payload.currentFilters;
             });
         },
 
-        getAvailableFilters: (state, action: PayloadAction<FilterEntity>) => {
-            updateFilterState(state, action.payload, (filter) => {
+        getAvailableFilters: (
+            state,
+            action: PayloadAction<{
+                entity: EntityType;
+                getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
+            }>,
+        ) => {
+            updateFilterState(state, action.payload.entity, (filter) => {
                 filter.availableFilters = [];
                 filter.isFetchingFilters = true;
             });
         },
 
-        getAvailableFiltersSuccess: (state, action: PayloadAction<{ entity: FilterEntity; availableFilters: SearchFieldListModel[] }>) => {
+        getAvailableFiltersSuccess: (state, action: PayloadAction<{ entity: EntityType; availableFilters: SearchFieldListModel[] }>) => {
             updateFilterState(state, action.payload.entity, (filter) => {
                 filter.availableFilters = action.payload.availableFilters;
                 filter.isFetchingFilters = false;
             });
         },
 
-        getAvailableFiltersFailure: (state, action: PayloadAction<{ entity: FilterEntity; error: string | undefined }>) => {
+        getAvailableFiltersFailure: (state, action: PayloadAction<{ entity: EntityType; error: string | undefined }>) => {
             updateFilterState(state, action.payload.entity, (filter) => {
                 filter.isFetchingFilters = false;
             });
@@ -82,11 +90,11 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const availableFilters = (entity: FilterEntity) =>
+const availableFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).availableFilters);
-const currentFilters = (entity: FilterEntity) =>
+const currentFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).currentFilters);
-const isFetchingFilters = (entity: FilterEntity) =>
+const isFetchingFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).isFetchingFilters);
 
 export const selectors = {

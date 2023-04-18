@@ -9,6 +9,9 @@ import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 
+import { store } from "index";
+import { EntityType } from "./filters";
+import { actions as pagingActions } from "./paging";
 import {
     transformCryptographicKeyAddRequestModelToDto,
     transformCryptographicKeyBulkCompromiseModelToDto,
@@ -24,26 +27,28 @@ import {
 const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listCryptographicKeys.match),
-        switchMap((action) =>
-            deps.apiClients.cryptographicKeys
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.KEY));
+            return deps.apiClients.cryptographicKeys
                 .listCryptographicKeys({ searchRequestDto: transformSearchRequestModelToDto(action.payload) })
                 .pipe(
-                    map((list) =>
-                        slice.actions.listCryptographicKeysSuccess({
-                            cryptographicKeys: list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
-                            totalItems: list.totalItems,
-                            totalPages: list.totalPages,
-                        }),
+                    mergeMap((list) =>
+                        of(
+                            slice.actions.listCryptographicKeysSuccess(
+                                list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
+                            ),
+                            pagingActions.listSuccess({ entity: EntityType.KEY, totalItems: list.totalItems }),
+                        ),
                     ),
 
                     catchError((error) =>
                         of(
-                            slice.actions.listCryptographicKeysFailure({ error: extractError(error, "Failed to get key list") }),
+                            pagingActions.listFailure(EntityType.KEY),
                             appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
                         ),
                     ),
-                ),
-        ),
+                );
+        }),
     );
 };
 

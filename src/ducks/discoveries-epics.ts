@@ -6,7 +6,10 @@ import { FunctionGroupCode } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 
+import { store } from "index";
 import { slice } from "./discoveries";
+import { EntityType } from "./filters";
+import { actions as pagingActions } from "./paging";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
@@ -20,24 +23,24 @@ import {
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listDiscoveries.match),
-        switchMap((action) =>
-            deps.apiClients.discoveries.listDiscoveries({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }).pipe(
-                map((discoveryResponse) =>
-                    slice.actions.listDiscoveriesSuccess({
-                        discoveryList: discoveryResponse.discoveries.map(transformDiscoveryResponseDtoToModel),
-                        totalItems: discoveryResponse.totalItems,
-                        totalPages: discoveryResponse.totalPages,
-                    }),
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.DISCOVERY));
+            return deps.apiClients.discoveries.listDiscoveries({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }).pipe(
+                mergeMap((discoveryResponse) =>
+                    of(
+                        slice.actions.listDiscoveriesSuccess(discoveryResponse.discoveries.map(transformDiscoveryResponseDtoToModel)),
+                        pagingActions.listSuccess({ entity: EntityType.DISCOVERY, totalItems: discoveryResponse.totalItems }),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.listDiscoveriesFailure({ error: extractError(err, "Failed to get Discovery list") }),
+                        pagingActions.listFailure(EntityType.DISCOVERY),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery list" }),
                     ),
                 ),
-            ),
-        ),
+            );
+        }),
     );
 };
 

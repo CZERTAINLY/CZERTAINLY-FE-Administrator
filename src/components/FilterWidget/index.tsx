@@ -2,11 +2,13 @@ import Widget from "components/Widget";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { FilterEntity, actions, selectors } from "ducks/filters";
+import { ApiClients } from "api";
+import { EntityType, actions, selectors } from "ducks/filters";
 import { useDispatch, useSelector } from "react-redux";
 import Select, { MultiValue, SingleValue } from "react-select";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
-import { SearchFilterModel } from "types/certificate";
+import { Observable } from "rxjs";
+import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
 import { SearchCondition, SearchableFieldType } from "types/openapi";
 import styles from "./FilterWidget.module.scss";
 
@@ -29,10 +31,11 @@ const noValue: { [condition in SearchCondition]: boolean } = {
 
 interface Props {
     title: string;
-    entity: FilterEntity;
+    entity: EntityType;
+    getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
 }
 
-export default function FilterWidget({ title, entity }: Props) {
+export default function FilterWidget({ title, entity, getAvailableFiltersApi }: Props) {
     const dispatch = useDispatch();
 
     const availableFilters = useSelector(selectors.availableFilters(entity));
@@ -60,8 +63,8 @@ export default function FilterWidget({ title, entity }: Props) {
     );
 
     useEffect(() => {
-        dispatch(actions.getAvailableFilters(entity));
-    }, [dispatch, entity]);
+        dispatch(actions.getAvailableFilters({ entity, getAvailableFiltersApi }));
+    }, [dispatch, entity, getAvailableFiltersApi]);
 
     useEffect(() => {
         if (selectedFilter >= currentFilters.length) {

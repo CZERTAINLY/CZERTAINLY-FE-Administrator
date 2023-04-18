@@ -47,6 +47,7 @@ import { slice as globalMetadataSlice, initialState as initialGlobalMetadataStat
 import globalMetadataEpics from "./globalMetadata-epics";
 import { slice as initialLocationsSlice, initialState as initialLocationsState } from "./locations";
 import locationsEpics from "./locations-epics";
+import { initialState as initialPagingState, slice as pagingSlice } from "./paging";
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
 import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
@@ -87,6 +88,7 @@ export const initialState = {
     [groupsSlice.name]: initialGroupsState,
     [connectorsSlice.name]: initialConnectorsState,
     [discoveriesSlice.name]: initialDiscoveriesState,
+    [pagingSlice.name]: initialPagingState,
     [usersSlice.name]: initialUsersState,
     [rolesSlice.name]: initialRolesState,
     [certificatesSlice.name]: initialCertificatesState,
@@ -122,6 +124,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [groupsSlice.name]: groupsSlice.reducer,
     [connectorsSlice.name]: connectorsSlice.reducer,
     [discoveriesSlice.name]: discoveriesSlice.reducer,
+    [pagingSlice.name]: pagingSlice.reducer,
     [usersSlice.name]: usersSlice.reducer,
     [rolesSlice.name]: rolesSlice.reducer,
     [certificatesSlice.name]: certificatesSlice.reducer,

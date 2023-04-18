@@ -12,8 +12,6 @@ import { createFeatureSelector } from "utils/ducks";
 import { GetDiscoveryCertificatesRequest } from "../types/openapi";
 
 export type State = {
-    checkedRows: string[];
-
     discovery?: DiscoveryResponseDetailModel;
     discoveries: DiscoveryResponseModel[];
 
@@ -22,14 +20,10 @@ export type State = {
 
     discoveryCertificates?: DiscoveryCertificateListModel;
 
-    totalPages: number;
-    totalItems: number;
-
     isFetchingDiscoveryProviders: boolean;
     isFetchingDiscoveryProviderAttributeDescriptors: boolean;
     isFetchingDiscoveryCertificates: boolean;
 
-    isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
     isDeleting: boolean;
@@ -37,18 +31,12 @@ export type State = {
 };
 
 export const initialState: State = {
-    checkedRows: [],
-
     discoveries: [],
-
-    totalPages: 0,
-    totalItems: 0,
 
     isFetchingDiscoveryProviders: false,
     isFetchingDiscoveryProviderAttributeDescriptors: false,
     isFetchingDiscoveryCertificates: false,
 
-    isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
@@ -67,10 +55,6 @@ export const slice = createSlice({
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
-        },
-
-        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
-            state.checkedRows = action.payload.checkedRows;
         },
 
         clearDiscoveryProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
@@ -124,21 +108,10 @@ export const slice = createSlice({
 
         listDiscoveries: (state, action: PayloadAction<SearchRequestModel>) => {
             state.discoveries = [];
-            state.isFetchingList = true;
         },
 
-        listDiscoveriesSuccess: (
-            state,
-            action: PayloadAction<{ discoveryList: DiscoveryResponseModel[]; totalPages: number; totalItems: number }>,
-        ) => {
-            state.discoveries = action.payload.discoveryList;
-            state.isFetchingList = false;
-            state.totalItems = action.payload.totalItems;
-            state.totalPages = action.payload.totalPages;
-        },
-
-        listDiscoveriesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingList = false;
+        listDiscoveriesSuccess: (state, action: PayloadAction<DiscoveryResponseModel[]>) => {
+            state.discoveries = action.payload;
         },
 
         getDiscoveryDetail: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -217,8 +190,6 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const checkedRows = createSelector(state, (state) => state.checkedRows);
-
 const discoveryProviders = createSelector(state, (state) => state.discoveryProviders);
 const discoveryProviderAttributeDescriptors = createSelector(state, (state) => state.discoveryProviderAttributeDescriptors);
 
@@ -227,9 +198,6 @@ const discoveryCertificates = createSelector(state, (state) => state.discoveryCe
 const discovery = createSelector(state, (state) => state.discovery);
 const discoveries = createSelector(state, (state) => state.discoveries);
 
-const totalItems = createSelector(state, (state) => state.totalItems);
-const totalPages = createSelector(state, (state) => state.totalPages);
-
 const isFetchingDiscoveryProviders = createSelector(state, (state) => state.isFetchingDiscoveryProviders);
 const isFetchingDiscoveryProviderAttributeDescriptors = createSelector(
     state,
@@ -237,7 +205,6 @@ const isFetchingDiscoveryProviderAttributeDescriptors = createSelector(
 );
 const isFetchingDiscoveryCertificates = createSelector(state, (state) => state.isFetchingDiscoveryCertificates);
 
-const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
@@ -245,8 +212,6 @@ const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 
 export const selectors = {
     state,
-
-    checkedRows,
 
     discoveryProviders,
     discoveryProviderAttributeDescriptors,
@@ -256,14 +221,10 @@ export const selectors = {
     discovery,
     discoveries,
 
-    totalItems,
-    totalPages,
-
     isFetchingDiscoveryProviders,
     isFetchingDiscoveryProviderAttributeDescriptors,
     isFetchingDiscoveryCertificates,
 
-    isFetchingList,
     isFetchingDetail,
     isCreating,
     isDeleting,

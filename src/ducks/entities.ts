@@ -6,13 +6,8 @@ import { EntityRequestModel, EntityResponseModel } from "types/entities";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
-    checkedRows: string[];
-
     entity?: EntityResponseModel;
     entities: EntityResponseModel[];
-
-    totalPages: number;
-    totalItems: number;
 
     locationAttributeDescriptors?: AttributeDescriptorModel[];
 
@@ -22,7 +17,6 @@ export type State = {
     isFetchingEntityProviders: boolean;
     isFetchingEntityProviderAttributeDescriptors: boolean;
 
-    isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingLocationAttributeDescriptors: boolean;
     isCreating: boolean;
@@ -31,17 +25,11 @@ export type State = {
 };
 
 export const initialState: State = {
-    checkedRows: [],
-
     entities: [],
-
-    totalPages: 0,
-    totalItems: 0,
 
     isFetchingEntityProviders: false,
     isFetchingEntityProviderAttributeDescriptors: false,
 
-    isFetchingList: false,
     isFetchingDetail: false,
     isFetchingLocationAttributeDescriptors: false,
     isCreating: false,
@@ -61,10 +49,6 @@ export const slice = createSlice({
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
-        },
-
-        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
-            state.checkedRows = action.payload.checkedRows;
         },
 
         clearEntityProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
@@ -103,21 +87,10 @@ export const slice = createSlice({
 
         listEntities: (state, action: PayloadAction<SearchRequestModel>) => {
             state.entities = [];
-            state.isFetchingList = true;
         },
 
-        listEntitiesSuccess: (
-            state,
-            action: PayloadAction<{ entities: EntityResponseModel[]; totalPages: number; totalItems: number }>,
-        ) => {
-            state.entities = action.payload.entities;
-            state.isFetchingList = false;
-            state.totalItems = action.payload.totalItems;
-            state.totalPages = action.payload.totalPages;
-        },
-
-        listEntitiesFailure: (state, action: PayloadAction<{ error: string }>) => {
-            state.isFetchingList = false;
+        listEntitiesSuccess: (state, action: PayloadAction<EntityResponseModel[]>) => {
+            state.entities = action.payload;
         },
 
         getEntityDetail: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -151,9 +124,6 @@ export const slice = createSlice({
         },
 
         deleteEntitySuccess: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
-            const index = state.checkedRows.findIndex((uuid: string) => uuid === action.payload.uuid);
-            state.checkedRows.splice(index, 1);
-
             const index1 = state.entities.findIndex((entity: EntityResponseModel) => entity.uuid === action.payload.uuid);
             state.entities.splice(index1, 1);
 
@@ -196,8 +166,6 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const checkedRows = createSelector(state, (state) => state.checkedRows);
-
 const entityProviders = createSelector(state, (state) => state.entityProviders);
 const entityProviderAttributeDescriptors = createSelector(state, (state) => state.entityProviderAttributeDescriptors);
 const locationAttributeDescriptors = createSelector(state, (state) => state.locationAttributeDescriptors);
@@ -205,13 +173,9 @@ const locationAttributeDescriptors = createSelector(state, (state) => state.loca
 const entity = createSelector(state, (state) => state.entity);
 const entities = createSelector(state, (state) => state.entities);
 
-const totalItems = createSelector(state, (state) => state.totalItems);
-const totalPages = createSelector(state, (state) => state.totalPages);
-
 const isFetchingEntityProviders = createSelector(state, (state) => state.isFetchingEntityProviders);
 const isFetchingEntityProviderAttributeDescriptors = createSelector(state, (state) => state.isFetchingEntityProviderAttributeDescriptors);
 
-const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingLocationAttributeDescriptors = createSelector(state, (state) => state.isFetchingLocationAttributeDescriptors);
 const isCreating = createSelector(state, (state) => state.isCreating);
@@ -221,8 +185,6 @@ const isUpdating = createSelector(state, (state) => state.isUpdating);
 export const selectors = {
     state,
 
-    checkedRows,
-
     entityProviders,
     entityProviderAttributeDescriptors,
     locationAttributeDescriptors,
@@ -230,14 +192,10 @@ export const selectors = {
     entity,
     entities,
 
-    totalItems,
-    totalPages,
-
     isFetchingEntityProviders,
     isFetchingEntityProviderAttributeDescriptors,
     isFetchingLocationAttributeDescriptors,
 
-    isFetchingList,
     isFetchingDetail,
     isCreating,
     isDeleting,

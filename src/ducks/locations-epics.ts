@@ -4,9 +4,12 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
 
+import { store } from "index";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice as certsSlice } from "./certificates";
+import { EntityType } from "./filters";
 import { slice } from "./locations";
+import { actions as pagingActions } from "./paging";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 import {
@@ -19,24 +22,24 @@ import {
 const listLocations: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listLocations.match),
-        switchMap((action) =>
-            deps.apiClients.locations.listLocations({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }).pipe(
-                map((locationResponse) =>
-                    slice.actions.listLocationsSuccess({
-                        locations: locationResponse.locations.map(transformLocationResponseDtoToModel),
-                        totalItems: locationResponse.totalItems,
-                        totalPages: locationResponse.totalPages,
-                    }),
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.LOCATION));
+            return deps.apiClients.locations.listLocations({ searchRequestDto: transformSearchRequestModelToDto(action.payload) }).pipe(
+                mergeMap((locationResponse) =>
+                    of(
+                        slice.actions.listLocationsSuccess(locationResponse.locations.map(transformLocationResponseDtoToModel)),
+                        pagingActions.listSuccess({ entity: EntityType.LOCATION, totalItems: locationResponse.totalItems }),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
-                        slice.actions.listLocationsFailure({ error: extractError(error, "Failed to get Location list") }),
+                        pagingActions.listFailure(EntityType.LOCATION),
                         appRedirectActions.fetchError({ error, message: "Failed to get Location list" }),
                     ),
                 ),
-            ),
-        ),
+            );
+        }),
     );
 };
 

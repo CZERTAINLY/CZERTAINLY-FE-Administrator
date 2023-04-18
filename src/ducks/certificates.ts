@@ -26,17 +26,9 @@ import { downloadFileZip } from "utils/download";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
-    forceRefreshList: boolean;
-
-    checkedRows: string[];
-
     deleteErrorMessage: string;
 
-    lastQuery?: SearchRequestModel;
-
     certificates: CertificateListResponseModel[];
-    totalPages: number;
-    totalItems: number;
 
     certificateDetail?: CertificateDetailResponseModel;
     certificateHistory?: CertificateHistoryModel[];
@@ -47,7 +39,6 @@ export type State = {
 
     isFetchingValidationResult: boolean;
 
-    isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingHistory: boolean;
     isFetchingLocations: boolean;
@@ -83,15 +74,9 @@ export type State = {
 };
 
 export const initialState: State = {
-    forceRefreshList: false,
-
-    checkedRows: [],
-
     deleteErrorMessage: "",
 
     certificates: [],
-    totalPages: 0,
-    totalItems: 0,
 
     issuanceAttributes: {},
     revocationAttributes: [],
@@ -99,7 +84,6 @@ export const initialState: State = {
 
     isFetchingValidationResult: false,
 
-    isFetchingList: false,
     isFetchingDetail: false,
     isFetchingHistory: false,
     isFetchingLocations: false,
@@ -148,14 +132,6 @@ export const slice = createSlice({
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
         },
 
-        setForceRefreshList: (state, action: PayloadAction<{ forceRefreshList: boolean }>) => {
-            state.forceRefreshList = action.payload.forceRefreshList;
-        },
-
-        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
-            state.checkedRows = action.payload.checkedRows;
-        },
-
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
             state.deleteErrorMessage = "";
         },
@@ -166,26 +142,10 @@ export const slice = createSlice({
 
         listCertificates: (state, action: PayloadAction<SearchRequestModel>) => {
             state.certificates = [];
-            state.isFetchingList = true;
-            state.lastQuery = action.payload;
         },
 
-        listCertificatesSuccess: (
-            state,
-            action: PayloadAction<{
-                certificateList: CertificateListResponseModel[];
-                totalPages: number;
-                totalItems: number;
-            }>,
-        ) => {
-            state.isFetchingList = false;
-            state.certificates = action.payload.certificateList;
-            state.totalItems = action.payload.totalItems;
-            state.totalPages = action.payload.totalPages;
-        },
-
-        listCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingList = false;
+        listCertificatesSuccess: (state, action: PayloadAction<CertificateListResponseModel[]>) => {
+            state.certificates = action.payload;
         },
 
         getCertificateDetail: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -505,7 +465,6 @@ export const slice = createSlice({
 
         uploadCertificateSuccess: (state, action: PayloadAction<{ uuid: string; certificate: CertificateDetailResponseModel }>) => {
             state.isUploading = false;
-            state.forceRefreshList = true;
             state.certificates.push(action.payload.certificate);
         },
 
@@ -590,15 +549,9 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const forceRefreshList = createSelector(state, (state) => state.forceRefreshList);
-
-const checkedRows = createSelector(state, (state) => state.checkedRows);
-
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 
 const certificates = createSelector(state, (state) => state.certificates);
-const totalItems = createSelector(state, (state) => state.totalItems);
-const totalPages = createSelector(state, (state) => state.totalPages);
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
 const certificateHistory = createSelector(state, (state) => state.certificateHistory);
@@ -606,7 +559,6 @@ const certificateLocations = createSelector(state, (state) => state.certificateL
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
 const revocationAttributes = createSelector(state, (state) => state.revocationAttributes);
 
-const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingHistory = createSelector(state, (state) => state.isFetchingHistory);
 const isFetchingLocations = createSelector(state, (state) => state.isFetchingLocations);
@@ -642,18 +594,13 @@ const isFetchingContents = createSelector(state, (state) => state.isFetchingCont
 
 export const selectors = {
     state,
-    forceRefreshList,
-    checkedRows,
     deleteErrorMessage,
     certificates,
-    totalItems,
-    totalPages,
     certificateDetail,
     certificateHistory,
     certificateLocations,
     issuanceAttributes,
     revocationAttributes,
-    isFetchingList,
     isFetchingDetail,
     isFetchingHistory,
     isFetchingLocations,
