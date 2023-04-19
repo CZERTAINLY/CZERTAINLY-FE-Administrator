@@ -1,50 +1,53 @@
 import { ApiClients } from "api";
 import { AnyAction, combineReducers } from "redux";
-import { combineEpics, Epic } from "redux-observable";
-import { initialState as initialAcmeAccountsState, slice as acmeAccountsSlice } from "./acme-accounts";
+import { Epic, combineEpics } from "redux-observable";
+import { slice as acmeAccountsSlice, initialState as initialAcmeAccountsState } from "./acme-accounts";
 import acmeAccountsEpics from "./acme-accounts-epics";
-import { initialState as initialAcmeProfilesState, slice as acmeProfilesSlice } from "./acme-profiles";
+import { slice as acmeProfilesSlice, initialState as initialAcmeProfilesState } from "./acme-profiles";
 import acmeProfilesEpics from "./acme-profiles-epics";
 import { initialState as initialScepProfilesState, slice as scepProfilesSlice } from "./scep-profiles";
 import scepProfilesEpics from "./scep-profiles-epics";
 
-import { initialState as initialAlertsState, slice as alertsSlice } from "./alerts";
-import { initialState as initialAppRedirectState, slice as appRedirectSlice } from "./app-redirect";
+import { slice as alertsSlice, initialState as initialAlertsState } from "./alerts";
+import { slice as appRedirectSlice, initialState as initialAppRedirectState } from "./app-redirect";
 import appRedirectEpics from "./app-redirect-epics";
-import { initialState as initialAuditLogsState, slice as auditLogsSlice } from "./auditLogs";
+import { slice as auditLogsSlice, initialState as initialAuditLogsState } from "./auditLogs";
 import auditLogsEpics from "./auditLogs-epics";
-import { initialState as initialAuthState, slice as authSlice } from "./auth";
+import { slice as authSlice, initialState as initialAuthState } from "./auth";
 
 import authEpics from "./auth-epics";
-import { initialState as initialAuthoritiesState, slice as authoritiesSlice } from "./authorities";
+import { slice as authoritiesSlice, initialState as initialAuthoritiesState } from "./authorities";
 import authoritiesEpics from "./authorities-epics";
-import { initialState as initialGroupsState, slice as groupsSlice } from "./certificateGroups";
+import { slice as groupsSlice, initialState as initialGroupsState } from "./certificateGroups";
 import groupsEpics from "./certificateGroups-epics";
-import { initialState as initialCertificatesState, slice as certificatesSlice } from "./certificates";
+import { slice as certificatesSlice, initialState as initialCertificatesState } from "./certificates";
 import certificatesEpics from "./certificates-epics";
-import { initialState as initialComplianceProfilesState, slice as initialComplianceProfilesSlice } from "./compliance-profiles";
+import { slice as initialComplianceProfilesSlice, initialState as initialComplianceProfilesState } from "./compliance-profiles";
 import complianceProfilesEpics from "./compliance-profiles-epics";
-import { initialState as initialConnectorsState, slice as connectorsSlice } from "./connectors";
+import { slice as connectorsSlice, initialState as initialConnectorsState } from "./connectors";
 import connectorsEpics from "./connectors-epic";
-import { initialState as initialCredentialsState, slice as initialCredentialsSlice } from "./credentials";
+import { slice as initialCredentialsSlice, initialState as initialCredentialsState } from "./credentials";
 import credentialsEpics from "./credentials-epics";
-import { initialState as initialCryptographicKeyAttributesState, slice as cryptographicKeySlice } from "./cryptographic-keys";
+import { slice as cryptographicKeySlice, initialState as initialCryptographicKeyAttributesState } from "./cryptographic-keys";
 import cryptographicKeyEpics from "./cryptographic-keys-epics";
 import {
-    initialState as initialCryptographicOperationsAttributesState,
     slice as cryptographicOperationsSlice,
+    initialState as initialCryptographicOperationsAttributesState,
 } from "./cryptographic-operations";
 import cryptographicOperationsEpics from "./cryptographic-operations-epics";
-import { initialState as initialCustomAttributesState, slice as customAttributesSlice } from "./customAttributes";
+import { slice as customAttributesSlice, initialState as initialCustomAttributesState } from "./customAttributes";
 import customAttributesEpics from "./customAttributes-epics";
-import { initialState as initialDiscoveriesState, slice as discoveriesSlice } from "./discoveries";
+import { slice as discoveriesSlice, initialState as initialDiscoveriesState } from "./discoveries";
 import discoveriesEpics from "./discoveries-epics";
-import { initialState as initialEntitiesState, slice as initialEntitiesSlice } from "./entities";
+import { slice as initialEntitiesSlice, initialState as initialEntitiesState } from "./entities";
 import entitiesEpics from "./entities-epics";
-import { initialState as initialGlobalMetadataState, slice as globalMetadataSlice } from "./globalMetadata";
+import { slice as initialFiltersSlice, initialState as initialFiltersState } from "./filters";
+import filtersEpics from "./filters-epics";
+import { slice as globalMetadataSlice, initialState as initialGlobalMetadataState } from "./globalMetadata";
 import globalMetadataEpics from "./globalMetadata-epics";
-import { initialState as initialLocationsState, slice as initialLocationsSlice } from "./locations";
+import { slice as initialLocationsSlice, initialState as initialLocationsState } from "./locations";
 import locationsEpics from "./locations-epics";
+import { initialState as initialPagingState, slice as pagingSlice } from "./paging";
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
 import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
@@ -52,7 +55,7 @@ import rolesEpics from "./roles-epics";
 import { initialState as initialSettingsState, slice as settingsSlice } from "./settings";
 import settingsEpics from "./settings-epics";
 import startupEpics from "./startup-epics";
-import { initialState as initialDashboardState, slice as dashboardSlice } from "./statisticsDashboard";
+import { slice as dashboardSlice, initialState as initialDashboardState } from "./statisticsDashboard";
 import dashboardEpics from "./statisticsDashboard-epics";
 import { initialState as initialTokenProfileAttributesState, slice as tokenProfileSlice } from "./token-profiles";
 import tokenProfileEpics from "./token-profiles-epics";
@@ -85,6 +88,7 @@ export const initialState = {
     [groupsSlice.name]: initialGroupsState,
     [connectorsSlice.name]: initialConnectorsState,
     [discoveriesSlice.name]: initialDiscoveriesState,
+    [pagingSlice.name]: initialPagingState,
     [usersSlice.name]: initialUsersState,
     [rolesSlice.name]: initialRolesState,
     [certificatesSlice.name]: initialCertificatesState,
@@ -96,6 +100,7 @@ export const initialState = {
     [initialComplianceProfilesSlice.name]: initialComplianceProfilesState,
     [initialCredentialsSlice.name]: initialCredentialsState,
     [initialEntitiesSlice.name]: initialEntitiesState,
+    [initialFiltersSlice.name]: initialFiltersState,
     [initialLocationsSlice.name]: initialLocationsState,
     [auditLogsSlice.name]: initialAuditLogsState,
     [customAttributesSlice.name]: initialCustomAttributesState,
@@ -119,6 +124,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [groupsSlice.name]: groupsSlice.reducer,
     [connectorsSlice.name]: connectorsSlice.reducer,
     [discoveriesSlice.name]: discoveriesSlice.reducer,
+    [pagingSlice.name]: pagingSlice.reducer,
     [usersSlice.name]: usersSlice.reducer,
     [rolesSlice.name]: rolesSlice.reducer,
     [certificatesSlice.name]: certificatesSlice.reducer,
@@ -130,6 +136,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
     [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
     [initialEntitiesSlice.name]: initialEntitiesSlice.reducer,
+    [initialFiltersSlice.name]: initialFiltersSlice.reducer,
     [initialLocationsSlice.name]: initialLocationsSlice.reducer,
     [auditLogsSlice.name]: auditLogsSlice.reducer,
     [customAttributesSlice.name]: customAttributesSlice.reducer,
@@ -164,6 +171,7 @@ export const epics = combineEpics(
     ...complianceProfilesEpics,
     ...credentialsEpics,
     ...entitiesEpics,
+    ...filtersEpics,
     ...locationsEpics,
     ...auditLogsEpics,
     ...customAttributesEpics,

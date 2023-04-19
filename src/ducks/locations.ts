@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AttributeDescriptorModel } from "types/attributes";
-import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
+import { SearchRequestModel } from "types/certificate";
 import {
     LocationAddRequestModel,
     LocationEditRequestModel,
@@ -11,21 +11,12 @@ import {
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
-    checkedRows: string[];
-
     location?: LocationResponseModel;
     locations: LocationResponseModel[];
-
-    availableFilters: SearchFieldListModel[];
-    currentFilters: SearchFilterModel[];
-    isFetchingFilters: boolean;
-    totalPages: number;
-    totalItems: number;
 
     pushAttributeDescriptors?: AttributeDescriptorModel[];
     csrAttributeDescriptors?: AttributeDescriptorModel[];
 
-    isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
     isUpdating: boolean;
@@ -47,17 +38,8 @@ export type State = {
 };
 
 export const initialState: State = {
-    checkedRows: [],
-
     locations: [],
 
-    availableFilters: [],
-    currentFilters: [],
-    totalPages: 0,
-    totalItems: 0,
-    isFetchingFilters: false,
-
-    isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
@@ -85,57 +67,21 @@ export const slice = createSlice({
 
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
-            let currentFilterRef = state.currentFilters;
             Object.keys(state).forEach((key) => {
                 if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
             });
 
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
-            state.currentFilters = currentFilterRef;
-        },
-
-        setCurrentFilters: (state, action: PayloadAction<SearchFilterModel[]>) => {
-            state.currentFilters = action.payload;
-        },
-
-        getAvailableFilters: (state, action: PayloadAction<void>) => {
-            state.availableFilters = [];
-            state.isFetchingFilters = true;
-        },
-
-        getAvailableFiltersSuccess: (state, action: PayloadAction<{ availableFilters: SearchFieldListModel[] }>) => {
-            state.isFetchingFilters = false;
-            state.availableFilters = action.payload.availableFilters;
-        },
-
-        getAvailableFiltersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingFilters = false;
-        },
-
-        setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
-            state.checkedRows = action.payload.checkedRows;
         },
 
         clearPushAttributeDescriptors: (state, action: PayloadAction<void>) => {
             state.pushAttributeDescriptors = undefined;
         },
 
-        listLocations: (state, action: PayloadAction<SearchRequestModel>) => {
-            state.isFetchingList = true;
-        },
+        listLocations: (state, action: PayloadAction<SearchRequestModel>) => {},
 
-        listLocationsSuccess: (
-            state,
-            action: PayloadAction<{ locations: LocationResponseModel[]; totalPages: number; totalItems: number }>,
-        ) => {
-            state.isFetchingList = false;
-            state.locations = action.payload.locations;
-            state.totalItems = action.payload.totalItems;
-            state.totalPages = action.payload.totalPages;
-        },
-
-        listLocationsFailure: (state, action: PayloadAction<{ error: string }>) => {
-            state.isFetchingList = false;
+        listLocationsSuccess: (state, action: PayloadAction<LocationResponseModel[]>) => {
+            state.locations = action.payload;
         },
 
         getLocationDetail: (state, action: PayloadAction<{ entityUuid: string; uuid: string }>) => {
@@ -365,16 +311,8 @@ export const slice = createSlice({
 
 export const state = createFeatureSelector<State>(slice.name);
 
-export const checkedRows = createSelector(state, (state) => state.checkedRows);
-
 export const location = createSelector(state, (state) => state.location);
 export const locations = createSelector(state, (state) => state.locations);
-
-const availableFilters = createSelector(state, (state) => state.availableFilters);
-const currentFilters = createSelector(state, (state) => state.currentFilters);
-const totalItems = createSelector(state, (state) => state.totalItems);
-const totalPages = createSelector(state, (state) => state.totalPages);
-const isFetchingFilters = createSelector(state, (state) => state.isFetchingFilters);
 
 export const pushAttributeDescriptors = createSelector(state, (state) => state.pushAttributeDescriptors);
 export const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttributeDescriptors);
@@ -382,7 +320,6 @@ export const csrAttributeDescriptors = createSelector(state, (state) => state.cs
 export const isFetchingPushAttributeDescriptors = createSelector(state, (state) => state.isFetchingPushAttributeDescriptors);
 export const isFetchingCSRAttributeDescriptors = createSelector(state, (state) => state.isFetchingCSRAttributeDescriptors);
 
-export const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 export const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 export const isCreating = createSelector(state, (state) => state.isCreating);
 export const isUpdating = createSelector(state, (state) => state.isUpdating);
@@ -402,16 +339,8 @@ export const isRemovingCertificate = createSelector(state, (state) => state.isRe
 export const selectors = {
     state,
 
-    checkedRows,
-
     location,
     locations,
-
-    availableFilters,
-    currentFilters,
-    totalItems,
-    totalPages,
-    isFetchingFilters,
 
     pushAttributeDescriptors,
     csrAttributeDescriptors,
@@ -419,7 +348,6 @@ export const selectors = {
     isFetchingPushAttributeDescriptors,
     isFetchingCSRAttributeDescriptors,
 
-    isFetchingList,
     isFetchingDetail,
     isCreating,
     isUpdating,

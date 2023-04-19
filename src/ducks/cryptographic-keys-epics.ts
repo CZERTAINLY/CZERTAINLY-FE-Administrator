@@ -7,8 +7,11 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchFieldListDtoToModel, transformSearchRequestModelToDto } from "./transform/certificates";
+import { transformSearchRequestModelToDto } from "./transform/certificates";
 
+import { store } from "index";
+import { EntityType } from "./filters";
+import { actions as pagingActions } from "./paging";
 import {
     transformCryptographicKeyAddRequestModelToDto,
     transformCryptographicKeyBulkCompromiseModelToDto,
@@ -24,26 +27,28 @@ import {
 const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listCryptographicKeys.match),
-        switchMap((action) =>
-            deps.apiClients.cryptographicKeys
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.KEY));
+            return deps.apiClients.cryptographicKeys
                 .listCryptographicKeys({ searchRequestDto: transformSearchRequestModelToDto(action.payload) })
                 .pipe(
-                    map((list) =>
-                        slice.actions.listCryptographicKeysSuccess({
-                            cryptographicKeys: list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
-                            totalItems: list.totalItems,
-                            totalPages: list.totalPages,
-                        }),
+                    mergeMap((list) =>
+                        of(
+                            slice.actions.listCryptographicKeysSuccess(
+                                list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
+                            ),
+                            pagingActions.listSuccess({ entity: EntityType.KEY, totalItems: list.totalItems }),
+                        ),
                     ),
 
                     catchError((error) =>
                         of(
-                            slice.actions.listCryptographicKeysFailure({ error: extractError(error, "Failed to get key list") }),
+                            pagingActions.listFailure(EntityType.KEY),
                             appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
                         ),
                     ),
-                ),
-        ),
+                );
+        }),
     );
 };
 
@@ -655,28 +660,6 @@ const bulkDestroyCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const getAvailableKeyFilters: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getAvailableKeyFilters.match),
-        switchMap((action) =>
-            deps.apiClients.cryptographicKeys.getSearchableFieldInformation1().pipe(
-                map((filters) =>
-                    slice.actions.getAvailableKeyFiltersSuccess({
-                        availableKeyFilters: filters.map((filter) => transformSearchFieldListDtoToModel(filter)),
-                    }),
-                ),
-
-                catchError((err) =>
-                    of(
-                        slice.actions.getAvailableKeyFiltersFailure({ error: extractError(err, "Failed to get available key filters") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get available key filters" }),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
 const getKeyHistory: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getHistory.match),
@@ -732,7 +715,6 @@ const epics = [
     destroyCryptographicKey,
     bulkDestroyCryptographicKeys,
     bulkDestroyCryptographicKeyItems,
-    getAvailableKeyFilters,
     getKeyHistory,
 ];
 

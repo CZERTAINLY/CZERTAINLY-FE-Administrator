@@ -7,6 +7,7 @@ import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
+import { selectors as pagingSelectors } from "ducks/paging";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 
 import { actions as userActions, selectors as userSelectors } from "ducks/users";
@@ -16,10 +17,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { Badge, Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
+import { Badge, Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
 import { UserDetailModel } from "types/auth";
 import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
+import { EntityType } from "ducks/filters";
 import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
@@ -59,7 +61,7 @@ function UserForm() {
     const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
     const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
-    const isFetchingCertsList = useSelector(certSelectors.isFetchingList);
+    const isFetchingCertsList = useSelector(pagingSelectors.isFetchingList(EntityType.CERTIFICATE));
     const isFetchingCertDetail = useSelector(certSelectors.isFetchingDetail);
 
     const isCreatingUser = useSelector(userSelectors.isCreating);
