@@ -4,7 +4,7 @@
     "homepage": ".",
     "private": true,
     "dependencies": {
-        "@openapitools/openapi-generator-cli": "^2.5.2",
+        "@openapitools/openapi-generator-cli": "^2.6.0",
         "@reduxjs/toolkit": "^1.9.3",
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
