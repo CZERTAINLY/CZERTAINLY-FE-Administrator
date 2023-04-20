@@ -17,11 +17,11 @@
  * @enum {string}
  */
 export enum CertificateStatus {
-    Valid = "valid",
-    Revoked = "revoked",
-    Expired = "expired",
     Unknown = "unknown",
-    Expiring = "expiring",
     New = "new",
+    Valid = "valid",
     Invalid = "invalid",
+    Revoked = "revoked",
+    Expiring = "expiring",
+    Expired = "expired",
 }

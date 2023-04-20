@@ -11,9 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { SearchableFieldType, SearchCondition } from "./";
+import type { PlatformEnum, SearchCondition, SearchableFieldType } from "./";
 
 /**
+ * List of search fields for specified search group
  * @export
  * @interface SearchFieldDataDto
  */
@@ -41,6 +42,11 @@ export interface SearchFieldDataDto {
      * @memberof SearchFieldDataDto
      */
     conditions: Array<SearchCondition>;
+    /**
+     * @type {PlatformEnum}
+     * @memberof SearchFieldDataDto
+     */
+    platformEnum?: PlatformEnum;
     /**
      * Available values for the field
      * @type {object}

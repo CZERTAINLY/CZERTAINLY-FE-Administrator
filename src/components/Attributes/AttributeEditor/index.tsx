@@ -21,7 +21,7 @@ import {
     isInfoAttributeModel,
 } from "types/attributes";
 import { CallbackAttributeModel } from "types/connectors";
-import { AttributeContentType, FunctionGroupCode, Resource } from "types/openapi";
+import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from "types/openapi";
 import { Attribute } from "./Attribute";
 
 // same empty array is used to prevent re-rendering of the component
@@ -210,7 +210,15 @@ export default function AttributeEditor({
                     if (value === undefined) hasUndefinedMapping = true;
 
                     mapping.targets.forEach((target) => {
-                        data[target]![mapping.to] = value;
+                        if (target === AttributeValueTarget.PathVariable) {
+                            data.pathVariable![mapping.to] = value;
+                        }
+                        if (target === AttributeValueTarget.Body) {
+                            data.body![mapping.to] = value;
+                        }
+                        if (target === AttributeValueTarget.RequestParameter) {
+                            data.requestParameter![mapping.to] = value;
+                        }
                     });
                 });
             }

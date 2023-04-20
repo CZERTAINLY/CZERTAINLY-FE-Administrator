@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Select from "react-select";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 import { CredentialResponseModel } from "types/credentials";

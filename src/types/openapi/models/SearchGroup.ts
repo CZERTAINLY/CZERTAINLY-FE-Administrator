@@ -12,13 +12,12 @@
  */
 
 /**
- * Reason for Compromise
+ * Group to search
  * @export
  * @enum {string}
  */
-export enum KeyCompromiseReason {
-    Disclosure = "disclosure",
-    Modification = "modification",
-    Substitution = "substitution",
-    UseOfSensitiveData = "use_of_sensitive_data",
+export enum SearchGroup {
+    Meta = "meta",
+    Custom = "custom",
+    Property = "property",
 }

@@ -13,9 +13,9 @@ import {
     CustomAttributeModel,
     DataAttributeModel,
     InfoAttributeModel,
+    RegexpAttributeConstraintModel,
     isCustomAttributeModel,
     isDataAttributeModel,
-    RegexpAttributeConstraintModel,
 } from "types/attributes";
 import { AttributeConstraintType, AttributeContentType } from "types/openapi";
 

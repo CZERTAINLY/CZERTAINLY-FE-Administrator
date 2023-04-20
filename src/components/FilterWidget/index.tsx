@@ -9,14 +9,16 @@ import Select, { MultiValue, SingleValue } from "react-select";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
-import { SearchCondition, SearchableFieldType } from "types/openapi";
+import { SearchCondition, SearchGroup, SearchableFieldType } from "types/openapi";
 import styles from "./FilterWidget.module.scss";
 
 const noValue: { [condition in SearchCondition]: boolean } = {
     [SearchCondition.Equals]: false,
     [SearchCondition.NotEquals]: false,
     [SearchCondition.Greater]: false,
+    [SearchCondition.GreaterOrEqual]: false,
     [SearchCondition.Lesser]: false,
+    [SearchCondition.LesserOrEqual]: false,
     [SearchCondition.Contains]: false,
     [SearchCondition.NotContains]: false,
     [SearchCondition.StartsWith]: false,
@@ -44,7 +46,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
     const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 
-    const [filterGroup, setFilterGroup] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
+    const [filterGroup, setFilterGroup] = useState<SingleValue<{ label: string; value: SearchGroup }> | undefined>(undefined);
     const [filterField, setFilterField] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
     const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string; value: SearchCondition }> | undefined>(undefined);
     const [filterValue, setFilterValue] = useState<
@@ -81,11 +83,11 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         }
 
         const field = availableFilters
-            .find((f) => f.groupName === currentFilters[selectedFilter].groupName)
+            .find((f) => f.searchGroup === currentFilters[selectedFilter].searchGroup)
             ?.searchFieldData?.find((f) => f.fieldIdentifier === currentFilters[selectedFilter].fieldIdentifier);
         if (!field) return;
 
-        setFilterGroup({ label: currentFilters[selectedFilter].groupName, value: currentFilters[selectedFilter].groupName });
+        setFilterGroup({ label: currentFilters[selectedFilter].searchGroup, value: currentFilters[selectedFilter].searchGroup });
         setFilterField({ label: field.fieldLabel, value: field.fieldIdentifier });
         setFilterCondition({ label: currentFilters[selectedFilter].condition, value: currentFilters[selectedFilter].condition });
 
@@ -123,7 +125,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
     );
 
     const onUpdateFilterClick = useCallback(() => {
-        if (!filterField || !filterCondition) {
+        if (!filterGroup || !filterField || !filterCondition) {
             return;
         }
 
@@ -133,7 +135,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         }
 
         const updatedFilterItem: SearchFilterModel = {
-            groupName: filterGroup?.value ?? "",
+            searchGroup: filterGroup.value,
             fieldIdentifier: filterField.value,
             condition: filterCondition.value,
             value: filterValue
@@ -168,13 +170,11 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
     );
 
     const currentFields = useMemo(
-        () => availableFilters.find((f) => f.groupName === filterGroup?.value)?.searchFieldData,
+        () => availableFilters.find((f) => f.searchGroup === filterGroup?.value)?.searchFieldData,
         [availableFilters, filterGroup],
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
-
-    const isFilterGroupAvailable = useMemo(() => availableFilters.some((a) => a.groupName !== undefined), [availableFilters]);
 
     return (
         <>
@@ -182,25 +182,26 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div style={{ width: "99%", borderBottom: "solid 1px silver", marginBottom: "1rem" }}>
                         <Row>
-                            {isFilterGroupAvailable && (
-                                <Col>
-                                    <FormGroup>
-                                        <Label for="group">Filter Field Source</Label>
-                                        <Select
-                                            id="group"
-                                            options={availableFilters.map((f) => ({ label: f.groupName ?? "", value: f.groupName ?? "" }))}
-                                            onChange={(e) => {
-                                                setFilterGroup(e);
-                                                setFilterField(undefined);
-                                                setFilterCondition(undefined);
-                                                setFilterValue(undefined);
-                                            }}
-                                            value={filterGroup || null}
-                                            isClearable={true}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            )}
+                            <Col>
+                                <FormGroup>
+                                    <Label for="group">Filter Field Source</Label>
+                                    <Select
+                                        id="group"
+                                        options={availableFilters.map((f) => ({
+                                            label: f.searchGroup,
+                                            value: f.searchGroup,
+                                        }))}
+                                        onChange={(e) => {
+                                            setFilterGroup(e);
+                                            setFilterField(undefined);
+                                            setFilterCondition(undefined);
+                                            setFilterValue(undefined);
+                                        }}
+                                        value={filterGroup || null}
+                                        isClearable={true}
+                                    />
+                                </FormGroup>
+                            </Col>
 
                             <Col>
                                 <FormGroup>
@@ -214,7 +215,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                             setFilterValue(undefined);
                                         }}
                                         value={filterField || null}
-                                        isDisabled={isFilterGroupAvailable && !filterGroup}
+                                        isDisabled={!filterGroup}
                                         isClearable={true}
                                     />
                                 </FormGroup>
@@ -297,7 +298,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                     </div>
                     {currentFilters.map((f, i) => {
                         const field = availableFilters
-                            .find((a) => a.groupName === f.groupName)
+                            .find((a) => a.searchGroup === f.searchGroup)
                             ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
                         const label = field ? field.fieldLabel : f.fieldIdentifier;
                         const value =
@@ -315,7 +316,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? "primary" : "secondary"}
                             >
-                                {isFilterGroupAvailable && <b>{f.groupName}&nbsp;</b>}'{label}'&nbsp;
+                                <b>{f.searchGroup}&nbsp;</b>'{label}'&nbsp;
                                 {f.condition}&nbsp;
                                 {value}
                                 <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>

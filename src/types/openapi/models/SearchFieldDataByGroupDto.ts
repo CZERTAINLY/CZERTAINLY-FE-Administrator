@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { SearchFieldDataDto } from "./";
+import type { SearchFieldDataDto, SearchGroup } from "./";
 
 /**
  * @export
@@ -19,13 +19,14 @@ import type { SearchFieldDataDto } from "./";
  */
 export interface SearchFieldDataByGroupDto {
     /**
+     * @type {SearchGroup}
+     * @memberof SearchFieldDataByGroupDto
+     */
+    searchGroup: SearchGroup;
+    /**
+     * List of search fields for specified search group
      * @type {Array<SearchFieldDataDto>}
      * @memberof SearchFieldDataByGroupDto
      */
     searchFieldData?: Array<SearchFieldDataDto>;
-    /**
-     * @type {string}
-     * @memberof SearchFieldDataByGroupDto
-     */
-    groupName?: string;
 }
