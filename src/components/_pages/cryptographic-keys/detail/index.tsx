@@ -14,8 +14,9 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { Col, Container, Label, Row } from "reactstrap";
-import { KeyCompromiseReason, KeyState, Resource } from "types/openapi";
+import { KeyCompromiseReason, KeyState, PlatformEnum, Resource } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import CryptographicKeyItem from "./CryptographicKeyItem";
@@ -45,6 +46,8 @@ export default function CryptographicKeyDetail() {
     const [confirmDestroy, setConfirmDestroy] = useState<boolean>(false);
 
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
+    const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
+    const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
 
     const isBusy = useMemo(
         () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
@@ -126,7 +129,7 @@ export default function CryptographicKeyDetail() {
         var options = [];
         for (const reason in KeyCompromiseReason) {
             const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: myReason });
+            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
         }
         return options;
     };
@@ -345,7 +348,7 @@ export default function CryptographicKeyDetail() {
             ? []
             : cryptographicKey?.items.map((item, index) => {
                   return {
-                      title: item.type,
+                      title: keyTypeEnum[item.type].label,
                       content: (
                           <Widget busy={isBusy || isFetchingHistory}>
                               <CryptographicKeyItem

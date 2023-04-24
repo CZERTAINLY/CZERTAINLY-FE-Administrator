@@ -17,6 +17,7 @@ import {
     CustomAttributesApi,
     DiscoveryManagementApi,
     EntityManagementApi,
+    EnumsApi,
     GlobalMetadataApi,
     LocationManagementApi,
     RAProfileManagementApi,
@@ -62,6 +63,7 @@ export interface ApiClients {
     customAttributes: CustomAttributesApi;
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
+    enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
     cryptographicKeys: CryptographicKeyControllerApi;
@@ -96,6 +98,7 @@ export const backendClient: ApiClients = {
     customAttributes: new CustomAttributesApi(configuration),
     globalMetadata: new GlobalMetadataApi(configuration),
     settings: new SettingsApi(configuration),
+    enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),
     cryptographicKeys: new CryptographicKeyControllerApi(configuration),

@@ -3,14 +3,15 @@ import TextField from "components/Input/TextField";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { actions, selectors } from "ducks/globalMetadata";
 import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from "types/globalMetadata";
-import { AttributeContentType } from "types/openapi";
+import { AttributeContentType, PlatformEnum } from "types/openapi";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 export default function GlobalMetadataForm() {
@@ -24,6 +25,8 @@ export default function GlobalMetadataForm() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
+
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isCreating, isFetchingDetail, isUpdating]);
 
@@ -94,7 +97,7 @@ export default function GlobalMetadataForm() {
                                     >
                                         {Object.values(AttributeContentType).map((contentType) => (
                                             <option key={contentType} value={contentType}>
-                                                {contentType}
+                                                {attributeContentTypeEnum[contentType].label}
                                             </option>
                                         ))}
                                     </Input>

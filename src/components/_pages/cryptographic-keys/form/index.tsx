@@ -23,9 +23,10 @@ import { TokenProfileResponseModel } from "types/token-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { KeyRequestType, Resource } from "../../../../types/openapi";
+import { KeyRequestType, PlatformEnum, Resource } from "../../../../types/openapi";
 
 interface FormValues {
     name: string;
@@ -47,6 +48,7 @@ export default function CryptographicKeyForm() {
     const keyDetail = useSelector(cryptographicKeysSelectors.cryptographicKey);
 
     const groups = useSelector(groupSelectors.certificateGroups);
+    const keyRequestTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyRequestType));
 
     const tokenProfiles = useSelector(tokenProfilesSelectors.tokenProfiles);
     const cryptographicKeyAttributeDescriptors = useSelector(cryptographicKeysSelectors.keyAttributeDescriptors);
@@ -189,7 +191,7 @@ export default function CryptographicKeyForm() {
     const optionsForType = () => {
         let options: { value: KeyRequestType; label: string }[] = [];
         for (let key in KeyRequestType) {
-            options.push({ value: KeyRequestType[key as keyof typeof KeyRequestType], label: key });
+            options.push({ value: KeyRequestType[key as keyof typeof KeyRequestType], label: keyRequestTypeEnum[key].label });
         }
         return options;
     };

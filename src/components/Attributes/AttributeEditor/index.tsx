@@ -494,6 +494,7 @@ export default function AttributeEditor({
                     // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
                     if (changedAttributes[attributeName]) {
                         let mappings = buildCallbackMappings(descriptor);
+                        console.log(mappings);
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;

@@ -4,6 +4,7 @@ import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
+import { selectors as enumSelectors } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
 import { ConnectorResponseModel, EndpointModel } from "types/connectors";
-import { AuthType, ConnectorStatus, Resource } from "types/openapi";
+import { AuthType, ConnectorStatus, PlatformEnum, Resource } from "types/openapi";
 
 import { attributeFieldNameTransform, collectFormAttributes } from "utils/attributes/attributes";
 
@@ -34,6 +35,7 @@ export default function ConnectorForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const authTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AuthType));
     const { id } = useParams();
 
     const editMode = useMemo(() => !!id, [id]);
@@ -41,15 +43,15 @@ export default function ConnectorForm() {
     const optionsForAuth: { label: string; value: AuthType }[] = useMemo(
         () => [
             {
-                label: "No Auth",
+                label: authTypeEnum[AuthType.None].label,
                 value: AuthType.None,
             },
             {
-                label: "Basic Auth",
+                label: authTypeEnum[AuthType.Basic].label,
                 value: AuthType.Basic,
             },
             {
-                label: "Client Cert",
+                label: authTypeEnum[AuthType.Certificate].label,
                 value: AuthType.Certificate,
             },
         ],

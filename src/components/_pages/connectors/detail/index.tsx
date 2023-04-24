@@ -6,6 +6,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/connectors";
+import { selectors as enumSelectors } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -17,7 +18,7 @@ import { FunctionGroupModel, HealthModel } from "types/connectors";
 
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
-import { ConnectorStatus, Resource } from "../../../../types/openapi";
+import { ConnectorStatus, PlatformEnum, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 import styles from "./connectorDetails.module.scss";
@@ -27,6 +28,8 @@ export default function ConnectorDetail() {
     const navigate = useNavigate();
 
     const { id } = useParams();
+
+    const authTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AuthType));
 
     const connector = useSelector(selectors.connector);
     const health = useSelector(selectors.connectorHealth);
@@ -213,7 +216,7 @@ export default function ConnectorDetail() {
             },
             {
                 id: "authType",
-                columns: ["Auth Type", connector.authType],
+                columns: ["Auth Type", authTypeEnum[connector.authType].label],
             },
         ];
     }, [connector]);

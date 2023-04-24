@@ -1,21 +1,25 @@
+import { selectors as enumSelectors } from "ducks/enums";
+import { useSelector } from "react-redux";
 import { Badge } from "reactstrap";
-import { ConnectorStatus } from "types/openapi";
+import { ConnectorStatus, PlatformEnum } from "types/openapi";
 
 interface Props {
     status: ConnectorStatus | undefined;
 }
 
 export default function InventoryStatusBadge({ status }: Props) {
+    const connectorStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConnectorStatus));
+    const statusText = status ? connectorStatusEnum[status].label : undefined;
     const getStatus = (status: ConnectorStatus) => {
         switch (status) {
             case ConnectorStatus.Connected:
-                return { color: "success", text: "Connected" };
+                return { color: "success", text: statusText };
             case ConnectorStatus.Failed:
-                return { color: "danger", text: "Failed" };
+                return { color: "danger", text: statusText };
             case ConnectorStatus.Offline:
-                return { color: "secondary", text: "Offline" };
+                return { color: "secondary", text: statusText };
             case ConnectorStatus.WaitingForApproval:
-                return { color: "info", text: "Waiting for approval" };
+                return { color: "info", text: statusText };
         }
     };
 

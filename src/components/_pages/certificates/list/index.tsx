@@ -10,12 +10,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
 import PagedList from "components/PagedList/PagedList";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
-import { CertificateType } from "../../../../types/openapi";
+import { CertificateType, PlatformEnum } from "../../../../types/openapi";
 import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
 import CertificateGroupDialog from "../CertificateGroupDialog";
 import CertificateOwnerDialog from "../CertificateOwnerDialog";
@@ -47,6 +48,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
     const isBulkUpdatingRaProfile = useSelector(selectors.isBulkUpdatingRaProfile);
     const isBulkUpdatingOwner = useSelector(selectors.isBulkUpdatingOwner);
     const isUploading = useSelector(selectors.isUploading);
+    const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
 
     const [upload, setUpload] = useState<boolean>(false);
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
@@ -294,7 +296,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
                         certificate.issuerCommonName || "",
                         certificate.certificateType ? (
                             <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>
-                                {certificate.certificateType}
+                                {certificateTypeEnum[certificate.certificateType].label}
                             </Badge>
                         ) : (
                             ""
@@ -302,7 +304,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
                     ],
                 };
             }),
-        [certificates, selectCertsOnly],
+        [certificates, selectCertsOnly, certificateTypeEnum],
     );
 
     return (

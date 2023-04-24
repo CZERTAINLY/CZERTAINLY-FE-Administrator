@@ -20,16 +20,17 @@ import { TokenProfileDetailResponseModel } from "types/token-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { KeyUsage, Resource } from "../../../../types/openapi";
+import { KeyUsage, PlatformEnum, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
     name: string;
     description: string;
     token: { value: any; label: string } | undefined;
-    usages: { value: KeyUsage; label: KeyUsage }[];
+    usages: { value: KeyUsage; label: string }[];
 }
 
 export default function TokenProfileForm() {
@@ -47,6 +48,7 @@ export default function TokenProfileForm() {
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
+    const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
     const isFetchingTokenProfileAttributes = useSelector(tokensSelectors.isFetchingTokenProfileAttributesDescriptors);
 
     const isFetchingDetail = useSelector(tokenProfilesSelectors.isFetchingDetail);
@@ -176,7 +178,10 @@ export default function TokenProfileForm() {
     const keyUsageOptions = () => {
         let options: { value: KeyUsage; label: string }[] = [];
         for (let key in KeyUsage) {
-            options.push({ value: KeyUsage[key as keyof typeof KeyUsage], label: key });
+            options.push({
+                value: KeyUsage[key as keyof typeof KeyUsage],
+                label: keyUsageEnum[KeyUsage[key as keyof typeof KeyUsage]].label,
+            });
         }
         return options;
     };
