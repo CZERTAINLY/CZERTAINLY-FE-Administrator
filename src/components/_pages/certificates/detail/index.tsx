@@ -385,7 +385,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "retweet",
-                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
                 tooltip: "Renew",
                 onClick: () => {
                     setRenew(true);
@@ -393,7 +393,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "rekey",
-                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
                 tooltip: "Rekey",
                 onClick: () => {
                     setRekey(true);
@@ -401,7 +401,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "minus-square",
-                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
                 tooltip: "Revoke",
                 onClick: () => {
                     setRevoke(true);
@@ -409,7 +409,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "gavel",
-                disabled: !certificate?.raProfile || certificate?.status === "revoked",
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
                 tooltip: "Check Compliance",
                 onClick: () => {
                     onComplianceCheck();

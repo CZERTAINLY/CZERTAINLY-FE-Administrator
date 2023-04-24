@@ -17,7 +17,7 @@ import { FunctionGroupModel, HealthModel } from "types/connectors";
 
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
-import { Resource } from "../../../../types/openapi";
+import { ConnectorStatus, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 import styles from "./connectorDetails.module.scss";
@@ -150,7 +150,7 @@ export default function ConnectorDetail() {
             },
             {
                 icon: "check",
-                disabled: connector ? connector.status === "connected" : false,
+                disabled: connector ? connector.status === ConnectorStatus.Connected : false,
                 tooltip: "Approve",
                 onClick: () => {
                     setConfirmAuthorize(true);

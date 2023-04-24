@@ -17,6 +17,7 @@ export * from "./CryptographicOperationsControllerApi";
 export * from "./CustomAttributesApi";
 export * from "./DiscoveryManagementApi";
 export * from "./EntityManagementApi";
+export * from "./EnumsApi";
 export * from "./GlobalMetadataApi";
 export * from "./LocalOperationsApi";
 export * from "./LocationManagementApi";

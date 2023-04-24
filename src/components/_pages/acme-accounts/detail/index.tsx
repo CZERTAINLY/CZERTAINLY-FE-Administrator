@@ -12,6 +12,7 @@ import StatusCircle from "components/StatusCircle";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
+import { AccountStatus } from "types/openapi";
 import { acmeAccountStatus } from "../acmeAccountStatus";
 
 export default function AcmeAccountDetail() {
@@ -55,7 +56,7 @@ export default function AcmeAccountDetail() {
         () => [
             {
                 icon: "cross-circle",
-                disabled: acmeAccount ? acmeAccount.status !== "valid" : true,
+                disabled: acmeAccount ? acmeAccount.status !== AccountStatus.Valid : true,
                 tooltip: "Revoke",
                 onClick: () => {
                     setConfirmRevoke(true);
@@ -63,7 +64,7 @@ export default function AcmeAccountDetail() {
             },
             {
                 icon: "check",
-                disabled: acmeAccount ? acmeAccount.enabled || acmeAccount.status !== "valid" : true,
+                disabled: acmeAccount ? acmeAccount.enabled || acmeAccount.status !== AccountStatus.Valid : true,
                 tooltip: "Enable",
                 onClick: () => {
                     onEnableClick();

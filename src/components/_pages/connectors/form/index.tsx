@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Select from "react-select";
-import { Badge, Button, ButtonGroup, Container, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
+import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
 import { ConnectorResponseModel, EndpointModel } from "types/connectors";
 import { AuthType, ConnectorStatus, Resource } from "types/openapi";
 
@@ -255,7 +255,7 @@ export default function ConnectorForm() {
                                     )}
                                 </Field>
 
-                                {values.authenticationType.value === "basic" ? (
+                                {values.authenticationType.value === AuthType.Basic ? (
                                     <div>
                                         <Field name="username">
                                             {({ input, meta }) => (
@@ -296,7 +296,7 @@ export default function ConnectorForm() {
                                     </div>
                                 ) : null}
 
-                                {values.authenticationType.value === "certificate" ? (
+                                {values.authenticationType.value === AuthType.Certificate ? (
                                     <Field name="clientCert">
                                         {({ input, meta }) => (
                                             <FormGroup>

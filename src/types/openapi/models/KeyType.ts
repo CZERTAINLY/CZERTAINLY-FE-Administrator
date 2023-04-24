@@ -17,8 +17,8 @@
  * @enum {string}
  */
 export enum KeyType {
-    SecretKey = "Secret key",
-    PublicKey = "Public key",
-    PrivateKey = "Private key",
-    SplitKey = "Split key",
+    Secret = "secret",
+    Public = "public",
+    Private = "private",
+    Split = "split",
 }

@@ -3,7 +3,7 @@ import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } 
 import { useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ButtonGroup, Form as BootstrapForm } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup } from "reactstrap";
 import { CertificateDetailResponseModel } from "types/certificate";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificate";

@@ -18,6 +18,7 @@ apis/CryptographicOperationsControllerApi.ts
 apis/CustomAttributesApi.ts
 apis/DiscoveryManagementApi.ts
 apis/EntityManagementApi.ts
+apis/EnumsApi.ts
 apis/GlobalMetadataApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
@@ -160,6 +161,7 @@ models/EntityInstanceDto.ts
 models/EntityInstanceRequestDto.ts
 models/EntityInstanceResponseDto.ts
 models/EntityInstanceUpdateRequestDto.ts
+models/EnumItemDto.ts
 models/ErrorMessageDto.ts
 models/FileAttributeContent.ts
 models/FileAttributeContentData.ts
@@ -203,6 +205,7 @@ models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
 models/Pageable.ts
+models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
 models/ProgrammingLanguageEnum.ts
 models/PushToLocationRequestDto.ts
@@ -236,9 +239,9 @@ models/SearchCondition.ts
 models/SearchFieldDataByGroupDto.ts
 models/SearchFieldDataDto.ts
 models/SearchFilterRequestDto.ts
+models/SearchGroup.ts
 models/SearchRequestDto.ts
 models/SearchableFieldType.ts
-models/SearchableFields.ts
 models/SecretAttributeContent.ts
 models/SecretAttributeContentData.ts
 models/SignDataRequestDto.ts

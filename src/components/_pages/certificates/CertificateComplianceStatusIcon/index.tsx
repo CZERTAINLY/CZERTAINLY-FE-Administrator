@@ -1,5 +1,7 @@
+import { ComplianceStatus } from "types/openapi";
+
 interface Props {
-    status: "ok" | "nok" | "na" | undefined;
+    status: ComplianceStatus | undefined;
     id: string;
 }
 
@@ -12,15 +14,15 @@ interface CertificateComplianceIcon {
 
 //TODO replace with CertificateStatus?
 const certificateIcon: CertificateComplianceIcon = {
-    ok: {
+    [ComplianceStatus.Ok]: {
         color: "green",
         message: "Compliant",
     },
-    nok: {
+    [ComplianceStatus.Nok]: {
         color: "red",
         message: "Non Compliant",
     },
-    na: {
+    [ComplianceStatus.Na]: {
         color: "grey",
         message: "Not Applicable",
     },

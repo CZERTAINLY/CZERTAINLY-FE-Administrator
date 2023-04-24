@@ -14,7 +14,7 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 
 import Select, { SingleValue } from "react-select";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { CertificateDetailResponseModel } from "types/certificate";
 import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
@@ -127,15 +127,15 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
             if (!event) return;
             if (!event.value.tokenProfileUuid) return;
             if (!event.value.tokenInstanceUuid) return;
-            if (event.value.items.filter((e) => e.type === KeyType.PrivateKey).length === 0) return;
+            if (event.value.items.filter((e) => e.type === KeyType.Private).length === 0) return;
             dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors());
             dispatch(
                 cryptographyOperationActions.listSignatureAttributeDescriptors({
                     uuid: event.value.uuid,
                     tokenProfileUuid: event.value.tokenProfileUuid,
                     tokenInstanceUuid: event.value.tokenInstanceUuid,
-                    keyItemUuid: event.value.items.filter((e) => e.type === KeyType.PrivateKey)[0].uuid,
-                    algorithm: event.value.items.filter((e) => e.type === KeyType.PrivateKey)[0].cryptographicAlgorithm,
+                    keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
+                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].cryptographicAlgorithm,
                 }),
             );
         },

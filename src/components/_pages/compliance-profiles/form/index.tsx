@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Button, ButtonGroup, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";

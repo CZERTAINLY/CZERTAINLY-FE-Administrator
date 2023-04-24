@@ -189,7 +189,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "sign",
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.PublicKey,
+                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.Public,
                 tooltip: "Sign",
                 onClick: () => {
                     setSignData(true);
@@ -197,7 +197,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "verify",
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.PrivateKey,
+                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.Private,
                 tooltip: "Verify",
                 onClick: () => {
                     setVerifyData(true);
