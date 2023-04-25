@@ -1,6 +1,8 @@
+import { selectors as enumSelectors } from "ducks/enums";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, FormGroup, Input, Label } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
 import { actions, selectors } from "../../../../ducks/globalMetadata";
 import CustomTable, { TableDataRow, TableHeader } from "../../../CustomTable";
 import Dialog from "../../../Dialog";
@@ -18,6 +20,7 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
     const isFetchingConnectorMetadata = useSelector(selectors.isFetchingConnectorMetadata);
 
     const [connectorUuid, setConnectorUuid] = useState<string | undefined>(undefined);
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     useEffect(() => {
         if (show) {
@@ -69,7 +72,7 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                 id: metadata.uuid,
                 columns: [
                     metadata.name,
-                    metadata.contentType,
+                    attributeContentTypeEnum[metadata.contentType].label,
                     <Button
                         key={metadata.uuid}
                         color={"primary"}
@@ -83,7 +86,7 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
         } else {
             return [];
         }
-    }, [connectorMetadata, dispatch, connectorUuid]);
+    }, [connectorMetadata, dispatch, connectorUuid, attributeContentTypeEnum]);
 
     return (
         <Dialog

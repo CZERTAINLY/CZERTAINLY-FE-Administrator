@@ -62,7 +62,7 @@ export default function CustomAttributeForm() {
                       resources: customAttributeDetail.resources?.map((r) => ({ label: resourceEnum[r].label, value: r })),
                   }
                 : defaultValuesCreate,
-        [customAttributeDetail, defaultValuesCreate],
+        [customAttributeDetail, defaultValuesCreate, resourceEnum],
     );
 
     const onSubmitCreate = useCallback(

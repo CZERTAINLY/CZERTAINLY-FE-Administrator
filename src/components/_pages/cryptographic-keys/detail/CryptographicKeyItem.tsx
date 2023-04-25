@@ -56,6 +56,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
     const [displayKeyData, setDisplayKeyData] = useState<boolean>(false);
     const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
+    const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
     const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
 
     useEffect(() => {
@@ -239,14 +240,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                       },
                       {
                           id: "Type",
-                          columns: ["Type", keyItem.type],
+                          columns: ["Type", keyTypeEnum[keyItem.type].label],
                       },
                       {
                           id: "cryptographicAlgorithm",
                           columns: ["Cryptographic Algorithm", keyItem.cryptographicAlgorithm],
                       },
                   ],
-        [keyItem],
+        [keyItem, keyTypeEnum],
     );
 
     const detailDataSlice2: TableDataRow[] = useMemo(

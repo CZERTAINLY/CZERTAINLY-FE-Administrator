@@ -219,7 +219,7 @@ export default function ConnectorDetail() {
                 columns: ["Auth Type", authTypeEnum[connector.authType].label],
             },
         ];
-    }, [connector]);
+    }, [connector, authTypeEnum]);
 
     const functionalityHeaders: TableHeader[] = useMemo(
         () => [

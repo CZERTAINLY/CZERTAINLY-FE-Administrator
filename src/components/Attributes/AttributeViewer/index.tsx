@@ -105,7 +105,7 @@ export default function AttributeViewer({
                 getContent(attribute.contentType, attribute.content),
             ],
         }),
-        [getContent],
+        [getContent, contentTypeEnum],
     );
 
     const getDescriptorsTableData = useCallback(
@@ -124,7 +124,7 @@ export default function AttributeViewer({
                 ],
             };
         },
-        [getContent, attributes],
+        [getContent, attributes, contentTypeEnum],
     );
 
     const getMetadataTableData = useCallback(
@@ -213,7 +213,7 @@ export default function AttributeViewer({
                     };
                 });
         },
-        [getContent, getButtons, editingAttributesNames, onSubmit],
+        [getContent, getButtons, editingAttributesNames, onSubmit, contentTypeEnum],
     );
 
     const tableData: TableDataRow[] = useMemo(() => {

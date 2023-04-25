@@ -31,6 +31,7 @@ function CryptographicKeyList() {
     const isBulkDestroying = useSelector(selectors.isBulkDestroying);
 
     const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
+    const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
     const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
     const isBusy = isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkUpdatingKeyUsage || isBulkCompromising || isBulkDestroying;
 
@@ -245,7 +246,7 @@ function CryptographicKeyList() {
                             {cryptographicKeys[key].name}
                         </Link>
                     </span>,
-                    <Badge color="secondary">{cryptographicKeys[key].type}</Badge>,
+                    <Badge color="secondary">{keyTypeEnum[cryptographicKeys[key].type].label}</Badge>,
                     cryptographicKeys[key].cryptographicAlgorithm,
                     cryptographicKeys[key].length?.toString() || "unknown",
                     cryptographicKeys[key].format || "unknown",

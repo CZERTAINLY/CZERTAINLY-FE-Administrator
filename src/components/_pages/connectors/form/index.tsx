@@ -55,7 +55,7 @@ export default function ConnectorForm() {
                 value: AuthType.Certificate,
             },
         ],
-        [],
+        [authTypeEnum],
     );
 
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);

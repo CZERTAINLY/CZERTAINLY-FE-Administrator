@@ -26,6 +26,7 @@ export default function CustomAttributeDetail() {
     const isEnabling = useSelector(selectors.isEnabling);
     const isDisabling = useSelector(selectors.isDisabling);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -138,7 +139,7 @@ export default function CustomAttributeDetail() {
                       },
                       {
                           id: "contentType",
-                          columns: ["Content Type", customAttribute.contentType],
+                          columns: ["Content Type", attributeContentTypeEnum[customAttribute.contentType].label],
                       },
                       {
                           id: "content",
@@ -181,7 +182,7 @@ export default function CustomAttributeDetail() {
                           ],
                       },
                   ],
-        [customAttribute],
+        [customAttribute, attributeContentTypeEnum],
     );
 
     return (

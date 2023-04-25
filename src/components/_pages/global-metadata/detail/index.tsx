@@ -9,7 +9,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -19,6 +21,7 @@ export default function GlobalMetadataDetail() {
 
     const globalMetadata = useSelector(selectors.globalMetadata);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -112,7 +115,7 @@ export default function GlobalMetadataDetail() {
                       },
                       {
                           id: "contentType",
-                          columns: ["Content Type", globalMetadata.contentType],
+                          columns: ["Content Type", attributeContentTypeEnum[globalMetadata.contentType].label],
                       },
                       {
                           id: "group",
@@ -126,7 +129,7 @@ export default function GlobalMetadataDetail() {
                           ],
                       },
                   ],
-        [globalMetadata],
+        [globalMetadata, attributeContentTypeEnum],
     );
 
     return (
