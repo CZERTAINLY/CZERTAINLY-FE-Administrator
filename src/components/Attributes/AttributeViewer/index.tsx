@@ -1,6 +1,8 @@
 import CustomTable, { TableDataRow } from "components/CustomTable";
+import { selectors as enumSelectors } from "ducks/enums";
 import { useCallback, useMemo, useState } from "react";
 import { Form } from "react-final-form";
+import { useSelector } from "react-redux";
 import { Form as BootstrapForm } from "reactstrap";
 import {
     AttributeDescriptorModel,
@@ -11,6 +13,7 @@ import {
     isDataAttributeModel,
 } from "types/attributes";
 import { MetadataItemModel, MetadataModel } from "types/locations";
+import { PlatformEnum } from "types/openapi";
 import { getAttributeContent } from "utils/attributes/attributes";
 import ContentValueField from "../../Input/DynamicContent/ContentValueField";
 import WidgetButtons, { IconName } from "../../WidgetButtons";
@@ -44,6 +47,7 @@ export default function AttributeViewer({
 }: Props) {
     const getContent = useCallback(getAttributeContent, []);
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
+    const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const tableHeaders = (viewerType: ATTRIBUTE_VIEWER_TYPE) => {
         const result = [];
@@ -95,7 +99,11 @@ export default function AttributeViewer({
     const getAttributesTableData = useCallback(
         (attribute: AttributeResponseModel | MetadataItemModel) => ({
             id: attribute.uuid || "",
-            columns: [attribute.label || "", attribute.contentType || "", getContent(attribute.contentType, attribute.content)],
+            columns: [
+                attribute.label || "",
+                contentTypeEnum[attribute.contentType].label || "",
+                getContent(attribute.contentType, attribute.content),
+            ],
         }),
         [getContent],
     );
@@ -107,7 +115,7 @@ export default function AttributeViewer({
                 id: descriptor.uuid || "",
                 columns: [
                     isDataAttributeModel(descriptor) ? descriptor.properties.label : descriptor.name,
-                    isDataAttributeModel(descriptor) ? descriptor.contentType : "n/a",
+                    isDataAttributeModel(descriptor) ? contentTypeEnum[descriptor.contentType].label : "n/a",
                     isDataAttributeModel(descriptor)
                         ? attribute
                             ? getContent(attribute.contentType, attribute.content)
@@ -181,7 +189,7 @@ export default function AttributeViewer({
                         id: a.uuid || "",
                         columns: [
                             a.label || "",
-                            a.contentType || "",
+                            contentTypeEnum[a.contentType].label || "",
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
                                 <Form onSubmit={() => {}}>
                                     {({ values }) => (
