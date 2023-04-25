@@ -5,14 +5,15 @@ import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
 import { actions, selectors } from "ducks/customAttributes";
+import { selectors as enumSelectors } from "ducks/enums";
 import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from "types/customAttributes";
-import { AttributeContentType } from "types/openapi";
+import { AttributeContentType, PlatformEnum } from "types/openapi";
 import { validateAlphaNumeric, validateRequired } from "utils/validators";
 
 export default function CustomAttributeForm() {
@@ -28,6 +29,7 @@ export default function CustomAttributeForm() {
     const isFetchingResources = useSelector(selectors.isFetchingResources);
     const isCreating = useSelector(selectors.isCreating);
     const isUpdating = useSelector(selectors.isUpdating);
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const isBusy = useMemo(
         () => isFetchingDetail || isCreating || isUpdating || isFetchingResources,
@@ -55,9 +57,12 @@ export default function CustomAttributeForm() {
     const defaultValuesUpdate: FormValues = useMemo(
         () =>
             customAttributeDetail
-                ? { ...customAttributeDetail, resources: customAttributeDetail.resources?.map((r) => ({ label: r, value: r })) }
+                ? {
+                      ...customAttributeDetail,
+                      resources: customAttributeDetail.resources?.map((r) => ({ label: resourceEnum[r].label, value: r })),
+                  }
                 : defaultValuesCreate,
-        [customAttributeDetail, defaultValuesCreate],
+        [customAttributeDetail, defaultValuesCreate, resourceEnum],
     );
 
     const onSubmitCreate = useCallback(
@@ -115,7 +120,7 @@ export default function CustomAttributeForm() {
                                         {...input}
                                         id="resources"
                                         placeholder="Resources"
-                                        options={resources.map((r) => ({ label: r, value: r }))}
+                                        options={resources.map((r) => ({ label: resourceEnum[r]?.label ?? "", value: r }))}
                                         isMulti={true}
                                         isClearable={true}
                                     />

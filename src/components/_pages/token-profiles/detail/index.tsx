@@ -14,8 +14,9 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { Badge, Col, Container, Label, Row } from "reactstrap";
-import { KeyUsage, Resource } from "types/openapi";
+import { KeyUsage, PlatformEnum, Resource } from "types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function TokenProfileDetail() {
@@ -37,6 +38,7 @@ export default function TokenProfileDetail() {
 
     const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
 
+    const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
     const isBusy = useMemo(
@@ -80,7 +82,10 @@ export default function TokenProfileDetail() {
     const keyUsageOptions = () => {
         let options: { value: KeyUsage; label: string }[] = [];
         for (let key in KeyUsage) {
-            options.push({ value: KeyUsage[key as keyof typeof KeyUsage], label: key });
+            options.push({
+                value: KeyUsage[key as keyof typeof KeyUsage],
+                label: keyUsageEnum[KeyUsage[key as keyof typeof KeyUsage]].label,
+            });
         }
         return options;
     };

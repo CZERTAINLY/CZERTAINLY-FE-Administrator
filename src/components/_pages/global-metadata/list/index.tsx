@@ -3,11 +3,13 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { actions, selectors } from "ducks/globalMetadata";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
 import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
 
 export default function GlobalMetadataList() {
@@ -24,6 +26,7 @@ export default function GlobalMetadataList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [showPromote, setShowPromote] = useState<boolean>(false);
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     useEffect(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -95,9 +98,13 @@ export default function GlobalMetadataList() {
         () =>
             globalMetadata.map((metadata) => ({
                 id: metadata.uuid,
-                columns: [<Link to={`./detail/${metadata.uuid}`}>{metadata.name}</Link>, metadata.contentType, metadata.description],
+                columns: [
+                    <Link to={`./detail/${metadata.uuid}`}>{metadata.name}</Link>,
+                    attributeContentTypeEnum[metadata.contentType].label,
+                    metadata.description,
+                ],
             })),
-        [globalMetadata],
+        [globalMetadata, attributeContentTypeEnum],
     );
 
     return (

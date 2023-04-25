@@ -12,9 +12,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { Badge, Button, Col, Row } from "reactstrap";
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
-import { KeyCompromiseReason, KeyState, KeyType, KeyUsage } from "types/openapi";
+import { KeyCompromiseReason, KeyState, KeyType, KeyUsage, PlatformEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateBadge from "../KeyStateBadge";
 import KeyStatus from "../KeyStatus";
@@ -54,6 +55,9 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
     const [displayKeyData, setDisplayKeyData] = useState<boolean>(false);
+    const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
+    const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
+    const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
 
     useEffect(() => {
         if (!keyItem) return;
@@ -236,14 +240,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                       },
                       {
                           id: "Type",
-                          columns: ["Type", keyItem.type],
+                          columns: ["Type", keyTypeEnum[keyItem.type].label],
                       },
                       {
                           id: "cryptographicAlgorithm",
                           columns: ["Cryptographic Algorithm", keyItem.cryptographicAlgorithm],
                       },
                   ],
-        [keyItem],
+        [keyItem, keyTypeEnum],
     );
 
     const detailDataSlice2: TableDataRow[] = useMemo(
@@ -335,7 +339,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         var options = [];
         for (const reason in KeyCompromiseReason) {
             const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: myReason });
+            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
         }
         return options;
     };
@@ -374,7 +378,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const keyUsageOptions = () => {
         let options = [];
         for (const suit in KeyUsage) {
-            options.push({ label: suit, value: KeyUsage[suit as keyof typeof KeyUsage] });
+            options.push({
+                label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                value: KeyUsage[suit as keyof typeof KeyUsage],
+            });
         }
         return options;
     };

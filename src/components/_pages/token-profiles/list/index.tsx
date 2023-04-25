@@ -11,8 +11,9 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
+import { selectors as enumSelectors } from "ducks/enums";
 import Select from "react-select";
-import { KeyUsage } from "types/openapi";
+import { KeyUsage, PlatformEnum } from "types/openapi";
 import { TokenProfileResponseModel } from "types/token-profiles";
 
 function TokenProfileList() {
@@ -30,6 +31,7 @@ function TokenProfileList() {
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkUpdatingKeyUsage = useSelector(selectors.isBulkUpdatingKeyUsage);
+    const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
 
     const isBusy =
         isFetching ||
@@ -130,7 +132,10 @@ function TokenProfileList() {
     const keyUsageOptions = () => {
         let options = [];
         for (const suit in KeyUsage) {
-            options.push({ label: suit, value: KeyUsage[suit as keyof typeof KeyUsage] });
+            options.push({
+                label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                value: KeyUsage[suit as keyof typeof KeyUsage],
+            });
         }
         return options;
     };

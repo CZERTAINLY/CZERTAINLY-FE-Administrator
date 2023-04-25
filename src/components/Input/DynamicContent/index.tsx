@@ -1,7 +1,9 @@
+import { selectors as enumSelectors } from "ducks/enums";
 import { Field, useForm, useFormState } from "react-final-form";
+import { useSelector } from "react-redux";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
-import { AttributeContentType } from "types/openapi";
+import { AttributeContentType, PlatformEnum } from "types/openapi";
 import { composeValidators, validateAlphaNumeric, validateFloat, validateInteger, validateRequired } from "utils/validators";
 import ContentDescriptorField from "./ContentDescriptorField";
 
@@ -66,6 +68,7 @@ export default function DynamicContent({ editable, isList }: Props) {
     const form = useForm();
     const formState = useFormState();
     const contentTypeValue = formState.values["contentType"];
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     return (
         <>
@@ -88,7 +91,7 @@ export default function DynamicContent({ editable, isList }: Props) {
                         >
                             {AllowedAttributeContentType.map((contentType) => (
                                 <option key={contentType} value={contentType}>
-                                    {contentType}
+                                    {attributeContentTypeEnum[contentType].label}
                                 </option>
                             ))}
                         </Input>

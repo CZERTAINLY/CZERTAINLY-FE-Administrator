@@ -6,11 +6,13 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/customAttributes";
+import { selectors as enumSelectors } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Badge, Container } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
 import { getAttributeContent } from "utils/attributes/attributes";
 
 export default function CustomAttributeDetail() {
@@ -23,6 +25,8 @@ export default function CustomAttributeDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isEnabling = useSelector(selectors.isEnabling);
     const isDisabling = useSelector(selectors.isDisabling);
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -131,11 +135,11 @@ export default function CustomAttributeDetail() {
                       },
                       {
                           id: "resources",
-                          columns: ["Resources", customAttribute.resources?.join(", ") ?? ""],
+                          columns: ["Resources", customAttribute.resources?.map((r) => resourceEnum[r].label).join(", ") ?? ""],
                       },
                       {
                           id: "contentType",
-                          columns: ["Content Type", customAttribute.contentType],
+                          columns: ["Content Type", attributeContentTypeEnum[customAttribute.contentType].label],
                       },
                       {
                           id: "content",
@@ -178,7 +182,7 @@ export default function CustomAttributeDetail() {
                           ],
                       },
                   ],
-        [customAttribute],
+        [customAttribute, attributeContentTypeEnum],
     );
 
     return (

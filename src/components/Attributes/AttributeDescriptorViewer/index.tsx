@@ -2,14 +2,18 @@ import { useMemo } from "react";
 import { attributeFieldNameTransform, getAttributeContent } from "utils/attributes/attributes";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import { selectors as enumSelectors } from "ducks/enums";
+import { useSelector } from "react-redux";
 import { AttributeDescriptorModel, isDataAttributeModel, isInfoAttributeModel } from "types/attributes";
-import { AttributeConstraintType } from "types/openapi";
+import { AttributeConstraintType, PlatformEnum } from "types/openapi";
 
 interface Props {
     attributeDescriptors: AttributeDescriptorModel[];
 }
 
 export default function AttributeDescriptorViewer({ attributeDescriptors }: Props) {
+    const attributeTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeType));
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const headers: TableHeader[] = useMemo(
         () => [
             {
@@ -45,7 +49,7 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
         if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
             return [
                 attr.properties.label || attributeFieldNameTransform[attr.name] || attr.name,
-                attr.type,
+                attributeTypeEnum[attr.type].label,
                 isDataAttributeModel(attr) ? (attr.properties.required ? "Yes" : "No") : "n/a",
                 attr.description ?? "Not set",
                 getAttributeContent(attr.contentType, attr.content),
@@ -73,7 +77,7 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
             columns = [
                 { id: "label", columns: [<b>Label</b>, attr.properties.label] },
                 { id: "group", columns: [<b>Group</b>, attr.properties.group || "Not set"] },
-                { id: "contentType", columns: [<b>Content Type</b>, attr.contentType] },
+                { id: "contentType", columns: [<b>Content Type</b>, attributeContentTypeEnum[attr.contentType].label] },
                 ...columns,
                 { id: "defaults", columns: [<b>Defaults</b>, getAttributeContent(attr.contentType, attr.content)] },
             ];
@@ -109,7 +113,7 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
                     detailColumns: getDetailColumns(attributeDescriptor),
                 };
             }),
-        [attributeDescriptors],
+        [attributeDescriptors, getColumns, getDetailColumns],
     );
 
     return <CustomTable headers={headers} data={data} hasDetails={true} />;

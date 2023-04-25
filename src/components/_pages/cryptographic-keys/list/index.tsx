@@ -5,6 +5,7 @@ import { WidgetButtonProps } from "components/WidgetButtons";
 
 import PagedList from "components/PagedList/PagedList";
 import { actions, selectors } from "ducks/cryptographic-keys";
+import { selectors as enumSelectors } from "ducks/enums";
 import { EntityType } from "ducks/filters";
 import { selectors as pagingSelectors } from "ducks/paging";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -12,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Container } from "reactstrap";
-import { KeyCompromiseReason, KeyUsage } from "types/openapi";
+import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
@@ -29,6 +30,9 @@ function CryptographicKeyList() {
     const isBulkCompromising = useSelector(selectors.isBulkCompromising);
     const isBulkDestroying = useSelector(selectors.isBulkDestroying);
 
+    const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
+    const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
+    const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
     const isBusy = isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkUpdatingKeyUsage || isBulkCompromising || isBulkDestroying;
 
     const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
@@ -118,7 +122,10 @@ function CryptographicKeyList() {
     const keyUsageOptions = () => {
         let options = [];
         for (const suit in KeyUsage) {
-            options.push({ label: suit, value: KeyUsage[suit as keyof typeof KeyUsage] });
+            options.push({
+                label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                value: KeyUsage[suit as keyof typeof KeyUsage],
+            });
         }
         return options;
     };
@@ -239,7 +246,7 @@ function CryptographicKeyList() {
                             {cryptographicKeys[key].name}
                         </Link>
                     </span>,
-                    <Badge color="secondary">{cryptographicKeys[key].type}</Badge>,
+                    <Badge color="secondary">{keyTypeEnum[cryptographicKeys[key].type].label}</Badge>,
                     cryptographicKeys[key].cryptographicAlgorithm,
                     cryptographicKeys[key].length?.toString() || "unknown",
                     cryptographicKeys[key].format || "unknown",
@@ -259,7 +266,7 @@ function CryptographicKeyList() {
         var options = [];
         for (const reason in KeyCompromiseReason) {
             const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: myReason });
+            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
         }
         return options;
     };

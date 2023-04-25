@@ -9,7 +9,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
+import { selectors as enumSelectors } from "ducks/enums";
 import { Container } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
 
 export default function CustomAttributesList() {
     const dispatch = useDispatch();
@@ -25,6 +27,7 @@ export default function CustomAttributesList() {
     const isUpdating = useSelector(selectors.isUpdating);
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     useEffect(() => {
@@ -121,11 +124,11 @@ export default function CustomAttributesList() {
                 columns: [
                     <Link to={`./detail/${customAttribute.uuid}`}>{customAttribute.name}</Link>,
                     <StatusBadge enabled={customAttribute.enabled} />,
-                    customAttribute.contentType,
+                    attributeContentTypeEnum[customAttribute.contentType].label,
                     customAttribute.description,
                 ],
             })),
-        [customAttributes],
+        [customAttributes, attributeContentTypeEnum],
     );
 
     return (

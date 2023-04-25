@@ -3,13 +3,14 @@ import Widget from "components/Widget";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ApiClients } from "api";
+import { selectors as enumSelectors } from "ducks/enums";
 import { EntityType, actions, selectors } from "ducks/filters";
 import { useDispatch, useSelector } from "react-redux";
 import Select, { MultiValue, SingleValue } from "react-select";
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
-import { SearchCondition, SearchGroup, SearchableFieldType } from "types/openapi";
+import { PlatformEnum, SearchCondition, SearchGroup, SearchableFieldType } from "types/openapi";
 import styles from "./FilterWidget.module.scss";
 
 const noValue: { [condition in SearchCondition]: boolean } = {
@@ -39,6 +40,10 @@ interface Props {
 
 export default function FilterWidget({ title, entity, getAvailableFiltersApi }: Props) {
     const dispatch = useDispatch();
+
+    const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SearchGroup));
+    const searchConditionEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SearchCondition));
+    const platformEnums = useSelector(enumSelectors.platformEnums);
 
     const availableFilters = useSelector(selectors.availableFilters(entity));
     const currentFilters = useSelector(selectors.currentFilters(entity));
@@ -87,9 +92,15 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
             ?.searchFieldData?.find((f) => f.fieldIdentifier === currentFilters[selectedFilter].fieldIdentifier);
         if (!field) return;
 
-        setFilterGroup({ label: currentFilters[selectedFilter].searchGroup, value: currentFilters[selectedFilter].searchGroup });
+        setFilterGroup({
+            label: searchGroupEnum[currentFilters[selectedFilter].searchGroup].label,
+            value: currentFilters[selectedFilter].searchGroup,
+        });
         setFilterField({ label: field.fieldLabel, value: field.fieldIdentifier });
-        setFilterCondition({ label: currentFilters[selectedFilter].condition, value: currentFilters[selectedFilter].condition });
+        setFilterCondition({
+            label: searchConditionEnum[currentFilters[selectedFilter].condition].label,
+            value: currentFilters[selectedFilter].condition,
+        });
 
         if (
             field.type === SearchableFieldType.String ||
@@ -106,14 +117,21 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         }
 
         if (!field.multiValue) {
-            setFilterValue({ label: currentFilters[selectedFilter].value, value: currentFilters[selectedFilter].value });
+            const value = currentFilters[selectedFilter].value;
+            const label = field.platformEnum ? platformEnums[field.platformEnum][(value ?? "") as string].label : value;
+            setFilterValue({ label, value });
             return;
         }
 
         if (Array.isArray(currentFilters[selectedFilter].value)) {
-            setFilterValue((currentFilters[selectedFilter].value as Array<object>).map((v: object) => ({ label: v, value: v })));
+            setFilterValue(
+                (currentFilters[selectedFilter].value as Array<object>).map((v: object) => {
+                    const label = field.platformEnum ? platformEnums[field.platformEnum][v as unknown as string].label : v;
+                    return { label, value: v };
+                }),
+            );
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions]);
+    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, searchConditionEnum, searchGroupEnum]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -188,7 +206,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                     <Select
                                         id="group"
                                         options={availableFilters.map((f) => ({
-                                            label: f.searchGroup,
+                                            label: searchGroupEnum[f.searchGroup].label,
                                             value: f.searchGroup,
                                         }))}
                                         onChange={(e) => {
@@ -226,7 +244,11 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                     <Label for="conditions">Filter Condition</Label>
                                     <Select
                                         id="conditions"
-                                        options={filterField ? currentField?.conditions.map((c) => ({ label: c, value: c })) : undefined}
+                                        options={
+                                            filterField
+                                                ? currentField?.conditions.map((c) => ({ label: searchConditionEnum[c].label, value: c }))
+                                                : undefined
+                                        }
                                         onChange={(e) => {
                                             setFilterCondition(e);
                                             setFilterValue(undefined);
@@ -269,7 +291,12 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                             id="value"
                                             options={
                                                 filterField
-                                                    ? (currentField?.value as string[])?.map((v) => ({ label: v, value: v }))
+                                                    ? (currentField?.value as string[])?.map((v) => {
+                                                          const label = currentField.platformEnum
+                                                              ? platformEnums[currentField.platformEnum][(v ?? "") as string].label
+                                                              : v;
+                                                          return { label, value: v };
+                                                      })
                                                     : undefined
                                             }
                                             value={filterValue || null}
@@ -305,9 +332,13 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                             field && field.type === SearchableFieldType.Boolean
                                 ? `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`
                                 : Array.isArray(f.value) && f.value.length > 1
-                                ? `(${f.value.map((v) => `'${v}'`).join(" OR ")})`
+                                ? `(${f.value
+                                      .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v].label : v}'`)
+                                      .join(" OR ")})`
                                 : f.value
-                                ? `'${f.value}'`
+                                ? `'${
+                                      field?.platformEnum ? platformEnums[field.platformEnum][f.value as unknown as string].label : f.value
+                                  }'`
                                 : "";
                         return (
                             <Badge
@@ -316,8 +347,8 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? "primary" : "secondary"}
                             >
-                                <b>{f.searchGroup}&nbsp;</b>'{label}'&nbsp;
-                                {f.condition}&nbsp;
+                                <b>{searchGroupEnum[f.searchGroup].label}&nbsp;</b>'{label}'&nbsp;
+                                {searchConditionEnum[f.condition].label}&nbsp;
                                 {value}
                                 <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>
                                     &times;
