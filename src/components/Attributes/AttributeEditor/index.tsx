@@ -2,7 +2,7 @@ import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
 import debounce from "lodash.debounce";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useFormState } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -256,15 +256,6 @@ export default function AttributeEditor({
         [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind],
     );
 
-    const callCallback = useMemo(
-        () =>
-            debounce((mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
-                form.mutators.setAttribute(formAttributeName, undefined);
-                executeCallback(mappings, descriptor, formAttributeName);
-            }, 600),
-        [executeCallback, form.mutators],
-    );
-
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
      */
@@ -445,7 +436,7 @@ export default function AttributeEditor({
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
      */
-    useEffect(() => {
+    const doCallbacks = useCallback(() => {
         if (previousFormValues === formState.values) return;
 
         setPreviousFormValues(formState.values);
@@ -482,9 +473,10 @@ export default function AttributeEditor({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
                 // list all 'from' mappings (get attribute names from the descriptor)
                 const fromNames: string[] = [];
-
                 descriptor.attributeCallback?.mappings?.forEach((mapping) => {
-                    if (mapping.from) fromNames.push(mapping.from);
+                    if (mapping.from) {
+                        fromNames.push(mapping.from);
+                    }
                 });
 
                 // check if any of the changed attributes is in the 'from' list
@@ -498,7 +490,8 @@ export default function AttributeEditor({
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                            callCallback(mappings, descriptor, formAttributeName);
+                            form.mutators.setAttribute(formAttributeName, undefined);
+                            executeCallback(mappings, descriptor, formAttributeName);
                         }
                     }
                 }
@@ -508,14 +501,19 @@ export default function AttributeEditor({
         attributeDescriptors,
         groupAttributesCallbackAttributes,
         buildCallbackMappings,
-        dispatch,
         form.mutators,
         formState.values,
         id,
         isRunningCb,
         previousFormValues,
-        callCallback,
+        executeCallback,
     ]);
+
+    const ref = useRef(debounce((doCallbacksParam) => doCallbacksParam(), 600));
+
+    useEffect(() => {
+        ref.current(doCallbacks);
+    }, [doCallbacks]);
 
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly
