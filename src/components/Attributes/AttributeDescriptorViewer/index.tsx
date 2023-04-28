@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { attributeFieldNameTransform, getAttributeContent } from "utils/attributes/attributes";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
@@ -45,64 +45,70 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
         [],
     );
 
-    const getColumns = (attr: AttributeDescriptorModel) => {
-        if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
-            return [
-                attr.properties.label || attributeFieldNameTransform[attr.name] || attr.name,
-                attributeTypeEnum[attr.type].label,
-                isDataAttributeModel(attr) ? (attr.properties.required ? "Yes" : "No") : "n/a",
-                attr.description ?? "Not set",
-                getAttributeContent(attr.contentType, attr.content),
-            ];
-        } else {
-            return [attr.name, attr.type, "n/a", attr.description ?? "Not set", ""];
-        }
-    };
+    const getColumns = useCallback(
+        (attr: AttributeDescriptorModel) => {
+            if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
+                return [
+                    attr.properties.label || attributeFieldNameTransform[attr.name] || attr.name,
+                    attributeTypeEnum[attr.type].label,
+                    isDataAttributeModel(attr) ? (attr.properties.required ? "Yes" : "No") : "n/a",
+                    attr.description ?? "Not set",
+                    getAttributeContent(attr.contentType, attr.content),
+                ];
+            } else {
+                return [attr.name, attr.type, "n/a", attr.description ?? "Not set", ""];
+            }
+        },
+        [attributeTypeEnum],
+    );
 
-    const getDetailColumns = (attr: AttributeDescriptorModel) => {
-        let columns: TableDataRow[] = [];
+    const getDetailColumns = useCallback(
+        (attr: AttributeDescriptorModel) => {
+            let columns: TableDataRow[] = [];
 
-        if (isDataAttributeModel(attr)) {
-            const regex = attr.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
-            columns = [
-                { id: "required", columns: [<b>Required</b>, attr.properties.required ? "Yes" : "No"] },
-                { id: "readOnly", columns: [<b>Read Only</b>, attr.properties.readOnly ? "Yes" : "No"] },
-                { id: "list", columns: [<b>List</b>, attr.properties.list ? "Yes" : "No"] },
-                { id: "multiValue", columns: [<b>Multiple Values</b>, attr.properties.multiSelect ? "Yes" : "No"] },
-                { id: "validationRegex", columns: [<b>Validation Regex</b>, regex?.data?.toString() ?? "Not set"] },
-            ];
-        }
+            if (isDataAttributeModel(attr)) {
+                const regex = attr.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
+                columns = [
+                    { id: "required", columns: [<b>Required</b>, attr.properties.required ? "Yes" : "No"] },
+                    { id: "readOnly", columns: [<b>Read Only</b>, attr.properties.readOnly ? "Yes" : "No"] },
+                    { id: "list", columns: [<b>List</b>, attr.properties.list ? "Yes" : "No"] },
+                    { id: "multiValue", columns: [<b>Multiple Values</b>, attr.properties.multiSelect ? "Yes" : "No"] },
+                    { id: "validationRegex", columns: [<b>Validation Regex</b>, regex?.data?.toString() ?? "Not set"] },
+                ];
+            }
 
-        if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
-            columns = [
-                { id: "label", columns: [<b>Label</b>, attr.properties.label] },
-                { id: "group", columns: [<b>Group</b>, attr.properties.group || "Not set"] },
-                { id: "contentType", columns: [<b>Content Type</b>, attributeContentTypeEnum[attr.contentType].label] },
-                ...columns,
-                { id: "defaults", columns: [<b>Defaults</b>, getAttributeContent(attr.contentType, attr.content)] },
-            ];
-        }
-
-        return [
-            <></>,
-            <></>,
-            <></>,
-            <></>,
-            <></>,
-            <CustomTable
-                headers={[
-                    { id: "name", content: "Name" },
-                    { id: "value", content: "Value" },
-                ]}
-                data={[
-                    { id: "name", columns: [<b>Name</b>, attr.name] },
-                    { id: "desc", columns: [<b>Description</b>, attr.description || "Not set"] },
+            if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
+                columns = [
+                    { id: "label", columns: [<b>Label</b>, attr.properties.label] },
+                    { id: "group", columns: [<b>Group</b>, attr.properties.group || "Not set"] },
+                    { id: "contentType", columns: [<b>Content Type</b>, attributeContentTypeEnum[attr.contentType].label] },
                     ...columns,
-                ]}
-                hasHeader={false}
-            />,
-        ];
-    };
+                    { id: "defaults", columns: [<b>Defaults</b>, getAttributeContent(attr.contentType, attr.content)] },
+                ];
+            }
+
+            return [
+                <></>,
+                <></>,
+                <></>,
+                <></>,
+                <></>,
+                <CustomTable
+                    headers={[
+                        { id: "name", content: "Name" },
+                        { id: "value", content: "Value" },
+                    ]}
+                    data={[
+                        { id: "name", columns: [<b>Name</b>, attr.name] },
+                        { id: "desc", columns: [<b>Description</b>, attr.description || "Not set"] },
+                        ...columns,
+                    ]}
+                    hasHeader={false}
+                />,
+            ];
+        },
+        [attributeContentTypeEnum],
+    );
 
     const data: TableDataRow[] = useMemo(
         () =>
