@@ -22,20 +22,8 @@ function DonutChart({ title, data = {}, entity, redirect, onSetFilter: onLegendC
 
     const options: ApexCharts.ApexOptions = {
         labels,
-        theme: {
-            mode: "light",
-            monochrome: {
-                enabled: false,
-                color: "#e31e25",
-                shadeTo: "light",
-                shadeIntensity: 0.8,
-            },
-        },
         fill: {
             type: "gradient",
-        },
-        legend: {
-            onItemHover: { highlightDataSeries: true },
         },
         dataLabels: {
             formatter: function (val: any, opts: any) {
