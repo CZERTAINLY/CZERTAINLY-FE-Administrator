@@ -155,6 +155,22 @@ function Dashboard() {
                                     },
                                 ];
                             }
+                            if (labels[index] === "60" || labels[index] === "90") {
+                                return [
+                                    {
+                                        searchGroup: SearchGroup.Property,
+                                        condition: SearchCondition.Greater,
+                                        fieldIdentifier: "NOT_AFTER",
+                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
+                                    },
+                                    {
+                                        searchGroup: SearchGroup.Property,
+                                        condition: SearchCondition.Lesser,
+                                        fieldIdentifier: "NOT_AFTER",
+                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
+                                    },
+                                ];
+                            }
                             return [
                                 {
                                     searchGroup: SearchGroup.Property,
