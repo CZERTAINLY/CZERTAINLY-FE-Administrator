@@ -101,6 +101,7 @@ export * from "./CryptographicKeyResponseDto";
 export * from "./CustomAttribute";
 export * from "./CustomAttributeCreateRequestDto";
 export * from "./CustomAttributeDefinitionDetailDto";
+export * from "./CustomAttributeDefinitionDto";
 export * from "./CustomAttributeProperties";
 export * from "./CustomAttributeUpdateRequestDto";
 export * from "./DataAttribute";

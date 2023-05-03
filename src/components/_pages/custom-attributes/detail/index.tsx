@@ -108,6 +108,15 @@ export default function CustomAttributeDetail() {
         [],
     );
 
+    const getBadge = (property: boolean | undefined, label: string) =>
+        property ? (
+            <Badge style={{ margin: "1px" }} color="success">
+                {label}
+            </Badge>
+        ) : (
+            <></>
+        );
+
     const detailData: TableDataRow[] = useMemo(
         () =>
             !customAttribute
@@ -135,7 +144,14 @@ export default function CustomAttributeDetail() {
                       },
                       {
                           id: "resources",
-                          columns: ["Resources", customAttribute.resources?.map((r) => resourceEnum[r].label).join(", ") ?? ""],
+                          columns: [
+                              "Resources",
+                              customAttribute.resources?.map((r) => (
+                                  <Badge key={r} style={{ margin: "1px" }} color="secondary">
+                                      {resourceEnum[r].label}
+                                  </Badge>
+                              )) ?? "",
+                          ],
                       },
                       {
                           id: "contentType",
@@ -146,43 +162,21 @@ export default function CustomAttributeDetail() {
                           columns: ["Content", getAttributeContent(customAttribute.contentType, customAttribute.content)],
                       },
                       {
-                          id: "enabled",
-                          columns: ["Enabled", <StatusBadge enabled={customAttribute.enabled} />],
-                      },
-                      {
-                          id: "visible",
+                          id: "properties",
                           columns: [
-                              "Visible",
-                              customAttribute.visible ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-                          ],
-                      },
-                      {
-                          id: "required",
-                          columns: [
-                              "Required",
-                              customAttribute.required ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-                          ],
-                      },
-                      {
-                          id: "readOnly",
-                          columns: [
-                              "Read Only",
-                              customAttribute.readOnly ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
-                          ],
-                      },
-                      {
-                          id: "list",
-                          columns: ["List", customAttribute.list ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>],
-                      },
-                      {
-                          id: "multiSelect",
-                          columns: [
-                              "Multi Select",
-                              customAttribute.multiSelect ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
+                              "Properties",
+                              <>
+                                  <StatusBadge style={{ margin: "1px" }} enabled={customAttribute.enabled} />
+                                  {getBadge(customAttribute.visible, "Visible")}
+                                  {getBadge(customAttribute.required, "Required")}
+                                  {getBadge(customAttribute.readOnly, "Read Only")}
+                                  {getBadge(customAttribute.list, "List")}
+                                  {getBadge(customAttribute.multiSelect, "Multi Select")}
+                              </>,
                           ],
                       },
                   ],
-        [customAttribute, attributeContentTypeEnum],
+        [customAttribute, attributeContentTypeEnum, resourceEnum],
     );
 
     return (

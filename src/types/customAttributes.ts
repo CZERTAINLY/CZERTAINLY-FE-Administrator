@@ -1,12 +1,12 @@
 import { BaseAttributeContentModel } from "./attributes";
 import {
-    AttributeDefinitionDto,
     CustomAttributeCreateRequestDto as CustomAttributeCreateRequestDtoOpenApi,
     CustomAttributeDefinitionDetailDto,
+    CustomAttributeDefinitionDto,
     CustomAttributeUpdateRequestDto as CustomAttributeUpdateRequestDtoOpenApi,
 } from "./openapi";
 
-export type CustomAttributeResponseDto = AttributeDefinitionDto;
+export type CustomAttributeResponseDto = CustomAttributeDefinitionDto;
 export type CustomAttributeResponseModel = CustomAttributeResponseDto;
 
 export type CustomAttributeDetailResponseDto = CustomAttributeDefinitionDetailDto;

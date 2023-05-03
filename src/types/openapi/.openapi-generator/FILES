@@ -135,6 +135,7 @@ models/CryptographicKeyResponseDto.ts
 models/CustomAttribute.ts
 models/CustomAttributeCreateRequestDto.ts
 models/CustomAttributeDefinitionDetailDto.ts
+models/CustomAttributeDefinitionDto.ts
 models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts

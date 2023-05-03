@@ -16,12 +16,12 @@ import type { AjaxResponse } from "rxjs/ajax";
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
 import type { OperationOpts, HttpHeaders } from "../runtime";
 import type {
-    AttributeDefinitionDto,
     AuthenticationServiceExceptionDto,
     BaseAttributeContentDto,
     CustomAttribute,
     CustomAttributeCreateRequestDto,
     CustomAttributeDefinitionDetailDto,
+    CustomAttributeDefinitionDto,
     CustomAttributeUpdateRequestDto,
     ErrorMessageDto,
     Resource,
@@ -388,10 +388,12 @@ export class CustomAttributesApi extends BaseAPI {
     /**
      * List Custom Attributes
      */
-    listCustomAttributes(): Observable<Array<AttributeDefinitionDto>>;
-    listCustomAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<AttributeDefinitionDto>>>;
-    listCustomAttributes(opts?: OperationOpts): Observable<Array<AttributeDefinitionDto> | AjaxResponse<Array<AttributeDefinitionDto>>> {
-        return this.request<Array<AttributeDefinitionDto>>(
+    listCustomAttributes(): Observable<Array<CustomAttributeDefinitionDto>>;
+    listCustomAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<CustomAttributeDefinitionDto>>>;
+    listCustomAttributes(
+        opts?: OperationOpts,
+    ): Observable<Array<CustomAttributeDefinitionDto> | AjaxResponse<Array<CustomAttributeDefinitionDto>>> {
+        return this.request<Array<CustomAttributeDefinitionDto>>(
             {
                 url: "/v1/attributes/custom",
                 method: "GET",

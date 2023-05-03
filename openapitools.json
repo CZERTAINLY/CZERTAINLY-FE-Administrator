@@ -6,6 +6,22 @@
         "generators": {
             "typescript-rxjs-local": {
                 "generatorName": "typescript-rxjs",
+                "inputSpec": "./src/doc-openapi-czertainly-core.yaml",
+                "output": "./src/types/openapi",
+                "typeMappings": {
+                    "set": "Array",
+                    "Date": "string"
+                },
+                "additionalProperties": {
+                    "withoutRuntimeChecks": true,
+                    "supportsES6": true,
+                    "withInterfaces": true,
+                    "stringEnums": true,
+                    "typescriptThreePlus": true
+                }
+            },
+            "typescript-rxjs-remote": {
+                "generatorName": "typescript-rxjs",
                 "inputSpec": "https://api.czertainly.com/develop/doc-openapi-czertainly-core.yaml",
                 "output": "./src/types/openapi",
                 "typeMappings": {
