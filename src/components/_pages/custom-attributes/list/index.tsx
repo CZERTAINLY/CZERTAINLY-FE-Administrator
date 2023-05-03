@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { selectors as enumSelectors } from "ducks/enums";
-import { Container } from "reactstrap";
+import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
 
 export default function CustomAttributesList() {
@@ -28,6 +28,7 @@ export default function CustomAttributesList() {
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
+    const resourcesEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     useEffect(() => {
@@ -93,7 +94,7 @@ export default function CustomAttributesList() {
                 content: "Name",
                 sortable: true,
                 sort: "asc",
-                width: "20%",
+                width: "8%",
             },
             {
                 id: "status",
@@ -105,13 +106,19 @@ export default function CustomAttributesList() {
                 id: "contentType",
                 content: "Content Type",
                 sortable: true,
-                width: "15%",
+                width: "5%",
             },
             {
                 id: "description",
                 content: "Description",
                 sortable: true,
-                width: "40%",
+                width: "20%",
+            },
+            {
+                id: "resources",
+                content: "Resources",
+                sortable: false,
+                width: "30%",
             },
         ],
         [],
@@ -126,9 +133,16 @@ export default function CustomAttributesList() {
                     <StatusBadge enabled={customAttribute.enabled} />,
                     attributeContentTypeEnum[customAttribute.contentType].label,
                     customAttribute.description,
+                    <>
+                        {customAttribute.resources.map((r) => (
+                            <Badge style={{ margin: "1px" }} color="secondary">
+                                {resourcesEnum[r].label}
+                            </Badge>
+                        ))}
+                    </>,
                 ],
             })),
-        [customAttributes, attributeContentTypeEnum],
+        [customAttributes, attributeContentTypeEnum, resourcesEnum],
     );
 
     return (
