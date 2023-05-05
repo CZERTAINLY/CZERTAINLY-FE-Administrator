@@ -77,6 +77,12 @@ export interface ScepProfileDto {
      */
     renewThreshold?: number;
     /**
+     * SCEP URL
+     * @type {string}
+     * @memberof ScepProfileDto
+     */
+    scepUrl?: string;
+    /**
      * Status of Intune
      * @type {boolean}
      * @memberof ScepProfileDto

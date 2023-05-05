@@ -247,7 +247,7 @@ function CryptographicKeyList() {
                         </Link>
                     </span>,
                     <Badge color="secondary">{keyTypeEnum[cryptographicKeys[key].type].label}</Badge>,
-                    cryptographicKeys[key].cryptographicAlgorithm,
+                    cryptographicKeys[key].keyAlgorithm,
                     cryptographicKeys[key].length?.toString() || "unknown",
                     cryptographicKeys[key].format || "unknown",
                     <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKeys[key].creationTime) || ""}</span>,

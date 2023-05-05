@@ -168,7 +168,7 @@ export default function CertificateForm() {
                     tokenProfileUuid: event.value.tokenInstanceUuid,
                     tokenInstanceUuid: event.value.tokenInstanceUuid,
                     keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
-                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].cryptographicAlgorithm,
+                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
                 }),
             );
         },

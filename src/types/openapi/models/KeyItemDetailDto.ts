@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CryptographicAlgorithm, KeyCompromiseReason, KeyFormat, KeyState, KeyType, KeyUsage, MetadataResponseDto } from "./";
+import type { KeyAlgorithm, KeyCompromiseReason, KeyFormat, KeyState, KeyType, KeyUsage, MetadataResponseDto } from "./";
 
 /**
  * Key Objects
@@ -43,10 +43,10 @@ export interface KeyItemDetailDto {
      */
     type: KeyType;
     /**
-     * @type {CryptographicAlgorithm}
+     * @type {KeyAlgorithm}
      * @memberof KeyItemDetailDto
      */
-    cryptographicAlgorithm: CryptographicAlgorithm;
+    keyAlgorithm: KeyAlgorithm;
     /**
      * @type {KeyFormat}
      * @memberof KeyItemDetailDto
