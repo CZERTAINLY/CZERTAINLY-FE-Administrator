@@ -19,10 +19,10 @@ import type {
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
     CipherDataRequestDto,
-    CryptographicAlgorithm,
     DecryptDataResponseDto,
     EncryptDataResponseDto,
     ErrorMessageDto,
+    KeyAlgorithm,
     RandomDataRequestDto,
     RandomDataResponseDto,
     SignDataRequestDto,
@@ -52,7 +52,7 @@ export interface ListCipherAttributesRequest {
     tokenProfileUuid: string;
     uuid: string;
     keyItemUuid: string;
-    algorithm: CryptographicAlgorithm;
+    algorithm: KeyAlgorithm;
 }
 
 export interface ListRandomAttributesRequest {
@@ -64,7 +64,7 @@ export interface ListSignatureAttributesRequest {
     tokenProfileUuid: string;
     uuid: string;
     keyItemUuid: string;
-    algorithm: CryptographicAlgorithm;
+    algorithm: KeyAlgorithm;
 }
 
 export interface RandomDataRequest {

@@ -16,7 +16,7 @@
  * @export
  * @enum {string}
  */
-export enum CryptographicAlgorithm {
+export enum KeyAlgorithm {
     Rsa = "RSA",
     Ecdsa = "ECDSA",
     Falcon = "FALCON",

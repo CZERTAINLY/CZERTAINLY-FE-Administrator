@@ -8,7 +8,7 @@ import {
     CryptographicKeyVerifyDataRequestModel,
     CryptographicKeyVerifyResponseModel,
 } from "types/cryptographic-operations";
-import { CryptographicAlgorithm } from "types/openapi";
+import { KeyAlgorithm } from "types/openapi";
 import { downloadFile } from "utils/download";
 import { createFeatureSelector } from "utils/ducks";
 
@@ -77,7 +77,7 @@ export const slice = createSlice({
                 tokenProfileUuid: string;
                 uuid: string;
                 keyItemUuid: string;
-                algorithm: CryptographicAlgorithm;
+                algorithm: KeyAlgorithm;
             }>,
         ) => {
             state.isFetchingSignatureAttributes = true;
@@ -103,7 +103,7 @@ export const slice = createSlice({
                 tokenProfileUuid: string;
                 uuid: string;
                 keyItemUuid: string;
-                algorithm: CryptographicAlgorithm;
+                algorithm: KeyAlgorithm;
             }>,
         ) => {
             state.isFetchingCipherAttributes = true;

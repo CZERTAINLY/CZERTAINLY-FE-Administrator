@@ -130,7 +130,6 @@ models/CredentialAttributeContentData.ts
 models/CredentialDto.ts
 models/CredentialRequestDto.ts
 models/CredentialUpdateRequestDto.ts
-models/CryptographicAlgorithm.ts
 models/CryptographicKeyResponseDto.ts
 models/CustomAttribute.ts
 models/CustomAttributeCreateRequestDto.ts
@@ -181,6 +180,7 @@ models/InfoAttribute.ts
 models/InfoAttributeProperties.ts
 models/IntegerAttributeContent.ts
 models/IssueToLocationRequestDto.ts
+models/KeyAlgorithm.ts
 models/KeyAssociationDto.ts
 models/KeyCompromiseReason.ts
 models/KeyDetailDto.ts

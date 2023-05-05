@@ -243,8 +243,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           columns: ["Type", keyTypeEnum[keyItem.type].label],
                       },
                       {
-                          id: "cryptographicAlgorithm",
-                          columns: ["Cryptographic Algorithm", keyItem.cryptographicAlgorithm],
+                          id: "keyAlgorithm",
+                          columns: ["Key Algorithm", keyItem.keyAlgorithm],
                       },
                   ],
         [keyItem, keyTypeEnum],
@@ -444,7 +444,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             <div>
                 <h6 className="d-inline-block">
                     <Badge key={keyItem.uuid} color="dark" className="mr-xs">
-                        {keyItem.cryptographicAlgorithm}
+                        {keyItem.keyAlgorithm}
                     </Badge>
                 </h6>
                 <div className="fa-pull-right mt-n-xs">
@@ -535,7 +535,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     tokenUuid: tokenInstanceUuid,
                     keyUuid: keyUuid,
                     keyItemUuid: keyItem.uuid,
-                    algorithm: keyItem.cryptographicAlgorithm,
+                    algorithm: keyItem.keyAlgorithm,
                     tokenProfileUuid: tokenProfileUuid,
                 })}
                 toggle={() => setSignData(false)}
@@ -552,7 +552,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     tokenUuid: tokenInstanceUuid,
                     keyUuid: keyUuid,
                     keyItemUuid: keyItem.uuid,
-                    algorithm: keyItem.cryptographicAlgorithm,
+                    algorithm: keyItem.keyAlgorithm,
                     tokenProfileUuid: tokenProfileUuid,
                 })}
                 toggle={() => setVerifyData(false)}

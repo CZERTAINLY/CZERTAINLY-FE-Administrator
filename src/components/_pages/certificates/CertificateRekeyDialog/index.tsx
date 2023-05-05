@@ -135,7 +135,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                     tokenProfileUuid: event.value.tokenProfileUuid,
                     tokenInstanceUuid: event.value.tokenInstanceUuid,
                     keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
-                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].cryptographicAlgorithm,
+                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
                 }),
             );
         },

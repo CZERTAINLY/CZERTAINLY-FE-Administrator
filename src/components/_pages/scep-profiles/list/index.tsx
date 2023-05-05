@@ -184,6 +184,20 @@ export default function ScepProfiles() {
                 sortable: true,
                 width: "7%",
             },
+            {
+                id: "scepUrl",
+                content: "SCEP URL",
+                sortable: true,
+                width: "10%",
+                align: "center",
+            },
+            {
+                id: "enableIntune",
+                content: "Intune",
+                align: "center",
+                sortable: true,
+                width: "7%",
+            },
         ],
         [],
     );
@@ -203,6 +217,8 @@ export default function ScepProfiles() {
                     <Badge color="info">{scepProfile.raProfileName}</Badge>,
 
                     <StatusBadge enabled={scepProfile.enabled} />,
+                    <span style={{ whiteSpace: "nowrap" }}>{scepProfile.scepUrl || ""}</span>,
+                    <StatusBadge enabled={scepProfile.enableIntune} />,
                 ],
             })),
         [scepProfiles],

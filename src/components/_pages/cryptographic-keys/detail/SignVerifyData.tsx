@@ -7,7 +7,7 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
-import { CryptographicAlgorithm } from "types/openapi";
+import { KeyAlgorithm } from "types/openapi";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -19,7 +19,7 @@ interface Props {
     tokenProfileUuid?: string;
     keyUuid?: string;
     keyItemUuid?: string;
-    algorithm?: CryptographicAlgorithm;
+    algorithm?: KeyAlgorithm;
     visible: boolean;
     action: "sign" | "verify";
     onClose: () => void;

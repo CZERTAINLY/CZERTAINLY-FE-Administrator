@@ -79,6 +79,12 @@ export interface ScepProfileDetailDto {
      */
     renewThreshold?: number;
     /**
+     * SCEP URL
+     * @type {string}
+     * @memberof ScepProfileDetailDto
+     */
+    scepUrl?: string;
+    /**
      * Status of Intune
      * @type {boolean}
      * @memberof ScepProfileDetailDto
@@ -89,12 +95,6 @@ export interface ScepProfileDetailDto {
      * @memberof ScepProfileDetailDto
      */
     raProfile?: RaProfileDto;
-    /**
-     * SCEP URL
-     * @type {string}
-     * @memberof ScepProfileDetailDto
-     */
-    scepUrl?: string;
     /**
      * List of Attributes to issue a Certificate
      * @type {Array<ResponseAttributeDto>}
