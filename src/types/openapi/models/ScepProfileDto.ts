@@ -35,7 +35,7 @@ export interface ScepProfileDto {
      */
     enabled: boolean;
     /**
-     * ACME Profile description
+     * SCEP Profile description
      * @type {string}
      * @memberof ScepProfileDto
      */
@@ -59,21 +59,27 @@ export interface ScepProfileDto {
      */
     raProfileUuid?: string;
     /**
-     * Include CA Certificate in the scep response
+     * Include CA certificate in the SCEP response
      * @type {boolean}
      * @memberof ScepProfileDto
      */
     includeCaCertificate: boolean;
     /**
-     * Include CA Certificate Chain in the scep response
+     * Include CA certificate chain in the SCEP response
      * @type {boolean}
      * @memberof ScepProfileDto
      */
     includeCaCertificateChain: boolean;
     /**
-     * Renew Threshold
+     * Renewal time threshold in days
      * @type {number}
      * @memberof ScepProfileDto
      */
     renewThreshold?: number;
+    /**
+     * Status of Intune
+     * @type {boolean}
+     * @memberof ScepProfileDto
+     */
+    enableIntune?: boolean;
 }

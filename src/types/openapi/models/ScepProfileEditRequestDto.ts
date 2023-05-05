@@ -55,7 +55,7 @@ export interface ScepProfileEditRequestDto {
      */
     customAttributes?: Array<RequestAttributeDto>;
     /**
-     * Minimum expiry days to allow renewal of certificate
+     * Minimum expiry days to allow renewal of certificate. Empty or the value \'0\' will be considered as null and half life of the certificate validity will be considered for the protocol
      * @type {number}
      * @memberof ScepProfileEditRequestDto
      */
@@ -78,4 +78,28 @@ export interface ScepProfileEditRequestDto {
      * @memberof ScepProfileEditRequestDto
      */
     challengePassword: string;
+    /**
+     * Status of Intune
+     * @type {boolean}
+     * @memberof ScepProfileEditRequestDto
+     */
+    enableIntune?: boolean;
+    /**
+     * Intune Tenant
+     * @type {string}
+     * @memberof ScepProfileEditRequestDto
+     */
+    intuneTenant?: string;
+    /**
+     * Intune Application ID
+     * @type {string}
+     * @memberof ScepProfileEditRequestDto
+     */
+    intuneApplicationId?: string;
+    /**
+     * Intune Application Key
+     * @type {string}
+     * @memberof ScepProfileEditRequestDto
+     */
+    intuneApplicationKey?: string;
 }

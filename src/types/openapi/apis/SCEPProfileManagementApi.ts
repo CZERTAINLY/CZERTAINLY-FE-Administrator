@@ -14,7 +14,7 @@
 import type { Observable } from "rxjs";
 import type { AjaxResponse } from "rxjs/ajax";
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
 import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
@@ -65,6 +65,10 @@ export interface ForceDeleteScepProfilesRequest {
 
 export interface GetScepProfileRequest {
     uuid: string;
+}
+
+export interface ListScepCaCertificatesRequest {
+    intuneEnabled: boolean;
 }
 
 export interface UpdateRaProfileRequest {
@@ -313,13 +317,27 @@ export class SCEPProfileManagementApi extends BaseAPI {
     /**
      * Get list of certificates eligible for CA certificate of SCEP requests
      */
-    listScepCaCertificates(): Observable<Array<CertificateDto>>;
-    listScepCaCertificates(opts?: OperationOpts): Observable<AjaxResponse<Array<CertificateDto>>>;
-    listScepCaCertificates(opts?: OperationOpts): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
+    listScepCaCertificates({ intuneEnabled }: ListScepCaCertificatesRequest): Observable<Array<CertificateDto>>;
+    listScepCaCertificates(
+        { intuneEnabled }: ListScepCaCertificatesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<CertificateDto>>>;
+    listScepCaCertificates(
+        { intuneEnabled }: ListScepCaCertificatesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
+        throwIfNullOrUndefined(intuneEnabled, "intuneEnabled", "listScepCaCertificates");
+
+        const query: HttpQuery = {
+            // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            intuneEnabled: intuneEnabled,
+        };
+
         return this.request<Array<CertificateDto>>(
             {
                 url: "/v1/scepProfiles/caCertificates",
                 method: "GET",
+                query,
             },
             opts?.responseOpts,
         );

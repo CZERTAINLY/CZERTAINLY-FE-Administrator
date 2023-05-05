@@ -91,7 +91,7 @@ export const slice = createSlice({
             state.isFetchingList = false;
         },
 
-        listScepCaCertificates: (state, action: PayloadAction<void>) => {
+        listScepCaCertificates: (state, action: PayloadAction<boolean>) => {
             state.isFetchingCertificates = true;
         },
 

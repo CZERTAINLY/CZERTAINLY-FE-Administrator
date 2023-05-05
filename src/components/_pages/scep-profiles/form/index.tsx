@@ -1,5 +1,5 @@
 import AttributeEditor from "components/Attributes/AttributeEditor";
-import CheckboxField from "components/Input/CheckboxField";
+import SwitchField from "components/Input/SwitchField";
 import TextField from "components/Input/TextField";
 import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
@@ -36,6 +36,10 @@ interface FormValues {
     includeCaCertificate: boolean;
     includeCaCertificateChain: boolean;
     challengePassword: string;
+    enableIntune: boolean;
+    intuneTenant: string;
+    intuneApplicationId: string;
+    intuneApplicationKey: string;
     raProfile: { value: string; label: string } | undefined;
     certificate: { value: string; label: string } | undefined;
 }
@@ -67,6 +71,7 @@ export default function ScepProfileForm() {
 
     const [scepProfile, setScepProfile] = useState<ScepProfileResponseModel>();
     const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
+    const [intune, setIntune] = useState(false);
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
 
@@ -76,6 +81,7 @@ export default function ScepProfileForm() {
         }
 
         if (editMode && scepProfileSelector && scepProfileSelector.uuid === id) {
+            setIntune(scepProfileSelector.enableIntune ?? false);
             setScepProfile(scepProfileSelector);
             setRaProfile(scepProfileSelector.raProfile);
         }
@@ -84,8 +90,11 @@ export default function ScepProfileForm() {
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.ScepProfiles));
         dispatch(raProfileActions.listRaProfiles());
-        dispatch(scepProfileActions.listScepCaCertificates());
     }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(scepProfileActions.listScepCaCertificates(intune));
+    }, [dispatch, intune]);
 
     useEffect(() => {
         if (raProfile) {
@@ -161,15 +170,6 @@ export default function ScepProfileForm() {
         [raProfiles],
     );
 
-    const optionsForCertificates = useMemo(
-        () =>
-            certificates?.map((certificate) => ({
-                value: certificate.uuid,
-                label: `${certificate.commonName} (${certificate.serialNumber})`,
-            })),
-        [certificates],
-    );
-
     const defaultValues: FormValues = useMemo(
         () => ({
             name: editMode ? scepProfile?.name || "" : "",
@@ -179,25 +179,57 @@ export default function ScepProfileForm() {
             includeCaCertificate: editMode ? scepProfile?.includeCaCertificate || false : false,
             includeCaCertificateChain: editMode ? scepProfile?.includeCaCertificateChain || false : false,
             challengePassword: "",
+            enableIntune: editMode ? scepProfile?.enableIntune ?? false : false,
+            intuneTenant: editMode ? scepProfile?.intuneTenant ?? "" : "",
+            intuneApplicationId: editMode ? scepProfile?.intuneApplicationId ?? "" : "",
+            intuneApplicationKey: "",
             raProfile: editMode
                 ? scepProfile?.raProfile
                     ? optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfile.raProfile?.uuid)
                     : undefined
                 : undefined,
-            certificate: editMode
-                ? scepProfile?.caCertificate
-                    ? optionsForCertificates?.find((certificate) => certificate.value === scepProfile.caCertificate?.uuid)
-                    : undefined
-                : undefined,
+            certificate: undefined,
         }),
-        [editMode, scepProfile, optionsForRaProfiles, optionsForCertificates],
+        [editMode, scepProfile, optionsForRaProfiles],
     );
+
+    const optionsForCertificates = useMemo(() => {
+        const options = certificates?.map((certificate) => ({
+            value: certificate.uuid,
+            label: `${certificate.commonName} (${certificate.serialNumber})`,
+        }));
+        defaultValues.certificate = editMode
+            ? scepProfile?.caCertificate
+                ? options?.find((certificate) => certificate.value === scepProfile.caCertificate?.uuid)
+                : undefined
+            : undefined;
+        return options;
+    }, [certificates, defaultValues, editMode, scepProfile?.caCertificate]);
 
     const title = useMemo(() => (editMode ? "Edit SCEP Profile" : "Create SCEP Profile"), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+            <Form
+                initialValues={defaultValues}
+                onSubmit={onSubmit}
+                mutators={{ ...mutators<FormValues>() }}
+                validate={(values) => {
+                    const errors: { intuneTenant?: string; intuneApplicationId?: string; intuneApplicationKey?: string } = {};
+                    if (values.enableIntune) {
+                        if (!values.intuneTenant) {
+                            errors.intuneTenant = "Required Field";
+                        }
+                        if (!values.intuneApplicationId) {
+                            errors.intuneApplicationId = "Required Field";
+                        }
+                        if (!values.intuneApplicationKey) {
+                            errors.intuneApplicationKey = "Required Field";
+                        }
+                    }
+                    return errors;
+                }}
+            >
                 {({ handleSubmit, pristine, submitting, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <TextField
@@ -214,9 +246,13 @@ export default function ScepProfileForm() {
                             description="Minimum expiry days to allow renewal of certificate."
                             validators={[validateInteger()]}
                         />
-                        <CheckboxField id="requireManualApproval" label="Require Manual Approval" />
-                        <CheckboxField id="includeCaCertificate" label="Include CA Certificate" />
-                        <CheckboxField id="includeCaCertificateChain" label="Include CA Certificate Chain" />
+                        <SwitchField id="requireManualApproval" label="Require Manual Approval" />
+                        <SwitchField id="includeCaCertificate" label="Include CA Certificate" />
+                        <SwitchField id="includeCaCertificateChain" label="Include CA Certificate Chain" />
+                        <SwitchField id="enableIntune" label="Enable Intune" onChange={(e) => setIntune(e)} />
+                        <TextField id="intuneTenant" label="Intune Tenant" validators={[]} disabled={!intune} />
+                        <TextField id="intuneApplicationId" label="Intune Application ID" validators={[]} disabled={!intune} />
+                        <TextField id="intuneApplicationKey" label="Intune Application Key" validators={[]} disabled={!intune} />
 
                         <Field name="certificate" validate={validateRequired()}>
                             {({ input, meta }) => (
