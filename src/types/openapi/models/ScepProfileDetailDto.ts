@@ -37,7 +37,7 @@ export interface ScepProfileDetailDto {
      */
     enabled: boolean;
     /**
-     * ACME Profile description
+     * SCEP Profile description
      * @type {string}
      * @memberof ScepProfileDetailDto
      */
@@ -48,6 +48,42 @@ export interface ScepProfileDetailDto {
      * @memberof ScepProfileDetailDto
      */
     requireManualApproval: boolean;
+    /**
+     * Name of the RA Profile
+     * @type {string}
+     * @memberof ScepProfileDetailDto
+     */
+    raProfileName?: string;
+    /**
+     * UUID of RA Profile
+     * @type {string}
+     * @memberof ScepProfileDetailDto
+     */
+    raProfileUuid?: string;
+    /**
+     * Include CA certificate in the SCEP response
+     * @type {boolean}
+     * @memberof ScepProfileDetailDto
+     */
+    includeCaCertificate: boolean;
+    /**
+     * Include CA certificate chain in the SCEP response
+     * @type {boolean}
+     * @memberof ScepProfileDetailDto
+     */
+    includeCaCertificateChain: boolean;
+    /**
+     * Renewal time threshold in days
+     * @type {number}
+     * @memberof ScepProfileDetailDto
+     */
+    renewThreshold?: number;
+    /**
+     * Status of Intune
+     * @type {boolean}
+     * @memberof ScepProfileDetailDto
+     */
+    enableIntune?: boolean;
     /**
      * @type {RaProfileDto}
      * @memberof ScepProfileDetailDto
@@ -77,21 +113,15 @@ export interface ScepProfileDetailDto {
      */
     caCertificate?: CertificateDto;
     /**
-     * Include CA Certificate in the scep response
-     * @type {boolean}
+     * Intune tenant
+     * @type {string}
      * @memberof ScepProfileDetailDto
      */
-    includeCaCertificate: boolean;
+    intuneTenant?: string;
     /**
-     * Include CA Certificate Chain in the scep response
-     * @type {boolean}
+     * Intune application ID
+     * @type {string}
      * @memberof ScepProfileDetailDto
      */
-    includeCaCertificateChain: boolean;
-    /**
-     * Renew Threshold
-     * @type {number}
-     * @memberof ScepProfileDetailDto
-     */
-    renewThreshold?: number;
+    intuneApplicationId?: string;
 }

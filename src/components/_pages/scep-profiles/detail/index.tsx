@@ -178,6 +178,23 @@ export default function ScepProfileDetail() {
         [scepProfile],
     );
 
+    const intuneDetailData: TableDataRow[] = useMemo(
+        () =>
+            !scepProfile
+                ? []
+                : [
+                      {
+                          id: "intuneTenant",
+                          columns: ["Intune Tenant", scepProfile.intuneTenant ?? ""],
+                      },
+                      {
+                          id: "intuneApplicationId",
+                          columns: ["Intune Application ID", scepProfile.intuneApplicationId ?? ""],
+                      },
+                  ],
+        [scepProfile],
+    );
+
     const raProfileDetailData: TableDataRow[] = useMemo(
         () =>
             !scepProfile || !scepProfile.raProfile
@@ -252,6 +269,12 @@ export default function ScepProfileDetail() {
                     resourceUuid={scepProfile.uuid}
                     attributes={scepProfile.customAttributes}
                 />
+            )}
+
+            {scepProfile && scepProfile.enableIntune && (
+                <Widget title={"Intune Configuration"} busy={isBusy}>
+                    <CustomTable headers={tableHeader} data={intuneDetailData} />
+                </Widget>
             )}
 
             <Widget title={"CA Certificate Configuration"} busy={isBusy}>

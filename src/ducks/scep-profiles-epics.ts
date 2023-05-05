@@ -39,8 +39,8 @@ const listScepProfiles: AppEpic = (action$, state$, deps) => {
 const listScepCaCertificates: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listScepCaCertificates.match),
-        switchMap(() =>
-            deps.apiClients.scepProfiles.listScepCaCertificates().pipe(
+        switchMap((action) =>
+            deps.apiClients.scepProfiles.listScepCaCertificates({ intuneEnabled: action.payload }).pipe(
                 map((scepProfiles) =>
                     slice.actions.listScepCaCertificatesSuccess({
                         certificates: scepProfiles.map(transformCertificateListResponseDtoToModel),
