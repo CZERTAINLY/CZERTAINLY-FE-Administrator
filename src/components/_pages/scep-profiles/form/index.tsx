@@ -26,7 +26,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { validateAlphaNumeric, validateInteger, validateRequired } from "utils/validators";
-import { Resource } from "../../../../types/openapi";
+import { KeyAlgorithm, Resource } from "../../../../types/openapi";
 
 interface FormValues {
     name: string;
@@ -35,7 +35,7 @@ interface FormValues {
     renewalThreshold: number;
     includeCaCertificate: boolean;
     includeCaCertificateChain: boolean;
-    challengePassword: string;
+    challengePassword?: string;
     enableIntune: boolean;
     intuneTenant: string;
     intuneApplicationId: string;
@@ -178,7 +178,6 @@ export default function ScepProfileForm() {
             renewalThreshold: editMode ? scepProfile?.renewThreshold || 0 : 0,
             includeCaCertificate: editMode ? scepProfile?.includeCaCertificate || false : false,
             includeCaCertificateChain: editMode ? scepProfile?.includeCaCertificateChain || false : false,
-            challengePassword: "",
             enableIntune: editMode ? scepProfile?.enableIntune ?? false : false,
             intuneTenant: editMode ? scepProfile?.intuneTenant ?? "" : "",
             intuneApplicationId: editMode ? scepProfile?.intuneApplicationId ?? "" : "",
@@ -215,7 +214,12 @@ export default function ScepProfileForm() {
                 onSubmit={onSubmit}
                 mutators={{ ...mutators<FormValues>() }}
                 validate={(values) => {
-                    const errors: { intuneTenant?: string; intuneApplicationId?: string; intuneApplicationKey?: string } = {};
+                    const errors: {
+                        intuneTenant?: string;
+                        intuneApplicationId?: string;
+                        intuneApplicationKey?: string;
+                        challengePassword?: string;
+                    } = {};
                     if (values.enableIntune) {
                         if (!values.intuneTenant) {
                             errors.intuneTenant = "Required Field";
@@ -226,6 +230,12 @@ export default function ScepProfileForm() {
                         if (!values.intuneApplicationKey) {
                             errors.intuneApplicationKey = "Required Field";
                         }
+                    }
+                    if (
+                        certificates?.find((c) => c.uuid === values.certificate?.value)?.publicKeyAlgorithm === KeyAlgorithm.Ecdsa &&
+                        !values.challengePassword
+                    ) {
+                        errors.challengePassword = "Required Field";
                     }
                     return errors;
                 }}

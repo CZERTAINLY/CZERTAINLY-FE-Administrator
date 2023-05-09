@@ -77,7 +77,7 @@ export interface ScepProfileEditRequestDto {
      * @type {string}
      * @memberof ScepProfileEditRequestDto
      */
-    challengePassword: string;
+    challengePassword?: string;
     /**
      * Status of Intune
      * @type {boolean}
