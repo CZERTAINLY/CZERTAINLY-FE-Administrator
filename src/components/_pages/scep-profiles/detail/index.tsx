@@ -159,10 +159,6 @@ export default function ScepProfileDetail() {
                           columns: ["Renew Threshold", scepProfile.renewThreshold?.toString() || "N/A"],
                       },
                       {
-                          id: "requireManualApproval",
-                          columns: ["Require Manual Approval", scepProfile.requireManualApproval ? "true" : "false"],
-                      },
-                      {
                           id: "includeCaCertificate",
                           columns: ["Include CA Certificate", scepProfile.includeCaCertificate ? "true" : "false"],
                       },

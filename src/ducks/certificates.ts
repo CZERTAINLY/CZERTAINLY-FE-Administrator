@@ -187,6 +187,17 @@ export const slice = createSlice({
             state.isIssuing = true;
         },
 
+        issueCertificateNew: (
+            state,
+            action: PayloadAction<{
+                authorityUuid: string;
+                raProfileUuid: string;
+                certificateUuid: string;
+            }>,
+        ) => {
+            state.isIssuing = true;
+        },
+
         issueCertificateSuccess: (
             state,
             action: PayloadAction<{

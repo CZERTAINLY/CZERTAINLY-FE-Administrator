@@ -31,7 +31,6 @@ import { KeyAlgorithm, Resource } from "../../../../types/openapi";
 interface FormValues {
     name: string;
     description: string;
-    requireManualApproval: boolean;
     renewalThreshold: number;
     includeCaCertificate: boolean;
     includeCaCertificateChain: boolean;
@@ -174,7 +173,6 @@ export default function ScepProfileForm() {
         () => ({
             name: editMode ? scepProfile?.name || "" : "",
             description: editMode ? scepProfile?.description || "" : "",
-            requireManualApproval: editMode ? scepProfile?.requireManualApproval || false : false,
             renewalThreshold: editMode ? scepProfile?.renewThreshold || 0 : 0,
             includeCaCertificate: editMode ? scepProfile?.includeCaCertificate || false : false,
             includeCaCertificateChain: editMode ? scepProfile?.includeCaCertificateChain || false : false,
@@ -256,7 +254,6 @@ export default function ScepProfileForm() {
                             description="Minimum expiry days to allow renewal of certificate."
                             validators={[validateInteger()]}
                         />
-                        <SwitchField id="requireManualApproval" label="Require Manual Approval" />
                         <SwitchField id="includeCaCertificate" label="Include CA Certificate" />
                         <SwitchField id="includeCaCertificateChain" label="Include CA Certificate Chain" />
                         <SwitchField id="enableIntune" label="Enable Intune" onChange={(e) => setIntune(e)} />
