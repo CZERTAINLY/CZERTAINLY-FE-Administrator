@@ -42,7 +42,7 @@ export interface CertificateInLocationDto {
      * @type {Array<MetadataResponseDto>}
      * @memberof CertificateInLocationDto
      */
-    metadata: Array<MetadataResponseDto>;
+    metadata?: Array<MetadataResponseDto>;
     /**
      * Applied push attributes
      * @type {Array<ResponseAttributeDto>}

@@ -60,10 +60,4 @@ export interface ClientCertificateSignRequestDto {
      * @memberof ClientCertificateSignRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
-    /**
-     * UUID of CSR Entity to be signed
-     * @type {string}
-     * @memberof ClientCertificateSignRequestDto
-     */
-    uuid?: string;
 }

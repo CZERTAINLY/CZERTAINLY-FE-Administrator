@@ -37,12 +37,6 @@ export interface ScepProfileRequestDto {
      */
     issueCertificateAttributes: Array<RequestAttributeDto>;
     /**
-     * Require manual approval for SCEP requests
-     * @type {boolean}
-     * @memberof ScepProfileRequestDto
-     */
-    requireManualApproval?: boolean;
-    /**
      * UUID of the Certificate to be used as CA Certificate for SCEP Requests
      * @type {string}
      * @memberof ScepProfileRequestDto

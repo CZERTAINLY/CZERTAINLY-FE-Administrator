@@ -354,7 +354,11 @@ export default function CertificateDetail() {
                 <DropdownMenu>
                     <DropdownItem
                         key="pem"
-                        onClick={() => downloadFile(formatPEM(certificate?.certificateContent || ""), fileNameToDownload + ".pem")}
+                        onClick={() =>
+                            certificate?.status === CertStatus.New
+                                ? downloadFile(formatPEM(certificate?.csr || "", true), fileNameToDownload + ".pem")
+                                : downloadFile(formatPEM(certificate?.certificateContent || ""), fileNameToDownload + ".pem")
+                        }
                     >
                         PEM (.pem)
                     </DropdownItem>
@@ -362,7 +366,9 @@ export default function CertificateDetail() {
                     <DropdownItem
                         key="der"
                         onClick={() =>
-                            downloadFile(Buffer.from(certificate?.certificateContent || "", "base64"), fileNameToDownload + ".cer")
+                            certificate?.status === CertStatus.New
+                                ? downloadFile(Buffer.from(certificate?.csr || "", "base64"), fileNameToDownload + ".cer")
+                                : downloadFile(Buffer.from(certificate?.certificateContent || "", "base64"), fileNameToDownload + ".cer")
                         }
                     >
                         DER (.cer)
@@ -384,8 +390,22 @@ export default function CertificateDetail() {
                 },
             },
             {
+                icon: "cubes",
+                disabled: !certificate?.raProfile || certificate?.status !== CertStatus.New,
+                tooltip: "Issue",
+                onClick: () => {
+                    dispatch(
+                        actions.issueCertificateNew({
+                            certificateUuid: certificate?.uuid ?? "",
+                            raProfileUuid: certificate?.raProfile?.uuid ?? "",
+                            authorityUuid: certificate?.raProfile?.authorityInstanceUuid ?? "",
+                        }),
+                    );
+                },
+            },
+            {
                 icon: "retweet",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
                 tooltip: "Renew",
                 onClick: () => {
                     setRenew(true);
@@ -393,7 +413,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "rekey",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
                 tooltip: "Rekey",
                 onClick: () => {
                     setRekey(true);
@@ -401,7 +421,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "minus-square",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
                 tooltip: "Revoke",
                 onClick: () => {
                     setRevoke(true);
@@ -409,7 +429,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "gavel",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
                 tooltip: "Check Compliance",
                 onClick: () => {
                     onComplianceCheck();

@@ -127,6 +127,35 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
     );
 };
 
+const issueCertificateNew: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.issueCertificateNew.match),
+        switchMap((action) =>
+            deps.apiClients.clientOperations
+                .issueNewCertificate({
+                    authorityUuid: action.payload.authorityUuid,
+                    raProfileUuid: action.payload.raProfileUuid,
+                    certificateUuid: action.payload.certificateUuid,
+                })
+                .pipe(
+                    mergeMap((operation) =>
+                        of(
+                            slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
+                            appRedirectActions.redirect({ url: `../detail/${operation.uuid}` }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.issueCertificateFailure({ error: extractError(err, "Failed to issue certificate") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to issue certificate" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const revokeCertificate: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.revokeCertificate.match),
@@ -708,6 +737,7 @@ const epics = [
     getCertificateDetail,
     getCertificateValidationResult,
     issueCertificate,
+    issueCertificateNew,
     revokeCertificate,
     renewCertificate,
     rekeyCertificate,

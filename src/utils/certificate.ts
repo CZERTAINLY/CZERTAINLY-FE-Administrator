@@ -25,7 +25,7 @@ export const emptyCertificate: CertificateDetailResponseModel = {
     privateKeyAvailability: false,
 };
 
-export function formatPEM(pemString: string) {
+export function formatPEM(pemString: string, csr?: boolean) {
     const PEM_STRING_LENGTH = pemString.length,
         LINE_LENGTH = 64;
     const wrapNeeded = PEM_STRING_LENGTH > LINE_LENGTH;
@@ -41,9 +41,9 @@ export function formatPEM(pemString: string) {
 
         formattedString += pemString.substring(wrapIndex, PEM_STRING_LENGTH);
 
-        return `-----BEGIN CERTIFICATE-----\n${formattedString}\n-----END CERTIFICATE-----`;
+        return `-----BEGIN CERTIFICATE${csr ? " REQUEST" : ""}-----\n${formattedString}\n-----END CERTIFICATE${csr ? " REQUEST" : ""}-----`;
     } else {
-        return `-----BEGIN CERTIFICATE-----\n${pemString}\n-----END CERTIFICATE-----`;
+        return `-----BEGIN CERTIFICATE${csr ? " REQUEST" : ""}-----\n${pemString}\n-----END CERTIFICATE${csr ? " REQUEST" : ""}-----`;
     }
 }
 
