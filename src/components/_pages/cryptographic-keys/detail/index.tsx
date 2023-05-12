@@ -438,7 +438,7 @@ export default function CryptographicKeyDetail() {
 
             <Dialog
                 isOpen={confirmDestroy}
-                caption={`Destroy Key"}`}
+                caption={`Destroy Key`}
                 body={`You are about to destroy the Key. Is this what you want to do?`}
                 toggle={() => setConfirmDestroy(false)}
                 buttons={[

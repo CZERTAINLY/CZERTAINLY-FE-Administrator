@@ -1,4 +1,5 @@
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import styles from "./Dialog.module.scss";
 
 interface DialogButton {
     color: string;
@@ -40,7 +41,13 @@ export default function Dialog(props: Props) {
                     <></>
                 ) : (
                     props.buttons.map((button, index) => (
-                        <Button key={index} color={button.color} onClick={() => button.onClick()} disabled={button.disabled || false}>
+                        <Button
+                            key={index}
+                            color={button.color}
+                            onClick={() => button.onClick()}
+                            disabled={button.disabled || false}
+                            className={styles.dialogButton}
+                        >
                             {button.body}
                         </Button>
                     ))

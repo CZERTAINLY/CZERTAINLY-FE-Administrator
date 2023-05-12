@@ -2,6 +2,7 @@ import AttributeViewer from "components/Attributes/AttributeViewer";
 import CustomAttributeWidget from "components/Attributes/CustomAttributeWidget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import SwitchField from "components/Input/SwitchField";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 
@@ -10,9 +11,10 @@ import CertificateStatus from "components/_pages/certificates/CertificateStatus"
 
 import { actions, selectors } from "ducks/scep-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container } from "reactstrap";
+import { Container, Form as BootstrapForm } from "reactstrap";
 import { Resource } from "types/openapi";
 
 export default function ScepProfileDetail() {
@@ -160,15 +162,60 @@ export default function ScepProfileDetail() {
                       },
                       {
                           id: "requireManualApproval",
-                          columns: ["Require Manual Approval", scepProfile.requireManualApproval ? "true" : "false"],
+                          columns: [
+                              "Require Manual Approvals",
+                              <Form
+                                  onSubmit={() => {}}
+                                  render={() => (
+                                      <BootstrapForm>
+                                          <SwitchField
+                                              disabled
+                                              checked={scepProfile.requireManualApproval}
+                                              id="requireManualApprovalSwitch"
+                                              label=""
+                                          />
+                                      </BootstrapForm>
+                                  )}
+                              />,
+                          ],
                       },
                       {
                           id: "includeCaCertificate",
-                          columns: ["Include CA Certificate", scepProfile.includeCaCertificate ? "true" : "false"],
+                          columns: [
+                              "Include CA Certificate",
+                              <Form
+                                  onSubmit={() => {}}
+                                  render={() => (
+                                      <BootstrapForm>
+                                          <SwitchField
+                                              disabled
+                                              checked={scepProfile.includeCaCertificate}
+                                              id="includeCaCertificateSwitch"
+                                              label=""
+                                          />
+                                      </BootstrapForm>
+                                  )}
+                              />,
+                          ],
                       },
                       {
                           id: "includeCaCertificateChain",
-                          columns: ["Include CA Certificate Chain", scepProfile.includeCaCertificateChain ? "true" : "false"],
+                          columns: [
+                              "Include CA Certificate Chain",
+                              <Form
+                                  onSubmit={() => {}}
+                                  render={() => (
+                                      <BootstrapForm>
+                                          <SwitchField
+                                              disabled
+                                              checked={scepProfile.includeCaCertificateChain}
+                                              id="includeCaCertificateChainSwitch"
+                                              label=""
+                                          />
+                                      </BootstrapForm>
+                                  )}
+                              />,
+                          ],
                       },
                       {
                           id: "scepUrl",

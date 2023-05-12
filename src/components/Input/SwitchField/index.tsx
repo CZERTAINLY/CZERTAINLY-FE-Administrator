@@ -6,9 +6,10 @@ type Props = {
     label: string;
     disabled?: boolean;
     onChange?: (value: boolean) => void;
+    checked?: boolean;
 };
 
-export default function SwitchField({ id, label, onChange = undefined, disabled = false }: Props) {
+export default function SwitchField({ id, label, onChange = undefined, disabled = false, checked = false }: Props) {
     return (
         <Field name={id} type={"checkbox"}>
             {({ input }) => (
@@ -18,6 +19,7 @@ export default function SwitchField({ id, label, onChange = undefined, disabled 
                         type="switch"
                         id={id}
                         disabled={disabled}
+                        checked={checked}
                         onChange={(e) => {
                             input.onChange(e);
                             if (onChange) {
