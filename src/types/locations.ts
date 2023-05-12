@@ -48,7 +48,7 @@ export type MetadataModel = Omit<MetadataDto, "items"> & { items: Array<Metadata
 
 export type LocationCertificateDto = CertificateInLocationDto;
 export type LocationCertificateModel = Omit<LocationCertificateDto, "metadata | pushAttributes | csrAttributes"> & {
-    metadata: Array<MetadataModel>;
+    metadata?: Array<MetadataModel>;
     pushAttributes?: Array<AttributeResponseModel>;
     csrAttributes?: Array<AttributeResponseModel>;
 };
