@@ -70,6 +70,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         }
     }, [history, keyItem.uuid]);
 
+    useEffect(() => {
+        setKeyUsages(keyItem?.usage || []);
+    }, [keyUsageUpdate, keyItem?.usage]);
+
     const onEnableClick = useCallback(() => {
         if (!keyItem) return;
         dispatch(
@@ -294,7 +298,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                               keyItem.reason ? (
                                   <>
                                       <KeyStateBadge state={keyItem.state} />
-                                      &nbsp;({keyItem.reason})
+                                      &nbsp;{keyCompromiseReasonEnum[keyItem.reason].label}
                                   </>
                               ) : (
                                   <KeyStateBadge state={keyItem.state} />
@@ -302,7 +306,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           ],
                       },
                   ],
-        [keyItem],
+        [keyCompromiseReasonEnum, keyItem],
     );
 
     const historyHeaders: TableHeader[] = useMemo(
@@ -512,7 +516,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 caption={`Destroy Key`}
                 body={
                     <div>
-                        <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
+                        <p>You are about to destroy the Key. Is this what you want to do?</p>
                         <p>
                             <b>Warning:</b> This action cannot be undone.
                         </p>

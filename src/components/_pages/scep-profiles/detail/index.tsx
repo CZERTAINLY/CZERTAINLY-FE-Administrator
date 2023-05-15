@@ -2,6 +2,7 @@ import AttributeViewer from "components/Attributes/AttributeViewer";
 import CustomAttributeWidget from "components/Attributes/CustomAttributeWidget";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import SwitchField from "components/Input/SwitchField";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 
@@ -10,6 +11,7 @@ import CertificateStatus from "components/_pages/certificates/CertificateStatus"
 
 import { actions, selectors } from "ducks/scep-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container } from "reactstrap";
@@ -160,11 +162,37 @@ export default function ScepProfileDetail() {
                       },
                       {
                           id: "includeCaCertificate",
-                          columns: ["Include CA Certificate", scepProfile.includeCaCertificate ? "true" : "false"],
+                          columns: [
+                              "Include CA Certificate",
+                              <Form
+                                  onSubmit={() => {}}
+                                  render={() => (
+                                      <SwitchField
+                                          disabled
+                                          viewOnly={{ checked: scepProfile.includeCaCertificate }}
+                                          id="includeCaCertificateSwitch"
+                                          label=""
+                                      />
+                                  )}
+                              />,
+                          ],
                       },
                       {
                           id: "includeCaCertificateChain",
-                          columns: ["Include CA Certificate Chain", scepProfile.includeCaCertificateChain ? "true" : "false"],
+                          columns: [
+                              "Include CA Certificate Chain",
+                              <Form
+                                  onSubmit={() => {}}
+                                  render={() => (
+                                      <SwitchField
+                                          disabled
+                                          viewOnly={{ checked: scepProfile.includeCaCertificateChain }}
+                                          id="includeCaCertificateChainSwitch"
+                                          label=""
+                                      />
+                                  )}
+                              />,
+                          ],
                       },
                       {
                           id: "scepUrl",
