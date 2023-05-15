@@ -14,7 +14,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container, Form as BootstrapForm } from "reactstrap";
+import { Container } from "reactstrap";
 import { Resource } from "types/openapi";
 
 export default function ScepProfileDetail() {
@@ -167,14 +167,12 @@ export default function ScepProfileDetail() {
                               <Form
                                   onSubmit={() => {}}
                                   render={() => (
-                                      <BootstrapForm>
-                                          <SwitchField
-                                              disabled
-                                              checked={scepProfile.includeCaCertificate}
-                                              id="includeCaCertificateSwitch"
-                                              label=""
-                                          />
-                                      </BootstrapForm>
+                                      <SwitchField
+                                          disabled
+                                          viewOnly={{ checked: scepProfile.includeCaCertificate }}
+                                          id="includeCaCertificateSwitch"
+                                          label=""
+                                      />
                                   )}
                               />,
                           ],
@@ -186,14 +184,12 @@ export default function ScepProfileDetail() {
                               <Form
                                   onSubmit={() => {}}
                                   render={() => (
-                                      <BootstrapForm>
-                                          <SwitchField
-                                              disabled
-                                              checked={scepProfile.includeCaCertificateChain}
-                                              id="includeCaCertificateChainSwitch"
-                                              label=""
-                                          />
-                                      </BootstrapForm>
+                                      <SwitchField
+                                          disabled
+                                          viewOnly={{ checked: scepProfile.includeCaCertificateChain }}
+                                          id="includeCaCertificateChainSwitch"
+                                          label=""
+                                      />
                                   )}
                               />,
                           ],

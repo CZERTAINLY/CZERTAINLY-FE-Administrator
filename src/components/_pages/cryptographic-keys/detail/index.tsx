@@ -392,7 +392,6 @@ export default function CryptographicKeyDetail() {
                     )}
                 </Col>
             </Row>
-
             <TabLayout tabs={itemTabs()} />
 
             <Widget title={associationTitle} busy={isBusy}>
