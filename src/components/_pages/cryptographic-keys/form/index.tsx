@@ -191,7 +191,10 @@ export default function CryptographicKeyForm() {
     const optionsForType = () => {
         let options: { value: KeyRequestType; label: string }[] = [];
         for (let key in KeyRequestType) {
-            options.push({ value: KeyRequestType[key as keyof typeof KeyRequestType], label: keyRequestTypeEnum[key].label });
+            options.push({
+                value: KeyRequestType[key as keyof typeof KeyRequestType],
+                label: keyRequestTypeEnum[KeyRequestType[key as keyof typeof KeyRequestType]].label,
+            });
         }
         return options;
     };

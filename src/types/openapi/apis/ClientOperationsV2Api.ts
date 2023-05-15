@@ -33,6 +33,12 @@ export interface IssueCertificateRequest {
     clientCertificateSignRequestDto: ClientCertificateSignRequestDto;
 }
 
+export interface IssueNewCertificateRequest {
+    authorityUuid: string;
+    raProfileUuid: string;
+    certificateUuid: string;
+}
+
 export interface ListIssueCertificateAttributesRequest {
     authorityUuid: string;
     raProfileUuid: string;
@@ -112,6 +118,38 @@ export class ClientOperationsV2Api extends BaseAPI {
                 method: "POST",
                 headers,
                 body: clientCertificateSignRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Issue existing certificate with status New
+     */
+    issueNewCertificate({
+        authorityUuid,
+        raProfileUuid,
+        certificateUuid,
+    }: IssueNewCertificateRequest): Observable<ClientCertificateDataResponseDto>;
+    issueNewCertificate(
+        { authorityUuid, raProfileUuid, certificateUuid }: IssueNewCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ClientCertificateDataResponseDto>>;
+    issueNewCertificate(
+        { authorityUuid, raProfileUuid, certificateUuid }: IssueNewCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<ClientCertificateDataResponseDto | AjaxResponse<ClientCertificateDataResponseDto>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "issueNewCertificate");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "issueNewCertificate");
+        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "issueNewCertificate");
+
+        return this.request<ClientCertificateDataResponseDto>(
+            {
+                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/issue"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
+                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
+                method: "POST",
             },
             opts?.responseOpts,
         );

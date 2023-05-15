@@ -43,12 +43,6 @@ export interface ScepProfileDetailDto {
      */
     description?: string;
     /**
-     * Enforce manual approval for all requests
-     * @type {boolean}
-     * @memberof ScepProfileDetailDto
-     */
-    requireManualApproval: boolean;
-    /**
      * Name of the RA Profile
      * @type {string}
      * @memberof ScepProfileDetailDto

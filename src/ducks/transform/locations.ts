@@ -41,7 +41,7 @@ export function transformMetadataDtoToModel(metadata: MetadataDto): MetadataMode
 export function transformLocationCertificateDtoToModel(locationCertificate: LocationCertificateDto): LocationCertificateModel {
     return {
         ...locationCertificate,
-        metadata: locationCertificate.metadata.map(transformMetadataDtoToModel),
+        metadata: locationCertificate.metadata?.map(transformMetadataDtoToModel),
         pushAttributes: locationCertificate.pushAttributes?.map(transformAttributeResponseDtoToModel),
         csrAttributes: locationCertificate.csrAttributes?.map(transformAttributeResponseDtoToModel),
     };

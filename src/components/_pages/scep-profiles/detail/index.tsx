@@ -161,25 +161,6 @@ export default function ScepProfileDetail() {
                           columns: ["Renew Threshold", scepProfile.renewThreshold?.toString() || "N/A"],
                       },
                       {
-                          id: "requireManualApproval",
-                          columns: [
-                              "Require Manual Approvals",
-                              <Form
-                                  onSubmit={() => {}}
-                                  render={() => (
-                                      <BootstrapForm>
-                                          <SwitchField
-                                              disabled
-                                              checked={scepProfile.requireManualApproval}
-                                              id="requireManualApprovalSwitch"
-                                              label=""
-                                          />
-                                      </BootstrapForm>
-                                  )}
-                              />,
-                          ],
-                      },
-                      {
                           id: "includeCaCertificate",
                           columns: [
                               "Include CA Certificate",
