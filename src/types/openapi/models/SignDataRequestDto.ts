@@ -19,7 +19,7 @@ import type { RequestAttributeDto, SignatureRequestData } from "./";
  */
 export interface SignDataRequestDto {
     /**
-     * List of cipher Attributes
+     * List of signature Attributes
      * @type {Array<RequestAttributeDto>}
      * @memberof SignDataRequestDto
      */
@@ -29,5 +29,5 @@ export interface SignDataRequestDto {
      * @type {Array<SignatureRequestData>}
      * @memberof SignDataRequestDto
      */
-    data?: Array<SignatureRequestData>;
+    data: Array<SignatureRequestData>;
 }

@@ -12,7 +12,7 @@ import {
 
 export type CryptographicKeySignDataRequestDto = SignDataRequestDto;
 export type CryptographicKeySignDataRequestModel = Omit<CryptographicKeySignDataRequestDto, "data"> & {
-    data?: Array<SignatureRequestData>;
+    data: Array<SignatureRequestData>;
 };
 
 export type CryptographicKeySignatureRequestDataDto = SignatureRequestData;
@@ -26,7 +26,7 @@ export type CryptographicKeySignResponseDataModel = CryptographicKeySignResponse
 
 export type CryptographicKeyVerifyDataRequestDto = VerifyDataRequestDto;
 export type CryptographicKeyVerifyDataRequestModel = Omit<CryptographicKeyVerifyDataRequestDto, "data"> & {
-    data?: Array<SignatureRequestData>;
+    data: Array<SignatureRequestData>;
 };
 
 export type CryptographicKeyVerifyResponseDto = VerifyDataResponseDto;
