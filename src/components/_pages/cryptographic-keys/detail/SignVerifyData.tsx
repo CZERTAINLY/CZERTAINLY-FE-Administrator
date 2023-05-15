@@ -5,7 +5,7 @@ import { actions, selectors } from "ducks/cryptographic-operations";
 import { useCallback, useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
 import { KeyAlgorithm } from "types/openapi";
 
@@ -182,7 +182,12 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
 
                         <div style={{ textAlign: "right" }}>
                             <ButtonGroup>
-                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
+                                <Button
+                                    type="submit"
+                                    color="primary"
+                                    disabled={(action === "verify" ? !signatureContent : false) || !fileContent || submitting || !valid}
+                                    onClick={handleSubmit}
+                                >
                                     {action === "sign" ? "Sign" : "Verify"}
                                 </Button>
 

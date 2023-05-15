@@ -19,7 +19,7 @@ import type { RequestAttributeDto, SignatureRequestData } from "./";
  */
 export interface VerifyDataRequestDto {
     /**
-     * List of cipher Attributes
+     * List of signature Attributes
      * @type {Array<RequestAttributeDto>}
      * @memberof VerifyDataRequestDto
      */
@@ -29,7 +29,7 @@ export interface VerifyDataRequestDto {
      * @type {Array<SignatureRequestData>}
      * @memberof VerifyDataRequestDto
      */
-    data?: Array<SignatureRequestData>;
+    data: Array<SignatureRequestData>;
     /**
      * Signatures to verify
      * @type {Array<SignatureRequestData>}
