@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CertificateListResponseDto } from "types/certificate";
+import { CertificateListResponseDto, CertificateListResponseModel } from "types/certificate";
 import { BulkActionModel } from "types/connectors";
 import {
     ScepProfileAddRequestModel,
@@ -17,7 +17,7 @@ export type State = {
 
     scepProfile?: ScepProfileResponseModel;
     scepProfiles: ScepProfileListResponseModel[];
-    caCertificates?: CertificateListResponseDto[];
+    caCertificates?: CertificateListResponseModel[];
 
     isFetchingList: boolean;
     isFetchingCertificates: boolean;

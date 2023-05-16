@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
-import { AcmeProfileResponseModel } from "types/acme-profiles";
+import { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from "types/acme-profiles";
 import { AttributeDescriptorModel } from "types/attributes";
 import { RaProfileResponseModel } from "types/ra-profiles";
 
@@ -44,7 +44,7 @@ interface FormValues {
     webSite: string;
     termsChangeUrl: string;
     disableOrders: boolean;
-    requireAgreement: boolean;
+    requireTermsOfService: boolean;
     requireContact: boolean;
     raProfile: { value: string; label: string } | undefined;
 }
@@ -112,64 +112,35 @@ export default function AcmeProfileForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
+            const request: AcmeProfileEditRequestModel | AcmeProfileAddRequestModel = {
+                ...values,
+                dnsResolverIp: values.dnsIpAddress,
+                dnsResolverPort: values.dnsPort,
+                retryInterval: parseInt(values.retryInterval),
+                validity: parseInt(values.orderValidity),
+                termsOfServiceUrl: values.termsUrl,
+                websiteUrl: values.webSite,
+                termsOfServiceChangeUrl: values.termsChangeUrl,
+                termsOfServiceChangeDisable: values.disableOrders,
+                issueCertificateAttributes: collectFormAttributes(
+                    "issuanceAttributes",
+                    [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
+                    values,
+                ),
+                revokeCertificateAttributes: collectFormAttributes(
+                    "revocationAttributes",
+                    [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
+                    values,
+                ),
+                customAttributes: collectFormAttributes("customAcmeProfile", resourceCustomAttributes, values),
+            };
+            if (values.raProfile) {
+                request.raProfileUuid = values.raProfile.value;
+            }
             if (editMode) {
-                dispatch(
-                    acmeProfileActions.updateAcmeProfile({
-                        uuid: id!,
-                        updateAcmeRequest: {
-                            description: values.description,
-                            dnsResolverIp: values.dnsIpAddress,
-                            dnsResolverPort: values.dnsPort,
-                            retryInterval: parseInt(values.retryInterval),
-                            validity: parseInt(values.orderValidity),
-                            termsOfServiceUrl: values.termsUrl,
-                            websiteUrl: values.webSite,
-                            termsOfServiceChangeUrl: values.termsChangeUrl,
-                            termsOfServiceChangeDisable: values.disableOrders,
-                            requireTermsOfService: values.requireAgreement,
-                            requireContact: values.requireContact,
-                            raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-                            issueCertificateAttributes: collectFormAttributes(
-                                "issuanceAttributes",
-                                [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
-                                values,
-                            ),
-                            revokeCertificateAttributes: collectFormAttributes(
-                                "revocationAttributes",
-                                [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
-                                values,
-                            ),
-                            customAttributes: collectFormAttributes("customAcmeProfile", resourceCustomAttributes, values),
-                        },
-                    }),
-                );
+                dispatch(acmeProfileActions.updateAcmeProfile({ uuid: id!, updateAcmeRequest: request }));
             } else {
-                dispatch(
-                    acmeProfileActions.createAcmeProfile({
-                        name: values.name,
-                        description: values.description,
-                        dnsResolverIp: values.dnsIpAddress,
-                        dnsResolverPort: values.dnsPort,
-                        retryInterval: parseInt(values.retryInterval),
-                        validity: parseInt(values.orderValidity),
-                        termsOfServiceUrl: values.termsUrl,
-                        websiteUrl: values.webSite,
-                        requireTermsOfService: values.requireAgreement,
-                        requireContact: values.requireContact,
-                        raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-                        issueCertificateAttributes: collectFormAttributes(
-                            "issuanceAttributes",
-                            [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
-                            values,
-                        ),
-                        revokeCertificateAttributes: collectFormAttributes(
-                            "revocationAttributes",
-                            [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
-                            values,
-                        ),
-                        customAttributes: collectFormAttributes("customAcmeProfile", resourceCustomAttributes, values),
-                    }),
-                );
+                dispatch(acmeProfileActions.createAcmeProfile(request as AcmeProfileAddRequestModel));
             }
         },
         [
@@ -203,13 +174,6 @@ export default function AcmeProfileForm() {
 
             setRaProfile(raProfiles.find((p) => p.uuid === value) || undefined);
 
-            dispatch(
-                raProfileActions.listIssuanceAttributeDescriptors({ authorityUuid: raProfile?.authorityInstanceUuid || "", uuid: value }),
-            );
-            dispatch(
-                raProfileActions.listRevocationAttributeDescriptors({ authorityUuid: raProfile?.authorityInstanceUuid || "", uuid: value }),
-            );
-
             if (acmeProfile) {
                 setAcmeProfile({
                     ...acmeProfile,
@@ -218,7 +182,7 @@ export default function AcmeProfileForm() {
                 });
             }
         },
-        [dispatch, raProfiles, acmeProfile, raProfile?.authorityInstanceUuid],
+        [dispatch, raProfiles, acmeProfile],
     );
 
     const optionsForRaProfiles = useMemo(
@@ -242,7 +206,7 @@ export default function AcmeProfileForm() {
             webSite: editMode ? acmeProfile?.websiteUrl || "" : "",
             termsChangeUrl: editMode ? acmeProfile?.termsOfServiceChangeUrl || "" : "",
             disableOrders: editMode ? acmeProfile?.termsOfServiceChangeDisable || false : false,
-            requireAgreement: editMode ? acmeProfile?.requireTermsOfService || false : false,
+            requireTermsOfService: editMode ? acmeProfile?.requireTermsOfService || false : false,
             requireContact: editMode ? acmeProfile?.requireContact || false : false,
             raProfile: editMode
                 ? acmeProfile?.raProfile
@@ -482,12 +446,12 @@ export default function AcmeProfileForm() {
                                 </Row>
                             )}
 
-                            <Field name="requireAgreement" type="checkbox">
+                            <Field name="requireTermsOfService" type="checkbox">
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Input {...input} id="requireAgreement" type="checkbox" />
+                                        <Input {...input} id="requireTermsOfService" type="checkbox" />
 
-                                        <Label for="requireAgreement">&nbsp;Require agree on Terms Of Service for new account</Label>
+                                        <Label for="requireTermsOfService">&nbsp;Require agree on Terms Of Service for new account</Label>
                                     </FormGroup>
                                 )}
                             </Field>

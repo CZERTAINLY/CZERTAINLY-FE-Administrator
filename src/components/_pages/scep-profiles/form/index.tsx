@@ -20,13 +20,14 @@ import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { RaProfileResponseModel } from "types/ra-profiles";
-import { ScepProfileResponseModel } from "types/scep-profiles";
+import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from "types/scep-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { validateAlphaNumeric, validateInteger, validateRequired } from "utils/validators";
 import { KeyAlgorithm, Resource } from "../../../../types/openapi";
+import CertificateField from "../CertificateField";
 
 interface FormValues {
     name: string;
@@ -105,10 +106,9 @@ export default function ScepProfileForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
-            const scepRequest = {
+            const scepRequest: ScepProfileEditRequestModel | ScepProfileAddRequestModel = {
                 ...values,
-                raProfileUuid: values.raProfile ? values.raProfile.value : "NONE",
-                caCertificateUuid: values.certificate ? values.certificate.value : "NONE",
+                caCertificateUuid: values.certificate!.value,
                 issueCertificateAttributes: collectFormAttributes(
                     "issuanceAttributes",
                     [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
@@ -116,6 +116,9 @@ export default function ScepProfileForm() {
                 ),
                 customAttributes: collectFormAttributes("customScepProfile", resourceCustomAttributes, values),
             };
+            if (values.raProfile) {
+                scepRequest.raProfileUuid = values.raProfile.value;
+            }
             if (editMode) {
                 dispatch(
                     scepProfileActions.updateScepProfile({
@@ -124,7 +127,7 @@ export default function ScepProfileForm() {
                     }),
                 );
             } else {
-                dispatch(scepProfileActions.createScepProfile(scepRequest));
+                dispatch(scepProfileActions.createScepProfile(scepRequest as ScepProfileAddRequestModel));
             }
         },
         [dispatch, editMode, id, raProfileIssuanceAttrDescs, issueGroupAttributesCallbackAttributes, resourceCustomAttributes],
@@ -146,10 +149,6 @@ export default function ScepProfileForm() {
 
             setRaProfile(raProfiles.find((p) => p.uuid === value) || undefined);
 
-            dispatch(
-                raProfileActions.listIssuanceAttributeDescriptors({ authorityUuid: raProfile?.authorityInstanceUuid || "", uuid: value }),
-            );
-
             if (scepProfile) {
                 setScepProfile({
                     ...scepProfile,
@@ -157,7 +156,7 @@ export default function ScepProfileForm() {
                 });
             }
         },
-        [dispatch, raProfiles, scepProfile, raProfile?.authorityInstanceUuid],
+        [dispatch, raProfiles, scepProfile],
     );
 
     const optionsForRaProfiles = useMemo(
@@ -169,39 +168,32 @@ export default function ScepProfileForm() {
         [raProfiles],
     );
 
-    const defaultValues: FormValues = useMemo(
+    const defaultValues = useMemo(
         () => ({
-            name: editMode ? scepProfile?.name || "" : "",
-            description: editMode ? scepProfile?.description || "" : "",
-            renewalThreshold: editMode ? scepProfile?.renewThreshold || 0 : 0,
-            includeCaCertificate: editMode ? scepProfile?.includeCaCertificate || false : false,
-            includeCaCertificateChain: editMode ? scepProfile?.includeCaCertificateChain || false : false,
-            enableIntune: editMode ? scepProfile?.enableIntune ?? false : false,
-            intuneTenant: editMode ? scepProfile?.intuneTenant ?? "" : "",
-            intuneApplicationId: editMode ? scepProfile?.intuneApplicationId ?? "" : "",
+            name: editMode ? scepProfileSelector?.name || "" : "",
+            description: editMode ? scepProfileSelector?.description || "" : "",
+            renewalThreshold: editMode ? scepProfileSelector?.renewThreshold || 0 : 0,
+            includeCaCertificate: editMode ? scepProfileSelector?.includeCaCertificate || false : false,
+            includeCaCertificateChain: editMode ? scepProfileSelector?.includeCaCertificateChain || false : false,
+            enableIntune: editMode ? scepProfileSelector?.enableIntune ?? false : false,
+            intuneTenant: editMode ? scepProfileSelector?.intuneTenant ?? "" : "",
+            intuneApplicationId: editMode ? scepProfileSelector?.intuneApplicationId ?? "" : "",
             intuneApplicationKey: "",
             raProfile: editMode
-                ? scepProfile?.raProfile
-                    ? optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfile.raProfile?.uuid)
+                ? scepProfileSelector?.raProfile
+                    ? optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfileSelector.raProfile?.uuid)
                     : undefined
                 : undefined,
-            certificate: undefined,
+            certificate:
+                editMode && scepProfileSelector?.caCertificate
+                    ? {
+                          label: `${scepProfileSelector.caCertificate.commonName} (${scepProfileSelector.caCertificate.serialNumber})`,
+                          value: scepProfileSelector.caCertificate.uuid,
+                      }
+                    : undefined,
         }),
-        [editMode, scepProfile, optionsForRaProfiles],
+        [editMode, scepProfileSelector, optionsForRaProfiles],
     );
-
-    const optionsForCertificates = useMemo(() => {
-        const options = certificates?.map((certificate) => ({
-            value: certificate.uuid,
-            label: `${certificate.commonName} (${certificate.serialNumber})`,
-        }));
-        defaultValues.certificate = editMode
-            ? scepProfile?.caCertificate
-                ? options?.find((certificate) => certificate.value === scepProfile.caCertificate?.uuid)
-                : undefined
-            : undefined;
-        return options;
-    }, [certificates, defaultValues, editMode, scepProfile?.caCertificate]);
 
     const title = useMemo(() => (editMode ? "Edit SCEP Profile" : "Create SCEP Profile"), [editMode]);
 
@@ -261,22 +253,7 @@ export default function ScepProfileForm() {
                         <TextField id="intuneApplicationId" label="Intune Application ID" validators={[]} disabled={!intune} />
                         <TextField id="intuneApplicationKey" label="Intune Application Key" validators={[]} disabled={!intune} />
 
-                        <Field name="certificate" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="certificate">CA Certificate</Label>
-                                    <Select
-                                        {...input}
-                                        id="certificate"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForCertificates}
-                                        placeholder="Select to change CA Certificate if needed"
-                                        isClearable={true}
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
+                        <CertificateField certificates={certificates} />
 
                         <Widget
                             title="RA Profile Configuration"
