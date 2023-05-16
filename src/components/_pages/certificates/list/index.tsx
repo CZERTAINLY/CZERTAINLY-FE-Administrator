@@ -28,9 +28,15 @@ interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
+    topActionsHidden?: boolean;
 }
 
-export default function CertificateList({ selectCertsOnly = false, multiSelect = true, onCheckedRowsChanged }: Props) {
+export default function CertificateList({
+    selectCertsOnly = false,
+    multiSelect = true,
+    onCheckedRowsChanged,
+    topActionsHidden = false,
+}: Props) {
     const dispatch = useDispatch();
 
     const certificates = useSelector(selectors.certificates);
@@ -323,6 +329,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
                 entityNamePlural="Certificates"
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
+                topActionsHidden={topActionsHidden}
             />
 
             <Dialog

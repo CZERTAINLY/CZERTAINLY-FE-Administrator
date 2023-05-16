@@ -554,11 +554,12 @@ export default function LocationDetail() {
                 caption="Push certificate to the location"
                 toggle={() => setPushDialog(false)}
                 buttons={[]}
-                size="lg"
+                size="xl"
                 body={
                     <>
                         <CertificateList
                             selectCertsOnly={true}
+                            topActionsHidden={true}
                             multiSelect={false}
                             onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
                         />
