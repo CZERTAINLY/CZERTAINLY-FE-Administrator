@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Field, useForm, useFormState } from "react-final-form";
 import { useSelector } from "react-redux";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
@@ -91,7 +91,7 @@ export default function DynamicContent({ editable, isList }: Props) {
                         >
                             {AllowedAttributeContentType.map((contentType) => (
                                 <option key={contentType} value={contentType}>
-                                    {attributeContentTypeEnum[contentType].label}
+                                    {getEnumLabel(attributeContentTypeEnum, contentType)}
                                 </option>
                             ))}
                         </Input>

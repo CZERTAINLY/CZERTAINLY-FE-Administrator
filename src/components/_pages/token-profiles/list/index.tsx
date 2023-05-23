@@ -11,7 +11,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import Select from "react-select";
 import { KeyUsage, PlatformEnum } from "types/openapi";
 import { TokenProfileResponseModel } from "types/token-profiles";
@@ -133,7 +133,7 @@ function TokenProfileList() {
         let options = [];
         for (const suit in KeyUsage) {
             options.push({
-                label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
                 value: KeyUsage[suit as keyof typeof KeyUsage],
             });
         }

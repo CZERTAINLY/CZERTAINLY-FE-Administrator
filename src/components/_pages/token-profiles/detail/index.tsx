@@ -14,7 +14,7 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Col, Container, Label, Row } from "reactstrap";
 import { KeyUsage, PlatformEnum, Resource } from "types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
@@ -84,7 +84,7 @@ export default function TokenProfileDetail() {
         for (let key in KeyUsage) {
             options.push({
                 value: KeyUsage[key as keyof typeof KeyUsage],
-                label: keyUsageEnum[KeyUsage[key as keyof typeof KeyUsage]].label,
+                label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
             });
         }
         return options;

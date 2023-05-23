@@ -14,7 +14,7 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Col, Container, Label, Row } from "reactstrap";
 import { KeyCompromiseReason, KeyState, PlatformEnum, Resource } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
@@ -130,7 +130,7 @@ export default function CryptographicKeyDetail() {
         if (keyCompromiseReasonEnum) {
             for (const reason in KeyCompromiseReason) {
                 const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-                options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+                options.push({ value: myReason, label: getEnumLabel(keyCompromiseReasonEnum, myReason) });
             }
         }
         return options;
@@ -356,7 +356,7 @@ export default function CryptographicKeyDetail() {
             ? []
             : cryptographicKey?.items.map((item, index) => {
                   return {
-                      title: keyTypeEnum[item.type].label,
+                      title: getEnumLabel(keyTypeEnum, item.type),
                       content: (
                           <Widget busy={isBusy || isFetchingHistory}>
                               <CryptographicKeyItem

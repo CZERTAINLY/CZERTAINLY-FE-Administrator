@@ -5,7 +5,7 @@ import { WidgetButtonProps } from "components/WidgetButtons";
 
 import PagedList from "components/PagedList/PagedList";
 import { actions, selectors } from "ducks/cryptographic-keys";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { EntityType } from "ducks/filters";
 import { selectors as pagingSelectors } from "ducks/paging";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -124,7 +124,7 @@ function CryptographicKeyList() {
         if (keyUsageEnum) {
             for (const suit in KeyUsage) {
                 options.push({
-                    label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                    label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
                     value: KeyUsage[suit as keyof typeof KeyUsage],
                 });
             }
@@ -248,7 +248,7 @@ function CryptographicKeyList() {
                             {cryptographicKeys[key].name}
                         </Link>
                     </span>,
-                    <Badge color="secondary">{keyTypeEnum[cryptographicKeys[key].type].label}</Badge>,
+                    <Badge color="secondary">{getEnumLabel(keyTypeEnum, cryptographicKeys[key].type)}</Badge>,
                     cryptographicKeys[key].keyAlgorithm,
                     cryptographicKeys[key].length?.toString() || "unknown",
                     cryptographicKeys[key].format || "unknown",
@@ -269,7 +269,7 @@ function CryptographicKeyList() {
         if (keyCompromiseReasonEnum) {
             for (const reason in KeyCompromiseReason) {
                 const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-                options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+                options.push({ value: myReason, label: getEnumLabel(keyCompromiseReasonEnum, myReason) });
             }
         }
         return options;

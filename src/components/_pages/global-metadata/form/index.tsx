@@ -3,7 +3,7 @@ import TextField from "components/Input/TextField";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { actions, selectors } from "ducks/globalMetadata";
 import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
@@ -97,7 +97,7 @@ export default function GlobalMetadataForm() {
                                     >
                                         {Object.values(AttributeContentType).map((contentType) => (
                                             <option key={contentType} value={contentType}>
-                                                {attributeContentTypeEnum[contentType].label}
+                                                {getEnumLabel(attributeContentTypeEnum, contentType)}
                                             </option>
                                         ))}
                                     </Input>

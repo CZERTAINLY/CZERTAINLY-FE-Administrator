@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useSelector } from "react-redux";
 import { Badge } from "reactstrap";
 import { ConnectorStatus, PlatformEnum } from "types/openapi";
@@ -9,7 +9,7 @@ interface Props {
 
 export default function InventoryStatusBadge({ status }: Props) {
     const connectorStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConnectorStatus));
-    const statusText = status ? connectorStatusEnum[status].label : undefined;
+    const statusText = status ? getEnumLabel(connectorStatusEnum, status) : undefined;
     const getStatus = (status: ConnectorStatus) => {
         switch (status) {
             case ConnectorStatus.Connected:

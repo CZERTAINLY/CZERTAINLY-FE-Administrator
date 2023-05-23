@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useSelector } from "react-redux";
 import { Badge } from "reactstrap";
 import { KeyState, PlatformEnum } from "types/openapi";
@@ -9,7 +9,7 @@ interface Props {
 
 function KeyStateBadge({ state }: Props) {
     const keyStateEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyState));
-    const text = keyStateEnum[state].label;
+    const text = getEnumLabel(keyStateEnum, state);
     switch (state) {
         case KeyState.Active:
             return <Badge color="success">{text}</Badge>;

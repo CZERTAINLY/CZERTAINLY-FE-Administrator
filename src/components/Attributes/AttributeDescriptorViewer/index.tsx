@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { attributeFieldNameTransform, getAttributeContent } from "utils/attributes/attributes";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useSelector } from "react-redux";
 import { AttributeDescriptorModel, isDataAttributeModel, isInfoAttributeModel } from "types/attributes";
 import { AttributeConstraintType, PlatformEnum } from "types/openapi";
@@ -50,7 +50,7 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
             if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
                 return [
                     attr.properties.label || attributeFieldNameTransform[attr.name] || attr.name,
-                    attributeTypeEnum[attr.type].label,
+                    getEnumLabel(attributeTypeEnum, attr.type),
                     isDataAttributeModel(attr) ? (attr.properties.required ? "Yes" : "No") : "n/a",
                     attr.description ?? "Not set",
                     getAttributeContent(attr.contentType, attr.content),
@@ -81,7 +81,7 @@ export default function AttributeDescriptorViewer({ attributeDescriptors }: Prop
                 columns = [
                     { id: "label", columns: [<b>Label</b>, attr.properties.label] },
                     { id: "group", columns: [<b>Group</b>, attr.properties.group || "Not set"] },
-                    { id: "contentType", columns: [<b>Content Type</b>, attributeContentTypeEnum[attr.contentType].label] },
+                    { id: "contentType", columns: [<b>Content Type</b>, getEnumLabel(attributeContentTypeEnum, attr.contentType)] },
                     ...columns,
                     { id: "defaults", columns: [<b>Defaults</b>, getAttributeContent(attr.contentType, attr.content)] },
                 ];

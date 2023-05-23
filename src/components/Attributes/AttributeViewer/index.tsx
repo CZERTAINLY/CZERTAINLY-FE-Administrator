@@ -1,5 +1,5 @@
 import CustomTable, { TableDataRow } from "components/CustomTable";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useSelector } from "react-redux";
@@ -101,7 +101,7 @@ export default function AttributeViewer({
             id: attribute.uuid || "",
             columns: [
                 attribute.label || "",
-                contentTypeEnum[attribute.contentType].label || "",
+                getEnumLabel(contentTypeEnum, attribute.contentType),
                 getContent(attribute.contentType, attribute.content),
             ],
         }),
@@ -115,7 +115,7 @@ export default function AttributeViewer({
                 id: descriptor.uuid || "",
                 columns: [
                     isDataAttributeModel(descriptor) ? descriptor.properties.label : descriptor.name,
-                    isDataAttributeModel(descriptor) ? contentTypeEnum[descriptor.contentType].label : "n/a",
+                    isDataAttributeModel(descriptor) ? getEnumLabel(contentTypeEnum, descriptor.contentType) : "n/a",
                     isDataAttributeModel(descriptor)
                         ? attribute
                             ? getContent(attribute.contentType, attribute.content)
@@ -189,7 +189,7 @@ export default function AttributeViewer({
                         id: a.uuid || "",
                         columns: [
                             a.label || "",
-                            contentTypeEnum[a.contentType].label || "",
+                            getEnumLabel(contentTypeEnum, a.contentType),
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
                                 <Form onSubmit={() => {}}>
                                     {({ values }) => (

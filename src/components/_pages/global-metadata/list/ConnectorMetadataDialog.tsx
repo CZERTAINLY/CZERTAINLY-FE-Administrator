@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -72,7 +72,7 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                 id: metadata.uuid,
                 columns: [
                     metadata.name,
-                    attributeContentTypeEnum[metadata.contentType].label,
+                    getEnumLabel(attributeContentTypeEnum, metadata.contentType),
                     <Button
                         key={metadata.uuid}
                         color={"primary"}

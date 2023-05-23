@@ -6,7 +6,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/connectors";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -216,7 +216,7 @@ export default function ConnectorDetail() {
             },
             {
                 id: "authType",
-                columns: ["Auth Type", authTypeEnum[connector.authType].label],
+                columns: ["Auth Type", getEnumLabel(authTypeEnum, connector.authType)],
             },
         ];
     }, [connector, authTypeEnum]);

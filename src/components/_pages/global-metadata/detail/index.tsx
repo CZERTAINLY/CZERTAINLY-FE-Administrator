@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
 
@@ -115,7 +115,7 @@ export default function GlobalMetadataDetail() {
                       },
                       {
                           id: "contentType",
-                          columns: ["Content Type", attributeContentTypeEnum[globalMetadata.contentType].label],
+                          columns: ["Content Type", getEnumLabel(attributeContentTypeEnum, globalMetadata.contentType)],
                       },
                       {
                           id: "group",

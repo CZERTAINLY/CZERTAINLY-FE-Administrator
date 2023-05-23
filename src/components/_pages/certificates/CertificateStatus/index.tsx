@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useSelector } from "react-redux";
 import { Badge } from "reactstrap";
 import {
@@ -33,53 +33,53 @@ function CertificateStatus({ status, asIcon = false }: Props) {
             text: string;
         };
     } = {
-        [Status.Valid]: { color: "success", text: certificateStatusEnum[Status.Valid].label },
-        [Status.Revoked]: { color: "dark", text: certificateStatusEnum[Status.Revoked].label },
-        [Status.Invalid]: { color: "danger", text: certificateStatusEnum[Status.Invalid].label },
-        [Status.Expiring]: { color: "warning", text: certificateStatusEnum[Status.Expiring].label },
-        [Status.Expired]: { color: "danger", text: certificateStatusEnum[Status.Expired].label },
-        [Status.Unknown]: { color: "secondary", text: certificateStatusEnum[Status.Unknown].label },
-        [Status.New]: { color: "primary", text: certificateStatusEnum[Status.New].label },
+        [Status.Valid]: { color: "success", text: getEnumLabel(certificateStatusEnum, Status.Valid) },
+        [Status.Revoked]: { color: "dark", text: getEnumLabel(certificateStatusEnum, Status.Revoked) },
+        [Status.Invalid]: { color: "danger", text: getEnumLabel(certificateStatusEnum, Status.Invalid) },
+        [Status.Expiring]: { color: "warning", text: getEnumLabel(certificateStatusEnum, Status.Expiring) },
+        [Status.Expired]: { color: "danger", text: getEnumLabel(certificateStatusEnum, Status.Expired) },
+        [Status.Unknown]: { color: "secondary", text: getEnumLabel(certificateStatusEnum, Status.Unknown) },
+        [Status.New]: { color: "primary", text: getEnumLabel(certificateStatusEnum, Status.New) },
         [CertificateValidationStatus.Success]: {
             color: "success",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Success].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Success),
         },
         [CertificateValidationStatus.Failed]: {
             color: "danger",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Failed].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Failed),
         },
         [CertificateValidationStatus.Warning]: {
             color: "warning",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Warning].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Warning),
         },
         [CertificateValidationStatus.Revoked]: {
             color: "dark",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Revoked].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Revoked),
         },
         [CertificateValidationStatus.NotChecked]: {
             color: "secondary",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.NotChecked].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.NotChecked),
         },
         [CertificateValidationStatus.Invalid]: {
             color: "danger",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Invalid].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Invalid),
         },
         [CertificateValidationStatus.Expiring]: {
             color: "warning",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Expiring].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Expiring),
         },
         [CertificateValidationStatus.Expired]: {
             color: "danger",
-            text: certificateValidationStatusEnum[CertificateValidationStatus.Expired].label,
+            text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Expired),
         },
         [CertificateEventHistoryDtoStatusEnum.Success]: { color: "success", text: "Success" },
         [CertificateEventHistoryDtoStatusEnum.Failed]: { color: "danger", text: "Failed" },
-        [ComplianceStatus.Ok]: { color: "success", text: complianceStatusEnum[ComplianceStatus.Ok].label },
-        [ComplianceStatus.Nok]: { color: "danger", text: complianceStatusEnum[ComplianceStatus.Nok].label },
-        [ComplianceStatus.Na]: { color: "secondary", text: complianceStatusEnum[ComplianceStatus.Na].label },
-        [ComplianceRuleStatus.Ok]: { color: "success", text: complianceRuleStatusEnum[ComplianceRuleStatus.Ok].label },
-        [ComplianceRuleStatus.Nok]: { color: "danger", text: complianceRuleStatusEnum[ComplianceRuleStatus.Nok].label },
-        [ComplianceRuleStatus.Na]: { color: "secondary", text: complianceRuleStatusEnum[ComplianceRuleStatus.Na].label },
+        [ComplianceStatus.Ok]: { color: "success", text: getEnumLabel(complianceStatusEnum, ComplianceStatus.Ok) },
+        [ComplianceStatus.Nok]: { color: "danger", text: getEnumLabel(complianceStatusEnum, ComplianceStatus.Nok) },
+        [ComplianceStatus.Na]: { color: "secondary", text: getEnumLabel(complianceStatusEnum, ComplianceStatus.Na) },
+        [ComplianceRuleStatus.Ok]: { color: "success", text: getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Ok) },
+        [ComplianceRuleStatus.Nok]: { color: "danger", text: getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Nok) },
+        [ComplianceRuleStatus.Na]: { color: "secondary", text: getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Na) },
     };
 
     const _default = { color: "secondary", text: "Unknown" };

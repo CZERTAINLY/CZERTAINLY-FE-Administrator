@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useSelector } from "react-redux";
 import { KeyState, PlatformEnum } from "types/openapi";
 
@@ -8,7 +8,7 @@ interface Props {
 
 function KeyStateCircle({ state }: Props) {
     const keyStateEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyState));
-    const stateText = keyStateEnum[state].label;
+    const stateText = getEnumLabel(keyStateEnum, state);
     const stateMap: { [key in KeyState]: { color: string; text: string } } = {
         [KeyState.Active]: { color: "success", text: stateText },
         [KeyState.PreActive]: { color: "dark", text: stateText },

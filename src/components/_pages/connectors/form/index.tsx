@@ -4,7 +4,7 @@ import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,15 +43,15 @@ export default function ConnectorForm() {
     const optionsForAuth: { label: string; value: AuthType }[] = useMemo(
         () => [
             {
-                label: authTypeEnum[AuthType.None].label,
+                label: getEnumLabel(authTypeEnum, AuthType.None),
                 value: AuthType.None,
             },
             {
-                label: authTypeEnum[AuthType.Basic].label,
+                label: getEnumLabel(authTypeEnum, AuthType.Basic),
                 value: AuthType.Basic,
             },
             {
-                label: authTypeEnum[AuthType.Certificate].label,
+                label: getEnumLabel(authTypeEnum, AuthType.Certificate),
                 value: AuthType.Certificate,
             },
         ],

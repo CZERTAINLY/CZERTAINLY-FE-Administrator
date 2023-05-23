@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Button, Col, Row } from "reactstrap";
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
 import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from "types/openapi";
@@ -244,7 +244,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                       },
                       {
                           id: "Type",
-                          columns: ["Type", keyTypeEnum[keyItem.type].label],
+                          columns: ["Type", getEnumLabel(keyTypeEnum, keyItem.type)],
                       },
                       {
                           id: "keyAlgorithm",
@@ -298,7 +298,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                               keyItem.reason ? (
                                   <>
                                       <KeyStateBadge state={keyItem.state} />
-                                      &nbsp;{keyCompromiseReasonEnum[keyItem.reason].label}
+                                      &nbsp;{getEnumLabel(keyCompromiseReasonEnum, keyItem.reason)}
                                   </>
                               ) : (
                                   <KeyStateBadge state={keyItem.state} />
@@ -343,7 +343,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         var options = [];
         for (const reason in KeyCompromiseReason) {
             const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+            options.push({ value: myReason, label: getEnumLabel(keyCompromiseReasonEnum, myReason) });
         }
         return options;
     };
@@ -383,7 +383,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         let options = [];
         for (const suit in KeyUsage) {
             options.push({
-                label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                label: getEnumLabel(keyUsageEnum, KeyUsage[suit as keyof typeof KeyUsage]),
                 value: KeyUsage[suit as keyof typeof KeyUsage],
             });
         }
