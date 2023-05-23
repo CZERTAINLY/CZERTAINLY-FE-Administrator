@@ -14,7 +14,7 @@ interface Props {
     caption?: string | JSX.Element;
     body?: string | JSX.Element;
     buttons?: DialogButton[];
-    size?: "sm" | "lg";
+    size?: "sm" | "lg" | "xl";
 }
 
 export default function Dialog(props: Props) {

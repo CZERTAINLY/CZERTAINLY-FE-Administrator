@@ -287,9 +287,11 @@ export const slice = createSlice({
             state.isDeleting = false;
 
             const index = state.cryptographicKeys.findIndex((cryptographicKey) => cryptographicKey.uuid === action.payload.uuid);
-            if (action.payload.keyItemUuid.length === state.cryptographicKey?.items.length) {
+            if (action.payload.keyItemUuid.length === state.cryptographicKey?.items.length || action.payload.keyItemUuid.length === 0) {
                 if (index !== -1) state.cryptographicKeys.splice(index, 1);
-                if (state.cryptographicKey?.uuid === action.payload.uuid) state.cryptographicKey = undefined;
+                if (state.cryptographicKey?.uuid === action.payload.uuid) {
+                    state.cryptographicKey = undefined;
+                }
             } else {
                 action.payload.keyItemUuid.map((keyUuid) => {
                     const keyItem = state.cryptographicKey?.items.find((keyItem) => keyItem.uuid === keyUuid);

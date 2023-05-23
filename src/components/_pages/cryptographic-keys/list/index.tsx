@@ -120,16 +120,18 @@ function CryptographicKeyList() {
         [checkedRows, onEnableClick, onDisableClick, setKeyUsageUpdate],
     );
 
-    const keyUsageOptions = () => {
+    const keyUsageOptions = useMemo(() => {
         let options = [];
-        for (const suit in KeyUsage) {
-            options.push({
-                label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
-                value: KeyUsage[suit as keyof typeof KeyUsage],
-            });
+        if (keyUsageEnum) {
+            for (const suit in KeyUsage) {
+                options.push({
+                    label: keyUsageEnum[KeyUsage[suit as keyof typeof KeyUsage]].label,
+                    value: KeyUsage[suit as keyof typeof KeyUsage],
+                });
+            }
         }
         return options;
-    };
+    }, [keyUsageEnum]);
 
     const keyUsageBody = (
         <div>
@@ -138,7 +140,7 @@ function CryptographicKeyList() {
                 <Select
                     isMulti={true}
                     id="field"
-                    options={keyUsageOptions()}
+                    options={keyUsageOptions}
                     onChange={(e) => {
                         setKeyUsages(e.map((item) => item.value));
                     }}
@@ -263,14 +265,16 @@ function CryptographicKeyList() {
         return responseList;
     };
 
-    const optionForCompromise = () => {
+    const optionForCompromise = useMemo(() => {
         var options = [];
-        for (const reason in KeyCompromiseReason) {
-            const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+        if (keyCompromiseReasonEnum) {
+            for (const reason in KeyCompromiseReason) {
+                const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
+                options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+            }
         }
         return options;
-    };
+    }, [keyCompromiseReasonEnum]);
 
     return (
         <Container className="themed-container" fluid>
@@ -302,7 +306,7 @@ function CryptographicKeyList() {
                         <Select
                             name="compromiseReason"
                             id="compromiseReason"
-                            options={optionForCompromise()}
+                            options={optionForCompromise}
                             onChange={(e) => setCompromiseReason(e?.value)}
                         />
                     </div>

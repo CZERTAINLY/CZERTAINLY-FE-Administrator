@@ -195,6 +195,23 @@ export default function ScepProfileDetail() {
                           ],
                       },
                       {
+                          id: "intuneEnabled",
+                          columns: [
+                              "Intune Enabled",
+                              <Form
+                                  onSubmit={() => {}}
+                                  render={() => (
+                                      <SwitchField
+                                          disabled
+                                          viewOnly={{ checked: !!scepProfile.enableIntune }}
+                                          id="intuneEnabledSwitch"
+                                          label=""
+                                      />
+                                  )}
+                              />,
+                          ],
+                      },
+                      {
                           id: "scepUrl",
                           columns: ["URL", scepProfile.scepUrl || "N/A"],
                       },

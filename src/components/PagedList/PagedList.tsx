@@ -31,6 +31,7 @@ interface Props {
     entityNamePlural: string;
     additionalButtons?: WidgetButtonProps[];
     pageWidgetLockName?: LockWidgetNameEnum;
+    topActionsHidden?: boolean;
 }
 
 function PagedList({
@@ -48,6 +49,7 @@ function PagedList({
     entityNameSingular,
     additionalButtons,
     pageWidgetLockName,
+    topActionsHidden = false,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -113,15 +115,17 @@ function PagedList({
     const tableTitle = useMemo(
         () => (
             <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
+                {!topActionsHidden && (
+                    <div className="fa-pull-right mt-n-xs">
+                        <WidgetButtons buttons={buttons} />
+                    </div>
+                )}
                 <h5 className="mt-0">
                     <span className="fw-semi-bold">{title}</span>
                 </h5>
             </div>
         ),
-        [buttons, title],
+        [buttons, title, topActionsHidden],
     );
 
     const paginationData = useMemo(
