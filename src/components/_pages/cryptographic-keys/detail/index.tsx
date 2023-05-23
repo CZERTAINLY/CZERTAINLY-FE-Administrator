@@ -125,14 +125,16 @@ export default function CryptographicKeyDetail() {
         setConfirmDestroy(false);
     }, [dispatch, cryptographicKey]);
 
-    const optionForCompromise = () => {
+    const optionForCompromise = useMemo(() => {
         var options = [];
-        for (const reason in KeyCompromiseReason) {
-            const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+        if (keyCompromiseReasonEnum) {
+            for (const reason in KeyCompromiseReason) {
+                const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
+                options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+            }
         }
         return options;
-    };
+    }, [keyCompromiseReasonEnum]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -154,7 +156,7 @@ export default function CryptographicKeyDetail() {
             },
             {
                 icon: "check",
-                disabled: cryptographicKey?.items.every((item) => item.enabled) || false,
+                disabled: cryptographicKey?.items.every((item) => item.enabled) ?? false,
                 tooltip: "Enable",
                 onClick: () => {
                     onEnableClick();
@@ -162,7 +164,7 @@ export default function CryptographicKeyDetail() {
             },
             {
                 icon: "times",
-                disabled: !cryptographicKey?.items.every((item) => item.enabled) || false,
+                disabled: cryptographicKey?.items.every((item) => !item.enabled) ?? false,
                 tooltip: "Disable",
                 onClick: () => {
                     onDisableClick();
@@ -170,15 +172,21 @@ export default function CryptographicKeyDetail() {
             },
             {
                 icon: "compromise",
-                disabled: cryptographicKey?.items.every((item) => item.state === KeyState.Compromised) || false,
-                tooltip: "Compromised",
+                disabled:
+                    cryptographicKey?.items.every(
+                        (item) => ![KeyState.PreActive, KeyState.Active, KeyState.Deactivated].includes(item.state),
+                    ) ?? false,
+                tooltip: "Compromise",
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
             },
             {
                 icon: "destroy",
-                disabled: cryptographicKey?.items.every((item) => item.state === KeyState.Destroyed) || false,
+                disabled:
+                    cryptographicKey?.items.every(
+                        (item) => ![KeyState.PreActive, KeyState.Compromised, KeyState.Deactivated].includes(item.state),
+                    ) ?? false,
                 tooltip: "Destroy",
                 onClick: () => {
                     setConfirmDestroy(true);
@@ -423,7 +431,7 @@ export default function CryptographicKeyDetail() {
                         <Select
                             name="compromiseReason"
                             id="compromiseReason"
-                            options={optionForCompromise()}
+                            options={optionForCompromise}
                             onChange={(e) => setCompromiseReason(e?.value)}
                         />
                     </div>

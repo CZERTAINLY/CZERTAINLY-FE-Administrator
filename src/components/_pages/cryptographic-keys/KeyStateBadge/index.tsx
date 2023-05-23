@@ -19,7 +19,7 @@ function KeyStateBadge({ state }: Props) {
 
         case KeyState.Compromised:
         case KeyState.Destroyed:
-        case KeyState.CompromisedDestroyed:
+        case KeyState.DestroyedCompromised:
             return <Badge color="danger">{text}</Badge>;
 
         default:

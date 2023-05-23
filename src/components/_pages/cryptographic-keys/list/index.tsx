@@ -102,7 +102,7 @@ function CryptographicKeyList() {
             {
                 icon: "compromise",
                 disabled: checkedRows.length === 0,
-                tooltip: "Compromised",
+                tooltip: "Compromise",
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
@@ -280,7 +280,7 @@ function CryptographicKeyList() {
             <PagedList
                 entity={EntityType.KEY}
                 listAction={actions.listCryptographicKeys}
-                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteCryptographicKeys({ uuids }))}
+                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteCryptographicKeyItems({ uuids }))}
                 getAvailableFiltersApi={useCallback((apiClients) => apiClients.cryptographicKeys.getSearchableFieldInformation1(), [])}
                 additionalButtons={buttons}
                 headers={cryptographicKeysTableHeaders}

@@ -15,7 +15,7 @@ function KeyStateCircle({ state }: Props) {
         [KeyState.Compromised]: { color: "danger", text: stateText },
         [KeyState.Destroyed]: { color: "danger", text: stateText },
         [KeyState.Deactivated]: { color: "warning", text: stateText },
-        [KeyState.CompromisedDestroyed]: { color: "danger", text: stateText },
+        [KeyState.DestroyedCompromised]: { color: "danger", text: stateText },
     };
 
     const _default = { color: "secondary", text: stateText };

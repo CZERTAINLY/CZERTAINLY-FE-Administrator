@@ -15,7 +15,7 @@ import Select from "react-select";
 import { selectors as enumSelectors } from "ducks/enums";
 import { Badge, Button, Col, Row } from "reactstrap";
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
-import { KeyCompromiseReason, KeyState, KeyType, KeyUsage, PlatformEnum } from "types/openapi";
+import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateBadge from "../KeyStateBadge";
 import KeyStatus from "../KeyStatus";
@@ -157,7 +157,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "check",
-                disabled: keyItem.state !== KeyState.Active || keyItem.enabled,
+                disabled: keyItem.enabled,
                 tooltip: "Enable",
                 onClick: () => {
                     onEnableClick();
@@ -165,7 +165,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "times",
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled,
+                disabled: !keyItem.enabled,
                 tooltip: "Disable",
                 onClick: () => {
                     onDisableClick();
@@ -173,7 +173,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "key",
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled,
+                disabled: false,
                 tooltip: "Update Key Usage",
                 onClick: () => {
                     setKeyUsageUpdate(true);
@@ -181,15 +181,15 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "compromise",
-                disabled: keyItem.state === KeyState.Compromised || keyItem.state === KeyState.Destroyed,
-                tooltip: "Compromised",
+                disabled: ![KeyState.PreActive, KeyState.Active, KeyState.Deactivated].includes(keyItem.state),
+                tooltip: "Compromise",
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
             },
             {
                 icon: "destroy",
-                disabled: keyItem.state === KeyState.Destroyed,
+                disabled: ![KeyState.PreActive, KeyState.Compromised, KeyState.Deactivated].includes(keyItem.state),
                 tooltip: "Destroy",
                 onClick: () => {
                     setConfirmDestroy(true);
@@ -197,7 +197,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "sign",
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.Public,
+                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Sign),
                 tooltip: "Sign",
                 onClick: () => {
                     setSignData(true);
@@ -205,14 +205,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: "verify",
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || keyItem.type === KeyType.Private,
+                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Verify),
                 tooltip: "Verify",
                 onClick: () => {
                     setVerifyData(true);
                 },
             },
         ],
-        [onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy, keyItem.enabled, keyItem.state, keyItem.type],
+        [onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy, keyItem.enabled, keyItem.state, keyItem.usage],
     );
 
     const detailHeaders: TableHeader[] = useMemo(

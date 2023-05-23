@@ -246,7 +246,14 @@ export const slice = createSlice({
             }
         },
 
-        enableCryptographicKeyFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        enableCryptographicKeyFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            if (action.payload.requestUuids.length === 0) {
+                state.cryptographicKey?.items.forEach((keyItem) => {
+                    if (!action.payload.failedUuids.includes(keyItem.uuid)) {
+                        keyItem.enabled = true;
+                    }
+                });
+            }
             state.isEnabling = false;
         },
 
@@ -272,7 +279,14 @@ export const slice = createSlice({
             }
         },
 
-        disableCryptographicKeyFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        disableCryptographicKeyFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            if (action.payload.requestUuids.length === 0) {
+                state.cryptographicKey?.items.forEach((keyItem) => {
+                    if (!action.payload.failedUuids.includes(keyItem.uuid)) {
+                        keyItem.enabled = false;
+                    }
+                });
+            }
             state.isDisabling = false;
         },
 
@@ -337,7 +351,14 @@ export const slice = createSlice({
             }
         },
 
-        compromiseCryptographicKeyFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        compromiseCryptographicKeyFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            if (action.payload.requestUuids.length === 0) {
+                state.cryptographicKey?.items.forEach((keyItem) => {
+                    if (!action.payload.failedUuids.includes(keyItem.uuid)) {
+                        keyItem.state = KeyState.Compromised;
+                    }
+                });
+            }
             state.isCompromising = false;
         },
 
@@ -354,16 +375,24 @@ export const slice = createSlice({
             if (action.payload.keyItemUuid.length > 0) {
                 action.payload.keyItemUuid.forEach((keyItemUuid) => {
                     const keyItem = state.cryptographicKey?.items.find((keyItem) => keyItem.uuid === keyItemUuid);
-                    if (keyItem) keyItem.state = KeyState.Destroyed;
+                    if (keyItem)
+                        keyItem.state = keyItem.state === KeyState.Compromised ? KeyState.DestroyedCompromised : KeyState.Destroyed;
                 });
             } else {
                 state.cryptographicKey?.items.forEach((keyItem) => {
-                    keyItem.state = KeyState.Destroyed;
+                    keyItem.state = keyItem.state === KeyState.Compromised ? KeyState.DestroyedCompromised : KeyState.Destroyed;
                 });
             }
         },
 
-        destroyCryptographicKeyFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        destroyCryptographicKeyFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            if (action.payload.requestUuids.length === 0) {
+                state.cryptographicKey?.items.forEach((keyItem) => {
+                    if (!action.payload.failedUuids.includes(keyItem.uuid)) {
+                        keyItem.state = keyItem.state === KeyState.Compromised ? KeyState.DestroyedCompromised : KeyState.Destroyed;
+                    }
+                });
+            }
             state.isDestroying = false;
         },
 
@@ -432,7 +461,15 @@ export const slice = createSlice({
             });
         },
 
-        bulkEnableCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        bulkEnableCryptographicKeyItemsFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            action.payload.requestUuids.forEach((uuid) => {
+                if (!action.payload.failedUuids.includes(uuid)) {
+                    const keyItemIndex = state.cryptographicKeys.findIndex((keyItem) => keyItem.uuid === uuid);
+                    if (keyItemIndex >= 0) {
+                        state.cryptographicKeys[keyItemIndex].enabled = true;
+                    }
+                }
+            });
             state.isBulkEnabling = false;
         },
 
@@ -461,7 +498,15 @@ export const slice = createSlice({
             });
         },
 
-        bulkDisableCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        bulkDisableCryptographicKeyItemsFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            action.payload.requestUuids.forEach((uuid) => {
+                if (!action.payload.failedUuids.includes(uuid)) {
+                    const keyItemIndex = state.cryptographicKeys.findIndex((keyItem) => keyItem.uuid === uuid);
+                    if (keyItemIndex >= 0) {
+                        state.cryptographicKeys[keyItemIndex].enabled = false;
+                    }
+                }
+            });
             state.isBulkDisabling = false;
         },
 
@@ -510,13 +555,30 @@ export const slice = createSlice({
         bulkUpdateKeyItemUsageSuccess: (state, action: PayloadAction<{ usages: Array<KeyUsage>; uuids: Array<string> }>) => {
             state.isBulkUpdatingKeyUsage = false;
 
-            if (action.payload.uuids && action.payload.uuids.length === 1) {
-                const index = state.cryptographicKey!.items.findIndex((keyItem) => keyItem.uuid === action.payload.uuids[0]);
-                if (index >= 0) state.cryptographicKey!.items[index].usage = action.payload.usages;
+            if (action.payload.uuids && state.cryptographicKey) {
+                action.payload.uuids.forEach((uuid) => {
+                    const index = state.cryptographicKey!.items.findIndex((keyItem) => keyItem.uuid === uuid);
+                    if (index >= 0) {
+                        state.cryptographicKey!.items[index].usage = action.payload.usages;
+                    }
+                });
             }
         },
 
-        bulkUpdateKeyItemUsageFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        bulkUpdateKeyItemUsageFailure: (
+            state,
+            action: PayloadAction<{ requestUuids: string[]; failedUuids: string[]; usages: Array<KeyUsage> }>,
+        ) => {
+            if (state.cryptographicKey) {
+                action.payload.requestUuids.forEach((uuid) => {
+                    if (!action.payload.failedUuids.includes(uuid)) {
+                        const index = state.cryptographicKey!.items.findIndex((keyItem) => keyItem.uuid === uuid);
+                        if (index >= 0) {
+                            state.cryptographicKey!.items[index].usage = action.payload.usages;
+                        }
+                    }
+                });
+            }
             state.isBulkUpdatingKeyUsage = false;
         },
 
@@ -553,7 +615,15 @@ export const slice = createSlice({
             });
         },
 
-        bulkCompromiseCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        bulkCompromiseCryptographicKeyItemsFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            action.payload.requestUuids.forEach((uuid) => {
+                if (!action.payload.failedUuids.includes(uuid)) {
+                    const keyItemIndex = state.cryptographicKeys.findIndex((keyItem) => keyItem.uuid === uuid);
+                    if (keyItemIndex >= 0) {
+                        state.cryptographicKeys[keyItemIndex].state = KeyState.Compromised;
+                    }
+                }
+            });
             state.isBulkCompromising = false;
         },
 
@@ -578,11 +648,26 @@ export const slice = createSlice({
 
             action.payload.uuids.forEach((uuid) => {
                 const keyItemIndex = state.cryptographicKeys.findIndex((keyItem) => keyItem.uuid === uuid);
-                if (keyItemIndex >= 0) state.cryptographicKeys[keyItemIndex].state = KeyState.Destroyed;
+                if (keyItemIndex >= 0)
+                    state.cryptographicKeys[keyItemIndex].state =
+                        state.cryptographicKeys[keyItemIndex].state === KeyState.Compromised
+                            ? KeyState.DestroyedCompromised
+                            : KeyState.Destroyed;
             });
         },
 
-        bulkDestroyCryptographicKeyItemsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        bulkDestroyCryptographicKeyItemsFailure: (state, action: PayloadAction<{ requestUuids: string[]; failedUuids: string[] }>) => {
+            action.payload.requestUuids.forEach((uuid) => {
+                if (!action.payload.failedUuids.includes(uuid)) {
+                    const keyItemIndex = state.cryptographicKeys.findIndex((keyItem) => keyItem.uuid === uuid);
+                    if (keyItemIndex >= 0) {
+                        state.cryptographicKeys[keyItemIndex].state =
+                            state.cryptographicKeys[keyItemIndex].state === KeyState.Compromised
+                                ? KeyState.DestroyedCompromised
+                                : KeyState.Destroyed;
+                    }
+                }
+            });
             state.isBulkDestroying = false;
         },
 
