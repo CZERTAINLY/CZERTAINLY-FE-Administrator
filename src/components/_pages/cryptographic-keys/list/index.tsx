@@ -17,6 +17,7 @@ import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();
@@ -283,6 +284,7 @@ function CryptographicKeyList() {
                 data={profilesTableData()}
                 isBusy={isBusy}
                 title="List of Keys"
+                pageWidgetLockName={LockWidgetNameEnum.CryptographicKeysList}
                 entityNameSingular="a Key"
                 entityNamePlural="Keys"
                 filterTitle="Key Inventory Filter"

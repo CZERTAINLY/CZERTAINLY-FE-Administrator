@@ -13,6 +13,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { FunctionGroupModel } from "types/connectors";
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function ConnectorList() {
     const dispatch = useDispatch();
@@ -250,7 +251,7 @@ export default function ConnectorList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ConnectorStoreList}>
                 <br />
 
                 <CustomTable

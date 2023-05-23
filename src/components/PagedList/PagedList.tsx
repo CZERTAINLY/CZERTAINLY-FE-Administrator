@@ -14,6 +14,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/paging";
 import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 interface Props {
     entity: EntityType;
@@ -29,6 +30,7 @@ interface Props {
     entityNameSingular: string;
     entityNamePlural: string;
     additionalButtons?: WidgetButtonProps[];
+    pageWidgetLockName?: LockWidgetNameEnum;
 }
 
 function PagedList({
@@ -45,6 +47,7 @@ function PagedList({
     entityNamePlural,
     entityNameSingular,
     additionalButtons,
+    pageWidgetLockName,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -137,7 +140,7 @@ function PagedList({
         <Container className="themed-container" fluid>
             <FilterWidget entity={entity} title={filterTitle} getAvailableFiltersApi={getAvailableFiltersApi} />
 
-            <Widget title={tableTitle} busy={isBusy || isFetchingList}>
+            <Widget title={tableTitle} busy={isBusy || isFetchingList} widgetLockName={pageWidgetLockName}>
                 <CustomTable
                     headers={headers}
                     data={data}
