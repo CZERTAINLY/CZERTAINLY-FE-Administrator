@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 
 type Props = {
@@ -10,10 +10,11 @@ type Props = {
         onClick?: () => void;
     }[];
     onlyActiveTabContent?: boolean;
+    selectedTab?: number;
 };
 
-export default function TabLayout({ tabs, onlyActiveTabContent = false }: Props) {
-    const [activeTab, setActiveTab] = useState(0);
+export default function TabLayout({ tabs, onlyActiveTabContent = false, selectedTab = 0 }: Props) {
+    const [activeTab, setActiveTab] = useState(selectedTab);
 
     useEffect(() => {
         if (tabs.length <= activeTab) {

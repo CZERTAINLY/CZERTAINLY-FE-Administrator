@@ -3,7 +3,7 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { actions, selectors } from "ducks/globalMetadata";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -100,7 +100,7 @@ export default function GlobalMetadataList() {
                 id: metadata.uuid,
                 columns: [
                     <Link to={`./detail/${metadata.uuid}`}>{metadata.name}</Link>,
-                    attributeContentTypeEnum[metadata.contentType].label,
+                    getEnumLabel(attributeContentTypeEnum, metadata.contentType),
                     metadata.description,
                 ],
             })),

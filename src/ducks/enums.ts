@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PlatformEnumModel } from "types/enums";
+import { EnumItemModel, PlatformEnumModel } from "types/enums";
 import { PlatformEnum } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
 
@@ -30,6 +30,9 @@ const state = createFeatureSelector<State>(slice.name);
 const platformEnums = createSelector(state, (state: State) => state.platformEnums);
 
 const platformEnum = (platformEnum: PlatformEnum) => createSelector(platformEnums, (platformEnums) => platformEnums[platformEnum]);
+
+export const getEnumLabel = (platformEnum: { [key: string]: EnumItemModel } | undefined, enumItemKey: string): string =>
+    platformEnum ? platformEnum[enumItemKey]?.label ?? enumItemKey : enumItemKey;
 
 export const selectors = {
     state,

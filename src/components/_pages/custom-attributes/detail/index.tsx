@@ -6,7 +6,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/customAttributes";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -148,14 +148,14 @@ export default function CustomAttributeDetail() {
                               "Resources",
                               customAttribute.resources?.map((r) => (
                                   <Badge key={r} style={{ margin: "1px" }} color="secondary">
-                                      {resourceEnum[r].label}
+                                      {getEnumLabel(resourceEnum, r)}
                                   </Badge>
                               )) ?? "",
                           ],
                       },
                       {
                           id: "contentType",
-                          columns: ["Content Type", attributeContentTypeEnum[customAttribute.contentType].label],
+                          columns: ["Content Type", getEnumLabel(attributeContentTypeEnum, customAttribute.contentType)],
                       },
                       {
                           id: "content",

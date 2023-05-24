@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
 import PagedList from "components/PagedList/PagedList";
@@ -302,7 +302,7 @@ export default function CertificateList({
                         certificate.issuerCommonName || "",
                         certificate.certificateType ? (
                             <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>
-                                {certificateTypeEnum[certificate.certificateType].label}
+                                {getEnumLabel(certificateTypeEnum, certificate.certificateType)}
                             </Badge>
                         ) : (
                             ""

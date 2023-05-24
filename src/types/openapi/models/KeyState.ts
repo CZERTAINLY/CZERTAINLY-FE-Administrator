@@ -22,5 +22,5 @@ export enum KeyState {
     Deactivated = "deactivated",
     Compromised = "compromised",
     Destroyed = "destroyed",
-    CompromisedDestroyed = "compromisedDestroyed",
+    DestroyedCompromised = "destroyedCompromised",
 }

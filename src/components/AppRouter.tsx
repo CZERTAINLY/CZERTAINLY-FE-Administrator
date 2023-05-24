@@ -89,8 +89,8 @@ import UserProfileEdit from "./_pages/user-profile/form";
 import UserDetail from "./_pages/users/detail";
 import UserEdit from "./_pages/users/form";
 
-import AppLogin from "./AppLogin/AppLogin";
 import UsersList from "./_pages/users/list";
+import AppLogin from "./AppLogin/AppLogin";
 
 import AppRedirect from "./AppRedirect";
 
@@ -227,7 +227,7 @@ export default function AppRouter() {
 
                     <Route path="/cryptographickeys" element={<CryptographicKeyList />} />
                     <Route path="/cryptographickeys/list" element={<Navigate to="/cryptographickeys" />} />
-                    <Route path="/cryptographickeys/detail/:tokenId/:id" element={<CryptographicKeyDetail />} />
+                    <Route path="/cryptographickeys/detail/:tokenId/:id/:keyItemUuid?" element={<CryptographicKeyDetail />} />
                     <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
                     <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
 

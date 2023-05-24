@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
 
@@ -131,12 +131,12 @@ export default function CustomAttributesList() {
                 columns: [
                     <Link to={`./detail/${customAttribute.uuid}`}>{customAttribute.name}</Link>,
                     <StatusBadge enabled={customAttribute.enabled} />,
-                    attributeContentTypeEnum[customAttribute.contentType].label,
+                    getEnumLabel(attributeContentTypeEnum, customAttribute.contentType),
                     customAttribute.description,
                     <>
                         {customAttribute.resources.map((r) => (
                             <Badge style={{ margin: "1px" }} color="secondary">
-                                {resourcesEnum[r].label}
+                                {getEnumLabel(resourcesEnum, r)}
                             </Badge>
                         ))}
                     </>,

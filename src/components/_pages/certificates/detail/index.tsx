@@ -443,7 +443,7 @@ export default function CertificateDetail() {
                 onClick: () => {},
             },
         ],
-        [certificate, downloadDropDown, onComplianceCheck],
+        [certificate, downloadDropDown, onComplianceCheck, dispatch],
     );
 
     const buttonsLocations: WidgetButtonProps[] = useMemo(

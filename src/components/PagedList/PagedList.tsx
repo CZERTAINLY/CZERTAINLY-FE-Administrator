@@ -79,7 +79,8 @@ function PagedList({
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
         onDeleteCallback(checkedRows, currentFilters);
-    }, [checkedRows, onDeleteCallback, currentFilters]);
+        onCheckedRowsChanged([]);
+    }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged]);
 
     useEffect(() => {
         setPageNumber(1);

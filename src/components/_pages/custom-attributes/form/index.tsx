@@ -5,7 +5,7 @@ import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
 import { actions, selectors } from "ducks/customAttributes";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,7 +59,7 @@ export default function CustomAttributeForm() {
             customAttributeDetail
                 ? {
                       ...customAttributeDetail,
-                      resources: customAttributeDetail.resources?.map((r) => ({ label: resourceEnum[r].label, value: r })),
+                      resources: customAttributeDetail.resources?.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r })),
                   }
                 : defaultValuesCreate,
         [customAttributeDetail, defaultValuesCreate, resourceEnum],
@@ -120,7 +120,7 @@ export default function CustomAttributeForm() {
                                         {...input}
                                         id="resources"
                                         placeholder="Resources"
-                                        options={resources.map((r) => ({ label: resourceEnum[r]?.label ?? "", value: r }))}
+                                        options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
                                         isMulti={true}
                                         isClearable={true}
                                     />

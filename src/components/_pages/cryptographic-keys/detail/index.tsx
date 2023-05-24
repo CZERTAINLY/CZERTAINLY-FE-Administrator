@@ -14,9 +14,9 @@ import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Col, Container, Label, Row } from "reactstrap";
-import { KeyCompromiseReason, KeyState, PlatformEnum, Resource } from "types/openapi";
+import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import CryptographicKeyItem from "./CryptographicKeyItem";
@@ -25,7 +25,8 @@ export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { id, tokenId } = useParams();
+    const { id, tokenId, keyItemUuid } = useParams();
+    const relativePath = keyItemUuid ? "../../../.." : "../../..";
 
     const cryptographicKey = useSelector(selectors.cryptographicKey);
 
@@ -62,8 +63,8 @@ export default function CryptographicKeyDetail() {
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
-        navigate(`../../../edit/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey?.uuid}`, { relative: "path" });
-    }, [navigate, cryptographicKey]);
+        navigate(`${relativePath}/edit/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey?.uuid}`, { relative: "path" });
+    }, [navigate, cryptographicKey, relativePath]);
 
     const onEnableClick = useCallback(() => {
         if (!cryptographicKey) return;
@@ -94,11 +95,11 @@ export default function CryptographicKeyDetail() {
                 keyItemUuid: [],
                 tokenInstanceUuid: cryptographicKey.tokenInstanceUuid || "unknown",
                 uuid: cryptographicKey.uuid,
-                redirect: cryptographicKey.items.length > 1 ? "../../../" : undefined,
+                redirect: cryptographicKey.items.length > 1 ? `${relativePath}/` : undefined,
             }),
         );
         setConfirmDelete(false);
-    }, [dispatch, cryptographicKey]);
+    }, [dispatch, cryptographicKey, relativePath]);
 
     const onCompromise = useCallback(() => {
         if (!cryptographicKey) return;
@@ -125,14 +126,16 @@ export default function CryptographicKeyDetail() {
         setConfirmDestroy(false);
     }, [dispatch, cryptographicKey]);
 
-    const optionForCompromise = () => {
+    const optionForCompromise = useMemo(() => {
         var options = [];
-        for (const reason in KeyCompromiseReason) {
-            const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
-            options.push({ value: myReason, label: keyCompromiseReasonEnum[myReason].label });
+        if (keyCompromiseReasonEnum) {
+            for (const reason in KeyCompromiseReason) {
+                const myReason: KeyCompromiseReason = KeyCompromiseReason[reason as keyof typeof KeyCompromiseReason];
+                options.push({ value: myReason, label: getEnumLabel(keyCompromiseReasonEnum, myReason) });
+            }
         }
         return options;
-    };
+    }, [keyCompromiseReasonEnum]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -154,7 +157,7 @@ export default function CryptographicKeyDetail() {
             },
             {
                 icon: "check",
-                disabled: cryptographicKey?.items.every((item) => item.enabled) || false,
+                disabled: cryptographicKey?.items.every((item) => item.enabled) ?? false,
                 tooltip: "Enable",
                 onClick: () => {
                     onEnableClick();
@@ -162,7 +165,7 @@ export default function CryptographicKeyDetail() {
             },
             {
                 icon: "times",
-                disabled: !cryptographicKey?.items.every((item) => item.enabled) || false,
+                disabled: cryptographicKey?.items.every((item) => !item.enabled) ?? false,
                 tooltip: "Disable",
                 onClick: () => {
                     onDisableClick();
@@ -170,15 +173,21 @@ export default function CryptographicKeyDetail() {
             },
             {
                 icon: "compromise",
-                disabled: cryptographicKey?.items.every((item) => item.state === KeyState.Compromised) || false,
-                tooltip: "Compromised",
+                disabled:
+                    cryptographicKey?.items.every(
+                        (item) => ![KeyState.PreActive, KeyState.Active, KeyState.Deactivated].includes(item.state),
+                    ) ?? false,
+                tooltip: "Compromise",
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
             },
             {
                 icon: "destroy",
-                disabled: cryptographicKey?.items.every((item) => item.state === KeyState.Destroyed) || false,
+                disabled:
+                    cryptographicKey?.items.every(
+                        (item) => ![KeyState.PreActive, KeyState.Compromised, KeyState.Deactivated].includes(item.state),
+                    ) ?? false,
                 tooltip: "Destroy",
                 onClick: () => {
                     setConfirmDestroy(true);
@@ -256,7 +265,7 @@ export default function CryptographicKeyDetail() {
                           item.resource !== Resource.Certificates ? (
                               item.name
                           ) : (
-                              <Link to={`../../../certificates/detail/${item.uuid}`}>{item.name}</Link>
+                              <Link to={`${relativePath}/certificates/detail/${item.uuid}`}>{item.name}</Link>
                           ),
 
                           item.uuid,
@@ -264,7 +273,7 @@ export default function CryptographicKeyDetail() {
                           item.resource,
                       ],
                   })),
-        [cryptographicKey],
+        [cryptographicKey, relativePath],
     );
 
     const detailData: TableDataRow[] = useMemo(
@@ -293,7 +302,7 @@ export default function CryptographicKeyDetail() {
                           columns: [
                               "Token Instance Name",
                               cryptographicKey.tokenInstanceUuid ? (
-                                  <Link to={`../../../tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
+                                  <Link to={`${relativePath}/tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
                                       {cryptographicKey.tokenInstanceName}
                                   </Link>
                               ) : (
@@ -311,7 +320,7 @@ export default function CryptographicKeyDetail() {
                               "Token Profile Name",
                               cryptographicKey.tokenInstanceUuid && cryptographicKey.tokenProfileUuid ? (
                                   <Link
-                                      to={`../../../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}
+                                      to={`${relativePath}/tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}
                                   >
                                       {cryptographicKey.tokenProfileName}
                                   </Link>
@@ -333,37 +342,40 @@ export default function CryptographicKeyDetail() {
                           columns: [
                               "Group Name",
                               cryptographicKey.group ? (
-                                  <Link to={`../../groups/detail/${cryptographicKey.group.uuid}`}>{cryptographicKey.group.name}</Link>
+                                  <Link to={`${relativePath}/groups/detail/${cryptographicKey.group.uuid}`}>
+                                      {cryptographicKey.group.name}
+                                  </Link>
                               ) : (
                                   ""
                               ),
                           ],
                       },
                   ],
-        [cryptographicKey],
+        [cryptographicKey, relativePath],
     );
 
-    const itemTabs = () => {
-        return !cryptographicKey
-            ? []
-            : cryptographicKey?.items.map((item, index) => {
-                  return {
-                      title: keyTypeEnum[item.type].label,
-                      content: (
-                          <Widget busy={isBusy || isFetchingHistory}>
-                              <CryptographicKeyItem
-                                  key={item.uuid}
-                                  keyItem={item}
-                                  keyUuid={cryptographicKey.uuid}
-                                  tokenInstanceUuid={cryptographicKey.tokenInstanceUuid}
-                                  tokenProfileUuid={cryptographicKey.tokenProfileUuid}
-                                  totalKeyItems={cryptographicKey.items.length}
-                              />
-                          </Widget>
-                      ),
-                  };
-              });
-    };
+    const itemTabs = useMemo(() => {
+        const keyItems = [...(cryptographicKey?.items ?? [])].sort(
+            (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
+        );
+        const selectedTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
+        const tabs = keyItems.map((item) => ({
+            title: getEnumLabel(keyTypeEnum, item.type),
+            content: (
+                <Widget busy={isBusy || isFetchingHistory}>
+                    <CryptographicKeyItem
+                        key={item.uuid}
+                        keyItem={item}
+                        keyUuid={cryptographicKey!.uuid}
+                        tokenInstanceUuid={cryptographicKey!.tokenInstanceUuid}
+                        tokenProfileUuid={cryptographicKey!.tokenProfileUuid}
+                        totalKeyItems={cryptographicKey!.items.length}
+                    />
+                </Widget>
+            ),
+        }));
+        return { tabs, selectedTab: selectedTab !== -1 ? selectedTab : 0 };
+    }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum, keyItemUuid]);
 
     return (
         <Container className="themed-container" fluid>
@@ -392,7 +404,8 @@ export default function CryptographicKeyDetail() {
                     )}
                 </Col>
             </Row>
-            <TabLayout tabs={itemTabs()} />
+
+            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={itemTabs.selectedTab} />}
 
             <Widget title={associationTitle} busy={isBusy}>
                 <br />
@@ -423,7 +436,7 @@ export default function CryptographicKeyDetail() {
                         <Select
                             name="compromiseReason"
                             id="compromiseReason"
-                            options={optionForCompromise()}
+                            options={optionForCompromise}
                             onChange={(e) => setCompromiseReason(e?.value)}
                         />
                     </div>

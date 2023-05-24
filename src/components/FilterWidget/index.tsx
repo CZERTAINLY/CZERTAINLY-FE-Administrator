@@ -3,7 +3,7 @@ import Widget from "components/Widget";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ApiClients } from "api";
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { EntityType, actions, selectors } from "ducks/filters";
 import { useDispatch, useSelector } from "react-redux";
 import Select, { MultiValue, SingleValue } from "react-select";
@@ -93,12 +93,12 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         if (!field) return;
 
         setFilterGroup({
-            label: searchGroupEnum[currentFilters[selectedFilter].searchGroup].label,
+            label: getEnumLabel(searchGroupEnum, currentFilters[selectedFilter].searchGroup),
             value: currentFilters[selectedFilter].searchGroup,
         });
         setFilterField({ label: field.fieldLabel, value: field.fieldIdentifier });
         setFilterCondition({
-            label: searchConditionEnum[currentFilters[selectedFilter].condition].label,
+            label: getEnumLabel(searchConditionEnum, currentFilters[selectedFilter].condition),
             value: currentFilters[selectedFilter].condition,
         });
 
@@ -206,7 +206,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                     <Select
                                         id="group"
                                         options={availableFilters.map((f) => ({
-                                            label: searchGroupEnum[f.searchGroup].label,
+                                            label: getEnumLabel(searchGroupEnum, f.searchGroup),
                                             value: f.searchGroup,
                                         }))}
                                         onChange={(e) => {
@@ -246,7 +246,10 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                         id="conditions"
                                         options={
                                             filterField
-                                                ? currentField?.conditions.map((c) => ({ label: searchConditionEnum[c].label, value: c }))
+                                                ? currentField?.conditions.map((c) => ({
+                                                      label: getEnumLabel(searchConditionEnum, c),
+                                                      value: c,
+                                                  }))
                                                 : undefined
                                         }
                                         onChange={(e) => {
@@ -347,8 +350,8 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? "primary" : "secondary"}
                             >
-                                <b>{searchGroupEnum[f.searchGroup].label}&nbsp;</b>'{label}'&nbsp;
-                                {searchConditionEnum[f.condition].label}&nbsp;
+                                <b>{getEnumLabel(searchGroupEnum, f.searchGroup)}&nbsp;</b>'{label}'&nbsp;
+                                {getEnumLabel(searchConditionEnum, f.condition)}&nbsp;
                                 {value}
                                 <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>
                                     &times;
