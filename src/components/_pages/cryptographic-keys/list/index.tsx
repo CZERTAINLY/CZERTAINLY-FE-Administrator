@@ -243,7 +243,7 @@ function CryptographicKeyList() {
                         <Link
                             to={`./detail/${cryptographicKeys[key].tokenInstanceUuid || "unknown"}/${
                                 cryptographicKeys[key].keyWrapperUuid
-                            }`}
+                            }/${cryptographicKeys[key].uuid}`}
                         >
                             {cryptographicKeys[key].name}
                         </Link>
