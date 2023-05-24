@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Col, Row } from "reactstrap";
 
 interface Props {
+    //TODO: Add a null type to data which should also be sent from the backend then we can use widget lock for this component
     data?: number;
     title: string;
     link: string;

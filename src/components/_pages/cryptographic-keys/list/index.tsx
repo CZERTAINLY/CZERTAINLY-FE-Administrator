@@ -18,7 +18,6 @@ import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
 import { LockWidgetNameEnum } from "types/widget-locks";
-
 function CryptographicKeyList() {
     const dispatch = useDispatch();
 

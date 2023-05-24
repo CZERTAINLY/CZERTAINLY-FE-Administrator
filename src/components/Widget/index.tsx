@@ -17,9 +17,7 @@ interface Props {
 }
 
 function Widget({ title = "", className, children = [], busy = false, widgetLockName }: Props) {
-    const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName) || null;
-    console.log("widgetLock?.lockType-", widgetLock?.lockType);
-    console.log("widgetLock-", widgetLock);
+    const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
 
     return (
         <section className={cx(style.widget, className)}>

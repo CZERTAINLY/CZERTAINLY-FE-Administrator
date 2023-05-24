@@ -7,6 +7,10 @@ export enum LockTypeEnum {
     SERVER_ERROR = "SERVER_ERROR",
 }
 
+export const ErrorCodeMessageMap = {
+    ACCESS_DENIED: "Access Denied",
+};
+
 export enum LockWidgetNameEnum {
     CryptographicKeysList = "CryptographicKeysList",
     ConnectorStoreList = "ConnectorStoreList",

@@ -124,6 +124,8 @@ const classNames = {
     rekey: "fa fa-random",
 };
 
+//TODO: Add refresh button put it on left which should be optional
+
 function WidgetButtons({ buttons }: Props) {
     const renderButton = (button: WidgetButtonProps) => {
         let toolTip: JSX.Element | undefined;

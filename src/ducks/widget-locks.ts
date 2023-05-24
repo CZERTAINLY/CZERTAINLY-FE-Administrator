@@ -3,7 +3,7 @@ import { createSelector } from "reselect";
 import { AjaxError } from "rxjs/ajax";
 import { LockWidgetNameEnum, WidgetLockModel } from "types/widget-locks";
 import { createFeatureSelector } from "utils/ducks";
-import { getErrorMessageObject } from "utils/httpErrorMessage";
+import { getErrorMessageObject } from "utils/net";
 
 export type State = {
     widgetLocks: WidgetLockModel[];
@@ -21,6 +21,9 @@ export const slice = createSlice({
     reducers: {
         insertWidgetLock: {
             prepare: (error: AjaxError, lockWidgetName: LockWidgetNameEnum) => {
+                console.log("error", error);
+
+                //TODO: add a check in response object is present or do the following
                 const errorMessageObjet = getErrorMessageObject(error);
                 let payload: WidgetLockModel = {
                     widgetName: lockWidgetName,
@@ -34,11 +37,7 @@ export const slice = createSlice({
             },
         },
         removeWidgetLock: (state, action: PayloadAction<LockWidgetNameEnum>) => {
-            const lockIndex = state.widgetLocks.findIndex((lock) => lock.widgetName === action.payload);
-            if (lockIndex === -1) return;
-            let currentState = state.widgetLocks;
-            currentState.splice(lockIndex, 1);
-            state.widgetLocks = currentState.length ? currentState : [];
+            state.widgetLocks = state.widgetLocks.filter((widgetLock) => widgetLock.widgetName !== action.payload);
         },
     },
 });
@@ -53,18 +52,5 @@ export const selectors = {
 };
 
 export const actions = slice.actions;
-
-// setInterval(() => {
-//     const alerts = store.getState().alerts;
-//     alerts.messages.forEach((message) => {
-//         if (Date.now() - message.time > 17000) {
-//             store.dispatch(actions.hide(message.id));
-//         }
-
-//         if (Date.now() - message.time > 20000) {
-//             store.dispatch(actions.dismiss(message.id));
-//         }
-//     });
-// }, 1000);
 
 export default slice.reducer;
