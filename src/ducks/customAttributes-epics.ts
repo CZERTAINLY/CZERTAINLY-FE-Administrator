@@ -5,7 +5,7 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./customAttributes";
 import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToModel } from "./transform/attributes";
 
@@ -15,17 +15,24 @@ import {
     transformCustomAttributeResponseDtoToModel,
     transformCustomAttributeUpdateRequestModelToDto,
 } from "./transform/customAttributes";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listCustomAttributes.match),
         switchMap(() =>
             deps.apiClients.customAttributes.listCustomAttributes().pipe(
-                map((list) => slice.actions.listCustomAttributesSuccess(list.map(transformCustomAttributeResponseDtoToModel))),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listCustomAttributesSuccess(list.map(transformCustomAttributeResponseDtoToModel)),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfSCEPProfiles),
+                    ),
+                ),
                 catchError((err) =>
                     of(
                         slice.actions.listCustomAttributesFailure({ error: extractError(err, "Failed to get Custom Attributes list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Custom Attributes list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCustomAttributes),
                     ),
                 ),
             ),

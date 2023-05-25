@@ -5,7 +5,7 @@ import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./tokens";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
@@ -15,22 +15,27 @@ import {
     transformTokenRequestModelToDto,
     transformTokenResponseDtoToModel,
 } from "./transform/tokens";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listTokens: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listTokens.match),
         switchMap(() =>
             deps.apiClients.tokenInstances.listTokenInstances().pipe(
-                map((tokens) =>
-                    slice.actions.listTokensSuccess({
-                        tokenList: tokens.map(transformTokenResponseDtoToModel),
-                    }),
+                switchMap((tokens) =>
+                    of(
+                        slice.actions.listTokensSuccess({
+                            tokenList: tokens.map(transformTokenResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.TokenStore),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listTokensFailure({ error: extractError(err, "Failed to get Tokens list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Tokens list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenStore),
                     ),
                 ),
             ),

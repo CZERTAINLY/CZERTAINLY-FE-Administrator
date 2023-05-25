@@ -287,7 +287,7 @@ function CryptographicKeyList() {
                 data={profilesTableData()}
                 isBusy={isBusy}
                 title="List of Keys"
-                pageWidgetLockName={LockWidgetNameEnum.CryptographicKeysList}
+                pageWidgetLockName={LockWidgetNameEnum.ListOfKeys}
                 entityNameSingular="a Key"
                 entityNamePlural="Keys"
                 filterTitle="Key Inventory Filter"

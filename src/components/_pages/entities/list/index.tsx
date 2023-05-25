@@ -8,6 +8,7 @@ import { actions, selectors } from "ducks/entities";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import { EntityType } from "ducks/filters";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function EntityList() {
     const dispatch = useDispatch();
@@ -73,6 +74,7 @@ function EntityList() {
                 entityNameSingular="an Entity"
                 entityNamePlural="Entities"
                 filterTitle="Entities Filter"
+                pageWidgetLockName={LockWidgetNameEnum.EntityStore}
             />
         </Container>
     );

@@ -5,6 +5,7 @@ import { RaProfileSimplifiedModel } from "types/certificate";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 
 import { slice } from "./compliance-profiles";
 import {
@@ -18,24 +19,28 @@ import {
     transformComplianceProfileRuleDeleteRequestModelToDto,
     transformComplianceProfileRuleListResponseDtoToModel,
 } from "./transform/compliance-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listComplianceProfiles.match),
         switchMap(() =>
             deps.apiClients.complianceProfile.listComplianceProfiles().pipe(
-                map((complianceProfiles) =>
-                    slice.actions.listComplianceProfilesSuccess({
-                        complianceProfileList: complianceProfiles.map(transformComplianceProfileListModelToDto),
-                    }),
+                switchMap((complianceProfiles) =>
+                    of(
+                        slice.actions.listComplianceProfilesSuccess({
+                            complianceProfileList: complianceProfiles.map(transformComplianceProfileListModelToDto),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfComplianceProfiles),
+                    ),
                 ),
-
                 catchError((error) =>
                     of(
                         slice.actions.listComplianceProfilesFailed({
                             error: extractError(error, "Failed to get Compliance Profiles list"),
                         }),
                         appRedirectActions.fetchError({ error, message: "Failed to get Compliance Profiles list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfComplianceProfiles),
                     ),
                 ),
             ),

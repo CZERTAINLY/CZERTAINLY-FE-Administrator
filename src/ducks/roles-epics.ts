@@ -5,23 +5,32 @@ import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
+
 import * as slice from "./roles";
 
 import { transformRoleResponseDtoToModel } from "./transform/auth";
 import { transformRoleDetailDtoToModel, transformRoleRequestModelToDto, transformSubjectPermissionsDtoToModel } from "./transform/roles";
 import { transformUserResponseDtoToModel } from "./transform/users";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const list: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.list.match),
         switchMap(() =>
             deps.apiClients.roles.listRoles().pipe(
-                map((list) => slice.actions.listSuccess({ roles: list.map((role) => transformRoleResponseDtoToModel(role)) })),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listSuccess({ roles: list.map((role) => transformRoleResponseDtoToModel(role)) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfRoles),
+                    ),
+                ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get roles list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfRoles),
                     ),
                 ),
             ),

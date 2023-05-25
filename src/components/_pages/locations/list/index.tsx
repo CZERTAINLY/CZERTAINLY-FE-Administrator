@@ -11,6 +11,7 @@ import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import StatusBadge from "components/StatusBadge";
 import { WidgetButtonProps } from "components/WidgetButtons";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function LocationList() {
     const dispatch = useDispatch();
@@ -144,6 +145,7 @@ function LocationList() {
                 entityNamePlural="Locations"
                 filterTitle="Locations Filter"
                 additionalButtons={buttons}
+                pageWidgetLockName={LockWidgetNameEnum.LocationsStore}
             />
         </Container>
     );

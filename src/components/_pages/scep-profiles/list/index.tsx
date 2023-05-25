@@ -10,6 +10,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function ScepProfiles() {
     const dispatch = useDispatch();
@@ -226,7 +227,7 @@ export default function ScepProfiles() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}>
                 <br />
                 <CustomTable
                     headers={scepProfilesTableHeader}

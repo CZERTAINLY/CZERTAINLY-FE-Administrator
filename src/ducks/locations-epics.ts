@@ -6,6 +6,7 @@ import { extractError } from "utils/net";
 
 import { store } from "index";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice as certsSlice } from "./certificates";
 import { EntityType } from "./filters";
 import { slice } from "./locations";
@@ -18,6 +19,7 @@ import {
     transformLocationPushRequestModelToDto,
     transformLocationResponseDtoToModel,
 } from "./transform/locations";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listLocations: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -29,6 +31,7 @@ const listLocations: AppEpic = (action$, state, deps) => {
                     of(
                         slice.actions.listLocationsSuccess(locationResponse.locations.map(transformLocationResponseDtoToModel)),
                         pagingActions.listSuccess({ entity: EntityType.LOCATION, totalItems: locationResponse.totalItems }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.LocationsStore),
                     ),
                 ),
 
@@ -36,6 +39,7 @@ const listLocations: AppEpic = (action$, state, deps) => {
                     of(
                         pagingActions.listFailure(EntityType.LOCATION),
                         appRedirectActions.fetchError({ error, message: "Failed to get Location list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.LocationsStore),
                     ),
                 ),
             );

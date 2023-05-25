@@ -23,6 +23,7 @@ import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateStatus from "../CertificateStatus";
 import CertificateUploadDialog from "../CertificateUploadDialog";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -330,6 +331,7 @@ export default function CertificateList({
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
                 topActionsHidden={topActionsHidden}
+                pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
             />
 
             <Dialog

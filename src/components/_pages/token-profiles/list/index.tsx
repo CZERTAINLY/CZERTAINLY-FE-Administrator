@@ -15,6 +15,7 @@ import { selectors as enumSelectors } from "ducks/enums";
 import Select from "react-select";
 import { KeyUsage, PlatformEnum } from "types/openapi";
 import { TokenProfileResponseModel } from "types/token-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function TokenProfileList() {
     const dispatch = useDispatch();
@@ -255,7 +256,7 @@ function TokenProfileList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfTokenProfiles}>
                 <br />
                 <CustomTable
                     headers={tokenProfilesTableHeaders}

@@ -11,6 +11,7 @@ import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function TokenList() {
     const dispatch = useDispatch();
@@ -177,7 +178,7 @@ function TokenList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.TokenStore}>
                 <br />
 
                 <CustomTable

@@ -6,7 +6,7 @@ import { extractError } from "utils/net";
 import { Resource } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./globalMetadata";
 
 import {
@@ -17,17 +17,24 @@ import {
     transformGlobalMetadataUpdateRequestModelToDto,
 } from "./transform/globalMetadata";
 import { transformNameAndUuidDtoToModel } from "./transform/locations";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listGlobalMetadata: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listGlobalMetadata.match),
         switchMap(() =>
             deps.apiClients.globalMetadata.listGlobalMetadata().pipe(
-                map((list) => slice.actions.listGlobalMetadataSuccess(list.map(transformGlobalMetadataResponseDtoToModel))),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listGlobalMetadataSuccess(list.map(transformGlobalMetadataResponseDtoToModel)),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfGlobalMetadata),
+                    ),
+                ),
                 catchError((err) =>
                     of(
                         slice.actions.listGlobalMetadataFailure({ error: extractError(err, "Failed to get Global Metadata list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Global Metadata list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGlobalMetadata),
                     ),
                 ),
             ),

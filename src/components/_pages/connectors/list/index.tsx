@@ -251,7 +251,7 @@ export default function ConnectorList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ConnectorStoreList}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ConnectorStore}>
                 <br />
 
                 <CustomTable

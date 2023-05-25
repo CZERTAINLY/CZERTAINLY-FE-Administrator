@@ -10,6 +10,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function RaProfileList() {
     const dispatch = useDispatch();
@@ -209,7 +210,7 @@ function RaProfileList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfRAProfiles}>
                 <br />
                 <CustomTable
                     headers={raProfilesTableHeaders}

@@ -39,7 +39,7 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                                 list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
                             ),
                             pagingActions.listSuccess({ entity: EntityType.KEY, totalItems: list.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CryptographicKeysList),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
 
@@ -47,7 +47,7 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                         of(
                             pagingActions.listFailure(EntityType.KEY),
                             appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CryptographicKeysList),
+                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
                 );

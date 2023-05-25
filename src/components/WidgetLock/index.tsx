@@ -2,36 +2,33 @@ import {
     Button,
     Card,
     CardBody,
-    CardSubtitle,
     CardText,
     CardTitle,
     Col,
     Container,
-    Popover,
     PopoverBody,
     PopoverHeader,
     Row,
-    Tooltip,
-    UncontrolledTooltip,
+    UncontrolledPopover,
 } from "reactstrap";
 import cx from "classnames";
 import styles from "./WidgetLock.module.scss";
 import { LockTypeEnum } from "types/widget-locks";
-import { CSSProperties, useEffect, useRef, useState } from "react";
-import "./WidgetLock.module.scss";
 interface Props {
     size?: "small" | "normal" | "large";
-    lockReason?: string;
-    lockDescription?: string;
+    lockTitle?: string;
+    lockText?: string;
+    lockDetails?: string;
     lockType?: LockTypeEnum;
 }
 
 // TODO: Add a refresh button
 const WidgetLock = ({
     size = "normal",
-    lockReason = "There was some problem",
-    lockDescription = "There was some issue please try again later",
+    lockTitle = "There was some problem",
+    lockText = "There was some issue please try again later",
     lockType = LockTypeEnum.GENERIC,
+    lockDetails,
 }: Props) => {
     const iconClasses = cx(
         `fa ${styles.lockWidgetIcon}`,
@@ -44,35 +41,17 @@ const WidgetLock = ({
         { "fa-wifi": lockType === LockTypeEnum.NETWORK },
         { "fa-database": lockType === LockTypeEnum.SERVER_ERROR || lockType === LockTypeEnum.SERVICE_ERROR },
     );
-    const [popoverOpen, setPopoverOpen] = useState(false);
-    const popoverRef = useRef<HTMLDivElement | null>(null);
-
-    const togglePopover = () => setPopoverOpen(!popoverOpen);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
-                setPopoverOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [popoverRef]);
 
     const renderPopOver = () => {
         return (
-            <div ref={popoverRef}>
-                <Button className={styles.popOverTrigger} color="link" id="popoverButton" type="button" onClick={togglePopover}>
+            <div>
+                <Button id="PopoverFocus" type="button" className={styles.popOverTrigger} color="link">
                     <i className="fa fa-circle-info ms-1" id="UncontrolledTooltip" />
                 </Button>
-                <Popover placement="right" isOpen={popoverOpen} target="popoverButton" toggle={togglePopover}>
-                    <PopoverHeader className={cx("text-center", styles.popOverHeaderTitle)}>{lockReason}</PopoverHeader>
-                    <PopoverBody className={cx("text-center")}>{lockDescription}</PopoverBody>
-                </Popover>
+                <UncontrolledPopover placement="right" target="PopoverFocus" trigger="focus">
+                    <PopoverHeader className={cx("text-center", styles.popOverHeaderTitle)}>{lockTitle}</PopoverHeader>
+                    <PopoverBody className={cx("text-center")}>{lockDetails}</PopoverBody>
+                </UncontrolledPopover>
             </div>
         );
     };
@@ -94,10 +73,10 @@ const WidgetLock = ({
                                         )}
                                         tag="h5"
                                     >
-                                        {lockReason}
-                                        {renderPopOver()}
+                                        {lockTitle}
+                                        {lockDetails && renderPopOver()}
                                     </CardTitle>
-                                    <CardText className={styles.cardText}>{lockDescription}</CardText>
+                                    <CardText className={styles.cardText}>{lockText}</CardText>
                                 </Col>
                             </Row>
                         </CardBody>

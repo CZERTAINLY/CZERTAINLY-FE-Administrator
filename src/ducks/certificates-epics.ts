@@ -4,6 +4,7 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 
 import * as slice from "./certificates";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
@@ -31,6 +32,7 @@ import {
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -44,6 +46,7 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.listCertificatesSuccess(list.certificates.map(transformCertificateListResponseDtoToModel)),
                             pagingActions.listSuccess({ entity: EntityType.CERTIFICATE, totalItems: list.totalItems }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfCertificates),
                         ),
                     ),
 
@@ -51,6 +54,7 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                         of(
                             pagingActions.listFailure(EntityType.CERTIFICATE),
                             appRedirectActions.fetchError({ error: err, message: "Failed to get certificates list" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCertificates),
                         ),
                     ),
                 );

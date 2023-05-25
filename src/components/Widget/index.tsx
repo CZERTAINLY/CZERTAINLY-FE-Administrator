@@ -24,8 +24,9 @@ function Widget({ title = "", className, children = [], busy = false, widgetLock
             {typeof title === "string" ? <h5 className={style.title}>{title}</h5> : <header className={style.title}>{title}</header>}
             {widgetLock ? (
                 <WidgetLock
-                    lockReason={widgetLock.errorMessage}
-                    lockDescription={widgetLock.errorDetails}
+                    lockTitle={widgetLock.lockTitle}
+                    lockText={widgetLock.lockText}
+                    lockDetails={widgetLock.lockDetails}
                     size="normal"
                     lockType={widgetLock.lockType}
                 />

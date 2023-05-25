@@ -35,7 +35,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                         slice.actions.listConnectorsSuccess({
                             connectorList: list.map(transformConnectorResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStoreList),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
 
@@ -43,7 +43,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                     of(
                         slice.actions.listConnectorsFailure(),
                         appRedirectActions.fetchError({ error, message: "Failed to get connector list" }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStoreList),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
             ),

@@ -5,6 +5,7 @@ import { extractError } from "utils/net";
 
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./scep-profiles";
 import { transformCertificateListResponseDtoToModel } from "./transform/certificates";
 import {
@@ -13,22 +14,27 @@ import {
     transformScepProfileListResponseDtoToModel,
     transformScepProfileResponseDtoToModel,
 } from "./transform/scep-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listScepProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listScepProfiles.match),
         switchMap(() =>
             deps.apiClients.scepProfiles.listScepProfiles().pipe(
-                map((scepProfiles) =>
-                    slice.actions.listScepProfilesSuccess({
-                        scepProfileList: scepProfiles.map(transformScepProfileListResponseDtoToModel),
-                    }),
+                switchMap((scepProfiles) =>
+                    of(
+                        slice.actions.listScepProfilesSuccess({
+                            scepProfileList: scepProfiles.map(transformScepProfileListResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfSCEPProfiles),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listScepProfilesFailure({ error: extractError(error, "Failed to get SCEP Profiles list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get SCEP Profiles list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSCEPProfiles),
                     ),
                 ),
             ),

@@ -5,7 +5,7 @@ import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./authorities";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
@@ -15,22 +15,26 @@ import {
     transformAuthorityUpdateRequestModelToDto,
 } from "./transform/authorities";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listAuthorities: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listAuthorities.match),
         switchMap(() =>
             deps.apiClients.authorities.listAuthorityInstances().pipe(
-                map((authorities) =>
-                    slice.actions.listAuthoritiesSuccess({
-                        authorityList: authorities.map(transformAuthorityResponseDtoToModel),
-                    }),
+                switchMap((authorities) =>
+                    of(
+                        slice.actions.listAuthoritiesSuccess({
+                            authorityList: authorities.map(transformAuthorityResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.AuthorityStore),
+                    ),
                 ),
-
                 catchError((err) =>
                     of(
                         slice.actions.listAuthoritiesFailure({ error: extractError(err, "Failed to get Authorities list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Authorities list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.AuthorityStore),
                     ),
                 ),
             ),

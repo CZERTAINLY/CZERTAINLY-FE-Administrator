@@ -3,7 +3,7 @@ import { createSelector } from "reselect";
 import { AjaxError } from "rxjs/ajax";
 import { LockWidgetNameEnum, WidgetLockModel } from "types/widget-locks";
 import { createFeatureSelector } from "utils/ducks";
-import { getErrorMessageObject } from "utils/net";
+import { getLockWidgetObject } from "utils/net";
 
 export type State = {
     widgetLocks: WidgetLockModel[];
@@ -21,13 +21,10 @@ export const slice = createSlice({
     reducers: {
         insertWidgetLock: {
             prepare: (error: AjaxError, lockWidgetName: LockWidgetNameEnum) => {
-                console.log("error", error);
-
-                //TODO: add a check in response object is present or do the following
-                const errorMessageObjet = getErrorMessageObject(error);
+                const widgetLockObject = getLockWidgetObject(error);
                 let payload: WidgetLockModel = {
                     widgetName: lockWidgetName,
-                    ...errorMessageObjet,
+                    ...widgetLockObject,
                 };
                 return { payload };
             },

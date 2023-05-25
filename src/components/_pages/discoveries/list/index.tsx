@@ -9,6 +9,7 @@ import { EntityType } from "ducks/filters";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import DiscoveryStatus from "../DiscoveryStatus";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function DiscoveryList() {
     const dispatch = useDispatch();
@@ -89,6 +90,7 @@ function DiscoveryList() {
                 entityNameSingular="a Discovery"
                 entityNamePlural="Discoveries"
                 filterTitle="Discoveries Filter"
+                pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
             />
         </Container>
     );

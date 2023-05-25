@@ -4,7 +4,7 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./token-profiles";
 
 import {
@@ -13,22 +13,27 @@ import {
     transformTokenProfileEditRequestModelToDto,
     transformTokenProfileResponseDtoToModel,
 } from "./transform/token-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listTokenProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listTokenProfiles.match),
         switchMap((action) =>
             deps.apiClients.tokenProfiles.listTokenProfiles({ enabled: action.payload.enabled }).pipe(
-                map((list) =>
-                    slice.actions.listTokenProfilesSuccess({
-                        tokenProfiles: list.map(transformTokenProfileResponseDtoToModel),
-                    }),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listTokenProfilesSuccess({
+                            tokenProfiles: list.map(transformTokenProfileResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfTokenProfiles),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listTokenProfilesFailure({ error: extractError(error, "Failed to get Token profiles list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get Token profiles list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),
             ),

@@ -6,23 +6,28 @@ import { extractError } from "utils/net";
 
 import { slice } from "./acme-accounts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 import { transformAcmeAccountListResponseDtoToModel, transformAcmeAccountResponseDtoToModel } from "./transform/acme-accounts";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listAcmeAccounts.match),
         switchMap(() =>
             deps.apiClients.acmeAccounts.listAcmeAccounts().pipe(
-                map((accounts) =>
-                    slice.actions.listAcmeAccountsSuccess({
-                        acmeAccounts: accounts.map(transformAcmeAccountListResponseDtoToModel),
-                    }),
+                switchMap((accounts) =>
+                    of(
+                        slice.actions.listAcmeAccountsSuccess({
+                            acmeAccounts: accounts.map(transformAcmeAccountListResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfACMEAccounts),
+                    ),
                 ),
-
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeAccountsFailed({ error: extractError(error, "Failed to get ACME Accounts list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get ACME Accounts list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEAccounts),
                     ),
                 ),
             ),
