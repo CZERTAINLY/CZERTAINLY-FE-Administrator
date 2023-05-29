@@ -11,7 +11,7 @@ export function extractError(err: Error, headline: string): string {
 }
 
 function getLockEnumFromStatus(status: number): LockTypeEnum {
-    if (status === 422) return LockTypeEnum.PERMISSION;
+    if (status === 403 || status === 401) return LockTypeEnum.PERMISSION;
     else if (status > 400 && status < 500) return LockTypeEnum.CLIENT;
     else if (status === 503) return LockTypeEnum.SERVICE_ERROR;
     else if (status > 500 && status < 600) return LockTypeEnum.SERVER_ERROR;
@@ -32,7 +32,7 @@ export function getLockWidgetObject(error: AjaxError): ErrorMessageObjectModel {
     if (error.status === 422)
         return {
             lockTitle: "Validation Error",
-            lockText: "There problem in validating the request",
+            lockText: "There was a problem in validating the request",
             lockType: getLockEnumFromStatus(error.status),
         };
     else if (error.status > 400 && error.status < 500)
