@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function PlatformSettingsDetail() {
     const dispatch = useDispatch();
@@ -101,7 +102,7 @@ export default function PlatformSettingsDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingPlatform}>
+            <Widget title={detailsTitle} busy={isFetchingPlatform} widgetLockName={LockWidgetNameEnum.PlatformSettings}>
                 <TabLayout
                     tabs={[
                         {

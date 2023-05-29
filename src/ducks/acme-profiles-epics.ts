@@ -6,28 +6,34 @@ import { extractError } from "utils/net";
 import { slice } from "./acme-profiles";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 import {
     transformAcmeProfileAddRequestModelToDto,
     transformAcmeProfileEditRequestModelToDto,
     transformAcmeProfileListResponseDtoToModel,
     transformAcmeProfileResponseDtoToModel,
 } from "./transform/acme-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listAcmeProfiles.match),
         switchMap(() =>
             deps.apiClients.acmeProfiles.listAcmeProfiles().pipe(
-                map((acmeProfiles) =>
-                    slice.actions.listAcmeProfilesSuccess({
-                        acmeProfileList: acmeProfiles.map(transformAcmeProfileListResponseDtoToModel),
-                    }),
+                switchMap((acmeProfiles) =>
+                    of(
+                        slice.actions.listAcmeProfilesSuccess({
+                            acmeProfileList: acmeProfiles.map(transformAcmeProfileListResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfACMEProfiles),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeProfilesFailure({ error: extractError(error, "Failed to get ACME Profiles list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get ACME Profiles list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEProfiles),
                     ),
                 ),
             ),

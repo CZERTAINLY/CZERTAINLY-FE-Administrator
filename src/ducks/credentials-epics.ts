@@ -5,7 +5,7 @@ import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./credentials";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
@@ -14,22 +14,28 @@ import {
     transformCredentialEditRequestModelToDto,
     transformCredentialResponseDtoToModel,
 } from "./transform/credentials";
+import { LockWidgetNameEnum } from "types/widget-locks";
+import { error } from "console";
 
 const listCredentials: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listCredentials.match),
         switchMap(() =>
             deps.apiClients.credentials.listCredentials().pipe(
-                map((credentials) =>
-                    slice.actions.listCredentialsSuccess({
-                        credentialList: credentials.map(transformCredentialResponseDtoToModel),
-                    }),
+                switchMap((credentials) =>
+                    of(
+                        slice.actions.listCredentialsSuccess({
+                            credentialList: credentials.map(transformCredentialResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CredentialStore),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listCredentialsFailure({ error: extractError(error, "Failed to get Credential list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get Credential list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialStore),
                     ),
                 ),
             ),

@@ -5,24 +5,29 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { updateBackendUtilsClients } from "../api";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./settings";
 import { transformSettingsPlatformDtoToModel } from "./transform/settings";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const getPlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getPlatformSettings.match),
         switchMap(() =>
             deps.apiClients.settings.getPlatformSettings().pipe(
-                map((platformSettings) => {
+                switchMap((platformSettings) => {
                     const platformSettingsModel = transformSettingsPlatformDtoToModel(platformSettings);
                     updateBackendUtilsClients(platformSettingsModel.utils.utilsServiceUrl);
-                    return slice.actions.getPlatformSettingsSuccess(platformSettingsModel);
+                    return of(
+                        slice.actions.getPlatformSettingsSuccess(platformSettingsModel),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
+                    );
                 }),
                 catchError((err) =>
                     of(
                         slice.actions.getPlatformSettingsFailure({ error: extractError(err, "Failed to get platform settings") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get platform settings" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.PlatformSettings),
                     ),
                 ),
             ),

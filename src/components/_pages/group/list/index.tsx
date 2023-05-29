@@ -9,6 +9,7 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function GroupList() {
     const dispatch = useDispatch();
@@ -114,7 +115,7 @@ export default function GroupList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfGroups}>
                 <br />
                 <CustomTable
                     headers={groupsTableHeaders}

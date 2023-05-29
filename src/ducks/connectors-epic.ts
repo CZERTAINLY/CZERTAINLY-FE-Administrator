@@ -4,6 +4,8 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 import { slice } from "./connectors";
 
@@ -28,16 +30,20 @@ const listConnectors: AppEpic = (action$, state, deps) => {
         filter(slice.actions.listConnectors.match),
         switchMap(() =>
             deps.apiClients.connectors.listConnectors({}).pipe(
-                map((list) =>
-                    slice.actions.listConnectorsSuccess({
-                        connectorList: list.map(transformConnectorResponseDtoToModel),
-                    }),
+                mergeMap((list) =>
+                    of(
+                        slice.actions.listConnectorsSuccess({
+                            connectorList: list.map(transformConnectorResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listConnectorsFailure(),
                         appRedirectActions.fetchError({ error, message: "Failed to get connector list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
             ),

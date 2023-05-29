@@ -1,10 +1,12 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
+import { of, from } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 
 import * as slice from "./auditLogs";
 import { transformAuditLogDtoToModel, transformAuditLogFilterModelToDto, transformPageableModelToDto } from "./transform/auditLogs";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listLogs: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -18,18 +20,21 @@ const listLogs: AppEpic = (action$, state, deps) => {
                 .pipe(
                     map((pagedAuditLog) => {
                         const auditLogModel = transformAuditLogDtoToModel(pagedAuditLog);
-                        return slice.actions.listLogsSuccess({
+                        const action = slice.actions.listLogsSuccess({
                             data: auditLogModel.items,
                             page: auditLogModel.page,
                             size: auditLogModel.size,
                             total: auditLogModel.totalPages,
                         });
+                        return [action, widgetLockActions.removeWidgetLock(LockWidgetNameEnum.AuditLogs)];
                     }),
+                    switchMap((actions) => from(actions)),
 
                     catchError((error) =>
                         of(
                             slice.actions.listLogsFailure(),
                             appRedirectActions.fetchError({ error, message: "Failed to get audit logs list" }),
+                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.AuditLogs),
                         ),
                     ),
                 ),

@@ -1,0 +1,61 @@
+.lockWidgetIcon {
+    margin: 0 auto;
+    color: red;
+    z-index: 2;
+}
+
+.small {
+    font-size: 40px;
+    @media (max-width: 768px) {
+        font-size: 30px;
+    }
+}
+
+.normal {
+    font-size: 80px;
+    @media (max-width: 768px) {
+        font-size: 60px;
+    }
+}
+
+.large {
+    font-size: 120px;
+    @media (max-width: 768px) {
+        font-size: 90px;
+    }
+}
+
+.grayOut {
+    background-color: #e3e3e3cc !important;
+    opacity: 0.6;
+    padding: 0.5rem 0;
+}
+
+.cardTitle {
+    color: red;
+    font-weight: 600;
+    font-size: medium;
+    margin-top: 3px;
+}
+
+.cardText {
+    font-size: small;
+}
+
+.popOverTrigger {
+    padding: 0 !important;
+    margin: 0 !important;
+    color: red !important;
+    :after,
+    :active,
+    :hover {
+        color: red !important;
+    }
+}
+
+.popOverHeaderTitle {
+    background-color: #ff6666 !important;
+    color: white !important;
+    font-weight: 600;
+    border-bottom: transparent !important;
+}

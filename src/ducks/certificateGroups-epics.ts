@@ -5,26 +5,31 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./certificateGroups";
 
 import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listGroups: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listGroups.match),
         switchMap(() =>
             deps.apiClients.certificateGroups.listGroups().pipe(
-                map((list) =>
-                    slice.actions.listGroupsSuccess({
-                        groups: list.map(transformCertificateGroupResponseDtoToModel),
-                    }),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listGroupsSuccess({
+                            groups: list.map(transformCertificateGroupResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfGroups),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listGroupsFailure({ error: extractError(err, "Failed to get Group list") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Group list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),
             ),

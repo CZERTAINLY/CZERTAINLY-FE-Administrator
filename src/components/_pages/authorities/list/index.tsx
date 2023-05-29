@@ -9,6 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function AuthorityList() {
     const dispatch = useDispatch();
@@ -175,7 +176,7 @@ function AuthorityList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.AuthorityStore}>
                 <br />
 
                 <CustomTable

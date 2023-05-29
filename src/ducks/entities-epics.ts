@@ -6,6 +6,7 @@ import { extractError } from "utils/net";
 
 import { store } from "index";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./entities";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
@@ -15,6 +16,7 @@ import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelT
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { transformEntityRequestModelToDto, transformEntityResponseDtoToModel } from "./transform/entities";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listEntityProviders: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -80,6 +82,7 @@ const listEntities: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.listEntitiesSuccess(entityResponse.entities.map(transformEntityResponseDtoToModel)),
                             pagingActions.listSuccess({ entity: EntityType.ENTITY, totalItems: entityResponse.totalItems }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.EntityStore),
                         ),
                     ),
 
@@ -87,6 +90,7 @@ const listEntities: AppEpic = (action$, state$, deps) => {
                         of(
                             pagingActions.listFailure(EntityType.ENTITY),
                             appRedirectActions.fetchError({ error, message: "Failed to get list of Entities" }),
+                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityStore),
                         ),
                     ),
                 );

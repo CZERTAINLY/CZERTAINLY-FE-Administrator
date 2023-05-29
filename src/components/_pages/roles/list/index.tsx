@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function RolesList() {
     const dispatch = useDispatch();
@@ -165,7 +166,7 @@ export default function RolesList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfRoles}>
                 <br />
                 <CustomTable
                     headers={rolesTableHeader}

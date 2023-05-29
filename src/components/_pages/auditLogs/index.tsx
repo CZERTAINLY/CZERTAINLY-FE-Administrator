@@ -14,6 +14,7 @@ import styles from "./auditLogs.module.scss";
 
 import AuditLogsFilters from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const defaultPageSize = 10;
 
@@ -224,7 +225,7 @@ function AuditLogs() {
                 />
             </Widget>
 
-            <Widget title={auditLogsTitle} busy={isBusy}>
+            <Widget title={auditLogsTitle} busy={isBusy} widgetLockName={LockWidgetNameEnum.AuditLogs}>
                 <CustomTable
                     headers={auditLogsRowHeaders}
                     data={auditLogsList}

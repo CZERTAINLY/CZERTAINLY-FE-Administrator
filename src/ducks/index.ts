@@ -9,6 +9,7 @@ import { initialState as initialScepProfilesState, slice as scepProfilesSlice } 
 import scepProfilesEpics from "./scep-profiles-epics";
 
 import { slice as alertsSlice, initialState as initialAlertsState } from "./alerts";
+import { slice as widgetLockSlice, initialState as initialWidgetLockState } from "./widget-locks";
 import { slice as appRedirectSlice, initialState as initialAppRedirectState } from "./app-redirect";
 import appRedirectEpics from "./app-redirect-epics";
 import { slice as auditLogsSlice, initialState as initialAuditLogsState } from "./auditLogs";
@@ -84,6 +85,7 @@ export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
 
 export const initialState = {
     [alertsSlice.name]: initialAlertsState,
+    [widgetLockSlice.name]: initialWidgetLockState,
     [appRedirectSlice.name]: initialAppRedirectState,
     [authSlice.name]: initialAuthState,
     [dashboardSlice.name]: initialDashboardState,
@@ -121,6 +123,7 @@ export const initialState = {
 
 export const reducers = combineReducers<typeof initialState, any>({
     [alertsSlice.name]: alertsSlice.reducer,
+    [widgetLockSlice.name]: widgetLockSlice.reducer,
     [appRedirectSlice.name]: appRedirectSlice.reducer,
     [authSlice.name]: authSlice.reducer,
     [dashboardSlice.name]: dashboardSlice.reducer,

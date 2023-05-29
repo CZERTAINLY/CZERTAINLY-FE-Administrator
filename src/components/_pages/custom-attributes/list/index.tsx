@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function CustomAttributesList() {
     const dispatch = useDispatch();
@@ -147,7 +148,7 @@ export default function CustomAttributesList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfCustomAttributes}>
                 <br />
                 <CustomTable
                     headers={customAttributesTableHeaders}

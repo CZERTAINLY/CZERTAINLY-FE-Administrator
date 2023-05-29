@@ -4,7 +4,7 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./ra-profiles";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 
@@ -18,22 +18,27 @@ import {
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
 } from "./transform/ra-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listRaProfiles.match),
         switchMap(() =>
             deps.apiClients.raProfiles.listRaProfiles({}).pipe(
-                map((list) =>
-                    slice.actions.listRaProfilesSuccess({
-                        raProfiles: list.map(transformRaProfileResponseDtoToModel),
-                    }),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listRaProfilesSuccess({
+                            raProfiles: list.map(transformRaProfileResponseDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfRAProfiles),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listRaProfilesFailure({ error: extractError(error, "Failed to get RA profiles list") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get RA profiles list" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfRAProfiles),
                     ),
                 ),
             ),

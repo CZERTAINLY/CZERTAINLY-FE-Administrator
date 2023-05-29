@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
 import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function GlobalMetadataList() {
     const dispatch = useDispatch();
@@ -109,7 +110,7 @@ export default function GlobalMetadataList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfGlobalMetadata}>
                 <br />
                 <CustomTable
                     headers={globalMetadataTableHeaders}

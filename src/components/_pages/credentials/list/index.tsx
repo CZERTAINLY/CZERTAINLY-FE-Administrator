@@ -10,6 +10,7 @@ import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 function CredentialList() {
     const dispatch = useDispatch();
@@ -131,7 +132,7 @@ function CredentialList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.CredentialStore}>
                 <br />
 
                 <CustomTable

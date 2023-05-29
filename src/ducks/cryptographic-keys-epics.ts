@@ -4,7 +4,8 @@ import { catchError, concatMap, filter, map, mergeMap, switchMap } from "rxjs/op
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-
+import { actions as widgetLockActions } from "./widget-locks";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
@@ -38,6 +39,7 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                                 list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
                             ),
                             pagingActions.listSuccess({ entity: EntityType.KEY, totalItems: list.totalItems }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
 
@@ -45,6 +47,7 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                         of(
                             pagingActions.listFailure(EntityType.KEY),
                             appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
+                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
                 );

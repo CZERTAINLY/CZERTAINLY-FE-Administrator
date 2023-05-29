@@ -5,6 +5,7 @@ import { extractError } from "utils/net";
 import { FunctionGroupCode } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 
 import { store } from "index";
 import { slice } from "./discoveries";
@@ -19,6 +20,7 @@ import {
     transformDiscoveryResponseDetailDtoToModel,
     transformDiscoveryResponseDtoToModel,
 } from "./transform/discoveries";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -30,6 +32,7 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listDiscoveriesSuccess(discoveryResponse.discoveries.map(transformDiscoveryResponseDtoToModel)),
                         pagingActions.listSuccess({ entity: EntityType.DISCOVERY, totalItems: discoveryResponse.totalItems }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
 
@@ -37,6 +40,7 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
                     of(
                         pagingActions.listFailure(EntityType.DISCOVERY),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery list" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
             );
