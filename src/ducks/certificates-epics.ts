@@ -422,7 +422,7 @@ const updateOwner: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.updateOwnerSuccess({
                                 uuid: action.payload.uuid,
-                                owner: action.payload.updateOwnerRequest.owner!,
+                                user: action.payload.user,
                             }),
                             slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
                         ),
@@ -528,13 +528,13 @@ const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.certificates
                 .bulkUpdateCertificateObjects({
-                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload),
+                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload.request),
                 })
                 .pipe(
                     map(() =>
                         slice.actions.bulkUpdateOwnerSuccess({
-                            uuids: action.payload.certificateUuids!,
-                            owner: action.payload.owner!,
+                            uuids: action.payload.request.certificateUuids!,
+                            user: action.payload.user,
                         }),
                     ),
 

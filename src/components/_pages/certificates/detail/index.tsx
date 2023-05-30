@@ -12,6 +12,7 @@ import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } 
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
+import { actions as userAction, selectors as userSelectors } from "ducks/users";
 
 import { actions, selectors } from "ducks/certificates";
 import { actions as connectorActions } from "ducks/connectors";
@@ -37,7 +38,6 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownToggle,
-    Input,
     Label,
     Row,
     UncontrolledButtonDropdown,
@@ -66,6 +66,7 @@ export default function CertificateDetail() {
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
+    const users = useSelector(userSelectors.users);
 
     const eventHistory = useSelector(selectors.certificateHistory);
     const certLocations = useSelector(selectors.certificateLocations);
@@ -78,6 +79,7 @@ export default function CertificateDetail() {
 
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
+    const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -102,7 +104,7 @@ export default function CertificateDetail() {
     const [currentInfoId, setCurrentInfoId] = useState("");
 
     const [group, setGroup] = useState<string>();
-    const [owner, setOwner] = useState<string>();
+    const [ownerUuid, setOwnerUuid] = useState<string>();
     const [raProfile, setRaProfile] = useState<string>();
     const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
     const [revokeReason, setRevokeReason] = useState<ClientCertificateRevocationDtoReasonEnum>();
@@ -166,6 +168,15 @@ export default function CertificateDetail() {
     }, [dispatch, groups]);
 
     useEffect(() => {
+        setUserOptions(
+            users.map((user) => ({
+                value: user.uuid,
+                label: `${user.firstName ? user.firstName + " " : ""}${user.lastName ? user.lastName + " " : ""}(${user.username})`,
+            })),
+        );
+    }, [dispatch, users]);
+
+    useEffect(() => {
         setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ":#" + group.authorityInstanceUuid, label: group.name })));
     }, [dispatch, raProfiles]);
 
@@ -173,6 +184,13 @@ export default function CertificateDetail() {
         if (!id || !updateGroup) return;
         dispatch(groupAction.listGroups());
     }, [dispatch, updateGroup, id]);
+
+    useEffect(() => {
+        if (!id) {
+            return;
+        }
+        dispatch(userAction.list());
+    }, [dispatch, id]);
 
     useEffect(() => {
         if (!id || !revoke) return;
@@ -224,8 +242,8 @@ export default function CertificateDetail() {
 
     const onCancelOwnerUpdate = useCallback(() => {
         setUpdateOwner(false);
-        setOwner(undefined);
-    }, [setUpdateOwner, setOwner]);
+        setOwnerUuid(undefined);
+    }, [setUpdateOwner, setOwnerUuid]);
 
     const onCancelRaProfileUpdate = useCallback(() => {
         setUpdateRaProfile(false);
@@ -246,11 +264,17 @@ export default function CertificateDetail() {
     }, [certificate, dispatch, group]);
 
     const onUpdateOwner = useCallback(() => {
-        if (!certificate || !owner) return;
+        if (!certificate || !ownerUuid || !users) {
+            return;
+        }
+        const user = users.find((u) => u.uuid === ownerUuid);
+        if (!user) {
+            return;
+        }
 
-        dispatch(actions.updateOwner({ uuid: certificate.uuid, updateOwnerRequest: { owner: owner } }));
+        dispatch(actions.updateOwner({ uuid: certificate.uuid, user, updateOwnerRequest: { ownerUuid: ownerUuid } }));
         setUpdateOwner(false);
-    }, [certificate, dispatch, owner]);
+    }, [certificate, dispatch, ownerUuid, users]);
 
     const onUpdateRaProfile = useCallback(() => {
         if (!certificate || !raProfile) return;
@@ -472,11 +496,16 @@ export default function CertificateDetail() {
     const updateOwnerBody = useMemo(
         () => (
             <div>
-                <Label for="Owner Name">Owner</Label>
-                <Input type="text" placeholder="Enter the owner name / Email" onChange={(event) => setOwner(event.target.value)}></Input>
+                <Select
+                    maxMenuHeight={140}
+                    menuPlacement="auto"
+                    options={userOptions}
+                    placeholder={`Select Owner`}
+                    onChange={(event) => setOwnerUuid(event?.value)}
+                />
             </div>
         ),
-        [setOwner],
+        [setOwnerUuid, userOptions],
     );
 
     const updateGroupBody = useMemo(() => {
@@ -774,82 +803,88 @@ export default function CertificateDetail() {
         [certificate],
     );
 
-    const propertiesData: TableDataRow[] = useMemo(
-        () =>
-            !certificate
-                ? []
-                : [
-                      {
-                          id: "uuid",
-                          columns: ["UUID", certificate.uuid, ""],
-                      },
-                      {
-                          id: "owner",
-                          columns: [
-                              "Owner",
-                              certificate.owner || "Unassigned",
-                              <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  onClick={() => setUpdateOwner(true)}
-                                  title="Update Owner"
+    const propertiesData: TableDataRow[] = useMemo(() => {
+        const userUuid = users.find((u) => u.username === certificate?.owner)?.uuid;
+        return !certificate
+            ? []
+            : [
+                  {
+                      id: "uuid",
+                      columns: ["UUID", certificate.uuid, ""],
+                  },
+                  {
+                      id: "owner",
+                      columns: [
+                          "Owner",
+                          userUuid ? (
+                              <Link to={`../../users/detail/${userUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                          ) : (
+                              certificate.owner ?? "Unassigned"
+                          ),
+                          <Button
+                              className="btn btn-link"
+                              size="sm"
+                              color="secondary"
+                              onClick={() => {
+                                  setOwnerUuid(undefined);
+                                  setUpdateOwner(true);
+                              }}
+                              title="Update Owner"
+                          >
+                              <i className="fa fa-pencil-square-o" />
+                          </Button>,
+                      ],
+                  },
+                  {
+                      id: "group",
+                      columns: [
+                          "Group",
+                          certificate?.group?.name ? (
+                              <Link to={`../../groups/detail/${certificate?.group.uuid}`}>{certificate?.group.name}</Link>
+                          ) : (
+                              "Unassigned"
+                          ),
+                          <Button
+                              className="btn btn-link"
+                              size="sm"
+                              color="secondary"
+                              onClick={() => setUpdateGroup(true)}
+                              title="Update Group"
+                          >
+                              <i className="fa fa-pencil-square-o" />
+                          </Button>,
+                      ],
+                  },
+                  {
+                      id: "raProfile",
+                      columns: [
+                          "RA Profile",
+                          certificate?.raProfile?.name ? (
+                              <Link
+                                  to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
                               >
-                                  <i className="fa fa-pencil-square-o" />
-                              </Button>,
-                          ],
-                      },
-                      {
-                          id: "group",
-                          columns: [
-                              "Group",
-                              certificate?.group?.name ? (
-                                  <Link to={`../../groups/detail/${certificate?.group.uuid}`}>{certificate?.group.name}</Link>
-                              ) : (
-                                  "Unassigned"
-                              ),
-                              <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  onClick={() => setUpdateGroup(true)}
-                                  title="Update Group"
-                              >
-                                  <i className="fa fa-pencil-square-o" />
-                              </Button>,
-                          ],
-                      },
-                      {
-                          id: "raProfile",
-                          columns: [
-                              "RA Profile",
-                              certificate?.raProfile?.name ? (
-                                  <Link
-                                      to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
-                                  >
-                                      {certificate?.raProfile.name}
-                                  </Link>
-                              ) : (
-                                  "Unassigned"
-                              ),
-                              <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  onClick={() => setUpdateRaProfile(true)}
-                                  title="Update RA Profile"
-                              >
-                                  <i className="fa fa-pencil-square-o" />
-                              </Button>,
-                          ],
-                      },
-                      {
-                          id: "type",
-                          columns: ["Type", certificate.certificateType || "", ""],
-                      },
-                  ],
-        [certificate],
-    );
+                                  {certificate?.raProfile.name}
+                              </Link>
+                          ) : (
+                              "Unassigned"
+                          ),
+                          <Button
+                              className="btn btn-link"
+                              size="sm"
+                              color="secondary"
+                              onClick={() => setUpdateRaProfile(true)}
+                              title="Update RA Profile"
+                          >
+                              <i className="fa fa-pencil-square-o" />
+                          </Button>,
+                      ],
+                  },
+                  {
+                      id: "type",
+                      columns: ["Type", certificate.certificateType || "", ""],
+                  },
+              ];
+    }, [certificate, users]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];
@@ -1286,7 +1321,7 @@ export default function CertificateDetail() {
                 body={updateOwnerBody}
                 toggle={() => onCancelOwnerUpdate()}
                 buttons={[
-                    { color: "primary", onClick: onUpdateOwner, body: "Update", disabled: true ? owner === undefined : false },
+                    { color: "primary", onClick: onUpdateOwner, body: "Update", disabled: true ? ownerUuid === undefined : false },
                     { color: "secondary", onClick: () => onCancelOwnerUpdate(), body: "Cancel" },
                 ]}
             />

@@ -14,6 +14,7 @@ import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
 import PagedList from "components/PagedList/PagedList";
+import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";
@@ -42,6 +43,7 @@ export default function CertificateList({
 
     const certificates = useSelector(selectors.certificates);
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.CERTIFICATE));
+    const users = useSelector(userSelectors.users);
 
     const isIssuing = useSelector(selectors.isIssuing);
     const isRevoking = useSelector(selectors.isRevoking);
@@ -79,6 +81,7 @@ export default function CertificateList({
 
     useEffect(() => {
         dispatch(actions.clearDeleteErrorMessages());
+        dispatch(userAction.list());
     }, [dispatch]);
 
     useEffect(() => {
@@ -278,6 +281,7 @@ export default function CertificateList({
     const certificateList: TableDataRow[] = useMemo(
         () =>
             certificates.map((certificate) => {
+                const userUuid = users.find((u) => u.username === certificate.owner)?.uuid;
                 return {
                     id: certificate.uuid,
                     columns: [
@@ -296,7 +300,11 @@ export default function CertificateList({
                         certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
                         certificate.group?.name || "Unassigned",
                         <span style={{ whiteSpace: "nowrap" }}>{certificate.raProfile?.name || "Unassigned"}</span>,
-                        certificate.owner || "Unassigned",
+                        userUuid ? (
+                            <Link to={`../users/detail/${userUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                        ) : (
+                            certificate.owner ?? "Unassigned"
+                        ),
                         certificate.serialNumber || "",
                         certificate.signatureAlgorithm,
                         certificate.publicKeyAlgorithm,
@@ -311,7 +319,7 @@ export default function CertificateList({
                     ],
                 };
             }),
-        [certificates, selectCertsOnly, certificateTypeEnum],
+        [certificates, selectCertsOnly, certificateTypeEnum, users],
     );
 
     return (
@@ -361,6 +369,7 @@ export default function CertificateList({
                 caption={`Update Owner`}
                 body={
                     <CertificateOwnerDialog
+                        users={users}
                         uuids={checkedRows}
                         onCancel={() => setUpdateOwner(false)}
                         onUpdate={() => setUpdateOwner(false)}

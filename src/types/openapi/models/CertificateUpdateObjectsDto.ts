@@ -29,9 +29,9 @@ export interface CertificateUpdateObjectsDto {
      */
     groupUuid?: string;
     /**
-     * Certificate Owner
+     * Certificate Owner UUID
      * @type {string}
      * @memberof CertificateUpdateObjectsDto
      */
-    owner?: string;
+    ownerUuid?: string;
 }

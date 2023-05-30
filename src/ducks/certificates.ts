@@ -22,6 +22,7 @@ import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
 import { CertificateStatus } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
+import { UserResponseModel } from "types/users";
 import { downloadFileZip } from "utils/download";
 import { createFeatureSelector } from "utils/ducks";
 
@@ -378,18 +379,21 @@ export const slice = createSlice({
             state.isUpdatingRaProfile = false;
         },
 
-        updateOwner: (state, action: PayloadAction<{ uuid: string; updateOwnerRequest: CertificateObjectModel }>) => {
+        updateOwner: (
+            state,
+            action: PayloadAction<{ uuid: string; user: UserResponseModel; updateOwnerRequest: CertificateObjectModel }>,
+        ) => {
             state.isUpdatingOwner = true;
         },
 
-        updateOwnerSuccess: (state, action: PayloadAction<{ uuid: string; owner: string }>) => {
+        updateOwnerSuccess: (state, action: PayloadAction<{ uuid: string; user: UserResponseModel }>) => {
             state.isUpdatingOwner = false;
 
             const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
 
-            if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.owner;
+            if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.owner = action.payload.owner;
+            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.owner = action.payload.user.username;
         },
 
         updateOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -436,19 +440,19 @@ export const slice = createSlice({
             state.isBulkUpdatingRaProfile = false;
         },
 
-        bulkUpdateOwner: (state, action: PayloadAction<CertificateBulkObjectModel>) => {
+        bulkUpdateOwner: (state, action: PayloadAction<{ user: UserResponseModel; request: CertificateBulkObjectModel }>) => {
             state.isBulkUpdatingOwner = true;
         },
 
-        bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[]; owner: string }>) => {
+        bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[]; user: UserResponseModel }>) => {
             state.isBulkUpdatingOwner = false;
 
             action.payload.uuids.forEach((uuid) => {
                 const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
 
-                if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.owner;
+                if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.owner = action.payload.owner;
+                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.owner = action.payload.user.username;
             });
         },
 
