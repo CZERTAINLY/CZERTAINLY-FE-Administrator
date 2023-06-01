@@ -26,6 +26,10 @@ export const validateInteger = () => validatePattern(/^[+-]?(\d*)$/, "Value must
 
 export const validateFloat = () => validatePattern(/^[+-]?(\d*[.])?\d+$/, "Value must be a float without an exponent.");
 
+export const validateAlphaNumericWithoutAccents = () => {
+    return validatePattern(/^[a-zA-Z0-9-._~]+$/, "Value can only contain numbers or letters, dash, underscore, dot or tilde.");
+};
+
 export const validateAlphaNumeric = () => {
     return validatePattern(
         /^[a-zA-Z0-9À-ž]+([ '-/_][a-zA-Z0-9À-ž]+)*$/,

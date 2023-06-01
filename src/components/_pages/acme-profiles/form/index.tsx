@@ -26,6 +26,7 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 import {
     composeValidators,
     validateAlphaNumeric,
+    validateAlphaNumericWithoutAccents,
     validateCustomIp,
     validateCustomUrl,
     validateInteger,
@@ -224,7 +225,7 @@ export default function AcmeProfileForm() {
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="name">ACME Profile Name</Label>
