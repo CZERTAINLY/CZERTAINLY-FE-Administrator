@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/roles";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -30,10 +30,14 @@ export default function UserDetail() {
         dispatch(actions.resetState());
     }, [dispatch]);
 
-    useEffect(() => {
+    const getFreshDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.getDetail({ uuid: id }));
     }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshDetails();
+    }, [getFreshDetails, id]);
 
     useEffect(() => {
         if (!role || role.uuid !== id || permissions?.uuid === id || isFetchingPermissions) return;
@@ -95,39 +99,6 @@ export default function UserDetail() {
             },
         ],
         [role?.systemRole, onEditClick, onEditRoleUsersClick, onEditRolePermissionsClick],
-    );
-
-    const attributesTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Role <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const usersTitle = useMemo(
-        () => (
-            <h5>
-                Assigned <span className="fw-semi-bold">Users</span>
-            </h5>
-        ),
-        [],
-    );
-
-    const permissionsTitle = useMemo(
-        () => (
-            <h5>
-                Role <span className="fw-semi-bold">Permissions</span>
-            </h5>
-        ),
-        [],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -279,19 +250,19 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={attributesTitle} busy={isFetchingDetail}>
+            <Widget title="Role Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large" refreshAction={getFreshDetails}>
                 <br />
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title={usersTitle} busy={isFetchingDetail}>
+            <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
                 <br />
                 <CustomTable headers={usersHeaders} data={usersData} />
             </Widget>
 
             {role && <CustomAttributeWidget resource={Resource.Roles} resourceUuid={role.uuid} attributes={role.customAttributes} />}
 
-            <Widget title={permissionsTitle} busy={isFetchingDetail || isFetchingPermissions}>
+            <Widget title="Role Permissions" busy={isFetchingDetail || isFetchingPermissions} titleSize="large">
                 <br />
                 {!permissions ? (
                     <></>

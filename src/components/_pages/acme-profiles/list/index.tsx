@@ -34,10 +34,14 @@ export default function AdministratorsList() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.listAcmeProfiles());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     useEffect(() => {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
@@ -141,21 +145,6 @@ export default function AdministratorsList() {
         [bulkDeleteErrorMessages, checkedRows.length],
     );
 
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">ACME Profiles</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const acmeProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
@@ -219,7 +208,14 @@ export default function AdministratorsList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}>
+            <Widget
+                title="List of ACME Profiles"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={acmeProfilesTableHeader}

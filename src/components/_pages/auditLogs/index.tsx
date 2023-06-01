@@ -12,9 +12,9 @@ import { dateFormatter } from "utils/dateUtil";
 
 import styles from "./auditLogs.module.scss";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import AuditLogsFilters from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const defaultPageSize = 10;
 
@@ -43,6 +43,9 @@ function AuditLogs() {
 
     const [filters, setFilters] = useState<AuditLogFilterModel>({});
 
+    const getFreshData = useCallback(() => {
+        dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, filters }));
+    }, [page, pageSize, filters, dispatch]);
     useEffect(() => {
         dispatch(auditLogActions.listObjects());
         dispatch(auditLogActions.listOperations());
@@ -50,8 +53,8 @@ function AuditLogs() {
     }, [dispatch]);
 
     useEffect(() => {
-        dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, filters }));
-    }, [page, pageSize, filters, dispatch]);
+        getFreshData();
+    }, [getFreshData]);
 
     useEffect(() => {
         const link = document.getElementById("exportLink");
@@ -88,25 +91,17 @@ function AuditLogs() {
         [dispatch, page, pageSize, filters],
     );
 
-    const auditLogsTitle = useMemo(
+    const exportPurgeButtonsNode = useMemo(
         () => (
-            <div className="d-flex justify-content-between align-items-center">
-                <h5>
-                    <span className="fw-semi-bold">Audit Logs</span>
-                </h5>
-
-                <div>
-                    <ButtonGroup>
-                        <Button color={"default"} onClick={exportCallback}>
-                            Export
-                        </Button>
-                        <a id={"exportLink"} href={exportUrl} download="auditLogs.zip" hidden={true} />
-                        <Button type="submit" color="primary" onClick={purgeCallback}>
-                            Purge
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </div>
+            <ButtonGroup>
+                <Button color={"default"} onClick={exportCallback}>
+                    Export
+                </Button>
+                <a id={"exportLink"} href={exportUrl} download="auditLogs.zip" hidden={true} />
+                <Button type="submit" color="primary" onClick={purgeCallback}>
+                    Purge
+                </Button>
+            </ButtonGroup>
         ),
         [purgeCallback, exportCallback, exportUrl],
     );
@@ -215,7 +210,7 @@ function AuditLogs() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title="Filter Audit Logs" busy={isFilterBusy}>
+            <Widget title="Filter Audit Logs" busy={isFilterBusy} titleSize="large">
                 <AuditLogsFilters
                     operations={operations}
                     operationStates={states}
@@ -225,7 +220,14 @@ function AuditLogs() {
                 />
             </Widget>
 
-            <Widget title={auditLogsTitle} busy={isBusy} widgetLockName={LockWidgetNameEnum.AuditLogs}>
+            <Widget
+                title="Audit Logs"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.AuditLogs}
+                widgetExtraTopNode={exportPurgeButtonsNode}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <CustomTable
                     headers={auditLogsRowHeaders}
                     data={auditLogsList}

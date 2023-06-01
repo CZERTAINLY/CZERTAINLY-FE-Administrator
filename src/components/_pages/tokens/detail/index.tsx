@@ -4,7 +4,7 @@ import Dialog from "components/Dialog";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
 import { actions, selectors } from "ducks/tokens";
@@ -44,12 +44,21 @@ export default function TokenDetail() {
         [isFetching, isDeleting, isActivating, isDeactivating, isReloading, isSyncing],
     );
 
-    useEffect(() => {
+    const getFreshTokenDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getTokenDetail({ uuid: id }));
+    }, [dispatch, id]);
+
+    const getFreshAttributes = useCallback(() => {
+        if (!id) return;
         dispatch(actions.listActivationAttributeDescriptors({ uuid: id }));
     }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshTokenDetails();
+        getFreshAttributes();
+    }, [getFreshTokenDetails, getFreshAttributes, id]);
 
     const onEditClick = useCallback(() => {
         if (!token) return;
@@ -144,27 +153,6 @@ export default function TokenDetail() {
         [onEditClick, onReload, token?.status.status, onSync, setRandomDataGeneration],
     );
 
-    const tokenTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Token <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const metaTitle = (
-        <h5>
-            <span className="fw-semi-bold">Meta Data</span>
-        </h5>
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -225,13 +213,13 @@ export default function TokenDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={tokenTitle} busy={isBusy}>
+            <Widget title="Token Details" busy={isBusy} widgetButtons={buttons} titleSize="large" refreshAction={getFreshTokenDetails}>
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Attributes">
+            <Widget title="Attributes" titleSize="large" refreshAction={getFreshAttributes}>
                 <br />
 
                 <Label>Token Attributes</Label>
@@ -240,7 +228,7 @@ export default function TokenDetail() {
 
             {token && <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />}
 
-            <Widget title={metaTitle}>
+            <Widget title="Meta Data" titleSize="large">
                 <br />
                 <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
             </Widget>

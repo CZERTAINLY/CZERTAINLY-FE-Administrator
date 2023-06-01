@@ -1,7 +1,7 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import TabLayout from "components/Layout/TabLayout";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/settings";
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
@@ -21,9 +21,13 @@ export default function PlatformSettingsDetail() {
 
     const health = useSelector(utilsActuatorSelectors.health);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(utilsActuatorActions.health());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     useEffect(() => {
         if (!platformSettings) {
@@ -47,18 +51,6 @@ export default function PlatformSettingsDetail() {
             },
         ],
         [onEditClick],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-                <h5>Platform Settings</h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const headers: TableHeader[] = useMemo(
@@ -102,7 +94,14 @@ export default function PlatformSettingsDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingPlatform} widgetLockName={LockWidgetNameEnum.PlatformSettings}>
+            <Widget
+                title="Platform Settings"
+                busy={isFetchingPlatform}
+                widgetLockName={LockWidgetNameEnum.PlatformSettings}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <TabLayout
                     tabs={[
                         {

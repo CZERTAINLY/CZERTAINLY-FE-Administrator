@@ -26,10 +26,14 @@ export default function RolesList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setRolesListCheckedRows({ checkedRows: [] }));
         dispatch(actions.list());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -103,21 +107,6 @@ export default function RolesList() {
         [checkedRows.length, isSystemRoleSelected, onAddClick, onEditRolePermissionsClick, onEditRoleUsersClick],
     );
 
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Roles</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [
             {
@@ -166,7 +155,14 @@ export default function RolesList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfRoles}>
+            <Widget
+                title="List of Roles"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfRoles}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={rolesTableHeader}

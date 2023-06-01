@@ -3,7 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/customAttributes";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -30,12 +30,16 @@ export default function CustomAttributeDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshCustomAttribute = useCallback(() => {
         if (!id) return;
         if (!customAttribute || id !== customAttribute.uuid) {
             dispatch(actions.getCustomAttribute(id));
         }
-    }, [dispatch, customAttribute, id]);
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshCustomAttribute();
+    }, [getFreshCustomAttribute, id]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${customAttribute?.uuid}`, { relative: "path" });
@@ -78,20 +82,6 @@ export default function CustomAttributeDetail() {
             },
         ],
         [onEditClick, customAttribute, dispatch, isDisabling, isEnabling],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-                <h5>
-                    Custom Attribute <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -181,7 +171,13 @@ export default function CustomAttributeDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingDetail || isEnabling || isDisabling}>
+            <Widget
+                title="Custom Attribute Details"
+                busy={isFetchingDetail || isEnabling || isDisabling}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshCustomAttribute}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 

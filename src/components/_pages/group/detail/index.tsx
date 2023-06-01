@@ -24,11 +24,14 @@ export default function GroupDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshGroupDetails = useCallback(() => {
         if (!id) return;
-
         dispatch(actions.getGroupDetail({ uuid: id }));
-    }, [dispatch, id]);
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        getFreshGroupDetails();
+    }, [getFreshGroupDetails, id]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${group?.uuid}`, { relative: "path" });
@@ -115,7 +118,13 @@ export default function GroupDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingDetail}>
+            <Widget
+                title="Group Details"
+                busy={isFetchingDetail}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshGroupDetails}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 

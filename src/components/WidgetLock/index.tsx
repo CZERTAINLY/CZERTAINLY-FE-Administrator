@@ -1,3 +1,4 @@
+import cx from "classnames";
 import {
     Button,
     Card,
@@ -11,9 +12,8 @@ import {
     Row,
     UncontrolledPopover,
 } from "reactstrap";
-import cx from "classnames";
-import styles from "./WidgetLock.module.scss";
 import { LockTypeEnum } from "types/widget-locks";
+import styles from "./WidgetLock.module.scss";
 interface Props {
     size?: "small" | "normal" | "large";
     lockTitle?: string;

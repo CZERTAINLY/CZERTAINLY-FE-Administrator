@@ -334,29 +334,25 @@ function UserForm() {
         return userRoles.length !== usrRoleUuids.length || userRoles.some((roleUuid) => !usrRoleUuids.includes(roleUuid));
     }, [user, userRoles]);
 
-    const title = useMemo(
-        () => (
-            <>
-                {editMode ? (
-                    <></>
-                ) : (
-                    <div style={{ float: "right", color: "black" }}>
-                        <Field name="enabled">
-                            {({ input, meta }) => (
-                                <Label for="enabled">
-                                    <Input {...input} id="enabled" type="checkbox" label="Enabled" checked={input.value} />
-                                    &nbsp;&nbsp;Enabled
-                                </Label>
-                            )}
-                        </Field>
-                    </div>
-                )}
-
-                {editMode ? "Edit user" : "Create user"}
-            </>
-        ),
+    const enableCheckButton = useMemo(
+        () =>
+            editMode ? (
+                <></>
+            ) : (
+                <div className="ms-auto">
+                    <Field name="enabled">
+                        {({ input, meta }) => (
+                            <Label for="enabled">
+                                <Input {...input} id="enabled" type="checkbox" label="Enabled" checked={input.value} />
+                                &nbsp;&nbsp;Enabled
+                            </Label>
+                        )}
+                    </Field>
+                </div>
+            ),
         [editMode],
     );
+    const title = useMemo(() => (editMode ? "Edit user" : "Create user"), [editMode]);
 
     return (
         <>
@@ -374,6 +370,7 @@ function UserForm() {
                                 isCreatingUser ||
                                 isFetchingResourceCustomAttributes
                             }
+                            widgetExtraTopNode={enableCheckButton}
                         >
                             <Field name="username" validate={validateRequired()}>
                                 {({ input, meta }) => (

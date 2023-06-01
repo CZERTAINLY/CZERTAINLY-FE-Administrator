@@ -39,6 +39,7 @@ export default function ConnectorForm() {
     const { id } = useParams();
 
     const editMode = useMemo(() => !!id, [id]);
+    const connectorWidgetTitle = useMemo(() => (editMode ? "Edit Connector" : "Create Connector"), [editMode]);
 
     const optionsForAuth: { label: string; value: AuthType }[] = useMemo(
         () => [
@@ -76,10 +77,10 @@ export default function ConnectorForm() {
         editMode ? optionsForAuth.find((opt) => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
     );
 
-    const submitTitle = editMode ? "Save" : "Create";
-    const connectTitle = editMode ? "Reconnect" : "Connect";
-    const inProgressTitle = editMode ? "Saving..." : "Creating...";
-    const connectProgressTitle = editMode ? "Reconnecting..." : "Connecting...";
+    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const connectTitle = useMemo(() => (editMode ? "Reconnect" : "Connect"), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const connectProgressTitle = useMemo(() => (editMode ? "Reconnecting..." : "Connecting..."), [editMode]);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Connectors));
@@ -207,13 +208,7 @@ export default function ConnectorForm() {
                 <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, values }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
-                            <Widget
-                                title={
-                                    <h5>
-                                        {editMode ? "Edit" : "Add new"} <span className="fw-semi-bold">Connector</span>
-                                    </h5>
-                                }
-                            >
+                            <Widget title={connectorWidgetTitle} titleSize="large">
                                 <Field name="url" validate={composeValidators(validateRequired(), validateUrl())}>
                                     {({ input, meta }) => (
                                         <FormGroup>
@@ -352,7 +347,7 @@ export default function ConnectorForm() {
                             </Widget>
 
                             {connectionDetails ? (
-                                <Widget title="Connection Details" busy={isConnecting}>
+                                <Widget title="Connection Details" busy={isConnecting} titleSize="large">
                                     <Table className="table-hover" size="sm">
                                         <tbody>
                                             <tr>
@@ -397,19 +392,17 @@ export default function ConnectorForm() {
                                             {connectionDetails.map((functionGroup) => (
                                                 <Widget
                                                     key={functionGroup.name}
-                                                    title={
-                                                        <>
-                                                            {attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
-
-                                                            <div className="fa-pull-right mt-n-xs">
-                                                                {functionGroup.kinds.map((kinds) => (
-                                                                    <>
-                                                                        &nbsp;
-                                                                        <Badge color="secondary">{kinds}</Badge>
-                                                                    </>
-                                                                ))}
-                                                            </div>
-                                                        </>
+                                                    title={attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                    titleSize="large"
+                                                    widgetExtraTopNode={
+                                                        <div className="fa-pull-right mt-n-xs ms-auto">
+                                                            {functionGroup.kinds.map((kinds) => (
+                                                                <>
+                                                                    &nbsp;
+                                                                    <Badge color="secondary">{kinds}</Badge>
+                                                                </>
+                                                            ))}
+                                                        </div>
                                                     }
                                                 >
                                                     <CustomTable

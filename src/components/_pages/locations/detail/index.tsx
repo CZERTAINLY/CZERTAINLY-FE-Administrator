@@ -8,7 +8,7 @@ import StatusBadge from "components/StatusBadge";
 import CertificateList from "components/_pages/certificates/list";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/locations";
 import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
@@ -82,12 +82,16 @@ export default function LocationDetail() {
         [isFetching, isDeleting, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors, isFetchingResourceCustomAttributes],
     );
 
-    useEffect(() => {
+    const getFreshLocationDetails = useCallback(() => {
         dispatch(customAttributesActions.listSecondaryResourceCustomAttributes(Resource.Certificates));
 
         if (!id || !entityId) return;
         dispatch(actions.getLocationDetail({ entityUuid: entityId!, uuid: id! }));
-    }, [dispatch, id, entityId]);
+    }, [dispatch, entityId, id]);
+
+    useEffect(() => {
+        getFreshLocationDetails();
+    }, [id, getFreshLocationDetails]);
 
     useEffect(() => {
         if (!id || !entityId || !location || !location.uuid) return;
@@ -270,21 +274,6 @@ export default function LocationDetail() {
         [location?.enabled, onDisableClick, onEditClick, onEnableClick],
     );
 
-    const locationTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Location <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const certButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -329,21 +318,6 @@ export default function LocationDetail() {
             },
         ],
         [certCheckedRows.length, location, onRenewClick, onSyncClick],
-    );
-
-    const certsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={certButtons} />
-                </div>
-
-                <h5>
-                    Location <span className="fw-semi-bold">Certificates</span>
-                </h5>
-            </div>
-        ),
-        [certButtons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -472,13 +446,19 @@ export default function LocationDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={locationTitle} busy={isBusy}>
+            <Widget
+                title="Location Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshLocationDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Attributes">
+            <Widget title="Attributes" titleSize="large">
                 <br />
 
                 <Label>Location Attributes</Label>
@@ -489,7 +469,9 @@ export default function LocationDetail() {
             )}
 
             <Widget
-                title={certsTitle}
+                title="Location Certificates"
+                titleSize="large"
+                widgetButtons={certButtons}
                 busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}
             >
                 <br />

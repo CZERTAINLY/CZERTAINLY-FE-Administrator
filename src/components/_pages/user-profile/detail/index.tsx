@@ -8,7 +8,7 @@ import { actions, selectors } from "ducks/auth";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 export default function UserProfileDetail() {
     const dispatch = useDispatch();
@@ -37,21 +37,6 @@ export default function UserProfileDetail() {
             },
         ],
         [profile, onEditClick],
-    );
-
-    const attributesTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    User <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -99,7 +84,7 @@ export default function UserProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={attributesTitle} busy={isFetchingDetail}>
+            <Widget title="User Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large">
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
         </Container>

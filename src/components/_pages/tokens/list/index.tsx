@@ -8,10 +8,10 @@ import { actions, selectors } from "ducks/tokens";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
-import TokenActivationDialogBody from "../TokenActivationDialogBody";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import TokenActivationDialogBody from "../TokenActivationDialogBody";
 
 function TokenList() {
     const dispatch = useDispatch();
@@ -31,11 +31,15 @@ function TokenList() {
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.clearDeleteErrorMessages());
         dispatch(actions.listTokens());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate("./add");
@@ -98,21 +102,6 @@ function TokenList() {
             },
         ],
         [checkedRows, onAddClick],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    <span className="fw-semi-bold">Token Store</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const tokenRowHeader: TableHeader[] = useMemo(
@@ -178,7 +167,14 @@ function TokenList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.TokenStore}>
+            <Widget
+                title="Token Store"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.TokenStore}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
 
                 <CustomTable

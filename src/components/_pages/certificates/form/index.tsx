@@ -229,14 +229,7 @@ export default function CertificateForm() {
         <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, valid, submitting, values, form }) => (
                 <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget
-                        title={
-                            <h5>
-                                Add new <span className="fw-semi-bold">Certificate</span>
-                            </h5>
-                        }
-                        busy={issuingCertificate || isFetchingResourceCustomAttributes}
-                    >
+                    <Widget title="Add new Certificate" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
                         <Field name="raProfile" validate={validateRequired()}>
                             {({ input, meta, onChange }) => (
                                 <FormGroup>
@@ -282,14 +275,7 @@ export default function CertificateForm() {
                         </Field>
                     </Widget>
 
-                    <Widget
-                        title={
-                            <h5>
-                                <span className="fw-semi-bold">Request Properties</span>
-                            </h5>
-                        }
-                        busy={issuingCertificate || isFetchingResourceCustomAttributes}
-                    >
+                    <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
                         {values.uploadCsr?.value && values.raProfile ? (
                             <>
                                 <FileUpload
