@@ -29,7 +29,7 @@
         "jszip": "^3.10.1",
         "lodash.debounce": "^4.0.8",
         "marked": "^4.3.0",
-        "npm": "^8.19.4",
+        "npm": "^9.0.0",
         "prettier": "^2.8.7",
         "react": "^18.2.0",
         "react-apexcharts": "^1.4.0",
