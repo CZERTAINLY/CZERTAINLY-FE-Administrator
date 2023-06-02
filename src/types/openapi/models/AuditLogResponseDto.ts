@@ -19,23 +19,29 @@ import type { AuditLogDto } from "./";
  */
 export interface AuditLogResponseDto {
     /**
-     * Page number
+     * Number of entries per page
      * @type {number}
      * @memberof AuditLogResponseDto
      */
-    page: number;
+    itemsPerPage: number;
     /**
-     * Size of the data per page
+     * Page number for the request
      * @type {number}
      * @memberof AuditLogResponseDto
      */
-    size: number;
+    pageNumber: number;
     /**
-     * Number of pages
+     * Number of pages available
      * @type {number}
      * @memberof AuditLogResponseDto
      */
     totalPages: number;
+    /**
+     * Number of items available
+     * @type {number}
+     * @memberof AuditLogResponseDto
+     */
+    totalItems: number;
     /**
      * Audit log items
      * @type {Array<AuditLogDto>}

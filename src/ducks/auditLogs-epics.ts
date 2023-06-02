@@ -1,12 +1,12 @@
 import { AppEpic } from "ducks";
-import { of, from } from "rxjs";
+import { from, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { actions as appRedirectActions } from "./app-redirect";
 import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import * as slice from "./auditLogs";
 import { transformAuditLogDtoToModel, transformAuditLogFilterModelToDto, transformPageableModelToDto } from "./transform/auditLogs";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listLogs: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -22,9 +22,10 @@ const listLogs: AppEpic = (action$, state, deps) => {
                         const auditLogModel = transformAuditLogDtoToModel(pagedAuditLog);
                         const action = slice.actions.listLogsSuccess({
                             data: auditLogModel.items,
-                            page: auditLogModel.page,
-                            size: auditLogModel.size,
-                            total: auditLogModel.totalPages,
+                            pageNumber: auditLogModel.pageNumber,
+                            itemsPerPage: auditLogModel.itemsPerPage,
+                            totalPages: auditLogModel.totalPages,
+                            totalItems: auditLogModel.totalItems,
                         });
                         return [action, widgetLockActions.removeWidgetLock(LockWidgetNameEnum.AuditLogs)];
                     }),
