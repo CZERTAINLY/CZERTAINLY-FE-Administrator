@@ -12,17 +12,16 @@ import { dateFormatter } from "utils/dateUtil";
 
 import styles from "./auditLogs.module.scss";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import AuditLogsFilters from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const defaultPageSize = 10;
 
 function AuditLogs() {
     const dispatch = useDispatch();
 
-    const totalPages = useSelector(selectors.totalPagesAvailable);
-    const loadedPageSize = useSelector(selectors.loadedPageSize);
+    const totalItems = useSelector(selectors.totalItems);
     const isFetchingPageData = useSelector(selectors.isFetchingPageData);
     const isFetchingObjects = useSelector(selectors.isFetchingObjects);
     const isFetchingOperations = useSelector(selectors.isFetchingOperations);
@@ -196,13 +195,13 @@ function AuditLogs() {
     const paginationData = useMemo(
         () => ({
             page,
-            totalItems: page === totalPages ? (totalPages - 1) * pageSize + loadedPageSize : totalPages * pageSize,
+            totalItems: totalItems,
             pageSize,
-            loadedPageSize,
-            totalPages,
+            loadedPageSize: pageSize,
+            totalPages: Math.ceil(totalItems / pageSize),
             itemsPerPageOptions: [10, 20, 50, 100],
         }),
-        [page, totalPages, pageSize, loadedPageSize],
+        [page, pageSize, totalItems],
     );
 
     const onPageSizeChanged = useCallback(
