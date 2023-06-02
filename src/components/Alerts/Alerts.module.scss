@@ -1,15 +1,16 @@
 .alerts {
-  position: fixed;
-  left: 200px;
-  right: 0;
-  bottom: 60px;
-  padding: 0 30px;
+    position: fixed;
+    left: 200px;
+    right: 0;
+    bottom: 60px;
+    padding: 0 30px;
+    white-space: pre-line;
 }
 
 .alert {
 }
 
 .alert[data-hiding="true"] {
-   transition: 3s;
-   opacity: 0;
+    transition: 3s;
+    opacity: 0;
 }

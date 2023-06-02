@@ -12,21 +12,23 @@ import {
 } from "types/globalMetadata";
 
 export function transformGlobalMetadataResponseDtoToModel(metadata: GlobalMetadataResponseDto): GlobalMetadataResponseModel {
-    return {...metadata};
+    return { ...metadata };
 }
 
-export function transformGlobalMetadataDetailResponseDtoToModel(metadata: GlobalMetadataDetailResponseDto): GlobalMetadataDetailResponseModel {
-    return {...metadata};
+export function transformGlobalMetadataDetailResponseDtoToModel(
+    metadata: GlobalMetadataDetailResponseDto,
+): GlobalMetadataDetailResponseModel {
+    return { ...metadata };
 }
 
 export function transformGlobalMetadataCreateRequestModelToDto(metadata: GlobalMetadataCreateRequestModel): GlobalMetadataCreateRequestDto {
-    return {...metadata};
+    return { ...metadata };
 }
 
 export function transformGlobalMetadataUpdateRequestModelToDto(metadata: GlobalMetadataUpdateRequestModel): GlobalMetadataUpdateRequestDto {
-    return {...metadata};
+    return { ...metadata };
 }
 
 export function transformConnectorMetadataResponseDtoToModel(metadata: ConnectorMetadataResponseDto): ConnectorMetadataResponseModel {
-    return {...metadata};
+    return { ...metadata };
 }

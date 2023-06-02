@@ -22,7 +22,7 @@ import {
     SearchFilterRequestDto,
     SearchRequestDto as SearchRequestDtoOpenApi,
     SimplifiedRaProfileDto,
-    UploadCertificateRequestDto
+    UploadCertificateRequestDto,
 } from "./openapi";
 
 export type SearchFilterDto = SearchFilterRequestDto;
@@ -35,17 +35,22 @@ export type RaProfileSimplifiedDto = SimplifiedRaProfileDto;
 export type RaProfileSimplifiedModel = RaProfileSimplifiedDto;
 
 export type CertificateComplianceResponseDto = CertificateComplianceResultDto;
-export type CertificateComplianceResponseModel = Omit<CertificateComplianceResponseDto, "attributes"> & { attributes?: Array<AttributeResponseModel> };
+export type CertificateComplianceResponseModel = Omit<CertificateComplianceResponseDto, "attributes"> & {
+    attributes?: Array<AttributeResponseModel>;
+};
 
 export type CertificateDetailResponseDto = CertificateDetailResponseDtoOpenApi;
-export type CertificateDetailResponseModel = Omit<CertificateDetailResponseDto, "metadata | raProfile | locations | group | nonCompliantRules | customAttributes"> & {
-    metadata?: Array<MetadataModel>,
-    raProfile?: RaProfileSimplifiedModel,
-    locations?: Array<LocationResponseModel>,
-    group?: CertificateGroupResponseModel,
-    nonCompliantRules?: Array<CertificateComplianceResponseModel>,
-    customAttributes?: Array<AttributeResponseModel>,
-}
+export type CertificateDetailResponseModel = Omit<
+    CertificateDetailResponseDto,
+    "metadata | raProfile | locations | group | nonCompliantRules | customAttributes"
+> & {
+    metadata?: Array<MetadataModel>;
+    raProfile?: RaProfileSimplifiedModel;
+    locations?: Array<LocationResponseModel>;
+    group?: CertificateGroupResponseModel;
+    nonCompliantRules?: Array<CertificateComplianceResponseModel>;
+    customAttributes?: Array<AttributeResponseModel>;
+};
 
 export type CertificateListResponseDto = CertificateDto;
 export type CertificateListResponseModel = CertificateListResponseDto;
@@ -54,7 +59,15 @@ export type CertificateValidationDto = CertificateValidationDtoOpenApi;
 export type CertificateValidationModel = CertificateValidationDto;
 
 export type CertificateSignRequestDto = ClientCertificateSignRequestDto;
-export type CertificateSignRequestModel = Omit<CertificateSignRequestDto, "attributes | customAttributes | csrAttributes | signatureAttributes"> & { attributes: Array<AttributeRequestModel>, customAttributes?: Array<AttributeRequestModel>, csrAttributes?: Array<AttributeRequestModel>, signatureAttributes?: Array<AttributeRequestModel> };
+export type CertificateSignRequestModel = Omit<
+    CertificateSignRequestDto,
+    "attributes | customAttributes | csrAttributes | signatureAttributes"
+> & {
+    attributes: Array<AttributeRequestModel>;
+    customAttributes?: Array<AttributeRequestModel>;
+    csrAttributes?: Array<AttributeRequestModel>;
+    signatureAttributes?: Array<AttributeRequestModel>;
+};
 
 export type CertificateRevokeRequestDto = ClientCertificateRevocationDto;
 export type CertificateRevokeRequestModel = Omit<CertificateRevokeRequestDto, "attributes"> & { attributes: Array<AttributeRequestModel> };

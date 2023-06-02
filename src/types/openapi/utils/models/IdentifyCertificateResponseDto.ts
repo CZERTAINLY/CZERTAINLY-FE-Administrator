@@ -29,7 +29,6 @@ export interface IdentifyCertificateResponseDto {
  * @enum {string}
  */
 export enum IdentifyCertificateResponseDtoCertificateTypeEnum {
-    X509 = 'X509',
-    Ssh = 'SSH'
+    X509 = "X509",
+    Ssh = "SSH",
 }
-

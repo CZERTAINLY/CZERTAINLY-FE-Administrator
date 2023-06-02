@@ -1,459 +1,337 @@
-import { createFeatureSelector } from "utils/ducks";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserAddRequestModel, UserResponseModel } from "types/users";
 import { RoleResponseModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
-
+import { UserAddRequestModel, UserResponseModel } from "types/users";
+import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
+    usersListCheckedRows: string[];
+    userRolesListCheckedRows: string[];
 
-   usersListCheckedRows: string[];
-   userRolesListCheckedRows: string[];
+    deleteErrorMessage: string;
 
-   deleteErrorMessage: string;
+    user?: UserDetailModel;
+    userRoles?: RoleResponseModel[];
 
-   user?: UserDetailModel;
-   userRoles?: RoleResponseModel[];
+    users: UserResponseModel[];
 
-   users: UserResponseModel[];
-
-   isFetchingList: boolean;
-   isFetchingDetail: boolean;
-   isCreating: boolean;
-   isDeleting: boolean;
-   isUpdating: boolean;
-   isEnabling: boolean;
-   isDisabling: boolean;
-   isFetchingRoles: boolean;
-   isUpdatingRoles: boolean;
-   isAddingRole: boolean;
-   isRemovingRole: boolean;
-
+    isFetchingList: boolean;
+    isFetchingDetail: boolean;
+    isCreating: boolean;
+    isDeleting: boolean;
+    isUpdating: boolean;
+    isEnabling: boolean;
+    isDisabling: boolean;
+    isFetchingRoles: boolean;
+    isUpdatingRoles: boolean;
+    isAddingRole: boolean;
+    isRemovingRole: boolean;
 };
-
 
 export const initialState: State = {
+    usersListCheckedRows: [],
+    userRolesListCheckedRows: [],
 
-   usersListCheckedRows: [],
-   userRolesListCheckedRows: [],
+    deleteErrorMessage: "",
 
-   deleteErrorMessage: "",
+    users: [],
 
-   users: [],
-
-   isFetchingDetail: false,
-   isFetchingList: false,
-   isCreating: false,
-   isDeleting: false,
-   isUpdating: false,
-   isEnabling: false,
-   isDisabling: false,
-   isFetchingRoles: false,
-   isUpdatingRoles: false,
-   isAddingRole: false,
-   isRemovingRole: false,
-
+    isFetchingDetail: false,
+    isFetchingList: false,
+    isCreating: false,
+    isDeleting: false,
+    isUpdating: false,
+    isEnabling: false,
+    isDisabling: false,
+    isFetchingRoles: false,
+    isUpdatingRoles: false,
+    isAddingRole: false,
+    isRemovingRole: false,
 };
 
-
 export const slice = createSlice({
+    name: "users",
 
-   name: "users",
+    initialState,
 
-   initialState,
+    reducers: {
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
 
-   reducers: {
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
 
-      resetState: (state, action: PayloadAction<void>) => {
+        setUserListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+            state.usersListCheckedRows = action.payload.checkedRows;
+        },
 
-         Object.keys(state).forEach(
-            key => { if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined; }
-         );
+        setUserRolesListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+            state.userRolesListCheckedRows = action.payload.checkedRows;
+        },
 
-         Object.keys(initialState).forEach(
-            key => (state as any)[key] = (initialState as any)[key]
-         );
+        clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
+            state.deleteErrorMessage = "";
+        },
 
-      },
+        list: (state, action: PayloadAction<void>) => {
+            state.usersListCheckedRows = [];
+            state.isFetchingList = true;
+        },
 
+        listSuccess: (state, action: PayloadAction<{ users: UserResponseModel[] }>) => {
+            state.isFetchingList = false;
+            state.users = action.payload.users;
+        },
 
-      setUserListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+        listFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingList = false;
+        },
 
-         state.usersListCheckedRows = action.payload.checkedRows;
+        getDetail: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.user = undefined;
+            state.userRoles = undefined;
+            state.userRolesListCheckedRows = [];
+            state.isFetchingDetail = true;
+        },
 
-      },
+        getDetailSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            state.isFetchingDetail = false;
 
+            state.user = action.payload.user;
 
-      setUserRolesListCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
+            const userIndex = state.users.findIndex((user) => user.uuid === action.payload.user.uuid);
 
-         state.userRolesListCheckedRows = action.payload.checkedRows;
+            if (userIndex >= 0) {
+                state.users[userIndex] = action.payload.user;
+            } else {
+                state.users.push(action.payload.user);
+            }
+        },
 
-      },
+        getDetailFailure: (state, acttion: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingDetail = false;
+        },
 
+        create: (
+            state,
+            action: PayloadAction<{
+                userAddRequest: UserAddRequestModel;
+                roles?: string[];
+            }>,
+        ) => {
+            state.isCreating = true;
+        },
 
-      clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-
-         state.deleteErrorMessage = "";
-
-      },
-
-
-      list: (state, action: PayloadAction<void>) => {
-
-         state.usersListCheckedRows = [];
-         state.isFetchingList = true;
-
-      },
-
-
-      listSuccess: (state, action: PayloadAction<{ users: UserResponseModel[] }>) => {
-
-         state.isFetchingList = false;
-         state.users = action.payload.users;
-
-      },
-
-
-      listFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isFetchingList = false;
-      },
-
-
-      getDetail: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.user = undefined;
-         state.userRoles = undefined;
-         state.userRolesListCheckedRows = [];
-         state.isFetchingDetail = true;
-
-      },
-
-
-      getDetailSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-
-         state.isFetchingDetail = false;
-
-         state.user = action.payload.user;
-
-         const userIndex = state.users.findIndex(user => user.uuid === action.payload.user.uuid);
-
-         if (userIndex >= 0) {
-            state.users[userIndex] = action.payload.user;
-         } else {
+        createSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            state.isCreating = false;
             state.users.push(action.payload.user);
-         }
+        },
 
-      },
+        createFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreating = false;
+        },
 
+        update: (
+            state,
+            action: PayloadAction<{
+                uuid: string;
+                updateUserRequest: UserUpdateRequestModel;
+                roles?: string[];
+            }>,
+        ) => {
+            state.isUpdating = true;
+        },
 
-      getDetailFailure: (state, acttion: PayloadAction<{ error: string | undefined }>) => {
+        updateSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            state.isUpdating = false;
 
-         state.isFetchingDetail = false;
+            const userIndex = state.users.findIndex((user) => user.uuid === action.payload.user.uuid);
 
-      },
+            if (userIndex >= 0) {
+                state.users[userIndex] = action.payload.user;
+            } else {
+                state.users.push(action.payload.user);
+            }
 
+            if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+        },
 
-      create: (state, action: PayloadAction<{
-         userAddRequest: UserAddRequestModel,
-         roles?: string[]
-      }>) => {
+        updateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
 
-         state.isCreating = true;
+        deleteUser: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
+            state.isDeleting = true;
+        },
 
-      },
+        deleteUserSuccess: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
+            state.isDeleting = false;
 
+            state.usersListCheckedRows = [];
 
-      createSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            const userIndex = state.users.findIndex((user) => user.uuid === action.payload.uuid);
 
-         state.isCreating = false;
-         state.users.push(action.payload.user);
+            if (userIndex >= 0) state.users.splice(userIndex, 1);
 
-      },
+            if (state.user?.uuid === action.payload.uuid) state.user = undefined;
+        },
 
+        deleteUserFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.isDeleting = false;
+        },
 
-      createFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        enable: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isEnabling = true;
+        },
 
-         state.isCreating = false;
+        enableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isEnabling = false;
 
-      },
+            const admin = state.users.find((administrator) => administrator.uuid === action.payload.uuid);
+            if (admin) admin.enabled = true;
 
+            if (state.user?.uuid === action.payload.uuid) state.user.enabled = true;
+        },
 
-      update: (state, action: PayloadAction<{
-         uuid: string,
-         updateUserRequest: UserUpdateRequestModel,
-         roles?: string[]
-      }>) => {
+        enableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEnabling = false;
+        },
 
-         state.isUpdating = true;
+        disable: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDisabling = true;
+        },
 
-      },
+        disableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDisabling = false;
 
+            const admin = state.users.find((administrator) => administrator.uuid === action.payload.uuid);
 
-      updateSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            if (admin) admin.enabled = false;
 
-         state.isUpdating = false;
+            if (state.user?.uuid === action.payload.uuid) state.user.enabled = false;
+        },
 
-         const userIndex = state.users.findIndex(user => user.uuid === action.payload.user.uuid)
+        disableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDisabling = false;
+        },
 
-         if (userIndex >= 0) {
-            state.users[userIndex] = action.payload.user;
-         } else {
-            state.users.push(action.payload.user);
-         }
+        getRoles: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isFetchingRoles = true;
+        },
 
-         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+        getRolesSuccess: (state, action: PayloadAction<{ uuid: string; roles: RoleResponseModel[] }>) => {
+            state.isFetchingRoles = false;
 
-      },
+            state.userRoles = action.payload.roles;
+        },
 
+        getRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingRoles = false;
+        },
 
-      updateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        updateRoles: (state, action: PayloadAction<{ uuid: string; roles: string[] }>) => {
+            state.userRoles = undefined;
+            state.isUpdatingRoles = true;
+        },
 
-         state.isUpdating = false;
+        updateRolesSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            state.isUpdatingRoles = false;
 
-      },
+            state.userRoles = action.payload.user.roles;
 
+            if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+        },
 
-      deleteUser: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
+        updateRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingRoles = false;
+        },
 
-         state.isDeleting = true;
+        addRole: (state, action: PayloadAction<{ uuid: string; roleUuid: string }>) => {
+            state.isAddingRole = true;
+        },
 
-      },
+        addRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            state.isAddingRole = false;
 
+            state.userRoles = action.payload.user.roles;
 
-      deleteUserSuccess: (state, action: PayloadAction<{ uuid: string, redirect?: string }>) => {
+            if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+        },
 
-         state.isDeleting = false;
+        addRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isAddingRole = false;
+        },
 
-         state.usersListCheckedRows = [];
+        removeRole: (state, action: PayloadAction<{ uuid: string; roleUuid: string }>) => {
+            state.isRemovingRole = true;
+        },
 
-         const userIndex = state.users.findIndex(user => user.uuid === action.payload.uuid);
+        removeRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
+            state.isRemovingRole = false;
 
-         if (userIndex >= 0) state.users.splice(userIndex, 1);
+            state.userRoles = action.payload.user.roles;
 
-         if (state.user?.uuid === action.payload.uuid) state.user = undefined;
+            if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+        },
 
-      },
-
-
-      deleteUserFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.deleteErrorMessage = action.payload.error || "Unknown error";
-         state.isDeleting = false;
-
-      },
-
-
-      enable: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isEnabling = true;
-
-      },
-
-
-      enableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isEnabling = false;
-
-         const admin = state.users.find(administrator => administrator.uuid === action.payload.uuid)
-         if (admin) admin.enabled = true;
-
-         if (state.user?.uuid === action.payload.uuid) state.user.enabled = true;
-
-      },
-
-
-      enableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isEnabling = false;
-
-      },
-
-
-      disable: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isDisabling = true;
-
-      },
-
-
-      disableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isDisabling = false;
-
-         const admin = state.users.find(administrator => administrator.uuid === action.payload.uuid)
-
-         if (admin) admin.enabled = false;
-
-         if (state.user?.uuid === action.payload.uuid) state.user.enabled = false;
-
-      },
-
-
-      disableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isDisabling = false;
-
-      },
-
-
-      getRoles: (state, action: PayloadAction<{ uuid: string }>) => {
-
-         state.isFetchingRoles = true;
-
-      },
-
-
-      getRolesSuccess: (state, action: PayloadAction<{ uuid: string, roles: RoleResponseModel[] }>) => {
-
-         state.isFetchingRoles = false;
-
-         state.userRoles = action.payload.roles;
-
-      },
-
-
-      getRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isFetchingRoles = false;
-
-      },
-
-
-      updateRoles: (state, action: PayloadAction<{ uuid: string, roles: string[] }>) => {
-
-         state.userRoles = undefined;
-         state.isUpdatingRoles = true;
-
-      },
-
-
-      updateRolesSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-
-         state.isUpdatingRoles = false;
-
-         state.userRoles = action.payload.user.roles;
-
-         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
-
-      },
-
-
-      updateRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isUpdatingRoles = false;
-
-      },
-
-
-      addRole: (state, action: PayloadAction<{ uuid: string, roleUuid: string }>) => {
-
-         state.isAddingRole = true;
-
-      },
-
-
-      addRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-
-         state.isAddingRole = false;
-
-         state.userRoles = action.payload.user.roles;
-
-         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
-
-      },
-
-
-      addRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isAddingRole = false;
-
-      },
-
-
-      removeRole: (state, action: PayloadAction<{ uuid: string, roleUuid: string }>) => {
-
-         state.isRemovingRole = true;
-
-      },
-
-
-      removeRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-
-         state.isRemovingRole = false;
-
-         state.userRoles = action.payload.user.roles;
-
-         if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
-
-      },
-
-
-      removeRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-
-         state.isRemovingRole = false;
-
-      }
-
-   }
-
-})
-
+        removeRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isRemovingRole = false;
+        },
+    },
+});
 
 const state = createFeatureSelector<State>(slice.name);
 
-const usersListCheckedRows = createSelector(state, state => state.usersListCheckedRows);
-const userRolesListCheckedRows = createSelector(state, state => state.userRolesListCheckedRows);
+const usersListCheckedRows = createSelector(state, (state) => state.usersListCheckedRows);
+const userRolesListCheckedRows = createSelector(state, (state) => state.userRolesListCheckedRows);
 
-const deleteErrorMessage = createSelector(state, state => state.deleteErrorMessage);
+const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 
-const user = createSelector(state, state => state.user);
-const userRoles = createSelector(state, state => state.userRoles);
+const user = createSelector(state, (state) => state.user);
+const userRoles = createSelector(state, (state) => state.userRoles);
 
-const users = createSelector(state, state => state.users);
+const users = createSelector(state, (state) => state.users);
 
-const isFetchingList = createSelector(state, state => state.isFetchingList);
-const isFetchingDetail = createSelector(state, state => state.isFetchingDetail);
-const isCreating = createSelector(state, state => state.isCreating);
-const isUpdating = createSelector(state, state => state.isUpdating);
-const isDeleting = createSelector(state, state => state.isDeleting);
-const isEnabling = createSelector(state, state => state.isEnabling);
-const isDisabling = createSelector(state, state => state.isDisabling);
-const isFetchingRoles = createSelector(state, state => state.isFetchingRoles);
-const isUpdatingRoles = createSelector(state, state => state.isUpdatingRoles);
-const isAddingRole = createSelector(state, state => state.isAddingRole);
-const isRemovingRole = createSelector(state, state => state.isRemovingRole);
-
+const isFetchingList = createSelector(state, (state) => state.isFetchingList);
+const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
+const isCreating = createSelector(state, (state) => state.isCreating);
+const isUpdating = createSelector(state, (state) => state.isUpdating);
+const isDeleting = createSelector(state, (state) => state.isDeleting);
+const isEnabling = createSelector(state, (state) => state.isEnabling);
+const isDisabling = createSelector(state, (state) => state.isDisabling);
+const isFetchingRoles = createSelector(state, (state) => state.isFetchingRoles);
+const isUpdatingRoles = createSelector(state, (state) => state.isUpdatingRoles);
+const isAddingRole = createSelector(state, (state) => state.isAddingRole);
+const isRemovingRole = createSelector(state, (state) => state.isRemovingRole);
 
 export const selectors = {
+    state,
 
-   state,
+    usersListCheckedRows,
+    userRolesListCheckedRows,
 
-   usersListCheckedRows,
-   userRolesListCheckedRows,
+    deleteErrorMessage,
 
-   deleteErrorMessage,
+    user,
+    userRoles,
 
-   user,
-   userRoles,
+    users,
 
-   users,
-
-   isFetchingList,
-   isFetchingDetail,
-   isCreating,
-   isDeleting,
-   isUpdating,
-   isEnabling,
-   isDisabling,
-   isFetchingRoles,
-   isUpdatingRoles,
-   isAddingRole,
-   isRemovingRole
-
+    isFetchingList,
+    isFetchingDetail,
+    isCreating,
+    isDeleting,
+    isUpdating,
+    isEnabling,
+    isDisabling,
+    isFetchingRoles,
+    isUpdatingRoles,
+    isAddingRole,
+    isRemovingRole,
 };
 
-
 export const actions = slice.actions;
-
 
 export default slice.reducer;

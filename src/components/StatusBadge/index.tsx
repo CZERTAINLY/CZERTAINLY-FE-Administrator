@@ -1,43 +1,33 @@
-import React from "react";
 import { Badge } from "reactstrap";
 
 interface Props {
-   enabled: boolean | undefined;
+    enabled: boolean | undefined;
+    style?: React.CSSProperties;
 }
 
-function StatusBadge({
-   enabled
-}: Props) {
+function StatusBadge({ enabled, style }: Props) {
+    switch (enabled) {
+        case true:
+            return (
+                <Badge style={style} color="success">
+                    Enabled
+                </Badge>
+            );
 
-   switch (enabled) {
+        case false:
+            return (
+                <Badge style={style} color="danger">
+                    Disabled
+                </Badge>
+            );
 
-      case true:
-
-         return (
-            <Badge color="success">
-               Enabled
-            </Badge>
-         );
-
-      case false:
-
-         return (
-            <Badge color="danger">
-               Disabled
-            </Badge>
-         );
-
-      default:
-
-         return (
-            <Badge color="secondary">
-               Unknown
-            </Badge>
-         );
-
-   }
-
+        default:
+            return (
+                <Badge style={style} color="secondary">
+                    Unknown
+                </Badge>
+            );
+    }
 }
 
 export default StatusBadge;
-

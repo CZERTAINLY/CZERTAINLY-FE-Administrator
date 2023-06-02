@@ -9,7 +9,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import { Container } from "reactstrap";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
+import { Badge, Container } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function CustomAttributesList() {
     const dispatch = useDispatch();
@@ -25,50 +28,56 @@ export default function CustomAttributesList() {
     const isUpdating = useSelector(selectors.isUpdating);
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling;
 
+    const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
+    const resourcesEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(
-        () => {
-            dispatch(actions.setCheckedRows({checkedRows: []}));
-            dispatch(actions.listCustomAttributes());
-        },
-        [dispatch],
-    );
+    useEffect(() => {
+        dispatch(actions.setCheckedRows({ checkedRows: [] }));
+        dispatch(actions.listCustomAttributes());
+    }, [dispatch]);
 
-    const onAddClick = useCallback(
-        () => {
-            navigate(`./add`);
-        },
-        [navigate],
-    );
+    const onAddClick = useCallback(() => {
+        navigate(`./add`);
+    }, [navigate]);
 
-    const onDeleteConfirmed = useCallback(
-        () => {
-            dispatch(actions.bulkDeleteCustomAttributes(checkedRows));
-            setConfirmDelete(false);
-        },
-        [checkedRows, dispatch],
-    );
+    const onDeleteConfirmed = useCallback(() => {
+        dispatch(actions.bulkDeleteCustomAttributes(checkedRows));
+        setConfirmDelete(false);
+    }, [checkedRows, dispatch]);
 
     const setCheckedRows = useCallback(
         (rows: (string | number)[]) => {
-            dispatch(actions.setCheckedRows({checkedRows: rows as string[]}));
+            dispatch(actions.setCheckedRows({ checkedRows: rows as string[] }));
         },
         [dispatch],
     );
 
-    const buttons: WidgetButtonProps[] = useMemo(() => [
-        {icon: "plus", disabled: false, tooltip: "Create", onClick: onAddClick},
-        {icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true)},
-        {icon: "check", disabled: checkedRows.length === 0, tooltip: "Enable", onClick: () => dispatch(actions.bulkEnableCustomAttributes(checkedRows))},
-        {icon: "times", disabled: checkedRows.length === 0, tooltip: "Disable", onClick: () => dispatch(actions.bulkDisableCustomAttributes(checkedRows))},
-    ], [checkedRows, onAddClick, dispatch]);
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            { icon: "plus", disabled: false, tooltip: "Create", onClick: onAddClick },
+            { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true) },
+            {
+                icon: "check",
+                disabled: checkedRows.length === 0,
+                tooltip: "Enable",
+                onClick: () => dispatch(actions.bulkEnableCustomAttributes(checkedRows)),
+            },
+            {
+                icon: "times",
+                disabled: checkedRows.length === 0,
+                tooltip: "Disable",
+                onClick: () => dispatch(actions.bulkDisableCustomAttributes(checkedRows)),
+            },
+        ],
+        [checkedRows, onAddClick, dispatch],
+    );
 
     const title = useMemo(
         () => (
             <div>
                 <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons}/>
+                    <WidgetButtons buttons={buttons} />
                 </div>
 
                 <h5 className="mt-0">
@@ -86,7 +95,7 @@ export default function CustomAttributesList() {
                 content: "Name",
                 sortable: true,
                 sort: "asc",
-                width: "20%",
+                width: "8%",
             },
             {
                 id: "status",
@@ -98,37 +107,49 @@ export default function CustomAttributesList() {
                 id: "contentType",
                 content: "Content Type",
                 sortable: true,
-                width: "15%",
+                width: "5%",
             },
             {
                 id: "description",
                 content: "Description",
                 sortable: true,
-                width: "40%",
+                width: "20%",
+            },
+            {
+                id: "resources",
+                content: "Resources",
+                sortable: false,
+                width: "30%",
             },
         ],
         [],
     );
 
     const customAttributesTableData: TableDataRow[] = useMemo(
-        () => customAttributes.map(
-            customAttribute => ({
+        () =>
+            customAttributes.map((customAttribute) => ({
                 id: customAttribute.uuid,
                 columns: [
                     <Link to={`./detail/${customAttribute.uuid}`}>{customAttribute.name}</Link>,
                     <StatusBadge enabled={customAttribute.enabled} />,
-                    customAttribute.contentType,
+                    getEnumLabel(attributeContentTypeEnum, customAttribute.contentType),
                     customAttribute.description,
+                    <>
+                        {customAttribute.resources.map((r) => (
+                            <Badge style={{ margin: "1px" }} color="secondary">
+                                {getEnumLabel(resourcesEnum, r)}
+                            </Badge>
+                        ))}
+                    </>,
                 ],
-            }),
-        ),
-        [customAttributes],
+            })),
+        [customAttributes, attributeContentTypeEnum, resourcesEnum],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy}>
-                <br/>
+            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfCustomAttributes}>
+                <br />
                 <CustomTable
                     headers={customAttributesTableHeaders}
                     data={customAttributesTableData}
@@ -142,11 +163,13 @@ export default function CustomAttributesList() {
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete ${checkedRows.length > 1 ? "Custom Attributes" : "Custom Attribute"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "Custom Attributes" : "Custom Attribute"}. Is this what you want to do?`}
+                body={`You are about to delete ${
+                    checkedRows.length > 1 ? "Custom Attributes" : "Custom Attribute"
+                }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    {color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete"},
-                    {color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel"},
+                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
                 ]}
             />
         </Container>

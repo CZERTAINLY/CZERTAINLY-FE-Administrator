@@ -2,24 +2,20 @@ import { Badge } from "reactstrap";
 import { DiscoveryStatus } from "types/openapi";
 
 interface Props {
-   status: DiscoveryStatus | undefined;
+    status: DiscoveryStatus | undefined;
 }
 
-export default function DiscoveryStatusBadge({
-   status
-}: Props) {
+export default function DiscoveryStatusBadge({ status }: Props) {
+    const statusMap: { [key in DiscoveryStatus]: { color: string; text: string } } = {
+        [DiscoveryStatus.Completed]: { color: "success", text: "Completed" },
+        [DiscoveryStatus.Failed]: { color: "danger", text: "Failed" },
+        [DiscoveryStatus.InProgress]: { color: "info", text: "In Progress" },
+        [DiscoveryStatus.Warning]: { color: "warning", text: "Warning" },
+    };
 
-   const statusMap: { [key in DiscoveryStatus]: { color: string, text: string } } = {
-      [DiscoveryStatus.Completed]: { color: "success", text: "Completed" },
-      [DiscoveryStatus.Failed]: { color: "danger", text: "Failed" },
-      [DiscoveryStatus.InProgress]: { color: "info", text: "In Progress" },
-      [DiscoveryStatus.Warning]: { color: "warning", text: "Warning" },
-   }
+    const _default = { color: "secondary", text: "Unknown" };
 
-   const _default = { color: "secondary", text: "Unknown" };
+    const { color, text } = status ? statusMap[status] || _default : _default;
 
-   const { color, text } = status ? statusMap[status] || _default : _default;
-
-   return <Badge color={color}>{text}</Badge>;
-
+    return <Badge color={color}>{text}</Badge>;
 }

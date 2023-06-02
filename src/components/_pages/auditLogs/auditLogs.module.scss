@@ -1,48 +1,48 @@
 .paginationContainer {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
 
 .detailRow {
-  max-height: 200px;
-  transition: all 0.3s;
+    max-height: 200px;
+    transition: all 0.3s;
 
-  td {
-    ul {
-      list-style-type: none;
+    td {
+        ul {
+            list-style-type: none;
 
-      li {
-        overflow-wrap: anywhere;
-      }
+            li {
+                overflow-wrap: anywhere;
+            }
+        }
     }
-  }
 }
 
 .hidden {
-  max-height: 0;
-  overflow: hidden;
-  display: none;
+    max-height: 0;
+    overflow: hidden;
+    display: none;
 
-  td {
-    padding: 0;
-    border: none;
-  }
+    td {
+        padding: 0;
+        border: none;
+    }
 }
 
 .showMore {
-  cursor: pointer;
-  color: #3754a5;
+    cursor: pointer;
+    color: #3754a5;
 }
 
 .logs {
-  min-width: 712px;
+    min-width: 712px;
 }
 
 .logsTable {
-  max-width: 100%;
-  table-layout: fixed;
+    max-width: 100%;
+    table-layout: fixed;
 }
 
 .dateCell {
-  overflow-wrap: anywhere;
+    overflow-wrap: anywhere;
 }

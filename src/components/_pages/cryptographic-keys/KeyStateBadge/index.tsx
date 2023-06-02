@@ -1,63 +1,30 @@
-import React from "react";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
+import { useSelector } from "react-redux";
 import { Badge } from "reactstrap";
-import { KeyState } from "types/openapi";
+import { KeyState, PlatformEnum } from "types/openapi";
 
 interface Props {
-   state: KeyState;
+    state: KeyState;
 }
 
-function KeyStateBadge({
-   state
-}: Props) {
+function KeyStateBadge({ state }: Props) {
+    const keyStateEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyState));
+    const text = getEnumLabel(keyStateEnum, state);
+    switch (state) {
+        case KeyState.Active:
+            return <Badge color="success">{text}</Badge>;
 
-   switch (state) {
+        case KeyState.PreActive:
+            return <Badge color="warning">{text}</Badge>;
 
-      case KeyState.Active:
+        case KeyState.Compromised:
+        case KeyState.Destroyed:
+        case KeyState.DestroyedCompromised:
+            return <Badge color="danger">{text}</Badge>;
 
-         return (
-            <Badge color="success">
-               Active
-            </Badge>
-         );
-
-      case KeyState.PreActive:
-
-         return (
-            <Badge color="warning">
-               Pre Active
-            </Badge>
-         );
-
-      case KeyState.Compromised:
-         return (
-            <Badge color="danger">
-               Compromised
-            </Badge>
-         );
-      case KeyState.Destroyed:
-         return (
-            <Badge color="danger">
-               Destroyed
-            </Badge>
-         );
-      case KeyState.CompromisedDestroyed:
-
-         return (
-            <Badge color="danger">
-               Compromised & Destroyed
-            </Badge>
-         );
-
-      default:
-
-         return (
-            <Badge color="secondary">
-               {state}
-            </Badge>
-         );
-
-   }
-
+        default:
+            return <Badge color="secondary">{text}</Badge>;
+    }
 }
 
 export default KeyStateBadge;

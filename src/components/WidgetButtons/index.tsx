@@ -1,172 +1,165 @@
 import React from "react";
 import { Button, ButtonProps } from "reactstrap";
 
-export type IconName = "plus" |
-    "trash" |
-    "times" |
-    "check" |
-    "plug" |
-    "pencil" |
-    "cross-circle" |
-    "upload" |
-    "download" |
-    "group" |
-    "user" |
-    "cubes" |
-    "retweet" |
-    "minus-square" |
-    "info" |
-    "gavel" |
-    "push" |
-    "sync" |
-    "minus" |
-    "lock" |
-    "refresh" |
-    "reload"  |
-    "handshake" |
-    "compromise" |
-    "destroy" |
-    "bomb" |
-    "search" |
-    "random" |
-    "sign" |
-    "verify" |
-    "key" |
-    "link" |
-    "recycle" |
-    "rekey" ;
+export type IconName =
+    | "plus"
+    | "trash"
+    | "times"
+    | "check"
+    | "plug"
+    | "pencil"
+    | "cross-circle"
+    | "upload"
+    | "download"
+    | "group"
+    | "user"
+    | "cubes"
+    | "retweet"
+    | "minus-square"
+    | "info"
+    | "gavel"
+    | "push"
+    | "sync"
+    | "minus"
+    | "lock"
+    | "refresh"
+    | "reload"
+    | "handshake"
+    | "compromise"
+    | "destroy"
+    | "bomb"
+    | "search"
+    | "random"
+    | "sign"
+    | "verify"
+    | "key"
+    | "link"
+    | "recycle"
+    | "rekey";
 
 export interface WidgetButtonProps {
-   icon: IconName;
-   id?: string;
-   tooltip?: any;
-   disabled: boolean;
-   custom?: React.ReactNode;
-   onClick: (event: React.MouseEvent) => void
+    icon: IconName;
+    id?: string;
+    tooltip?: any;
+    disabled: boolean;
+    custom?: React.ReactNode;
+    onClick: (event: React.MouseEvent) => void;
 }
-
 
 interface Props {
-   buttons: WidgetButtonProps[];
+    buttons: WidgetButtonProps[];
 }
-
 
 const colors = {
-   "plus": "auto",
-   "trash": "red",
-   "times": "red",
-   "check": "green",
-   "plug": "auto",
-   "pencil": "auto",
-   "cross-circle": "black",
-   "upload": "auto",
-   "download": "auto",
-   "group": "auto",
-   "user": "auto",
-   "cubes": "auto",
-   "retweet": "auto",
-   "minus-square": "red",
-   "push": "auto",
-   "sync": "auto",
-   "info": "auto",
-   "minus": "red",
-   "gavel": "auto",
-   "lock": "auto",
-   "refresh": "auto",
-   "reload": "auto",
-   "handshake": "red",
-   "compromise": "red",
-   "destroy": "red",
-   "bomb": "red",
-   "search": "auto",
-   "random": "auto",
-   "sign": "auto",
-   "verify": "green",
-   "key": "auto",
-   "link": "auto",
-   "recycle": "auto",
-   "rekey": "auto",
+    plus: "auto",
+    trash: "red",
+    times: "red",
+    check: "green",
+    plug: "auto",
+    pencil: "auto",
+    "cross-circle": "black",
+    upload: "auto",
+    download: "auto",
+    group: "auto",
+    user: "auto",
+    cubes: "auto",
+    retweet: "auto",
+    "minus-square": "red",
+    push: "auto",
+    sync: "auto",
+    info: "auto",
+    minus: "red",
+    gavel: "auto",
+    lock: "auto",
+    refresh: "auto",
+    reload: "auto",
+    handshake: "red",
+    compromise: "red",
+    destroy: "red",
+    bomb: "red",
+    search: "auto",
+    random: "auto",
+    sign: "auto",
+    verify: "green",
+    key: "auto",
+    link: "auto",
+    recycle: "auto",
+    rekey: "auto",
 };
 
-
 const classNames = {
-   "plus": "fa fa-plus",
-   "trash": "fa fa-trash",
-   "times": "fa fa-times",
-   "check": "fa fa-check",
-   "plug": "fa fa-plug",
-   "pencil": "fa fa-pencil-square-o",
-   "cross-circle": "fa fa-times-circle",
-   "upload": "fa fa-upload",
-   "download": "fa fa-download",
-   "group": "fa fa-group",
-   "user": "fa fa-user-o",
-   "cubes": "fa fa-cubes",
-   "retweet": "fa fa-retweet",
-   "minus-square": "fa fa-minus-square",
-   "push": "fa fa-arrow-circle-up",
-   "sync": "fa fa-refresh",
-   "info": "fa fa-info-circle",
-   "minus": "fa fa-minus",
-   "gavel": "fa fa-gavel",
-   "lock": "fa fa-lock",
-   "refresh": "fa fa-refresh",
-   "reload": "fa fa-rotate-right",
-   "handshake": "fa fa-circle-exclamation",
-   "compromise": "fa fa-ban",
-   "destroy": "fa fa-circle-minus",
-   "bomb": "fa fa-bomb",
-   "search": "fa fa-search",
-   "random": "fa fa-dice",
-   "sign": "fas fa-pen",
-   "verify": "fa fa-check-square",
-   "key": "fa fa-key",
-   "link": "fa fa-link",
-   "recycle": "fa fa-recycle",
-   "rekey": "fa fa-random",
-}
+    plus: "fa fa-plus",
+    trash: "fa fa-trash",
+    times: "fa fa-times",
+    check: "fa fa-check",
+    plug: "fa fa-plug",
+    pencil: "fa fa-pencil-square-o",
+    "cross-circle": "fa fa-times-circle",
+    upload: "fa fa-upload",
+    download: "fa fa-download",
+    group: "fa fa-group",
+    user: "fa fa-user-o",
+    cubes: "fa fa-cubes",
+    retweet: "fa fa-retweet",
+    "minus-square": "fa fa-minus-square",
+    push: "fa fa-arrow-circle-up",
+    sync: "fa fa-refresh",
+    info: "fa fa-info-circle",
+    minus: "fa fa-minus",
+    gavel: "fa fa-gavel",
+    lock: "fa fa-lock",
+    refresh: "fa fa-refresh",
+    reload: "fa fa-rotate-right",
+    handshake: "fa fa-circle-exclamation",
+    compromise: "fa fa-ban",
+    destroy: "fa fa-circle-minus",
+    bomb: "fa fa-bomb",
+    search: "fa fa-search",
+    random: "fa fa-dice",
+    sign: "fas fa-pen",
+    verify: "fa fa-check-square",
+    key: "fa fa-key",
+    link: "fa fa-link",
+    recycle: "fa fa-recycle",
+    rekey: "fa fa-random",
+};
 
+//TODO: Add refresh button put it on left which should be optional
 
 function WidgetButtons({ buttons }: Props) {
+    const renderButton = (button: WidgetButtonProps) => {
+        let toolTip: JSX.Element | undefined;
+        let style;
 
-   const renderButton = (button: WidgetButtonProps) => {
+        let btnProps: ButtonProps = {
+            key: button.icon + button.tooltip + button.id || "",
+            className: "btn btn-link",
+            color: "white",
+            onClick: button.onClick,
+            disabled: button.disabled,
+        };
 
-      let toolTip: JSX.Element | undefined;
-      let style;
+        if (!button.disabled) {
+            style = { color: colors[button.icon] };
+        }
 
-      let btnProps: ButtonProps = {
-         key: button.icon + button.tooltip + button.id || "",
-         className: "btn btn-link",
-         color: "white",
-         onClick: button.onClick,
-         disabled: button.disabled,
-      }
-
-      if (!button.disabled) {
-         style = { color: colors[button.icon] }
-      }
-
-      return button.custom
-         ?
-         ( <span key={button.icon + button.tooltip}>{ button.custom }</span>)
-         :
-         (
+        return button.custom ? (
+            <span key={button.icon + button.tooltip}>{button.custom}</span>
+        ) : (
             <Button {...btnProps} title={button.tooltip}>
-               <i className={classNames[button.icon]} style={style} />
-               {toolTip}
+                <i className={classNames[button.icon]} style={style} />
+                {toolTip}
             </Button>
-         )
+        );
+    };
 
-   }
+    const renderedButtons: JSX.Element[] = [];
 
-   const renderedButtons: JSX.Element[] = [];
+    buttons.forEach((button) => {
+        renderedButtons.push(renderButton(button));
+    });
 
-   buttons.forEach(button => {
-      renderedButtons.push(renderButton(button))
-   });
-
-   return <>{renderedButtons}</>
-
+    return <>{renderedButtons}</>;
 }
 
 export default WidgetButtons;

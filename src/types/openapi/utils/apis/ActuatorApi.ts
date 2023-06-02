@@ -11,38 +11,42 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from 'rxjs';
-import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI } from '../runtime';
-import type { OperationOpts } from '../runtime';
+import type { Observable } from "rxjs";
+import type { AjaxResponse } from "rxjs/ajax";
+import type { OperationOpts } from "../runtime";
+import { BaseAPI } from "../runtime";
 
 /**
  * no description
  */
 export class ActuatorApi extends BaseAPI {
-
     /**
      * Actuator web endpoint \'health\'
      */
-    health(): Observable<object>
-    health(opts?: OperationOpts): Observable<AjaxResponse<object>>
+    health(): Observable<object>;
+    health(opts?: OperationOpts): Observable<AjaxResponse<object>>;
     health(opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
-        return this.request<object>({
-            url: '/health',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
+        return this.request<object>(
+            {
+                url: "/health",
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 
     /**
      * Actuator web endpoint \'health-path\'
      */
-    healthPath(): Observable<object>
-    healthPath(opts?: OperationOpts): Observable<AjaxResponse<object>>
+    healthPath(): Observable<object>;
+    healthPath(opts?: OperationOpts): Observable<AjaxResponse<object>>;
     healthPath(opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
-        return this.request<object>({
-            url: '/health/**',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
+        return this.request<object>(
+            {
+                url: "/health/**",
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
 }

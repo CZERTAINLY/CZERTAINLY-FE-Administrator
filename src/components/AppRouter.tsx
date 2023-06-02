@@ -49,6 +49,11 @@ import EntitiesList from "./_pages/entities/list";
 import GlobalMetadataDetail from "./_pages/global-metadata/detail";
 import GlobalMetadataEdit from "./_pages/global-metadata/form";
 
+import ScepProfileDetail from "./_pages/scep-profiles/detail";
+import ScepProfileEdit from "./_pages/scep-profiles/form";
+
+import ScepProfilesList from "./_pages/scep-profiles/list";
+
 import GlobalMetadataList from "./_pages/global-metadata/list";
 import GroupDetail from "./_pages/group/detail";
 import GroupEdit from "./_pages/group/form";
@@ -84,8 +89,8 @@ import UserProfileEdit from "./_pages/user-profile/form";
 import UserDetail from "./_pages/users/detail";
 import UserEdit from "./_pages/users/form";
 
-import AppLogin from "./AppLogin/AppLogin";
 import UsersList from "./_pages/users/list";
+import AppLogin from "./AppLogin/AppLogin";
 
 import AppRedirect from "./AppRedirect";
 
@@ -93,174 +98,162 @@ import Layout from "./Layout";
 import Spinner from "./Spinner";
 
 export default function AppRouter() {
-   const profile = useSelector(selectors.profile);
+    const profile = useSelector(selectors.profile);
 
-   const appRoutes = useMemo(
+    const appRoutes = useMemo(
+        () => (
+            <>
+                <Route element={<Layout />}>
+                    <Route path="" element={<Navigate to="/dashboard" />} />
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
 
-      () => (
+                    <Route path="/dashboard" element={<Dashboard />} />
 
-         <>
-            <Route element={< Layout />}>
+                    <Route path="/users" element={<UsersList />} />
+                    <Route path="/users/list" element={<Navigate to="/users" />} />
+                    <Route path="/users/detail/:id" element={<UserDetail />} />
+                    <Route path="/users/add" element={<UserEdit />} />
+                    <Route path="/users/edit/:id" element={<UserEdit />} />
 
-               <Route path="" element={<Navigate to="/dashboard" />} />
-               <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="/roles" element={<RolesList />} />
+                    <Route path="/roles/list" element={<Navigate to="/roles" />} />
+                    <Route path="/roles/detail/:id" element={<RoleDetail />} />
+                    <Route path="/roles/add" element={<RoleEdit />} />
+                    <Route path="/roles/edit/:id" element={<RoleEdit />} />
+                    <Route path="/roles/users/:id" element={<RoleUsers />} />
+                    <Route path="/roles/permissions/:id" element={<RolePermissions />} />
 
-               <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/certificates" element={<CertificatesList />} />
+                    <Route path="/certificates/list" element={<Navigate to="/certificates" />} />
+                    <Route path="/certificates/detail/:id" element={<CertificateDetail />} />
+                    <Route path="/certificates/add" element={<CertificateEdit />} />
 
-               <Route path="/users" element={<UsersList />} />
-               <Route path="/users/list" element={<Navigate to="/users" />} />
-               <Route path="/users/detail/:id" element={<UserDetail />} />
-               <Route path="/users/add" element={<UserEdit />} />
-               <Route path="/users/edit/:id" element={<UserEdit />} />
+                    <Route path="/connectors" element={<ConnectorsList />} />
+                    <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
+                    <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
+                    <Route path="/connectors/add" element={<ConnectorEdit />} />
+                    <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
 
-               <Route path="/roles" element={<RolesList />} />
-               <Route path="/roles/list" element={<Navigate to="/roles" />} />
-               <Route path="/roles/detail/:id" element={<RoleDetail />} />
-               <Route path="/roles/add" element={<RoleEdit />} />
-               <Route path="/roles/edit/:id" element={<RoleEdit />} />
-               <Route path="/roles/users/:id" element={<RoleUsers />} />
-               <Route path="/roles/permissions/:id" element={<RolePermissions />} />
+                    <Route path="/discoveries" element={<DiscoveriesList />} />
+                    <Route path="/discoveries/list" element={<Navigate to="/discoveries" />} />
+                    <Route path="/discoveries/detail/:id" element={<DiscoveryDetail />} />
+                    <Route path="/discoveries/add" element={<DiscoveryEdit />} />
 
-               <Route path="/certificates" element={<CertificatesList />} />
-               <Route path="/certificates/list" element={<Navigate to="/certificates" />} />
-               <Route path="/certificates/detail/:id" element={<CertificateDetail />} />
-               <Route path="/certificates/add" element={<CertificateEdit />} />
+                    <Route path="/authorities" element={<AuthoritiesList />} />
+                    <Route path="/authorities/list" element={<Navigate to="/authorities" />} />
+                    <Route path="/authorities/detail/:id" element={<AuthorityDetail />} />
+                    <Route path="/authorities/add" element={<AuthorityEdit />} />
+                    <Route path="/authorities/edit/:id" element={<AuthorityEdit />} />
 
-               <Route path="/connectors" element={<ConnectorsList />} />
-               <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
-               <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
-               <Route path="/connectors/add" element={<ConnectorEdit />} />
-               <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
+                    <Route path="/raprofiles" element={<RaProfilesList />} />
+                    <Route path="/raprofiles/list" element={<Navigate to="/raprofiles" />} />
+                    <Route path="/raprofiles/detail/:authorityId/:id" element={<RaProfileDetail />} />
+                    <Route path="/raprofiles/add" element={<RaProfileEdit />} />
+                    <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfileEdit />} />
 
-               <Route path="/discoveries" element={<DiscoveriesList />} />
-               <Route path="/discoveries/list" element={<Navigate to="/discoveries" />} />
-               <Route path="/discoveries/detail/:id" element={<DiscoveryDetail />} />
-               <Route path="/discoveries/add" element={<DiscoveryEdit />} />
+                    <Route path="/complianceprofiles" element={<ComplianceProfilesList />} />
+                    <Route path="/complianceprofiles/list" element={<Navigate to="/complianceprofiles" />} />
+                    <Route path="/complianceprofiles/detail/:id" element={<ComplianceProfileDetail />} />
+                    <Route path="/complianceprofiles/add" element={<ComplianceProfileEdit />} />
 
-               <Route path="/authorities" element={<AuthoritiesList />} />
-               <Route path="/authorities/list" element={<Navigate to="/authorities" />} />
-               <Route path="/authorities/detail/:id" element={<AuthorityDetail />} />
-               <Route path="/authorities/add" element={<AuthorityEdit />} />
-               <Route path="/authorities/edit/:id" element={<AuthorityEdit />} />
+                    <Route path="/acmeprofiles" element={<AcmeProfilesList />} />
+                    <Route path="/acmeprofiles/list" element={<Navigate to="/acmeprofiles" />} />
+                    <Route path="/acmeprofiles/detail/:id" element={<AcmeProfileDetail />} />
+                    <Route path="/acmeprofiles/edit/:id" element={<AcmeProfileEdit />} />
+                    <Route path="/acmeprofiles/add" element={<AcmeProfileEdit />} />
 
-               <Route path="/raprofiles" element={<RaProfilesList />} />
-               <Route path="/raprofiles/list" element={<Navigate to="/raprofiles" />} />
-               <Route path="/raprofiles/detail/:authorityId/:id" element={<RaProfileDetail />} />
-               <Route path="/raprofiles/add" element={<RaProfileEdit />} />
-               <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfileEdit />} />
+                    <Route path="/acmeaccounts" element={<AcmeAccountsList />} />
+                    <Route path="/acmeaccounts/list" element={<Navigate to="/acmeaccounts" />} />
+                    <Route path="/acmeaccounts/detail/:acmeProfileId/:id" element={<AcmeAccountDetail />} />
 
-               <Route path="/complianceprofiles" element={<ComplianceProfilesList />} />
-               <Route path="/complianceprofiles/list" element={<Navigate to="/complianceprofiles" />} />
-               <Route path="/complianceprofiles/detail/:id" element={<ComplianceProfileDetail />} />
-               <Route path="/complianceprofiles/add" element={<ComplianceProfileEdit />} />
+                    <Route path="/scepprofiles" element={<ScepProfilesList />} />
+                    <Route path="/scepprofiles/list" element={<Navigate to="/scepprofiles" />} />
+                    <Route path="/scepprofiles/detail/:id" element={<ScepProfileDetail />} />
+                    <Route path="/scepprofiles/edit/:id" element={<ScepProfileEdit />} />
+                    <Route path="/scepprofiles/add" element={<ScepProfileEdit />} />
 
-               <Route path="/acmeprofiles" element={<AcmeProfilesList />} />
-               <Route path="/acmeprofiles/list" element={<Navigate to="/acmeprofiles" />} />
-               <Route path="/acmeprofiles/detail/:id" element={<AcmeProfileDetail />} />
-               <Route path="/acmeprofiles/edit/:id" element={<AcmeProfileEdit />} />
-               <Route path="/acmeprofiles/add" element={<AcmeProfileEdit />} />
+                    <Route path="/groups" element={<GroupList />} />
+                    <Route path="/groups/list" element={<Navigate to="/groups" />} />
+                    <Route path="/groups/detail/:id" element={<GroupDetail />} />
+                    <Route path="/groups/add" element={<GroupEdit />} />
+                    <Route path="/groups/edit/:id" element={<GroupEdit />} />
 
-               <Route path="/acmeaccounts" element={<AcmeAccountsList />} />
-               <Route path="/acmeaccounts/list" element={<Navigate to="/acmeaccounts" />} />
-               <Route path="/acmeaccounts/detail/:acmeProfileId/:id" element={<AcmeAccountDetail />} />
+                    <Route path="/credentials" element={<CredentialsList />} />
+                    <Route path="/credentials/list" element={<Navigate to="/credentials" />} />
+                    <Route path="/credentials/detail/:id" element={<CredentialDetail />} />
+                    <Route path="/credentials/add" element={<CredentialEdit />} />
+                    <Route path="/credentials/edit/:id" element={<CredentialEdit />} />
 
-               <Route path="/groups" element={<GroupList />} />
-               <Route path="/groups/list" element={<Navigate to="/groups" />} />
-               <Route path="/groups/detail/:id" element={<GroupDetail />} />
-               <Route path="/groups/add" element={<GroupEdit />} />
-               <Route path="/groups/edit/:id" element={<GroupEdit />} />
+                    <Route path="/entities" element={<EntitiesList />} />
+                    <Route path="/entities/list" element={<Navigate to="/entities" />} />
+                    <Route path="/entities/detail/:id" element={<EntityDetail />} />
+                    <Route path="/entities/add" element={<EntityEdit />} />
+                    <Route path="/entities/edit/:id" element={<EntityEdit />} />
 
-               <Route path="/credentials" element={<CredentialsList />} />
-               <Route path="/credentials/list" element={<Navigate to="/credentials" />} />
-               <Route path="/credentials/detail/:id" element={<CredentialDetail />} />
-               <Route path="/credentials/add" element={<CredentialEdit />} />
-               <Route path="/credentials/edit/:id" element={<CredentialEdit />} />
+                    <Route path="/locations" element={<LocationsList />} />
+                    <Route path="/locations/list" element={<Navigate to="/locations" />} />
+                    <Route path="/locations/detail/:entityId/:id" element={<LocationDetail />} />
+                    <Route path="/locations/add" element={<LocationEdit />} />
+                    <Route path="/locations/edit/:entityId/:id" element={<LocationEdit />} />
 
-               <Route path="/entities" element={<EntitiesList />} />
-               <Route path="/entities/list" element={<Navigate to="/entities" />} />
-               <Route path="/entities/detail/:id" element={<EntityDetail />} />
-               <Route path="/entities/add" element={<EntityEdit />} />
-               <Route path="/entities/edit/:id" element={<EntityEdit />} />
+                    <Route path="/userprofile" element={<UserProfileDetail />} />
+                    <Route path="/userprofile/edit" element={<UserProfileEdit />} />
 
-               <Route path="/locations" element={<LocationsList />} />
-               <Route path="/locations/list" element={<Navigate to="/locations" />} />
-               <Route path="/locations/detail/:entityId/:id" element={<LocationDetail />} />
-               <Route path="/locations/add" element={<LocationEdit />} />
-               <Route path="/locations/edit/:entityId/:id" element={<LocationEdit />} />
+                    <Route path="/audit" element={<AuditLogs />} />
 
-               <Route path="/userprofile" element={<UserProfileDetail />} />
-               <Route path="/userprofile/edit" element={<UserProfileEdit />} />
+                    <Route path="/customattributes" element={<CustomAttributesList />} />
+                    <Route path="/customattributes/list" element={<Navigate to="/customattributes" />} />
+                    <Route path="/customattributes/detail/:id" element={<CustomAttributesDetail />} />
+                    <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
+                    <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
 
-               <Route path="/audit" element={<AuditLogs />} />
+                    <Route path="/globalmetadata" element={<GlobalMetadataList />} />
+                    <Route path="/globalmetadata/list" element={<Navigate to="/globalmetadata" />} />
+                    <Route path="/globalmetadata/detail/:id" element={<GlobalMetadataDetail />} />
+                    <Route path="/globalmetadata/add" element={<GlobalMetadataEdit />} />
+                    <Route path="/globalmetadata/edit/:id" element={<GlobalMetadataEdit />} />
 
-               <Route path="/customattributes" element={<CustomAttributesList />} />
-               <Route path="/customattributes/list" element={<Navigate to="/customattributes" />} />
-               <Route path="/customattributes/detail/:id" element={<CustomAttributesDetail />} />
-               <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
-               <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
+                    <Route path="/tokens" element={<TokenList />} />
+                    <Route path="/tokens/list" element={<Navigate to="/tokens" />} />
+                    <Route path="/tokens/detail/:id" element={<TokenDetail />} />
+                    <Route path="/tokens/add" element={<TokenEdit />} />
+                    <Route path="/tokens/edit/:id" element={<TokenEdit />} />
 
-               <Route path="/globalmetadata" element={<GlobalMetadataList />} />
-               <Route path="/globalmetadata/list" element={<Navigate to="/globalmetadata" />} />
-               <Route path="/globalmetadata/detail/:id" element={<GlobalMetadataDetail />} />
-               <Route path="/globalmetadata/add" element={<GlobalMetadataEdit />} />
-               <Route path="/globalmetadata/edit/:id" element={<GlobalMetadataEdit />} />
+                    <Route path="/tokenprofiles" element={<TokenProfileList />} />
+                    <Route path="/tokenprofiles/list" element={<Navigate to="/tokenprofiles" />} />
+                    <Route path="/tokenprofiles/detail/:tokenId/:id" element={<TokenProfileDetail />} />
+                    <Route path="/tokenprofiles/add" element={<TokenProfileForm />} />
+                    <Route path="/tokenprofiles/edit/:tokenId/:id" element={<TokenProfileForm />} />
 
-               <Route path="/tokens" element={<TokenList />} />
-               <Route path="/tokens/list" element={<Navigate to="/tokens" />} />
-               <Route path="/tokens/detail/:id" element={<TokenDetail />} />
-               <Route path="/tokens/add" element={<TokenEdit />} />
-               <Route path="/tokens/edit/:id" element={<TokenEdit />} />
+                    <Route path="/cryptographickeys" element={<CryptographicKeyList />} />
+                    <Route path="/cryptographickeys/list" element={<Navigate to="/cryptographickeys" />} />
+                    <Route path="/cryptographickeys/detail/:tokenId/:id/:keyItemUuid?" element={<CryptographicKeyDetail />} />
+                    <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
+                    <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
 
-               <Route path="/tokenprofiles" element={<TokenProfileList />} />
-               <Route path="/tokenprofiles/list" element={<Navigate to="/tokenprofiles" />} />
-               <Route path="/tokenprofiles/detail/:tokenId/:id" element={<TokenProfileDetail />} />
-               <Route path="/tokenprofiles/add" element={<TokenProfileForm />} />
-               <Route path="/tokenprofiles/edit/:tokenId/:id" element={<TokenProfileForm />} />
+                    <Route path="/platform" element={<PlatformSettingsDetail />} />
+                    <Route path="/platform/edit" element={<PlatformSettingsEdit />} />
+                </Route>
 
-               <Route path="/cryptographickeys" element={<CryptographicKeyList />} />
-               <Route path="/cryptographickeys/list" element={<Navigate to="/cryptographickeys" />} />
-               <Route path="/cryptographickeys/detail/:tokenId/:id" element={<CryptographicKeyDetail />} />
-               <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
-               <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
-
-               <Route path="/platform" element={<PlatformSettingsDetail />} />
-               <Route path="/platform/edit" element={<PlatformSettingsEdit />} />
-
-            </Route >
-
-            {
-               /*
+                {/*
                Please keep this remarked until migration is finished
                <Route path="*" element={<Navigate to="/home"/>}/>
-               */
-            }
-            <Route path="*" element={<h1>404</h1>} />
+               */}
+                <Route path="*" element={<h1>404</h1>} />
+            </>
+        ),
+        [],
+    );
 
-         </>
+    return (
+        <HashRouter>
+            <AppRedirect />
 
-      ),
-      []
+            <Routes>
+                <Route path="/login" element={<AppLogin />} />
 
-   )
-
-   return (
-
-      <HashRouter>
-
-         <AppRedirect />
-
-         <Routes>
-
-            <Route path="/login" element={<AppLogin />} />
-
-            {
-               profile ? appRoutes : <Route path="*" element={<Spinner active={true} />} />
-            }
-
-         </Routes>
-
-      </HashRouter >
-
-   );
-
+                {profile ? appRoutes : <Route path="*" element={<Spinner active={true} />} />}
+            </Routes>
+        </HashRouter>
+    );
 }
