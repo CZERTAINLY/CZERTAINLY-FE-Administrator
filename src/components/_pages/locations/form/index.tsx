@@ -271,6 +271,10 @@ export default function LocationForm() {
                                             values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
                                                 <AttributeEditor
                                                     id="location"
+                                                    callbackParentUuid={
+                                                        location?.entityInstanceUuid ?? form.getFieldState("entity")?.value?.value
+                                                    }
+                                                    callbackResource={Resource.Locations}
                                                     attributeDescriptors={locationAttributeDescriptors}
                                                     attributes={location?.attributes}
                                                     groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
