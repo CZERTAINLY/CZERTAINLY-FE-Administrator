@@ -367,7 +367,6 @@ export default function ConnectorDetail() {
 
             {connector && (
                 <CustomAttributeWidget
-                    refreshAction={getFreshConnectorAttributesDesc}
                     resource={Resource.Connectors}
                     resourceUuid={connector.uuid}
                     attributes={connector.customAttributes}
@@ -395,7 +394,7 @@ export default function ConnectorDetail() {
                     <CustomTable headers={endPointsHeaders} data={endPointsData} />
                 </Widget>
                 <hr />
-                <Widget title="Attributes" busy={isFetchingAttributes} titleSize="large">
+                <Widget title="Attributes" busy={isFetchingAttributes} titleSize="large" refreshAction={getFreshConnectorAttributesDesc}>
                     <Row xs="1" sm="2" md="3" lg="3" xl="4">
                         <Col>
                             <Select

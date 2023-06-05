@@ -228,7 +228,7 @@ export default function TokenDetail() {
 
             {token && <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />}
 
-            <Widget title="Meta Data" titleSize="large">
+            <Widget title="Metadata" titleSize="large">
                 <br />
                 <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
             </Widget>

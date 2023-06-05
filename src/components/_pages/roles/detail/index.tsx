@@ -39,6 +39,11 @@ export default function UserDetail() {
         getFreshDetails();
     }, [getFreshDetails, id]);
 
+    const getFreshPermissions = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getPermissions({ uuid: id }));
+    }, [dispatch, id]);
+
     useEffect(() => {
         if (!role || role.uuid !== id || permissions?.uuid === id || isFetchingPermissions) return;
         dispatch(actions.getPermissions({ uuid: id }));
@@ -262,7 +267,12 @@ export default function UserDetail() {
 
             {role && <CustomAttributeWidget resource={Resource.Roles} resourceUuid={role.uuid} attributes={role.customAttributes} />}
 
-            <Widget title="Role Permissions" busy={isFetchingDetail || isFetchingPermissions} titleSize="large">
+            <Widget
+                title="Role Permissions"
+                busy={isFetchingDetail || isFetchingPermissions}
+                titleSize="large"
+                refreshAction={getFreshPermissions}
+            >
                 <br />
                 {!permissions ? (
                     <></>

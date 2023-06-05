@@ -1180,7 +1180,7 @@ export default function CertificateDetail() {
                         title: "Attributes",
                         content: (
                             <Widget>
-                                <Widget title="Metadata" titleSize="large" refreshAction={getFreshCertificateDetail}>
+                                <Widget title="Metadata" titleSize="large">
                                     <br />
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>

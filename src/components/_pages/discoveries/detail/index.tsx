@@ -166,7 +166,7 @@ export default function DiscoveryDetail() {
                     )}
                 </Col>
                 <Col>
-                    <Widget title="Meta Data" titleSize="large">
+                    <Widget title="Metadata" titleSize="large">
                         <br />
                         <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
                     </Widget>

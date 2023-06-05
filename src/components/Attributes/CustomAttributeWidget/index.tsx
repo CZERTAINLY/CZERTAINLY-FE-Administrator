@@ -14,10 +14,9 @@ type Props = {
     resource: Resource;
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;
-    refreshAction?: () => void;
 };
 
-export default function CustomAttributeWidget({ resource, resourceUuid, attributes, refreshAction }: Props) {
+export default function CustomAttributeWidget({ resource, resourceUuid, attributes }: Props) {
     const dispatch = useDispatch();
 
     const resourceCustomAttributesContents = useSelector(
@@ -70,12 +69,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
     );
 
     return (
-        <Widget
-            title={"Custom Attributes"}
-            busy={isFetchingResourceCustomAttributes || isUpdatingContent}
-            titleSize="large"
-            refreshAction={refreshAction}
-        >
+        <Widget title={"Custom Attributes"} busy={isFetchingResourceCustomAttributes || isUpdatingContent} titleSize="large">
             <AttributeViewer
                 attributes={loadedAttributes}
                 descriptors={resourceCustomAttributes}
