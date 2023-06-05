@@ -123,6 +123,7 @@ export enum AuditLogDtoOriginationEnum {
     TokenInstance = "TOKEN_INSTANCE",
     CryptographicKey = "CRYPTOGRAPHIC_KEY",
     CryptographicOperations = "CRYPTOGRAPHIC_OPERATIONS",
+    Scheduler = "SCHEDULER",
 }
 /**
  * @export
@@ -161,6 +162,7 @@ export enum AuditLogDtoAffectedEnum {
     TokenInstance = "TOKEN_INSTANCE",
     CryptographicKey = "CRYPTOGRAPHIC_KEY",
     CryptographicOperations = "CRYPTOGRAPHIC_OPERATIONS",
+    Scheduler = "SCHEDULER",
 }
 /**
  * @export
@@ -189,4 +191,5 @@ export enum AuditLogDtoOperationEnum {
     Sign = "SIGN",
     Verify = "VERIFY",
     Approve = "APPROVE",
+    Update = "UPDATE",
 }

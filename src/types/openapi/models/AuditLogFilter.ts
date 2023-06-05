@@ -111,6 +111,7 @@ export enum AuditLogFilterOriginationEnum {
     TokenInstance = "TOKEN_INSTANCE",
     CryptographicKey = "CRYPTOGRAPHIC_KEY",
     CryptographicOperations = "CRYPTOGRAPHIC_OPERATIONS",
+    Scheduler = "SCHEDULER",
 }
 /**
  * @export
@@ -149,6 +150,7 @@ export enum AuditLogFilterAffectedEnum {
     TokenInstance = "TOKEN_INSTANCE",
     CryptographicKey = "CRYPTOGRAPHIC_KEY",
     CryptographicOperations = "CRYPTOGRAPHIC_OPERATIONS",
+    Scheduler = "SCHEDULER",
 }
 /**
  * @export
@@ -177,4 +179,5 @@ export enum AuditLogFilterOperationEnum {
     Sign = "SIGN",
     Verify = "VERIFY",
     Approve = "APPROVE",
+    Update = "UPDATE",
 }

@@ -25,7 +25,7 @@ import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileRes
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import { validateAlphaNumeric, validateInteger, validateRequired } from "utils/validators";
+import { validateAlphaNumeric, validateAlphaNumericWithoutAccents, validateInteger, validateRequired } from "utils/validators";
 import { KeyAlgorithm, Resource } from "../../../../types/openapi";
 import CertificateField from "../CertificateField";
 
@@ -235,7 +235,7 @@ export default function ScepProfileForm() {
                         <TextField
                             id="name"
                             label="SCEP Profile Name"
-                            validators={[validateRequired(), validateAlphaNumeric()]}
+                            validators={[validateRequired(), validateAlphaNumericWithoutAccents()]}
                             disabled={editMode}
                         />
                         <TextField id="description" label="Description" validators={[validateAlphaNumeric()]} />

@@ -3,9 +3,10 @@ import { AuditLogFilterModel, AuditLogItemModel } from "types/auditLogs";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
-    loadedPageNumber: number;
-    loadedPageSize: number;
-    totalPagesAvailable: number;
+    pageNumber: number;
+    itemsPerPage: number;
+    totalPages: number;
+    totalItems: number;
     exportUrl: string | undefined;
 
     pageData: AuditLogItemModel[];
@@ -24,9 +25,10 @@ export type State = {
 };
 
 export const initialState: State = {
-    loadedPageNumber: 0,
-    loadedPageSize: 0,
-    totalPagesAvailable: 0,
+    pageNumber: 0,
+    itemsPerPage: 0,
+    totalPages: 0,
+    totalItems: 0,
     exportUrl: undefined,
 
     pageData: [],
@@ -65,17 +67,19 @@ export const slice = createSlice({
         listLogsSuccess: (
             state,
             action: PayloadAction<{
-                page: number;
-                size: number;
-                total: number;
+                pageNumber: number;
+                itemsPerPage: number;
+                totalPages: number;
+                totalItems: number;
                 data: AuditLogItemModel[];
             }>,
         ) => {
             state.isFetchingPageData = false;
-            state.loadedPageNumber = action.payload.page;
-            state.loadedPageSize = action.payload.size;
+            state.pageNumber = action.payload.pageNumber;
+            state.itemsPerPage = action.payload.itemsPerPage;
             state.pageData = action.payload.data;
-            state.totalPagesAvailable = action.payload.total;
+            state.totalPages = action.payload.totalPages;
+            state.totalItems = action.payload.totalItems;
         },
 
         listLogsFailure: (state, action: PayloadAction<void>) => {
@@ -168,9 +172,10 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const loadedPageNumber = createSelector(state, (state) => state.loadedPageNumber);
-const loadedPageSize = createSelector(state, (state) => state.loadedPageSize);
-const totalPagesAvailable = createSelector(state, (state) => state.totalPagesAvailable);
+const pageNumber = createSelector(state, (state) => state.pageNumber);
+const itemsPerPage = createSelector(state, (state) => state.itemsPerPage);
+const totalPages = createSelector(state, (state) => state.totalPages);
+const totalItems = createSelector(state, (state) => state.totalItems);
 const exportUrl = createSelector(state, (state) => state.exportUrl);
 
 const pageData = createSelector(state, (state) => state.pageData);
@@ -188,9 +193,10 @@ const isExporting = createSelector(state, (state) => state.isExporting);
 export const selectors = {
     state,
 
-    loadedPageNumber,
-    loadedPageSize,
-    totalPagesAvailable,
+    pageNumber,
+    itemsPerPage,
+    totalPages,
+    totalItems,
     exportUrl,
 
     pageData,
