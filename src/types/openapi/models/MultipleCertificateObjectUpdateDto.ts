@@ -31,11 +31,11 @@ export interface MultipleCertificateObjectUpdateDto {
      */
     groupUuid?: string;
     /**
-     * Certificate Owner
+     * Certificate Owner UUID
      * @type {string}
      * @memberof MultipleCertificateObjectUpdateDto
      */
-    owner?: string;
+    ownerUuid?: string;
     /**
      * List of Certificate UUIDs
      * @type {Array<string>}
