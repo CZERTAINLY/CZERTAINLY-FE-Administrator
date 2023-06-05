@@ -6,7 +6,7 @@ import SwitchField from "components/Input/SwitchField";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import CertificateStatus from "components/_pages/certificates/CertificateStatus";
 
 import { actions, selectors } from "ducks/scep-profiles";
@@ -34,10 +34,14 @@ export default function ScepProfileDetail() {
 
     const isBusy = useMemo(() => isFetchingDetail || isDisabling || isEnabling, [isFetchingDetail, isDisabling, isEnabling]);
 
-    useEffect(() => {
+    const getFreshScepProfile = useCallback(() => {
         if (!id) return;
         dispatch(actions.getScepProfile({ uuid: id }));
-    }, [id, dispatch]);
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshScepProfile();
+    }, [id, getFreshScepProfile]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../scepprofiles/edit/${scepProfile?.uuid}`);
@@ -104,21 +108,6 @@ export default function ScepProfileDetail() {
             },
         ],
         [scepProfile, onEditClick, onDisableClick, onEnableClick],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    SCEP Profile <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const tableHeader: TableHeader[] = useMemo(
@@ -298,9 +287,20 @@ export default function ScepProfileDetail() {
         [scepProfile],
     );
 
+    const RAProfileDetailsTitle = useMemo(
+        () => (raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"),
+        [raProfileDetailData],
+    );
+
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isBusy}>
+            <Widget
+                title="SCEP Profile Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshScepProfile}
+            >
                 <CustomTable headers={tableHeader} data={scepProfileDetailData} />
             </Widget>
 
@@ -318,7 +318,7 @@ export default function ScepProfileDetail() {
                 </Widget>
             )}
 
-            <Widget title={"CA Certificate Configuration"} busy={isBusy}>
+            <Widget title={"CA Certificate Configuration"} busy={isBusy} titleSize="large">
                 {certificateDetailData.length === 0 ? (
                     <></>
                 ) : (
@@ -328,7 +328,7 @@ export default function ScepProfileDetail() {
                 )}
             </Widget>
 
-            <Widget title={raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"} busy={isBusy}>
+            <Widget title={RAProfileDetailsTitle} busy={isBusy} titleSize="large">
                 {raProfileDetailData.length === 0 ? (
                     <></>
                 ) : (

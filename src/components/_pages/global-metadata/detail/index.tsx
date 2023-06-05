@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/globalMetadata";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -24,6 +24,11 @@ export default function GlobalMetadataDetail() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+
+    const getFreshGlobalMetadata = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getGlobalMetadata(id));
+    }, [id]);
 
     useEffect(() => {
         if (!id) return;
@@ -62,20 +67,6 @@ export default function GlobalMetadataDetail() {
             },
         ],
         [onEditClick],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-                <h5>
-                    Global Metadata <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -134,7 +125,13 @@ export default function GlobalMetadataDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingDetail}>
+            <Widget
+                title="Global Metadata Details"
+                busy={isFetchingDetail}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshGlobalMetadata}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 

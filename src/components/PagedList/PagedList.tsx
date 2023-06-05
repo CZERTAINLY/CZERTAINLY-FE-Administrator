@@ -71,6 +71,11 @@ function PagedList({
         [dispatch, entity],
     );
 
+    const getFreshData = useCallback(() => {
+        dispatch(listAction({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
+        onCheckedRowsChanged([]);
+    }, [dispatch, currentFilters, pageSize, pageNumber, listAction, onCheckedRowsChanged]);
+
     const onPageSizeChanged = useCallback(
         (pageSize: number) => {
             setPageSize(pageSize);
@@ -90,9 +95,8 @@ function PagedList({
     }, [currentFilters]);
 
     useEffect(() => {
-        dispatch(listAction({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
-        onCheckedRowsChanged([]);
-    }, [dispatch, currentFilters, pageSize, pageNumber, listAction, onCheckedRowsChanged]);
+        getFreshData();
+    }, [getFreshData]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -145,7 +149,14 @@ function PagedList({
         <Container className="themed-container" fluid>
             <FilterWidget entity={entity} title={filterTitle} getAvailableFiltersApi={getAvailableFiltersApi} />
 
-            <Widget title={tableTitle} busy={isBusy || isFetchingList} widgetLockName={pageWidgetLockName}>
+            <Widget
+                title={title}
+                busy={isBusy || isFetchingList}
+                widgetLockName={pageWidgetLockName}
+                refreshAction={getFreshData}
+                widgetButtons={buttons}
+                titleSize="large"
+            >
                 <CustomTable
                     headers={headers}
                     data={data}

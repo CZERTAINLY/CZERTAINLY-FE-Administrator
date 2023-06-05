@@ -191,14 +191,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, valid, submitting, values, form }) => (
                 <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget
-                        title={
-                            <h5>
-                                Rekey <span className="fw-semi-bold">Certificate</span>
-                            </h5>
-                        }
-                        busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}
-                    >
+                    <Widget title="Rekey Certificate" busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}>
                         <Field name="uploadCsr">
                             {({ input, meta, onChange }) => (
                                 <FormGroup>
@@ -221,13 +214,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                         </Field>
                     </Widget>
 
-                    <Widget
-                        title={
-                            <h5>
-                                <span className="fw-semi-bold">Request Properties</span>
-                            </h5>
-                        }
-                    >
+                    <Widget title="Request Properties">
                         {values.uploadCsr?.value && certificate?.raProfile ? (
                             <>
                                 <FileUpload

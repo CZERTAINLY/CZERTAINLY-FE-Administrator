@@ -3,7 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/entities";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,11 +29,15 @@ export default function EntityDetail() {
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
-    useEffect(() => {
+    const getFreshEntityDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getEntityDetail({ uuid: id }));
     }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshEntityDetails();
+    }, [getFreshEntityDetails, id]);
 
     const onEditClick = useCallback(() => {
         if (!entity) return;
@@ -67,21 +71,6 @@ export default function EntityDetail() {
             },
         ],
         [onEditClick],
-    );
-
-    const entityTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Entity <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -136,13 +125,13 @@ export default function EntityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={entityTitle} busy={isBusy}>
+            <Widget title="Entity Details" busy={isBusy} widgetButtons={buttons} titleSize="large" refreshAction={getFreshEntityDetails}>
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Attributes">
+            <Widget title="Attributes" titleSize="large">
                 <br />
                 <Label>Entity Attributes</Label>
                 <AttributeViewer attributes={entity?.attributes} />

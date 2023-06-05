@@ -72,6 +72,39 @@ export default function RaProfileDetail() {
         [isActivatingAcme, isDeactivatingAcme, isFetchingAcmeDetails, isActivatingScep, isDeactivatingScep, isFetchingScepDetails],
     );
 
+    const getFreshRaProfileDetail = useCallback(() => {
+        if (!id || !authorityId) return;
+        dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+    }, [id, dispatch, authorityId]);
+
+    const getFreshComplianceRaProfileDetail = useCallback(() => {
+        if (!id || !authorityId) return;
+        if (authorityId === "unknown" || authorityId === "undefined") return;
+        dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
+    }, [id, dispatch, authorityId]);
+
+    const getFreshAttributes = useCallback(() => {
+        if (!id || !authorityId) return;
+        if (authorityId === "unknown" || authorityId === "undefined") return;
+        dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
+        dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
+    }, [id, dispatch, authorityId]);
+
+    const getFreshAvailableProtocols = useCallback(() => {
+        if (!id || !authorityId) return;
+        if (authorityId === "unknown" || authorityId === "undefined") return;
+
+        dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: authorityId, uuid: id }));
+        dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
+    }, [id, dispatch, authorityId]);
+
+    useEffect(() => {
+        getFreshRaProfileDetail();
+        getFreshComplianceRaProfileDetail();
+        getFreshAttributes();
+        getFreshAvailableProtocols();
+    }, [getFreshRaProfileDetail, getFreshComplianceRaProfileDetail, getFreshAttributes, getFreshAvailableProtocols]);
+
     useEffect(() => {
         if (!id || !authorityId) return;
 
@@ -198,21 +231,6 @@ export default function RaProfileDetail() {
         [raProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const raProfileTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    RA Profile <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const complianceProfileButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -272,21 +290,6 @@ export default function RaProfileDetail() {
                       ],
                   })),
         [associatedComplianceProfiles, onDissociateComplianceProfile],
-    );
-
-    const complianceProfileTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={complianceProfileButtons} />
-                </div>
-
-                <h5>
-                    <span className="fw-semi-bold">Compliance Profiles</span>
-                </h5>
-            </div>
-        ),
-        [complianceProfileButtons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -546,19 +549,31 @@ export default function RaProfileDetail() {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title={raProfileTitle} busy={isBusy}>
+                    <Widget
+                        title="RA Profile Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshRaProfileDetail}
+                    >
                         <br />
 
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
 
-                    <Widget title={complianceProfileTitle} busy={isFetchingAssociatedComplianceProfiles}>
+                    <Widget
+                        title="Compliance Profiles"
+                        busy={isFetchingAssociatedComplianceProfiles}
+                        widgetButtons={complianceProfileButtons}
+                        titleSize="large"
+                        refreshAction={getFreshComplianceRaProfileDetail}
+                    >
                         <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
                     </Widget>
                 </Col>
 
                 <Col>
-                    <Widget title="Attributes" busy={isBusy}>
+                    <Widget title="Attributes" busy={isBusy} titleSize="large" refreshAction={getFreshAttributes}>
                         {!raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? (
                             <></>
                         ) : (
@@ -584,7 +599,12 @@ export default function RaProfileDetail() {
                 <Col></Col>
             </Row>
 
-            <Widget title="Available protocols" busy={isBusy || isWorkingWithProtocol}>
+            <Widget
+                title="Available protocols"
+                busy={isBusy || isWorkingWithProtocol}
+                titleSize="large"
+                refreshAction={getFreshAvailableProtocols}
+            >
                 <br />
 
                 <CustomTable hasDetails={true} headers={availableProtocolsHeaders} data={availableProtocolsData} />

@@ -3,7 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/connectors";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -51,14 +51,28 @@ export default function ConnectorDetail() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
 
+    const getFreshConnectorDetails = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.resetState());
+        dispatch(actions.getConnectorDetail({ uuid: id }));
+    }, [id, dispatch]);
+
+    const getFreshConnectorHealth = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getConnectorHealth({ uuid: id }));
+    }, [id, dispatch]);
+
+    const getFreshConnectorAttributesDesc = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getConnectorAllAttributesDescriptors({ uuid: id }));
+    }, [id, dispatch]);
+
     useEffect(() => {
         setFunctionGroup(undefined);
-        if (id) {
-            dispatch(actions.getConnectorDetail({ uuid: id }));
-            dispatch(actions.getConnectorHealth({ uuid: id }));
-            dispatch(actions.getConnectorAllAttributesDescriptors({ uuid: id }));
-        }
-    }, [id, dispatch]);
+        getFreshConnectorDetails();
+        getFreshConnectorHealth();
+        getFreshConnectorAttributesDesc();
+    }, [id, getFreshConnectorDetails, getFreshConnectorHealth, getFreshConnectorAttributesDesc]);
 
     useEffect(() => {
         if (!connector || connector.functionGroups.length === 0) {
@@ -163,21 +177,6 @@ export default function ConnectorDetail() {
         [onEditClick, onReconnectClick, setConfirmDelete, setConfirmAuthorize, connector],
     );
 
-    const attributesTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={widgetButtons} />
-                </div>
-
-                <h5>
-                    Connector <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [widgetButtons],
-    );
-
     const attributesHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -253,10 +252,9 @@ export default function ConnectorDetail() {
         [connector],
     );
 
-    const healthTitle = (
+    const healthButtonsNode = (
         <div>
             <h5>
-                Connector <span className="fw-semi-bold">Health</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 {["up", "ok", "healthy"].includes(health ? health.status : "unknown") ? (
                     <i className="fa fa-check-circle" style={{ color: "green" }} aria-hidden="true" />
@@ -330,17 +328,29 @@ export default function ConnectorDetail() {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title={attributesTitle} busy={isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing}>
+                    <Widget
+                        title="Connector Details"
+                        busy={isFetchingDetail || isBulkReconnecting || isReconnecting || isAuthorizing}
+                        widgetButtons={widgetButtons}
+                        titleSize="large"
+                        refreshAction={getFreshConnectorDetails}
+                    >
                         <CustomTable headers={attributesHeaders} data={attributesData} />
                     </Widget>
                 </Col>
 
                 <Col>
-                    <Widget title="Connector Functionality" busy={isFetchingDetail || isReconnecting}>
+                    <Widget title="Connector Functionality" busy={isFetchingDetail || isReconnecting} titleSize="large">
                         <CustomTable headers={functionalityHeaders} data={functionalityData} />
                     </Widget>
 
-                    <Widget title={healthTitle} busy={isFetchingHealth}>
+                    <Widget
+                        title="Connector Health"
+                        busy={isFetchingHealth}
+                        widgetExtraTopNode={healthButtonsNode}
+                        titleSize="large"
+                        refreshAction={getFreshConnectorHealth}
+                    >
                         <Table className="table-hover" size="sm">
                             <tbody>
                                 <tr key="healthCheckStatus">
@@ -363,7 +373,7 @@ export default function ConnectorDetail() {
                 />
             )}
 
-            <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting}>
+            <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting} titleSize="large">
                 <hr />
                 <Row xs="1" sm="2" md="3" lg="3" xl="4">
                     <Col style={{ display: "inline-block" }}>
@@ -380,11 +390,11 @@ export default function ConnectorDetail() {
                     </Col>
                 </Row>
                 &nbsp;
-                <Widget title="Endpoints">
+                <Widget title="Endpoints" titleSize="large">
                     <CustomTable headers={endPointsHeaders} data={endPointsData} />
                 </Widget>
                 <hr />
-                <Widget title="Attributes" busy={isFetchingAttributes}>
+                <Widget title="Attributes" busy={isFetchingAttributes} titleSize="large" refreshAction={getFreshConnectorAttributesDesc}>
                     <Row xs="1" sm="2" md="3" lg="3" xl="4">
                         <Col>
                             <Select

@@ -10,7 +10,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import StatusCircle from "components/StatusCircle";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { AccountStatus } from "types/openapi";
 import { acmeAccountStatus } from "../acmeAccountStatus";
@@ -28,11 +28,15 @@ export default function AcmeAccountDetail() {
 
     const [confirmRevoke, setConfirmRevoke] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshAcmeAccount = useCallback(() => {
         if (!id || !acmeProfileId) return;
 
         dispatch(actions.getAcmeAccount({ acmeProfileUuid: acmeProfileId, uuid: id }));
     }, [id, dispatch, acmeProfileId]);
+
+    useEffect(() => {
+        getFreshAcmeAccount();
+    }, [id, getFreshAcmeAccount]);
 
     const onEnableClick = useCallback(() => {
         if (!acmeAccount) return;
@@ -80,21 +84,6 @@ export default function AcmeAccountDetail() {
             },
         ],
         [acmeAccount, onEnableClick, onDisableClick],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    ACME Account <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -211,11 +200,17 @@ export default function AcmeAccountDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}>
+            <Widget
+                title="ACME Account Details"
+                busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshAcmeAccount}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Order Summary" busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}>
+            <Widget title="Order Summary" busy={isFetchingDetail || isEnabling || isDisabling || isRevoking} titleSize="large">
                 <CustomTable headers={orderHeaders} data={orderData} />
             </Widget>
 

@@ -37,10 +37,14 @@ export default function ConnectorList() {
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.clearDeleteErrorMessages());
         dispatch(actions.listConnectors());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     useEffect(() => {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
@@ -113,21 +117,6 @@ export default function ConnectorList() {
             },
         ],
         [checkedRows, onAddClick, onReconnectClick],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    <span className="fw-semi-bold">Connector Store</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const getKinds = useCallback((functionGroups: FunctionGroupModel[]) => {
@@ -251,7 +240,14 @@ export default function ConnectorList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ConnectorStore}>
+            <Widget
+                title="Connector Store"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ConnectorStore}
+                refreshAction={getFreshData}
+                widgetButtons={buttons}
+                titleSize="large"
+            >
                 <br />
 
                 <CustomTable

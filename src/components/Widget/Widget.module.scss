@@ -10,9 +10,39 @@
 }
 
 .title {
-    margin-top: 0;
+    margin-top: 0.3rem;
     margin-bottom: 1.5rem / 2;
     color: $widget-title-color;
-
     @include clearfix();
+}
+
+.refreshIcon {
+    font-size: small;
+    border: none;
+    cursor: pointer;
+    margin: auto;
+    color: $czertainly-blue;
+    transition: color 0.2s ease-in-out;
+    background-color: transparent;
+    &:hover,
+    &:active,
+    &:focus {
+        color: #0056b3;
+    }
+}
+
+.titleSmall {
+    font-size: small;
+}
+
+.titleMedium {
+    font-size: medium;
+}
+
+.titleLarge {
+    font-size: large;
+}
+
+.titleXL {
+    font-size: larger;
 }

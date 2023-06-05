@@ -430,19 +430,6 @@ function RolePermissionsEditor({
         ];
     }, [onAddClick, onAllowAllClick, onDenyAllClick, onRemoveClick, selectedObjects.length]);
 
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">Object Action Permissions</h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const objectsToSelect: TableHeader[] = useMemo(
         () => [
             {
@@ -498,7 +485,7 @@ function RolePermissionsEditor({
                     {!currentResource?.objectAccess ? (
                         <></>
                     ) : (
-                        <Widget title={title} busy={isFetchingObjects}>
+                        <Widget title="Object Action Permissions" busy={isFetchingObjects} widgetButtons={buttons}>
                             <br />
 
                             <CustomTable

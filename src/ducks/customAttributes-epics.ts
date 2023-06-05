@@ -5,17 +5,17 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./customAttributes";
 import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToModel } from "./transform/attributes";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import {
     transformCustomAttributeCreateRequestModelToDto,
     transformCustomAttributeDetailResponseDtoToModel,
     transformCustomAttributeResponseDtoToModel,
     transformCustomAttributeUpdateRequestModelToDto,
 } from "./transform/customAttributes";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(

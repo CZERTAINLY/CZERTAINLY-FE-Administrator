@@ -3,7 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/discoveries";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -32,11 +32,15 @@ export default function DiscoveryDetail() {
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
-    useEffect(() => {
+    const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
-
+        dispatch(actions.resetState());
         dispatch(actions.getDiscoveryDetail({ uuid: id }));
-    }, [dispatch, id]);
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        getFreshDiscoveryDetails();
+    }, [id, getFreshDiscoveryDetails]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!discovery) return;
@@ -57,27 +61,6 @@ export default function DiscoveryDetail() {
             },
         ],
         [],
-    );
-
-    const discoveryTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Certificate Discovery <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const metaTitle = (
-        <h5>
-            <span className="fw-semi-bold">Meta Data</span>
-        </h5>
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -155,7 +138,13 @@ export default function DiscoveryDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={discoveryTitle} busy={isBusy}>
+            <Widget
+                title="Certificate Discovery Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshDiscoveryDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
@@ -163,7 +152,7 @@ export default function DiscoveryDetail() {
 
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title="Attributes">
+                    <Widget title="Attributes" titleSize="large">
                         <br />
                         <Label>Discovery Attributes</Label>
                         <AttributeViewer attributes={discovery?.attributes} />
@@ -177,7 +166,7 @@ export default function DiscoveryDetail() {
                     )}
                 </Col>
                 <Col>
-                    <Widget title={metaTitle}>
+                    <Widget title="Metadata" titleSize="large">
                         <br />
                         <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
                     </Widget>

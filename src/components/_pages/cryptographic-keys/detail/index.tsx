@@ -4,7 +4,7 @@ import Dialog from "components/Dialog";
 import TabLayout from "components/Layout/TabLayout";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/cryptographic-keys";
 
@@ -55,11 +55,15 @@ export default function CryptographicKeyDetail() {
         [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying],
     );
 
-    useEffect(() => {
+    const getFreshCryptographicKeyDetails = useCallback(() => {
         if (!id || !tokenId) return;
 
         dispatch(actions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId, uuid: id }));
     }, [id, dispatch, tokenId]);
+
+    useEffect(() => {
+        getFreshCryptographicKeyDetails();
+    }, [getFreshCryptographicKeyDetails, id, tokenId]);
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
@@ -195,32 +199,6 @@ export default function CryptographicKeyDetail() {
             },
         ],
         [cryptographicKey, onEditClick, onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy],
-    );
-
-    const cryptographicKeyTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Key <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const associationTitle = useMemo(
-        () => (
-            <div>
-                <h5>
-                    Key <span className="fw-semi-bold">Associations</span>
-                </h5>
-            </div>
-        ),
-        [],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -381,7 +359,13 @@ export default function CryptographicKeyDetail() {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title={cryptographicKeyTitle} busy={isBusy}>
+                    <Widget
+                        title="Key Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshCryptographicKeyDetails}
+                    >
                         <br />
 
                         <CustomTable headers={detailHeaders} data={detailData} />
@@ -389,7 +373,7 @@ export default function CryptographicKeyDetail() {
                 </Col>
 
                 <Col>
-                    <Widget title="Attributes" busy={isBusy}>
+                    <Widget title="Attributes" busy={isBusy} titleSize="large">
                         <br />
                         <Label>Key Attributes</Label>
                         <AttributeViewer attributes={cryptographicKey?.attributes} />
@@ -407,7 +391,7 @@ export default function CryptographicKeyDetail() {
 
             {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={itemTabs.selectedTab} />}
 
-            <Widget title={associationTitle} busy={isBusy}>
+            <Widget title="Key Associations" busy={isBusy} titleSize="large">
                 <br />
 
                 <CustomTable headers={associationHeaders} data={associationBody} />

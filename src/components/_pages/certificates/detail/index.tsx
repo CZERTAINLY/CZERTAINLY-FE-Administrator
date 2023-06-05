@@ -10,7 +10,7 @@ import StatusBadge from "components/StatusBadge";
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 
 import { actions, selectors } from "ducks/certificates";
@@ -136,7 +136,12 @@ export default function CertificateDetail() {
         dispatch(utilsActuatorActions.health());
     }, [dispatch, settings]);
 
-    useEffect(() => {
+    const getFreshCertificateHistory = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getCertificateHistory({ uuid: id }));
+    }, [dispatch, id]);
+
+    const getFreshCertificateDetail = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getCertificateDetail({ uuid: id }));
@@ -144,10 +149,18 @@ export default function CertificateDetail() {
     }, [dispatch, id]);
 
     useEffect(() => {
+        getFreshCertificateDetail();
+    }, [getFreshCertificateDetail, id]);
+
+    const getFreshCertificateValidations = useCallback(() => {
         if (!certificate) return;
         if (certificate.status === CertStatus.New) return;
         dispatch(actions.getCertificateValidationResult({ uuid: certificate.uuid }));
     }, [dispatch, certificate]);
+
+    useEffect(() => {
+        getFreshCertificateValidations();
+    }, [getFreshCertificateValidations]);
 
     useEffect(() => {
         if (!certificate || !locations || locations.length === 0) return;
@@ -203,13 +216,16 @@ export default function CertificateDetail() {
               );
     }, [dispatch, locationToEntityMap, selectLocationsCheckedRows]);
 
-    useEffect(() => {
+    const getFreshCertificateLocations = useCallback(() => {
         if (!id || isPushingCertificate || isRemovingCertificate) return;
 
         dispatch(actions.listCertificateLocations({ uuid: id }));
         dispatch(locationActions.listLocations({}));
     }, [dispatch, isPushingCertificate, isRemovingCertificate, id]);
 
+    useEffect(() => {
+        getFreshCertificateLocations();
+    }, [getFreshCertificateLocations]);
     const onDeleteConfirmed = useCallback(() => {
         if (!certificate) return;
 
@@ -570,40 +586,8 @@ export default function CertificateDetail() {
     }, [setRevokeReason]);
 
     const certificateTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>{certificate?.status === CertStatus.New ? "CSR" : "Certificate"} Properties</h5>
-            </div>
-        ),
-        [buttons, certificate?.status],
-    );
-
-    const metaTitle = <h5>Metadata</h5>;
-
-    const validationTitle = <h5>Validation Status</h5>;
-
-    const sanTitle = <h5>Subject Alternative Names</h5>;
-
-    const propertiesTitle = <h5>Other Properties</h5>;
-
-    const historyTitle = <h5>Event History</h5>;
-
-    const complianceTitle = <h5>Compliance Status</h5>;
-
-    const csrTitle = <h5>CSR</h5>;
-
-    const locationsTitle = (
-        <div>
-            <div className="fa-pull-right mt-n-xs">
-                <WidgetButtons buttons={buttonsLocations} />
-            </div>
-
-            <h5>Certificate Locations</h5>
-        </div>
+        () => (certificate?.status === CertStatus.New ? "CSR Properties" : "Certificate Properties"),
+        [certificate?.status],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -1165,19 +1149,25 @@ export default function CertificateDetail() {
                             <Widget>
                                 <Row xs="1" sm="1" md="2" lg="2" xl="2">
                                     <Col>
-                                        <Widget title={certificateTitle} busy={isBusy}>
+                                        <Widget
+                                            title={certificateTitle}
+                                            busy={isBusy}
+                                            widgetButtons={buttons}
+                                            titleSize="large"
+                                            refreshAction={getFreshCertificateDetail}
+                                        >
                                             <br />
                                             <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
                                         </Widget>
                                     </Col>
 
                                     <Col>
-                                        <Widget title={sanTitle} busy={isBusy}>
+                                        <Widget title="Subject Alternative Names" busy={isBusy} titleSize="large">
                                             <br />
                                             <CustomTable headers={detailHeaders} data={sanData} />
                                         </Widget>
 
-                                        <Widget title={propertiesTitle}>
+                                        <Widget title="Other Properties" titleSize="large">
                                             <br />
                                             <CustomTable headers={propertiesHeaders} data={propertiesData} />
                                         </Widget>
@@ -1190,13 +1180,13 @@ export default function CertificateDetail() {
                         title: "Attributes",
                         content: (
                             <Widget>
-                                <Widget title={metaTitle}>
+                                <Widget title="Metadata" titleSize="large">
                                     <br />
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>
 
                                 {certificate?.csrAttributes && certificate.csrAttributes.length > 0 ? (
-                                    <Widget title={csrTitle} busy={isBusy}>
+                                    <Widget title="CSR" busy={isBusy}>
                                         <AttributeViewer attributes={certificate.csrAttributes} />
                                     </Widget>
                                 ) : null}
@@ -1216,11 +1206,16 @@ export default function CertificateDetail() {
                         hidden: certificate?.status === CertStatus.New,
                         content: (
                             <Widget>
-                                <Widget title={validationTitle} busy={isFetchingValidationResult}>
+                                <Widget
+                                    title="Validation Status"
+                                    busy={isFetchingValidationResult}
+                                    titleSize="large"
+                                    refreshAction={getFreshCertificateValidations}
+                                >
                                     <br />
                                     <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
-                                <Widget title={complianceTitle} busy={isFetching}>
+                                <Widget title="Compliance Status" busy={isFetching} titleSize="large">
                                     <br />
                                     <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
                                 </Widget>
@@ -1232,7 +1227,13 @@ export default function CertificateDetail() {
                         hidden: certificate?.status === CertStatus.New,
                         content: (
                             <Widget>
-                                <Widget title={locationsTitle} busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}>
+                                <Widget
+                                    title="Certificate Locations"
+                                    busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
+                                    widgetButtons={buttonsLocations}
+                                    titleSize="large"
+                                    refreshAction={getFreshCertificateLocations}
+                                >
                                     <br />
                                     <CustomTable
                                         headers={locationsHeaders}
@@ -1248,7 +1249,12 @@ export default function CertificateDetail() {
                         title: "History",
                         content: (
                             <Widget>
-                                <Widget title={historyTitle} busy={isFetchingHistory}>
+                                <Widget
+                                    title="Event History"
+                                    busy={isFetchingHistory}
+                                    titleSize="large"
+                                    refreshAction={getFreshCertificateHistory}
+                                >
                                     <br />
                                     <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
                                 </Widget>

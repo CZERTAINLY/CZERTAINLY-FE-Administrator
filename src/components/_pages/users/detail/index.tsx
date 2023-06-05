@@ -4,7 +4,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 
 import { actions, selectors } from "ducks/users";
@@ -32,12 +32,16 @@ export default function UserDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshUserDetails = useCallback(() => {
         if (!id) return;
         dispatch(certActions.clearCertificateDetail());
         dispatch(actions.getDetail({ uuid: id }));
         dispatch(actions.getRoles({ uuid: id }));
-    }, [dispatch, id]);
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        getFreshUserDetails();
+    }, [getFreshUserDetails, id]);
 
     useEffect(() => {
         if (!user || !user.certificate || !user.certificate.uuid || user.uuid !== id) return;
@@ -105,30 +109,6 @@ export default function UserDetail() {
         [user, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const attributesTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    User <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const certificateTitle = useMemo(
-        () => (
-            <h5>
-                User Certificate <span className="fw-semi-bold">Details</span>
-            </h5>
-        ),
-        [],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -189,11 +169,17 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={attributesTitle} busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}>
+            <Widget
+                title="User Details"
+                busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshUserDetails}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title={certificateTitle} busy={isFetchingDetail || isFetchingCertificateDetail}>
+            <Widget title="User Certificate Details" busy={isFetchingDetail || isFetchingCertificateDetail} titleSize="large">
                 <CertificateAttributes certificate={certificate} />
             </Widget>
 

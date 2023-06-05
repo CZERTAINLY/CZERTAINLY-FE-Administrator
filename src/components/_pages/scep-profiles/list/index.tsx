@@ -34,10 +34,14 @@ export default function ScepProfiles() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.listScepProfiles());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     useEffect(() => {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
@@ -141,21 +145,6 @@ export default function ScepProfiles() {
         [bulkDeleteErrorMessages, checkedRows.length],
     );
 
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">SCEP Profiles</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const scepProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
@@ -227,7 +216,14 @@ export default function ScepProfiles() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}>
+            <Widget
+                title="List of SCEP Profiles"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={scepProfilesTableHeader}

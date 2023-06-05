@@ -196,7 +196,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
     return (
         <>
-            <Widget title={title} busy={isFetchingAvailableFilters}>
+            <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div style={{ width: "99%", borderBottom: "solid 1px silver", marginBottom: "1rem" }}>
                         <Row>

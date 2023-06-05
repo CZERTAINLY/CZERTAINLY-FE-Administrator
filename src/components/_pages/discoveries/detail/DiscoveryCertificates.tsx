@@ -99,7 +99,7 @@ export default function DiscoveryCertificates({ id }: Props) {
     );
 
     return (
-        <Widget title={discoveryCertificatesTitle} busy={isFetchingDiscoveryCertificates}>
+        <Widget title="Discovered Certificates" busy={isFetchingDiscoveryCertificates}>
             <br />
 
             <TabLayout

@@ -9,7 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
 function RaProfileList() {
@@ -33,10 +33,14 @@ function RaProfileList() {
 
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.listRaProfiles());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -111,21 +115,6 @@ function RaProfileList() {
             },
         ],
         [checkedRows, onAddClick, onEnableClick, onDisableClick],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">RA Profiles</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const raProfilesTableHeaders: TableHeader[] = useMemo(
@@ -210,7 +199,14 @@ function RaProfileList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfRAProfiles}>
+            <Widget
+                title="List of RA Profiles"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfRAProfiles}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={raProfilesTableHeaders}
