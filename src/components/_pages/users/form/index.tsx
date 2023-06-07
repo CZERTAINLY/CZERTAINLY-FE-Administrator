@@ -6,6 +6,7 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
+import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 import { selectors as pagingSelectors } from "ducks/paging";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
@@ -32,6 +33,7 @@ import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
     username: string;
+    group: { label: string; value: string };
     description: string;
     firstName: string;
     lastName: string;
@@ -52,6 +54,7 @@ function UserForm() {
 
     const userSelector = useSelector(userSelectors.user);
     const rolesSelector = useSelector(rolesSelectors.roles);
+    const groups = useSelector(groupSelectors.certificateGroups);
     const certificates = useSelector(certSelectors.certificates);
     const certificateDetail = useSelector(certSelectors.certificateDetail);
 
@@ -89,6 +92,15 @@ function UserForm() {
         [],
     );
 
+    const optionsForGroup = useMemo(
+        () =>
+            groups.map((g) => ({
+                label: g.name,
+                value: g.uuid,
+            })),
+        [groups],
+    );
+
     const [selectedCertificate, setSelectedCertificate] = useState<{ label: string; value: string }>();
 
     const [certUploadDialog, setCertUploadDialog] = useState(false);
@@ -111,6 +123,7 @@ function UserForm() {
         );
 
         dispatch(rolesActions.list());
+        dispatch(groupActions.listGroups());
     }, [dispatch]);
 
     /* Load user */
@@ -206,6 +219,7 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email,
+                            groupUuid: values.group.value ?? undefined,
                             certificateUuid:
                                 values.inputType.value === "select"
                                     ? values.certificate
@@ -227,6 +241,7 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email || undefined,
+                            groupUuid: values.group.value ?? undefined,
                             enabled: values.enabled,
                             certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
                             certificateUuid:
@@ -269,6 +284,7 @@ function UserForm() {
         () => ({
             username: editMode ? user?.username : "",
             description: editMode ? user?.description : "",
+            group: editMode && user?.groupName && user?.groupUuid ? { label: user.groupName, value: user.groupUuid } : undefined,
             firstName: editMode ? user?.firstName || "" : "",
             lastName: editMode ? user?.lastName : "",
             email: editMode ? user?.email : "",
@@ -387,6 +403,22 @@ function UserForm() {
                                         />
 
                                         <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
+
+                            <Field name="group">
+                                {({ input }) => (
+                                    <FormGroup>
+                                        <Label for="group">Group</Label>
+
+                                        <Select
+                                            {...input}
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={optionsForGroup}
+                                            placeholder="Select Group"
+                                        />
                                     </FormGroup>
                                 )}
                             </Field>

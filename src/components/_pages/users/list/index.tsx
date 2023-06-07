@@ -133,6 +133,11 @@ export default function UsersList() {
                 width: "10%",
             },
             {
+                id: "group",
+                content: "Group",
+                sortable: true,
+            },
+            {
                 id: "description",
                 content: "Description",
                 sortable: true,
@@ -181,6 +186,10 @@ export default function UsersList() {
                 columns: [
                     <span style={{ whiteSpace: "nowrap" }}>
                         <Link to={`./detail/${user.uuid}`}>{user.username}</Link>
+                    </span>,
+
+                    <span style={{ whiteSpace: "nowrap" }}>
+                        {user.groupUuid ? <Link to={`../groups/detail/${user.groupUuid}`}>{user.groupName}</Link> : user.groupName}
                     </span>,
 
                     <span style={{ whiteSpace: "nowrap" }}>{user.description || ""}</span>,
