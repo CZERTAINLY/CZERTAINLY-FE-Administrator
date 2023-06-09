@@ -2,10 +2,10 @@ import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { FunctionGroupCode } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./credentials";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
@@ -14,8 +14,7 @@ import {
     transformCredentialEditRequestModelToDto,
     transformCredentialResponseDtoToModel,
 } from "./transform/credentials";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { error } from "console";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const listCredentials: AppEpic = (action$, state, deps) => {
     return action$.pipe(
