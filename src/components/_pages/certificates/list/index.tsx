@@ -30,9 +30,15 @@ interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
+    hideWidgetButtons?: boolean;
 }
 
-export default function CertificateList({ selectCertsOnly = false, multiSelect = true, onCheckedRowsChanged }: Props) {
+export default function CertificateList({
+    hideWidgetButtons = false,
+    selectCertsOnly = false,
+    multiSelect = true,
+    onCheckedRowsChanged,
+}: Props) {
     const dispatch = useDispatch();
 
     const certificates = useSelector(selectors.certificates);
@@ -319,6 +325,7 @@ export default function CertificateList({ selectCertsOnly = false, multiSelect =
     return (
         <Container className="themed-container" fluid>
             <PagedList
+                hideWidgetButtons={hideWidgetButtons}
                 entity={EntityType.CERTIFICATE}
                 listAction={actions.listCertificates}
                 onDeleteCallback={(uuids, filters) => dispatch(actions.bulkDelete({ uuids, filters }))}

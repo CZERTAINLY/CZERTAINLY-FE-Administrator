@@ -31,6 +31,7 @@ interface Props {
     entityNamePlural: string;
     additionalButtons?: WidgetButtonProps[];
     pageWidgetLockName?: LockWidgetNameEnum;
+    hideWidgetButtons?: boolean;
 }
 
 function PagedList({
@@ -48,6 +49,7 @@ function PagedList({
     entityNameSingular,
     additionalButtons,
     pageWidgetLockName,
+    hideWidgetButtons = false,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -138,6 +140,7 @@ function PagedList({
                 refreshAction={getFreshData}
                 widgetButtons={buttons}
                 titleSize="large"
+                hideWidgetButtons={hideWidgetButtons}
             >
                 <CustomTable
                     headers={headers}

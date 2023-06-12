@@ -22,6 +22,7 @@ interface Props {
     refreshAction?: () => void;
     widgetButtons?: WidgetButtonProps[];
     widgetExtraTopNode?: React.ReactNode;
+    hideWidgetButtons?: boolean;
 }
 
 function Widget({
@@ -36,6 +37,7 @@ function Widget({
     widgetLockName,
     refreshAction,
     widgetExtraTopNode,
+    hideWidgetButtons = false,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
 
@@ -67,6 +69,7 @@ function Widget({
 
     const renderWidgetButtons = () => {
         if (!widgetButtons) return null;
+        if (hideWidgetButtons) return null;
         else {
             return (
                 <div className="ms-auto">
