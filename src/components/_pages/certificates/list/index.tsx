@@ -15,6 +15,7 @@ import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, Uncontrol
 
 import PagedList from "components/PagedList/PagedList";
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";
@@ -24,20 +25,19 @@ import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateStatus from "../CertificateStatus";
 import CertificateUploadDialog from "../CertificateUploadDialog";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
-    topActionsHidden?: boolean;
+    hideWidgetButtons?: boolean;
 }
 
 export default function CertificateList({
+    hideWidgetButtons = false,
     selectCertsOnly = false,
     multiSelect = true,
     onCheckedRowsChanged,
-    topActionsHidden = false,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -325,6 +325,7 @@ export default function CertificateList({
     return (
         <Container className="themed-container" fluid>
             <PagedList
+                hideWidgetButtons={hideWidgetButtons}
                 entity={EntityType.CERTIFICATE}
                 listAction={actions.listCertificates}
                 onDeleteCallback={(uuids, filters) => dispatch(actions.bulkDelete({ uuids, filters }))}
@@ -338,7 +339,6 @@ export default function CertificateList({
                 entityNamePlural="Certificates"
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
-                topActionsHidden={topActionsHidden}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
             />
 

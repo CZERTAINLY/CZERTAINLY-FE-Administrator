@@ -10,7 +10,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import FilterWidget from "components/FilterWidget";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/paging";
 import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
@@ -31,7 +31,7 @@ interface Props {
     entityNamePlural: string;
     additionalButtons?: WidgetButtonProps[];
     pageWidgetLockName?: LockWidgetNameEnum;
-    topActionsHidden?: boolean;
+    hideWidgetButtons?: boolean;
 }
 
 function PagedList({
@@ -49,7 +49,7 @@ function PagedList({
     entityNameSingular,
     additionalButtons,
     pageWidgetLockName,
-    topActionsHidden = false,
+    hideWidgetButtons = false,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -117,22 +117,6 @@ function PagedList({
         [checkedRows, additionalButtons, navigate],
     );
 
-    const tableTitle = useMemo(
-        () => (
-            <div>
-                {!topActionsHidden && (
-                    <div className="fa-pull-right mt-n-xs">
-                        <WidgetButtons buttons={buttons} />
-                    </div>
-                )}
-                <h5 className="mt-0">
-                    <span className="fw-semi-bold">{title}</span>
-                </h5>
-            </div>
-        ),
-        [buttons, title, topActionsHidden],
-    );
-
     const paginationData = useMemo(
         () => ({
             page: pageNumber,
@@ -156,6 +140,7 @@ function PagedList({
                 refreshAction={getFreshData}
                 widgetButtons={buttons}
                 titleSize="large"
+                hideWidgetButtons={hideWidgetButtons}
             >
                 <CustomTable
                     headers={headers}

@@ -219,14 +219,14 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email,
-                            groupUuid: values.group.value ?? undefined,
+                            groupUuid: values.group?.value ?? undefined,
                             certificateUuid:
                                 values.inputType.value === "select"
                                     ? values.certificate
                                         ? values.certificate.value
                                         : undefined
                                     : undefined,
-                            certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                            certificateData: values.inputType?.value === "upload" ? certToUpload?.certificateContent : undefined,
                             customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
                         },
                     }),
@@ -241,13 +241,13 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email || undefined,
-                            groupUuid: values.group.value ?? undefined,
+                            groupUuid: values.group?.value ?? undefined,
                             enabled: values.enabled,
-                            certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                            certificateData: values.inputType?.value === "upload" ? certToUpload?.certificateContent : undefined,
                             certificateUuid:
-                                values.inputType.value === "select"
+                                values.inputType?.value === "select"
                                     ? values.certificate
-                                        ? values.certificate.value
+                                        ? values.certificate?.value
                                         : undefined
                                     : undefined,
                             customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
