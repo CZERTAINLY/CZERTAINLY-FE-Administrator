@@ -221,9 +221,9 @@ function UserForm() {
                             email: values.email,
                             groupUuid: values.group?.value ?? undefined,
                             certificateUuid:
-                                values.inputType?.value === "select"
+                                values.inputType.value === "select"
                                     ? values.certificate
-                                        ? values.certificate?.value
+                                        ? values.certificate.value
                                         : undefined
                                     : undefined,
                             certificateData: values.inputType?.value === "upload" ? certToUpload?.certificateContent : undefined,
