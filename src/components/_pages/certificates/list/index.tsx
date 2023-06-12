@@ -15,6 +15,7 @@ import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, Uncontrol
 
 import PagedList from "components/PagedList/PagedList";
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";
@@ -24,21 +25,14 @@ import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateStatus from "../CertificateStatus";
 import CertificateUploadDialog from "../CertificateUploadDialog";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
-    topActionsHidden?: boolean;
 }
 
-export default function CertificateList({
-    selectCertsOnly = false,
-    multiSelect = true,
-    onCheckedRowsChanged,
-    topActionsHidden = false,
-}: Props) {
+export default function CertificateList({ selectCertsOnly = false, multiSelect = true, onCheckedRowsChanged }: Props) {
     const dispatch = useDispatch();
 
     const certificates = useSelector(selectors.certificates);
@@ -338,7 +332,6 @@ export default function CertificateList({
                 entityNamePlural="Certificates"
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
-                topActionsHidden={topActionsHidden}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
             />
 
