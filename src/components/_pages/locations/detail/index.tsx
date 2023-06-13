@@ -541,8 +541,8 @@ export default function LocationDetail() {
                     <>
                         <CertificateList
                             selectCertsOnly={true}
-                            topActionsHidden={true}
                             multiSelect={false}
+                            hideWidgetButtons
                             onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
                         />
 

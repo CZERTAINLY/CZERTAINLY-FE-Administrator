@@ -10,7 +10,7 @@ import { actions as certActions, selectors as certSelectors } from "ducks/certif
 import { actions, selectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
@@ -131,6 +131,17 @@ export default function UserDetail() {
                       {
                           id: "username",
                           columns: ["Username", user.username],
+                      },
+                      {
+                          id: "group",
+                          columns: [
+                              "Group",
+                              user.groupUuid ? (
+                                  <Link to={`../../groups/detail/${user.groupUuid}`}>{user.groupName}</Link>
+                              ) : (
+                                  user.groupName ?? ""
+                              ),
+                          ],
                       },
                       {
                           id: "description",
