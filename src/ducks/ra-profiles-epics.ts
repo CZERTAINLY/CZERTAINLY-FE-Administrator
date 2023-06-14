@@ -4,10 +4,11 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./ra-profiles";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import {
     transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
@@ -18,7 +19,6 @@ import {
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
 } from "./transform/ra-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -53,16 +53,20 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
             deps.apiClients.raProfiles
                 .getRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
                 .pipe(
-                    map((profileDto) =>
-                        slice.actions.getRaProfileDetailSuccess({
-                            raProfile: transformRaProfileResponseDtoToModel(profileDto),
-                        }),
+                    switchMap((profileDto) =>
+                        of(
+                            slice.actions.getRaProfileDetailSuccess({
+                                raProfile: transformRaProfileResponseDtoToModel(profileDto),
+                            }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RaProfileDetails),
+                        ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }),
                             appRedirectActions.fetchError({ error: err, message: "Failed to get RA Profile detail" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
                         ),
                     ),
                 ),
@@ -573,10 +577,13 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
             deps.apiClients.raProfiles
                 .getAssociatedComplianceProfiles({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
                 .pipe(
-                    map((profileDto) =>
-                        slice.actions.getComplianceProfilesForRaProfileSuccess({
-                            complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel),
-                        }),
+                    switchMap((profileDto) =>
+                        of(
+                            slice.actions.getComplianceProfilesForRaProfileSuccess({
+                                complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel),
+                            }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RaProfileComplianceDetails),
+                        ),
                     ),
 
                     catchError((err) =>
@@ -585,6 +592,7 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
                                 error: extractError(err, "Failed to get associated Compliance Profiles"),
                             }),
                             appRedirectActions.fetchError({ error: err, message: "Failed to get associated Compliance Profiles" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
                         ),
                     ),
                 ),

@@ -5,17 +5,17 @@ import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./tokens";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import {
     transformTokenDetailResponseDtoToModel,
     transformTokenRequestModelToDto,
     transformTokenResponseDtoToModel,
 } from "./transform/tokens";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listTokens: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -49,12 +49,18 @@ const getTokenDetail: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.tokenInstances.getTokenInstance({ uuid: action.payload.uuid }).pipe(
-                map((tokenDto) => slice.actions.getTokenDetailSuccess({ token: transformTokenDetailResponseDtoToModel(tokenDto) })),
+                switchMap((tokenDto) =>
+                    of(
+                        slice.actions.getTokenDetailSuccess({ token: transformTokenDetailResponseDtoToModel(tokenDto) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.TokenDetails),
+                    ),
+                ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getTokenDetailFailure({ error: extractError(err, "Failed to get Token detail") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Token detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenDetails),
                     ),
                 ),
             ),

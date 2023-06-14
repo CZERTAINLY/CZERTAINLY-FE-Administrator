@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
 import { Resource, TokenInstanceStatus } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
 import RandomDataGeneration from "./RandomDataGeneration";
@@ -213,13 +214,25 @@ export default function TokenDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title="Token Details" busy={isBusy} widgetButtons={buttons} titleSize="large" refreshAction={getFreshTokenDetails}>
+            <Widget
+                title="Token Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshTokenDetails}
+                widgetLockName={LockWidgetNameEnum.TokenDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Attributes" titleSize="large" refreshAction={getFreshAttributes}>
+            <Widget
+                title="Attributes"
+                titleSize="large"
+                refreshAction={getFreshAttributes}
+                widgetLockName={LockWidgetNameEnum.TokenDetails}
+            >
                 <br />
 
                 <Label>Token Attributes</Label>

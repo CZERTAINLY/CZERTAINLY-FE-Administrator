@@ -55,6 +55,7 @@ import Asn1Dialog from "../Asn1Dialog/Asn1Dialog";
 import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import CertificateStatus from "../CertificateStatus";
 
 export default function CertificateDetail() {
@@ -155,6 +156,7 @@ export default function CertificateDetail() {
     }, [getFreshCertificateDetail, id]);
 
     const getFreshCertificateValidations = useCallback(() => {
+        // TODO: Add toast for no certificate
         if (!certificate) return;
         if (certificate.status === CertStatus.New) return;
         dispatch(actions.getCertificateValidationResult({ uuid: certificate.uuid }));
@@ -1189,6 +1191,8 @@ export default function CertificateDetail() {
                                             busy={isBusy}
                                             widgetButtons={buttons}
                                             titleSize="large"
+                                            lockSize="large"
+                                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                             refreshAction={getFreshCertificateDetail}
                                         >
                                             <br />
@@ -1215,7 +1219,7 @@ export default function CertificateDetail() {
                         title: "Attributes",
                         content: (
                             <Widget>
-                                <Widget title="Metadata" titleSize="large">
+                                <Widget title="Metadata" titleSize="large" widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}>
                                     <br />
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>
@@ -1245,12 +1249,19 @@ export default function CertificateDetail() {
                                     title="Validation Status"
                                     busy={isFetchingValidationResult}
                                     titleSize="large"
-                                    refreshAction={getFreshCertificateValidations}
+                                    refreshAction={certificate && getFreshCertificateValidations}
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
                                     <br />
                                     <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
-                                <Widget title="Compliance Status" busy={isFetching} titleSize="large">
+                                <Widget
+                                    title="Compliance Status"
+                                    busy={isFetching}
+                                    titleSize="large"
+                                    lockSize="normal"
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                >
                                     <br />
                                     <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
                                 </Widget>
@@ -1267,7 +1278,8 @@ export default function CertificateDetail() {
                                     busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
                                     widgetButtons={buttonsLocations}
                                     titleSize="large"
-                                    refreshAction={getFreshCertificateLocations}
+                                    refreshAction={certificate && getFreshCertificateLocations}
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
                                     <br />
                                     <CustomTable

@@ -21,6 +21,7 @@ import { inventoryStatus } from "utils/connector";
 import { ConnectorStatus, PlatformEnum, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import styles from "./connectorDetails.module.scss";
 
 export default function ConnectorDetail() {
@@ -334,6 +335,8 @@ export default function ConnectorDetail() {
                         widgetButtons={widgetButtons}
                         titleSize="large"
                         refreshAction={getFreshConnectorDetails}
+                        widgetLockName={LockWidgetNameEnum.ConnectorDetails}
+                        lockSize="large"
                     >
                         <CustomTable headers={attributesHeaders} data={attributesData} />
                     </Widget>

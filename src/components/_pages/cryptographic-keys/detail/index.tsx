@@ -17,6 +17,7 @@ import Select from "react-select";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Col, Container, Label, Row } from "reactstrap";
 import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import CryptographicKeyItem from "./CryptographicKeyItem";
@@ -365,6 +366,8 @@ export default function CryptographicKeyDetail() {
                         widgetButtons={buttons}
                         titleSize="large"
                         refreshAction={getFreshCryptographicKeyDetails}
+                        widgetLockName={LockWidgetNameEnum.keyDetails}
+                        lockSize="large"
                     >
                         <br />
 

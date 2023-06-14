@@ -1,11 +1,11 @@
 import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { actions as widgetLockActions } from "./widget-locks";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 import { slice } from "./connectors";
 
@@ -56,11 +56,17 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getConnectorDetail.match),
         switchMap((action) =>
             deps.apiClients.connectors.getConnector({ uuid: action.payload.uuid }).pipe(
-                map((detail) => slice.actions.getConnectorDetailSuccess({ connector: transformConnectorResponseDtoToModel(detail) })),
+                mergeMap((detail) =>
+                    of(
+                        slice.actions.getConnectorDetailSuccess({ connector: transformConnectorResponseDtoToModel(detail) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorDetails),
+                    ),
+                ),
                 catchError((error) =>
                     of(
                         slice.actions.getConnectorDetailFailure(),
                         appRedirectActions.fetchError({ error, message: "Failed to get connector detail" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),
             ),

@@ -25,6 +25,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { validateRequired } from "utils/validators";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
@@ -452,6 +453,7 @@ export default function LocationDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshLocationDetails}
+                widgetLockName={LockWidgetNameEnum.LocationDetails}
             >
                 <br />
 

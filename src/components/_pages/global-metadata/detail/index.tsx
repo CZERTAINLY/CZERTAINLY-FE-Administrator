@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -131,6 +132,7 @@ export default function GlobalMetadataDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshGlobalMetadata}
+                widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
             >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>

@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -43,10 +44,15 @@ export default function UserDetail() {
         getFreshUserDetails();
     }, [getFreshUserDetails, id]);
 
-    useEffect(() => {
+    const getFreshCertificateDetails = useCallback(() => {
+        // TODO: Add Toast to notify user
         if (!user || !user.certificate || !user.certificate.uuid || user.uuid !== id) return;
         dispatch(certActions.getCertificateDetail({ uuid: user.certificate.uuid }));
     }, [user, dispatch, id]);
+
+    useEffect(() => {
+        getFreshCertificateDetails();
+    }, [getFreshCertificateDetails, id]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${user?.uuid}`, { relative: "path" });
@@ -186,11 +192,17 @@ export default function UserDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshUserDetails}
+                widgetLockName={LockWidgetNameEnum.UserDetails}
             >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="User Certificate Details" busy={isFetchingDetail || isFetchingCertificateDetail} titleSize="large">
+            <Widget
+                title="User Certificate Details"
+                busy={isFetchingDetail || isFetchingCertificateDetail}
+                titleSize="large"
+                refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
+            >
                 <CertificateAttributes certificate={certificate} />
             </Widget>
 

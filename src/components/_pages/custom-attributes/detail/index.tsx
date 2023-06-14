@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { getAttributeContent } from "utils/attributes/attributes";
 
 export default function CustomAttributeDetail() {
@@ -177,6 +178,7 @@ export default function CustomAttributeDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshCustomAttribute}
+                widgetLockName={LockWidgetNameEnum.CustomAttributeDetails}
             >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>

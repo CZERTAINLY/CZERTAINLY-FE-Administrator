@@ -13,6 +13,7 @@ import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { AccountStatus } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { acmeAccountStatus } from "../acmeAccountStatus";
 
 export default function AcmeAccountDetail() {
@@ -206,6 +207,7 @@ export default function AcmeAccountDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshAcmeAccount}
+                widgetLockName={LockWidgetNameEnum.ACMEAccountDetails}
             >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>

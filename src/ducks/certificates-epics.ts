@@ -11,6 +11,7 @@ import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 import { store } from "index";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
 import {
@@ -32,7 +33,6 @@ import {
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -67,14 +67,19 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getCertificateDetail.match),
         switchMap((action) =>
             deps.apiClients.certificates.getCertificate({ uuid: action.payload.uuid }).pipe(
-                map((certificate) =>
-                    slice.actions.getCertificateDetailSuccess({ certificate: transformCertificateDetailResponseDtoToModel(certificate) }),
+                switchMap((certificate) =>
+                    of(
+                        slice.actions.getCertificateDetailSuccess({
+                            certificate: transformCertificateDetailResponseDtoToModel(certificate),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificateDetailsWidget),
+                    ),
                 ),
-
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get certificate detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
                     ),
                 ),
             ),

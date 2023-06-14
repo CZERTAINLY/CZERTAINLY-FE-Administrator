@@ -47,16 +47,20 @@ const getCredentialDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getCredentialDetail.match),
         switchMap((action) =>
             deps.apiClients.credentials.getCredential({ uuid: action.payload.uuid }).pipe(
-                map((credential) =>
-                    slice.actions.getCredentialDetailSuccess({
-                        credential: transformCredentialResponseDtoToModel(credential),
-                    }),
+                switchMap((credential) =>
+                    of(
+                        slice.actions.getCredentialDetailSuccess({
+                            credential: transformCredentialResponseDtoToModel(credential),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CredentialDetails),
+                    ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getCredentialDetailFailure({ error: extractError(error, "Failed to get Credential") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get Credential" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialDetails),
                     ),
                 ),
             ),

@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -268,6 +269,8 @@ export default function AdministratorDetail() {
                         widgetButtons={buttons}
                         titleSize="large"
                         refreshAction={getFreshAcmeProfile}
+                        widgetLockName={LockWidgetNameEnum.ACMEProfileDetails}
+                        lockSize="large"
                     >
                         <CustomTable headers={tableHeader} data={acmeProfileDetailData} />
                     </Widget>

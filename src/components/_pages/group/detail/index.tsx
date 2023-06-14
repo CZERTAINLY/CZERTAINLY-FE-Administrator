@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -109,6 +110,7 @@ export default function GroupDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshGroupDetails}
+                widgetLockName={LockWidgetNameEnum.GroupDetails}
             >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>

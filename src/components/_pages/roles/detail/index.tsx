@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -37,7 +38,7 @@ export default function UserDetail() {
 
     useEffect(() => {
         getFreshDetails();
-    }, [getFreshDetails, id]);
+    }, []);
 
     const getFreshPermissions = useCallback(() => {
         if (!id) return;
@@ -46,8 +47,9 @@ export default function UserDetail() {
 
     useEffect(() => {
         if (!role || role.uuid !== id || permissions?.uuid === id || isFetchingPermissions) return;
+        getFreshDetails();
         dispatch(actions.getPermissions({ uuid: id }));
-    }, [role, dispatch, permissions?.uuid, isFetchingPermissions, id]);
+    }, [role, dispatch, permissions?.uuid, isFetchingPermissions, id, getFreshDetails]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../roles/edit/${role?.uuid}`);
@@ -255,7 +257,14 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title="Role Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large" refreshAction={getFreshDetails}>
+            <Widget
+                title="Role Details"
+                busy={isFetchingDetail}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshDetails}
+                widgetLockName={LockWidgetNameEnum.RoleDetails}
+            >
                 <br />
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
@@ -271,7 +280,7 @@ export default function UserDetail() {
                 title="Role Permissions"
                 busy={isFetchingDetail || isFetchingPermissions}
                 titleSize="large"
-                refreshAction={getFreshPermissions}
+                refreshAction={role && getFreshPermissions}
             >
                 <br />
                 {!permissions ? (

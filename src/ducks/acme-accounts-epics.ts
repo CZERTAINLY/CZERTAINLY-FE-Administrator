@@ -4,11 +4,11 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./acme-accounts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { transformAcmeAccountListResponseDtoToModel, transformAcmeAccountResponseDtoToModel } from "./transform/acme-accounts";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -42,12 +42,18 @@ const getAccountDetail: AppEpic = (action$, state$, deps) => {
             deps.apiClients.acmeAccounts
                 .getAcmeAccount({ acmeProfileUuid: action.payload.acmeProfileUuid, acmeAccountUuid: action.payload.uuid })
                 .pipe(
-                    map((detail) => slice.actions.getAcmeAccountSuccess({ acmeAccount: transformAcmeAccountResponseDtoToModel(detail) })),
+                    switchMap((detail) =>
+                        of(
+                            slice.actions.getAcmeAccountSuccess({ acmeAccount: transformAcmeAccountResponseDtoToModel(detail) }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ACMEAccountDetails),
+                        ),
+                    ),
 
                     catchError((error) =>
                         of(
                             slice.actions.getAcmeAccountFailed({ error: extractError(error, "Failed to get ACME Account details") }),
                             appRedirectActions.fetchError({ error, message: "Failed to get ACME Account details" }),
+                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEAccountDetails),
                         ),
                     ),
                 ),

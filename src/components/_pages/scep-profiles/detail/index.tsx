@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container } from "reactstrap";
 import { Resource } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
@@ -300,6 +301,7 @@ export default function ScepProfileDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshScepProfile}
+                widgetLockName={LockWidgetNameEnum.SCEPProfileDetails}
             >
                 <CustomTable headers={tableHeader} data={scepProfileDetailData} />
             </Widget>

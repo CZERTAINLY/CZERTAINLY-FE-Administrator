@@ -23,7 +23,10 @@ export default function PlatformSettingsDetail() {
 
     const getFreshData = useCallback(() => {
         dispatch(utilsActuatorActions.health());
-    }, [dispatch]);
+        if (!platformSettings) {
+            dispatch(actions.getPlatformSettings());
+        }
+    }, [dispatch, platformSettings]);
 
     useEffect(() => {
         getFreshData();
