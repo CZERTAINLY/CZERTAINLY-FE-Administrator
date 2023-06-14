@@ -29,7 +29,7 @@ export default function GlobalMetadataDetail() {
     const getFreshGlobalMetadata = useCallback(() => {
         if (!id) return;
         dispatch(actions.getGlobalMetadata(id));
-    }, [id]);
+    }, [id, dispatch]);
 
     useEffect(() => {
         if (!id) return;

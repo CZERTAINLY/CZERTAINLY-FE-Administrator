@@ -33,14 +33,14 @@ export default function CustomAttributeDetail() {
 
     const getFreshCustomAttribute = useCallback(() => {
         if (!id) return;
-        if (!customAttribute || id !== customAttribute.uuid) {
-            dispatch(actions.getCustomAttribute(id));
-        }
+        dispatch(actions.getCustomAttribute(id));
     }, [dispatch, id]);
 
     useEffect(() => {
-        getFreshCustomAttribute();
-    }, [getFreshCustomAttribute, id]);
+        if (!customAttribute || id !== customAttribute.uuid) {
+            getFreshCustomAttribute();
+        }
+    }, [getFreshCustomAttribute, id, customAttribute]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${customAttribute?.uuid}`, { relative: "path" });

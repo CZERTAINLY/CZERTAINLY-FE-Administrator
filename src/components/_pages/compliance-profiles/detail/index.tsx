@@ -32,7 +32,8 @@ export default function ComplianceProfileDetail() {
 
     const profile = useSelector(selectors.complianceProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-
+    const isFetchingGroups = useSelector(selectors.isFetchingGroups);
+    const isFetchingRules = useSelector(selectors.isFetchingRules);
     const rules = useSelector(selectors.rules);
 
     const groups = useSelector(selectors.groups);
@@ -66,7 +67,7 @@ export default function ComplianceProfileDetail() {
         dispatch(actions.listComplianceGroups());
     }, [id, dispatch]);
 
-    const getCOmplianceRulesAndGroups = useCallback(() => {
+    const getComplianceRulesAndGroups = useCallback(() => {
         dispatch(actions.listComplianceRules());
         dispatch(actions.listComplianceGroups());
     }, [id, dispatch]);
@@ -830,9 +831,9 @@ export default function ComplianceProfileDetail() {
 
             <Widget
                 title="Rules & Groups"
-                busy={isFetchingDetail}
+                busy={isFetchingGroups || isFetchingRules}
                 titleSize="large"
-                refreshAction={profile && getCOmplianceRulesAndGroups}
+                refreshAction={profile && getComplianceRulesAndGroups}
                 widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
             >
                 <Row xs="1" sm="1" md="2" lg="2" xl="2">

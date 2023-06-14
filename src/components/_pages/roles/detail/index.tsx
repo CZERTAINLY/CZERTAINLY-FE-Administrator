@@ -38,7 +38,7 @@ export default function UserDetail() {
 
     useEffect(() => {
         getFreshDetails();
-    }, []);
+    }, [getFreshDetails]);
 
     const getFreshPermissions = useCallback(() => {
         if (!id) return;
