@@ -1,5 +1,5 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as appRedirectActions } from "./app-redirect";
@@ -107,9 +107,13 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.scheduler.deleteScheduledJob({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(
-                        slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: "../../" }),
+                    iif(
+                        () => action.payload.redirect,
+                        of(
+                            slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid }),
+                            appRedirectActions.redirect({ url: "../../" }),
+                        ),
+                        of(slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid })),
                     ),
                 ),
 

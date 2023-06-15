@@ -75,7 +75,7 @@ export const slice = createSlice({
             state.isFetchingDetail = false;
         },
 
-        deleteSchedulerJob: (state, action: PayloadAction<{ uuid: string }>) => {
+        deleteSchedulerJob: (state, action: PayloadAction<{ uuid: string; redirect: boolean }>) => {
             state.isDeleting = true;
         },
 

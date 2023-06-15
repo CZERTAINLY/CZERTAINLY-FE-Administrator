@@ -124,7 +124,7 @@ function SchedulerJobsList() {
             <PagedList
                 entity={EntityType.SCHEDULER}
                 onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(actions.deleteSchedulerJob({ uuid })))}
+                onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(actions.deleteSchedulerJob({ uuid, redirect: false })))}
                 headers={schedulerJobsRowHeaders}
                 data={schedulerJobList}
                 isBusy={isBusy}

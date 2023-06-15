@@ -47,7 +47,7 @@ export default function SchedulerJobDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!schedulerJob) return;
 
-        dispatch(actions.deleteSchedulerJob({ uuid: schedulerJob.uuid }));
+        dispatch(actions.deleteSchedulerJob({ uuid: schedulerJob.uuid, redirect: true }));
         setConfirmDelete(false);
     }, [schedulerJob, dispatch]);
 
