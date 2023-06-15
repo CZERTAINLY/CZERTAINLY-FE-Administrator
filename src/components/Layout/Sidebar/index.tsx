@@ -54,6 +54,8 @@ export default function Sidebar() {
                         ]}
                     />
 
+                    <LinksGroup _key="/scheduler" header="Scheduler" headerLink="/scheduler" />
+
                     <LinksGroup
                         _key="settings"
                         header="Settings"

@@ -46,6 +46,9 @@ export enum LockWidgetNameEnum {
     ListOfCustomAttributes,
     ListOfGlobalMetadata,
     AuditLogs,
+    ListOfScheduler,
+    ListOfSchedulerHistory,
+    SchedulerJobDetail,
 }
 
 export interface WidgetLockModel {

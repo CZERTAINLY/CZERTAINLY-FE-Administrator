@@ -49,4 +49,5 @@ export enum PlatformEnum {
     AttributeConstraintType = "AttributeConstraintType",
     AttributeValueTarget = "AttributeValueTarget",
     ProgrammingLanguageEnum = "ProgrammingLanguageEnum",
+    SchedulerJobExecutionStatus = "SchedulerJobExecutionStatus",
 }
