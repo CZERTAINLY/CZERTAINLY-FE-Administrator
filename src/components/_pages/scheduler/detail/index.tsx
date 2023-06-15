@@ -15,8 +15,8 @@ import { Badge, Container } from "reactstrap";
 import StatusBadge from "components/StatusBadge";
 import StatusCircle from "components/StatusCircle";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
-import SchedulerJobHistory from "./SchedulerJobHistory";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import SchedulerJobHistory from "./SchedulerJobHistory";
 
 export default function SchedulerJobDetail() {
     const dispatch = useDispatch();
@@ -114,7 +114,7 @@ export default function SchedulerJobDetail() {
                       },
                       {
                           id: "oneShot",
-                          columns: ["One Shot Only", <StatusCircle status={schedulerJob.oneShotOnly} />],
+                          columns: ["One Time Only", <StatusCircle status={schedulerJob.oneShotOnly} />],
                       },
                       {
                           id: "system",

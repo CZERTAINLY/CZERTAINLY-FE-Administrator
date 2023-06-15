@@ -11,7 +11,7 @@ import { Badge } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
 import { LockWidgetNameEnum } from "types/widget-locks";
-import { dateFormatter } from "utils/dateUtil";
+import { dateFormatter, timeFormatter } from "utils/dateUtil";
 
 interface Props {
     uuid: string;
@@ -38,6 +38,12 @@ function SchedulerJobHistory({ uuid }: Props) {
                 width: "auto",
             },
             {
+                content: "Duration",
+                sortable: true,
+                id: "duration",
+                width: "auto",
+            },
+            {
                 content: "Status",
                 sortable: true,
                 id: "status",
@@ -59,6 +65,9 @@ function SchedulerJobHistory({ uuid }: Props) {
                 columns: [
                     dateFormatter(history.startTime) ?? "",
                     dateFormatter(history.endTime) ?? "",
+                    history.startTime && history.endTime
+                        ? timeFormatter(new Date(history.endTime).valueOf() - new Date(history.startTime).valueOf())
+                        : "",
                     <Badge
                         color={
                             history.status === SchedulerJobExecutionStatus.Failed

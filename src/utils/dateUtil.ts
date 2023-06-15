@@ -1,12 +1,27 @@
-export function dateFormatter(date: any): string {
-    function leading0(s: string, count: number) {
-        while (s.length < count) {
-            s = "0" + s;
-        }
-
-        return s;
+function leading0(s: string, count: number) {
+    while (s.length < count) {
+        s = "0" + s;
     }
 
+    return s;
+}
+
+export function timeFormatter(date: any): string {
+    try {
+        const dateObj = new Date(date);
+
+        const hours = leading0(dateObj.getUTCHours().toString(), 2);
+        const minutes = leading0(dateObj.getMinutes().toString(), 2);
+        const seconds = leading0(dateObj.getSeconds().toString(), 2);
+
+        return `${hours}:${minutes}:${seconds}`;
+    } catch (error) {
+        console.debug("Unable to convert the given time to date object");
+        return date;
+    }
+}
+
+export function dateFormatter(date: any): string {
     try {
         const dateObj = new Date(date);
 
