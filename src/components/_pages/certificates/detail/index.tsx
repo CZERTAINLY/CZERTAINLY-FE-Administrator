@@ -1279,7 +1279,7 @@ export default function CertificateDetail() {
                                     widgetButtons={buttonsLocations}
                                     titleSize="large"
                                     refreshAction={certificate && getFreshCertificateLocations}
-                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                    widgetLockName={LockWidgetNameEnum.CertificationLocations}
                                 >
                                     <br />
                                     <CustomTable

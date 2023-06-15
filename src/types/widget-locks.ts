@@ -26,6 +26,7 @@ export const ErrorCodeDetailMap = {
 export enum LockWidgetNameEnum {
     ListOfCertificates,
     CertificateDetailsWidget,
+    CertificationLocations,
     ListOfKeys,
     keyDetails,
     DiscoveriesStore,

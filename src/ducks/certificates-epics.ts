@@ -4,7 +4,6 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 
 import * as slice from "./certificates";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
@@ -33,6 +32,7 @@ import {
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -282,16 +282,20 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
         filter(slice.actions.listCertificateLocations.match),
         switchMap((action) =>
             deps.apiClients.certificates.listCertificateLocations({ certificateUuid: action.payload.uuid }).pipe(
-                map((locations) =>
-                    slice.actions.listCertificateLocationsSuccess({
-                        certificateLocations: locations.map((location) => transformLocationResponseDtoToModel(location)),
-                    }),
+                switchMap((locations) =>
+                    of(
+                        slice.actions.listCertificateLocationsSuccess({
+                            certificateLocations: locations.map((location) => transformLocationResponseDtoToModel(location)),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificationLocations),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to list certificate locations" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationLocations),
                     ),
                 ),
             ),
