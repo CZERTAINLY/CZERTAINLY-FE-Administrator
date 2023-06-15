@@ -5,9 +5,11 @@ import { Badge, Container } from "reactstrap";
 
 import { actions, selectors } from "ducks/entities";
 
+import { ApiClients } from "api";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import { EntityType } from "ducks/filters";
+import { SearchRequestModel } from "types/certificate";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
 function EntityList() {
@@ -60,13 +62,15 @@ function EntityList() {
         [entities],
     );
 
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listEntities(filters)), [dispatch]);
+
     return (
         <Container className="themed-container" fluid>
             <PagedList
                 entity={EntityType.ENTITY}
-                listAction={actions.listEntities}
+                onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => uuids.map((uuid) => dispatch(actions.deleteEntity({ uuid })))}
-                getAvailableFiltersApi={useCallback((apiClients) => apiClients.entities.getSearchableFieldInformation2(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getSearchableFieldInformation2(), [])}
                 headers={entitiesRowHeaders}
                 data={entityList}
                 isBusy={isBusy}

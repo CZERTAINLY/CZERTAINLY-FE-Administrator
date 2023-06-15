@@ -22,6 +22,7 @@ import type {
     DiscoveryHistoryDetailDto,
     DiscoveryResponseDto,
     ErrorMessageDto,
+    ScheduleDiscoveryDto,
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     UuidDto,
@@ -52,6 +53,10 @@ export interface GetDiscoveryCertificatesRequest {
 
 export interface ListDiscoveriesRequest {
     searchRequestDto: SearchRequestDto;
+}
+
+export interface ScheduleDiscoveryRequest {
+    scheduleDiscoveryDto: ScheduleDiscoveryDto;
 }
 
 /**
@@ -220,6 +225,32 @@ export class DiscoveryManagementApi extends BaseAPI {
                 method: "POST",
                 headers,
                 body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Schedule Discovery
+     */
+    scheduleDiscovery({ scheduleDiscoveryDto }: ScheduleDiscoveryRequest): Observable<UuidDto>;
+    scheduleDiscovery({ scheduleDiscoveryDto }: ScheduleDiscoveryRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
+    scheduleDiscovery(
+        { scheduleDiscoveryDto }: ScheduleDiscoveryRequest,
+        opts?: OperationOpts,
+    ): Observable<UuidDto | AjaxResponse<UuidDto>> {
+        throwIfNullOrUndefined(scheduleDiscoveryDto, "scheduleDiscoveryDto", "scheduleDiscovery");
+
+        const headers: HttpHeaders = {
+            "Content-Type": "application/json",
+        };
+
+        return this.request<UuidDto>(
+            {
+                url: "/v1/discoveries/schedule",
+                method: "POST",
+                headers,
+                body: scheduleDiscoveryDto,
             },
             opts?.responseOpts,
         );

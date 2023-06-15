@@ -3,6 +3,7 @@ import Dialog from "components/Dialog";
 
 import { WidgetButtonProps } from "components/WidgetButtons";
 
+import { ApiClients } from "api";
 import PagedList from "components/PagedList/PagedList";
 import { actions, selectors } from "ducks/cryptographic-keys";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -13,11 +14,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Container } from "reactstrap";
+import { SearchRequestModel } from "types/certificate";
 import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
-import { LockWidgetNameEnum } from "types/widget-locks";
 function CryptographicKeyList() {
     const dispatch = useDispatch();
 
@@ -275,13 +277,18 @@ function CryptographicKeyList() {
         return options;
     }, [keyCompromiseReasonEnum]);
 
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCryptographicKeys(filters)), [dispatch]);
+
     return (
         <Container className="themed-container" fluid>
             <PagedList
                 entity={EntityType.KEY}
-                listAction={actions.listCryptographicKeys}
+                onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteCryptographicKeyItems({ uuids }))}
-                getAvailableFiltersApi={useCallback((apiClients) => apiClients.cryptographicKeys.getSearchableFieldInformation1(), [])}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.cryptographicKeys.getSearchableFieldInformation1(),
+                    [],
+                )}
                 additionalButtons={buttons}
                 headers={cryptographicKeysTableHeaders}
                 data={profilesTableData()}

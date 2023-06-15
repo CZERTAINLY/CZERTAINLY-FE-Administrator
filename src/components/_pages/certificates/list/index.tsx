@@ -13,8 +13,10 @@ import { Link } from "react-router-dom";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
+import { ApiClients } from "api";
 import PagedList from "components/PagedList/PagedList";
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
+import { SearchRequestModel } from "types/certificate";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
@@ -322,14 +324,19 @@ export default function CertificateList({
         [certificates, selectCertsOnly, certificateTypeEnum, users],
     );
 
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCertificates(filters)), [dispatch]);
+
     return (
         <Container className="themed-container" fluid>
             <PagedList
                 hideWidgetButtons={hideWidgetButtons}
                 entity={EntityType.CERTIFICATE}
-                listAction={actions.listCertificates}
+                onListCallback={onListCallback}
                 onDeleteCallback={(uuids, filters) => dispatch(actions.bulkDelete({ uuids, filters }))}
-                getAvailableFiltersApi={useCallback((apiClients) => apiClients.certificates.getSearchableFieldInformation4(), [])}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.certificates.getSearchableFieldInformation4(),
+                    [],
+                )}
                 additionalButtons={buttons}
                 headers={certificatesRowHeaders}
                 data={certificateList}

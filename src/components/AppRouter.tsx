@@ -94,6 +94,8 @@ import AppLogin from "./AppLogin/AppLogin";
 
 import AppRedirect from "./AppRedirect";
 
+import SchedulerJobDetail from "./_pages/scheduler/detail";
+import SchedulerJobsList from "./_pages/scheduler/list";
 import Layout from "./Layout";
 import Spinner from "./Spinner";
 
@@ -233,6 +235,10 @@ export default function AppRouter() {
 
                     <Route path="/platform" element={<PlatformSettingsDetail />} />
                     <Route path="/platform/edit" element={<PlatformSettingsEdit />} />
+
+                    <Route path="/scheduler" element={<SchedulerJobsList />} />
+                    <Route path="/scheduler/list" element={<Navigate to="/scheduler" />} />
+                    <Route path="/scheduler/detail/:id" element={<SchedulerJobDetail />} />
                 </Route>
 
                 {/*

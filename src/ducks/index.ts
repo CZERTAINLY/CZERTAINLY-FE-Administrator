@@ -9,12 +9,12 @@ import { initialState as initialScepProfilesState, slice as scepProfilesSlice } 
 import scepProfilesEpics from "./scep-profiles-epics";
 
 import { slice as alertsSlice, initialState as initialAlertsState } from "./alerts";
-import { slice as widgetLockSlice, initialState as initialWidgetLockState } from "./widget-locks";
 import { slice as appRedirectSlice, initialState as initialAppRedirectState } from "./app-redirect";
 import appRedirectEpics from "./app-redirect-epics";
 import { slice as auditLogsSlice, initialState as initialAuditLogsState } from "./auditLogs";
 import auditLogsEpics from "./auditLogs-epics";
 import { slice as authSlice, initialState as initialAuthState } from "./auth";
+import { initialState as initialWidgetLockState, slice as widgetLockSlice } from "./widget-locks";
 
 import authEpics from "./auth-epics";
 import { slice as authoritiesSlice, initialState as initialAuthoritiesState } from "./authorities";
@@ -55,6 +55,8 @@ import { initialState as initialRaProfilesState, slice as raProfilesSlice } from
 import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
 import rolesEpics from "./roles-epics";
+import { initialState as initialSchedulerState, slice as schedulerSlice } from "./scheduler";
+import schedulerEpics from "./scheduler-epics";
 import { initialState as initialSettingsState, slice as settingsSlice } from "./settings";
 import settingsEpics from "./settings-epics";
 import startupEpics from "./startup-epics";
@@ -110,6 +112,7 @@ export const initialState = {
     [customAttributesSlice.name]: initialCustomAttributesState,
     [globalMetadataSlice.name]: initialGlobalMetadataState,
     [settingsSlice.name]: initialSettingsState,
+    [schedulerSlice.name]: initialSchedulerState,
     [enumsSlice.name]: initialEnumsState,
     [tokenSlice.name]: initialTokenAttributesState,
     [tokenProfileSlice.name]: initialTokenProfileAttributesState,
@@ -148,6 +151,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [customAttributesSlice.name]: customAttributesSlice.reducer,
     [globalMetadataSlice.name]: globalMetadataSlice.reducer,
     [settingsSlice.name]: settingsSlice.reducer,
+    [schedulerSlice.name]: schedulerSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
@@ -184,6 +188,7 @@ export const epics = combineEpics(
     ...customAttributesEpics,
     ...globalMetadataEpics,
     ...settingsEpics,
+    ...schedulerEpics,
     ...enumsEpics,
     ...tokenEpics,
     ...tokenProfileEpics,

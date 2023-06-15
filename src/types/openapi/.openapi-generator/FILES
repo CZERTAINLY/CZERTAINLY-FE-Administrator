@@ -25,6 +25,7 @@ apis/LocationManagementApi.ts
 apis/RAProfileManagementApi.ts
 apis/RoleManagementApi.ts
 apis/SCEPProfileManagementApi.ts
+apis/ScheduledJobsManagementApi.ts
 apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
 apis/TokenInstanceControllerApi.ts
@@ -206,6 +207,7 @@ models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
 models/Pageable.ts
+models/PaginationRequestDto.ts
 models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
 models/ProgrammingLanguageEnum.ts
@@ -236,6 +238,13 @@ models/ScepProfileDetailDto.ts
 models/ScepProfileDto.ts
 models/ScepProfileEditRequestDto.ts
 models/ScepProfileRequestDto.ts
+models/ScheduleDiscoveryDto.ts
+models/ScheduledJobDetailDto.ts
+models/ScheduledJobDto.ts
+models/ScheduledJobHistoryDto.ts
+models/ScheduledJobHistoryResponseDto.ts
+models/ScheduledJobsResponseDto.ts
+models/SchedulerJobExecutionStatus.ts
 models/SearchCondition.ts
 models/SearchFieldDataByGroupDto.ts
 models/SearchFieldDataDto.ts

@@ -6,10 +6,12 @@ import { Badge, Container } from "reactstrap";
 import { actions, selectors } from "ducks/discoveries";
 import { EntityType } from "ducks/filters";
 
+import { ApiClients } from "api";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
-import DiscoveryStatus from "../DiscoveryStatus";
+import { SearchRequestModel } from "types/certificate";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import DiscoveryStatus from "../DiscoveryStatus";
 
 function DiscoveryList() {
     const dispatch = useDispatch();
@@ -76,13 +78,18 @@ function DiscoveryList() {
         [discoveries],
     );
 
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listDiscoveries(filters)), [dispatch]);
+
     return (
         <Container className="themed-container" fluid>
             <PagedList
                 entity={EntityType.DISCOVERY}
-                listAction={actions.listDiscoveries}
+                onListCallback={onListCallback}
                 onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
-                getAvailableFiltersApi={useCallback((apiClients) => apiClients.discoveries.getSearchableFieldInformation3(), [])}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation3(),
+                    [],
+                )}
                 headers={discoveriesRowHeaders}
                 data={discoveryList}
                 isBusy={isBusy}
