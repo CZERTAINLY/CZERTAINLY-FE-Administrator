@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { getAttributeContent } from "utils/attributes/attributes";
 
 export default function CustomAttributeDetail() {
@@ -32,14 +33,14 @@ export default function CustomAttributeDetail() {
 
     const getFreshCustomAttribute = useCallback(() => {
         if (!id) return;
-        if (!customAttribute || id !== customAttribute.uuid) {
-            dispatch(actions.getCustomAttribute(id));
-        }
+        dispatch(actions.getCustomAttribute(id));
     }, [dispatch, id]);
 
     useEffect(() => {
-        getFreshCustomAttribute();
-    }, [getFreshCustomAttribute, id]);
+        if (!customAttribute || id !== customAttribute.uuid) {
+            getFreshCustomAttribute();
+        }
+    }, [getFreshCustomAttribute, id, customAttribute]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${customAttribute?.uuid}`, { relative: "path" });
@@ -177,6 +178,7 @@ export default function CustomAttributeDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshCustomAttribute}
+                widgetLockName={LockWidgetNameEnum.CustomAttributeDetails}
             >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>

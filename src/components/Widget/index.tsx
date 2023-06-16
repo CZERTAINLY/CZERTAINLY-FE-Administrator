@@ -23,6 +23,7 @@ interface Props {
     widgetButtons?: WidgetButtonProps[];
     widgetExtraTopNode?: React.ReactNode;
     hideWidgetButtons?: boolean;
+    lockSize?: "small" | "normal" | "large";
 }
 
 function Widget({
@@ -38,6 +39,7 @@ function Widget({
     refreshAction,
     widgetExtraTopNode,
     hideWidgetButtons = false,
+    lockSize = "normal",
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
 
@@ -92,7 +94,7 @@ function Widget({
                     lockTitle={widgetLock.lockTitle}
                     lockText={widgetLock.lockText}
                     lockDetails={widgetLock.lockDetails}
-                    size="normal"
+                    size={lockSize}
                     lockType={widgetLock.lockType}
                 />
             ) : (

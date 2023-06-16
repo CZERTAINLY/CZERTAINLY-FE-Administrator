@@ -7,6 +7,7 @@ import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./compliance-profiles";
 import {
     transformComplianceProfileGroupListResponseDtoToModel,
@@ -19,7 +20,6 @@ import {
     transformComplianceProfileRuleDeleteRequestModelToDto,
     transformComplianceProfileRuleListResponseDtoToModel,
 } from "./transform/compliance-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -54,8 +54,13 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.complianceProfile.getComplianceProfile({ uuid: action.payload.uuid }).pipe(
-                map((detail) =>
-                    slice.actions.getComplianceProfileSuccess({ complianceProfile: transformComplianceProfileResponseDtoToModel(detail) }),
+                switchMap((detail) =>
+                    of(
+                        slice.actions.getComplianceProfileSuccess({
+                            complianceProfile: transformComplianceProfileResponseDtoToModel(detail),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ComplianceProfileDetails),
+                    ),
                 ),
 
                 catchError((error) =>
@@ -64,6 +69,7 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
                             error: extractError(error, "Failed to get Compliance Profile details"),
                         }),
                         appRedirectActions.fetchError({ error, message: "Failed to get Compliance Profile details" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
             ),
@@ -399,6 +405,7 @@ const getRules: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listComplianceRulesFailed({ error: extractError(error, "Failed to get compliance rules") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get compliance rules" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
             ),
@@ -419,6 +426,7 @@ const getGroups: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listComplianceGroupsFailed({ error: extractError(error, "Failed to get compliance groups") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get compliance groups" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
             ),

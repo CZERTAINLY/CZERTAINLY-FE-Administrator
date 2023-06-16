@@ -8,9 +8,9 @@ import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./users";
 import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { transformRoleResponseDtoToModel, transformUserDetailDtoToModel, transformUserUpdateRequestModelToDto } from "./transform/auth";
 import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from "./transform/users";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const list: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -43,16 +43,19 @@ const getDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getDetail.match),
         switchMap((action) =>
             deps.apiClients.users.getUser({ userUuid: action.payload.uuid }).pipe(
-                map((detail) =>
-                    slice.actions.getDetailSuccess({
-                        user: transformUserDetailDtoToModel(detail),
-                    }),
+                switchMap((detail) =>
+                    of(
+                        slice.actions.getDetailSuccess({
+                            user: transformUserDetailDtoToModel(detail),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.UserDetails),
+                    ),
                 ),
-
                 catchError((err) =>
                     of(
                         slice.actions.getDetailFailure({ error: extractError(err, "Failed to load user detail") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to load user detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.UserDetails),
                     ),
                 ),
             ),

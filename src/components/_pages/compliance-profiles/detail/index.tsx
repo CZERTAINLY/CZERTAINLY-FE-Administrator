@@ -19,6 +19,7 @@ import {
     ComplianceProfileResponseRuleRuleModel,
     ComplianceProfileRuleListResponseRuleModel,
 } from "types/complianceProfiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";
@@ -31,7 +32,8 @@ export default function ComplianceProfileDetail() {
 
     const profile = useSelector(selectors.complianceProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-
+    const isFetchingGroups = useSelector(selectors.isFetchingGroups);
+    const isFetchingRules = useSelector(selectors.isFetchingRules);
     const rules = useSelector(selectors.rules);
 
     const groups = useSelector(selectors.groups);
@@ -65,7 +67,7 @@ export default function ComplianceProfileDetail() {
         dispatch(actions.listComplianceGroups());
     }, [id, dispatch]);
 
-    const getCOmplianceRulesAndGroups = useCallback(() => {
+    const getComplianceRulesAndGroups = useCallback(() => {
         dispatch(actions.listComplianceRules());
         dispatch(actions.listComplianceGroups());
     }, [id, dispatch]);
@@ -798,13 +800,22 @@ export default function ComplianceProfileDetail() {
                         widgetButtons={buttons}
                         titleSize="large"
                         refreshAction={getFreshComplianceProfileDetails}
+                        widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+                        lockSize="large"
                     >
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
                 </Col>
 
                 <Col>
-                    <Widget title="Associated RA Profiles" busy={isFetchingDetail} widgetButtons={raProfileButtons} titleSize="large">
+                    <Widget
+                        title="Associated RA Profiles"
+                        busy={isFetchingDetail}
+                        widgetButtons={raProfileButtons}
+                        titleSize="large"
+                        widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+                        lockSize="large"
+                    >
                         <CustomTable headers={raProfileHeaders} data={raProfileData} />
                     </Widget>
 
@@ -818,7 +829,13 @@ export default function ComplianceProfileDetail() {
                 </Col>
             </Row>
 
-            <Widget title="Rules & Groups" busy={isFetchingDetail} titleSize="large" refreshAction={getCOmplianceRulesAndGroups}>
+            <Widget
+                title="Rules & Groups"
+                busy={isFetchingGroups || isFetchingRules}
+                titleSize="large"
+                refreshAction={profile && getComplianceRulesAndGroups}
+                widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+            >
                 <Row xs="1" sm="1" md="2" lg="2" xl="2">
                     <Col>
                         <Label>Filter by Selection</Label>

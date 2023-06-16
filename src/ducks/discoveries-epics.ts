@@ -8,6 +8,7 @@ import { actions as appRedirectActions } from "./app-redirect";
 import { actions as widgetLockActions } from "./widget-locks";
 
 import { store } from "index";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./discoveries";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
@@ -20,7 +21,6 @@ import {
     transformDiscoveryResponseDetailDtoToModel,
     transformDiscoveryResponseDtoToModel,
 } from "./transform/discoveries";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -54,14 +54,17 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.discoveries.getDiscovery({ uuid: action.payload.uuid }).pipe(
-                map((discoveryDto) =>
-                    slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDetailDtoToModel(discoveryDto) }),
+                switchMap((discoveryDto) =>
+                    of(
+                        slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDetailDtoToModel(discoveryDto) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.DiscoveryDetails),
+                    ),
                 ),
-
                 catchError((err) =>
                     of(
                         slice.actions.getDiscoveryDetailFailure({ error: extractError(err, "Failed to get Discovery detail") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveryDetails),
                     ),
                 ),
             ),

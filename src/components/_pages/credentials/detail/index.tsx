@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -135,6 +136,7 @@ function CredentialDetail() {
                 widgetButtons={widgetButtons}
                 titleSize="large"
                 refreshAction={getFreshCredentialDetails}
+                widgetLockName={LockWidgetNameEnum.CredentialDetails}
             >
                 <br />
 

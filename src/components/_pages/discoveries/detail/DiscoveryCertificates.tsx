@@ -37,12 +37,6 @@ export default function DiscoveryCertificates({ id }: Props) {
         [dispatch, id, newlyDiscovered],
     );
 
-    const discoveryCertificatesTitle = (
-        <h5>
-            <span className="fw-semi-bold">Discovered Certificates</span>
-        </h5>
-    );
-
     const discoveryCertificatesHeaders: TableHeader[] = useMemo(
         () => [
             {
