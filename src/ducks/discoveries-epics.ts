@@ -1,13 +1,14 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
-import { FunctionGroupCode } from "../types/openapi";
+import { FunctionGroupCode, UuidDto } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { actions as widgetLockActions } from "./widget-locks";
 
 import { store } from "index";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./discoveries";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
@@ -20,7 +21,6 @@ import {
     transformDiscoveryResponseDetailDtoToModel,
     transformDiscoveryResponseDtoToModel,
 } from "./transform/discoveries";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -145,13 +145,21 @@ const getDiscoveryCertificates: AppEpic = (action$, state, deps) => {
 const createDiscovery: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createDiscovery.match),
-        switchMap((action) =>
-            deps.apiClients.discoveries.createDiscovery({ discoveryDto: transformDiscoveryRequestModelToDto(action.payload) }).pipe(
-                mergeMap((obj) =>
-                    of(
-                        slice.actions.createDiscoverySuccess({ uuid: obj.uuid }),
-                        appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
-                    ),
+        switchMap((action) => {
+            const url = action.payload.scheduled ? "../../scheduler/detail/" : "../detail/";
+            return iif(
+                () => action.payload.scheduled,
+                deps.apiClients.discoveries.scheduleDiscovery({
+                    scheduleDiscoveryDto: {
+                        jobName: action.payload.jobName,
+                        cronExpression: action.payload.cronExpression,
+                        request: transformDiscoveryRequestModelToDto(action.payload.request),
+                    },
+                }),
+                deps.apiClients.discoveries.createDiscovery({ discoveryDto: transformDiscoveryRequestModelToDto(action.payload.request) }),
+            ).pipe(
+                mergeMap((obj: UuidDto) =>
+                    of(slice.actions.createDiscoverySuccess({ uuid: obj.uuid }), appRedirectActions.redirect({ url: `${url}${obj.uuid}` })),
                 ),
 
                 catchError((err) =>
@@ -160,8 +168,8 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
                         appRedirectActions.fetchError({ error: err, message: "Failed to create discovery" }),
                     ),
                 ),
-            ),
-        ),
+            );
+        }),
     );
 };
 

@@ -1,4 +1,6 @@
 import AttributeEditor from "components/Attributes/AttributeEditor";
+import SwitchField from "components/Input/SwitchField";
+import TextField from "components/Input/TextField";
 import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
@@ -27,6 +29,9 @@ interface FormValues {
     name: string | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
     storeKind: { value: string; label: string } | undefined;
+    jobName: string | undefined;
+    cronExpression: string | undefined;
+    scheduled: boolean;
 }
 
 export default function DiscoveryForm() {
@@ -103,15 +108,20 @@ export default function DiscoveryForm() {
         (values: FormValues, form: any) => {
             dispatch(
                 discoveryActions.createDiscovery({
-                    name: values.name!,
-                    connectorUuid: values.discoveryProvider!.value,
-                    kind: values.storeKind?.value!,
-                    attributes: collectFormAttributes(
-                        "discovery",
-                        [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                        values,
-                    ),
-                    customAttributes: collectFormAttributes("customDiscovery", resourceCustomAttributes, values),
+                    request: {
+                        name: values.name!,
+                        connectorUuid: values.discoveryProvider!.value,
+                        kind: values.storeKind?.value!,
+                        attributes: collectFormAttributes(
+                            "discovery",
+                            [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                            values,
+                        ),
+                        customAttributes: collectFormAttributes("customDiscovery", resourceCustomAttributes, values),
+                    },
+                    scheduled: values.scheduled,
+                    jobName: values.jobName,
+                    cronExpression: values.cronExpression,
                 }),
             );
         },
@@ -196,6 +206,15 @@ export default function DiscoveryForm() {
                                 </FormGroup>
                             )}
                         </Field>
+
+                        <SwitchField id="scheduled" label="Scheduled Job" />
+
+                        {values.scheduled && (
+                            <>
+                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumeric()]} />
+                                <TextField id="cronExpression" label="Cron Expression" validators={[validateRequired()]} />
+                            </>
+                        )}
 
                         {discoveryProvider ? (
                             <Field name="storeKind" validate={validateRequired()}>
