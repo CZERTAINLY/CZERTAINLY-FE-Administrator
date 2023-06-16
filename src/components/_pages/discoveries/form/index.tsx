@@ -25,6 +25,8 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
+import { parseExpression } from "cron-parser";
+
 interface FormValues {
     name: string | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
@@ -152,11 +154,36 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
+    const getCronExpression = useCallback((cronExpression: string | undefined) => {
+        if (cronExpression) {
+            try {
+                return parseExpression(cronExpression ?? "")
+                    .next()
+                    .toString();
+            } catch (err) {}
+        }
+        return "";
+    }, []);
+
     return (
         <Widget title="Add discovery" busy={isBusy}>
             <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
+                        <SwitchField id="scheduled" label="Scheduled Job" />
+
+                        {values.scheduled && (
+                            <>
+                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumeric()]} />
+                                <TextField
+                                    id="cronExpression"
+                                    label="Cron Expression"
+                                    validators={[validateRequired()]}
+                                    description={getCronExpression(values.cronExpression)}
+                                />
+                            </>
+                        )}
+
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -206,15 +233,6 @@ export default function DiscoveryForm() {
                                 </FormGroup>
                             )}
                         </Field>
-
-                        <SwitchField id="scheduled" label="Scheduled Job" />
-
-                        {values.scheduled && (
-                            <>
-                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumeric()]} />
-                                <TextField id="cronExpression" label="Cron Expression" validators={[validateRequired()]} />
-                            </>
-                        )}
 
                         {discoveryProvider ? (
                             <Field name="storeKind" validate={validateRequired()}>
