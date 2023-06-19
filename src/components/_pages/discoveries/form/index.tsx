@@ -166,10 +166,10 @@ export default function DiscoveryForm() {
     }, []);
 
     return (
-        <Widget title="Add discovery" busy={isBusy}>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
+        <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+            {({ handleSubmit, pristine, submitting, values, valid, form }) => (
+                <BootstrapForm onSubmit={handleSubmit}>
+                    <Widget title="Scheduled Job">
                         <SwitchField id="scheduled" label="Scheduled Job" />
 
                         {values.scheduled && (
@@ -183,7 +183,9 @@ export default function DiscoveryForm() {
                                 />
                             </>
                         )}
+                    </Widget>
 
+                    <Widget title="Add discovery" busy={isBusy}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -320,9 +322,9 @@ export default function DiscoveryForm() {
                                 </ButtonGroup>
                             </div>
                         }
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                    </Widget>
+                </BootstrapForm>
+            )}
+        </Form>
     );
 }
