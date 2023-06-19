@@ -1,4 +1,6 @@
 import AttributeEditor from "components/Attributes/AttributeEditor";
+import SwitchField from "components/Input/SwitchField";
+import TextField from "components/Input/TextField";
 import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
@@ -23,10 +25,16 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
+import { parseExpression } from "cron-parser";
+import { dateFormatter } from "utils/dateUtil";
+
 interface FormValues {
     name: string | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
     storeKind: { value: string; label: string } | undefined;
+    jobName: string | undefined;
+    cronExpression: string | undefined;
+    scheduled: boolean;
 }
 
 export default function DiscoveryForm() {
@@ -103,15 +111,20 @@ export default function DiscoveryForm() {
         (values: FormValues, form: any) => {
             dispatch(
                 discoveryActions.createDiscovery({
-                    name: values.name!,
-                    connectorUuid: values.discoveryProvider!.value,
-                    kind: values.storeKind?.value!,
-                    attributes: collectFormAttributes(
-                        "discovery",
-                        [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                        values,
-                    ),
-                    customAttributes: collectFormAttributes("customDiscovery", resourceCustomAttributes, values),
+                    request: {
+                        name: values.name!,
+                        connectorUuid: values.discoveryProvider!.value,
+                        kind: values.storeKind?.value!,
+                        attributes: collectFormAttributes(
+                            "discovery",
+                            [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                            values,
+                        ),
+                        customAttributes: collectFormAttributes("customDiscovery", resourceCustomAttributes, values),
+                    },
+                    scheduled: values.scheduled,
+                    jobName: values.jobName,
+                    cronExpression: values.cronExpression,
                 }),
             );
         },
@@ -142,11 +155,51 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
+    const getCronExpression = useCallback((cronExpression: string | undefined) => {
+        if (cronExpression) {
+            try {
+                const times = [];
+                const expression = parseExpression(cronExpression ?? "", { iterator: true });
+                for (let i = 0; i < 5; i++) {
+                    const value = expression.next().value;
+                    times.push(value.toDate());
+                }
+                return (
+                    <>
+                        Next five executions:{" "}
+                        <ul>
+                            {times.map((t) => (
+                                <li key={t.toString()}>{dateFormatter(t)}</li>
+                            ))}
+                        </ul>
+                    </>
+                );
+            } catch (err) {}
+        }
+        return "";
+    }, []);
+
     return (
-        <Widget title="Add discovery" busy={isBusy}>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
+        <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+            {({ handleSubmit, pristine, submitting, values, valid, form }) => (
+                <BootstrapForm onSubmit={handleSubmit}>
+                    <Widget title="Scheduled Job">
+                        <SwitchField id="scheduled" label="Scheduled Job" />
+
+                        {values.scheduled && (
+                            <>
+                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumeric()]} />
+                                <TextField
+                                    id="cronExpression"
+                                    label="Cron Expression"
+                                    validators={[validateRequired()]}
+                                    description={getCronExpression(values.cronExpression)}
+                                />
+                            </>
+                        )}
+                    </Widget>
+
+                    <Widget title="Add discovery" busy={isBusy}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -283,9 +336,9 @@ export default function DiscoveryForm() {
                                 </ButtonGroup>
                             </div>
                         }
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                    </Widget>
+                </BootstrapForm>
+            )}
+        </Form>
     );
 }
