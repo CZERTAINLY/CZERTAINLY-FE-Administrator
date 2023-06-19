@@ -26,6 +26,7 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
 
 import { parseExpression } from "cron-parser";
+import { dateFormatter } from "utils/dateUtil";
 
 interface FormValues {
     name: string | undefined;
@@ -157,9 +158,22 @@ export default function DiscoveryForm() {
     const getCronExpression = useCallback((cronExpression: string | undefined) => {
         if (cronExpression) {
             try {
-                return parseExpression(cronExpression ?? "")
-                    .next()
-                    .toString();
+                const times = [];
+                const expression = parseExpression(cronExpression ?? "", { iterator: true });
+                for (let i = 0; i < 5; i++) {
+                    const value = expression.next().value;
+                    times.push(value.toDate());
+                }
+                return (
+                    <>
+                        Next five executions:{" "}
+                        <ul>
+                            {times.map((t) => (
+                                <li key={t.toString()}>{dateFormatter(t)}</li>
+                            ))}
+                        </ul>
+                    </>
+                );
             } catch (err) {}
         }
         return "";
