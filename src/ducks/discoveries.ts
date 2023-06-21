@@ -139,7 +139,13 @@ export const slice = createSlice({
 
         createDiscovery: (
             state,
-            action: PayloadAction<{ scheduled: boolean; jobName?: string; cronExpression?: string; request: DiscoveryRequestModel }>,
+            action: PayloadAction<{
+                scheduled: boolean;
+                jobName?: string;
+                cronExpression?: string;
+                oneTime?: boolean;
+                request: DiscoveryRequestModel;
+            }>,
         ) => {
             state.isCreating = true;
         },

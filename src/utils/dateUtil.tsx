@@ -1,3 +1,5 @@
+import { parseExpression } from "cron-parser";
+
 function leading0(s: string, count: number) {
     while (s.length < count) {
         s = "0" + s;
@@ -48,3 +50,39 @@ export function dateFormatter(date: any): string {
         return date;
     }
 }
+
+const getCronTimes = (cronExpression: string | undefined) => {
+    if (cronExpression) {
+        try {
+            const times = [];
+            const expression = parseExpression(cronExpression ?? "", { iterator: true });
+            for (let i = 0; i < 5; i++) {
+                const value = expression.next().value;
+                times.push(value.toDate());
+            }
+            return times;
+        } catch (err) {}
+    }
+    return undefined;
+};
+
+export const getCronExpression = (cronExpression: string | undefined) => {
+    const times = getCronTimes(cronExpression);
+    return times ? (
+        <>
+            Next five executions:
+            <ul>
+                {times.map((t) => (
+                    <li key={t.toString()}>{dateFormatter(t)}</li>
+                ))}
+            </ul>
+        </>
+    ) : (
+        ""
+    );
+};
+
+export const getCronExpressionString = (cronExpression: string | undefined) => {
+    const times = getCronTimes(cronExpression);
+    return times ? `Next five executions:\n${times.map((t) => dateFormatter(t) + "\n").join("")}` : "";
+};

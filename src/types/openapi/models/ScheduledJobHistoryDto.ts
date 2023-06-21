@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { SchedulerJobExecutionStatus } from "./";
+import type { Resource, SchedulerJobExecutionStatus } from "./";
 
 /**
  * Scheduled job history
@@ -43,9 +43,20 @@ export interface ScheduledJobHistoryDto {
      */
     status: SchedulerJobExecutionStatus;
     /**
-     * Error message if triggered task failed
+     * Message explaining result status
      * @type {string}
      * @memberof ScheduledJobHistoryDto
      */
-    errorMessage?: string;
+    resultMessage?: string;
+    /**
+     * @type {Resource}
+     * @memberof ScheduledJobHistoryDto
+     */
+    resultObjectType?: Resource;
+    /**
+     * Result object identification (UUID)
+     * @type {Array<string>}
+     * @memberof ScheduledJobHistoryDto
+     */
+    resultObjectIdentification?: Array<string>;
 }

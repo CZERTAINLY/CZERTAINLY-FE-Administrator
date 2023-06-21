@@ -12,10 +12,10 @@ import { useParams } from "react-router-dom";
 
 import { Badge, Container } from "reactstrap";
 
-import StatusBadge from "components/StatusBadge";
-import StatusCircle from "components/StatusCircle";
+import SwitchField from "components/Input/SwitchField";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import { getCronExpressionString } from "utils/dateUtil";
 import SchedulerJobHistory from "./SchedulerJobHistory";
 
 export default function SchedulerJobDetail() {
@@ -109,20 +109,20 @@ export default function SchedulerJobDetail() {
                           columns: ["Name", schedulerJob.jobName],
                       },
                       {
-                          id: "className",
-                          columns: ["Class Name", schedulerJob.jobClassName ?? ""],
+                          id: "jobType",
+                          columns: ["Job Type", schedulerJob.jobType ?? ""],
                       },
                       {
-                          id: "oneShot",
-                          columns: ["One Time Only", <StatusCircle status={schedulerJob.oneShotOnly} />],
+                          id: "oneTime",
+                          columns: ["One Time Only", <SwitchField label="" viewOnly={{ checked: schedulerJob.oneTime }} id="oneTime" />],
                       },
                       {
                           id: "system",
-                          columns: ["System Job", <StatusCircle status={schedulerJob.system} />],
+                          columns: ["System Job", <SwitchField label="" viewOnly={{ checked: schedulerJob.system }} id="system" />],
                       },
                       {
                           id: "enabled",
-                          columns: ["Enabled", <StatusBadge enabled={schedulerJob.enabled} />],
+                          columns: ["Enabled", <SwitchField label="" viewOnly={{ checked: schedulerJob.enabled }} id="enabled" />],
                       },
                       {
                           id: "status",
@@ -143,7 +143,13 @@ export default function SchedulerJobDetail() {
                       },
                       {
                           id: "cron",
-                          columns: ["Cron Expression", schedulerJob.cronExpression],
+                          columns: [
+                              "Cron Expression",
+                              <>
+                                  {schedulerJob.cronExpression}&nbsp;
+                                  <i className="fa fa-info-circle" title={getCronExpressionString(schedulerJob.cronExpression)}></i>
+                              </>,
+                          ],
                       },
                   ],
         [schedulerJob, schedulerJobExecutionStatusEnum],
