@@ -149,13 +149,14 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createDiscovery.match),
         switchMap((action) => {
-            const url = action.payload.scheduled ? "../../scheduler/detail/" : "../detail/";
+            const url = action.payload.scheduled ? "../../jobs/detail/" : "../detail/";
             return iif(
                 () => action.payload.scheduled,
                 deps.apiClients.discoveries.scheduleDiscovery({
                     scheduleDiscoveryDto: {
                         jobName: action.payload.jobName,
                         cronExpression: action.payload.cronExpression,
+                        oneTime: action.payload.oneTime,
                         request: transformDiscoveryRequestModelToDto(action.payload.request),
                     },
                 }),

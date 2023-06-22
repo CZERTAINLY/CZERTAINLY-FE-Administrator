@@ -22,11 +22,9 @@ import { FunctionGroupCode, Resource } from "types/openapi";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
+import { getCronExpression } from "utils/dateUtil";
 
 import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
-
-import { parseExpression } from "cron-parser";
-import { dateFormatter } from "utils/dateUtil";
 
 interface FormValues {
     name: string | undefined;
@@ -35,6 +33,7 @@ interface FormValues {
     jobName: string | undefined;
     cronExpression: string | undefined;
     scheduled: boolean;
+    oneTime: boolean;
 }
 
 export default function DiscoveryForm() {
@@ -125,6 +124,7 @@ export default function DiscoveryForm() {
                     scheduled: values.scheduled,
                     jobName: values.jobName,
                     cronExpression: values.cronExpression,
+                    oneTime: values.oneTime,
                 }),
             );
         },
@@ -155,37 +155,18 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
-    const getCronExpression = useCallback((cronExpression: string | undefined) => {
-        if (cronExpression) {
-            try {
-                const times = [];
-                const expression = parseExpression(cronExpression ?? "", { iterator: true });
-                for (let i = 0; i < 5; i++) {
-                    const value = expression.next().value;
-                    times.push(value.toDate());
-                }
-                return (
-                    <>
-                        Next five executions:{" "}
-                        <ul>
-                            {times.map((t) => (
-                                <li key={t.toString()}>{dateFormatter(t)}</li>
-                            ))}
-                        </ul>
-                    </>
-                );
-            } catch (err) {}
-        }
-        return "";
-    }, []);
-
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                 <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget title="Scheduled Job">
-                        <SwitchField id="scheduled" label="Scheduled Job" />
-
+                    <Widget
+                        title="Schedule"
+                        widgetExtraTopNode={
+                            <div className="ms-2">
+                                <SwitchField id="scheduled" label="" />
+                            </div>
+                        }
+                    >
                         {values.scheduled && (
                             <>
                                 <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumeric()]} />
@@ -195,6 +176,7 @@ export default function DiscoveryForm() {
                                     validators={[validateRequired()]}
                                     description={getCronExpression(values.cronExpression)}
                                 />
+                                <SwitchField id="oneTime" label="One Time Only" />
                             </>
                         )}
                     </Widget>

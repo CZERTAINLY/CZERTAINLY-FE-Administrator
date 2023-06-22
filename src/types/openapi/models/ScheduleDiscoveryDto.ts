@@ -29,6 +29,11 @@ export interface ScheduleDiscoveryDto {
      */
     cronExpression?: string;
     /**
+     * @type {boolean}
+     * @memberof ScheduleDiscoveryDto
+     */
+    oneTime?: boolean;
+    /**
      * @type {DiscoveryDto}
      * @memberof ScheduleDiscoveryDto
      */

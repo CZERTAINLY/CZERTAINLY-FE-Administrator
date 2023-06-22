@@ -32,6 +32,12 @@ export interface ScheduledJobDto {
      */
     jobName: string;
     /**
+     * Type of scheduled job (job processor name)
+     * @type {string}
+     * @memberof ScheduledJobDto
+     */
+    jobType: string;
+    /**
      * CRON expression representing configuration of pattern how to run scheduled job
      * @type {string}
      * @memberof ScheduledJobDto
@@ -48,7 +54,13 @@ export interface ScheduledJobDto {
      * @type {boolean}
      * @memberof ScheduledJobDto
      */
-    oneShotOnly: boolean;
+    oneTime: boolean;
+    /**
+     * Is system scheduled job
+     * @type {boolean}
+     * @memberof ScheduledJobDto
+     */
+    system: boolean;
     /**
      * @type {SchedulerJobExecutionStatus}
      * @memberof ScheduledJobDto

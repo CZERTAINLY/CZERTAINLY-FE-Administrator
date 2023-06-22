@@ -3,16 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
 
-import { selectors as enumSelectors } from "ducks/enums";
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { EntityType } from "ducks/filters";
 import { selectors as pagingSelectors } from "ducks/paging";
 import { actions, selectors } from "ducks/scheduler";
 
+import BooleanBadge from "components/BooleanBadge/BooleanBadge";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
-import StatusBadge from "components/StatusBadge";
 import { WidgetButtonProps } from "components/WidgetButtons";
-import { getEnumLabel } from "ducks/enums";
 import { SearchRequestModel } from "types/certificate";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
 import { LockWidgetNameEnum } from "types/widget-locks";
@@ -73,10 +72,10 @@ function SchedulerJobsList() {
                 width: "auto",
             },
             {
-                content: "Enabled",
+                content: "Job Type",
                 sortable: true,
                 sort: "asc",
-                id: "enabled",
+                id: "jobtype",
                 width: "auto",
             },
             {
@@ -86,7 +85,30 @@ function SchedulerJobsList() {
             },
             {
                 content: "Last Execution Status",
+                sortable: true,
+                sort: "asc",
                 id: "status",
+                width: "auto",
+            },
+            {
+                content: "System",
+                sortable: true,
+                sort: "asc",
+                id: "system",
+                width: "auto",
+            },
+            {
+                content: "One Time Only",
+                sortable: true,
+                sort: "asc",
+                id: "onetime",
+                width: "auto",
+            },
+            {
+                content: "Enabled",
+                sortable: true,
+                sort: "asc",
+                id: "enabled",
                 width: "auto",
             },
         ],
@@ -99,7 +121,7 @@ function SchedulerJobsList() {
                 id: schedulerJob.uuid,
                 columns: [
                     <Link to={`./detail/${schedulerJob.uuid}`}>{schedulerJob.jobName}</Link>,
-                    <StatusBadge enabled={schedulerJob.enabled} />,
+                    schedulerJob.jobType,
                     schedulerJob.cronExpression,
                     <Badge
                         color={
@@ -112,6 +134,9 @@ function SchedulerJobsList() {
                     >
                         {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}
                     </Badge>,
+                    <BooleanBadge value={schedulerJob.system} />,
+                    <BooleanBadge value={schedulerJob.oneTime} />,
+                    <BooleanBadge value={schedulerJob.enabled} />,
                 ],
             })),
         [schedulerJobs, schedulerJobExecutionStatusEnum],

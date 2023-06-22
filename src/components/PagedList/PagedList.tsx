@@ -31,6 +31,7 @@ interface Props {
     additionalButtons?: WidgetButtonProps[];
     pageWidgetLockName?: LockWidgetNameEnum;
     hideWidgetButtons?: boolean;
+    hasCheckboxes?: boolean;
 }
 
 function PagedList({
@@ -50,6 +51,7 @@ function PagedList({
     additionalButtons,
     pageWidgetLockName,
     hideWidgetButtons = false,
+    hasCheckboxes = true,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -152,7 +154,7 @@ function PagedList({
                 <CustomTable
                     headers={headers}
                     data={data}
-                    hasCheckboxes={true}
+                    hasCheckboxes={hasCheckboxes}
                     hasPagination={true}
                     multiSelect={multiSelect}
                     paginationData={paginationData}
