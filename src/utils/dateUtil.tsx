@@ -84,5 +84,5 @@ export const getCronExpression = (cronExpression: string | undefined) => {
 
 export const getCronExpressionString = (cronExpression: string | undefined) => {
     const times = getCronTimes(cronExpression);
-    return times ? `Next five executions:\n${times.map((t) => dateFormatter(t) + "\n").join("")}` : "";
+    return times ? `Next five executions:\n${times.map((t, i) => (i > 0 ? "\n" : "") + dateFormatter(t)).join("")}` : "";
 };
