@@ -72,30 +72,16 @@ function SchedulerJobsList() {
                 width: "auto",
             },
             {
-                content: "System",
+                content: "Job Type",
                 sortable: true,
                 sort: "asc",
-                id: "system",
-                width: "auto",
-            },
-            {
-                content: "Enabled",
-                sortable: true,
-                sort: "asc",
-                id: "enabled",
+                id: "jobtype",
                 width: "auto",
             },
             {
                 content: "Cron Expression",
                 id: "cron",
                 width: "60%",
-            },
-            {
-                content: "One Time Only",
-                sortable: true,
-                sort: "asc",
-                id: "onetime",
-                width: "auto",
             },
             {
                 content: "Last Execution Status",
@@ -105,10 +91,24 @@ function SchedulerJobsList() {
                 width: "auto",
             },
             {
-                content: "Job Type",
+                content: "System",
                 sortable: true,
                 sort: "asc",
-                id: "jobtype",
+                id: "system",
+                width: "auto",
+            },
+            {
+                content: "One Time Only",
+                sortable: true,
+                sort: "asc",
+                id: "onetime",
+                width: "auto",
+            },
+            {
+                content: "Enabled",
+                sortable: true,
+                sort: "asc",
+                id: "enabled",
                 width: "auto",
             },
         ],
@@ -121,10 +121,8 @@ function SchedulerJobsList() {
                 id: schedulerJob.uuid,
                 columns: [
                     <Link to={`./detail/${schedulerJob.uuid}`}>{schedulerJob.jobName}</Link>,
-                    <BooleanBadge value={schedulerJob.system} />,
-                    <BooleanBadge value={schedulerJob.enabled} />,
+                    schedulerJob.jobType,
                     schedulerJob.cronExpression,
-                    <BooleanBadge value={schedulerJob.oneTime} />,
                     <Badge
                         color={
                             schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
@@ -136,7 +134,9 @@ function SchedulerJobsList() {
                     >
                         {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}
                     </Badge>,
-                    schedulerJob.jobType,
+                    <BooleanBadge value={schedulerJob.system} />,
+                    <BooleanBadge value={schedulerJob.oneTime} />,
+                    <BooleanBadge value={schedulerJob.enabled} />,
                 ],
             })),
         [schedulerJobs, schedulerJobExecutionStatusEnum],

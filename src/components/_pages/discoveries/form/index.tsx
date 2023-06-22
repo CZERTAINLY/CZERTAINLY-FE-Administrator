@@ -162,7 +162,7 @@ export default function DiscoveryForm() {
                     <Widget
                         title="Schedule"
                         widgetExtraTopNode={
-                            <div className="ms-auto">
+                            <div className="ms-2">
                                 <SwitchField id="scheduled" label="" />
                             </div>
                         }

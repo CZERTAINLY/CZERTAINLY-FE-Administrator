@@ -8,7 +8,7 @@ import { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import PagedList from "components/PagedList/PagedList";
 import { EntityType } from "ducks/filters";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Badge, Button } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
@@ -21,6 +21,7 @@ interface Props {
 
 function SchedulerJobHistory({ uuid }: Props) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const schedulerJobHistory = useSelector(selectors.schedulerJobHistory);
     const schedulerJobExecutionStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SchedulerJobExecutionStatus));
@@ -54,11 +55,6 @@ function SchedulerJobHistory({ uuid }: Props) {
                 id: "status",
                 width: "auto",
             },
-            {
-                content: "Result",
-                id: "result",
-                width: "auto",
-            },
         ],
         [],
     );
@@ -68,8 +64,8 @@ function SchedulerJobHistory({ uuid }: Props) {
             schedulerJobHistory.map((history) => ({
                 id: history.jobUuid ?? "",
                 columns: [
-                    dateFormatter(history.startTime) ?? "",
-                    dateFormatter(history.endTime) ?? "",
+                    history.startTime ? dateFormatter(history.startTime) : "",
+                    history.endTime ? dateFormatter(history.endTime) : "",
                     history.startTime && history.endTime
                         ? timeFormatter(new Date(history.endTime).valueOf() - new Date(history.startTime).valueOf())
                         : "",
@@ -89,6 +85,7 @@ function SchedulerJobHistory({ uuid }: Props) {
                             <Button
                                 color="white"
                                 size="sm"
+                                className="p-1"
                                 onClick={() => {
                                     setMessage(history.resultMessage ?? "");
                                     setShowMessage(true);
@@ -97,21 +94,28 @@ function SchedulerJobHistory({ uuid }: Props) {
                                 <i className="fa fa-info-circle"></i>
                             </Button>
                         )}
+                        {history.resultObjectType && history.resultObjectIdentification ? (
+                            <Button
+                                color="white"
+                                size="sm"
+                                className={history.resultMessage ? "p-0" : "p-1"}
+                                onClick={() => {
+                                    navigate(
+                                        `../../${history.resultObjectType}/detail/${history.resultObjectIdentification?.reduce(
+                                            (prev, curr) => prev + "/" + curr,
+                                        )}`,
+                                    );
+                                }}
+                            >
+                                <i className="fa fa-circle-arrow-right"></i>
+                            </Button>
+                        ) : (
+                            ""
+                        )}
                     </>,
-                    history.resultObjectType && history.resultObjectIdentification ? (
-                        <Link
-                            to={`../../${history.resultObjectType}/detail/${history.resultObjectIdentification.reduce(
-                                (prev, curr) => prev + "/" + curr,
-                            )}`}
-                        >
-                            <i className="fa fa-circle-arrow-right"></i>
-                        </Link>
-                    ) : (
-                        ""
-                    ),
                 ],
             })),
-        [schedulerJobHistory, schedulerJobExecutionStatusEnum],
+        [schedulerJobHistory, schedulerJobExecutionStatusEnum, navigate],
     );
 
     const onListCallback = useCallback(
