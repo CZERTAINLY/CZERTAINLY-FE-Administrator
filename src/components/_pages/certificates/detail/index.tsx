@@ -799,6 +799,19 @@ export default function CertificateDetail() {
                       columns: ["UUID", certificate.uuid, ""],
                   },
                   {
+                      id: "sourceCertificateUuid",
+                      columns: [
+                          "Source Certificate UUID",
+                          certificate.sourceCertificateUuid ? (
+                              <Link to={`../certificates/detail/${certificate.sourceCertificateUuid}`}>
+                                  {certificate.sourceCertificateUuid}
+                              </Link>
+                          ) : (
+                              ""
+                          ),
+                      ],
+                  },
+                  {
                       id: "owner",
                       columns: [
                           "Owner",
