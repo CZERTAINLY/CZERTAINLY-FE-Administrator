@@ -9,10 +9,10 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
-import { acmeAccountStatus } from "../acmeAccountStatus";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import { acmeAccountStatus } from "../acmeAccountStatus";
 
 export default function AcmeAccountList() {
     const dispatch = useDispatch();

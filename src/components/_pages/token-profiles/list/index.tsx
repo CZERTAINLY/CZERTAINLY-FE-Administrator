@@ -9,7 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import Select from "react-select";

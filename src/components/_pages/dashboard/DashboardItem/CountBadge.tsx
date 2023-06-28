@@ -1,5 +1,4 @@
 import Widget from "components/Widget";
-import { Link } from "react-router-dom";
 import { Col, Row } from "reactstrap";
 
 interface Props {

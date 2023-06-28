@@ -100,6 +100,7 @@ export const slice = createSlice({
         },
 
         getDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.role = undefined;
             state.isFetchingDetail = false;
         },
 
@@ -199,6 +200,7 @@ export const slice = createSlice({
         },
 
         getPermissionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.rolePermissions = undefined;
             state.isFetchingPermissions = false;
         },
 

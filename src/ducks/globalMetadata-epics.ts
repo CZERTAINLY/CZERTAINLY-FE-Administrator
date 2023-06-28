@@ -6,9 +6,10 @@ import { extractError } from "utils/net";
 import { Resource } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./globalMetadata";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import {
     transformConnectorMetadataResponseDtoToModel,
     transformGlobalMetadataCreateRequestModelToDto,
@@ -17,7 +18,6 @@ import {
     transformGlobalMetadataUpdateRequestModelToDto,
 } from "./transform/globalMetadata";
 import { transformNameAndUuidDtoToModel } from "./transform/locations";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listGlobalMetadata: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -102,13 +102,17 @@ const getGlobalMetadata: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getGlobalMetadata.match),
         switchMap((action) =>
             deps.apiClients.globalMetadata.getGlobalMetadata({ uuid: action.payload }).pipe(
-                map((globalMetadataDetail) =>
-                    slice.actions.getGlobalMetadataSuccess(transformGlobalMetadataDetailResponseDtoToModel(globalMetadataDetail)),
+                switchMap((globalMetadataDetail) =>
+                    of(
+                        slice.actions.getGlobalMetadataSuccess(transformGlobalMetadataDetailResponseDtoToModel(globalMetadataDetail)),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.GlobalMetadataDetails),
+                    ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getGlobalMetadataFailure({ error: extractError(err, "Failed to get global metadata detail") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get global metadata detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GlobalMetadataDetails),
                     ),
                 ),
             ),

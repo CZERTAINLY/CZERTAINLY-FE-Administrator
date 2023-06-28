@@ -221,4 +221,10 @@ export interface CertificateDetailDto {
      * @memberof CertificateDetailDto
      */
     key?: KeyDto;
+    /**
+     * Source certificate UUID
+     * @type {string}
+     * @memberof CertificateDetailDto
+     */
+    sourceCertificateUuid?: string;
 }

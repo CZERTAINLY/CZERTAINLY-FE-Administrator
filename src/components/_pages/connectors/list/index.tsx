@@ -8,12 +8,12 @@ import { actions, selectors } from "ducks/connectors";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { FunctionGroupModel } from "types/connectors";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function ConnectorList() {
     const dispatch = useDispatch();

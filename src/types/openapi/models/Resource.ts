@@ -23,6 +23,8 @@ export enum Resource {
     AuditLogs = "auditLogs",
     Credentials = "credentials",
     Connectors = "connectors",
+    Attributes = "attributes",
+    Jobs = "jobs",
     Users = "users",
     Roles = "roles",
     AcmeAccounts = "acmeAccounts",
@@ -39,5 +41,4 @@ export enum Resource {
     TokenProfiles = "tokenProfiles",
     Tokens = "tokens",
     Keys = "keys",
-    Attributes = "attributes",
 }

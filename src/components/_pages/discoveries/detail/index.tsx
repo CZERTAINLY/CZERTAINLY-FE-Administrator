@@ -12,6 +12,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Col, Container, Label, Row } from "reactstrap";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
@@ -144,6 +145,7 @@ export default function DiscoveryDetail() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshDiscoveryDetails}
+                widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
             >
                 <br />
 

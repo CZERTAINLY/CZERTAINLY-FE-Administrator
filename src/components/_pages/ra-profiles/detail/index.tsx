@@ -17,6 +17,7 @@ import { Col, Container, Label, Row } from "reactstrap";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
 import ProtocolActivationDialogBody, { Protocol } from "../ProtocolActivationDialogBody";
 
@@ -555,6 +556,8 @@ export default function RaProfileDetail() {
                         widgetButtons={buttons}
                         titleSize="large"
                         refreshAction={getFreshRaProfileDetail}
+                        widgetLockName={LockWidgetNameEnum.RaProfileDetails}
+                        lockSize="large"
                     >
                         <br />
 
@@ -567,13 +570,22 @@ export default function RaProfileDetail() {
                         widgetButtons={complianceProfileButtons}
                         titleSize="large"
                         refreshAction={getFreshComplianceRaProfileDetail}
+                        widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
+                        lockSize="large"
                     >
                         <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
                     </Widget>
                 </Col>
 
                 <Col>
-                    <Widget title="Attributes" busy={isBusy} titleSize="large" refreshAction={getFreshAttributes}>
+                    <Widget
+                        title="Attributes"
+                        busy={isBusy}
+                        titleSize="large"
+                        refreshAction={getFreshAttributes}
+                        widgetLockName={LockWidgetNameEnum.RaProfileDetails}
+                        lockSize="large"
+                    >
                         {!raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? (
                             <></>
                         ) : (
@@ -604,6 +616,7 @@ export default function RaProfileDetail() {
                 busy={isBusy || isWorkingWithProtocol}
                 titleSize="large"
                 refreshAction={getFreshAvailableProtocols}
+                widgetLockName={LockWidgetNameEnum.RaProfileDetails}
             >
                 <br />
 

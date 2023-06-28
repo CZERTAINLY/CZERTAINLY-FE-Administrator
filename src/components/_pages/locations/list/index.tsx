@@ -7,10 +7,12 @@ import { EntityType } from "ducks/filters";
 import { actions, selectors } from "ducks/locations";
 import { selectors as pagingSelectors } from "ducks/paging";
 
+import { ApiClients } from "api";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import StatusBadge from "components/StatusBadge";
 import { WidgetButtonProps } from "components/WidgetButtons";
+import { SearchRequestModel } from "types/certificate";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
 function LocationList() {
@@ -121,11 +123,13 @@ function LocationList() {
         [locations],
     );
 
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listLocations(filters)), [dispatch]);
+
     return (
         <Container className="themed-container" fluid>
             <PagedList
                 entity={EntityType.LOCATION}
-                listAction={actions.listLocations}
+                onListCallback={onListCallback}
                 onDeleteCallback={(uuids) =>
                     uuids.map((uuid) =>
                         dispatch(
@@ -136,7 +140,7 @@ function LocationList() {
                         ),
                     )
                 }
-                getAvailableFiltersApi={useCallback((apiClients) => apiClients.locations.getSearchableFieldInformation(), [])}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getSearchableFieldInformation(), [])}
                 headers={locationsRowHeaders}
                 data={locationList}
                 isBusy={isBusy}

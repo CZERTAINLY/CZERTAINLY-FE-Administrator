@@ -25,7 +25,7 @@ interface Props {
     onUpload: (data: {
         fileContent: string;
         customAttributes?: Array<AttributeRequestModel>;
-        certificate: CertificateDetailResponseModel;
+        certificate?: CertificateDetailResponseModel;
     }) => void;
     okButtonTitle?: string;
 }
@@ -58,7 +58,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                 onUpload({
                     fileContent: fileContent,
                     customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values),
-                    certificate: certificate!,
+                    certificate: certificate,
                 })
             }
             mutators={{ ...mutators<FormValues>() }}

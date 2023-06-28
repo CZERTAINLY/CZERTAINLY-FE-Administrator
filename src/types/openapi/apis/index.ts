@@ -24,6 +24,7 @@ export * from "./LocationManagementApi";
 export * from "./RAProfileManagementApi";
 export * from "./RoleManagementApi";
 export * from "./SCEPProfileManagementApi";
+export * from "./ScheduledJobsManagementApi";
 export * from "./SettingsApi";
 export * from "./StatisticsDashboardApi";
 export * from "./TokenInstanceControllerApi";

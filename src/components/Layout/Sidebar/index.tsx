@@ -8,7 +8,7 @@ export default function Sidebar() {
                 <ul>
                     <LinksGroup _key="/dashboard" header="Dashboard" headerLink="/dashboard" />
                     <LinksGroup _key="/certificates" header="Certificates" headerLink="/certificates" />
-                    <LinksGroup _key="/cryptographickeys" header="Keys" headerLink="/cryptographickeys" />
+                    <LinksGroup _key="/keys" header="Keys" headerLink="/keys" />
                     <LinksGroup _key="/discovery" header="Discoveries" headerLink="/discoveries" />
                     <LinksGroup _key="/connectors" header="Connectors" headerLink="/connectors" />
 
@@ -54,17 +54,19 @@ export default function Sidebar() {
                         ]}
                     />
 
+                    <LinksGroup _key="/jobs" header="Scheduler" headerLink="/jobs" />
+
                     <LinksGroup
                         _key="settings"
                         header="Settings"
                         childrenLinks={[
-                            { _key: "/platform", name: "Platform", link: "/platform" },
+                            { _key: "/settings", name: "Platform", link: "/settings" },
                             { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
                             { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
                         ]}
                     />
 
-                    <LinksGroup _key="/audit" header="Audit Logs" headerLink="/audit" />
+                    <LinksGroup _key="/auditlogs" header="Audit Logs" headerLink="/auditlogs" />
                 </ul>
             </div>
         </nav>

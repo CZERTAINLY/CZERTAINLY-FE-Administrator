@@ -148,6 +148,7 @@ export const slice = createSlice({
         },
 
         getCryptographicKeyDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingDetail = false;
             state.isSyncing = false;
         },
 

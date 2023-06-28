@@ -1,7 +1,7 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { actions, selectors } from "ducks/globalMetadata";
@@ -10,8 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
-import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
 
 export default function GlobalMetadataList() {
     const dispatch = useDispatch();

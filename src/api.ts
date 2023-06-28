@@ -23,6 +23,7 @@ import {
     RAProfileManagementApi,
     RoleManagementApi,
     SCEPProfileManagementApi,
+    ScheduledJobsManagementApi,
     SettingsApi,
     StatisticsDashboardApi,
     TokenProfileManagementApi,
@@ -63,6 +64,7 @@ export interface ApiClients {
     customAttributes: CustomAttributesApi;
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
+    scheduler: ScheduledJobsManagementApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
@@ -98,6 +100,7 @@ export const backendClient: ApiClients = {
     customAttributes: new CustomAttributesApi(configuration),
     globalMetadata: new GlobalMetadataApi(configuration),
     settings: new SettingsApi(configuration),
+    scheduler: new ScheduledJobsManagementApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),

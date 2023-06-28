@@ -1,14 +1,14 @@
 import { AppEpic } from "ducks";
 import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { updateBackendUtilsClients } from "../api";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./settings";
 import { transformSettingsPlatformDtoToModel } from "./transform/settings";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const getPlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(

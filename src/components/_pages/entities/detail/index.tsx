@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Container, Label } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -125,7 +126,14 @@ export default function EntityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title="Entity Details" busy={isBusy} widgetButtons={buttons} titleSize="large" refreshAction={getFreshEntityDetails}>
+            <Widget
+                title="Entity Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshEntityDetails}
+                widgetLockName={LockWidgetNameEnum.EntityDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />

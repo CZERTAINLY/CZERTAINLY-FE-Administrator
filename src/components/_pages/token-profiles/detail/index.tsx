@@ -17,6 +17,7 @@ import Select from "react-select";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Col, Container, Label, Row } from "reactstrap";
 import { KeyUsage, PlatformEnum, Resource } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function TokenProfileDetail() {
@@ -257,6 +258,8 @@ export default function TokenProfileDetail() {
                         widgetButtons={buttons}
                         titleSize="large"
                         refreshAction={getFreshTokenProfileDetails}
+                        widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
+                        lockSize="large"
                     >
                         <br />
 

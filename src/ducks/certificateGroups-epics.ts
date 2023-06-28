@@ -1,15 +1,15 @@
 import { AppEpic } from "ducks";
 import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./certificateGroups";
+import { actions as widgetLockActions } from "./widget-locks";
 
-import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 const listGroups: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -42,16 +42,20 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getGroupDetail.match),
         switchMap((action) =>
             deps.apiClients.certificateGroups.getGroup({ uuid: action.payload.uuid }).pipe(
-                map((groupDto) =>
-                    slice.actions.getGroupDetailSuccess({
-                        group: transformCertificateGroupResponseDtoToModel(groupDto),
-                    }),
+                switchMap((groupDto) =>
+                    of(
+                        slice.actions.getGroupDetailSuccess({
+                            group: transformCertificateGroupResponseDtoToModel(groupDto),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.GroupDetails),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getGroupDetailFailure({ error: extractError(err, "Failed to get Group detail") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get Group detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
                     ),
                 ),
             ),

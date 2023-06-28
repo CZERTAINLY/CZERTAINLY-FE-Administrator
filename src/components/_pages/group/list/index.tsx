@@ -7,7 +7,7 @@ import { actions, selectors } from "ducks/certificateGroups";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { Container } from "reactstrap";
 import { LockWidgetNameEnum } from "types/widget-locks";
 

@@ -105,6 +105,7 @@ function UserForm() {
 
     const [certUploadDialog, setCertUploadDialog] = useState(false);
     const [certToUpload, setCertToUpload] = useState<CertificateDetailResponseModel>();
+    const [certFileContent, setCertFileContent] = useState<string>();
 
     /* Load first page of certificates & all roles available */
 
@@ -226,7 +227,8 @@ function UserForm() {
                                         ? values.certificate.value
                                         : undefined
                                     : undefined,
-                            certificateData: values.inputType?.value === "upload" ? certToUpload?.certificateContent : undefined,
+                            certificateData:
+                                values.inputType?.value === "upload" ? certToUpload?.certificateContent ?? certFileContent : undefined,
                             customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
                         },
                     }),
@@ -243,7 +245,8 @@ function UserForm() {
                             email: values.email || undefined,
                             groupUuid: values.group?.value ?? undefined,
                             enabled: values.enabled,
-                            certificateData: values.inputType?.value === "upload" ? certToUpload?.certificateContent : undefined,
+                            certificateData:
+                                values.inputType?.value === "upload" ? certToUpload?.certificateContent ?? certFileContent : undefined,
                             certificateUuid:
                                 values.inputType?.value === "select"
                                     ? values.certificate
@@ -257,7 +260,7 @@ function UserForm() {
             }
         },
 
-        [user, certToUpload, dispatch, editMode, userRoles, resourceCustomAttributes],
+        [user, certToUpload, certFileContent, dispatch, editMode, userRoles, resourceCustomAttributes],
     );
 
     const onCancel = useCallback(() => {
@@ -523,6 +526,8 @@ function UserForm() {
                                     <div>
                                         {certToUpload ? (
                                             <CertificateAttributes certificate={certToUpload} />
+                                        ) : certFileContent ? (
+                                            <>Certificate to be uploaded selected.&nbsp;&nbsp;&nbsp;</>
                                         ) : (
                                             <>Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;</>
                                         )}
@@ -641,6 +646,7 @@ function UserForm() {
                         onCancel={() => setCertUploadDialog(false)}
                         onUpload={(data) => {
                             setCertToUpload(data.certificate);
+                            setCertFileContent(data.fileContent);
                             setCertUploadDialog(false);
                         }}
                     />

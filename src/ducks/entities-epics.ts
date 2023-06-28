@@ -6,17 +6,17 @@ import { extractError } from "utils/net";
 
 import { store } from "index";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./entities";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
+import { actions as widgetLockActions } from "./widget-locks";
 
 import { FunctionGroupCode } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
 import { transformEntityRequestModelToDto, transformEntityResponseDtoToModel } from "./transform/entities";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listEntityProviders: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -103,12 +103,18 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getEntityDetail.match),
         switchMap((action) =>
             deps.apiClients.entities.getEntityInstance({ entityUuid: action.payload.uuid }).pipe(
-                map((entity) => slice.actions.getEntityDetailSuccess({ entity: transformEntityResponseDtoToModel(entity) })),
+                switchMap((entity) =>
+                    of(
+                        slice.actions.getEntityDetailSuccess({ entity: transformEntityResponseDtoToModel(entity) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.EntityDetails),
+                    ),
+                ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getEntityDetailFailure({ error: extractError(error, "Failed to get Entity detail") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get Entity detail" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityDetails),
                     ),
                 ),
             ),
