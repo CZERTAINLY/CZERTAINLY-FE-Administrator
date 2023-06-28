@@ -27,6 +27,7 @@ import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
+import "reactflow/dist/style.css";
 
 import {
     Badge,
@@ -55,6 +56,9 @@ import Asn1Dialog from "../Asn1Dialog/Asn1Dialog";
 import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
+import FlowChart from "components/FlowChart";
+import { FlowChartType } from "types/flowchart";
+import { useFlowChartValues } from "utils/flowChart";
 import CertificateStatus from "../CertificateStatus";
 
 export default function CertificateDetail() {
@@ -129,6 +133,8 @@ export default function CertificateDetail() {
             isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
+
+    const [certificateNodes, certificateEdges] = useFlowChartValues(FlowChartType.CERTIFICATE);
 
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
@@ -1299,6 +1305,7 @@ export default function CertificateDetail() {
                 ]}
             />
 
+            <FlowChart flowChartTitle="Certficiate Flow" flowChartEdges={certificateEdges} flowChartNodes={certificateNodes} />
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Certificate"

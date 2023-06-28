@@ -1,3 +1,5 @@
+import { CustomNode } from "components/FlowChart";
+import { Edge } from "reactflow";
 import {
     CertificateBulkDeleteRequestDto,
     CertificateBulkDeleteRequestModel,
@@ -39,7 +41,7 @@ import {
     SearchRequestDto,
     SearchRequestModel,
 } from "types/certificate";
-import { CertificateComplianceCheckDto } from "../../types/openapi";
+import { CertificateComplianceCheckDto, UserDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
@@ -171,4 +173,211 @@ export function transformCertificateUploadModelToDto(upload: CertificateUploadMo
 
 export function transformCertificateComplianceCheckModelToDto(check: CertificateComplianceCheckModel): CertificateComplianceCheckDto {
     return { ...check };
+}
+
+export function transformCertifacetObjectToNodesAndEdges(certificate: CertificateDetailResponseModel, users: UserDto[]) {
+    const nodes: CustomNode[] = [];
+    const edges: Edge[] = [];
+
+    nodes.push({
+        id: "0",
+        type: "customFlowNode",
+        position: { x: 0, y: 0 },
+        data: {
+            entityType: "Root CA",
+            entityLabel: "Root Certificate Authority",
+            icon: "fa fa-sun",
+        },
+    });
+    edges.push({
+        id: "e0-1",
+        source: "0",
+        target: "6",
+        type: "smoothstep",
+
+        data: { edgeColor: "red" },
+    });
+
+    nodes.push({
+        id: "1",
+        type: "customFlowNode",
+        position: { x: 0, y: 0 },
+        data: {
+            entityType: "certificate",
+            entityLabel: certificate.commonName,
+            icon: "fa fa-certificate",
+            otherProperties: [
+                {
+                    propertyName: "Serial Number",
+                    propertyValue: certificate?.serialNumber || "NA",
+                },
+                {
+                    propertyName: "Subject DN",
+                    propertyValue: certificate?.subjectDn || "NA",
+                },
+                {
+                    propertyName: "certificateType",
+                    propertyValue: certificate?.certificateType || "NA",
+                },
+            ],
+        },
+    });
+    const user = users.find((u) => u.username === certificate?.owner);
+
+    if (certificate?.issuerCommonName) {
+        nodes.push({
+            id: "6",
+            type: "customFlowNode",
+            position: { x: 0, y: 0 },
+            data: {
+                entityType: "Certificate Issuer",
+                icon: "fa fa fa fa-stamp",
+                entityLabel: certificate?.issuerCommonName || "",
+                otherProperties: [
+                    {
+                        propertyName: "Issuer DN",
+                        propertyValue: certificate?.issuerDn || "NA",
+                    },
+                    {
+                        propertyName: "Issuer Sr. No.",
+                        propertyValue: certificate?.issuerSerialNumber || "NA",
+                    },
+                ],
+            },
+        });
+        edges.push({
+            id: "e1-6",
+            source: "6",
+            target: "1",
+            type: "smoothstep",
+            data: { edgeColor: "red" },
+        });
+    }
+
+    if (certificate?.key) {
+        nodes.push({
+            id: "4",
+            type: "customFlowNode",
+            position: { x: 0, y: 0 },
+            data: {
+                entityType: "key",
+                entityLabel: certificate?.key?.name || "",
+                icon: "fa fa fa-key",
+                handleHide: "target",
+                description: certificate?.key?.description || "",
+                redirectUrl:
+                    certificate?.key?.uuid && certificate?.key?.tokenInstanceUuid
+                        ? `/cryptographicKeys/detail/${certificate.key.tokenInstanceUuid}/${certificate.key.uuid}`
+                        : undefined,
+                otherProperties: [
+                    {
+                        propertyName: "Key Owner",
+                        propertyValue: certificate?.key?.owner || "NA",
+                    },
+                    {
+                        propertyName: "Key Token ProfileName",
+                        propertyValue: certificate?.key?.tokenProfileName || "NA",
+                    },
+                ],
+            },
+        });
+        edges.push({
+            id: "e1-4",
+            source: "4",
+            target: "1",
+            type: "smoothstep",
+            data: { edgeColor: "red" },
+        });
+    }
+
+    if (user) {
+        nodes.push({
+            id: "2",
+            type: "customFlowNode",
+            position: { x: 0, y: 0 },
+            data: {
+                entityType: "user",
+                icon: "fa fa fa-user",
+                handleHide: "source",
+                entityLabel: user?.username || "",
+                description: user?.description || "",
+                redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
+                otherProperties: [
+                    {
+                        propertyName: "User Email",
+                        propertyValue: user?.email || "NA",
+                    },
+                    {
+                        propertyName: "User Enabled",
+                        propertyValue: user?.enabled !== undefined ? (user?.enabled ? "Yes" : "No") : "NA",
+                    },
+                ],
+            },
+        });
+        edges.push({
+            id: "e1-2",
+            source: "1",
+            target: "2",
+            type: "smoothstep",
+            data: { edgeColor: "red" },
+        });
+    }
+
+    if (certificate?.group) {
+        nodes.push({
+            id: "3",
+            type: "customFlowNode",
+            position: { x: 0, y: 0 },
+            data: {
+                entityType: "user-group",
+                handleHide: "target",
+                description: certificate?.group?.description || "",
+                icon: "fa fa fa-users",
+                entityLabel: certificate?.group?.name || "",
+                redirectUrl: certificate?.group?.uuid ? `/groups/detail/${certificate?.group?.uuid}` : undefined,
+            },
+        });
+        edges.push({
+            id: "e1-3",
+            source: "3",
+            target: "2",
+            type: "smoothstep",
+            data: { edgeColor: "red" },
+        });
+    }
+
+    if (certificate?.raProfile) {
+        nodes.push({
+            id: "5",
+            type: "customFlowNode",
+            position: { x: 0, y: 0 },
+            data: {
+                entityType: "ra-profile",
+                icon: "fa fa fa-address-card",
+                handleHide: "source",
+                entityLabel: certificate?.raProfile?.name || "",
+                redirectUrl:
+                    certificate?.raProfile?.uuid && certificate?.raProfile.authorityInstanceUuid
+                        ? `/raProfiles/detail/${certificate.raProfile.authorityInstanceUuid}/${certificate.raProfile.uuid}`
+                        : undefined,
+                otherProperties: [
+                    {
+                        propertyName: "RA Profile Enabled",
+                        propertyValue:
+                            certificate?.raProfile?.enabled !== undefined ? (certificate?.raProfile?.enabled ? "Yes" : "No") : "NA",
+                    },
+                ],
+            },
+        });
+        edges.push({
+            id: "e1-5",
+            source: "1",
+            target: "5",
+            type: "smoothstep",
+
+            data: { edgeColor: "red" },
+        });
+    }
+
+    return { nodes, edges };
 }

@@ -1,0 +1,90 @@
+@import "src/resources/styles/app";
+
+.customNodeBackground {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    min-width: 150px;
+    min-height: 55px;
+    border-style: solid;
+    border-color: #3754a566;
+    border-width: 2px;
+    text-align: left;
+    max-width: 515px;
+}
+
+.iconContainer {
+    background-color: white;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem 1rem 0.5rem 1rem;
+    border-radius: 10px 10px 0 0;
+    border-color: #3754a566;
+    border-style: solid;
+    border-width: 2px;
+    border-bottom-color: white;
+    margin-bottom: -1.7px;
+}
+
+.iconStyle {
+    font-size: xx-large;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: $brand-primary;
+}
+
+.handleUp {
+    background-color: $brand-primary;
+}
+
+.handleDown {
+    background-color: $brand-primary;
+}
+
+.selectedBackground {
+    background-color: #eee;
+}
+
+.entityType {
+    color: $gray-500;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.entityLabel {
+    font-weight: bold;
+    color: $gray-600;
+    font-size: medium;
+}
+
+.tableContainer {
+    overflow: auto;
+    height: 150px;
+    width: 100%;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $gray-400;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: $gray-200;
+        border-radius: 4px;
+    }
+
+    th {
+        font-weight: bold;
+    }
+}
