@@ -398,8 +398,8 @@ export default function CertificateDetail() {
                         key="pem"
                         onClick={() =>
                             certificate?.status === CertStatus.New
-                                ? downloadFile(formatPEM(certificate?.csr || "", true), fileNameToDownload + ".pem")
-                                : downloadFile(formatPEM(certificate?.certificateContent || ""), fileNameToDownload + ".pem")
+                                ? downloadFile(formatPEM(certificate?.certificateRequest?.content ?? "", true), fileNameToDownload + ".pem")
+                                : downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")
                         }
                     >
                         PEM (.pem)
@@ -409,8 +409,11 @@ export default function CertificateDetail() {
                         key="der"
                         onClick={() =>
                             certificate?.status === CertStatus.New
-                                ? downloadFile(Buffer.from(certificate?.csr || "", "base64"), fileNameToDownload + ".cer")
-                                : downloadFile(Buffer.from(certificate?.certificateContent || "", "base64"), fileNameToDownload + ".cer")
+                                ? downloadFile(
+                                      Buffer.from(certificate?.certificateRequest?.content ?? "", "base64"),
+                                      fileNameToDownload + ".cer",
+                                  )
+                                : downloadFile(Buffer.from(certificate?.certificateContent ?? "", "base64"), fileNameToDownload + ".cer")
                         }
                     >
                         DER (.cer)
@@ -1237,9 +1240,21 @@ export default function CertificateDetail() {
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>
 
-                                {certificate?.csrAttributes && certificate.csrAttributes.length > 0 ? (
-                                    <Widget title="CSR" busy={isBusy}>
-                                        <AttributeViewer attributes={certificate.csrAttributes} />
+                                {certificate?.certificateRequest?.attributes && certificate.certificateRequest.attributes.length > 0 ? (
+                                    <Widget title="CSR" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.certificateRequest.attributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate?.issueAttributes && certificate.issueAttributes.length > 0 ? (
+                                    <Widget title="Issue Attributes" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.issueAttributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate?.revokeAttributes && certificate.revokeAttributes.length > 0 ? (
+                                    <Widget title="Revoke Attributes" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.revokeAttributes} />
                                     </Widget>
                                 ) : null}
 
