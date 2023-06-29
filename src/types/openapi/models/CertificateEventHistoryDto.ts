@@ -74,6 +74,7 @@ export enum CertificateEventHistoryDtoEventEnum {
     IssueCertificate = "Issue Certificate",
     CreateCsr = "Create CSR",
     RenewCertificate = "Renew Certificate",
+    RekeyCertificate = "Rekey Certificate",
     RevokeCertificate = "Revoke Certificate",
     DeleteCertificate = "Delete Certificate",
     UpdateRaProfile = "Update RA Profile",
