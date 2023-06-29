@@ -13,6 +13,7 @@
 
 import type {
     CertificateComplianceResultDto,
+    CertificateDto,
     CertificateRequestDto,
     CertificateStatus,
     CertificateType,
@@ -227,4 +228,10 @@ export interface CertificateDetailDto {
      * @memberof CertificateDetailDto
      */
     revokeAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * List of related certificates
+     * @type {Array<CertificateDto>}
+     * @memberof CertificateDetailDto
+     */
+    relatedCertificates?: Array<CertificateDto>;
 }

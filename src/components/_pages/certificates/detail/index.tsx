@@ -763,6 +763,32 @@ export default function CertificateDetail() {
         [],
     );
 
+    const relatedCertificatesHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "name",
+                content: "Common Name",
+            },
+            {
+                id: "serial",
+                content: "Serial Number",
+            },
+            {
+                id: "valid",
+                content: "Valid From",
+            },
+            {
+                id: "expires",
+                content: "Expires At",
+            },
+            {
+                id: "status",
+                content: "Status",
+            },
+        ],
+        [],
+    );
+
     const complianceHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -925,6 +951,23 @@ export default function CertificateDetail() {
         [certificate, validationResult],
     );
 
+    const relatedCertificatesData: TableDataRow[] = useMemo(
+        () =>
+            !certificate?.relatedCertificates
+                ? []
+                : certificate.relatedCertificates.map((c) => ({
+                      id: c.uuid,
+                      columns: [
+                          <Link to={`../certificates/detail/${c.uuid}`}>{c.commonName}</Link>,
+                          c.serialNumber ?? "",
+                          c.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(c.notBefore)}</span> : "",
+                          c.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(c.notAfter)}</span> : "",
+                          <CertificateStatus status={c.status} />,
+                      ],
+                  })),
+        [certificate?.relatedCertificates],
+    );
+
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
             ? []
@@ -963,17 +1006,17 @@ export default function CertificateDetail() {
                       columns: ["Subject DN", certificate.subjectDn],
                   },
                   {
-                      id: "expiresAt",
-                      columns: [
-                          "Expires At",
-                          certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
-                      ],
-                  },
-                  {
                       id: "validFrom",
                       columns: [
                           "Valid From",
                           certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
+                      ],
+                  },
+                  {
+                      id: "expiresAt",
+                      columns: [
+                          "Expires At",
+                          certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
                       ],
                   },
                   {
@@ -1332,6 +1375,22 @@ export default function CertificateDetail() {
                                 >
                                     <br />
                                     <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Related Certificates",
+                        hidden: !certificate?.relatedCertificates?.length,
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Related Certificates"
+                                    titleSize="large"
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                >
+                                    <br />
+                                    <CustomTable headers={relatedCertificatesHeaders} data={relatedCertificatesData} />
                                 </Widget>
                             </Widget>
                         ),
