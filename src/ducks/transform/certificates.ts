@@ -175,27 +175,16 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
+// fix typo
 export function transformCertifacetObjectToNodesAndEdges(certificate: CertificateDetailResponseModel, users: UserDto[]) {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
 
-    nodes.push({
-        id: "0",
-        type: "customFlowNode",
-        position: { x: 0, y: 0 },
-        data: {
-            entityType: "Root CA",
-            entityLabel: "Root Certificate Authority",
-            icon: "fa fa-sun",
-        },
-    });
     edges.push({
         id: "e0-1",
         source: "0",
         target: "6",
-        type: "smoothstep",
-
-        data: { edgeColor: "red" },
+        type: "default",
     });
 
     nodes.push({
@@ -203,9 +192,10 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
         type: "customFlowNode",
         position: { x: 0, y: 0 },
         data: {
-            entityType: "certificate",
+            entityType: "Certificate",
             entityLabel: certificate.commonName,
             icon: "fa fa-certificate",
+            isMainNode: true,
             otherProperties: [
                 {
                     propertyName: "Serial Number",
@@ -224,43 +214,13 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
     });
     const user = users.find((u) => u.username === certificate?.owner);
 
-    if (certificate?.issuerCommonName) {
-        nodes.push({
-            id: "6",
-            type: "customFlowNode",
-            position: { x: 0, y: 0 },
-            data: {
-                entityType: "Certificate Issuer",
-                icon: "fa fa fa fa-stamp",
-                entityLabel: certificate?.issuerCommonName || "",
-                otherProperties: [
-                    {
-                        propertyName: "Issuer DN",
-                        propertyValue: certificate?.issuerDn || "NA",
-                    },
-                    {
-                        propertyName: "Issuer Sr. No.",
-                        propertyValue: certificate?.issuerSerialNumber || "NA",
-                    },
-                ],
-            },
-        });
-        edges.push({
-            id: "e1-6",
-            source: "6",
-            target: "1",
-            type: "smoothstep",
-            data: { edgeColor: "red" },
-        });
-    }
-
     if (certificate?.key) {
         nodes.push({
             id: "4",
             type: "customFlowNode",
             position: { x: 0, y: 0 },
             data: {
-                entityType: "key",
+                entityType: "Key",
                 entityLabel: certificate?.key?.name || "",
                 icon: "fa fa fa-key",
                 handleHide: "target",
@@ -285,8 +245,37 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             id: "e1-4",
             source: "4",
             target: "1",
-            type: "smoothstep",
-            data: { edgeColor: "red" },
+            type: "default",
+        });
+    }
+
+    if (certificate?.issuerCommonName) {
+        nodes.push({
+            id: "6",
+            type: "customFlowNode",
+            position: { x: 0, y: 0 },
+            data: {
+                entityType: "Certificate Issuer",
+                icon: "fa fa fa fa-stamp",
+                entityLabel: certificate?.issuerCommonName || "",
+                handleHide: "target",
+                otherProperties: [
+                    {
+                        propertyName: "Issuer DN",
+                        propertyValue: certificate?.issuerDn || "NA",
+                    },
+                    {
+                        propertyName: "Issuer Sr. No.",
+                        propertyValue: certificate?.issuerSerialNumber || "NA",
+                    },
+                ],
+            },
+        });
+        edges.push({
+            id: "e1-6",
+            source: "6",
+            target: "1",
+            type: "default",
         });
     }
 
@@ -296,7 +285,7 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             type: "customFlowNode",
             position: { x: 0, y: 0 },
             data: {
-                entityType: "user",
+                entityType: "Owner",
                 icon: "fa fa fa-user",
                 handleHide: "source",
                 entityLabel: user?.username || "",
@@ -318,8 +307,7 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             id: "e1-2",
             source: "1",
             target: "2",
-            type: "smoothstep",
-            data: { edgeColor: "red" },
+            type: "default",
         });
     }
 
@@ -329,7 +317,7 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             type: "customFlowNode",
             position: { x: 0, y: 0 },
             data: {
-                entityType: "user-group",
+                entityType: "Group",
                 handleHide: "target",
                 description: certificate?.group?.description || "",
                 icon: "fa fa fa-users",
@@ -340,9 +328,8 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
         edges.push({
             id: "e1-3",
             source: "3",
-            target: "2",
-            type: "smoothstep",
-            data: { edgeColor: "red" },
+            target: "1",
+            type: "default",
         });
     }
 
@@ -352,7 +339,7 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             type: "customFlowNode",
             position: { x: 0, y: 0 },
             data: {
-                entityType: "ra-profile",
+                entityType: "Ra Profile",
                 icon: "fa fa fa-address-card",
                 handleHide: "source",
                 entityLabel: certificate?.raProfile?.name || "",
@@ -373,9 +360,7 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             id: "e1-5",
             source: "1",
             target: "5",
-            type: "smoothstep",
-
-            data: { edgeColor: "red" },
+            type: "default",
         });
     }
 

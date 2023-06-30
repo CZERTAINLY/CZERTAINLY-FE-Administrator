@@ -57,7 +57,6 @@ import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import FlowChart from "components/FlowChart";
-import { FlowChartType } from "types/flowchart";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { useFlowChartValues } from "utils/flowChart";
 import CertificateStatus from "../CertificateStatus";
@@ -135,7 +134,7 @@ export default function CertificateDetail() {
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
 
-    const [certificateNodes, certificateEdges] = useFlowChartValues(FlowChartType.CERTIFICATE);
+    const [certificateNodes, certificateEdges] = useFlowChartValues(Resource.Certificates);
 
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
@@ -1327,10 +1326,19 @@ export default function CertificateDetail() {
                             </Widget>
                         ),
                     },
+                    {
+                        title: "Flow",
+                        content: (
+                            <FlowChart
+                                flowChartTitle="Certificate Flow"
+                                flowChartEdges={certificateEdges}
+                                flowChartNodes={certificateNodes}
+                            />
+                        ),
+                    },
                 ]}
             />
 
-            <FlowChart flowChartTitle="Certficiate Flow" flowChartEdges={certificateEdges} flowChartNodes={certificateNodes} />
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Certificate"

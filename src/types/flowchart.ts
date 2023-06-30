@@ -1,15 +1,12 @@
 import { Edge, NodeProps } from "reactflow";
 
-export enum FlowChartType {
-    CERTIFICATE,
-}
-
 export interface OtherProperties {
     propertyName: string;
     propertyValue: string;
 }
 
 export interface CustomNodeData {
+    isMainNode?: boolean;
     entityType: string;
     entityLabel: string;
     redirectUrl?: string;

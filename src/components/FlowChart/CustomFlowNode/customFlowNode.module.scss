@@ -29,6 +29,7 @@
     border-width: 2px;
     border-bottom-color: white;
     margin-bottom: -1.7px;
+    border-bottom: 0;
 }
 
 .iconStyle {
@@ -64,11 +65,13 @@
     font-size: medium;
 }
 
-.tableContainer {
-    overflow: auto;
+.listContainer {
     max-height: 150px;
+    overflow: auto;
     width: 100%;
-
+    /* scrollbar styles */
+    scrollbar-width: thin;
+    scrollbar-color: $gray-400 $gray-200;
     &::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -83,8 +86,35 @@
         background-color: $gray-200;
         border-radius: 4px;
     }
+}
 
-    th {
-        font-weight: bold;
-    }
+.listStyle {
+    max-width: 300px;
+}
+
+.propertyName {
+    font-weight: bold;
+    color: $gray-500;
+}
+
+.propertyValue {
+    font-weight: 500;
+    // text wrap if longer and start on same line
+    color: $gray-600;
+}
+.mainNodeBody {
+    // background-color: $czertainly-blue-light;
+
+    border-width: 5px;
+    border-color: $czertainly-blue;
+}
+
+.mainNodeHeader {
+    // background-color: $czertainly-blue-light;
+    border-width: 5px;
+    margin-bottom: -5px;
+    border-color: $czertainly-blue;
+    border-bottom: none;
+
+    // border-bottom-color: white;
 }

@@ -2,7 +2,6 @@ import cx from "classnames";
 import { Link } from "react-router-dom";
 import { Handle, Position } from "reactflow";
 import "reactflow/dist/style.css";
-import { Table } from "reactstrap";
 import { EntityNodeProps } from "types/flowchart";
 import style from "./customFlowNode.module.scss";
 
@@ -13,12 +12,26 @@ export default function CustomFlowNode({ data, dragging, xPos, yPos }: EntityNod
 
             {data.icon && (
                 <div className="d-flex flex-column align-items-center">
-                    <div className={cx(style.iconContainer, { [style.selectedBackground]: dragging })}>
+                    <div
+                        className={cx(
+                            style.iconContainer,
+                            { [style.selectedBackground]: dragging },
+                            { [style.mainNodeHeader]: data.isMainNode },
+                        )}
+                    >
                         <i className={cx(style.iconStyle, data.icon)}></i>
                     </div>
                 </div>
             )}
-            <div className={cx(style.customNodeBackground, { [style.selectedBackground]: dragging })}>
+            <div
+                className={cx(
+                    style.customNodeBackground,
+                    { [style.selectedBackground]: dragging },
+                    {
+                        [style.mainNodeBody]: data.isMainNode,
+                    },
+                )}
+            >
                 <div className="mx-auto">
                     <h6 className={style.entityType}>{data.entityType}</h6>
                 </div>
@@ -47,23 +60,15 @@ export default function CustomFlowNode({ data, dragging, xPos, yPos }: EntityNod
                 )}
 
                 {data.otherProperties && (
-                    <div className={style.tableContainer}>
-                        <Table responsive className={cx("table-bordered", style.tableStyle)}>
-                            <thead>
-                                <tr>
-                                    <th>Property Name</th>
-                                    <th>Property Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.otherProperties.map((property, index) => (
-                                    <tr key={index}>
-                                        <td>{property.propertyName}</td>
-                                        <td>{property.propertyValue}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                    <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
+                        <ul className={cx("list-group ps-2", style.listStyle)}>
+                            {data.otherProperties.map((property, index) => (
+                                <li key={index} className="list-group-item text-wrap p-0 ">
+                                    <span className={style.propertyName}>{property.propertyName} : </span>
+                                    <span className={style.propertyValue}>{property.propertyValue}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 )}
             </div>

@@ -19,6 +19,7 @@ import {
 import "reactflow/dist/style.css";
 import { CustomNodeData } from "types/flowchart";
 import CustomFlowNode from "./CustomFlowNode";
+import style from "./flowChart.module.scss";
 const nodeTypes = { customFlowNode: CustomFlowNode };
 
 export interface CustomNode extends Node {
@@ -85,10 +86,11 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes }: FlowChart
     return (
         <Widget>
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
-            <div style={{ width: "100%", height: "400px" }}>
+            <div className={style.flowChartContainer}>
                 <ReactFlow
-                    title="Certificate Flow"
+                    title={flowChartTitle}
                     nodes={nodes}
+                    proOptions={{ hideAttribution: true }}
                     edges={edges}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
