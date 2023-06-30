@@ -404,8 +404,8 @@ export default function CertificateDetail() {
                         key="pem"
                         onClick={() =>
                             certificate?.status === CertStatus.New
-                                ? downloadFile(formatPEM(certificate?.csr || "", true), fileNameToDownload + ".pem")
-                                : downloadFile(formatPEM(certificate?.certificateContent || ""), fileNameToDownload + ".pem")
+                                ? downloadFile(formatPEM(certificate?.certificateRequest?.content ?? "", true), fileNameToDownload + ".pem")
+                                : downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")
                         }
                     >
                         PEM (.pem)
@@ -415,8 +415,11 @@ export default function CertificateDetail() {
                         key="der"
                         onClick={() =>
                             certificate?.status === CertStatus.New
-                                ? downloadFile(Buffer.from(certificate?.csr || "", "base64"), fileNameToDownload + ".cer")
-                                : downloadFile(Buffer.from(certificate?.certificateContent || "", "base64"), fileNameToDownload + ".cer")
+                                ? downloadFile(
+                                      Buffer.from(certificate?.certificateRequest?.content ?? "", "base64"),
+                                      fileNameToDownload + ".cer",
+                                  )
+                                : downloadFile(Buffer.from(certificate?.certificateContent ?? "", "base64"), fileNameToDownload + ".cer")
                         }
                     >
                         DER (.cer)
@@ -766,6 +769,32 @@ export default function CertificateDetail() {
         [],
     );
 
+    const relatedCertificatesHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "name",
+                content: "Common Name",
+            },
+            {
+                id: "serial",
+                content: "Serial Number",
+            },
+            {
+                id: "valid",
+                content: "Valid From",
+            },
+            {
+                id: "expires",
+                content: "Expires At",
+            },
+            {
+                id: "status",
+                content: "Status",
+            },
+        ],
+        [],
+    );
+
     const complianceHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -928,6 +957,23 @@ export default function CertificateDetail() {
         [certificate, validationResult],
     );
 
+    const relatedCertificatesData: TableDataRow[] = useMemo(
+        () =>
+            !certificate?.relatedCertificates
+                ? []
+                : certificate.relatedCertificates.map((c) => ({
+                      id: c.uuid,
+                      columns: [
+                          <Link to={`../certificates/detail/${c.uuid}`}>{c.commonName}</Link>,
+                          c.serialNumber ?? "",
+                          c.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(c.notBefore)}</span> : "",
+                          c.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(c.notAfter)}</span> : "",
+                          <CertificateStatus status={c.status} />,
+                      ],
+                  })),
+        [certificate?.relatedCertificates],
+    );
+
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
             ? []
@@ -966,17 +1012,17 @@ export default function CertificateDetail() {
                       columns: ["Subject DN", certificate.subjectDn],
                   },
                   {
-                      id: "expiresAt",
-                      columns: [
-                          "Expires At",
-                          certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
-                      ],
-                  },
-                  {
                       id: "validFrom",
                       columns: [
                           "Valid From",
                           certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
+                      ],
+                  },
+                  {
+                      id: "expiresAt",
+                      columns: [
+                          "Expires At",
+                          certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
                       ],
                   },
                   {
@@ -1252,9 +1298,21 @@ export default function CertificateDetail() {
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>
 
-                                {certificate?.csrAttributes && certificate.csrAttributes.length > 0 ? (
-                                    <Widget title="CSR" busy={isBusy}>
-                                        <AttributeViewer attributes={certificate.csrAttributes} />
+                                {certificate?.certificateRequest?.attributes && certificate.certificateRequest.attributes.length > 0 ? (
+                                    <Widget title="CSR" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.certificateRequest.attributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate?.issueAttributes && certificate.issueAttributes.length > 0 ? (
+                                    <Widget title="Issue Attributes" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.issueAttributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate?.revokeAttributes && certificate.revokeAttributes.length > 0 ? (
+                                    <Widget title="Revoke Attributes" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.revokeAttributes} />
                                     </Widget>
                                 ) : null}
 
@@ -1348,6 +1406,22 @@ export default function CertificateDetail() {
                         ) : (
                             // Todo: Add a placeholder for the flow chart
                             <></>
+                        ),
+                    },
+                    {
+                        title: "Related Certificates",
+                        hidden: !certificate?.relatedCertificates?.length,
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Related Certificates"
+                                    titleSize="large"
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                >
+                                    <br />
+                                    <CustomTable headers={relatedCertificatesHeaders} data={relatedCertificatesData} />
+                                </Widget>
+                            </Widget>
                         ),
                     },
                 ]}

@@ -13,6 +13,8 @@
 
 import type {
     CertificateComplianceResultDto,
+    CertificateDto,
+    CertificateRequestDto,
     CertificateStatus,
     CertificateType,
     ComplianceStatus,
@@ -199,32 +201,37 @@ export interface CertificateDetailDto {
      */
     customAttributes?: Array<ResponseAttributeDto>;
     /**
-     * CSR for the certificate
-     * @type {string}
-     * @memberof CertificateDetailDto
-     */
-    csr?: string;
-    /**
-     * CSR Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof CertificateDetailDto
-     */
-    csrAttributes?: Array<ResponseAttributeDto>;
-    /**
-     * Signature Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof CertificateDetailDto
-     */
-    signatureAttributes?: Array<ResponseAttributeDto>;
-    /**
      * @type {KeyDto}
      * @memberof CertificateDetailDto
      */
     key?: KeyDto;
+    /**
+     * @type {CertificateRequestDto}
+     * @memberof CertificateDetailDto
+     */
+    certificateRequest?: CertificateRequestDto;
     /**
      * Source certificate UUID
      * @type {string}
      * @memberof CertificateDetailDto
      */
     sourceCertificateUuid?: string;
+    /**
+     * List of issue attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CertificateDetailDto
+     */
+    issueAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * List of revoke attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CertificateDetailDto
+     */
+    revokeAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * List of related certificates
+     * @type {Array<CertificateDto>}
+     * @memberof CertificateDetailDto
+     */
+    relatedCertificates?: Array<CertificateDto>;
 }

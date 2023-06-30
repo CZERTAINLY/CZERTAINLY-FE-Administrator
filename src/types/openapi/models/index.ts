@@ -45,6 +45,7 @@ export * from "./CertificateDetailDto";
 export * from "./CertificateDto";
 export * from "./CertificateEventHistoryDto";
 export * from "./CertificateInLocationDto";
+export * from "./CertificateRequestDto";
 export * from "./CertificateResponseDto";
 export * from "./CertificateStatus";
 export * from "./CertificateType";
