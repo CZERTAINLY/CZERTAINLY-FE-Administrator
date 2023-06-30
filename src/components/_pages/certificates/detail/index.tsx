@@ -58,6 +58,7 @@ import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import FlowChart from "components/FlowChart";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import { useDeviceType } from "utils/common-hooks";
 import { useFlowChartValues } from "utils/flowChart";
 import CertificateStatus from "../CertificateStatus";
 
@@ -104,7 +105,7 @@ export default function CertificateDetail() {
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
     const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
-
+    const deviceType = useDeviceType();
     const [currentInfoId, setCurrentInfoId] = useState("");
 
     const [group, setGroup] = useState<string>();
@@ -1194,6 +1195,15 @@ export default function CertificateDetail() {
         [certLocations, locations],
     );
 
+    const defaultViewPort = useMemo(
+        () => ({
+            zoom: 0.5,
+            x: deviceType === "tablet" ? -50 : deviceType === "mobile" ? -150 : 300,
+            y: 0,
+        }),
+        [deviceType],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <TabLayout
@@ -1328,12 +1338,16 @@ export default function CertificateDetail() {
                     },
                     {
                         title: "Flow",
-                        content: (
+                        content: certificateNodes.length ? (
                             <FlowChart
                                 flowChartTitle="Certificate Flow"
                                 flowChartEdges={certificateEdges}
                                 flowChartNodes={certificateNodes}
+                                defaultViewport={defaultViewPort}
                             />
+                        ) : (
+                            // Todo: Add a placeholder for the flow chart
+                            <></>
                         ),
                     },
                 ]}

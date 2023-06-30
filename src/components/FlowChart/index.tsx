@@ -12,6 +12,7 @@ import {
     NodeChange,
     Position,
     ReactFlow,
+    Viewport,
     addEdge,
     applyEdgeChanges,
     applyNodeChanges,
@@ -30,6 +31,7 @@ export interface FlowChartProps {
     flowChartTitle?: string;
     flowChartNodes: CustomNode[];
     flowChartEdges: Edge[];
+    defaultViewport?: Viewport | undefined;
 }
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -69,7 +71,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
     return { nodes, edges };
 };
 
-const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes }: FlowChartProps) => {
+const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport }: FlowChartProps) => {
     const [nodes, setNodes] = useState(flowChartNodes);
     const [edges, setEdges] = useState(flowChartEdges);
 
@@ -96,7 +98,8 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes }: FlowChart
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
-                    fitView
+                    fitView={!defaultViewport}
+                    defaultViewport={defaultViewport}
                 >
                     <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
                 </ReactFlow>
