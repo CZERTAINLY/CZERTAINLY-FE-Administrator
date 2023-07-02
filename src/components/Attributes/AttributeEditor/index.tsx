@@ -418,6 +418,9 @@ export default function AttributeEditor({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         opts = { ...opts, ...newOptions };
         setOptions({ ...options, ...opts });
+
+        // now all fields are loaded in form, so set those formState.values as previousFormValues to prevent calling doCallback on form change
+        setPreviousFormValues(formState.values);
     }, [
         id,
         attributeDescriptors,
