@@ -175,7 +175,6 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
-// fix typo
 export function transformCertifacetObjectToNodesAndEdges(certificate: CertificateDetailResponseModel, users: UserDto[]) {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
