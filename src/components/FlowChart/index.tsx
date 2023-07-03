@@ -16,6 +16,7 @@ import {
     addEdge,
     applyEdgeChanges,
     applyNodeChanges,
+    Controls
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { CustomNodeData } from "types/flowchart";
@@ -74,6 +75,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
 const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport }: FlowChartProps) => {
     const [nodes, setNodes] = useState(flowChartNodes);
     const [edges, setEdges] = useState(flowChartEdges);
+    const defaultEdgeOptions = { animated: true };
 
     const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
     const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
@@ -100,7 +102,9 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
                     nodeTypes={nodeTypes}
                     fitView={!defaultViewport}
                     defaultViewport={defaultViewport}
+                    defaultEdgeOptions={defaultEdgeOptions}
                 >
+                    <Controls />
                     <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
                 </ReactFlow>
             </div>
