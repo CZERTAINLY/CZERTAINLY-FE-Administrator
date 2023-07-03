@@ -57,9 +57,9 @@ import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import FlowChart from "components/FlowChart";
+import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { useDeviceType } from "utils/common-hooks";
-import { useFlowChartValues } from "utils/flowChart";
 import CertificateStatus from "../CertificateStatus";
 
 export default function CertificateDetail() {
@@ -135,8 +135,7 @@ export default function CertificateDetail() {
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
 
-    const [certificateNodes, certificateEdges] = useFlowChartValues(Resource.Certificates);
-
+    const { nodes: certificateNodes, edges: certificateEdges } = transformCertifacetObjectToNodesAndEdges(certificate, users);
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
 
