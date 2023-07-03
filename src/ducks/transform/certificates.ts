@@ -41,7 +41,8 @@ import {
     SearchRequestDto,
     SearchRequestModel,
 } from "types/certificate";
-import { CertificateComplianceCheckDto, UserDto } from "../../types/openapi";
+import { UserResponseModel } from "types/users";
+import { CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
@@ -175,9 +176,13 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
-export function transformCertifacetObjectToNodesAndEdges(certificate: CertificateDetailResponseModel, users: UserDto[]) {
+export function transformCertifacetObjectToNodesAndEdges(certificate?: CertificateDetailResponseModel, users?: UserResponseModel[]) {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
+
+    if (!certificate) {
+        return { nodes, edges };
+    }
 
     edges.push({
         id: "e0-1",
@@ -211,7 +216,40 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             ],
         },
     });
-    const user = users.find((u) => u.username === certificate?.owner);
+    if (users?.length) {
+        const user = users.find((u) => u.username === certificate?.owner);
+        if (user) {
+            nodes.push({
+                id: "2",
+                type: "customFlowNode",
+                position: { x: 0, y: 0 },
+                data: {
+                    entityType: "Owner",
+                    icon: "fa fa fa-user",
+                    handleHide: "source",
+                    entityLabel: user?.username || "",
+                    description: user?.description || "",
+                    redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
+                    otherProperties: [
+                        {
+                            propertyName: "User Email",
+                            propertyValue: user?.email || "NA",
+                        },
+                        {
+                            propertyName: "User Enabled",
+                            propertyValue: user?.enabled !== undefined ? (user?.enabled ? "Yes" : "No") : "NA",
+                        },
+                    ],
+                },
+            });
+            edges.push({
+                id: "e1-2",
+                source: "1",
+                target: "2",
+                type: "default",
+            });
+        }
+    }
 
     if (certificate?.key) {
         nodes.push({
@@ -274,38 +312,6 @@ export function transformCertifacetObjectToNodesAndEdges(certificate: Certificat
             id: "e1-6",
             source: "6",
             target: "1",
-            type: "default",
-        });
-    }
-
-    if (user) {
-        nodes.push({
-            id: "2",
-            type: "customFlowNode",
-            position: { x: 0, y: 0 },
-            data: {
-                entityType: "Owner",
-                icon: "fa fa fa-user",
-                handleHide: "source",
-                entityLabel: user?.username || "",
-                description: user?.description || "",
-                redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
-                otherProperties: [
-                    {
-                        propertyName: "User Email",
-                        propertyValue: user?.email || "NA",
-                    },
-                    {
-                        propertyName: "User Enabled",
-                        propertyValue: user?.enabled !== undefined ? (user?.enabled ? "Yes" : "No") : "NA",
-                    },
-                ],
-            },
-        });
-        edges.push({
-            id: "e1-2",
-            source: "1",
-            target: "2",
             type: "default",
         });
     }
