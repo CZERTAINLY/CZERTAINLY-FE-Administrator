@@ -41,7 +41,8 @@ import {
     SearchRequestDto,
     SearchRequestModel,
 } from "types/certificate";
-import { CertificateComplianceCheckDto, UserDto } from "../../types/openapi";
+import { UserResponseModel } from "types/users";
+import { CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
@@ -175,7 +176,7 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
-export function transformCertifacetObjectToNodesAndEdges(certificate: CertificateDetailResponseModel, users: UserDto[]) {
+export function transformCertifacetObjectToNodesAndEdges(certificate: CertificateDetailResponseModel, users: UserResponseModel[]) {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
 
