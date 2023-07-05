@@ -1,35 +1,22 @@
 @import "src/resources/styles/app";
 
 .customNodeBackground {
+    position: relative;
     background-color: white;
     padding: 1rem;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: start;
-    min-width: 150px;
+    min-width: 350px;
     min-height: 55px;
     border-style: solid;
     border-color: #3754a566;
     border-width: 2px;
     text-align: left;
     max-width: 515px;
-}
-
-.iconContainer {
-    background-color: white;
-    width: fit-content;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 1rem 1rem 0.5rem 1rem;
-    border-radius: 10px 10px 0 0;
-    border-color: #3754a566;
-    border-style: solid;
-    border-width: 2px;
-    border-bottom-color: white;
-    margin-bottom: -1.7px;
-    border-bottom: 0;
+    z-index: 1;
+    box-shadow: 3px 3px 1px -1px rgba(0, 0, 0, 0.2), 2px 2px 1px 0px rgba(0, 0, 0, 0.14), 1px 1px 3px 0px rgba(0, 0, 0, 0.12);
 }
 
 .iconStyle {
@@ -69,7 +56,6 @@
     max-height: 150px;
     overflow: auto;
     width: 100%;
-    /* scrollbar styles */
     scrollbar-width: thin;
     scrollbar-color: $gray-400 $gray-200;
     &::-webkit-scrollbar {
@@ -99,22 +85,147 @@
 
 .propertyValue {
     font-weight: 500;
-    // text wrap if longer and start on same line
     color: $gray-600;
 }
 .mainNodeBody {
-    // background-color: $czertainly-blue-light;
-
     border-width: 5px;
     border-color: $czertainly-blue;
 }
 
-.mainNodeHeader {
-    // background-color: $czertainly-blue-light;
-    border-width: 5px;
-    margin-bottom: -5px;
-    border-color: $czertainly-blue;
-    border-bottom: none;
+.expandButtonContainer {
+    position: absolute;
+    top: 0;
+    right: -40px;
+}
 
-    // border-bottom-color: white;
+.expandButton {
+    border-radius: 10rem !important;
+    font-size: small;
+    width: 32.5px;
+}
+
+.expiringStatus {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.expandButtonExpiring {
+    background-color: #ffc107;
+    border: none;
+    &:hover {
+        background-color: #fabd05ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #fabd05d8 !important;
+        border: none;
+    }
+}
+
+.expiredStatus {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.expandButtonExpired {
+    background-color: #dc3545;
+    border: none;
+    &:hover {
+        background-color: #c94e39ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #c94e39d8 !important;
+        border: none;
+    }
+}
+
+.validStatus {
+    color: #6ad984e1;
+    border-color: #6ad984e1;
+}
+
+.expandButtonValid {
+    background-color: #6ad984e1 !important;
+    border: none !important;
+    &:hover {
+        background-color: #5cb85cec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #5cb85cd8 !important;
+        border: none;
+    }
+}
+
+.invalidStatus {
+    color: #ff8080;
+    border-color: #ff8080;
+}
+
+.expandButtonInvalid {
+    background-color: #ff8080 !important;
+    border: none !important;
+    &:hover {
+        background-color: #ff8080ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #ff8080d8 !important;
+        border: none;
+    }
+}
+
+.newStatus {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.expandButtonNew {
+    background-color: #007bff !important;
+    border: none !important;
+    &:hover {
+        background-color: #007bffec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #007bffec !important;
+        border: none;
+    }
+}
+
+.revokedStatus {
+    color: #c94e39;
+    border-color: #c94e39;
+}
+
+.expandButtonRevoked {
+    background-color: #c94e39 !important;
+    border: none !important;
+    &:hover {
+        background-color: #c94e39ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #c94e39d8 !important;
+        border: none;
+    }
+}
+
+.unknownStatus {
+    color: #3754a566;
+    border-color: #3754a566;
+}
+
+.expandButtonUnknown {
+    background-color: #3754a566 !important;
+    border: none !important;
+    &:hover {
+        background-color: #3754a5ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #3754a5d8 !important;
+        border: none;
+    }
 }

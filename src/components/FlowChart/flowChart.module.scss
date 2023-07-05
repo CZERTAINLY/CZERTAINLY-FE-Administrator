@@ -2,5 +2,16 @@
 
 .flowChartContainer {
     width: 100%;
-    height: 400px;
+
+    @include for-mobile {
+        height: 67.5vh;
+    }
+
+    @include for-tablet {
+        height: 70vh;
+    }
+
+    @include for-desktop {
+        height: 65vh;
+    }
 }

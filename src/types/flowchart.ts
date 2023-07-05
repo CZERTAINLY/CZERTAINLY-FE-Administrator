@@ -1,4 +1,5 @@
 import { Edge, NodeProps } from "reactflow";
+import { CertificateStatus } from "./openapi";
 
 export interface OtherProperties {
     propertyName: string;
@@ -14,6 +15,7 @@ export interface CustomNodeData {
     handleHide?: "source" | "target";
     description?: string;
     otherProperties?: OtherProperties[];
+    certificateNodeStatus?: CertificateStatus;
 }
 export interface EntityNodeProps extends NodeProps {
     data: CustomNodeData;

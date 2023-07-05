@@ -41,12 +41,13 @@ import {
     SearchRequestDto,
     SearchRequestModel,
 } from "types/certificate";
+import { LocationResponseModel } from "types/locations";
+import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
 import { CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
-
 export function transformSearchFilterModelToDto(search: SearchFilterModel): SearchFilterDto {
     return { ...search };
 }
@@ -176,7 +177,12 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
-export function transformCertifacetObjectToNodesAndEdges(certificate?: CertificateDetailResponseModel, users?: UserResponseModel[]) {
+export function transformCertifacetObjectToNodesAndEdges(
+    certificate?: CertificateDetailResponseModel,
+    users?: UserResponseModel[],
+    locations?: LocationResponseModel[],
+    raProfileSelected?: RaProfileResponseModel,
+) {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
 
@@ -200,6 +206,7 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
             entityLabel: certificate.commonName,
             icon: "fa fa-certificate",
             isMainNode: true,
+            certificateNodeStatus: certificate.status,
             otherProperties: [
                 {
                     propertyName: "Serial Number",
@@ -213,6 +220,11 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
                     propertyName: "certificateType",
                     propertyValue: certificate?.certificateType || "NA",
                 },
+                {
+                    propertyName: "Status",
+                    propertyValue: certificate?.status || "NA",
+                },
+                // ...locationProperties,
             ],
         },
     });
@@ -226,7 +238,6 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
                 data: {
                     entityType: "Owner",
                     icon: "fa fa fa-user",
-                    handleHide: "source",
                     entityLabel: user?.username || "",
                     description: user?.description || "",
                     redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
@@ -260,7 +271,6 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
                 entityType: "Key",
                 entityLabel: certificate?.key?.name || "",
                 icon: "fa fa fa-key",
-                handleHide: "target",
                 description: certificate?.key?.description || "",
                 redirectUrl:
                     certificate?.key?.uuid && certificate?.key?.tokenInstanceUuid
@@ -295,7 +305,6 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
                 entityType: "Certificate Issuer",
                 icon: "fa fa fa fa-stamp",
                 entityLabel: certificate?.issuerCommonName || "",
-                handleHide: "target",
                 otherProperties: [
                     {
                         propertyName: "Issuer DN",
@@ -323,7 +332,6 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
             position: { x: 0, y: 0 },
             data: {
                 entityType: "Group",
-                handleHide: "target",
                 description: certificate?.group?.description || "",
                 icon: "fa fa fa-users",
                 entityLabel: certificate?.group?.name || "",
@@ -344,9 +352,8 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
             type: "customFlowNode",
             position: { x: 0, y: 0 },
             data: {
-                entityType: "Ra Profile",
+                entityType: "RA Profile",
                 icon: "fa fa fa-address-card",
-                handleHide: "source",
                 entityLabel: certificate?.raProfile?.name || "",
                 redirectUrl:
                     certificate?.raProfile?.uuid && certificate?.raProfile.authorityInstanceUuid
@@ -366,6 +373,70 @@ export function transformCertifacetObjectToNodesAndEdges(certificate?: Certifica
             source: "1",
             target: "5",
             type: "default",
+        });
+
+        if (raProfileSelected) {
+            nodes.push({
+                id: "7",
+                type: "customFlowNode",
+                position: { x: 0, y: 0 },
+                data: {
+                    entityType: "Authority",
+                    // <i class="fa-solid fa-stamp"></i>
+                    icon: "fa fa fa-stamp",
+                    entityLabel: raProfileSelected.authorityInstanceName || "",
+                    // /authorities/detail/4b893a50-c5a8-4e5c-b3ec-ea8eddf540b6
+                    redirectUrl: `/authorities/detail/${raProfileSelected.authorityInstanceUuid}`,
+                    otherProperties: [
+                        {
+                            propertyName: "Authority Instance Name",
+                            propertyValue: raProfileSelected.authorityInstanceName || "NA",
+                        },
+
+                        {
+                            propertyName: "Authority UUID",
+                            propertyValue: raProfileSelected.authorityInstanceUuid || "NA",
+                        },
+                    ],
+                },
+            });
+            edges.push({
+                id: "e5-7",
+                target: "5",
+                source: "7",
+                type: "default",
+            });
+        }
+    }
+    if (locations?.length) {
+        locations.forEach((location) => {
+            nodes.push({
+                id: location?.uuid || "",
+                type: "customFlowNode",
+                position: { x: 0, y: 0 },
+                data: {
+                    entityType: "Location",
+                    icon: "fa fa fa-map-marker",
+                    entityLabel: location?.name || "",
+                    redirectUrl: location?.uuid ? `/locations/detail/${location?.uuid}` : undefined,
+                    otherProperties: [
+                        {
+                            propertyName: "Location Description",
+                            propertyValue: location?.description || "NA",
+                        },
+                        {
+                            propertyName: "Location Enabled",
+                            propertyValue: location?.enabled ? "Yes" : "No",
+                        },
+                    ],
+                },
+            });
+            edges.push({
+                id: `e${location?.uuid}-1`,
+                target: location?.uuid || "",
+                source: "1",
+                type: "default",
+            });
         });
     }
 

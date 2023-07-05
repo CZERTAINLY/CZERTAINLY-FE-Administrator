@@ -26,20 +26,24 @@ export function useScreenDimensions(): ScreenDimensions {
     return screenDimensions;
 }
 
-export type DeviceType = "mobile" | "tablet" | "desktop";
+export enum DeviceType {
+    Mobile = "mobile",
+    Tablet = "tablet",
+    Desktop = "desktop",
+}
 
 export function useDeviceType(): DeviceType {
-    const [deviceType, setDeviceType] = useState<DeviceType>("desktop");
+    const [deviceType, setDeviceType] = useState<DeviceType>(DeviceType.Desktop);
 
     useEffect(() => {
         function handleResize() {
             const { innerWidth } = window;
             if (innerWidth <= 768) {
-                setDeviceType("mobile");
+                setDeviceType(DeviceType.Mobile);
             } else if (innerWidth <= 1024) {
-                setDeviceType("tablet");
+                setDeviceType(DeviceType.Tablet);
             } else {
-                setDeviceType("desktop");
+                setDeviceType(DeviceType.Desktop);
             }
         }
 

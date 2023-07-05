@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
     Background,
     BackgroundVariant,
-    Connection,
+    Controls,
     Edge,
     EdgeChange,
     Node,
@@ -13,10 +13,8 @@ import {
     Position,
     ReactFlow,
     Viewport,
-    addEdge,
     applyEdgeChanges,
     applyNodeChanges,
-    Controls
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { CustomNodeData } from "types/flowchart";
@@ -79,7 +77,8 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
 
     const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
     const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
-    const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
+    // TODO: Implement onConnect in future if needed
+    // const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
 
     useEffect(() => {
         const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges);
@@ -98,7 +97,6 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
                     edges={edges}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
-                    onConnect={onConnect}
                     nodeTypes={nodeTypes}
                     fitView={!defaultViewport}
                     defaultViewport={defaultViewport}
