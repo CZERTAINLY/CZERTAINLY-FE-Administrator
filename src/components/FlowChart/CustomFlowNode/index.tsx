@@ -90,7 +90,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 </div>
 
                 {data.redirectUrl ? (
-                    <div className="d-flex ms-2">
+                    <div className={cx("d-flex ms-2", style.entityLabel)}>
                         <h6>Entity Name :</h6>
                         &nbsp;
                         <Link to={data.redirectUrl}>
