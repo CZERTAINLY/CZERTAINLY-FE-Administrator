@@ -197,19 +197,19 @@
 }
 
 .revokedStatus {
-    color: #c94e39;
-    border-color: #c94e39;
+    color: #343a40;
+    border-color: #343a40;
 }
 
 .expandButtonRevoked {
-    background-color: #c94f399d !important;
+    background-color: #343a40b7 !important;
     border: none !important;
     &:hover {
-        background-color: #c94e39ec !important;
+        background-color: #343a40 !important;
         border: none;
     }
     &:active {
-        background-color: #c94e39d8 !important;
+        background-color: #343a40 !important;
         border: none;
     }
 }
