@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-interface ScreenDimensions {
+interface WindowSizes {
     width: number;
     height: number;
 }
 
-export function useScreenDimensions(): ScreenDimensions {
-    const [screenDimensions, setScreenDimensions] = useState<ScreenDimensions>({
+export function useWindowSize(): WindowSizes {
+    const [screenDimensions, setScreenDimensions] = useState<WindowSizes>({
         width: window.innerWidth,
         height: window.innerHeight,
     });

@@ -18,8 +18,8 @@ import {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { CustomNodeData } from "types/flowchart";
+import { useWindowSize } from "utils/common-hooks";
 import CustomFlowNode from "./CustomFlowNode";
-import style from "./flowChart.module.scss";
 const nodeTypes = { customFlowNode: CustomFlowNode };
 
 export interface CustomNode extends Node {
@@ -79,6 +79,7 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
     const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
     // TODO: Implement onConnect in future if needed
     // const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
+    const windowSize = useWindowSize();
 
     useEffect(() => {
         const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges);
@@ -89,7 +90,13 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
     return (
         <Widget>
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
-            <div className={style.flowChartContainer}>
+            <div
+                style={{
+                    height: windowSize.height - 225,
+                }}
+
+                // className={style.flowChartContainer}
+            >
                 <ReactFlow
                     title={flowChartTitle}
                     nodes={nodes}
