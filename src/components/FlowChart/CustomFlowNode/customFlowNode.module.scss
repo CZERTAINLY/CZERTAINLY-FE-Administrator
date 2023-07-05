@@ -48,7 +48,7 @@
 
 .entityLabel {
     font-weight: bold;
-    color: #3754a566;
+    color: $gray-600;
     font-size: medium;
 }
 
@@ -213,7 +213,7 @@
 }
 
 .unknownStatus {
-    color: #3754a566 !important;
+    color: $gray-600 !important;
     border-color: #3754a566 !important;
 }
 
