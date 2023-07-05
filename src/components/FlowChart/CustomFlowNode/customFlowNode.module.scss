@@ -29,11 +29,11 @@
 }
 
 .handleUp {
-    background-color: $brand-primary;
+    opacity: 0;
 }
 
 .handleDown {
-    background-color: $brand-primary;
+    opacity: 0;
 }
 
 .selectedBackground {
@@ -112,8 +112,8 @@
 }
 
 .expandButtonExpiring {
-    background-color: #ffc107;
-    border: none;
+    background-color: #ffc107a6 !important;
+    border: none !important;
     &:hover {
         background-color: #fabd05ec !important;
         border: none;
@@ -125,26 +125,26 @@
 }
 
 .expiredStatus {
-    color: #dc3545;
-    border-color: #dc3545;
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
 }
 
 .expandButtonExpired {
-    background-color: #dc3545;
-    border: none;
+    background-color: #dc3546a4 !important;
+    border: none !important;
     &:hover {
-        background-color: #c94e39ec !important;
+        background-color: #dc3545 !important;
         border: none;
     }
     &:active {
-        background-color: #c94e39d8 !important;
+        background-color: #dc3545 !important;
         border: none;
     }
 }
 
 .validStatus {
-    color: #6ad984e1;
-    border-color: #6ad984e1;
+    color: #6ad984e1 !important;
+    border-color: #6ad984e1 !important;
 }
 
 .expandButtonValid {
@@ -161,8 +161,8 @@
 }
 
 .invalidStatus {
-    color: #ff8080;
-    border-color: #ff8080;
+    color: #ff8080 !important;
+    border-color: #ff8080 !important;
 }
 
 .expandButtonInvalid {
@@ -179,8 +179,8 @@
 }
 
 .newStatus {
-    color: #007bff;
-    border-color: #007bff;
+    color: #007bff !important;
+    border-color: #007bff !important;
 }
 
 .expandButtonNew {

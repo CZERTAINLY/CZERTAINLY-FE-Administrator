@@ -274,7 +274,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 description: certificate?.key?.description || "",
                 redirectUrl:
                     certificate?.key?.uuid && certificate?.key?.tokenInstanceUuid
-                        ? `/cryptographicKeys/detail/${certificate.key.tokenInstanceUuid}/${certificate.key.uuid}`
+                        ? `/keys/detail/${certificate.key.tokenInstanceUuid}/${certificate.key.uuid}`
                         : undefined,
                 otherProperties: [
                     {
@@ -418,7 +418,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     entityType: "Location",
                     icon: "fa fa fa-map-marker",
                     entityLabel: location?.name || "",
-                    redirectUrl: location?.uuid ? `/locations/detail/${location?.uuid}` : undefined,
+                    redirectUrl: location?.uuid ? `/locations/detail/${certificate?.uuid}/${location?.uuid}` : undefined,
                     otherProperties: [
                         {
                             propertyName: "Location Description",
