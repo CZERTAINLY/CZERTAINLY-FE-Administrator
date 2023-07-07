@@ -27,7 +27,9 @@ import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
+import "reactflow/dist/style.css";
 
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import {
     Badge,
     Form as BootstrapForm,
@@ -55,9 +57,13 @@ import Asn1Dialog from "../Asn1Dialog/Asn1Dialog";
 import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
+import cx from "classnames";
+import FlowChart from "components/FlowChart";
+import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
-
+import styles from "./certificateDetail.module.scss";
 export default function CertificateDetail() {
     const dispatch = useDispatch();
 
@@ -81,6 +87,7 @@ export default function CertificateDetail() {
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
+    const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -101,7 +108,7 @@ export default function CertificateDetail() {
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
     const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
-
+    const deviceType = useDeviceType();
     const [currentInfoId, setCurrentInfoId] = useState("");
 
     const [group, setGroup] = useState<string>();
@@ -131,8 +138,29 @@ export default function CertificateDetail() {
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
 
+    const { nodes: certificateNodes, edges: certificateEdges } = transformCertifacetObjectToNodesAndEdges(
+        certificate,
+        users,
+        certLocations,
+        raProfileSelected,
+    );
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
+
+    const getFreshRaProfileDetail = useCallback(() => {
+        if (!id || !certificate?.raProfile?.authorityInstanceUuid) return;
+        dispatch(
+            raProfilesActions.getRaProfileDetail({
+                authorityUuid: certificate.raProfile.authorityInstanceUuid,
+                uuid: certificate.raProfile.uuid,
+            }),
+        );
+    }, [id, dispatch, certificate]);
+
+    useEffect(() => {
+        if (!id) return;
+        getFreshRaProfileDetail();
+    }, [dispatch, id, certificate]);
 
     useEffect(() => {
         if (!settings?.utils.utilsServiceUrl) return;
@@ -1235,8 +1263,17 @@ export default function CertificateDetail() {
         [certLocations, locations],
     );
 
+    const defaultViewPort = useMemo(
+        () => ({
+            zoom: 0.5,
+            x: deviceType === DeviceType.Tablet ? -50 : deviceType === DeviceType.Mobile ? -150 : 300,
+            y: 0,
+        }),
+        [deviceType],
+    );
+
     return (
-        <Container className="themed-container" fluid>
+        <Container className={cx("themed-container", styles.certificateContainer)} fluid>
             <TabLayout
                 tabs={[
                     {
@@ -1377,6 +1414,20 @@ export default function CertificateDetail() {
                                     <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
                                 </Widget>
                             </Widget>
+                        ),
+                    },
+                    {
+                        title: "Flow",
+                        content: certificateNodes.length ? (
+                            <FlowChart
+                                flowChartTitle="Certificate Flow"
+                                flowChartEdges={certificateEdges}
+                                flowChartNodes={certificateNodes}
+                                defaultViewport={defaultViewPort}
+                            />
+                        ) : (
+                            // Todo: Add a placeholder for the flow chart
+                            <></>
                         ),
                     },
                     {

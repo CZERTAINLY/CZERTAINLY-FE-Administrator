@@ -1,0 +1,7 @@
+@import "src/resources/styles/app";
+
+.certificateContainer {
+    @include for-mobile {
+        padding: 0 !important;
+    }
+}
