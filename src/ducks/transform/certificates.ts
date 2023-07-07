@@ -1,5 +1,5 @@
-import { CustomNode } from "components/FlowChart";
-import { Edge } from "reactflow";
+import { CustomNode, nodeHeight, nodeWidth } from "components/FlowChart";
+import { Edge, MarkerType } from "reactflow";
 import {
     CertificateBulkDeleteRequestDto,
     CertificateBulkDeleteRequestModel,
@@ -190,17 +190,12 @@ export function transformCertifacetObjectToNodesAndEdges(
         return { nodes, edges };
     }
 
-    edges.push({
-        id: "e0-1",
-        source: "0",
-        target: "6",
-        type: "default",
-    });
-
     nodes.push({
         id: "1",
         type: "customFlowNode",
         position: { x: 0, y: 0 },
+        width: nodeWidth,
+        height: nodeHeight,
         data: {
             entityType: "Certificate",
             entityLabel: certificate.commonName,
@@ -235,6 +230,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: "2",
                 type: "customFlowNode",
                 position: { x: 0, y: 0 },
+                width: nodeWidth,
+                height: nodeHeight,
                 data: {
                     entityType: "Owner",
                     icon: "fa fa fa-user",
@@ -257,7 +254,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: "e1-2",
                 source: "1",
                 target: "2",
-                type: "default",
+                type: "floating",
+                markerEnd: { type: MarkerType.Arrow },
             });
         }
     }
@@ -267,6 +265,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "4",
             type: "customFlowNode",
             position: { x: 0, y: 0 },
+            width: nodeWidth,
+            height: nodeHeight,
             data: {
                 entityType: "Key",
                 entityLabel: certificate?.key?.name || "",
@@ -292,7 +292,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "e1-4",
             source: "4",
             target: "1",
-            type: "default",
+            type: "floating",
+            markerEnd: { type: MarkerType.Arrow },
         });
     }
 
@@ -301,6 +302,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "6",
             type: "customFlowNode",
             position: { x: 0, y: 0 },
+            width: nodeWidth,
+            height: nodeHeight,
             data: {
                 entityType: "Certificate Issuer",
                 icon: "fa fa fa fa-stamp",
@@ -321,7 +324,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "e1-6",
             source: "6",
             target: "1",
-            type: "default",
+            type: "floating",
+            markerEnd: { type: MarkerType.Arrow },
         });
     }
 
@@ -330,6 +334,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "3",
             type: "customFlowNode",
             position: { x: 0, y: 0 },
+            width: nodeWidth,
+            height: nodeHeight,
             data: {
                 entityType: "Group",
                 description: certificate?.group?.description || "",
@@ -342,7 +348,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "e1-3",
             source: "3",
             target: "1",
-            type: "default",
+            type: "floating",
+            markerEnd: { type: MarkerType.Arrow },
         });
     }
 
@@ -351,6 +358,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "5",
             type: "customFlowNode",
             position: { x: 0, y: 0 },
+            width: nodeWidth,
+            height: nodeHeight,
             data: {
                 entityType: "RA Profile",
                 icon: "fa fa fa-address-card",
@@ -372,7 +381,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: "e1-5",
             source: "1",
             target: "5",
-            type: "default",
+            type: "floating",
+            markerEnd: { type: MarkerType.Arrow },
         });
 
         if (raProfileSelected) {
@@ -380,6 +390,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: "7",
                 type: "customFlowNode",
                 position: { x: 0, y: 0 },
+                width: nodeWidth,
+                height: nodeHeight,
                 data: {
                     entityType: "Authority",
                     // <i class="fa-solid fa-stamp"></i>
@@ -404,7 +416,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: "e5-7",
                 target: "5",
                 source: "7",
-                type: "default",
+                type: "floating",
+                markerEnd: { type: MarkerType.Arrow },
             });
         }
     }
@@ -414,6 +427,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: location?.uuid || "",
                 type: "customFlowNode",
                 position: { x: 0, y: 0 },
+                width: nodeWidth,
+                height: nodeHeight,
                 data: {
                     entityType: "Location",
                     icon: "fa fa fa-map-marker",
@@ -435,7 +450,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: `e${location?.uuid}-1`,
                 target: location?.uuid || "",
                 source: "1",
-                type: "default",
+                type: "floating",
+                markerEnd: { type: MarkerType.Arrow },
             });
         });
     }

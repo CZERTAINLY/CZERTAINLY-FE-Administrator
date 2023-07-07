@@ -1,3 +1,4 @@
+import { CustomNode } from "components/FlowChart";
 import { Edge, NodeProps } from "reactflow";
 import { CertificateStatus } from "./openapi";
 
@@ -18,10 +19,6 @@ export interface CustomNodeData {
     certificateNodeStatus?: CertificateStatus;
 }
 export interface EntityNodeProps extends NodeProps {
-    data: CustomNodeData;
-}
-
-export interface CustomNode extends Node {
     data: CustomNodeData;
 }
 

@@ -2,6 +2,7 @@ import Widget from "components/Widget";
 import dagre from "dagre";
 import { useCallback, useEffect, useState } from "react";
 
+import cx from "classnames";
 import {
     Background,
     BackgroundVariant,
@@ -18,6 +19,8 @@ import {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { CustomNodeData } from "types/flowchart";
+import FloatingEdge from "./CustomEdge";
+import FloatingConnectionLine from "./CustomEdge/FloatingConnectionLine";
 import CustomFlowNode from "./CustomFlowNode";
 import style from "./flowChart.module.scss";
 const nodeTypes = { customFlowNode: CustomFlowNode };
@@ -33,18 +36,21 @@ export interface FlowChartProps {
     defaultViewport?: Viewport | undefined;
 }
 
+const edgeTypes = {
+    floating: FloatingEdge,
+};
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-const nodeWidth = 350;
-const nodeHeight = 350;
+export const nodeWidth = 350;
+export const nodeHeight = 100;
 
 const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB") => {
     const isHorizontal = direction === "LR";
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
-        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight : nodeHeight - 325;
+        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 40 : nodeHeight;
         dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
     });
 
@@ -73,7 +79,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
 const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport }: FlowChartProps) => {
     const [nodes, setNodes] = useState(flowChartNodes);
     const [edges, setEdges] = useState(flowChartEdges);
-    const defaultEdgeOptions = { animated: true };
+    const defaultEdgeOptions = { animated: false };
 
     const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
     const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
@@ -87,9 +93,9 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
     }, [flowChartEdges, flowChartNodes]);
 
     return (
-        <Widget>
+        <Widget className={style.flowWidget}>
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
-            <div className={style.flowChartContainer}>
+            <div className={cx(style.flowChartContainer, style.floatingedges)}>
                 <ReactFlow
                     nodes={nodes}
                     proOptions={{ hideAttribution: true }}
@@ -100,6 +106,8 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
                     fitView={!defaultViewport}
                     defaultViewport={defaultViewport}
                     defaultEdgeOptions={defaultEdgeOptions}
+                    edgeTypes={edgeTypes}
+                    connectionLineComponent={FloatingConnectionLine}
                 >
                     <Controls />
                     <Background variant={BackgroundVariant.Dots} gap={16} size={1} />

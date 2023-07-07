@@ -3,7 +3,7 @@
 .customNodeBackground {
     position: relative;
     background-color: white;
-    padding: 1rem;
+    padding: 0.5rem;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -16,7 +16,8 @@
     text-align: left;
     max-width: 515px;
     z-index: 1;
-    box-shadow: 3px 3px 1px -1px rgba(0, 0, 0, 0.2), 2px 2px 1px 0px rgba(0, 0, 0, 0.14), 1px 1px 3px 0px rgba(0, 0, 0, 0.12);
+    box-shadow: 2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15), 1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
+        0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
 }
 
 .iconStyle {
