@@ -4,6 +4,7 @@
     position: relative;
     background-color: white;
     padding: 0.5rem;
+    padding-bottom: 0.9rem;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -89,7 +90,7 @@
     color: $gray-600;
 }
 .mainNodeBody {
-    border-width: 5px;
+    border-width: 3px;
     border-color: $czertainly-blue;
 }
 

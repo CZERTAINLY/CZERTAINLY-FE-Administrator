@@ -79,7 +79,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
 const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport }: FlowChartProps) => {
     const [nodes, setNodes] = useState(flowChartNodes);
     const [edges, setEdges] = useState(flowChartEdges);
-    const defaultEdgeOptions = { animated: false };
+    const defaultEdgeOptions = { animated: true };
 
     const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
     const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
