@@ -50,6 +50,8 @@ import { slice as globalMetadataSlice, initialState as initialGlobalMetadataStat
 import globalMetadataEpics from "./globalMetadata-epics";
 import { slice as initialLocationsSlice, initialState as initialLocationsState } from "./locations";
 import locationsEpics from "./locations-epics";
+import { initialState as initialNotificationsState, slice as notificationsSlice } from "./notifications";
+import notificationsEpics from "./notifications-epics";
 import { initialState as initialPagingState, slice as pagingSlice } from "./paging";
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
 import raProfilesEpics from "./ra-profiles-epics";
@@ -113,6 +115,7 @@ export const initialState = {
     [globalMetadataSlice.name]: initialGlobalMetadataState,
     [settingsSlice.name]: initialSettingsState,
     [schedulerSlice.name]: initialSchedulerState,
+    [notificationsSlice.name]: initialNotificationsState,
     [enumsSlice.name]: initialEnumsState,
     [tokenSlice.name]: initialTokenAttributesState,
     [tokenProfileSlice.name]: initialTokenProfileAttributesState,
@@ -152,6 +155,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [globalMetadataSlice.name]: globalMetadataSlice.reducer,
     [settingsSlice.name]: settingsSlice.reducer,
     [schedulerSlice.name]: schedulerSlice.reducer,
+    [notificationsSlice.name]: notificationsSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
@@ -189,6 +193,7 @@ export const epics = combineEpics(
     ...globalMetadataEpics,
     ...settingsEpics,
     ...schedulerEpics,
+    ...notificationsEpics,
     ...enumsEpics,
     ...tokenEpics,
     ...tokenProfileEpics,

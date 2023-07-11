@@ -1,8 +1,9 @@
 import { AppEpic } from "ducks";
 
-import { mergeMap, take } from "rxjs/operators";
+import { debounceTime, map, mergeMap, take } from "rxjs/operators";
 import { actions as authActions } from "./auth";
 import { actions as enumActions } from "./enums";
+import { actions as notificationsActions } from "./notifications";
 import { actions as settingsActions } from "./settings";
 
 const startup: AppEpic = (action$) =>
@@ -11,6 +12,12 @@ const startup: AppEpic = (action$) =>
         mergeMap(() => [authActions.getProfile(), settingsActions.getPlatformSettings(), enumActions.getPlatformEnums()]),
     );
 
-const epics = [startup];
+const repeated: AppEpic = (action$) =>
+    action$.pipe(
+        debounceTime(30000),
+        map(() => notificationsActions.listNotifications({ unread: false, pagination: { filters: [] } })), // TODO: unread
+    );
+
+const epics = [startup, repeated];
 
 export default epics;

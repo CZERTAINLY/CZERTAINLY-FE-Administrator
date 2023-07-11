@@ -2,10 +2,11 @@ import cx from "classnames";
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavItem } from "reactstrap";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, Navbar } from "reactstrap";
 
 import { selectors } from "ducks/auth";
 
+import NotificationsList from "components/_pages/notifications/list";
 import logo from "../../../resources/images/czertainly_white_H.svg";
 import style from "./Header.module.scss";
 
@@ -67,6 +68,8 @@ function Header({ sidebarToggle }: Props) {
                         </DropdownMenu>
                     </Dropdown>
                 ) : null}
+
+                <NotificationsList />
             </Nav>
         </Navbar>
     );

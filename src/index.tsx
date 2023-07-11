@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import AppRouter from "./components/AppRouter";
+import { actions as notificationsActions } from "./ducks/notifications";
 import reportWebVitals from "./reportWebVitals";
 import configureStore from "./store";
 
@@ -11,6 +12,8 @@ const container = document.getElementById("root")!;
 const root = createRoot(container);
 
 export const store = configureStore();
+
+store.dispatch(notificationsActions.listNotifications({ unread: false, pagination: { filters: [] } })); // TODO: unread
 
 root.render(
     process.env.NODE_ENV === "development" ? (
