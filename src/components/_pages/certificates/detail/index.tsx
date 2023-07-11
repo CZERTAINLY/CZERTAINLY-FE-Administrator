@@ -172,11 +172,23 @@ export default function CertificateDetail() {
         dispatch(actions.getCertificateHistory({ uuid: id }));
     }, [dispatch, id]);
 
+    const getFreshCertificateLocations = useCallback(() => {
+        if (!id || isPushingCertificate || isRemovingCertificate) return;
+
+        dispatch(actions.listCertificateLocations({ uuid: id }));
+        dispatch(locationActions.listLocations({}));
+    }, [dispatch, isPushingCertificate, isRemovingCertificate, id]);
+
+    useEffect(() => {
+        getFreshCertificateLocations();
+    }, [getFreshCertificateLocations]);
+
     const getFreshCertificateDetail = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getCertificateDetail({ uuid: id }));
         dispatch(actions.getCertificateHistory({ uuid: id }));
+        getFreshCertificateLocations();
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -264,16 +276,6 @@ export default function CertificateDetail() {
               );
     }, [dispatch, locationToEntityMap, selectLocationsCheckedRows]);
 
-    const getFreshCertificateLocations = useCallback(() => {
-        if (!id || isPushingCertificate || isRemovingCertificate) return;
-
-        dispatch(actions.listCertificateLocations({ uuid: id }));
-        dispatch(locationActions.listLocations({}));
-    }, [dispatch, isPushingCertificate, isRemovingCertificate, id]);
-
-    useEffect(() => {
-        getFreshCertificateLocations();
-    }, [getFreshCertificateLocations]);
     const onDeleteConfirmed = useCallback(() => {
         if (!certificate) return;
 
@@ -1386,7 +1388,7 @@ export default function CertificateDetail() {
                                     busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
                                     widgetButtons={buttonsLocations}
                                     titleSize="large"
-                                    refreshAction={certificate && getFreshCertificateLocations}
+                                    refreshAction={getFreshCertificateLocations}
                                     widgetLockName={LockWidgetNameEnum.CertificationLocations}
                                 >
                                     <br />
@@ -1409,6 +1411,7 @@ export default function CertificateDetail() {
                                     busy={isFetchingHistory}
                                     titleSize="large"
                                     refreshAction={getFreshCertificateHistory}
+                                    widgetLockName={LockWidgetNameEnum.CertificateEventHistory}
                                 >
                                     <br />
                                     <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />

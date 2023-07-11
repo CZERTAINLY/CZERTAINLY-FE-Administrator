@@ -18,7 +18,6 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
     const onEntered = () => setStatus("-");
     const onExited = () => setStatus("+");
     const toggle = () => setCollapse(!collapse);
-    console.log("data.certificateNodeStatus", data.certificateNodeStatus);
 
     const getStatusClasses = () => {
         switch (data.certificateNodeStatus) {

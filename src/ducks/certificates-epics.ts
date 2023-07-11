@@ -260,16 +260,20 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getCertificateHistory.match),
         switchMap((action) =>
             deps.apiClients.certificates.getCertificateEventHistory({ uuid: action.payload.uuid }).pipe(
-                map((records) =>
-                    slice.actions.getCertificateHistorySuccess({
-                        certificateHistory: records.map((record) => transformCertificateHistoryDtoToModel(record)),
-                    }),
+                mergeMap((records) =>
+                    of(
+                        slice.actions.getCertificateHistorySuccess({
+                            certificateHistory: records.map((record) => transformCertificateHistoryDtoToModel(record)),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificateEventHistory),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateHistoryFailure({ error: extractError(err, "Failed to get certificate history") }),
                         appRedirectActions.fetchError({ error: err, message: "Failed to get certificate history" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateEventHistory),
                     ),
                 ),
             ),
