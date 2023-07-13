@@ -109,7 +109,6 @@ export default function CertificateForm() {
                     signRequest: {
                         pkcs10: fileContent,
                         attributes,
-                        //TODO: check how to retrieve this value while viewing in certificate details request tab
                         csrAttributes: collectFormAttributes("csrAttributes", csrAttributeDescriptors, values),
                         signatureAttributes: collectFormAttributes("signatureAttributes", signatureAttributeDescriptors, values),
                         keyUuid: values.key?.value.uuid,

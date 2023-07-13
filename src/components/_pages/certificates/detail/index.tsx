@@ -90,7 +90,8 @@ export default function CertificateDetail() {
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
-    const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
+    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
+    const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -972,7 +973,7 @@ export default function CertificateDetail() {
                       columns: [
                           "Certificate Type",
                           certificate?.certificateRequest?.certificateType
-                              ? getEnumLabel(contentTypeEnum, certificate?.certificateRequest?.certificateType)
+                              ? getEnumLabel(certificateTypeEnum, certificate?.certificateRequest?.certificateType)
                               : "",
                       ],
                   },
@@ -981,7 +982,7 @@ export default function CertificateDetail() {
                       columns: [
                           "Certificate Request Format",
                           certificate?.certificateRequest?.certificateRequestFormat
-                              ? getEnumLabel(contentTypeEnum, certificate?.certificateRequest?.certificateRequestFormat)
+                              ? getEnumLabel(certificateRequestFormatEnum, certificate?.certificateRequest?.certificateRequestFormat)
                               : "",
                       ],
                   },
@@ -1395,7 +1396,7 @@ export default function CertificateDetail() {
                                         <Widget title="Request Attributes" busy={isBusy} titleSize="large">
                                             <br />
                                             <AttributeViewer
-                                                viewerType={ATTRIBUTE_VIEWER_TYPE.SIGNATURE}
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
                                                 attributes={certificate?.certificateRequest?.attributes}
                                             />
                                         </Widget>
@@ -1403,7 +1404,7 @@ export default function CertificateDetail() {
                                         <Widget title="Signature attributes" titleSize="large">
                                             <br />
                                             <AttributeViewer
-                                                viewerType={ATTRIBUTE_VIEWER_TYPE.SIGNATURE}
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
                                                 attributes={certificate?.certificateRequest?.signatureAttributes}
                                             />
                                         </Widget>

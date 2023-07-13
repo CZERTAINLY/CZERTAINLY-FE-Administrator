@@ -24,8 +24,6 @@ export enum ATTRIBUTE_VIEWER_TYPE {
     METADATA,
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
-    SIGNATURE,
-    REQUEST,
 }
 
 export interface Props {
@@ -64,9 +62,7 @@ export default function AttributeViewer({
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE ||
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS ||
             viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT ||
-            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT ||
-            viewerType === ATTRIBUTE_VIEWER_TYPE.SIGNATURE ||
-            viewerType === ATTRIBUTE_VIEWER_TYPE.REQUEST
+            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT
         ) {
             result.push(
                 {
@@ -223,7 +219,7 @@ export default function AttributeViewer({
 
     const tableData: TableDataRow[] = useMemo(() => {
         switch (viewerType) {
-            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE || ATTRIBUTE_VIEWER_TYPE.SIGNATURE || ATTRIBUTE_VIEWER_TYPE.REQUEST:
+            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE:
                 return attributes?.map(getAttributesTableData);
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS:
                 return descriptors?.map(getDescriptorsTableData);
