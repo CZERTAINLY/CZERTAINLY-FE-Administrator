@@ -25,6 +25,7 @@ export enum ATTRIBUTE_VIEWER_TYPE {
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
     SIGNATURE,
+    REQUEST,
 }
 
 export interface Props {
@@ -63,7 +64,9 @@ export default function AttributeViewer({
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE ||
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS ||
             viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT ||
-            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT
+            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT ||
+            viewerType === ATTRIBUTE_VIEWER_TYPE.SIGNATURE ||
+            viewerType === ATTRIBUTE_VIEWER_TYPE.REQUEST
         ) {
             result.push(
                 {
@@ -94,22 +97,7 @@ export default function AttributeViewer({
                 width: "15%",
             });
         }
-        if (viewerType === ATTRIBUTE_VIEWER_TYPE.SIGNATURE) {
-            result.push(
-                {
-                    id: "Type",
-                    content: "Type",
-                },
-                {
-                    id: "label",
-                    content: "Label",
-                },
-                {
-                    id: "name",
-                    content: "Name",
-                },
-            );
-        }
+
         return result;
     };
 
@@ -235,7 +223,7 @@ export default function AttributeViewer({
 
     const tableData: TableDataRow[] = useMemo(() => {
         switch (viewerType) {
-            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE:
+            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE || ATTRIBUTE_VIEWER_TYPE.SIGNATURE || ATTRIBUTE_VIEWER_TYPE.REQUEST:
                 return attributes?.map(getAttributesTableData);
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS:
                 return descriptors?.map(getDescriptorsTableData);
@@ -252,13 +240,7 @@ export default function AttributeViewer({
                         })),
                     )
                     .flat();
-            case ATTRIBUTE_VIEWER_TYPE.SIGNATURE:
-                return attributes.map((attribute) => {
-                    return {
-                        id: attribute.type,
-                        columns: [attribute.type, attribute.label, attribute.name],
-                    };
-                });
+
             default:
                 return [];
         }

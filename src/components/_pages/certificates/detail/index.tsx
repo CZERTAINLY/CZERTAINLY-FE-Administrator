@@ -22,6 +22,7 @@ import { selectors as settingSelectors } from "ducks/settings";
 
 import { CertificateStatus as CertStatus } from "../../../../types/openapi";
 
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,6 +51,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { downloadFile, formatPEM } from "utils/certificate";
 
+import { PlatformEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
@@ -88,6 +90,7 @@ export default function CertificateDetail() {
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
+    const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -961,12 +964,26 @@ export default function CertificateDetail() {
         return certificate?.certificateRequest
             ? [
                   {
+                      id: "commonName",
+                      columns: ["Common Name", certificate?.certificateRequest?.commonName || ""],
+                  },
+                  {
                       id: "certificateType",
-                      columns: ["Certificate Type", certificate?.certificateRequest?.certificateType || ""],
+                      columns: [
+                          "Certificate Type",
+                          certificate?.certificateRequest?.certificateType
+                              ? getEnumLabel(contentTypeEnum, certificate?.certificateRequest?.certificateType)
+                              : "",
+                      ],
                   },
                   {
                       id: "certificateRequestFormat",
-                      columns: ["Certificate Request Format", certificate?.certificateRequest?.certificateRequestFormat || ""],
+                      columns: [
+                          "Certificate Request Format",
+                          certificate?.certificateRequest?.certificateRequestFormat
+                              ? getEnumLabel(contentTypeEnum, certificate?.certificateRequest?.certificateRequestFormat)
+                              : "",
+                      ],
                   },
                   {
                       id: "publicKeyAlgorithm",
@@ -1003,17 +1020,6 @@ export default function CertificateDetail() {
                       columns: ["Common Name", certificate?.certificateRequest?.commonName || ""],
                   },
               ]
-            : [];
-    }, [certificate?.certificateRequest]);
-
-    const csrSignatureAttributesData: TableDataRow[] = useMemo(() => {
-        return certificate?.certificateRequest?.signatureAttributes?.length
-            ? certificate?.certificateRequest?.signatureAttributes.map((attribute) => {
-                  return {
-                      id: attribute.type,
-                      columns: [attribute.type, attribute.label, attribute.name],
-                  };
-              })
             : [];
     }, [certificate?.certificateRequest]);
 
@@ -1170,7 +1176,7 @@ export default function CertificateDetail() {
                       columns: ["Basic Constraint", certificate.basicConstraints],
                   },
               ];
-        if (health && certificate?.status !== CertStatus.New) {
+        if (certificate?.status !== CertStatus.New) {
             certDetail.push({
                 id: "asn1structure",
                 columns: ["ASN.1 Structure", certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
@@ -1388,7 +1394,10 @@ export default function CertificateDetail() {
                                     <Col>
                                         <Widget title="Request Attributes" busy={isBusy} titleSize="large">
                                             <br />
-                                            <CustomTable headers={detailHeaders} data={csrRequestAttributesData} />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.SIGNATURE}
+                                                attributes={certificate?.certificateRequest?.attributes}
+                                            />
                                         </Widget>
 
                                         <Widget title="Signature attributes" titleSize="large">
