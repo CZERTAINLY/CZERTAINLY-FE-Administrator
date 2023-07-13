@@ -1,6 +1,6 @@
 import { AppEpic } from "ducks";
 import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as appRedirectActions } from "./app-redirect";
 import { actions as widgetLockActions } from "./widget-locks";
@@ -13,6 +13,32 @@ import { actions as pagingActions } from "./paging";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformNotificationDtoToModel } from "./transform/notifications";
 
+const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listOverviewNotifications.match),
+        switchMap((action) =>
+            deps.apiClients.notifications.listNotifications({ request: { unread: true } }).pipe(
+                mergeMap((response) =>
+                    of(
+                        slice.actions.listOverviewNotificationsSuccess(response.items.map(transformNotificationDtoToModel)),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.NotificationsOverview),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.listOverviewNotificationsFailure({
+                            error: extractError(err, "Failed to list overview notification"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to list overview notifications" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const listNotifications: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listNotifications.match),
@@ -20,7 +46,7 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
             store.dispatch(pagingActions.list(EntityType.NOTIFICATIONS));
             return deps.apiClients.notifications
                 .listNotifications({
-                    request: { ...transformSearchRequestModelToDto(action.payload.pagination), unread: action.payload.unread },
+                    request: { unread: action.payload.unread, ...transformSearchRequestModelToDto(action.payload.pagination) },
                 })
                 .pipe(
                     mergeMap((response) =>
@@ -46,9 +72,11 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
 const deleteNotification: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteNotification.match),
-        switchMap((action) =>
+        mergeMap((action) =>
             deps.apiClients.notifications.deleteNotification({ uuid: action.payload.uuid }).pipe(
-                map(() => slice.actions.deleteNotificationSuccess({ uuid: action.payload.uuid })),
+                mergeMap(() =>
+                    of(slice.actions.deleteNotificationSuccess({ uuid: action.payload.uuid }), slice.actions.listOverviewNotifications()),
+                ),
 
                 catchError((err) =>
                     of(
@@ -64,9 +92,14 @@ const deleteNotification: AppEpic = (action$, state$, deps) => {
 const markAsReadNotification: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.markAsReadNotification.match),
-        switchMap((action) =>
+        mergeMap((action) =>
             deps.apiClients.notifications.markNotificationAsRead({ uuid: action.payload.uuid }).pipe(
-                map((res) => slice.actions.markAsReadNotificationSuccess(transformNotificationDtoToModel(res))),
+                mergeMap((res) =>
+                    of(
+                        slice.actions.markAsReadNotificationSuccess(transformNotificationDtoToModel(res)),
+                        slice.actions.listOverviewNotifications(),
+                    ),
+                ),
 
                 catchError((err) =>
                     of(
@@ -79,6 +112,6 @@ const markAsReadNotification: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [listNotifications, deleteNotification, markAsReadNotification];
+const epics = [listOverviewNotifications, listNotifications, deleteNotification, markAsReadNotification];
 
 export default epics;

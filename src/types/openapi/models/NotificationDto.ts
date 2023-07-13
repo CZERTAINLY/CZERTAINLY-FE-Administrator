@@ -11,6 +11,8 @@
  * Do not edit the class manually.
  */
 
+import type { Resource } from "./";
+
 /**
  * @export
  * @interface NotificationDto
@@ -40,4 +42,21 @@ export interface NotificationDto {
      * @memberof NotificationDto
      */
     readAt?: string;
+    /**
+     * Notification sent date
+     * @type {string}
+     * @memberof NotificationDto
+     */
+    sentAt: string;
+    /**
+     * @type {Resource}
+     * @memberof NotificationDto
+     */
+    targetObjectType?: Resource;
+    /**
+     * Target object identification (UUID)
+     * @type {Array<string>}
+     * @memberof NotificationDto
+     */
+    targetObjectIdentification?: Array<string>;
 }

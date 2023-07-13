@@ -95,6 +95,7 @@ import AppLogin from "./AppLogin/AppLogin";
 import AppRedirect from "./AppRedirect";
 
 import { Resource } from "types/openapi";
+import NotificationsList from "./_pages/notifications/list";
 import SchedulerJobDetail from "./_pages/scheduler/detail";
 import SchedulerJobsList from "./_pages/scheduler/list";
 import Layout from "./Layout";
@@ -288,6 +289,8 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Jobs.toLowerCase()}`} element={<SchedulerJobsList />} />
                     <Route path={`/${Resource.Jobs.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Jobs.toLowerCase()}`} />} />
                     <Route path={`/${Resource.Jobs.toLowerCase()}/detail/:id`} element={<SchedulerJobDetail />} />
+
+                    <Route path={`/notifications`} element={<NotificationsList />} />
                 </Route>
 
                 {/*

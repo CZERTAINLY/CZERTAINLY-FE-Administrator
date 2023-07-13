@@ -9,13 +9,18 @@ import { actions as settingsActions } from "./settings";
 const startup: AppEpic = (action$) =>
     action$.pipe(
         take(1),
-        mergeMap(() => [authActions.getProfile(), settingsActions.getPlatformSettings(), enumActions.getPlatformEnums()]),
+        mergeMap(() => [
+            authActions.getProfile(),
+            settingsActions.getPlatformSettings(),
+            enumActions.getPlatformEnums(),
+            notificationsActions.listOverviewNotifications(),
+        ]),
     );
 
 const repeated: AppEpic = (action$) =>
     action$.pipe(
         debounceTime(30000),
-        map(() => notificationsActions.listNotifications({ unread: false, pagination: { filters: [] } })), // TODO: unread
+        map(() => notificationsActions.listOverviewNotifications()),
     );
 
 const epics = [startup, repeated];

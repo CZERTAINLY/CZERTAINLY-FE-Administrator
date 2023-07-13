@@ -73,6 +73,7 @@ export enum LockWidgetNameEnum {
     ListOfSchedulerHistory,
     SchedulerJobDetail,
     ListOfNotifications,
+    NotificationsOverview,
 }
 
 export interface WidgetLockModel {

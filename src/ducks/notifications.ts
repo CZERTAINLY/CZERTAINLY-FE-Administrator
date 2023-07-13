@@ -4,15 +4,19 @@ import { NotificationModel } from "types/notifications";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
+    overviewNotifications: NotificationModel[];
     notifications: NotificationModel[];
 
+    isFetchingOverview: boolean;
     isDeleting: boolean;
     isMarking: boolean;
 };
 
 export const initialState: State = {
+    overviewNotifications: [],
     notifications: [],
 
+    isFetchingOverview: false,
     isDeleting: false,
     isMarking: false,
 };
@@ -23,6 +27,20 @@ export const slice = createSlice({
     initialState,
 
     reducers: {
+        listOverviewNotifications: (state, action: PayloadAction<void>) => {
+            state.isFetchingOverview = true;
+            state.overviewNotifications = [];
+        },
+
+        listOverviewNotificationsSuccess: (state, action: PayloadAction<NotificationModel[]>) => {
+            state.isFetchingOverview = false;
+            state.overviewNotifications = action.payload;
+        },
+
+        listOverviewNotificationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingOverview = false;
+        },
+
         listNotifications: (state, action: PayloadAction<{ unread: boolean; pagination: SearchRequestModel }>) => {
             state.notifications = [];
         },
@@ -65,16 +83,20 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
+const overviewNotifications = createSelector(state, (state) => state.overviewNotifications);
 const notifications = createSelector(state, (state) => state.notifications);
 
+const isFetchingOverview = createSelector(state, (state) => state.isFetchingOverview);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isMarking = createSelector(state, (state) => state.isMarking);
 
 export const selectors = {
     state,
 
+    overviewNotifications,
     notifications,
 
+    isFetchingOverview,
     isDeleting,
     isMarking,
 };

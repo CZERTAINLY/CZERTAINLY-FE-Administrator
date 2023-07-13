@@ -6,7 +6,7 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, Nav
 
 import { selectors } from "ducks/auth";
 
-import NotificationsList from "components/_pages/notifications/list";
+import NotificationsOverview from "components/_pages/notifications/overview";
 import logo from "../../../resources/images/czertainly_white_H.svg";
 import style from "./Header.module.scss";
 
@@ -69,7 +69,7 @@ function Header({ sidebarToggle }: Props) {
                     </Dropdown>
                 ) : null}
 
-                <NotificationsList />
+                <NotificationsOverview />
             </Nav>
         </Navbar>
     );

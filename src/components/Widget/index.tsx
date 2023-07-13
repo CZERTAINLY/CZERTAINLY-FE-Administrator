@@ -43,22 +43,23 @@ function Widget({
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
 
-    const getTitleText = () => (
-        <h5
-            className={cx(
-                style.title,
-                { "fw-bold": titleBoldness === "bold" },
-                { "fw-bolder": titleBoldness === "bolder" },
-                { "fw-normal": titleBoldness === "normal" },
-                { [style.titleMedium]: titleSize === "medium" },
-                { [style.titleLarge]: titleSize === "large" },
-                { [style.titleSmall]: titleSize === "small" },
-                { [style.titleXL]: titleSize === "larger" },
-            )}
-        >
-            {title}
-        </h5>
-    );
+    const getTitleText = () =>
+        title ? (
+            <h5
+                className={cx(
+                    style.title,
+                    { "fw-bold": titleBoldness === "bold" },
+                    { "fw-bolder": titleBoldness === "bolder" },
+                    { "fw-normal": titleBoldness === "normal" },
+                    { [style.titleMedium]: titleSize === "medium" },
+                    { [style.titleLarge]: titleSize === "large" },
+                    { [style.titleSmall]: titleSize === "small" },
+                    { [style.titleXL]: titleSize === "larger" },
+                )}
+            >
+                {title}
+            </h5>
+        ) : null;
 
     const renderTitle = () => (titleLink ? <Link to={titleLink}>{getTitleText()}</Link> : getTitleText());
 
