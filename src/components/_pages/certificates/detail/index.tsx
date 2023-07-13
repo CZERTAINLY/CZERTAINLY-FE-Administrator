@@ -22,6 +22,7 @@ import { selectors as settingSelectors } from "ducks/settings";
 
 import { CertificateStatus as CertStatus } from "../../../../types/openapi";
 
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,6 +51,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { downloadFile, formatPEM } from "utils/certificate";
 
+import { PlatformEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
@@ -88,6 +90,8 @@ export default function CertificateDetail() {
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
+    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
+    const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -957,6 +961,69 @@ export default function CertificateDetail() {
         return sanList;
     }, [certificate]);
 
+    const csrPropertiesData: TableDataRow[] = useMemo(() => {
+        return certificate?.certificateRequest
+            ? [
+                  {
+                      id: "commonName",
+                      columns: ["Common Name", certificate?.certificateRequest?.commonName || ""],
+                  },
+                  {
+                      id: "certificateType",
+                      columns: [
+                          "Certificate Type",
+                          certificate?.certificateRequest?.certificateType
+                              ? getEnumLabel(certificateTypeEnum, certificate?.certificateRequest?.certificateType)
+                              : "",
+                      ],
+                  },
+                  {
+                      id: "certificateRequestFormat",
+                      columns: [
+                          "Certificate Request Format",
+                          certificate?.certificateRequest?.certificateRequestFormat
+                              ? getEnumLabel(certificateRequestFormatEnum, certificate?.certificateRequest?.certificateRequestFormat)
+                              : "",
+                      ],
+                  },
+                  {
+                      id: "publicKeyAlgorithm",
+                      columns: ["Public Key Algorithm", certificate?.certificateRequest?.publicKeyAlgorithm || ""],
+                  },
+                  {
+                      id: "signatureAlgorithm",
+                      columns: ["Signature Algorithm", certificate?.certificateRequest?.signatureAlgorithm || ""],
+                  },
+                  {
+                      id: "subjectDn",
+                      columns: ["Subject DN", certificate?.certificateRequest?.subjectDn || ""],
+                  },
+                  {
+                      id: "asn1RequestStructure",
+                      columns: [
+                          "ASN.1 Structure",
+                          certificate?.certificateRequest?.content ? (
+                              <Asn1Dialog content={certificate?.certificateRequest?.content} isCSR={true} />
+                          ) : (
+                              <>n/a</>
+                          ),
+                      ],
+                  },
+              ]
+            : [];
+    }, [certificate?.certificateRequest]);
+
+    const csrRequestAttributesData: TableDataRow[] = useMemo(() => {
+        return certificate?.certificateRequest
+            ? [
+                  {
+                      id: "Common Name",
+                      columns: ["Common Name", certificate?.certificateRequest?.commonName || ""],
+                  },
+              ]
+            : [];
+    }, [certificate?.certificateRequest]);
+
     const validationData: TableDataRow[] = useMemo(
         () =>
             !certificate
@@ -1110,10 +1177,10 @@ export default function CertificateDetail() {
                       columns: ["Basic Constraint", certificate.basicConstraints],
                   },
               ];
-        if (health && certificate?.status !== CertStatus.New) {
+        if (certificate?.status !== CertStatus.New) {
             certDetail.push({
                 id: "asn1structure",
-                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent} /> : <>n/a</>],
+                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
             });
         }
         return certDetail;
@@ -1307,6 +1374,39 @@ export default function CertificateDetail() {
                                         <Widget title="Other Properties" titleSize="large">
                                             <br />
                                             <CustomTable headers={propertiesHeaders} data={propertiesData} />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Request",
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget title="Properties" busy={isBusy} titleSize="large" lockSize="large">
+                                            <br />
+                                            <CustomTable headers={detailHeaders} data={csrPropertiesData} />
+                                        </Widget>
+                                    </Col>
+
+                                    <Col>
+                                        <Widget title="Request Attributes" busy={isBusy} titleSize="large">
+                                            <br />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
+                                                attributes={certificate?.certificateRequest?.attributes}
+                                            />
+                                        </Widget>
+
+                                        <Widget title="Signature attributes" titleSize="large">
+                                            <br />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
+                                                attributes={certificate?.certificateRequest?.signatureAttributes}
+                                            />
                                         </Widget>
                                     </Col>
                                 </Row>

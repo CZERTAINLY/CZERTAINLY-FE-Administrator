@@ -5,16 +5,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
 import { transformParseCertificateResponseDtoToAsn1String } from "../../../../ducks/transform/utilsCertificate";
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
-import { ParseCertificateRequestDtoParseTypeEnum } from "../../../../types/openapi/utils";
+import {
+    actions as utilsCertificateRequestActions,
+    selectors as utilsCertificateRequestSelectors,
+} from "../../../../ducks/utilsCertificateRequest";
+
+import { transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String } from "ducks/transform/utilsCertificateRequest";
+import { ParseCertificateRequestDtoParseTypeEnum, ParseRequestRequestDtoParseTypeEnum } from "../../../../types/openapi/utils";
 import Dialog from "../../../Dialog";
 
 interface Props {
-    certificateContent: string;
+    content: string;
+    isCSR?: boolean;
 }
 
-export default function Asn1Dialog({ certificateContent }: Props) {
+export default function Asn1Dialog({ content, isCSR }: Props) {
     const dispatch = useDispatch();
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
+    const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
+    const isFetchingCSRDetails = useSelector(utilsCertificateRequestSelectors.isFetchingDetail);
     const isFetchingDetail = useSelector(utilsCertificateSelectors.isFetchingDetail);
     const [asn1, setAsn1] = useState<string | undefined>(undefined);
 
@@ -22,6 +31,7 @@ export default function Asn1Dialog({ certificateContent }: Props) {
 
     useEffect(() => {
         dispatch(utilsCertificateActions.reset());
+        dispatch(utilsCertificateRequestActions.reset());
     }, [dispatch]);
 
     useEffect(() => {
@@ -31,27 +41,42 @@ export default function Asn1Dialog({ certificateContent }: Props) {
     }, [dispatch, health]);
 
     useEffect(() => {
-        if (parsedCertificate) {
+        if (parsedCertificate && !isCSR) {
             setAsn1(transformParseCertificateResponseDtoToAsn1String(parsedCertificate));
         }
     }, [parsedCertificate]);
 
+    useEffect(() => {
+        if (parsedCertificateRequest && isCSR) {
+            setAsn1(transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest));
+        }
+    }, [parsedCertificateRequest]);
+
     return (
         <>
-            <Spinner active={isFetchingDetail} />
+            <Spinner active={isFetchingDetail || isFetchingCSRDetails} />
             <Button
                 className="btn btn-link p-0"
-                disabled={!health || isFetchingDetail}
+                disabled={!health || isFetchingDetail || isFetchingCSRDetails}
                 size="sm"
                 color="primary"
                 onClick={() => {
-                    if (certificateContent && health) {
-                        dispatch(
-                            utilsCertificateActions.parseCertificate({
-                                certificate: certificateContent,
-                                parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1,
-                            }),
-                        );
+                    if (content && health) {
+                        if (!isCSR) {
+                            dispatch(
+                                utilsCertificateActions.parseCertificate({
+                                    certificate: content,
+                                    parseType: ParseCertificateRequestDtoParseTypeEnum.Asn1,
+                                }),
+                            );
+                        } else {
+                            dispatch(
+                                utilsCertificateRequestActions.parseCertificateRequest({
+                                    content,
+                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Asn1,
+                                }),
+                            );
+                        }
                     }
                 }}
                 title="Show ASN.1 Structure"

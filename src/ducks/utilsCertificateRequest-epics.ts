@@ -3,7 +3,7 @@ import { EMPTY, of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 
 import { extractError } from "utils/net";
-import { ParseRequestRequestDtoParseTypeEnum, ParseRequestRequestTypeEnum } from "../types/openapi/utils";
+import { ParseRequestRequestTypeEnum } from "../types/openapi/utils";
 import { actions as appRedirectActions } from "./app-redirect";
 
 import { slice } from "./utilsCertificateRequest";
@@ -17,8 +17,8 @@ const parseCertificateRequest: AppEpic = (action$, state$, deps) => {
                     ?.parseRequest({
                         requestType: ParseRequestRequestTypeEnum.Pkcs10,
                         parseRequestRequestDto: {
-                            request: action.payload,
-                            parseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                            request: action.payload.content,
+                            parseType: action.payload.requestParseType,
                         },
                     })
                     .pipe(

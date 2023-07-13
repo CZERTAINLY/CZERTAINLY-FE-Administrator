@@ -93,6 +93,7 @@ export default function AttributeViewer({
                 width: "15%",
             });
         }
+
         return result;
     };
 
@@ -235,6 +236,7 @@ export default function AttributeViewer({
                         })),
                     )
                     .flat();
+
             default:
                 return [];
         }

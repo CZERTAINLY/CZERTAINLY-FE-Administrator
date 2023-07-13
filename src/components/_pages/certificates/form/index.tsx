@@ -25,6 +25,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
+import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
@@ -283,7 +284,12 @@ export default function CertificateForm() {
                                     onFileContentLoaded={(fileContent) => {
                                         setFileContent(fileContent);
                                         if (health) {
-                                            dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent));
+                                            dispatch(
+                                                utilsCertificateRequestActions.parseCertificateRequest({
+                                                    content: fileContent,
+                                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                }),
+                                            );
                                         }
                                     }}
                                 />
