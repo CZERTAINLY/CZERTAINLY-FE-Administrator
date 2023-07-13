@@ -93,7 +93,7 @@ export default function PlatformSettingsForm() {
                                                 <TextField
                                                     label={"Utils Service URL"}
                                                     id={"utils.utilsServiceUrl"}
-                                                    validators={[validateUrl, debouncingHealthValidation.validateHealth]}
+                                                    validators={[debouncingHealthValidation.validateHealth]}
                                                 />
 
                                                 <div className="d-flex justify-content-end">

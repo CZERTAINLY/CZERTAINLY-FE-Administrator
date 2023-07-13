@@ -24,6 +24,7 @@ export enum ATTRIBUTE_VIEWER_TYPE {
     METADATA,
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
+    SIGNATURE,
 }
 
 export interface Props {
@@ -92,6 +93,22 @@ export default function AttributeViewer({
                 sortable: false,
                 width: "15%",
             });
+        }
+        if (viewerType === ATTRIBUTE_VIEWER_TYPE.SIGNATURE) {
+            result.push(
+                {
+                    id: "Type",
+                    content: "Type",
+                },
+                {
+                    id: "label",
+                    content: "Label",
+                },
+                {
+                    id: "name",
+                    content: "Name",
+                },
+            );
         }
         return result;
     };
@@ -235,6 +252,13 @@ export default function AttributeViewer({
                         })),
                     )
                     .flat();
+            case ATTRIBUTE_VIEWER_TYPE.SIGNATURE:
+                return attributes.map((attribute) => {
+                    return {
+                        id: attribute.type,
+                        columns: [attribute.type, attribute.label, attribute.name],
+                    };
+                });
             default:
                 return [];
         }

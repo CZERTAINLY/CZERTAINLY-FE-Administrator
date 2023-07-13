@@ -957,6 +957,66 @@ export default function CertificateDetail() {
         return sanList;
     }, [certificate]);
 
+    const csrPropertiesData: TableDataRow[] = useMemo(() => {
+        return certificate?.certificateRequest
+            ? [
+                  {
+                      id: "certificateType",
+                      columns: ["Certificate Type", certificate?.certificateRequest?.certificateType || ""],
+                  },
+                  {
+                      id: "certificateRequestFormat",
+                      columns: ["Certificate Request Format", certificate?.certificateRequest?.certificateRequestFormat || ""],
+                  },
+                  {
+                      id: "publicKeyAlgorithm",
+                      columns: ["Public Key Algorithm", certificate?.certificateRequest?.publicKeyAlgorithm || ""],
+                  },
+                  {
+                      id: "signatureAlgorithm",
+                      columns: ["Signature Algorithm", certificate?.certificateRequest?.signatureAlgorithm || ""],
+                  },
+                  {
+                      id: "subjectDn",
+                      columns: ["Subject DN", certificate?.certificateRequest?.subjectDn || ""],
+                  },
+                  {
+                      id: "asn1RequestStructure",
+                      columns: [
+                          "ASN.1 Structure",
+                          certificate?.certificateRequest?.content ? (
+                              <Asn1Dialog content={certificate?.certificateRequest?.content} isCSR={true} />
+                          ) : (
+                              <>n/a</>
+                          ),
+                      ],
+                  },
+              ]
+            : [];
+    }, [certificate?.certificateRequest]);
+
+    const csrRequestAttributesData: TableDataRow[] = useMemo(() => {
+        return certificate?.certificateRequest
+            ? [
+                  {
+                      id: "Common Name",
+                      columns: ["Common Name", certificate?.certificateRequest?.commonName || ""],
+                  },
+              ]
+            : [];
+    }, [certificate?.certificateRequest]);
+
+    const csrSignatureAttributesData: TableDataRow[] = useMemo(() => {
+        return certificate?.certificateRequest?.signatureAttributes?.length
+            ? certificate?.certificateRequest?.signatureAttributes.map((attribute) => {
+                  return {
+                      id: attribute.type,
+                      columns: [attribute.type, attribute.label, attribute.name],
+                  };
+              })
+            : [];
+    }, [certificate?.certificateRequest]);
+
     const validationData: TableDataRow[] = useMemo(
         () =>
             !certificate
@@ -1113,7 +1173,7 @@ export default function CertificateDetail() {
         if (health && certificate?.status !== CertStatus.New) {
             certDetail.push({
                 id: "asn1structure",
-                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog certificateContent={certificate.certificateContent} /> : <>n/a</>],
+                columns: ["ASN.1 Structure", certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
             });
         }
         return certDetail;
@@ -1307,6 +1367,36 @@ export default function CertificateDetail() {
                                         <Widget title="Other Properties" titleSize="large">
                                             <br />
                                             <CustomTable headers={propertiesHeaders} data={propertiesData} />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Request",
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget title="Properties" busy={isBusy} titleSize="large" lockSize="large">
+                                            <br />
+                                            <CustomTable headers={detailHeaders} data={csrPropertiesData} />
+                                        </Widget>
+                                    </Col>
+
+                                    <Col>
+                                        <Widget title="Request Attributes" busy={isBusy} titleSize="large">
+                                            <br />
+                                            <CustomTable headers={detailHeaders} data={csrRequestAttributesData} />
+                                        </Widget>
+
+                                        <Widget title="Signature attributes" titleSize="large">
+                                            <br />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.SIGNATURE}
+                                                attributes={certificate?.certificateRequest?.signatureAttributes}
+                                            />
                                         </Widget>
                                     </Col>
                                 </Row>
