@@ -74,20 +74,22 @@ function NotificationsList() {
                         }}
                     >
                         {notification.message}
-                        <Button
-                            color="white"
-                            size="sm"
-                            className={"px-1 m-0"}
-                            onClick={() => {
-                                navigate(
-                                    `../../${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
-                                        (prev, curr) => prev + "/" + curr,
-                                    )}`,
-                                );
-                            }}
-                        >
-                            <i className="fa fa-circle-arrow-right"></i>
-                        </Button>
+                        {notification.targetObjectType && notification.targetObjectIdentification && (
+                            <Button
+                                color="white"
+                                size="sm"
+                                className={"px-1 m-0"}
+                                onClick={() => {
+                                    navigate(
+                                        `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
+                                            (prev, curr) => prev + "/" + curr,
+                                        )}`,
+                                    );
+                                }}
+                            >
+                                <i className="fa fa-circle-arrow-right"></i>
+                            </Button>
+                        )}
                     </div>,
                 ],
                 detailColumns: notification.detail ? [notification.detail] : undefined,
