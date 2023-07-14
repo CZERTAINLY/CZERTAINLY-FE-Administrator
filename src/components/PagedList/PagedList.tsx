@@ -32,6 +32,7 @@ interface Props {
     pageWidgetLockName?: LockWidgetNameEnum;
     hideWidgetButtons?: boolean;
     hasCheckboxes?: boolean;
+    hasDetails?: boolean;
 }
 
 function PagedList({
@@ -52,6 +53,7 @@ function PagedList({
     pageWidgetLockName,
     hideWidgetButtons = false,
     hasCheckboxes = true,
+    hasDetails = false,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -155,6 +157,7 @@ function PagedList({
                     headers={headers}
                     data={data}
                     hasCheckboxes={hasCheckboxes}
+                    hasDetails={hasDetails}
                     hasPagination={true}
                     multiSelect={multiSelect}
                     paginationData={paginationData}

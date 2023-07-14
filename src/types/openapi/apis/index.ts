@@ -21,6 +21,7 @@ export * from "./EnumsApi";
 export * from "./GlobalMetadataApi";
 export * from "./LocalOperationsApi";
 export * from "./LocationManagementApi";
+export * from "./NotificationsApi";
 export * from "./RAProfileManagementApi";
 export * from "./RoleManagementApi";
 export * from "./SCEPProfileManagementApi";

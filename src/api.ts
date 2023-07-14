@@ -20,6 +20,7 @@ import {
     EnumsApi,
     GlobalMetadataApi,
     LocationManagementApi,
+    NotificationsApi,
     RAProfileManagementApi,
     RoleManagementApi,
     SCEPProfileManagementApi,
@@ -65,6 +66,7 @@ export interface ApiClients {
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
     scheduler: ScheduledJobsManagementApi;
+    notifications: NotificationsApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
@@ -101,6 +103,7 @@ export const backendClient: ApiClients = {
     globalMetadata: new GlobalMetadataApi(configuration),
     settings: new SettingsApi(configuration),
     scheduler: new ScheduledJobsManagementApi(configuration),
+    notifications: new NotificationsApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),

@@ -22,6 +22,7 @@ apis/EnumsApi.ts
 apis/GlobalMetadataApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
+apis/NotificationsApi.ts
 apis/RAProfileManagementApi.ts
 apis/RoleManagementApi.ts
 apis/SCEPProfileManagementApi.ts
@@ -204,6 +205,9 @@ models/MetadataResponseDto.ts
 models/MultipleCertificateObjectUpdateDto.ts
 models/NameAndIdDto.ts
 models/NameAndUuidDto.ts
+models/NotificationDto.ts
+models/NotificationRequestDto.ts
+models/NotificationResponseDto.ts
 models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
