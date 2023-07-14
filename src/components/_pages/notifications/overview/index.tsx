@@ -37,7 +37,7 @@ function NotificationsOverview() {
                                     <i className="fa fa-check"></i>
                                 </Button>
                             </Col>
-                            <Col className="g-0 col-10">
+                            <Col className="g-0 col-11">
                                 {notification.message}
                                 <span className="fw-light small px-1">{formatTimeAgo(notification.sentAt)}</span>
                                 {notification.targetObjectType && notification.targetObjectIdentification && (
@@ -56,7 +56,6 @@ function NotificationsOverview() {
                                         <i className="fa fa-circle-arrow-right"></i>
                                     </Button>
                                 )}
-                                <div className="fw-light small lh-1">{notification.detail}</div>
                             </Col>
                         </Row>
                     </div>
@@ -80,7 +79,7 @@ function NotificationsOverview() {
                 />
             </DropdownToggle>
 
-            <DropdownMenu style={{ width: "300px", maxHeight: "500px", overflowY: "auto" }} className="m-0 p-0">
+            <DropdownMenu style={{ width: "400px", maxHeight: "500px", overflowY: "auto" }} className="m-0 p-0">
                 <Widget
                     busy={isFetchingOverview}
                     widgetLockName={LockWidgetNameEnum.NotificationsOverview}
