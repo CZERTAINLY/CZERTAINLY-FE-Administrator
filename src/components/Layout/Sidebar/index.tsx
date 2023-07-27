@@ -28,6 +28,7 @@ export default function Sidebar() {
                             { _key: "/raprofiles", name: "RA Profiles", link: "/raprofiles" },
                             { _key: "/tokenprofiles", name: "Token Profiles", link: "/tokenprofiles" },
                             { _key: "/complianceprofiles", name: "Compliance Profiles", link: "/complianceprofiles" },
+                            { _key: "/approvalprofiles", name: "Approval Profiles", link: "/approvalprofiles" },
                         ]}
                     />
 

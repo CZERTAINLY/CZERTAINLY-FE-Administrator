@@ -1,6 +1,7 @@
 .gitignore
 apis/ACMEAccountManagementApi.ts
 apis/ACMEProfileManagementApi.ts
+apis/ApprovalProfileInventoryApi.ts
 apis/AuditLogApi.ts
 apis/AuthenticationManagementApi.ts
 apis/AuthorityManagementApi.ts
@@ -48,6 +49,12 @@ models/AddLocationRequestDto.ts
 models/AddRaProfileRequestDto.ts
 models/AddTokenProfileRequestDto.ts
 models/AddUserRequestDto.ts
+models/ApprovalProfileDetailDto.ts
+models/ApprovalProfileDto.ts
+models/ApprovalProfileRequestDto.ts
+models/ApprovalProfileResponseDto.ts
+models/ApprovalProfileUpdateRequestDto.ts
+models/ApprovalStepDto.ts
 models/AttributeCallback.ts
 models/AttributeCallbackMapping.ts
 models/AttributeConstraintType.ts

@@ -1,6 +1,7 @@
 import {
     ACMEAccountManagementApi,
     ACMEProfileManagementApi,
+    ApprovalProfileInventoryApi,
     AuditLogApi,
     AuthenticationManagementApi,
     AuthorityManagementApi,
@@ -66,6 +67,7 @@ export interface ApiClients {
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
     scheduler: ScheduledJobsManagementApi;
+    approvalProfiles: ApprovalProfileInventoryApi;
     notifications: NotificationsApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
@@ -103,6 +105,7 @@ export const backendClient: ApiClients = {
     globalMetadata: new GlobalMetadataApi(configuration),
     settings: new SettingsApi(configuration),
     scheduler: new ScheduledJobsManagementApi(configuration),
+    approvalProfiles: new ApprovalProfileInventoryApi(configuration),
     notifications: new NotificationsApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
