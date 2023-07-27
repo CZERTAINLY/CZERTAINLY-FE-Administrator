@@ -8,12 +8,18 @@ import { useCallback, useMemo } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 
 import { selectors as profileSelectors } from "ducks/auth";
 import { ProfileApprovalRequestModel, ProfileApprovalStepModel } from "types/approval-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumeric,
+    validateNonZeroInteger,
+    validatePositiveInteger,
+    validateRequired,
+} from "utils/validators";
 
 import ApprovalStepField from "./approval-step-field";
 
@@ -64,29 +70,53 @@ function ApprovalProfileForm() {
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ProfileApprovalRequestModel>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Profile Name</Label>
+                        <Row>
+                            <Col>
+                                <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label htmlFor="name">Profile Name</Label>
 
-                                    <Input
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        id="name"
-                                        placeholder="Approval Profile Name"
-                                    />
+                                            <Input
+                                                {...input}
+                                                valid={!meta.error && meta.touched}
+                                                invalid={!!meta.error && meta.touched}
+                                                type="text"
+                                                id="name"
+                                                placeholder="Approval Profile Name"
+                                            />
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
+                                            <FormFeedback>{meta.error}</FormFeedback>
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            </Col>
+                            <Col>
+                                <Field
+                                    name="expiry"
+                                    validate={composeValidators(validateRequired(), validateNonZeroInteger(), validatePositiveInteger())}
+                                >
+                                    {({ input, meta }) => (
+                                        <FormGroup htmlFor="expiry">
+                                            <Label>Expiry</Label>
+                                            <Input
+                                                {...input}
+                                                type="number"
+                                                id="expiry"
+                                                placeholder="Expiry in hours"
+                                                valid={!meta.error && meta.touched}
+                                                invalid={!!meta.error && meta.touched}
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            </Col>
+                        </Row>
 
                         <Field name="description" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="description">Profile Description</Label>
+                                    <Label htmlFor="description">Profile Description</Label>
 
                                     <Input
                                         {...input}

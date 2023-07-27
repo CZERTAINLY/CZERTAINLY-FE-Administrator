@@ -15,6 +15,7 @@ import {
     validatePositiveInteger,
     validateRequired,
 } from "utils/validators";
+import styles from "./approvalProfile.module.scss";
 
 type Props = {
     approvalSteps: ProfileApprovalStepModel[];
@@ -59,18 +60,18 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
     };
 
     const handleApprovalTypeChange = (e: SelectOptionApprover, index: number) => {
-        if (!e) return;
-        setselectedApprovalTypeList((prevList) => {
-            const newList = [...(prevList ?? [])];
-            newList[index] = e;
-            return newList;
-        });
+        if (!e || e.value === selectedApprovalTypeList?.[index]?.value) return;
 
-        setSelectedApproverList((prevList) => {
-            const newList = [...(prevList ?? [])];
-            newList[index] = null;
-            return newList;
-        });
+        console.log("handleApprovalTypeChange");
+
+        const newSelectedApprovalTypeList = [...(selectedApprovalTypeList ?? [])];
+        newSelectedApprovalTypeList[index] = e;
+        setselectedApprovalTypeList(newSelectedApprovalTypeList);
+
+        const newSelectedApproverList = [...(selectedApproverList ?? [])];
+        newSelectedApproverList[index] = null;
+        setSelectedApproverList(newSelectedApproverList);
+
         resetFormUuids(index);
         if (e.label === ApproverType.User) {
             form.change(`approvalSteps[${index}].requiredApprovals`, 1);
@@ -78,7 +79,8 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
     };
 
     const handleApproverChange = (e: SelectOptionApprover, index: number) => {
-        if (!e || !selectedApprovalTypeList) return;
+        if (!e || !selectedApprovalTypeList || e.value === selectedApproverList?.[index]?.value) return;
+
         resetFormUuids(index);
         form.change(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`, e.value);
         setSelectedApproverList((prevList) => {
@@ -116,6 +118,21 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
         [users, roles, groups],
     );
 
+    const handleAddStepClick = (): void => {
+        const newStep: ProfileApprovalStepModel = {
+            order: approvalSteps.length + 1,
+            description: "",
+            requiredApprovals: 0,
+        };
+        const newApprovalSteps = [...approvalSteps, newStep];
+        form.change("approvalSteps", newApprovalSteps);
+    };
+
+    const handleRemoveStepClick = (index: number): void => {
+        const newApprovalSteps = approvalSteps.filter((step, i) => i !== index);
+        form.change("approvalSteps", newApprovalSteps);
+    };
+
     const renderApprovalSteps = (index: number) => {
         return (
             <div key={index}>
@@ -129,11 +146,14 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
                         >
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label style={{ marginBottom: "9px" }}>Description:</Label>
+                                    <Label htmlFor="stepDescription" className={styles.textInputLabel}>
+                                        Description:
+                                    </Label>
                                     <Input
                                         {...input}
+                                        id="stepDescription"
                                         type="text"
-                                        style={{ padding: ".47rem" }}
+                                        className={styles.textInput}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                     />
@@ -143,7 +163,7 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
                     </Col>
                     <Col>
                         <FormGroup>
-                            <Label for="approverType">Approver Type</Label>
+                            <Label htmlFor="approverType">Approver Type</Label>
                             <Select
                                 id="approverType"
                                 maxMenuHeight={140}
@@ -165,10 +185,14 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
                         >
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label className="mb-2">Required Approvals:</Label>
+                                    <Label htmlFor="requiredApprovals" className={styles.textInputLabel}>
+                                        Required Approvals:
+                                    </Label>
 
                                     <Input
                                         {...input}
+                                        id="requiredApprovals"
+                                        className={styles.textInput}
                                         disabled={selectedApprovalTypeList && selectedApprovalTypeList[index]?.label === ApproverType.User}
                                         type="number"
                                         valid={!meta.error && meta.touched}
@@ -181,7 +205,7 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
                     <Col>
                         {selectedApprovalTypeList && selectedApprovalTypeList[index]?.label && (
                             <FormGroup>
-                                <Label>Select {selectedApprovalTypeList[index].label}:</Label>
+                                <Label htmlFor="selectedApprover">Select {selectedApprovalTypeList[index].label}:</Label>
                                 <Select
                                     id="selectedApprover"
                                     maxMenuHeight={140}
@@ -198,30 +222,14 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
                 </Row>
 
                 <ButtonGroup>
-                    <Button
-                        color="primary"
-                        onClick={() => {
-                            const newStep: ProfileApprovalStepModel = {
-                                order: approvalSteps.length + 1,
-                                description: "",
-                                requiredApprovals: 0,
-                            };
-                            const newApprovalSteps = [...approvalSteps, newStep];
-                            form.change("approvalSteps", newApprovalSteps);
-                        }}
-                    >
+                    <Button color="primary" onClick={() => handleAddStepClick()}>
                         Add Step
                     </Button>
-
-                    <Button
-                        color="secondary"
-                        onClick={() => {
-                            const newApprovalSteps = approvalSteps.filter((step, i) => i !== index);
-                            form.change("approvalSteps", newApprovalSteps);
-                        }}
-                    >
-                        Remove Step
-                    </Button>
+                    {index !== 0 && (
+                        <Button color="secondary" onClick={() => handleRemoveStepClick(index)}>
+                            Remove Step
+                        </Button>
+                    )}
                 </ButtonGroup>
             </div>
         );
