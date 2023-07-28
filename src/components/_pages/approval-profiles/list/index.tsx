@@ -27,7 +27,10 @@ export default function AdministratorsList() {
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
 
-    const isBusy = isFetching || isDeleting || isBulkDeleting || isBulkForceDeleting;
+    const isBusy = useMemo(
+        () => isFetching || isDeleting || isBulkDeleting || isBulkForceDeleting,
+        [isFetching, isDeleting, isBulkDeleting, isBulkForceDeleting],
+    );
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));

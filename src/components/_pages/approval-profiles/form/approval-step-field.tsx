@@ -1,10 +1,12 @@
 import TabLayout from "components/Layout/TabLayout";
+import { selectors as profileApprovalSelectors } from "ducks/approval-profiles";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, useForm } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { Button, ButtonGroup, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
@@ -20,7 +22,6 @@ import styles from "./approvalProfile.module.scss";
 type Props = {
     approvalSteps: ProfileApprovalStepModel[];
     inProgress: boolean;
-    disabled: boolean;
     onCancelClick: () => void;
 };
 
@@ -32,14 +33,17 @@ const approverTypeOptions = Object.values(ApproverType).map((type) => ({
     label: type,
 }));
 
-export default function ApprovalStepField({ approvalSteps, disabled, inProgress, onCancelClick }: Props) {
+export default function ApprovalStepField({ approvalSteps }: Props) {
     const form = useForm();
     const [selectedApprovalTypeList, setselectedApprovalTypeList] = useState<SelectOptionApproverType[] | undefined>(undefined);
     const [selectedApproverList, setSelectedApproverList] = useState<SelectOptionApprover[]>([]);
+    const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
     const dispatch = useDispatch();
     const users = useSelector(userSelectors.users);
     const roles = useSelector(rolesSelectors.roles);
     const groups = useSelector(groupSelectors.certificateGroups);
+    const { id } = useParams();
+    const editMode = useMemo(() => !!id, [id]);
 
     useEffect(() => {
         dispatch(userAction.list());
@@ -53,6 +57,41 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
         dispatch(rolesActions.list());
     }, [dispatch]);
 
+    useEffect(() => {
+        if (editMode && profileApprovalDetail?.approvalSteps.length) {
+            const newSelectedApprovalTypeList: SelectOptionApproverType[] = profileApprovalDetail?.approvalSteps.map((step) => {
+                if (step.userUuid) {
+                    return { label: ApproverType.User, value: ApproverType.User.toLocaleLowerCase() + "Uuid" };
+                }
+                if (step.groupUuid) {
+                    return { label: ApproverType.Group, value: ApproverType.Group.toLocaleLowerCase() + "Uuid" };
+                }
+                if (step.roleUuid) {
+                    return { label: ApproverType.Role, value: ApproverType.Role.toLocaleLowerCase() + "Uuid" };
+                }
+                return { label: "", value: "" };
+            });
+            setselectedApprovalTypeList(newSelectedApprovalTypeList);
+
+            const newSelectedApproverList: SelectOptionApprover[] = profileApprovalDetail?.approvalSteps.map((step) => {
+                if (step.userUuid) {
+                    return { label: users.find((user) => user.uuid === step.userUuid)?.username ?? "", value: step.userUuid };
+                }
+                if (step.groupUuid) {
+                    return { label: groups.find((group) => group.uuid === step.groupUuid)?.name ?? "", value: step.groupUuid };
+                }
+                if (step.roleUuid) {
+                    return { label: roles.find((role) => role.uuid === step.roleUuid)?.name ?? "", value: step.roleUuid };
+                }
+                return null;
+            });
+            form.initialize({
+                approvalSteps: profileApprovalDetail.approvalSteps,
+            });
+            setSelectedApproverList(newSelectedApproverList);
+        }
+    }, [profileApprovalDetail, editMode, users, roles, groups, setSelectedApproverList, setselectedApprovalTypeList]);
+
     const resetFormUuids = (index: number) => {
         form.change(`approvalSteps[${index}].${ApproverType.User.toLocaleLowerCase()}Uuid`, undefined);
         form.change(`approvalSteps[${index}].${ApproverType.Group.toLocaleLowerCase()}Uuid`, undefined);
@@ -61,8 +100,6 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
 
     const handleApprovalTypeChange = (e: SelectOptionApprover, index: number) => {
         if (!e || e.value === selectedApprovalTypeList?.[index]?.value) return;
-
-        console.log("handleApprovalTypeChange");
 
         const newSelectedApprovalTypeList = [...(selectedApprovalTypeList ?? [])];
         newSelectedApprovalTypeList[index] = e;
@@ -82,7 +119,9 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
         if (!e || !selectedApprovalTypeList || e.value === selectedApproverList?.[index]?.value) return;
 
         resetFormUuids(index);
+        form.resetFieldState(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`);
         form.change(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`, e.value);
+
         setSelectedApproverList((prevList) => {
             const newList = [...(prevList ?? [])];
             newList[index] = e;
@@ -204,19 +243,24 @@ export default function ApprovalStepField({ approvalSteps, disabled, inProgress,
                     </Col>
                     <Col>
                         {selectedApprovalTypeList && selectedApprovalTypeList[index]?.label && (
-                            <FormGroup>
-                                <Label htmlFor="selectedApprover">Select {selectedApprovalTypeList[index].label}:</Label>
-                                <Select
-                                    id="selectedApprover"
-                                    maxMenuHeight={140}
-                                    menuPlacement="auto"
-                                    options={getApproverOptions(selectedApprovalTypeList[index].label)}
-                                    placeholder="Select Approver"
-                                    isSearchable={false}
-                                    onChange={(e) => handleApproverChange(e, index)}
-                                    value={selectedApproverList?.length ? selectedApproverList[index] : null}
-                                />
-                            </FormGroup>
+                            <Field name={`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`} validate={validateRequired()}>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label htmlFor="selectedApprover">Select {selectedApprovalTypeList[index].label}:</Label>
+                                        <Select
+                                            {...input}
+                                            id="selectedApprover"
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={getApproverOptions(selectedApprovalTypeList[index].label)}
+                                            placeholder="Select Approver"
+                                            isSearchable={false}
+                                            onChange={(e) => handleApproverChange(e, index)}
+                                            value={selectedApproverList?.length ? selectedApproverList[index] : null}
+                                        />
+                                    </FormGroup>
+                                )}
+                            </Field>
                         )}
                     </Col>
                 </Row>

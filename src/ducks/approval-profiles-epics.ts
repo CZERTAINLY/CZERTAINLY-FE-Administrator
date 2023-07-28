@@ -79,7 +79,6 @@ const enableApprovalProfile: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.approvalProfiles.enableApprovalProfile({ uuid: action.payload.uuid }).pipe(
-                // switchMap((response) => of(slice.actions.enableApprovalProfileSuccess(response))),
                 map(() => slice.actions.enableApprovalProfileSuccess({ uuid: action.payload.uuid })),
 
                 catchError((err) =>
@@ -99,7 +98,6 @@ const disableApprovalProfile: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.approvalProfiles.disableApprovalProfile({ uuid: action.payload.uuid }).pipe(
-                // switchMap((response) => of(slice.actions.disableApprovalProfileSuccess({}))),
                 map(() => slice.actions.disableApprovalProfileSuccess({ uuid: action.payload.uuid })),
 
                 catchError((err) =>
@@ -124,8 +122,6 @@ const deleteApprovalProfile: AppEpic = (action$, state$, deps) => {
                 ),
                 catchError((err) =>
                     of(
-                        // slice.actions.deleteScepProfileFailure({ error: extractError(err, "Failed to delete Approval Profile") }),
-
                         appRedirectActions.fetchError({ error: err, message: "Failed to delete approval profile" }),
                         slice.actions.deleteApprovalProfileFailure({ error: extractError(err, "Failed to delete Approval Profile") }),
                     ),
@@ -143,10 +139,15 @@ const editApprovalProfile: AppEpic = (action$, state$, deps) => {
             deps.apiClients.approvalProfiles
                 .editApprovalProfile({
                     uuid: action.payload.uuid,
-                    approvalProfileUpdateRequestDto: action.payload.approvalProfileUpdateRequestDto,
+                    approvalProfileUpdateRequestDto: action.payload.editProfileApproval,
                 })
                 .pipe(
-                    switchMap((response) => of(slice.actions.editApprovalProfileSuccess(response))),
+                    switchMap((response) =>
+                        of(
+                            slice.actions.editApprovalProfileSuccess({ uuid: action.payload.uuid }),
+                            appRedirectActions.redirect({ url: `/approvalprofiles/detail/${action.payload.uuid}` }),
+                        ),
+                    ),
                     catchError((err) =>
                         of(
                             appRedirectActions.fetchError({ error: err, message: "Failed to update approval profile" }),

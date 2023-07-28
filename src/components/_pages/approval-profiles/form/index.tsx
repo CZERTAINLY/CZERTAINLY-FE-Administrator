@@ -3,14 +3,13 @@ import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from "ducks/approval-profiles";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 
-import { selectors as profileSelectors } from "ducks/auth";
 import { ProfileApprovalRequestModel, ProfileApprovalStepModel } from "types/approval-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import {
@@ -26,19 +25,35 @@ import ApprovalStepField from "./approval-step-field";
 function ApprovalProfileForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const profile = useSelector(profileSelectors.profile);
 
     const isCreating = useSelector(profileApprovalSelectors.isCreating);
+    const isUpdating = useSelector(profileApprovalSelectors.isUpdating);
+    const isBusy = useMemo(() => isCreating || isUpdating, [isCreating, isUpdating]);
 
-    const isBusy = useMemo(() => isCreating, [isCreating]);
+    const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
+
+    const { id } = useParams();
+
+    const editMode = useMemo(() => !!id, [id]);
+
+    useEffect(() => {
+        if (!id) return;
+        dispatch(profileApprovalActions.getApprovalProfile({ uuid: id }));
+    }, [id]);
 
     const onSubmit = useCallback(
         (values: ProfileApprovalRequestModel) => {
-            dispatch(
-                profileApprovalActions.createApprovalProfile({
-                    ...values,
-                }),
-            );
+            if (!editMode) {
+                dispatch(
+                    profileApprovalActions.createApprovalProfile({
+                        ...values,
+                    }),
+                );
+            } else {
+                if (!id) return;
+
+                dispatch(profileApprovalActions.editApprovalProfile({ editProfileApproval: values, uuid: id }));
+            }
         },
         [dispatch],
     );
@@ -52,21 +67,23 @@ function ApprovalProfileForm() {
             order: 1,
             description: "",
             requiredApprovals: 0,
-            // userUuid: profile?.uuid,
         },
     ];
     const defaultValues: ProfileApprovalRequestModel = useMemo(
-        () => ({
-            name: "",
-            description: "",
-            enabled: false,
-            approvalSteps,
-        }),
-        [],
+        () =>
+            editMode && profileApprovalDetail
+                ? profileApprovalDetail
+                : {
+                      name: "",
+                      description: "",
+                      enabled: false,
+                      approvalSteps,
+                  },
+        [profileApprovalDetail, editMode],
     );
 
     return (
-        <Widget title="Add Approval Profile" busy={isBusy}>
+        <Widget title={editMode ? "Edit Approval Profile" : "Add Approval Profile"} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ProfileApprovalRequestModel>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
@@ -133,23 +150,17 @@ function ApprovalProfileForm() {
                         <>
                             <br />
 
-                            <ApprovalStepField
-                                approvalSteps={values.approvalSteps}
-                                inProgress={submitting}
-                                disabled={pristine || submitting || !valid}
-                                onCancelClick={onCancelClick}
-                            />
+                            <ApprovalStepField approvalSteps={values.approvalSteps} inProgress={submitting} onCancelClick={onCancelClick} />
                         </>
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={"Create"}
-                                    inProgressTitle={"Creating..."}
+                                    title={editMode ? "Update" : "Create"}
+                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
                                     inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
+                                    disabled={submitting || !valid}
                                 />
-
                                 <Button color="default" onClick={onCancelClick} disabled={submitting}>
                                     Cancel
                                 </Button>

@@ -12,6 +12,7 @@ export type State = {
     profileApprovalDetail?: ProfileApprovalDetailModel;
     profileApprovalList: ProfileApprovalModel[];
     isFetchingDetail: boolean;
+    isUpdating: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
     isCreating: boolean;
@@ -21,6 +22,7 @@ export type State = {
 
 export const initialState: State = {
     profileApprovalDetail: undefined,
+    isUpdating: false,
     profileApprovalList: [],
     isFetchingDetail: false,
     isDeleting: false,
@@ -134,20 +136,15 @@ export const slice = createSlice({
             state.deleteErrorMessage = action.payload.error || "Unknown error";
         },
 
-        editApprovalProfile: (
-            state,
-            action: PayloadAction<{ uuid: string; approvalProfileUpdateRequestDto: ProfileApprovalRequestModel }>,
-        ) => {
-            // state.profileApprovalDetail = undefined;
-            state.isFetchingDetail = true;
+        editApprovalProfile: (state, action: PayloadAction<{ uuid: string; editProfileApproval: ProfileApprovalRequestModel }>) => {
+            state.profileApprovalDetail = undefined;
+            state.isUpdating = true;
         },
-        editApprovalProfileSuccess: (state, action: PayloadAction<any>) => {
-            // state.profileApprovalDetail = action.payload;
-            state.isFetchingDetail = false;
+        editApprovalProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdating = false;
         },
         editApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            // state.profileApprovalDetail = undefined;
-            state.isFetchingDetail = false;
+            state.isUpdating = false;
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
@@ -165,6 +162,9 @@ const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const totalItems = createSelector(state, (state) => state.totalItems);
+const isUpdating = createSelector(state, (state) => state.isUpdating);
+const isDeleting = createSelector(state, (state) => state.isDeleting);
+
 export const selectors = {
     state,
     profileApprovalDetail,
@@ -174,6 +174,8 @@ export const selectors = {
     isEnabling,
     deleteErrorMessage,
     totalItems,
+    isUpdating,
+    isDeleting,
 };
 
 export const actions = slice.actions;

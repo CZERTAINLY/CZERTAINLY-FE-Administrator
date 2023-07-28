@@ -3,30 +3,32 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
-import { actions as profileApprovalActions, selectors as profileApprovalSelector } from "ducks/approval-profiles";
+import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from "ducks/approval-profiles";
 import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
 import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
+    const navigate = useNavigate();
 
-    const profileApprovalDetail = useSelector(profileApprovalSelector.profileApprovalDetail);
-    const isFetchingDetail = useSelector(profileApprovalSelector.isFetchingDetail);
-    const isEnabling = useSelector(profileApprovalSelector.isEnabling);
-    const deleteErrorMessage = useSelector(profileApprovalSelector.deleteErrorMessage);
-
+    const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
+    const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
+    const isEnabling = useSelector(profileApprovalSelectors.isEnabling);
+    const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
+    const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
     const groupList = useSelector(groupSelectors.certificateGroups);
     const userList = useSelector(userSelectors.users);
     const roleList = useSelector(rolesSelectors.roles);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const isBusy = useMemo(() => isFetchingDetail || isEnabling || isDeleting, [isFetchingDetail, isEnabling, isDeleting]);
 
     useEffect(() => {
         if (id) {
@@ -54,31 +56,36 @@ const ApprovalProfileDetails = () => {
         dispatch(profileApprovalActions.disableApprovalProfile({ uuid: profileApprovalDetail.uuid }));
     }, [profileApprovalDetail, dispatch]);
 
+    const onEditClick = useCallback(() => {
+        if (!profileApprovalDetail) return;
+        navigate(`/approvalprofiles/edit/${profileApprovalDetail.uuid}`);
+    }, [profileApprovalDetail, navigate]);
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
+            {
+                icon: "pencil",
+                disabled: false,
+                tooltip: "Edit",
+                onClick: () => onEditClick(),
+            },
             {
                 icon: "check",
                 disabled: profileApprovalDetail?.enabled || false,
                 tooltip: "Enable",
-                onClick: () => {
-                    onEnableClick();
-                },
+                onClick: () => onEnableClick(),
             },
             {
                 icon: "times",
                 disabled: !(profileApprovalDetail?.enabled || false),
                 tooltip: "Disable",
-                onClick: () => {
-                    onDisableClick();
-                },
+                onClick: () => onDisableClick(),
             },
             {
                 icon: "trash",
                 disabled: false,
                 tooltip: "Delete",
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
+                onClick: () => setConfirmDelete(true),
             },
         ],
         [profileApprovalDetail, , onDisableClick, onEnableClick],
@@ -233,17 +240,12 @@ const ApprovalProfileDetails = () => {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget
-                        title="Approval Profile Details"
-                        busy={isFetchingDetail || isEnabling}
-                        titleSize="large"
-                        widgetButtons={buttons}
-                    >
+                    <Widget title="Approval Profile Details" busy={isBusy} titleSize="large" widgetButtons={buttons}>
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget title="Approval Profile Steps" busy={isFetchingDetail || isEnabling}>
+                    <Widget title="Approval Profile Steps" busy={isBusy}>
                         <CustomTable headers={stepsHeaders} data={stepsRows} />
                     </Widget>
                 </Col>
