@@ -5,3 +5,27 @@
 .textInput {
     padding: 0.47rem;
 }
+
+.titleDiv {
+    position: relative;
+    display: flex;
+}
+
+.addTabIcon {
+    position: absolute;
+    right: -50px;
+    top: 0;
+}
+
+.closeButton {
+    margin-left: 5px;
+    color: red !important;
+    &:hover {
+        color: white !important;
+    }
+    font-size: 12px;
+    border-width: 0;
+    border-radius: 20rem;
+    width: 22px;
+    height: 22px;
+}

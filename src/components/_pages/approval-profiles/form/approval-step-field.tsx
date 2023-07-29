@@ -8,7 +8,7 @@ import { Field, useForm } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Select from "react-select";
-import { Button, ButtonGroup, Col, FormGroup, Input, Label, Row } from "reactstrap";
+import { Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
 import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
 import {
     composeValidators,
@@ -44,6 +44,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
     const groups = useSelector(groupSelectors.certificateGroups);
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
+    const [selectedTab, setSelectedTab] = useState<number>(0);
 
     useEffect(() => {
         dispatch(userAction.list());
@@ -56,6 +57,14 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
     useEffect(() => {
         dispatch(rolesActions.list());
     }, [dispatch]);
+
+    const updateAppoverAfterRemove = (index: number) => {
+        const newSelectedApprovalTypeList = selectedApprovalTypeList?.filter((_, i) => i !== index);
+        setselectedApprovalTypeList(newSelectedApprovalTypeList);
+
+        const newSelectedApproverList = selectedApproverList?.filter((_, i) => i !== index);
+        setSelectedApproverList(newSelectedApproverList);
+    };
 
     useEffect(() => {
         if (editMode && profileApprovalDetail?.approvalSteps.length) {
@@ -85,9 +94,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                 }
                 return null;
             });
-            form.initialize({
-                approvalSteps: profileApprovalDetail.approvalSteps,
-            });
+
             setSelectedApproverList(newSelectedApproverList);
         }
     }, [profileApprovalDetail, editMode, users, roles, groups, setSelectedApproverList, setselectedApprovalTypeList]);
@@ -110,6 +117,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         setSelectedApproverList(newSelectedApproverList);
 
         resetFormUuids(index);
+
         if (e.label === ApproverType.User) {
             form.change(`approvalSteps[${index}].requiredApprovals`, 1);
         }
@@ -119,7 +127,6 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         if (!e || !selectedApprovalTypeList || e.value === selectedApproverList?.[index]?.value) return;
 
         resetFormUuids(index);
-        form.resetFieldState(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`);
         form.change(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`, e.value);
 
         setSelectedApproverList((prevList) => {
@@ -161,133 +168,168 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         const newStep: ProfileApprovalStepModel = {
             order: approvalSteps.length + 1,
             description: "",
-            requiredApprovals: 0,
         };
         const newApprovalSteps = [...approvalSteps, newStep];
         form.change("approvalSteps", newApprovalSteps);
+        setSelectedTab(newApprovalSteps.length - 1);
     };
 
     const handleRemoveStepClick = (index: number): void => {
+        if (approvalSteps.length === 1) return;
+
         const newApprovalSteps = approvalSteps.filter((step, i) => i !== index);
-        form.change("approvalSteps", newApprovalSteps);
+        const orderedApprovalSteps = newApprovalSteps.map((step, i) => ({ ...step, order: i + 1 }));
+
+        form.change("approvalSteps", orderedApprovalSteps);
+        updateAppoverAfterRemove(index);
+
+        if (selectedTab === index && index === approvalSteps.length - 1) {
+            setSelectedTab(index - 1);
+        }
     };
 
-    const renderApprovalSteps = (index: number) => {
-        return (
-            <div key={index}>
-                <br />
+    const renderApprovalSteps = useCallback(
+        (index: number) => {
+            return (
+                <div key={index}>
+                    <br />
 
-                <Row>
-                    <Col>
-                        <Field
-                            name={`approvalSteps[${index}].description`}
-                            validate={composeValidators(validateRequired(), validateAlphaNumeric())}
-                        >
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label htmlFor="stepDescription" className={styles.textInputLabel}>
-                                        Description:
-                                    </Label>
-                                    <Input
-                                        {...input}
-                                        id="stepDescription"
-                                        type="text"
-                                        className={styles.textInput}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
-                    </Col>
-                    <Col>
-                        <FormGroup>
-                            <Label htmlFor="approverType">Approver Type</Label>
-                            <Select
-                                id="approverType"
-                                maxMenuHeight={140}
-                                menuPlacement="auto"
-                                options={approverTypeOptions}
-                                placeholder="Select Approver Type"
-                                isSearchable={false}
-                                onChange={(e) => handleApprovalTypeChange(e, index)}
-                                value={selectedApprovalTypeList?.length ? selectedApprovalTypeList[index] : undefined}
-                            />
-                        </FormGroup>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Field
-                            name={`approvalSteps[${index}].requiredApprovals`}
-                            validate={composeValidators(validateRequired(), validatePositiveInteger(), validateNonZeroInteger())}
-                        >
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label htmlFor="requiredApprovals" className={styles.textInputLabel}>
-                                        Required Approvals:
-                                    </Label>
-
-                                    <Input
-                                        {...input}
-                                        id="requiredApprovals"
-                                        className={styles.textInput}
-                                        disabled={selectedApprovalTypeList && selectedApprovalTypeList[index]?.label === ApproverType.User}
-                                        type="number"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
-                    </Col>
-                    <Col>
-                        {selectedApprovalTypeList && selectedApprovalTypeList[index]?.label && (
-                            <Field name={`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`} validate={validateRequired()}>
+                    <Row>
+                        <Col>
+                            <Field
+                                name={`approvalSteps[${index}].description`}
+                                validate={composeValidators(validateRequired(), validateAlphaNumeric())}
+                            >
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label htmlFor="selectedApprover">Select {selectedApprovalTypeList[index].label}:</Label>
-                                        <Select
+                                        <Label htmlFor="stepDescription" className={styles.textInputLabel}>
+                                            Description
+                                        </Label>
+                                        <Input
                                             {...input}
-                                            id="selectedApprover"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={getApproverOptions(selectedApprovalTypeList[index].label)}
-                                            placeholder="Select Approver"
-                                            isSearchable={false}
-                                            onChange={(e) => handleApproverChange(e, index)}
-                                            value={selectedApproverList?.length ? selectedApproverList[index] : null}
+                                            id="stepDescription"
+                                            placeholder="Enter Description"
+                                            type="text"
+                                            className={styles.textInput}
+                                            valid={!meta.error && meta.touched}
+                                            invalid={!!meta.error && meta.touched}
                                         />
                                     </FormGroup>
                                 )}
                             </Field>
-                        )}
-                    </Col>
-                </Row>
+                        </Col>
+                        <Col>
+                            <FormGroup>
+                                <Label htmlFor="approverType">Approver Type</Label>
+                                <Select
+                                    id="approverType"
+                                    maxMenuHeight={140}
+                                    menuPlacement="auto"
+                                    options={approverTypeOptions}
+                                    placeholder="Select Approver Type"
+                                    isSearchable={false}
+                                    onChange={(e) => handleApprovalTypeChange(e, index)}
+                                    value={selectedApprovalTypeList?.length ? selectedApprovalTypeList[index] : undefined}
+                                />
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Field
+                                name={`approvalSteps[${index}].requiredApprovals`}
+                                validate={composeValidators(validateRequired(), validatePositiveInteger(), validateNonZeroInteger())}
+                            >
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label htmlFor="requiredApprovals" className={styles.textInputLabel}>
+                                            Required Approvals
+                                        </Label>
 
-                <ButtonGroup>
-                    <Button color="primary" onClick={() => handleAddStepClick()}>
-                        Add Step
-                    </Button>
-                    {index !== 0 && (
-                        <Button color="secondary" onClick={() => handleRemoveStepClick(index)}>
-                            Remove Step
+                                        <Input
+                                            {...input}
+                                            id="requiredApprovals"
+                                            className={styles.textInput}
+                                            placeholder="Enter Required Approvals"
+                                            disabled={
+                                                selectedApprovalTypeList && selectedApprovalTypeList[index]?.label === ApproverType.User
+                                            }
+                                            type="number"
+                                            valid={!meta.error && meta.touched}
+                                            invalid={!!meta.error && meta.touched}
+                                        />
+                                    </FormGroup>
+                                )}
+                            </Field>
+                        </Col>
+                        <Col>
+                            {selectedApprovalTypeList && selectedApprovalTypeList[index]?.label && (
+                                <Field
+                                    name={`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`}
+                                    validate={validateRequired()}
+                                >
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label htmlFor="selectedApprover">Select {selectedApprovalTypeList[index].label}</Label>
+                                            <Select
+                                                {...input}
+                                                id="selectedApprover"
+                                                maxMenuHeight={140}
+                                                menuPlacement="auto"
+                                                options={getApproverOptions(selectedApprovalTypeList[index].label)}
+                                                placeholder="Select Approver"
+                                                isSearchable={false}
+                                                onChange={(e) => handleApproverChange(e, index)}
+                                                value={selectedApproverList?.length ? selectedApproverList[index] : null}
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            )}
+                        </Col>
+                    </Row>
+                </div>
+            );
+        },
+        [selectedApprovalTypeList, handleApprovalTypeChange, selectedApproverList, handleApproverChange],
+    );
+
+    const tabs = useMemo(
+        () =>
+            approvalSteps.map((approvalStep, index) => ({
+                title: (
+                    <div className="d-flex align-items-center align-content-center justify-content-center">
+                        <h6 className="m-0" onClick={() => setSelectedTab(index)}>
+                            Approval Step {index + 1}
+                        </h6>
+                        <Button
+                            color="danger"
+                            outline
+                            size="sm"
+                            className={styles.closeButton}
+                            onClick={() => handleRemoveStepClick(index)}
+                        >
+                            <i className="fa fa-close" />
                         </Button>
-                    )}
-                </ButtonGroup>
-            </div>
-        );
-    };
+                    </div>
+                ),
+                content: renderApprovalSteps(index),
+            })),
+        [approvalSteps, renderApprovalSteps, handleRemoveStepClick],
+    );
 
     return (
         <>
             <TabLayout
-                tabs={
-                    approvalSteps.map((approvalStep, index) => ({
-                        title: `Apprvoal Step ${index + 1}`,
-                        content: renderApprovalSteps(index),
-                    })) ?? []
-                }
+                tabs={[
+                    ...tabs,
+                    {
+                        title: <i className="fa fa-plus " />,
+                        content: <></>,
+                        onClick: () => handleAddStepClick(),
+                    },
+                ]}
+                selectedTab={selectedTab}
             />
         </>
     );

@@ -28,7 +28,8 @@ function ApprovalProfileForm() {
 
     const isCreating = useSelector(profileApprovalSelectors.isCreating);
     const isUpdating = useSelector(profileApprovalSelectors.isUpdating);
-    const isBusy = useMemo(() => isCreating || isUpdating, [isCreating, isUpdating]);
+    const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
+    const isBusy = useMemo(() => isCreating || isUpdating || isFetchingDetail, [isCreating, isUpdating, isFetchingDetail]);
 
     const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
 
@@ -66,7 +67,6 @@ function ApprovalProfileForm() {
         {
             order: 1,
             description: "",
-            requiredApprovals: 0,
         },
     ];
     const defaultValues: ProfileApprovalRequestModel = useMemo(
@@ -84,8 +84,26 @@ function ApprovalProfileForm() {
 
     return (
         <Widget title={editMode ? "Edit Approval Profile" : "Add Approval Profile"} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ProfileApprovalRequestModel>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form, values }) => (
+            <Form
+                initialValues={defaultValues}
+                validate={(values) => {
+                    const errors: {
+                        approvalStepsInValid?: string;
+                    } = {};
+
+                    const inValidSteps = values.approvalSteps.some((step) => {
+                        const { roleUuid, groupUuid, userUuid } = step;
+                        return !roleUuid && !groupUuid && !userUuid;
+                    });
+                    if (inValidSteps) {
+                        errors.approvalStepsInValid = "Approval Steps are not valid";
+                    }
+                    return errors;
+                }}
+                onSubmit={onSubmit}
+                mutators={{ ...mutators<ProfileApprovalRequestModel>() }}
+            >
+                {({ handleSubmit, submitting, valid, values, errors }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Row>
                             <Col>
@@ -159,7 +177,7 @@ function ApprovalProfileForm() {
                                     title={editMode ? "Update" : "Create"}
                                     inProgressTitle={editMode ? "Updating..." : "Creating..."}
                                     inProgress={submitting}
-                                    disabled={submitting || !valid}
+                                    disabled={submitting || !valid || errors?.approvalStepsInValid}
                                 />
                                 <Button color="default" onClick={onCancelClick} disabled={submitting}>
                                     Cancel

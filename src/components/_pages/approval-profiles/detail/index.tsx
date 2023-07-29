@@ -24,11 +24,17 @@ const ApprovalProfileDetails = () => {
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
     const groupList = useSelector(groupSelectors.certificateGroups);
+    const isFetchingGroups = useSelector(groupSelectors.isFetchingList);
     const userList = useSelector(userSelectors.users);
+    const isFetchingUsers = useSelector(userSelectors.isFetchingList);
     const roleList = useSelector(rolesSelectors.roles);
+    const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-    const isBusy = useMemo(() => isFetchingDetail || isEnabling || isDeleting, [isFetchingDetail, isEnabling, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingDetail || isEnabling || isDeleting || isFetchingGroups || isFetchingUsers || isFetchingRoles,
+        [isFetchingDetail, isEnabling, isDeleting, isFetchingGroups, isFetchingUsers, isFetchingRoles],
+    );
 
     useEffect(() => {
         if (id) {
@@ -41,7 +47,6 @@ const ApprovalProfileDetails = () => {
 
     const onDeleteConfirmed = useCallback(() => {
         if (!profileApprovalDetail) return;
-
         dispatch(profileApprovalActions.deleteApprovalProfile({ uuid: profileApprovalDetail.uuid }));
         setConfirmDelete(false);
     }, [profileApprovalDetail, dispatch]);
