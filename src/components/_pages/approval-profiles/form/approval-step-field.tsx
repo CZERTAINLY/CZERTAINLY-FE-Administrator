@@ -167,7 +167,6 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
     const handleAddStepClick = (): void => {
         const newStep: ProfileApprovalStepModel = {
             order: approvalSteps.length + 1,
-            description: "",
         };
         const newApprovalSteps = [...approvalSteps, newStep];
         form.change("approvalSteps", newApprovalSteps);
@@ -183,8 +182,8 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         form.change("approvalSteps", orderedApprovalSteps);
         updateAppoverAfterRemove(index);
 
-        if (selectedTab === index && index === approvalSteps.length - 1) {
-            setSelectedTab(index - 1);
+        if (selectedTab === approvalSteps.length - 1) {
+            setSelectedTab(selectedTab - 1);
         }
     };
 
@@ -196,10 +195,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
 
                     <Row>
                         <Col>
-                            <Field
-                                name={`approvalSteps[${index}].description`}
-                                validate={composeValidators(validateRequired(), validateAlphaNumeric())}
-                            >
+                            <Field name={`approvalSteps[${index}].description`} validate={composeValidators(validateAlphaNumeric())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label htmlFor="stepDescription" className={styles.textInputLabel}>

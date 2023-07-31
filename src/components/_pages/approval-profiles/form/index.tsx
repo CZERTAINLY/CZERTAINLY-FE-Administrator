@@ -66,7 +66,6 @@ function ApprovalProfileForm() {
     const approvalSteps: ProfileApprovalStepModel[] = [
         {
             order: 1,
-            description: "",
         },
     ];
     const defaultValues: ProfileApprovalRequestModel = useMemo(

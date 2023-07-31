@@ -127,8 +127,14 @@ export const slice = createSlice({
             state.isDeleting = true;
         },
 
-        deleteApprovalProfileSuccess: (state, action: PayloadAction<void>) => {
+        deleteApprovalProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = false;
+
+            const profileIndex = state.profileApprovalList.findIndex((profile) => profile.uuid === action.payload.uuid);
+
+            if (profileIndex >= 0) state.profileApprovalList.splice(profileIndex, 1);
+
+            if (state.profileApprovalDetail?.uuid === action.payload.uuid) state.profileApprovalDetail = undefined;
         },
 
         deleteApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

@@ -117,8 +117,11 @@ const deleteApprovalProfile: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.approvalProfiles.deleteApprovalProfile({ uuid: action.payload.uuid }).pipe(
-                switchMap((response) =>
-                    of(slice.actions.deleteApprovalProfileSuccess(response), appRedirectActions.redirect({ url: `/approvalprofiles` })),
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteApprovalProfileSuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: `/approvalprofiles` }),
+                    ),
                 ),
                 catchError((err) =>
                     of(

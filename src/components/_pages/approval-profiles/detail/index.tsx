@@ -125,7 +125,7 @@ const ApprovalProfileDetails = () => {
                       },
                       {
                           id: "description",
-                          columns: ["Description", profileApprovalDetail.description || ""],
+                          columns: ["Description", profileApprovalDetail.description || "NA"],
                       },
 
                       {
@@ -229,7 +229,7 @@ const ApprovalProfileDetails = () => {
                       columns: [
                           profile.order.toString(),
 
-                          profile.description || "",
+                          profile.description || "NA",
 
                           profile?.requiredApprovals ? profile.requiredApprovals.toString() : "NA",
 
