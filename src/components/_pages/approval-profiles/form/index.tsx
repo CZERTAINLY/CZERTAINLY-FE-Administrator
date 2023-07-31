@@ -74,7 +74,6 @@ function ApprovalProfileForm() {
                 ? profileApprovalDetail
                 : {
                       name: "",
-                      description: "",
                       enabled: false,
                       approvalSteps,
                   },
@@ -147,7 +146,7 @@ function ApprovalProfileForm() {
                             </Col>
                         </Row>
 
-                        <Field name="description" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label htmlFor="description">Profile Description</Label>

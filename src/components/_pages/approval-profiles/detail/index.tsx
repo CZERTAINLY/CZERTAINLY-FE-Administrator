@@ -125,7 +125,7 @@ const ApprovalProfileDetails = () => {
                       },
                       {
                           id: "description",
-                          columns: ["Description", profileApprovalDetail.description || "NA"],
+                          columns: ["Description", profileApprovalDetail.description || ""],
                       },
 
                       {
@@ -135,12 +135,12 @@ const ApprovalProfileDetails = () => {
 
                       {
                           id: "expiry",
-                          columns: ["Expiry Date", profileApprovalDetail?.expiry ? profileApprovalDetail.expiry.toString() : "NA"],
+                          columns: ["Expiry Date", profileApprovalDetail?.expiry ? profileApprovalDetail.expiry.toString() : ""],
                       },
 
                       {
                           id: "version",
-                          columns: ["Version", profileApprovalDetail?.version.toString() || "NA"],
+                          columns: ["Version", profileApprovalDetail?.version.toString() || ""],
                       },
                   ],
         [profileApprovalDetail],
@@ -229,13 +229,13 @@ const ApprovalProfileDetails = () => {
                       columns: [
                           profile.order.toString(),
 
-                          profile.description || "NA",
+                          profile.description || "",
 
-                          profile?.requiredApprovals ? profile.requiredApprovals.toString() : "NA",
+                          profile?.requiredApprovals ? profile.requiredApprovals.toString() : "",
 
-                          getApprovalType(profile) || "NA",
+                          getApprovalType(profile) || "",
 
-                          renderApproverRedirect(profile) || "NA",
+                          renderApproverRedirect(profile) || "",
                       ],
                   })),
         [profileApprovalDetail, renderApproverRedirect],
