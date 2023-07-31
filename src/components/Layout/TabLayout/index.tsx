@@ -17,8 +17,8 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
     const [activeTab, setActiveTab] = useState(selectedTab);
 
     useEffect(() => {
-        if (tabs.length <= activeTab || tabs[activeTab].hidden) {
-            setActiveTab(0);
+        if (tabs.length <= activeTab || tabs[activeTab].hidden || selectedTab !== activeTab) {
+            setActiveTab(selectedTab ?? 0);
         }
     }, [activeTab, tabs]);
 

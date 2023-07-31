@@ -1,0 +1,29 @@
+.textInputLabel {
+    margin-bottom: 8px;
+}
+
+.textInput {
+    padding: 0.47rem;
+}
+
+.titleDiv {
+    position: relative;
+    display: flex;
+}
+
+.addTabIcon {
+    position: absolute;
+    right: -50px;
+    top: 0;
+}
+
+.closeButton {
+    margin-left: 10px;
+    color: red !important;
+    &:hover {
+        color: white !important;
+    }
+    font-size: 12px;
+    border-width: 0;
+    border-radius: 20rem;
+}

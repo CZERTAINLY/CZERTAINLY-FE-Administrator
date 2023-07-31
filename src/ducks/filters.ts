@@ -14,6 +14,7 @@ export const enum EntityType {
     NOTIFICATIONS,
     SCHEDULER,
     SCHEDULER_HISTORY,
+    APPROVAL_PROFILES,
 }
 
 export type Filter = {

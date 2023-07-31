@@ -25,6 +25,10 @@ import ComplianceProfilesList from "./_pages/compliance-profiles/list";
 import ConnectorDetail from "./_pages/connectors/detail";
 import ConnectorEdit from "./_pages/connectors/form";
 
+import ApprovalProfileDetails from "./_pages/approval-profiles/detail";
+import ApprovalProfilesForm from "./_pages/approval-profiles/form";
+import ApprovalProfiles from "./_pages/approval-profiles/list";
+
 import ConnectorsList from "./_pages/connectors/list";
 import CredentialDetail from "./_pages/credentials/detail";
 import CredentialEdit from "./_pages/credentials/form";
@@ -169,6 +173,11 @@ export default function AppRouter() {
                     <Route path={`/${Resource.RaProfiles.toLowerCase()}/detail/:authorityId/:id`} element={<RaProfileDetail />} />
                     <Route path={`/${Resource.RaProfiles.toLowerCase()}/add`} element={<RaProfileEdit />} />
                     <Route path={`/${Resource.RaProfiles.toLowerCase()}/edit/:authorityId/:id`} element={<RaProfileEdit />} />
+
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}`} element={<ApprovalProfiles />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/add`} element={<ApprovalProfilesForm />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/:id`} element={<ApprovalProfileDetails />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/edit/:id`} element={<ApprovalProfilesForm />} />
 
                     <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}`} element={<ComplianceProfilesList />} />
                     <Route
