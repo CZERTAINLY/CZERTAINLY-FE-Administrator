@@ -13,14 +13,16 @@ type Props = {
     selectedTab?: number;
 };
 
-export default function TabLayout({ tabs, onlyActiveTabContent = false, selectedTab = 0 }: Props) {
-    const [activeTab, setActiveTab] = useState(selectedTab);
+export default function TabLayout({ tabs, onlyActiveTabContent = false, selectedTab }: Props) {
+    const [activeTab, setActiveTab] = useState(selectedTab || 0);
 
     useEffect(() => {
-        if (tabs.length <= activeTab || tabs[activeTab].hidden || selectedTab !== activeTab) {
-            setActiveTab(selectedTab ?? 0);
+        if (selectedTab !== undefined && selectedTab !== activeTab) {
+            setActiveTab(selectedTab);
+        } else if (tabs.length <= activeTab || tabs[activeTab].hidden) {
+            setActiveTab(0);
         }
-    }, [activeTab, tabs]);
+    }, [activeTab, tabs, selectedTab]);
 
     return (
         <>

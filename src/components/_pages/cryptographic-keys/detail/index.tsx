@@ -40,7 +40,7 @@ export default function CryptographicKeyDetail() {
     const isCompromising = useSelector(selectors.isBulkCompromising);
     const isDestroying = useSelector(selectors.isBulkDestroying);
     const isFetchingHistory = useSelector(selectors.isFetchingHistory);
-
+    const [selectedTab, setSelectedTab] = useState(0);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
@@ -337,9 +337,14 @@ export default function CryptographicKeyDetail() {
         const keyItems = [...(cryptographicKey?.items ?? [])].sort(
             (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
         );
-        const selectedTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
-        const tabs = keyItems.map((item) => ({
-            title: getEnumLabel(keyTypeEnum, item.type),
+        const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
+        setSelectedTab(keyTab || 0);
+        const tabs = keyItems.map((item, i) => ({
+            title: (
+                <div className="d-flex" onClick={() => setSelectedTab(i)}>
+                    {getEnumLabel(keyTypeEnum, item.type)}
+                </div>
+            ),
             content: (
                 <Widget busy={isBusy || isFetchingHistory}>
                     <CryptographicKeyItem
@@ -353,7 +358,7 @@ export default function CryptographicKeyDetail() {
                 </Widget>
             ),
         }));
-        return { tabs, selectedTab: selectedTab !== -1 ? selectedTab : 0 };
+        return { tabs };
     }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum, keyItemUuid]);
 
     return (
@@ -392,7 +397,7 @@ export default function CryptographicKeyDetail() {
                 </Col>
             </Row>
 
-            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={itemTabs.selectedTab} />}
+            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
 
             <Widget title="Key Associations" busy={isBusy} titleSize="large">
                 <br />
