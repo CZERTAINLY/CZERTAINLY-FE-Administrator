@@ -18,6 +18,7 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
     complianceProvider: "Compliance Provider",
     entityProvider: "Entity Provider",
     cryptographyProvider: "Cryptography Provider",
+    notificationProvider: "Notification Provider"
 };
 
 export const getAttributeContent = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {
