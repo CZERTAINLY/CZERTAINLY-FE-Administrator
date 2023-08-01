@@ -14,7 +14,7 @@ type Props = {
 
 export const getHighLightedCode = (code: string, language: ProgrammingLanguageEnum) => {
     try {
-        return hljs.highlight(language, code).value;
+        return hljs.highlight(language, code == null ? "" : code).value;
     } catch (e) {
         console.error(e);
         return code;
@@ -43,7 +43,7 @@ export default function CodeBlock({ content }: Props) {
                                 fontSize: 14,
                             }}
                         >
-                            {parse(DOMPurify.sanitize(getHighLightedCode(atob(content.data.code), content.data.language)))}
+                            {parse(DOMPurify.sanitize(getHighLightedCode(content.data.code != null ? atob(content.data.code) : "", content.data.language)))}
                         </code>
                     </pre>
                 }
