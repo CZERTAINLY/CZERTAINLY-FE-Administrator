@@ -29,7 +29,10 @@ export function transformProfileApprovalDtoToModel(profileApproval: ProfileAppro
 }
 
 export function transformProfileApprovalRequestDtoToModel(profileApprovalRequest: ProfileApprovalRequestDto): ProfileApprovalRequestModel {
-    return { ...profileApprovalRequest };
+    return {
+        ...profileApprovalRequest,
+        approvalSteps: profileApprovalRequest.approvalSteps?.map(transformProfileApprovalStepDtoToModel) || [],
+    };
 }
 
 export function transformProfileApprovalResponseDtoToModel(

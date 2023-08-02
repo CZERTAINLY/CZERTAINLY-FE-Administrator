@@ -31,6 +31,12 @@ export interface RoleRequestDto {
      */
     description?: string;
     /**
+     * Role contact email
+     * @type {string}
+     * @memberof RoleRequestDto
+     */
+    email?: string;
+    /**
      * List of Custom Attributes
      * @type {Array<RequestAttributeDto>}
      * @memberof RoleRequestDto

@@ -15,6 +15,7 @@ import type { Observable } from "rxjs";
 import type { AjaxResponse } from "rxjs/ajax";
 import type {
     ApprovalProfileDetailDto,
+    ApprovalProfileForVersionDto,
     ApprovalProfileRequestDto,
     ApprovalProfileResponseDto,
     ApprovalProfileUpdateRequestDto,
@@ -47,6 +48,7 @@ export interface EnableApprovalProfileRequest {
 
 export interface GetApprovalProfileRequest {
     uuid: string;
+    approvalProfileForVersionDto: ApprovalProfileForVersionDto;
 }
 
 export interface ListApprovalProfilesRequest {
@@ -170,18 +172,27 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
     /**
      * Get Approval Profile Details
      */
-    getApprovalProfile({ uuid }: GetApprovalProfileRequest): Observable<ApprovalProfileDetailDto>;
-    getApprovalProfile({ uuid }: GetApprovalProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalProfileDetailDto>>;
+    getApprovalProfile({ uuid, approvalProfileForVersionDto }: GetApprovalProfileRequest): Observable<ApprovalProfileDetailDto>;
     getApprovalProfile(
-        { uuid }: GetApprovalProfileRequest,
+        { uuid, approvalProfileForVersionDto }: GetApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ApprovalProfileDetailDto>>;
+    getApprovalProfile(
+        { uuid, approvalProfileForVersionDto }: GetApprovalProfileRequest,
         opts?: OperationOpts,
     ): Observable<ApprovalProfileDetailDto | AjaxResponse<ApprovalProfileDetailDto>> {
         throwIfNullOrUndefined(uuid, "uuid", "getApprovalProfile");
+
+        const query: HttpQuery = {};
+        if (approvalProfileForVersionDto != null) {
+            Object.assign(query, approvalProfileForVersionDto);
+        }
 
         return this.request<ApprovalProfileDetailDto>(
             {
                 url: "/v1/approvalProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
                 method: "GET",
+                query,
             },
             opts?.responseOpts,
         );

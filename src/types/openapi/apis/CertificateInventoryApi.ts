@@ -13,10 +13,8 @@
 
 import type { Observable } from "rxjs";
 import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
 import type {
-    AuthenticationServiceExceptionDto,
+    ApprovalResponseDto,
     BaseAttributeDto,
     BulkOperationResponse,
     CertificateComplianceCheckDto,
@@ -27,15 +25,17 @@ import type {
     CertificateUpdateObjectsDto,
     CertificateValidationDto,
     ClientCertificateRequestDto,
-    ErrorMessageDto,
     LocationDto,
     MultipleCertificateObjectUpdateDto,
+    PaginationRequestDto,
     RemoveCertificateDto,
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     UploadCertificateRequestDto,
     UuidDto,
 } from "../models";
+import type { HttpHeaders, HttpQuery, OperationOpts } from "../runtime";
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
 
 export interface BulkDeleteCertificateRequest {
     removeCertificateDto: RemoveCertificateDto;
@@ -75,6 +75,11 @@ export interface GetCertificateEventHistoryRequest {
 
 export interface GetCertificateValidationResultRequest {
     uuid: string;
+}
+
+export interface ListCertificateApprovalsRequest {
+    uuid: string;
+    paginationRequestDto: PaginationRequestDto;
 }
 
 export interface ListCertificateLocationsRequest {
@@ -371,6 +376,36 @@ export class CertificateInventoryApi extends BaseAPI {
             {
                 url: "/v1/certificates/search",
                 method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * List Certificates Approvals
+     */
+    listCertificateApprovals({ uuid, paginationRequestDto }: ListCertificateApprovalsRequest): Observable<ApprovalResponseDto>;
+    listCertificateApprovals(
+        { uuid, paginationRequestDto }: ListCertificateApprovalsRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<ApprovalResponseDto>>;
+    listCertificateApprovals(
+        { uuid, paginationRequestDto }: ListCertificateApprovalsRequest,
+        opts?: OperationOpts,
+    ): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
+        throwIfNullOrUndefined(uuid, "uuid", "listCertificateApprovals");
+        throwIfNullOrUndefined(paginationRequestDto, "paginationRequestDto", "listCertificateApprovals");
+
+        const query: HttpQuery = {};
+        if (paginationRequestDto != null) {
+            Object.assign(query, paginationRequestDto);
+        }
+
+        return this.request<ApprovalResponseDto>(
+            {
+                url: "/v1/certificates/{uuid}/approvals".replace("{uuid}", encodeURI(uuid)),
+                method: "GET",
+                query,
             },
             opts?.responseOpts,
         );

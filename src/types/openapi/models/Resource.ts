@@ -25,6 +25,7 @@ export enum Resource {
     Connectors = "connectors",
     Attributes = "attributes",
     Jobs = "jobs",
+    NotificationInstances = "notificationInstances",
     Users = "users",
     Roles = "roles",
     AcmeAccounts = "acmeAccounts",
@@ -42,4 +43,5 @@ export enum Resource {
     TokenProfiles = "tokenProfiles",
     Tokens = "tokens",
     Keys = "keys",
+    Approvals = "approvals",
 }

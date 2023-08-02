@@ -19,6 +19,7 @@ import type {
     ActivateAcmeForRaProfileRequestDto,
     ActivateScepForRaProfileRequestDto,
     AddRaProfileRequestDto,
+    ApprovalProfileDto,
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
     EditRaProfileRequestDto,
@@ -42,6 +43,12 @@ export interface ActivateScepForRaProfileRequest {
     raProfileUuid: string;
     scepProfileUuid: string;
     activateScepForRaProfileRequestDto: ActivateScepForRaProfileRequestDto;
+}
+
+export interface AssociateRAProfileWithApprovalProfileRequest {
+    authorityUuid: string;
+    raProfileUuid: string;
+    approvalProfileUuid: string;
 }
 
 export interface BulkDeleteRaProfileRequest {
@@ -89,6 +96,12 @@ export interface DisableRaProfileRequest {
     raProfileUuid: string;
 }
 
+export interface DisassociateRAProfileFromApprovalProfileRequest {
+    authorityUuid: string;
+    raProfileUuid: string;
+    approvalProfileUuid: string;
+}
+
 export interface EditRaProfileRequest {
     authorityUuid: string;
     raProfileUuid: string;
@@ -101,6 +114,11 @@ export interface EnableRaProfileRequest {
 }
 
 export interface GetAcmeForRaProfileRequest {
+    authorityUuid: string;
+    raProfileUuid: string;
+}
+
+export interface GetAssociatedApprovalProfilesRequest {
     authorityUuid: string;
     raProfileUuid: string;
 }
@@ -217,6 +235,38 @@ export class RAProfileManagementApi extends BaseAPI {
                 method: "PATCH",
                 headers,
                 body: activateScepForRaProfileRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Associated RA profile with the Approval profile
+     */
+    associateRAProfileWithApprovalProfile({
+        authorityUuid,
+        raProfileUuid,
+        approvalProfileUuid,
+    }: AssociateRAProfileWithApprovalProfileRequest): Observable<void>;
+    associateRAProfileWithApprovalProfile(
+        { authorityUuid, raProfileUuid, approvalProfileUuid }: AssociateRAProfileWithApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    associateRAProfileWithApprovalProfile(
+        { authorityUuid, raProfileUuid, approvalProfileUuid }: AssociateRAProfileWithApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "associateRAProfileWithApprovalProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "associateRAProfileWithApprovalProfile");
+        throwIfNullOrUndefined(approvalProfileUuid, "approvalProfileUuid", "associateRAProfileWithApprovalProfile");
+
+        return this.request<void>(
+            {
+                url: "/v1/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
+                    .replace("{approvalProfileUuid}", encodeURI(approvalProfileUuid)),
+                method: "PATCH",
             },
             opts?.responseOpts,
         );
@@ -469,6 +519,38 @@ export class RAProfileManagementApi extends BaseAPI {
     }
 
     /**
+     * Disassociated RA profile with the Approval profile
+     */
+    disassociateRAProfileFromApprovalProfile({
+        authorityUuid,
+        raProfileUuid,
+        approvalProfileUuid,
+    }: DisassociateRAProfileFromApprovalProfileRequest): Observable<void>;
+    disassociateRAProfileFromApprovalProfile(
+        { authorityUuid, raProfileUuid, approvalProfileUuid }: DisassociateRAProfileFromApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    disassociateRAProfileFromApprovalProfile(
+        { authorityUuid, raProfileUuid, approvalProfileUuid }: DisassociateRAProfileFromApprovalProfileRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "disassociateRAProfileFromApprovalProfile");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "disassociateRAProfileFromApprovalProfile");
+        throwIfNullOrUndefined(approvalProfileUuid, "approvalProfileUuid", "disassociateRAProfileFromApprovalProfile");
+
+        return this.request<void>(
+            {
+                url: "/v1/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
+                    .replace("{approvalProfileUuid}", encodeURI(approvalProfileUuid)),
+                method: "DELETE",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
      * Edit RA Profile
      */
     editRaProfile({ authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest): Observable<RaProfileDto>;
@@ -539,6 +621,35 @@ export class RAProfileManagementApi extends BaseAPI {
         return this.request<RaProfileAcmeDetailResponseDto>(
             {
                 url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * List of Approval profiles associated with the RAProfile
+     */
+    getAssociatedApprovalProfiles({
+        authorityUuid,
+        raProfileUuid,
+    }: GetAssociatedApprovalProfilesRequest): Observable<Array<ApprovalProfileDto>>;
+    getAssociatedApprovalProfiles(
+        { authorityUuid, raProfileUuid }: GetAssociatedApprovalProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<ApprovalProfileDto>>>;
+    getAssociatedApprovalProfiles(
+        { authorityUuid, raProfileUuid }: GetAssociatedApprovalProfilesRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAssociatedApprovalProfiles");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAssociatedApprovalProfiles");
+
+        return this.request<Array<ApprovalProfileDto>>(
+            {
+                url: "/v1/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles"
                     .replace("{authorityUuid}", encodeURI(authorityUuid))
                     .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
                 method: "GET",

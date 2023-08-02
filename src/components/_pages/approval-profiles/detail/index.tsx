@@ -15,7 +15,7 @@ import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles"
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
-    const { id } = useParams();
+    const { id, version } = useParams();
     const navigate = useNavigate();
 
     const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
@@ -38,12 +38,12 @@ const ApprovalProfileDetails = () => {
 
     useEffect(() => {
         if (id) {
-            dispatch(profileApprovalActions.getApprovalProfile({ uuid: id }));
+            dispatch(profileApprovalActions.getApprovalProfile({ uuid: id, version: Number(version) }));
             dispatch(userAction.list());
             dispatch(groupAction.listGroups());
             dispatch(rolesActions.list());
         }
-    }, [id, dispatch]);
+    }, [id, dispatch, version]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!profileApprovalDetail) return;
@@ -135,7 +135,7 @@ const ApprovalProfileDetails = () => {
 
                       {
                           id: "expiry",
-                          columns: ["Expiry Date", profileApprovalDetail?.expiry ? profileApprovalDetail.expiry.toString() : ""],
+                          columns: ["Expiry (in hours)", profileApprovalDetail?.expiry ? profileApprovalDetail.expiry.toString() : ""],
                       },
 
                       {

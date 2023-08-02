@@ -6,24 +6,34 @@ import { actions as appRedirectActions } from "./app-redirect";
 
 import { extractError } from "utils/net";
 import { slice } from "./approval-profiles";
-import { transformProfileApprovalDetailDtoToModel } from "./transform/approval-profiles";
-// import { transformSearchRequestModelToDto } from "./transform/certificates";
+import {
+    transformProfileApprovalDetailDtoToModel,
+    transformProfileApprovalRequestDtoToModel,
+    transformProfileApprovalUpdateRequestDtoToModel,
+} from "./transform/approval-profiles";
 
 const getApprovalProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getApprovalProfile.match),
 
         switchMap((action) =>
-            deps.apiClients.approvalProfiles.getApprovalProfile({ uuid: action.payload.uuid }).pipe(
-                switchMap((response) => of(slice.actions.getApprovalProfileSuccess(transformProfileApprovalDetailDtoToModel(response)))),
+            deps.apiClients.approvalProfiles
+                .getApprovalProfile({
+                    uuid: action.payload.uuid,
+                    approvalProfileForVersionDto: action.payload.version ? { version: action.payload.version } : {},
+                })
+                .pipe(
+                    switchMap((response) =>
+                        of(slice.actions.getApprovalProfileSuccess(transformProfileApprovalDetailDtoToModel(response))),
+                    ),
 
-                catchError((err) =>
-                    of(
-                        slice.actions.getApprovalProfileFailure({ error: extractError(err, "Failed to get Approval Profile details") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get approval profile detail" }),
+                    catchError((err) =>
+                        of(
+                            slice.actions.getApprovalProfileFailure({ error: extractError(err, "Failed to get Approval Profile details") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to get approval profile detail" }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };
@@ -33,21 +43,23 @@ const createApprovalProfile: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.createApprovalProfile.match),
 
         switchMap((action) =>
-            deps.apiClients.approvalProfiles.createApprovalProfile({ approvalProfileRequestDto: action.payload }).pipe(
-                switchMap((response) =>
-                    of(
-                        slice.actions.createApprovalProfileSuccess(response),
-                        appRedirectActions.redirect({ url: `/approvalprofiles/detail/${response.uuid}` }),
+            deps.apiClients.approvalProfiles
+                .createApprovalProfile({ approvalProfileRequestDto: transformProfileApprovalRequestDtoToModel(action.payload) })
+                .pipe(
+                    switchMap((response) =>
+                        of(
+                            slice.actions.createApprovalProfileSuccess(response),
+                            appRedirectActions.redirect({ url: `/approvalprofiles/detail/${response.uuid}` }),
+                        ),
                     ),
-                ),
 
-                catchError((err) =>
-                    of(
-                        appRedirectActions.fetchError({ error: err, message: "Failed to create approvalprofile" }),
-                        slice.actions.createApprovalProfileFailure({ error: extractError(err, "Failed to create Approval Profile") }),
+                    catchError((err) =>
+                        of(
+                            appRedirectActions.fetchError({ error: err, message: "Failed to create approvalprofile" }),
+                            slice.actions.createApprovalProfileFailure({ error: extractError(err, "Failed to create Approval Profile") }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };
@@ -142,10 +154,10 @@ const editApprovalProfile: AppEpic = (action$, state$, deps) => {
             deps.apiClients.approvalProfiles
                 .editApprovalProfile({
                     uuid: action.payload.uuid,
-                    approvalProfileUpdateRequestDto: action.payload.editProfileApproval,
+                    approvalProfileUpdateRequestDto: transformProfileApprovalUpdateRequestDtoToModel(action.payload.editProfileApproval),
                 })
                 .pipe(
-                    switchMap((response) =>
+                    switchMap(() =>
                         of(
                             slice.actions.editApprovalProfileSuccess({ uuid: action.payload.uuid }),
                             appRedirectActions.redirect({ url: `/approvalprofiles/detail/${action.payload.uuid}` }),

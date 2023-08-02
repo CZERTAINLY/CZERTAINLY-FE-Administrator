@@ -1,5 +1,6 @@
 export * from "./ACMEAccountManagementApi";
 export * from "./ACMEProfileManagementApi";
+export * from "./ApprovalInventoryApi";
 export * from "./ApprovalProfileInventoryApi";
 export * from "./AuditLogApi";
 export * from "./AuthenticationManagementApi";
@@ -22,6 +23,7 @@ export * from "./EnumsApi";
 export * from "./GlobalMetadataApi";
 export * from "./LocalOperationsApi";
 export * from "./LocationManagementApi";
+export * from "./NotificationManagementApi";
 export * from "./NotificationsApi";
 export * from "./RAProfileManagementApi";
 export * from "./RoleManagementApi";

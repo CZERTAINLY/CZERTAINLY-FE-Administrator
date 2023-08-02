@@ -15,7 +15,11 @@ import type { Observable } from "rxjs";
 import type { AjaxResponse } from "rxjs/ajax";
 import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
 import type { OperationOpts, HttpHeaders } from "../runtime";
-import type { AuthenticationServiceExceptionDto, ErrorMessageDto, PlatformSettingsDto } from "../models";
+import type { AuthenticationServiceExceptionDto, ErrorMessageDto, NotificationSettingsDto, PlatformSettingsDto } from "../models";
+
+export interface UpdateNotificationsSettingsRequest {
+    notificationSettingsDto: NotificationSettingsDto;
+}
 
 export interface UpdatePlatformSettingsRequest {
     platformSettingsDto: PlatformSettingsDto;
@@ -26,6 +30,21 @@ export interface UpdatePlatformSettingsRequest {
  */
 export class SettingsApi extends BaseAPI {
     /**
+     * Get notification settings
+     */
+    getNotificationsSettings(): Observable<NotificationSettingsDto>;
+    getNotificationsSettings(opts?: OperationOpts): Observable<AjaxResponse<NotificationSettingsDto>>;
+    getNotificationsSettings(opts?: OperationOpts): Observable<NotificationSettingsDto | AjaxResponse<NotificationSettingsDto>> {
+        return this.request<NotificationSettingsDto>(
+            {
+                url: "/v1/settings/notifications",
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
      * Get platform settings
      */
     getPlatformSettings(): Observable<PlatformSettingsDto>;
@@ -35,6 +54,35 @@ export class SettingsApi extends BaseAPI {
             {
                 url: "/v1/settings/platform",
                 method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Update notifications setting
+     */
+    updateNotificationsSettings({ notificationSettingsDto }: UpdateNotificationsSettingsRequest): Observable<void>;
+    updateNotificationsSettings(
+        { notificationSettingsDto }: UpdateNotificationsSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>>;
+    updateNotificationsSettings(
+        { notificationSettingsDto }: UpdateNotificationsSettingsRequest,
+        opts?: OperationOpts,
+    ): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(notificationSettingsDto, "notificationSettingsDto", "updateNotificationsSettings");
+
+        const headers: HttpHeaders = {
+            "Content-Type": "application/json",
+        };
+
+        return this.request<void>(
+            {
+                url: "/v1/settings/notifications",
+                method: "PUT",
+                headers,
+                body: notificationSettingsDto,
             },
             opts?.responseOpts,
         );
