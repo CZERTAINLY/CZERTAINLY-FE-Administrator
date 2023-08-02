@@ -36,6 +36,12 @@ export interface RoleDto {
      */
     description?: string;
     /**
+     * Role contact email
+     * @type {string}
+     * @memberof RoleDto
+     */
+    email?: string;
+    /**
      * Is system role. True = Yes, False = No
      * @type {boolean}
      * @memberof RoleDto

@@ -22,6 +22,7 @@ export enum PlatformEnum {
     SearchableFieldType = "SearchableFieldType",
     SearchGroup = "SearchGroup",
     SettingsSection = "SettingsSection",
+    NotificationType = "NotificationType",
     AuthType = "AuthType",
     HealthStatus = "HealthStatus",
     ConnectorStatus = "ConnectorStatus",

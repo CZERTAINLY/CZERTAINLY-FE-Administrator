@@ -60,7 +60,7 @@ export const slice = createSlice({
             state.isCreating = false;
         },
 
-        getApprovalProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+        getApprovalProfile: (state, action: PayloadAction<{ uuid: string; version?: number }>) => {
             state.profileApprovalDetail = undefined;
             state.isFetchingDetail = true;
         },

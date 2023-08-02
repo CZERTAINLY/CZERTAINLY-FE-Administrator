@@ -19,8 +19,13 @@ import {
     validatePositiveInteger,
     validateRequired,
 } from "utils/validators";
-
 import ApprovalStepField from "./approval-step-field";
+
+const defaultApprovalSteps: ProfileApprovalStepModel[] = [
+    {
+        order: 1,
+    },
+];
 
 function ApprovalProfileForm() {
     const dispatch = useDispatch();
@@ -42,14 +47,30 @@ function ApprovalProfileForm() {
         dispatch(profileApprovalActions.getApprovalProfile({ uuid: id }));
     }, [id]);
 
+    const defaultValues: ProfileApprovalRequestModel = useMemo(
+        () =>
+            editMode && profileApprovalDetail
+                ? profileApprovalDetail
+                : {
+                      name: "",
+                      enabled: false,
+                      approvalSteps: defaultApprovalSteps,
+                  },
+        [profileApprovalDetail, editMode],
+    );
+
+    const areDefaultValuesSame = useCallback(
+        (values: ProfileApprovalRequestModel) => {
+            const isObjectSame = JSON.stringify(values) === JSON.stringify(defaultValues);
+            return isObjectSame;
+        },
+        [defaultValues],
+    );
+
     const onSubmit = useCallback(
         (values: ProfileApprovalRequestModel) => {
             if (!editMode) {
-                dispatch(
-                    profileApprovalActions.createApprovalProfile({
-                        ...values,
-                    }),
-                );
+                dispatch(profileApprovalActions.createApprovalProfile(values));
             } else {
                 if (!id) return;
 
@@ -62,23 +83,6 @@ function ApprovalProfileForm() {
     const onCancelClick = useCallback(() => {
         navigate(-1);
     }, [navigate]);
-
-    const approvalSteps: ProfileApprovalStepModel[] = [
-        {
-            order: 1,
-        },
-    ];
-    const defaultValues: ProfileApprovalRequestModel = useMemo(
-        () =>
-            editMode && profileApprovalDetail
-                ? profileApprovalDetail
-                : {
-                      name: "",
-                      enabled: false,
-                      approvalSteps,
-                  },
-        [profileApprovalDetail, editMode],
-    );
 
     return (
         <Widget title={editMode ? "Edit Approval Profile" : "Add Approval Profile"} busy={isBusy}>
@@ -117,6 +121,7 @@ function ApprovalProfileForm() {
                                                 type="text"
                                                 id="name"
                                                 placeholder="Approval Profile Name"
+                                                disabled={editMode}
                                             />
 
                                             <FormFeedback>{meta.error}</FormFeedback>
@@ -175,7 +180,7 @@ function ApprovalProfileForm() {
                                     title={editMode ? "Update" : "Create"}
                                     inProgressTitle={editMode ? "Updating..." : "Creating..."}
                                     inProgress={submitting}
-                                    disabled={submitting || !valid || errors?.approvalStepsInValid}
+                                    disabled={submitting || !valid || errors?.approvalStepsInValid || areDefaultValuesSame(values)}
                                 />
                                 <Button color="default" onClick={onCancelClick} disabled={submitting}>
                                     Cancel
