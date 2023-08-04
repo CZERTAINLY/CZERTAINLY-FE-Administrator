@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from "ducks/approval-profiles";
-import { actions, selectors } from "ducks/compliance-profiles";
+import { actions } from "ducks/compliance-profiles";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import StatusBadge from "components/StatusBadge";
@@ -12,7 +12,7 @@ import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
-export default function AdministratorsList() {
+export default function ApprovalProfilesList() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [pageNumber, setPageNumber] = useState<number>(1);
@@ -20,17 +20,9 @@ export default function AdministratorsList() {
 
     const profileApprovalList = useSelector(profileApprovalSelector.profileApprovalList);
     const profileApprovalListTotalItems = useSelector(profileApprovalSelector.totalItems);
-    const checkedRows = useSelector(selectors.checkedRows);
+    const isFetchingList = useSelector(profileApprovalSelector.isFetchingList);
 
-    const isFetching = useSelector(selectors.isFetchingList);
-    const isDeleting = useSelector(selectors.isDeleting);
-    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
-    const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
-
-    const isBusy = useMemo(
-        () => isFetching || isDeleting || isBulkDeleting || isBulkForceDeleting,
-        [isFetching, isDeleting, isBulkDeleting, isBulkForceDeleting],
-    );
+    const isBusy = useMemo(() => isFetchingList, [isFetchingList]);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -57,7 +49,7 @@ export default function AdministratorsList() {
                 },
             },
         ],
-        [checkedRows, onAddClick],
+        [onAddClick],
     );
 
     const approvalProfilesTableHeader: TableHeader[] = useMemo(

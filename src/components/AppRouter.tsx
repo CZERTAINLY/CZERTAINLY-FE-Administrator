@@ -29,6 +29,10 @@ import ApprovalProfileDetails from "./_pages/approval-profiles/detail";
 import ApprovalProfilesForm from "./_pages/approval-profiles/form";
 import ApprovalProfiles from "./_pages/approval-profiles/list";
 
+import ApprovalDetails from "./_pages/approvals/details";
+import ApprovalsList from "./_pages/approvals/list";
+import MyApprovalsList from "./_pages/approvals/myApprovals";
+
 import ConnectorsList from "./_pages/connectors/list";
 import CredentialDetail from "./_pages/credentials/detail";
 import CredentialEdit from "./_pages/credentials/form";
@@ -179,6 +183,12 @@ export default function AppRouter() {
                     <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/:id`} element={<ApprovalProfileDetails />} />
                     <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/:id/:version`} element={<ApprovalProfileDetails />} />
                     <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/edit/:id`} element={<ApprovalProfilesForm />} />
+
+                    <Route path={`/${Resource.Approvals.toLowerCase()}/list`} element={<ApprovalsList />} />
+                    <Route path={`/${Resource.Approvals.toLowerCase()}/list/detail/:id`} element={<ApprovalDetails />} />
+
+                    <Route path={`/${Resource.Approvals.toLowerCase()}/myapprovals`} element={<MyApprovalsList />} />
+                    <Route path={`/${Resource.Approvals.toLowerCase()}/myapprovals/detail/:id`} element={<ApprovalDetails />} />
 
                     <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}`} element={<ComplianceProfilesList />} />
                     <Route

@@ -1,6 +1,7 @@
 import {
     ACMEAccountManagementApi,
     ACMEProfileManagementApi,
+    ApprovalInventoryApi,
     ApprovalProfileInventoryApi,
     AuditLogApi,
     AuthenticationManagementApi,
@@ -68,6 +69,7 @@ export interface ApiClients {
     settings: SettingsApi;
     scheduler: ScheduledJobsManagementApi;
     approvalProfiles: ApprovalProfileInventoryApi;
+    approvals: ApprovalInventoryApi;
     notifications: NotificationsApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
@@ -106,6 +108,7 @@ export const backendClient: ApiClients = {
     settings: new SettingsApi(configuration),
     scheduler: new ScheduledJobsManagementApi(configuration),
     approvalProfiles: new ApprovalProfileInventoryApi(configuration),
+    approvals: new ApprovalInventoryApi(configuration),
     notifications: new NotificationsApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),

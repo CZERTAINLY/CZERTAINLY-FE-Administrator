@@ -28,7 +28,6 @@ export default function Sidebar() {
                             { _key: "/raprofiles", name: "RA Profiles", link: "/raprofiles" },
                             { _key: "/tokenprofiles", name: "Token Profiles", link: "/tokenprofiles" },
                             { _key: "/complianceprofiles", name: "Compliance Profiles", link: "/complianceprofiles" },
-                            { _key: "/approvalprofiles", name: "Approval Profiles", link: "/approvalprofiles" },
                         ]}
                     />
 
@@ -52,6 +51,24 @@ export default function Sidebar() {
                             { _key: "/acmeaccounts", name: "ACME Accounts", link: "/acmeaccounts" },
                             { _key: "/acmeprofiles", name: "ACME Profiles", link: "/acmeprofiles" },
                             { _key: "/scepprofiles", name: "SCEP Profiles", link: "/scepprofiles" },
+                        ]}
+                    />
+
+                    <LinksGroup
+                        _key="approvals"
+                        header="Approvals"
+                        childrenLinks={[
+                            { _key: "/approvalprofiles", name: "Approval Profiles", link: "/approvalprofiles" },
+                            {
+                                _key: "/approvals",
+                                name: "Approval List",
+                                link: "/approvals/list",
+                            },
+                            {
+                                _key: "/myapprovals",
+                                name: "My Approvals",
+                                link: "/approvals/myapprovals",
+                            },
                         ]}
                     />
 

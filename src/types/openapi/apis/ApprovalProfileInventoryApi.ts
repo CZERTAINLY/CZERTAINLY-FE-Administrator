@@ -182,6 +182,7 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
         opts?: OperationOpts,
     ): Observable<ApprovalProfileDetailDto | AjaxResponse<ApprovalProfileDetailDto>> {
         throwIfNullOrUndefined(uuid, "uuid", "getApprovalProfile");
+        throwIfNullOrUndefined(approvalProfileForVersionDto, "approvalProfileForVersionDto", "getApprovalProfile");
 
         const query: HttpQuery = {};
         if (approvalProfileForVersionDto != null) {
@@ -210,6 +211,7 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
         { paginationRequestDto }: ListApprovalProfilesRequest,
         opts?: OperationOpts,
     ): Observable<ApprovalProfileResponseDto | AjaxResponse<ApprovalProfileResponseDto>> {
+        throwIfNullOrUndefined(paginationRequestDto, "paginationRequestDto", "listApprovalProfiles");
         const query: HttpQuery = {};
         if (paginationRequestDto != null) {
             Object.assign(query, paginationRequestDto);

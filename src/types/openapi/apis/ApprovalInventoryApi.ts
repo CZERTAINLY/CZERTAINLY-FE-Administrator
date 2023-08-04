@@ -127,11 +127,6 @@ export class ApprovalInventoryApi extends BaseAPI {
     ): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
         throwIfNullOrUndefined(paginationRequestDto, "paginationRequestDto", "listApprovals");
 
-        // const query: HttpQuery = {
-        //     // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-        //     paginationRequestDto: paginationRequestDto,
-        // };
-
         const query: HttpQuery = {};
         if (paginationRequestDto != null) {
             Object.assign(query, paginationRequestDto);
@@ -161,12 +156,6 @@ export class ApprovalInventoryApi extends BaseAPI {
     ): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
         throwIfNullOrUndefined(paginationRequestDto, "paginationRequestDto", "listUserApprovals");
         throwIfNullOrUndefined(approvalUserDto, "approvalUserDto", "listUserApprovals");
-
-        // const query: HttpQuery = {
-        //     // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-        //     paginationRequestDto: paginationRequestDto,
-        //     approvalUserDto: approvalUserDto,
-        // };
 
         const query: HttpQuery = {};
         if (paginationRequestDto != null) {

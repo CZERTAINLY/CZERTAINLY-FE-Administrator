@@ -8,6 +8,7 @@ export type IconName =
     | "check"
     | "plug"
     | "pencil"
+    | "history"
     | "cross-circle"
     | "upload"
     | "download"
@@ -57,6 +58,7 @@ const colors = {
     check: "green",
     plug: "auto",
     pencil: "auto",
+    history: "auto",
     "cross-circle": "black",
     upload: "auto",
     download: "auto",
@@ -94,6 +96,7 @@ const classNames = {
     check: "fa fa-check",
     plug: "fa fa-plug",
     pencil: "fa fa-pencil-square-o",
+    history: "fa fa-history",
     "cross-circle": "fa fa-times-circle",
     upload: "fa fa-upload",
     download: "fa fa-download",
