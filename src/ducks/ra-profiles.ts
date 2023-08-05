@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ProfileApprovalModel } from "types/approval-profiles";
 import { AttributeDescriptorModel } from "types/attributes";
 import { BulkActionModel } from "types/connectors";
 import {
@@ -24,10 +25,14 @@ export type State = {
 
     acmeDetails?: RaProfileAcmeDetailResponseModel;
     scepDetails?: RaProfileScepDetailResponseModel;
+    associatedApprovalProfiles: ProfileApprovalModel[];
 
     issuanceAttributesDescriptors?: AttributeDescriptorModel[];
     revocationAttributesDescriptors?: AttributeDescriptorModel[];
 
+    isDissociatingApprovalProfile: boolean;
+    isAssociatingApprovalProfile: boolean;
+    isFetchingApprovalProfiles: boolean;
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isFetchingAttributes: boolean;
@@ -63,9 +68,12 @@ export const initialState: State = {
 
     deleteErrorMessage: "",
     bulkDeleteErrorMessages: [],
-
+    associatedApprovalProfiles: [],
     raProfiles: [],
 
+    isDissociatingApprovalProfile: false,
+    isAssociatingApprovalProfile: false,
+    isFetchingApprovalProfiles: false,
     isFetchingList: false,
     isFetchingDetail: false,
     isFetchingAttributes: false,
@@ -507,6 +515,63 @@ export const slice = createSlice({
         getComplianceProfilesForRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingAssociatedComplianceProfiles = false;
         },
+
+        getAssociatedApprovalProfiles: (state, action: PayloadAction<{ authorityUuid: string; raProfileUuid: string }>) => {
+            state.associatedApprovalProfiles = [];
+            state.isFetchingApprovalProfiles = true;
+        },
+
+        getAssociatedApprovalProfilesSuccess: (state, action: PayloadAction<{ associatedApprovalProfiles: ProfileApprovalModel[] }>) => {
+            state.isFetchingApprovalProfiles = false;
+            state.associatedApprovalProfiles = action.payload.associatedApprovalProfiles;
+        },
+
+        getAssociatedApprovalProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingApprovalProfiles = false;
+        },
+
+        associateRAProfileWithApprovalProfile: (
+            state,
+            action: PayloadAction<{ raProfileUuid: string; approvalProfileUuid: string; authorityUuid: string }>,
+        ) => {
+            state.isAssociatingApprovalProfile = true;
+        },
+
+        associateRAProfileWithApprovalProfileSuccess: (
+            state,
+            action: PayloadAction<{ raProfileUuid: string; approvalProfileUuid: string; authorityUuid: string }>,
+        ) => {
+            state.isAssociatingApprovalProfile = false;
+        },
+
+        associateRAProfileWithApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isAssociatingApprovalProfile = false;
+        },
+
+        disassociateRAProfileFromApprovalProfile: (
+            state,
+            action: PayloadAction<{ raProfileUuid: string; approvalProfileUuid: string; authorityUuid: string }>,
+        ) => {
+            state.isDissociatingApprovalProfile = true;
+        },
+
+        disassociateRAProfileFromApprovalProfileSuccess: (
+            state,
+            action: PayloadAction<{ raProfileUuid: string; approvalProfileUuid: string; authorityUuid: string }>,
+        ) => {
+            state.isDissociatingApprovalProfile = false;
+
+            if (!state.associatedApprovalProfiles) return;
+            const approvalProfileIndex = state.associatedApprovalProfiles.findIndex(
+                (profile) => profile.uuid === action.payload.approvalProfileUuid,
+            );
+
+            if (approvalProfileIndex >= 0) state.associatedApprovalProfiles.splice(approvalProfileIndex, 1);
+        },
+
+        disassociateRAProfileFromApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDissociatingApprovalProfile = false;
+        },
     },
 });
 
@@ -516,12 +581,14 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 
 const raProfile = createSelector(state, (state: State) => state.raProfile);
 const raProfiles = createSelector(state, (state: State) => state.raProfiles);
-
+const associatedApprovalProfiles = createSelector(state, (state: State) => state.associatedApprovalProfiles);
 const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
 const scepDetails = createSelector(state, (state: State) => state.scepDetails);
 const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
 const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
+const isAssociatingApprovalProfile = createSelector(state, (state: State) => state.isAssociatingApprovalProfile);
+const isFetchingApprovalProfiles = createSelector(state, (state: State) => state.isFetchingApprovalProfiles);
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
@@ -551,12 +618,15 @@ export const selectors = {
 
     raProfile,
     raProfiles,
+    associatedApprovalProfiles,
 
     acmeDetails,
     scepDetails,
     issuanceAttributes,
     revocationAttributes,
 
+    isAssociatingApprovalProfile,
+    isFetchingApprovalProfiles,
     isFetchingList,
     isFetchingDetail,
     isFetchingAttributes,

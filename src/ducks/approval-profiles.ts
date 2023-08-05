@@ -77,7 +77,7 @@ export const slice = createSlice({
             state.isFetchingDetail = false;
         },
 
-        listApprovalProfiles: (state, action: PayloadAction<{ itemsPerPage: number; pageNumber: number }>) => {
+        listApprovalProfiles: (state, action: PayloadAction<{ itemsPerPage: number; pageNumber: number } | undefined>) => {
             state.profileApprovalList = [];
             state.isFetchingList = true;
         },

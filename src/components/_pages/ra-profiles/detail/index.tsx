@@ -7,6 +7,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 
+import { actions as approvalProfileActions } from "ducks/approval-profiles";
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,7 @@ import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 import { LockWidgetNameEnum } from "types/widget-locks";
+import AssociateApprovalProfileDialogBody from "../AssociateApprovalProfileDialogBody";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
 import ProtocolActivationDialogBody, { Protocol } from "../ProtocolActivationDialogBody";
 
@@ -31,7 +33,9 @@ export default function RaProfileDetail() {
     const acmeDetails = useSelector(raProfilesSelectors.acmeDetails);
     const scepDetails = useSelector(raProfilesSelectors.scepDetails);
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
+    const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
 
+    const isfetchingApprvoalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
     const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
     const isFetchingScepDetails = useSelector(raProfilesSelectors.isFetchingScepDetails);
@@ -57,9 +61,11 @@ export default function RaProfileDetail() {
 
     const [associateComplianceProfile, setAssociateComplianceProfile] = useState<boolean>(false);
 
+    const [associateApprovalProfileDialog, setAssociateApprovalProfileDialog] = useState<boolean>(false);
+
     const isBusy = useMemo(
-        () => isFetchingProfile || isDeleting || isEnabling || isDisabling,
-        [isFetchingProfile, isDeleting, isEnabling, isDisabling],
+        () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isfetchingApprvoalProfiles,
+        [isFetchingProfile, isDeleting, isEnabling, isDisabling, isfetchingApprvoalProfiles],
     );
 
     const isWorkingWithProtocol = useMemo(
@@ -99,12 +105,34 @@ export default function RaProfileDetail() {
         dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
+    const getFreshAssociatedApprovalProfiles = useCallback(() => {
+        if (!id || !authorityId) return;
+        if (authorityId === "unknown" || authorityId === "undefined") return;
+
+        dispatch(raProfilesActions.getAssociatedApprovalProfiles({ authorityUuid: authorityId, raProfileUuid: id }));
+    }, [id, dispatch, authorityId]);
+
+    const getFreshAllApprovalProfiles = useCallback(() => {
+        if (authorityId === "unknown" || authorityId === "undefined") return;
+
+        dispatch(approvalProfileActions.listApprovalProfiles());
+    }, [dispatch, authorityId]);
+
     useEffect(() => {
         getFreshRaProfileDetail();
         getFreshComplianceRaProfileDetail();
         getFreshAttributes();
         getFreshAvailableProtocols();
-    }, [getFreshRaProfileDetail, getFreshComplianceRaProfileDetail, getFreshAttributes, getFreshAvailableProtocols]);
+        getFreshAssociatedApprovalProfiles();
+        getFreshAllApprovalProfiles();
+    }, [
+        getFreshRaProfileDetail,
+        getFreshComplianceRaProfileDetail,
+        getFreshAttributes,
+        getFreshAvailableProtocols,
+        getFreshAllApprovalProfiles,
+        getFreshAssociatedApprovalProfiles,
+    ]);
 
     useEffect(() => {
         if (!id || !authorityId) return;
@@ -162,6 +190,20 @@ export default function RaProfileDetail() {
         dispatch(raProfilesActions.deactivateScep({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
         setConfirmDeactivateScep(false);
     }, [dispatch, raProfile]);
+
+    const onDissociateApprovalProfile = useCallback(
+        (approvalProfileUuid: string) => {
+            if (!raProfile || !authorityId) return;
+            dispatch(
+                raProfilesActions.disassociateRAProfileFromApprovalProfile({
+                    approvalProfileUuid: approvalProfileUuid,
+                    authorityUuid: authorityId,
+                    raProfileUuid: raProfile.uuid,
+                }),
+            );
+        },
+        [raProfile, authorityId, dispatch],
+    );
 
     const openScepActivationDialog = useCallback(() => {
         setActivateScepDialog(true);
@@ -244,6 +286,78 @@ export default function RaProfileDetail() {
             },
         ],
         [],
+    );
+
+    const approvalProfilesButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: "plus",
+                disabled: false,
+                tooltip: "Associate Approval Profile",
+                onClick: () => {
+                    setAssociateApprovalProfileDialog(true);
+                },
+            },
+        ],
+        [],
+    );
+
+    const approvalProfilesHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "approvalProfileName",
+                content: "Name",
+            },
+            {
+                id: "description",
+                content: "Description",
+            },
+            {
+                id: "enabled",
+                content: "Enabled",
+            },
+            {
+                id: "expiry",
+                content: "Expiry (in hours)",
+            },
+            {
+                id: "action",
+                content: "Action",
+            },
+        ],
+        [],
+    );
+
+    const approvalProfilesData: TableDataRow[] = useMemo(
+        () =>
+            !associatedApprovalProfiles
+                ? []
+                : (associatedApprovalProfiles || []).map((profile) => ({
+                      id: profile.uuid,
+                      columns: [
+                          <Link to={`../../../approvalprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
+
+                          profile.description || "",
+
+                          <StatusBadge enabled={profile.enabled} />,
+
+                          profile?.expiry?.toString() || "",
+
+                          <WidgetButtons
+                              buttons={[
+                                  {
+                                      icon: "minus-square",
+                                      disabled: false,
+                                      tooltip: "Remove",
+                                      onClick: () => {
+                                          onDissociateApprovalProfile(profile.uuid);
+                                      },
+                                  },
+                              ]}
+                          />,
+                      ],
+                  })),
+        [associatedApprovalProfiles],
     );
 
     const complianceProfileHeaders: TableHeader[] = useMemo(
@@ -552,7 +666,7 @@ export default function RaProfileDetail() {
                 <Col>
                     <Widget
                         title="RA Profile Details"
-                        busy={isBusy}
+                        busy={isFetchingProfile}
                         widgetButtons={buttons}
                         titleSize="large"
                         refreshAction={getFreshRaProfileDetail}
@@ -574,6 +688,17 @@ export default function RaProfileDetail() {
                         lockSize="large"
                     >
                         <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
+                    </Widget>
+
+                    <Widget
+                        title="Approval Profiles"
+                        busy={isfetchingApprvoalProfiles}
+                        widgetButtons={approvalProfilesButtons}
+                        titleSize="large"
+                        refreshAction={getFreshAssociatedApprovalProfiles}
+                        lockSize="large"
+                    >
+                        <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
                     </Widget>
                 </Col>
 
@@ -708,6 +833,20 @@ export default function RaProfileDetail() {
                     { color: "primary", onClick: onComplianceCheck, body: "Yes" },
                     { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
                 ]}
+            />
+
+            <Dialog
+                isOpen={associateApprovalProfileDialog}
+                caption={`Associate Approval Profile`}
+                body={AssociateApprovalProfileDialogBody({
+                    visible: associateApprovalProfileDialog,
+                    onClose: () => setAssociateApprovalProfileDialog(false),
+                    availableApprovalProfileUuids: associatedApprovalProfiles.map((e) => e.uuid),
+                    authorityUuid: authorityId,
+                    raProfile: raProfile,
+                })}
+                toggle={() => setAssociateApprovalProfileDialog(false)}
+                buttons={[]}
             />
         </Container>
     );

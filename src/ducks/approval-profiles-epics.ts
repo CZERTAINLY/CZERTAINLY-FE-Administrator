@@ -69,7 +69,7 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listApprovalProfiles.match),
 
         switchMap((action) =>
-            deps.apiClients.approvalProfiles.listApprovalProfiles({ paginationRequestDto: action.payload }).pipe(
+            deps.apiClients.approvalProfiles.listApprovalProfiles({ paginationRequestDto: action.payload || {} }).pipe(
                 switchMap((response) => of(slice.actions.listApprovalProfilesSuccess(response))),
 
                 catchError((err) =>
