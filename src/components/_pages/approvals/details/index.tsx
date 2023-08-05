@@ -16,7 +16,6 @@ import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles"
 import { DetailApprovalStepModel } from "types/approvals";
 import { ApprovalDetailDtoStatusEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
-import { getResourceLinkFromNameAndUuid } from "utils/resource";
 
 export default function ApprovalDetails() {
     const dispatch = useDispatch();
@@ -65,7 +64,7 @@ export default function ApprovalDetails() {
             }),
         );
         setRecipientApproveDialog(false);
-    }, [dispatch, approvalDetails]);
+    }, [dispatch, approvalDetails, setRecipientApproveDialog]);
 
     const onRejectRecipient = useCallback(() => {
         if (!approvalDetails?.approvalUuid) return;
@@ -78,7 +77,7 @@ export default function ApprovalDetails() {
             }),
         );
         setRecipientApproveDialog(false);
-    }, [dispatch, approvalDetails]);
+    }, [dispatch, approvalDetails, setRecipientApproveDialog]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -213,7 +212,7 @@ export default function ApprovalDetails() {
                       },
                       {
                           id: "resource",
-                          columns: ["Resource", getResourceLinkFromNameAndUuid(approvalDetails.resource, approvalDetails.objectUuid)],
+                          columns: ["Resource", approvalDetails.resource || ""],
                       },
 
                       {

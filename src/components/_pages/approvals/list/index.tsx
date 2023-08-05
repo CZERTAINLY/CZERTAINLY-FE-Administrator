@@ -14,7 +14,6 @@ import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { ApprovalDtoStatusEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
-import { getResourceLinkFromNameAndUuid } from "utils/resource";
 
 export default function ApprovalsList() {
     const dispatch = useDispatch();
@@ -86,7 +85,8 @@ export default function ApprovalsList() {
                 uuid: checkedRows[0],
             }),
         );
-    }, [dispatch, checkedRows]);
+        setApproveApprovalDialogOpen(false);
+    }, [dispatch, checkedRows, setApproveApprovalDialogOpen]);
 
     const onRejectApprover = useCallback(() => {
         if (!checkedRows) return;
@@ -95,7 +95,8 @@ export default function ApprovalsList() {
                 uuid: checkedRows[0],
             }),
         );
-    }, [dispatch, checkedRows]);
+        setRejectApprovalDialogOpen(false);
+    }, [dispatch, checkedRows, setRejectApprovalDialogOpen]);
 
     const selectedApprovalStatus = useMemo(() => {
         if (!checkedRows) return;
@@ -199,7 +200,7 @@ export default function ApprovalsList() {
                     </>
                 ) || "",
                 getUserName(approval.creatorUuid) || "",
-                getResourceLinkFromNameAndUuid(approval.resource, approval.objectUuid),
+                approval.resource || "",
                 approval.resourceAction || "",
                 approval.createdAt ? dateFormatter(approval.createdAt) : "",
                 approval.closedAt ? dateFormatter(approval.closedAt) : "",
