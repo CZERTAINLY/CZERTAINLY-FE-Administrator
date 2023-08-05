@@ -10,15 +10,17 @@ import { actions as rolesActions, selectors as rolesSelectors } from "ducks/role
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import { Col, Container, Input, Row } from "reactstrap";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Button, Col, Container, Input, Row } from "reactstrap";
 import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
 import { DetailApprovalStepModel } from "types/approvals";
 import { ApprovalDetailDtoStatusEnum } from "types/openapi";
 import { dateFormatter } from "utils/dateUtil";
+import { getResourceLinkFromNameAndUuid } from "utils/resource";
 
 export default function ApprovalDetails() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { id } = useParams();
 
     const approvalDetails = useSelector(approvalSelectors.approvalDetails);
@@ -143,7 +145,40 @@ export default function ApprovalDetails() {
 
                       {
                           id: "status",
-                          columns: ["Status", <StatusBadge textStatus={approvalDetails.status} />],
+                          columns: [
+                              "Status",
+                              <>
+                                  <StatusBadge textStatus={approvalDetails.status} />
+                                  <Button
+                                      color="white"
+                                      size="sm"
+                                      className="p-0"
+                                      onClick={() => {
+                                          navigate(`../../${approvalDetails.resource}/detail/${approvalDetails.objectUuid}`);
+                                      }}
+                                  >
+                                      <i className="fa fa-circle-arrow-right"></i>
+                                  </Button>
+                              </>,
+                          ],
+                      },
+
+                      {
+                          id: "createdAt",
+                          columns: ["Created At", dateFormatter(approvalDetails.createdAt)],
+                      },
+                      {
+                          id: "closedAt",
+                          columns: ["Closed At", approvalDetails.closedAt ? dateFormatter(approvalDetails.closedAt) : ""],
+                      },
+
+                      {
+                          id: "action",
+                          columns: ["Action", approvalDetails.resourceAction],
+                      },
+                      {
+                          id: "resource",
+                          columns: ["Resource", getResourceLinkFromNameAndUuid(approvalDetails.resource, approvalDetails.objectUuid)],
                       },
 
                       {
@@ -259,7 +294,7 @@ export default function ApprovalDetails() {
             },
             {
                 id: "comment",
-                content: "commentv",
+                content: "Comment",
             },
         ];
 

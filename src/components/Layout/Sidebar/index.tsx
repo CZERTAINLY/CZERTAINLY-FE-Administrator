@@ -64,11 +64,6 @@ export default function Sidebar() {
                                 name: "Approval List",
                                 link: "/approvals/list",
                             },
-                            {
-                                _key: "/myapprovals",
-                                name: "My Approvals",
-                                link: "/approvals/myapprovals",
-                            },
                         ]}
                     />
 

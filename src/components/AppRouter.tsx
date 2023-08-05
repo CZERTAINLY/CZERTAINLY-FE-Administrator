@@ -31,7 +31,6 @@ import ApprovalProfiles from "./_pages/approval-profiles/list";
 
 import ApprovalDetails from "./_pages/approvals/details";
 import ApprovalsList from "./_pages/approvals/list";
-import MyApprovalsList from "./_pages/approvals/myApprovals";
 
 import ConnectorsList from "./_pages/connectors/list";
 import CredentialDetail from "./_pages/credentials/detail";
@@ -186,9 +185,6 @@ export default function AppRouter() {
 
                     <Route path={`/${Resource.Approvals.toLowerCase()}/list`} element={<ApprovalsList />} />
                     <Route path={`/${Resource.Approvals.toLowerCase()}/list/detail/:id`} element={<ApprovalDetails />} />
-
-                    <Route path={`/${Resource.Approvals.toLowerCase()}/myapprovals`} element={<MyApprovalsList />} />
-                    <Route path={`/${Resource.Approvals.toLowerCase()}/myapprovals/detail/:id`} element={<ApprovalDetails />} />
 
                     <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}`} element={<ComplianceProfilesList />} />
                     <Route

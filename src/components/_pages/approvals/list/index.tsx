@@ -1,27 +1,33 @@
 import { actions as approvalActions, selectors as approvalSelectors } from "ducks/approvals";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Container } from "reactstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Container } from "reactstrap";
 
 // import { selectors as profileApprovalSelector } from "ducks/approval-profiles";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
+import TabLayout from "components/Layout/TabLayout";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { ApprovalDtoStatusEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
+import { getResourceLinkFromNameAndUuid } from "utils/resource";
 
 export default function ApprovalsList() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const approvals = useSelector(approvalSelectors.approvals);
     const approvalsTotalItems = useSelector(approvalSelectors.approvalsTotalItems);
 
+    const userApprovals = useSelector(approvalSelectors.userApprovals);
+    const userApprovalsTotalItems = useSelector(approvalSelectors.userApprovalsTotalItems);
+
     const isFetching = useSelector(approvalSelectors.isFetchingList);
+    const isFetchingUserList = useSelector(approvalSelectors.isFetchingUserList);
 
     const [approveApprovalDialogOpen, setApproveApprovalDialogOpen] = useState<boolean>(false);
     const [rejectApprovalDialogOpen, setRejectApprovalDialogOpen] = useState<boolean>(false);
@@ -29,12 +35,22 @@ export default function ApprovalsList() {
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
+    const [showUserApprovals, setShowUserApprovals] = useState<boolean>(false);
+    const [showHistory, setShowHistory] = useState<boolean>(false);
 
-    const isBusy = useMemo(() => isFetching, [isFetching]);
+    const isBusy = useMemo(() => isFetching || isFetchingUserList, [isFetching, isFetchingUserList]);
 
     const getFreshData = useCallback(() => {
         dispatch(approvalActions.listApprovals({ itemsPerPage: pageSize, pageNumber }));
-    }, [dispatch, pageNumber, pageSize]);
+        dispatch(
+            approvalActions.listUserApprovals({
+                approvalUserDto: {
+                    history: showHistory,
+                },
+                paginationRequestDto: { itemsPerPage: pageSize, pageNumber },
+            }),
+        );
+    }, [dispatch, pageNumber, pageSize, showHistory]);
 
     useEffect(() => {
         getFreshData();
@@ -82,8 +98,16 @@ export default function ApprovalsList() {
                     setRejectApprovalDialogOpen(true);
                 },
             },
+            {
+                icon: "history",
+                tooltip: "Show History",
+                disabled: !showUserApprovals,
+                onClick: () => {
+                    setShowHistory(!showHistory);
+                },
+            },
         ],
-        [checkedRows, selectedApprovalStatus],
+        [checkedRows, selectedApprovalStatus, showHistory, showUserApprovals],
     );
 
     const approvalProfilesTableHeader: TableHeader[] = useMemo(
@@ -124,57 +148,120 @@ export default function ApprovalsList() {
         [],
     );
 
-    const approvalProfilesTableData: TableDataRow[] = useMemo(
-        () =>
-            approvals.map((approval) => ({
-                id: approval.approvalUuid,
+    const approvalProfilesTableData: TableDataRow[] = useMemo(() => {
+        const data = showUserApprovals ? userApprovals : approvals;
 
-                columns: [
-                    <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
-                    <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
-                    <StatusBadge textStatus={approval.status} /> || "",
-                    approval.resource || "",
-                    approval.resourceAction || "",
-                    approval.createdAt ? dateFormatter(approval.createdAt) : "",
-                    approval.closedAt ? dateFormatter(approval.closedAt) : "",
-                ],
-            })),
-        [approvals],
-    );
+        return data.map((approval) => ({
+            id: approval.approvalUuid,
+            columns: [
+                <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
+                <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
+                (
+                    <>
+                        {" "}
+                        <StatusBadge textStatus={approval.status} />
+                        <Button
+                            color="white"
+                            size="sm"
+                            className="p-0"
+                            onClick={() => {
+                                navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
+                            }}
+                        >
+                            <i className="fa fa-circle-arrow-right"></i>
+                        </Button>
+                    </>
+                ) || "",
+                getResourceLinkFromNameAndUuid(approval.resource, approval.objectUuid),
+                approval.resourceAction || "",
+                approval.createdAt ? dateFormatter(approval.createdAt) : "",
+                approval.closedAt ? dateFormatter(approval.closedAt) : "",
+            ],
+        }));
+    }, [approvals, userApprovals, showUserApprovals]);
 
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="List of Approvals"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfComplianceProfiles}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <br />
-                <CustomTable
-                    headers={approvalProfilesTableHeader}
-                    data={approvalProfilesTableData}
-                    hasPagination={true}
-                    hasCheckboxes
-                    checkedRows={checkedRows}
-                    onCheckedRowsChanged={(checkedRows) => {
-                        setCheckedRows(checkedRows as string[]);
-                    }}
-                    multiSelect={false}
-                    onPageChanged={setPageNumber}
-                    onPageSizeChanged={setPageSize}
-                    paginationData={{
-                        pageSize: pageSize,
-                        totalItems: approvalsTotalItems || 0,
-                        itemsPerPageOptions: [10, 20, 50, 100],
-                        loadedPageSize: pageSize,
-                        totalPages: approvalsTotalItems ? Math.ceil(approvalsTotalItems / pageSize) : 0,
-                        page: pageNumber,
-                    }}
-                />
-            </Widget>
+            <TabLayout
+                tabs={[
+                    {
+                        title: "List of Approvals",
+                        content: (
+                            <Widget
+                                title="List of Approvals"
+                                busy={isBusy}
+                                widgetButtons={buttons}
+                                titleSize="large"
+                                refreshAction={getFreshData}
+                            >
+                                <br />
+                                <CustomTable
+                                    headers={approvalProfilesTableHeader}
+                                    data={approvalProfilesTableData}
+                                    hasPagination={true}
+                                    hasCheckboxes
+                                    checkedRows={checkedRows}
+                                    onCheckedRowsChanged={(checkedRows) => {
+                                        setCheckedRows(checkedRows as string[]);
+                                    }}
+                                    multiSelect={false}
+                                    onPageChanged={setPageNumber}
+                                    onPageSizeChanged={setPageSize}
+                                    paginationData={{
+                                        pageSize: pageSize,
+                                        totalItems: approvalsTotalItems || 0,
+                                        itemsPerPageOptions: [10, 20, 50, 100],
+                                        loadedPageSize: pageSize,
+                                        totalPages: approvalsTotalItems ? Math.ceil(approvalsTotalItems / pageSize) : 0,
+                                        page: pageNumber,
+                                    }}
+                                />
+                            </Widget>
+                        ),
+                        onClick: () => {
+                            setShowUserApprovals(false);
+                        },
+                    },
+                    {
+                        title: "My Approvals",
+                        content: (
+                            <Widget
+                                title="List of User Approvals"
+                                busy={isBusy}
+                                widgetButtons={buttons}
+                                titleSize="large"
+                                refreshAction={getFreshData}
+                            >
+                                <br />
+                                <CustomTable
+                                    headers={approvalProfilesTableHeader}
+                                    data={approvalProfilesTableData}
+                                    hasPagination={true}
+                                    hasCheckboxes
+                                    checkedRows={checkedRows}
+                                    onCheckedRowsChanged={(checkedRows) => {
+                                        setCheckedRows(checkedRows as string[]);
+                                    }}
+                                    multiSelect={false}
+                                    onPageChanged={setPageNumber}
+                                    onPageSizeChanged={setPageSize}
+                                    paginationData={{
+                                        pageSize: pageSize,
+                                        totalItems: userApprovalsTotalItems || 0,
+                                        itemsPerPageOptions: [10, 20, 50, 100],
+                                        loadedPageSize: pageSize,
+                                        totalPages: userApprovalsTotalItems ? Math.ceil(userApprovalsTotalItems / pageSize) : 0,
+                                        page: pageNumber,
+                                    }}
+                                />
+                            </Widget>
+                        ),
+                        onClick: () => {
+                            setShowUserApprovals(true);
+                        },
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={approveApprovalDialogOpen}
