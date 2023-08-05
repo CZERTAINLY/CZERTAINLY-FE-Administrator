@@ -18,6 +18,10 @@ import { initialState as initialWidgetLockState, slice as widgetLockSlice } from
 
 import { initialState as initialProfileApprovalState, slice as profileApprovalSlice } from "./approval-profiles";
 import profileApprovalEpics from "./approval-profiles-epics";
+
+import { slice as approvalSlice, initialState as initialApprovalState } from "./approvals";
+import approvalsEpic from "./approvals-epic";
+
 import authEpics from "./auth-epics";
 import { slice as authoritiesSlice, initialState as initialAuthoritiesState } from "./authorities";
 import authoritiesEpics from "./authorities-epics";
@@ -118,6 +122,7 @@ export const initialState = {
     [settingsSlice.name]: initialSettingsState,
     [schedulerSlice.name]: initialSchedulerState,
     [profileApprovalSlice.name]: initialProfileApprovalState,
+    [approvalSlice.name]: initialApprovalState,
     [notificationsSlice.name]: initialNotificationsState,
     [enumsSlice.name]: initialEnumsState,
     [tokenSlice.name]: initialTokenAttributesState,
@@ -159,6 +164,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [settingsSlice.name]: settingsSlice.reducer,
     [schedulerSlice.name]: schedulerSlice.reducer,
     [profileApprovalSlice.name]: profileApprovalSlice.reducer,
+    [approvalSlice.name]: approvalSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
@@ -198,6 +204,7 @@ export const epics = combineEpics(
     ...settingsEpics,
     ...schedulerEpics,
     ...profileApprovalEpics,
+    ...approvalsEpic,
     ...notificationsEpics,
     ...enumsEpics,
     ...tokenEpics,

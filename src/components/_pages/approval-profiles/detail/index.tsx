@@ -36,14 +36,19 @@ const ApprovalProfileDetails = () => {
         [isFetchingDetail, isEnabling, isDeleting, isFetchingGroups, isFetchingUsers, isFetchingRoles],
     );
 
+    const getFreshData = useCallback(() => {
+        if (!id) return;
+        dispatch(profileApprovalActions.getApprovalProfile({ uuid: id, version: Number(version) }));
+    }, [dispatch, id, version]);
+
     useEffect(() => {
         if (id) {
-            dispatch(profileApprovalActions.getApprovalProfile({ uuid: id, version: Number(version) }));
+            getFreshData();
             dispatch(userAction.list());
             dispatch(groupAction.listGroups());
             dispatch(rolesActions.list());
         }
-    }, [id, dispatch, version]);
+    }, [id, dispatch, version, getFreshData]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!profileApprovalDetail) return;
@@ -245,7 +250,13 @@ const ApprovalProfileDetails = () => {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title="Approval Profile Details" busy={isBusy} titleSize="large" widgetButtons={buttons}>
+                    <Widget
+                        title="Approval Profile Details"
+                        busy={isBusy}
+                        titleSize="large"
+                        widgetButtons={buttons}
+                        refreshAction={getFreshData}
+                    >
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
                 </Col>

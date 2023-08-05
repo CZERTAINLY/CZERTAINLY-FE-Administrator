@@ -26,6 +26,12 @@ export interface ApprovalDto {
      */
     approvalUuid: string;
     /**
+     * UUID of the creator
+     * @type {string}
+     * @memberof ApprovalDto
+     */
+    creatorUuid: string;
+    /**
      * Version of the Approval profile
      * @type {number}
      * @memberof ApprovalDto

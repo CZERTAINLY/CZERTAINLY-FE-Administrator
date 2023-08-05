@@ -19,6 +19,18 @@ import type { RequestAttributeDto } from "./";
  */
 export interface ClientCertificateRequestDto {
     /**
+     * RA Profile UUID. Required if CSR is not uploaded
+     * @type {string}
+     * @memberof ClientCertificateRequestDto
+     */
+    raProfileUuid: string;
+    /**
+     * Source certificate UUID to specify in case of renew/rekey operation
+     * @type {string}
+     * @memberof ClientCertificateRequestDto
+     */
+    sourceCertificateUuid?: string;
+    /**
      * List of attributes to create CSR. Required if CSR is not provided
      * @type {Array<RequestAttributeDto>}
      * @memberof ClientCertificateRequestDto
@@ -35,7 +47,7 @@ export interface ClientCertificateRequestDto {
      * @type {string}
      * @memberof ClientCertificateRequestDto
      */
-    pkcs10: string;
+    pkcs10?: string;
     /**
      * Token Profile UUID. Required if CSR is not uploaded
      * @type {string}
@@ -48,6 +60,12 @@ export interface ClientCertificateRequestDto {
      * @memberof ClientCertificateRequestDto
      */
     keyUuid?: string;
+    /**
+     * List of RA Profile related Attributes to issue Certificate
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateRequestDto
+     */
+    issueAttributes: Array<RequestAttributeDto>;
     /**
      * List of Custom Attributes
      * @type {Array<RequestAttributeDto>}

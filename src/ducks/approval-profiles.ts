@@ -11,6 +11,7 @@ import { createFeatureSelector } from "utils/ducks";
 export type State = {
     profileApprovalDetail?: ProfileApprovalDetailModel;
     profileApprovalList: ProfileApprovalModel[];
+    isFetchingList: boolean;
     isFetchingDetail: boolean;
     isUpdating: boolean;
     isDeleting: boolean;
@@ -24,6 +25,7 @@ export const initialState: State = {
     profileApprovalDetail: undefined,
     isUpdating: false,
     profileApprovalList: [],
+    isFetchingList: false,
     isFetchingDetail: false,
     isDeleting: false,
     isEnabling: false,
@@ -77,18 +79,18 @@ export const slice = createSlice({
 
         listApprovalProfiles: (state, action: PayloadAction<{ itemsPerPage: number; pageNumber: number }>) => {
             state.profileApprovalList = [];
-            state.isFetchingDetail = true;
+            state.isFetchingList = true;
         },
 
         listApprovalProfilesSuccess: (state, action: PayloadAction<ProfileApprovalResponseModel>) => {
             state.profileApprovalList = action.payload?.approvalProfiles || [];
             state.totalItems = action.payload?.totalItems || 0;
-            state.isFetchingDetail = false;
+            state.isFetchingList = false;
         },
 
         listApprovalProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.profileApprovalList = [];
-            state.isFetchingDetail = false;
+            state.isFetchingList = false;
         },
 
         enableApprovalProfile: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -165,6 +167,7 @@ const profileApprovalDetail = createSelector(state, (state) => state.profileAppr
 const profileApprovalList = createSelector(state, (state) => state.profileApprovalList);
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
+const isFetchingList = createSelector(state, (state) => state.isFetchingList);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const totalItems = createSelector(state, (state) => state.totalItems);
@@ -182,6 +185,7 @@ export const selectors = {
     totalItems,
     isUpdating,
     isDeleting,
+    isFetchingList,
 };
 
 export const actions = slice.actions;

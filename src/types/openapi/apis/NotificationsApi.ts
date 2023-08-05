@@ -59,6 +59,8 @@ export class NotificationsApi extends BaseAPI {
         { request }: ListNotificationsRequest,
         opts?: OperationOpts,
     ): Observable<NotificationResponseDto | AjaxResponse<NotificationResponseDto>> {
+        throwIfNullOrUndefined(request, "request", "listNotifications");
+
         const query: HttpQuery = {};
 
         if (request != null) {

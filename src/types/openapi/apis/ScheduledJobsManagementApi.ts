@@ -129,6 +129,7 @@ export class ScheduledJobsManagementApi extends BaseAPI {
         { pagination, uuid }: GetScheduledJobHistoryRequest,
         opts?: OperationOpts,
     ): Observable<ScheduledJobHistoryResponseDto | AjaxResponse<ScheduledJobHistoryResponseDto>> {
+        throwIfNullOrUndefined(pagination, "pagination", "getScheduledJobHistory");
         throwIfNullOrUndefined(uuid, "uuid", "getScheduledJobHistory");
 
         const query: HttpQuery = {};
@@ -156,6 +157,7 @@ export class ScheduledJobsManagementApi extends BaseAPI {
         { pagination }: ListScheduledJobsRequest,
         opts?: OperationOpts,
     ): Observable<ScheduledJobsResponseDto | AjaxResponse<ScheduledJobsResponseDto>> {
+        throwIfNullOrUndefined(pagination, "pagination", "listScheduledJobs");
         const query: HttpQuery = {};
 
         if (pagination != null) {

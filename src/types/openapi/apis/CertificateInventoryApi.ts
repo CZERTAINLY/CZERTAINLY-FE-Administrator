@@ -90,6 +90,10 @@ export interface ListCertificatesRequest {
     searchRequestDto: SearchRequestDto;
 }
 
+export interface SubmitCertificateRequestRequest {
+    clientCertificateRequestDto: ClientCertificateRequestDto;
+}
+
 export interface UpdateCertificateObjectsRequest {
     uuid: string;
     certificateUpdateObjectsDto: CertificateUpdateObjectsDto;
@@ -455,6 +459,35 @@ export class CertificateInventoryApi extends BaseAPI {
                 method: "POST",
                 headers,
                 body: searchRequestDto,
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Submit certificate request
+     */
+    submitCertificateRequest({ clientCertificateRequestDto }: SubmitCertificateRequestRequest): Observable<CertificateDetailDto>;
+    submitCertificateRequest(
+        { clientCertificateRequestDto }: SubmitCertificateRequestRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CertificateDetailDto>>;
+    submitCertificateRequest(
+        { clientCertificateRequestDto }: SubmitCertificateRequestRequest,
+        opts?: OperationOpts,
+    ): Observable<CertificateDetailDto | AjaxResponse<CertificateDetailDto>> {
+        throwIfNullOrUndefined(clientCertificateRequestDto, "clientCertificateRequestDto", "submitCertificateRequest");
+
+        const headers: HttpHeaders = {
+            "Content-Type": "application/json",
+        };
+
+        return this.request<CertificateDetailDto>(
+            {
+                url: "/v1/certificates/create",
+                method: "POST",
+                headers,
+                body: clientCertificateRequestDto,
             },
             opts?.responseOpts,
         );
