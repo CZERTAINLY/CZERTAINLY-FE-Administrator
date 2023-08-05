@@ -101,6 +101,38 @@ export default function ApprovalDetails() {
         ],
         [recipientApproveDialog, recipientRejectDialog],
     );
+    const getApprovalType = (approvalStep: DetailApprovalStepModel) => {
+        if (approvalStep.userUuid) {
+            return ApproverType.User;
+        }
+        if (approvalStep.roleUuid) {
+            return ApproverType.Role;
+        }
+        if (approvalStep.groupUuid) {
+            return ApproverType.Group;
+        }
+    };
+
+    const getUserName = useCallback(
+        (userUuid: string) => {
+            return userList.find((user) => user.uuid === userUuid)?.username;
+        },
+        [userList],
+    );
+
+    const getRoleName = useCallback(
+        (roleUuid: string) => {
+            return roleList.find((role) => role.uuid === roleUuid)?.name;
+        },
+        [roleList],
+    );
+
+    const getGroupName = useCallback(
+        (groupUuid: string) => {
+            return groupList.find((group) => group.uuid === groupUuid)?.name;
+        },
+        [groupList],
+    );
 
     const detailHeaders: TableHeader[] = useMemo(
         () => [
@@ -142,7 +174,10 @@ export default function ApprovalDetails() {
                           id: "description",
                           columns: ["Description", approvalDetails.description || ""],
                       },
-
+                      {
+                          id: "requestedBy",
+                          columns: ["Requested By", getUserName(approvalDetails.creatorUuid) || ""],
+                      },
                       {
                           id: "status",
                           columns: [
@@ -152,7 +187,7 @@ export default function ApprovalDetails() {
                                   <Button
                                       color="white"
                                       size="sm"
-                                      className="p-0"
+                                      className="p-0 ms-1"
                                       onClick={() => {
                                           navigate(`../../${approvalDetails.resource}/detail/${approvalDetails.objectUuid}`);
                                       }}
@@ -218,39 +253,6 @@ export default function ApprovalDetails() {
             },
         ],
         [],
-    );
-
-    const getApprovalType = (approvalStep: DetailApprovalStepModel) => {
-        if (approvalStep.userUuid) {
-            return ApproverType.User;
-        }
-        if (approvalStep.roleUuid) {
-            return ApproverType.Role;
-        }
-        if (approvalStep.groupUuid) {
-            return ApproverType.Group;
-        }
-    };
-
-    const getUserName = useCallback(
-        (userUuid: string) => {
-            return userList.find((user) => user.uuid === userUuid)?.username;
-        },
-        [userList],
-    );
-
-    const getRoleName = useCallback(
-        (roleUuid: string) => {
-            return roleList.find((role) => role.uuid === roleUuid)?.name;
-        },
-        [roleList],
-    );
-
-    const getGroupName = useCallback(
-        (groupUuid: string) => {
-            return groupList.find((group) => group.uuid === groupUuid)?.name;
-        },
-        [groupList],
     );
 
     const renderApproverRedirect = useCallback(

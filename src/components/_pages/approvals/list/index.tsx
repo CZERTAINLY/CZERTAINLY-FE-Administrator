@@ -1,9 +1,9 @@
 import { actions as approvalActions, selectors as approvalSelectors } from "ducks/approvals";
+import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Container } from "reactstrap";
-
 // import { selectors as profileApprovalSelector } from "ducks/approval-profiles";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
@@ -32,16 +32,23 @@ export default function ApprovalsList() {
     const [approveApprovalDialogOpen, setApproveApprovalDialogOpen] = useState<boolean>(false);
     const [rejectApprovalDialogOpen, setRejectApprovalDialogOpen] = useState<boolean>(false);
 
+    const userList = useSelector(userSelectors.users);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
-    const [showUserApprovals, setShowUserApprovals] = useState<boolean>(false);
+    const [showAllApprovals, setShowAllApprovals] = useState<boolean>(false);
     const [showHistory, setShowHistory] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isFetchingUserList, [isFetching, isFetchingUserList]);
 
-    const getFreshData = useCallback(() => {
-        dispatch(approvalActions.listApprovals({ itemsPerPage: pageSize, pageNumber }));
+    const getUserName = useCallback(
+        (userUuid: string) => {
+            return userList.find((user) => user.uuid === userUuid)?.username;
+        },
+        [userList],
+    );
+
+    const listUserApprovals = useCallback(() => {
         dispatch(
             approvalActions.listUserApprovals({
                 approvalUserDto: {
@@ -52,9 +59,25 @@ export default function ApprovalsList() {
         );
     }, [dispatch, pageNumber, pageSize, showHistory]);
 
+    const listApprovals = useCallback(() => {
+        dispatch(approvalActions.listApprovals({ itemsPerPage: pageSize, pageNumber }));
+    }, [dispatch, pageNumber, pageSize]);
+
+    const getFreshData = useCallback(() => {
+        if (showAllApprovals) {
+            listApprovals();
+        } else {
+            listUserApprovals();
+        }
+    }, [listApprovals, listUserApprovals, showAllApprovals]);
+
     useEffect(() => {
         getFreshData();
     }, [getFreshData]);
+
+    useEffect(() => {
+        dispatch(userAction.list());
+    }, []);
 
     const onApproveApprover = useCallback(() => {
         if (!checkedRows) return;
@@ -101,13 +124,13 @@ export default function ApprovalsList() {
             {
                 icon: "history",
                 tooltip: "Show History",
-                disabled: !showUserApprovals,
+                disabled: showAllApprovals,
                 onClick: () => {
                     setShowHistory(!showHistory);
                 },
             },
         ],
-        [checkedRows, selectedApprovalStatus, showHistory, showUserApprovals],
+        [checkedRows, selectedApprovalStatus, showHistory, showAllApprovals],
     );
 
     const approvalProfilesTableHeader: TableHeader[] = useMemo(
@@ -124,6 +147,10 @@ export default function ApprovalsList() {
             {
                 id: "status",
                 content: "Status",
+            },
+            {
+                id: "requestedBy",
+                content: "Requested By",
             },
             {
                 id: "resource",
@@ -149,7 +176,7 @@ export default function ApprovalsList() {
     );
 
     const approvalProfilesTableData: TableDataRow[] = useMemo(() => {
-        const data = showUserApprovals ? userApprovals : approvals;
+        const data = showAllApprovals ? approvals : userApprovals;
 
         return data.map((approval) => ({
             id: approval.approvalUuid,
@@ -158,12 +185,11 @@ export default function ApprovalsList() {
                 <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
                 (
                     <>
-                        {" "}
                         <StatusBadge textStatus={approval.status} />
                         <Button
                             color="white"
                             size="sm"
-                            className="p-0"
+                            className="p-0 ms-1"
                             onClick={() => {
                                 navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
                             }}
@@ -172,56 +198,19 @@ export default function ApprovalsList() {
                         </Button>
                     </>
                 ) || "",
+                getUserName(approval.creatorUuid) || "",
                 getResourceLinkFromNameAndUuid(approval.resource, approval.objectUuid),
                 approval.resourceAction || "",
                 approval.createdAt ? dateFormatter(approval.createdAt) : "",
                 approval.closedAt ? dateFormatter(approval.closedAt) : "",
             ],
         }));
-    }, [approvals, userApprovals, showUserApprovals]);
+    }, [approvals, userApprovals, showAllApprovals]);
 
     return (
         <Container className="themed-container" fluid>
             <TabLayout
                 tabs={[
-                    {
-                        title: "List of Approvals",
-                        content: (
-                            <Widget
-                                title="List of Approvals"
-                                busy={isBusy}
-                                widgetButtons={buttons}
-                                titleSize="large"
-                                refreshAction={getFreshData}
-                            >
-                                <br />
-                                <CustomTable
-                                    headers={approvalProfilesTableHeader}
-                                    data={approvalProfilesTableData}
-                                    hasPagination={true}
-                                    hasCheckboxes
-                                    checkedRows={checkedRows}
-                                    onCheckedRowsChanged={(checkedRows) => {
-                                        setCheckedRows(checkedRows as string[]);
-                                    }}
-                                    multiSelect={false}
-                                    onPageChanged={setPageNumber}
-                                    onPageSizeChanged={setPageSize}
-                                    paginationData={{
-                                        pageSize: pageSize,
-                                        totalItems: approvalsTotalItems || 0,
-                                        itemsPerPageOptions: [10, 20, 50, 100],
-                                        loadedPageSize: pageSize,
-                                        totalPages: approvalsTotalItems ? Math.ceil(approvalsTotalItems / pageSize) : 0,
-                                        page: pageNumber,
-                                    }}
-                                />
-                            </Widget>
-                        ),
-                        onClick: () => {
-                            setShowUserApprovals(false);
-                        },
-                    },
                     {
                         title: "My Approvals",
                         content: (
@@ -230,7 +219,7 @@ export default function ApprovalsList() {
                                 busy={isBusy}
                                 widgetButtons={buttons}
                                 titleSize="large"
-                                refreshAction={getFreshData}
+                                refreshAction={listUserApprovals}
                             >
                                 <br />
                                 <CustomTable
@@ -257,7 +246,45 @@ export default function ApprovalsList() {
                             </Widget>
                         ),
                         onClick: () => {
-                            setShowUserApprovals(true);
+                            setShowAllApprovals(false);
+                        },
+                    },
+                    {
+                        title: "List of Approvals",
+                        content: (
+                            <Widget
+                                title="List of Approvals"
+                                busy={isBusy}
+                                widgetButtons={buttons}
+                                titleSize="large"
+                                refreshAction={listApprovals}
+                            >
+                                <br />
+                                <CustomTable
+                                    headers={approvalProfilesTableHeader}
+                                    data={approvalProfilesTableData}
+                                    hasPagination={true}
+                                    hasCheckboxes
+                                    checkedRows={checkedRows}
+                                    onCheckedRowsChanged={(checkedRows) => {
+                                        setCheckedRows(checkedRows as string[]);
+                                    }}
+                                    multiSelect={false}
+                                    onPageChanged={setPageNumber}
+                                    onPageSizeChanged={setPageSize}
+                                    paginationData={{
+                                        pageSize: pageSize,
+                                        totalItems: approvalsTotalItems || 0,
+                                        itemsPerPageOptions: [10, 20, 50, 100],
+                                        loadedPageSize: pageSize,
+                                        totalPages: approvalsTotalItems ? Math.ceil(approvalsTotalItems / pageSize) : 0,
+                                        page: pageNumber,
+                                    }}
+                                />
+                            </Widget>
+                        ),
+                        onClick: () => {
+                            setShowAllApprovals(true);
                         },
                     },
                 ]}

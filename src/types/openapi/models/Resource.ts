@@ -35,7 +35,6 @@ export enum Resource {
     RaProfiles = "raProfiles",
     Certificates = "certificates",
     Groups = "groups",
-    ApprovalProfiles = "approvalProfiles",
     ComplianceProfiles = "complianceProfiles",
     Discoveries = "discoveries",
     Entities = "entities",
@@ -43,5 +42,6 @@ export enum Resource {
     TokenProfiles = "tokenProfiles",
     Tokens = "tokens",
     Keys = "keys",
+    ApprovalProfiles = "approvalProfiles",
     Approvals = "approvals",
 }
