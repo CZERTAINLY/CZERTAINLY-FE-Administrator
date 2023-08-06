@@ -88,6 +88,13 @@ export default function GroupList() {
                 content: "Description",
                 sortable: true,
             },
+            {
+                id: "email",
+                content: "Email",
+                sortable: true,
+                sort: "asc",
+                width: "15%",
+            }
         ],
         [],
     );
@@ -97,7 +104,7 @@ export default function GroupList() {
             groups.map((group) => ({
                 id: group.uuid,
 
-                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || ""],
+                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || "", group.email || ""],
             })),
         [groups],
     );
