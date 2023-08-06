@@ -9,6 +9,7 @@ import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { actions as widgetLockActions } from "./widget-locks";
 
 import { LockWidgetNameEnum } from "types/widget-locks";
+import { transformProfileApprovalDtoToModel } from "./transform/approval-profiles";
 import {
     transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
@@ -600,6 +601,95 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAssociatedApprovalProfiles.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles.getAssociatedApprovalProfiles({ ...action.payload }).pipe(
+                switchMap((approvalProfiles) =>
+                    of(
+                        slice.actions.getAssociatedApprovalProfilesSuccess({
+                            associatedApprovalProfiles: approvalProfiles.map(transformProfileApprovalDtoToModel),
+                        }),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.getAssociatedApprovalProfilesFailure({
+                            error: extractError(err, "Failed to get associated Approval Profiles"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get associated Approval Profiles" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const associateRAProfileWithApprovalProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.associateRAProfileWithApprovalProfile.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .associateRAProfileWithApprovalProfile({
+                    ...action.payload,
+                })
+                .pipe(
+                    switchMap(() =>
+                        of(
+                            slice.actions.associateRAProfileWithApprovalProfileSuccess({
+                                ...action.payload,
+                            }),
+                            slice.actions.getAssociatedApprovalProfiles({
+                                ...action.payload,
+                            }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.associateRAProfileWithApprovalProfileFailure({
+                                error: extractError(err, "Failed to associate RA Profile with Approval Profile"),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: "Failed to associate RA Profile with Approval Profile",
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const disassociateRAProfileFromApprovalProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.disassociateRAProfileFromApprovalProfile.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .disassociateRAProfileFromApprovalProfile({
+                    ...action.payload,
+                })
+                .pipe(
+                    switchMap(() => of(slice.actions.disassociateRAProfileFromApprovalProfileSuccess({ ...action.payload }))),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.disassociateRAProfileFromApprovalProfileFailure({
+                                error: extractError(err, "Failed to disassociate RA Profile from Approval Profile"),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: "Failed to disassociate RA Profile from Approval Profile",
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const epics = [
     listRaProfiles,
     getRaProfileDetail,
@@ -623,6 +713,9 @@ const epics = [
     associateRaProfile,
     dissociateRaProfile,
     getComplianceProfilesForRaProfile,
+    getAssociatedApprovalProfiles,
+    associateRAProfileWithApprovalProfile,
+    disassociateRAProfileFromApprovalProfile,
 ];
 
 export default epics;
