@@ -587,6 +587,7 @@ const scepDetails = createSelector(state, (state: State) => state.scepDetails);
 const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
 const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
+const isDissociatingApprovalProfile = createSelector(state, (state: State) => state.isDissociatingApprovalProfile);
 const isAssociatingApprovalProfile = createSelector(state, (state: State) => state.isAssociatingApprovalProfile);
 const isFetchingApprovalProfiles = createSelector(state, (state: State) => state.isFetchingApprovalProfiles);
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
@@ -648,6 +649,7 @@ export const selectors = {
     isDeactivatingScep,
     isFetchingAssociatedComplianceProfiles,
     associatedComplianceProfiles,
+    isDissociatingApprovalProfile,
 };
 
 export const actions = slice.actions;

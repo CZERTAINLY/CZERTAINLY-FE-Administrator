@@ -23,6 +23,12 @@ import AssociateApprovalProfileDialogBody from "../AssociateApprovalProfileDialo
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
 import ProtocolActivationDialogBody, { Protocol } from "../ProtocolActivationDialogBody";
 
+interface DeassociateApprovalProfileDialogState {
+    isDialogOpen: boolean;
+    associatedApprovalProfileName: string;
+    associatedApprovalProfileUuid: string;
+}
+
 export default function RaProfileDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -35,6 +41,7 @@ export default function RaProfileDetail() {
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
 
+    const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
     const isfetchingApprvoalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
     const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
@@ -62,10 +69,12 @@ export default function RaProfileDetail() {
     const [associateComplianceProfile, setAssociateComplianceProfile] = useState<boolean>(false);
 
     const [associateApprovalProfileDialog, setAssociateApprovalProfileDialog] = useState<boolean>(false);
+    const [confirmDeassociateApprovalProfileDialog, setConfirmDeassociateApprovalProfileDialog] =
+        useState<DeassociateApprovalProfileDialogState>();
 
     const isBusy = useMemo(
-        () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isfetchingApprvoalProfiles,
-        [isFetchingProfile, isDeleting, isEnabling, isDisabling, isfetchingApprvoalProfiles],
+        () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isfetchingApprvoalProfiles || isDissociatingApprovalProfile,
+        [isFetchingProfile, isDeleting, isEnabling, isDisabling, isfetchingApprvoalProfiles, isDissociatingApprovalProfile],
     );
 
     const isWorkingWithProtocol = useMemo(
@@ -201,6 +210,7 @@ export default function RaProfileDetail() {
                     raProfileUuid: raProfile.uuid,
                 }),
             );
+            setConfirmDeassociateApprovalProfileDialog(undefined);
         },
         [raProfile, authorityId, dispatch],
     );
@@ -350,7 +360,11 @@ export default function RaProfileDetail() {
                                       disabled: false,
                                       tooltip: "Remove",
                                       onClick: () => {
-                                          onDissociateApprovalProfile(profile.uuid);
+                                          setConfirmDeassociateApprovalProfileDialog({
+                                              associatedApprovalProfileName: profile.name,
+                                              associatedApprovalProfileUuid: profile.uuid,
+                                              isDialogOpen: true,
+                                          });
                                       },
                                   },
                               ]}
@@ -692,7 +706,7 @@ export default function RaProfileDetail() {
 
                     <Widget
                         title="Approval Profiles"
-                        busy={isfetchingApprvoalProfiles}
+                        busy={isBusy}
                         widgetButtons={approvalProfilesButtons}
                         titleSize="large"
                         refreshAction={getFreshAssociatedApprovalProfiles}
@@ -847,6 +861,23 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setAssociateApprovalProfileDialog(false)}
                 buttons={[]}
+            />
+            <Dialog
+                isOpen={confirmDeassociateApprovalProfileDialog?.isDialogOpen || false}
+                caption={`Deassociate Approval Profile`}
+                body={`Are you sure you want to deassociate Approval Profile ${confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileName}?`}
+                toggle={() => setConfirmDeassociateApprovalProfileDialog(undefined)}
+                buttons={[
+                    {
+                        color: "primary",
+                        onClick: () =>
+                            confirmDeassociateApprovalProfileDialog
+                                ? onDissociateApprovalProfile(confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileUuid)
+                                : {},
+                        body: "Yes",
+                    },
+                    { color: "secondary", onClick: () => setConfirmDeassociateApprovalProfileDialog(undefined), body: "Cancel" },
+                ]}
             />
         </Container>
     );
