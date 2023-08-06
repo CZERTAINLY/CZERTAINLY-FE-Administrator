@@ -14,12 +14,13 @@ import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { Resource } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
     name: string;
     description: string;
+    email: string;
 }
 
 export default function GroupForm() {
@@ -53,6 +54,7 @@ export default function GroupForm() {
                         editGroupRequest: {
                             name: values.name,
                             description: values.description,
+                            email: values.email,
                             customAttributes: collectFormAttributes("customGroup", resourceCustomAttributes, values),
                         },
                     }),
@@ -62,6 +64,7 @@ export default function GroupForm() {
                     actions.createGroup({
                         name: values.name,
                         description: values.description,
+                        email: values.email,
                         customAttributes: collectFormAttributes("customGroup", resourceCustomAttributes, values),
                     }),
                 );
@@ -85,6 +88,7 @@ export default function GroupForm() {
         () => ({
             name: editMode ? group?.name || "" : "",
             description: editMode ? group?.description || "" : "",
+            email: editMode ? group?.email || "" : "",
         }),
         [editMode, group],
     );
@@ -128,6 +132,25 @@ export default function GroupForm() {
                                         type="text"
                                         id="description"
                                         placeholder="Group Description"
+                                    />
+
+                                    <FormFeedback>{meta.error}</FormFeedback>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        <Field name="email" validate={composeValidators(validateEmail())}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="email">Group E-mail</Label>
+
+                                    <Input
+                                        {...input}
+                                        valid={!meta.error && meta.touched}
+                                        invalid={!!meta.error && meta.touched}
+                                        type="text"
+                                        id="email"
+                                        placeholder="Group E-mail"
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>

@@ -124,6 +124,13 @@ export default function RolesList() {
                 width: "auto",
             },
             {
+                id: "email",
+                content: "Email",
+                sortable: true,
+                sort: "asc",
+                width: "auto",
+            },
+            {
                 id: "systemRole",
                 content: "System role",
                 sortable: true,
@@ -146,6 +153,8 @@ export default function RolesList() {
                     </span>,
 
                     role.description || "",
+
+                    role.email || "",
 
                     <Badge color={!role.systemRole ? "success" : "danger"}>{role.systemRole ? "Yes" : "No"}</Badge>,
                 ],

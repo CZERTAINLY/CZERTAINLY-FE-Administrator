@@ -95,6 +95,10 @@ export default function GroupDetail() {
                           columns: ["Name", group.name],
                       },
                       {
+                          id: "email",
+                          columns: ["Email", group.email || ""],
+                      },
+                      {
                           id: "description",
                           columns: ["Description", group.description || ""],
                       },

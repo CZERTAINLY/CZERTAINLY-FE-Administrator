@@ -136,6 +136,10 @@ export default function UserDetail() {
                           columns: ["Description", role.description || ""],
                       },
                       {
+                          id: "email",
+                          columns: ["Email", role.email || ""],
+                      },
+                      {
                           id: "systemRole",
                           columns: [
                               "System role ",
