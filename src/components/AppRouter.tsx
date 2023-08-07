@@ -186,8 +186,8 @@ export default function AppRouter() {
                     <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/:id/:version`} element={<ApprovalProfileDetails />} />
                     <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/edit/:id`} element={<ApprovalProfilesForm />} />
 
-                    <Route path={`/${Resource.Approvals.toLowerCase()}/list`} element={<ApprovalsList />} />
-                    <Route path={`/${Resource.Approvals.toLowerCase()}/list/detail/:id`} element={<ApprovalDetails />} />
+                    <Route path={`/${Resource.Approvals.toLowerCase()}`} element={<ApprovalsList />} />
+                    <Route path={`/${Resource.Approvals.toLowerCase()}/detail/:id`} element={<ApprovalDetails />} />
 
                     <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}`} element={<ComplianceProfilesList />} />
                     <Route

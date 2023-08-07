@@ -42,6 +42,7 @@ export interface WidgetButtonProps {
     icon: IconName;
     id?: string;
     tooltip?: any;
+    hidden?: boolean;
     disabled: boolean;
     custom?: React.ReactNode;
     onClick: (event: React.MouseEvent) => void;
@@ -149,7 +150,7 @@ function WidgetButtons({ buttons }: Props) {
         return button.custom ? (
             <span key={button.icon + button.tooltip}>{button.custom}</span>
         ) : (
-            <Button {...btnProps} title={button.tooltip}>
+            <Button {...btnProps} title={button.tooltip} hidden={button.hidden}>
                 <i className={classNames[button.icon]} style={style} />
                 {toolTip}
             </Button>
