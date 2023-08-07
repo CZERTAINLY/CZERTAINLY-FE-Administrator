@@ -1,13 +1,16 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SearchRequestModel } from "types/certificate";
 import { NotificationModel } from "types/notifications";
+import { NotificationInstanceDto } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
     overviewNotifications: NotificationModel[];
     notifications: NotificationModel[];
+    notificationInstances: NotificationInstanceDto[];
 
     isFetchingOverview: boolean;
+    isFetchingNotificationInstances: boolean;
     isDeleting: boolean;
     isMarking: boolean;
 };
@@ -15,7 +18,9 @@ export type State = {
 export const initialState: State = {
     overviewNotifications: [],
     notifications: [],
+    notificationInstances: [],
 
+    isFetchingNotificationInstances: false,
     isFetchingOverview: false,
     isDeleting: false,
     isMarking: false,
@@ -78,6 +83,17 @@ export const slice = createSlice({
         markAsReadNotificationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isMarking = false;
         },
+        listNotificationInstances: (state, action: PayloadAction<void>) => {
+            state.isFetchingNotificationInstances = true;
+            state.notificationInstances = [];
+        },
+        listNotificationInstancesSuccess: (state, action: PayloadAction<NotificationInstanceDto[]>) => {
+            state.notificationInstances = action.payload;
+            state.isFetchingNotificationInstances = false;
+        },
+        listNotificationInstancesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingNotificationInstances = false;
+        },
     },
 });
 
@@ -85,7 +101,9 @@ const state = createFeatureSelector<State>(slice.name);
 
 const overviewNotifications = createSelector(state, (state) => state.overviewNotifications);
 const notifications = createSelector(state, (state) => state.notifications);
+const notificationInstances = createSelector(state, (state) => state.notificationInstances);
 
+const isFetchingNotificationInstances = createSelector(state, (state) => state.isFetchingNotificationInstances);
 const isFetchingOverview = createSelector(state, (state) => state.isFetchingOverview);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isMarking = createSelector(state, (state) => state.isMarking);
@@ -95,7 +113,9 @@ export const selectors = {
 
     overviewNotifications,
     notifications,
+    notificationInstances,
 
+    isFetchingNotificationInstances,
     isFetchingOverview,
     isDeleting,
     isMarking,

@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { NotificationSettingsDto } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
 import { SettingsPlatformModel } from "../types/settings";
 
@@ -6,11 +7,14 @@ export type State = {
     platformSettings?: SettingsPlatformModel;
     isFetchingPlatform: boolean;
     isUpdatingPlatform: boolean;
+    notificationsSettings?: NotificationSettingsDto;
+    isFetchingNotificationsSetting: boolean;
 };
 
 export const initialState: State = {
     isFetchingPlatform: false,
     isUpdatingPlatform: false,
+    isFetchingNotificationsSetting: false,
 };
 
 export const slice = createSlice({
@@ -42,6 +46,19 @@ export const slice = createSlice({
         updatePlatformSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingPlatform = false;
         },
+
+        getNotificationsSettings: (state, action: PayloadAction<void>) => {
+            state.isFetchingPlatform = true;
+        },
+
+        getNotificationsSettingsSuccess: (state, action: PayloadAction<NotificationSettingsDto>) => {
+            state.notificationsSettings = action.payload;
+            state.isFetchingPlatform = false;
+        },
+
+        getNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingPlatform = false;
+        },
     },
 });
 
@@ -50,12 +67,16 @@ const state = createFeatureSelector<State>(slice.name);
 const platformSettings = createSelector(state, (state: State) => state.platformSettings);
 const isFetchingPlatform = createSelector(state, (state: State) => state.isFetchingPlatform);
 const isUpdatingPlatform = createSelector(state, (state: State) => state.isUpdatingPlatform);
+const notificationsSettings = createSelector(state, (state: State) => state.notificationsSettings);
+const isFetchingNotificationsSetting = createSelector(state, (state: State) => state.isFetchingNotificationsSetting);
 
 export const selectors = {
     state,
     platformSettings,
     isFetchingPlatform,
     isUpdatingPlatform,
+    notificationsSettings,
+    isFetchingNotificationsSetting,
 };
 
 export const actions = slice.actions;

@@ -112,6 +112,26 @@ const markAsReadNotification: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [listOverviewNotifications, listNotifications, deleteNotification, markAsReadNotification];
+const listNotificationInstances: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listNotificationInstances.match),
+        mergeMap((action) =>
+            deps.apiClients.notificationManagement.listNotificationInstances().pipe(
+                mergeMap((res) => of(slice.actions.listNotificationInstancesSuccess(res))),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.listNotificationInstancesFailure({
+                            error: extractError(err, "Failed to list notification instances"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to list notification instances" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const epics = [listOverviewNotifications, listNotifications, deleteNotification, markAsReadNotification, listNotificationInstances];
 
 export default epics;
