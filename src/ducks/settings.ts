@@ -63,16 +63,16 @@ export const slice = createSlice({
         },
 
         updateNotificationsSettings: (state, action: PayloadAction<NotificationSettingsDto>) => {
-            state.isUpdatingPlatform = true;
+            state.isUpdatingNotificationsSetting = true;
         },
 
         updateNotificationsSettingsSuccess: (state, action: PayloadAction<NotificationSettingsDto>) => {
-            state.isUpdatingPlatform = false;
+            state.isUpdatingNotificationsSetting = false;
             state.notificationsSettings = action.payload;
         },
 
         updateNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isUpdatingPlatform = false;
+            state.isUpdatingNotificationsSetting = false;
         },
     },
 });

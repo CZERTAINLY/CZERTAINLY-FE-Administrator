@@ -80,10 +80,7 @@ const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.settings.updateNotificationsSettings({ notificationSettingsDto: action.payload }).pipe(
                 mergeMap(() => {
-                    return of(
-                        slice.actions.updateNotificationsSettingsSuccess(action.payload),
-                        // appRedirectActions.redirect({ url: `../` }),
-                    );
+                    return of(slice.actions.updateNotificationsSettingsSuccess(action.payload));
                 }),
                 catchError((err) =>
                     of(
