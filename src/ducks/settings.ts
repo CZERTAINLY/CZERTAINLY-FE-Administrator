@@ -7,6 +7,7 @@ export type State = {
     platformSettings?: SettingsPlatformModel;
     isFetchingPlatform: boolean;
     isUpdatingPlatform: boolean;
+    isUpdatingNotificationsSetting: boolean;
     notificationsSettings?: NotificationSettingsDto;
     isFetchingNotificationsSetting: boolean;
 };
@@ -14,6 +15,7 @@ export type State = {
 export const initialState: State = {
     isFetchingPlatform: false,
     isUpdatingPlatform: false,
+    isUpdatingNotificationsSetting: false,
     isFetchingNotificationsSetting: false,
 };
 
@@ -59,6 +61,19 @@ export const slice = createSlice({
         getNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingPlatform = false;
         },
+
+        updateNotificationsSettings: (state, action: PayloadAction<NotificationSettingsDto>) => {
+            state.isUpdatingPlatform = true;
+        },
+
+        updateNotificationsSettingsSuccess: (state, action: PayloadAction<NotificationSettingsDto>) => {
+            state.isUpdatingPlatform = false;
+            state.notificationsSettings = action.payload;
+        },
+
+        updateNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingPlatform = false;
+        },
     },
 });
 
@@ -69,6 +84,7 @@ const isFetchingPlatform = createSelector(state, (state: State) => state.isFetch
 const isUpdatingPlatform = createSelector(state, (state: State) => state.isUpdatingPlatform);
 const notificationsSettings = createSelector(state, (state: State) => state.notificationsSettings);
 const isFetchingNotificationsSetting = createSelector(state, (state: State) => state.isFetchingNotificationsSetting);
+const isUpdatingNotificationsSetting = createSelector(state, (state: State) => state.isUpdatingNotificationsSetting);
 
 export const selectors = {
     state,
@@ -77,6 +93,7 @@ export const selectors = {
     isUpdatingPlatform,
     notificationsSettings,
     isFetchingNotificationsSetting,
+    isUpdatingNotificationsSetting,
 };
 
 export const actions = slice.actions;

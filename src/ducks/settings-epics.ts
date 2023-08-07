@@ -74,6 +74,30 @@ const getNotificationsSettings: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [getPlatformSettings, updatePlatformSettings, getNotificationsSettings];
+const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateNotificationsSettings.match),
+        switchMap((action) =>
+            deps.apiClients.settings.updateNotificationsSettings({ notificationSettingsDto: action.payload }).pipe(
+                mergeMap(() => {
+                    return of(
+                        slice.actions.updateNotificationsSettingsSuccess(action.payload),
+                        // appRedirectActions.redirect({ url: `../` }),
+                    );
+                }),
+                catchError((err) =>
+                    of(
+                        slice.actions.updateNotificationsSettingsFailure({
+                            error: extractError(err, "Failed to update notifications settings"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to update notifications settings" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const epics = [getPlatformSettings, updatePlatformSettings, getNotificationsSettings, updateNotificationsSettings];
 
 export default epics;
