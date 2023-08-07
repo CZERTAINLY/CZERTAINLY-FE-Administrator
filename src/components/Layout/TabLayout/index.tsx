@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 
 type Props = {
@@ -16,48 +16,48 @@ type Props = {
 export default function TabLayout({ tabs, onlyActiveTabContent = false, selectedTab }: Props) {
     const [activeTab, setActiveTab] = useState(selectedTab || 0);
 
+    const memoizedTabs = useMemo(() => {
+        return tabs.filter((e) => !e.hidden);
+    }, [tabs]);
+
     useEffect(() => {
         if (selectedTab !== undefined && selectedTab !== activeTab) {
             setActiveTab(selectedTab);
-        } else if (tabs.length <= activeTab) {
+        } else if (memoizedTabs.length <= activeTab) {
             setActiveTab(0);
         }
-    }, [activeTab, tabs, selectedTab]);
+    }, [activeTab, memoizedTabs, selectedTab]);
 
     return (
         <>
             <Nav tabs>
-                {tabs
-                    .filter((e) => !e.hidden)
-                    .map((t, i) => (
-                        <NavItem key={`nav-${i}`}>
-                            <NavLink
-                                className={activeTab === i ? "active" : ""}
-                                onClick={() => {
-                                    if (t.disabled) {
-                                        return;
-                                    }
-                                    setActiveTab(i);
-                                    if (t.onClick) {
-                                        t.onClick();
-                                    }
-                                }}
-                            >
-                                {t.title}
-                            </NavLink>
-                        </NavItem>
-                    ))}
+                {memoizedTabs.map((t, i) => (
+                    <NavItem key={`nav-${i}`}>
+                        <NavLink
+                            className={activeTab === i ? "active" : ""}
+                            onClick={() => {
+                                if (t.disabled) {
+                                    return;
+                                }
+                                setActiveTab(i);
+                                if (t.onClick) {
+                                    t.onClick();
+                                }
+                            }}
+                        >
+                            {t.title}
+                        </NavLink>
+                    </NavItem>
+                ))}
             </Nav>
             <TabContent activeTab={activeTab}>
-                {tabs
-                    .filter((e) => !e.hidden)
-                    .map((t, i) =>
-                        onlyActiveTabContent === false || activeTab === i ? (
-                            <TabPane key={`pane-${i}`} tabId={i}>
-                                {t.content}
-                            </TabPane>
-                        ) : null,
-                    )}
+                {memoizedTabs.map((t, i) =>
+                    onlyActiveTabContent === false || activeTab === i ? (
+                        <TabPane key={`pane-${i}`} tabId={i}>
+                            {t.content}
+                        </TabPane>
+                    ) : null,
+                )}
             </TabContent>
         </>
     );
