@@ -134,6 +134,11 @@ const ApprovalProfileDetails = () => {
                       },
 
                       {
+                          id: "associations",
+                          columns: ["Associations", profileApprovalDetail?.associations.toString() || ""],
+                      },
+
+                      {
                           id: "status",
                           columns: ["Status", <StatusBadge enabled={profileApprovalDetail.enabled} />],
                       },

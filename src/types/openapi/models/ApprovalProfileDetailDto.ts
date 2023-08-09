@@ -61,6 +61,12 @@ export interface ApprovalProfileDetailDto {
      */
     numberOfSteps: number;
     /**
+     * Number of associated objects
+     * @type {number}
+     * @memberof ApprovalProfileDetailDto
+     */
+    associations: number;
+    /**
      * List of Approval steps for the Approval profile
      * @type {Array<ApprovalStepDto>}
      * @memberof ApprovalProfileDetailDto

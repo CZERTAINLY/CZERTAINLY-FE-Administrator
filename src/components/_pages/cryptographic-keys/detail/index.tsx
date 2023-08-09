@@ -337,11 +337,13 @@ export default function CryptographicKeyDetail() {
         const keyItems = [...(cryptographicKey?.items ?? [])].sort(
             (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
         );
+
         const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
-        setSelectedTab(keyTab || 0);
+        setSelectedTab(keyTab < 0 ? 0 : keyTab);
+
         const tabs = keyItems.map((item, i) => ({
             title: (
-                <div className="d-flex" onClick={() => setSelectedTab(i)}>
+                <div className="d-flex p-2 px-3" onClick={() => setSelectedTab(i)}>
                     {getEnumLabel(keyTypeEnum, item.type)}
                 </div>
             ),

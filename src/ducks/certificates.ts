@@ -20,7 +20,7 @@ import {
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
-import { CertificateStatus } from "types/openapi";
+import { ApprovalDto, CertificateStatus, ListCertificateApprovalsRequest } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
 import { downloadFileZip } from "utils/download";
@@ -37,12 +37,14 @@ export type State = {
     issuanceAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
     revocationAttributes: AttributeDescriptorModel[];
     validationResult: { [key: string]: CertificateValidationModel };
+    approvals?: ApprovalDto[];
 
     isFetchingValidationResult: boolean;
 
     isFetchingDetail: boolean;
     isFetchingHistory: boolean;
     isFetchingLocations: boolean;
+    isFetchingApprovals: boolean;
 
     isIssuing: boolean;
     isRevoking: boolean;
@@ -82,9 +84,11 @@ export const initialState: State = {
     issuanceAttributes: {},
     revocationAttributes: [],
     validationResult: {},
+    approvals: [],
 
     isFetchingValidationResult: false,
 
+    isFetchingApprovals: false,
     isFetchingDetail: false,
     isFetchingHistory: false,
     isFetchingLocations: false,
@@ -559,6 +563,19 @@ export const slice = createSlice({
         getCertificateContentsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingContents = false;
         },
+
+        listCertificateApprovals: (state, action: PayloadAction<ListCertificateApprovalsRequest>) => {
+            state.isFetchingApprovals = true;
+        },
+
+        listCertificateApprovalsSuccess: (state, action: PayloadAction<{ approvals: ApprovalDto[] }>) => {
+            state.isFetchingApprovals = false;
+            state.approvals = action.payload.approvals;
+        },
+
+        listCertificateApprovalsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingApprovals = false;
+        },
     },
 });
 
@@ -573,7 +590,9 @@ const certificateHistory = createSelector(state, (state) => state.certificateHis
 const certificateLocations = createSelector(state, (state) => state.certificateLocations);
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
 const revocationAttributes = createSelector(state, (state) => state.revocationAttributes);
+const approvals = createSelector(state, (state) => state.approvals);
 
+const isFetchingApprovals = createSelector(state, (state) => state.isFetchingApprovals);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingHistory = createSelector(state, (state) => state.isFetchingHistory);
 const isFetchingLocations = createSelector(state, (state) => state.isFetchingLocations);
@@ -616,6 +635,7 @@ export const selectors = {
     certificateLocations,
     issuanceAttributes,
     revocationAttributes,
+    approvals,
     isFetchingDetail,
     isFetchingHistory,
     isFetchingLocations,
@@ -639,6 +659,7 @@ export const selectors = {
     isFetchingCsrAttributes,
     csrAttributeDescriptors,
     isFetchingContents,
+    isFetchingApprovals,
 };
 
 export const actions = slice.actions;

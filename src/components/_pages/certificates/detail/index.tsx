@@ -26,7 +26,7 @@ import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import "reactflow/dist/style.css";
 
@@ -68,7 +68,7 @@ import CertificateStatus from "../CertificateStatus";
 import styles from "./certificateDetail.module.scss";
 export default function CertificateDetail() {
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
     const { id } = useParams();
 
     const certificate = useSelector(selectors.certificateDetail);
@@ -79,6 +79,7 @@ export default function CertificateDetail() {
 
     const eventHistory = useSelector(selectors.certificateHistory);
     const certLocations = useSelector(selectors.certificateLocations);
+    const approvals = useSelector(selectors.approvals);
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -93,6 +94,7 @@ export default function CertificateDetail() {
     const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
 
+    const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdatingRaProfile = useSelector(selectors.isUpdatingRaProfile);
@@ -138,7 +140,15 @@ export default function CertificateDetail() {
 
     const isBusy = useMemo(
         () =>
-            isFetching || isDeleting || isUpdatingGroup || isUpdatingRaProfile || isUpdatingOwner || isRevoking || isRenewing || isRekeying,
+            isFetching ||
+            isDeleting ||
+            isUpdatingGroup ||
+            isUpdatingRaProfile ||
+            isUpdatingOwner ||
+            isRevoking ||
+            isRenewing ||
+            isRekeying ||
+            isFetchingApprovals,
         [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
     );
 
@@ -160,6 +170,13 @@ export default function CertificateDetail() {
             }),
         );
     }, [id, dispatch, certificate]);
+
+    const getUserName = useCallback(
+        (userUuid: string) => {
+            return users.find((user) => user.uuid === userUuid)?.username;
+        },
+        [users],
+    );
 
     useEffect(() => {
         if (!id) return;
@@ -183,6 +200,11 @@ export default function CertificateDetail() {
         dispatch(locationActions.listLocations({}));
     }, [dispatch, isPushingCertificate, isRemovingCertificate, id]);
 
+    const getFreshApprovalList = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.listCertificateApprovals({ uuid: id, paginationRequestDto: {} }));
+    }, [dispatch, id]);
+
     useEffect(() => {
         getFreshCertificateLocations();
     }, [getFreshCertificateLocations]);
@@ -192,6 +214,7 @@ export default function CertificateDetail() {
         dispatch(actions.resetState());
         dispatch(actions.getCertificateDetail({ uuid: id }));
         dispatch(actions.getCertificateHistory({ uuid: id }));
+        getFreshApprovalList();
         getFreshCertificateLocations();
     }, [dispatch, id]);
 
@@ -1332,6 +1355,80 @@ export default function CertificateDetail() {
         [certLocations, locations],
     );
 
+    const approvalsHeader: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "approvalUUID",
+                content: "Approval UUID ",
+                sort: "asc",
+            },
+            {
+                id: "approvalProfile",
+                content: "Approval Profile",
+            },
+            {
+                id: "status",
+                content: "Status",
+            },
+            {
+                id: "requestedBy",
+                content: "Requested By",
+            },
+            {
+                id: "resource",
+                content: "Resource",
+            },
+
+            {
+                id: "action",
+                content: "Action",
+            },
+
+            {
+                id: "createdAt",
+                content: "Created At",
+            },
+
+            {
+                id: "closedAt",
+                content: "Closed At",
+            },
+        ],
+        [],
+    );
+
+    const approvalsTableData: TableDataRow[] = useMemo(() => {
+        const data = approvals || [];
+
+        return data.map((approval) => ({
+            id: approval.approvalUuid,
+            columns: [
+                <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
+                <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
+                (
+                    <>
+                        <StatusBadge textStatus={approval.status} />
+                        <Button
+                            color="white"
+                            size="sm"
+                            className="p-0 ms-1"
+                            onClick={() => {
+                                navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
+                            }}
+                        >
+                            <i className="fa fa-circle-arrow-right"></i>
+                        </Button>
+                    </>
+                ) || "",
+                getUserName(approval.creatorUuid) || "",
+                approval.resource || "",
+                approval.resourceAction || "",
+                approval.createdAt ? dateFormatter(approval.createdAt) : "",
+                approval.closedAt ? dateFormatter(approval.closedAt) : "",
+            ],
+        }));
+    }, [approvals, getUserName]);
+
     const defaultViewPort = useMemo(
         () => ({
             zoom: 0.5,
@@ -1474,6 +1571,22 @@ export default function CertificateDetail() {
                                 >
                                     <br />
                                     <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Approvals",
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Certificate Approvals"
+                                    busy={isFetchingApprovals}
+                                    titleSize="large"
+                                    refreshAction={getFreshApprovalList}
+                                >
+                                    <br />
+                                    <CustomTable headers={approvalsHeader} data={approvalsTableData} />
                                 </Widget>
                             </Widget>
                         ),
