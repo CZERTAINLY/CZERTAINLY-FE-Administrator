@@ -188,7 +188,7 @@ export default function ApprovalsList() {
             id: approval.approvalUuid,
             columns: [
                 <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
-                <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
+                <Link to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
                 (
                     <>
                         <StatusBadge textStatus={approval.status} />
