@@ -5,6 +5,7 @@ import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { updateBackendUtilsClients } from "../api";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./settings";
 import { transformSettingsPlatformDtoToModel } from "./transform/settings";
@@ -80,7 +81,10 @@ const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.settings.updateNotificationsSettings({ notificationSettingsDto: action.payload }).pipe(
                 mergeMap(() => {
-                    return of(slice.actions.updateNotificationsSettingsSuccess(action.payload));
+                    return of(
+                        slice.actions.updateNotificationsSettingsSuccess(action.payload),
+                        alertActions.success("Successfully updated notification settings."),
+                    );
                 }),
                 catchError((err) =>
                     of(
