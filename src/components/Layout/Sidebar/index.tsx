@@ -76,6 +76,7 @@ export default function Sidebar() {
                             { _key: "/settings", name: "Platform", link: "/settings" },
                             { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
                             { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
+                            { _key: "/notificationsSetting", name: "Notifications", link: "/notificationssetting" },
                         ]}
                     />
 

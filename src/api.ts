@@ -22,6 +22,7 @@ import {
     EnumsApi,
     GlobalMetadataApi,
     LocationManagementApi,
+    NotificationManagementApi,
     NotificationsApi,
     RAProfileManagementApi,
     RoleManagementApi,
@@ -71,6 +72,7 @@ export interface ApiClients {
     approvalProfiles: ApprovalProfileInventoryApi;
     approvals: ApprovalInventoryApi;
     notifications: NotificationsApi;
+    notificationManagement: NotificationManagementApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
@@ -110,6 +112,7 @@ export const backendClient: ApiClients = {
     approvalProfiles: new ApprovalProfileInventoryApi(configuration),
     approvals: new ApprovalInventoryApi(configuration),
     notifications: new NotificationsApi(configuration),
+    notificationManagement: new NotificationManagementApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),
