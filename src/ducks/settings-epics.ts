@@ -83,7 +83,7 @@ const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
                 mergeMap(() => {
                     return of(
                         slice.actions.updateNotificationsSettingsSuccess(action.payload),
-                        alertActions.success("Successfully updated notification settings."),
+                        alertActions.success("Notifications settings updated successfully."),
                     );
                 }),
                 catchError((err) =>
