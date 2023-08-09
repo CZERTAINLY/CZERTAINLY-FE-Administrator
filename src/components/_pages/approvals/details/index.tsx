@@ -161,7 +161,7 @@ export default function ApprovalDetails() {
                           columns: [
                               "Name",
                               approvalDetails.approvalProfileUuid ? (
-                                  <Link to={`/approvalprofiles/detail/${approvalDetails.approvalProfileUuid}`}>
+                                  <Link to={`../../../approvalprofiles/detail/${approvalDetails.approvalProfileUuid}`}>
                                       {approvalDetails.approvalProfileName}
                                   </Link>
                               ) : (

@@ -1403,8 +1403,8 @@ export default function CertificateDetail() {
         return data.map((approval) => ({
             id: approval.approvalUuid,
             columns: [
-                <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
-                <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
+                <Link to={`../../../approvals/detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
+                <Link to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
                 (
                     <>
                         <StatusBadge textStatus={approval.status} />
