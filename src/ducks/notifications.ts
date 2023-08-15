@@ -1,16 +1,24 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AttributeDescriptorModel } from "types/attributes";
 import { SearchRequestModel } from "types/certificate";
-import { NotificationModel } from "types/notifications";
-import { NotificationInstanceDto } from "types/openapi";
+import { ConnectorResponseModel } from "types/connectors";
+import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from "types/notifications";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
     overviewNotifications: NotificationModel[];
     notifications: NotificationModel[];
-    notificationInstances: NotificationInstanceDto[];
+    notificationInstances: NotificationInstanceModel[];
+    notificationInstanceDetail?: NotificationInstanceModel;
+    notificationProviders?: ConnectorResponseModel[];
+    notificationProviderAttributeDescriptors?: AttributeDescriptorModel[];
 
+    isFetchingNotificationProviderAttributeDescriptors: boolean;
+    isFetchingNotificationProviders: boolean;
+    isFetchingNotificationInstanceDetail: boolean;
     isFetchingOverview: boolean;
     isFetchingNotificationInstances: boolean;
+    isCreatingNotificationInstance: boolean;
     isDeleting: boolean;
     isMarking: boolean;
 };
@@ -20,7 +28,11 @@ export const initialState: State = {
     notifications: [],
     notificationInstances: [],
 
+    isFetchingNotificationProviderAttributeDescriptors: false,
+    isFetchingNotificationProviders: false,
+    isFetchingNotificationInstanceDetail: false,
     isFetchingNotificationInstances: false,
+    isCreatingNotificationInstance: false,
     isFetchingOverview: false,
     isDeleting: false,
     isMarking: false,
@@ -87,12 +99,67 @@ export const slice = createSlice({
             state.isFetchingNotificationInstances = true;
             state.notificationInstances = [];
         },
-        listNotificationInstancesSuccess: (state, action: PayloadAction<NotificationInstanceDto[]>) => {
+        listNotificationInstancesSuccess: (state, action: PayloadAction<NotificationInstanceModel[]>) => {
             state.notificationInstances = action.payload;
             state.isFetchingNotificationInstances = false;
         },
         listNotificationInstancesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingNotificationInstances = false;
+        },
+
+        listNotificationProviders: (state, action: PayloadAction<void>) => {
+            state.isFetchingNotificationProviders = true;
+        },
+
+        listNotificationProvidersSuccess: (state, action: PayloadAction<{ providers: ConnectorResponseModel[] }>) => {
+            state.isFetchingNotificationProviders = false;
+            state.notificationProviders = action.payload.providers;
+        },
+
+        listNotificationProvidersFailure: (state, action: PayloadAction<{ error: string }>) => {
+            state.isFetchingNotificationProviders = false;
+        },
+
+        getNotificationAttributesDescriptors: (state, action: PayloadAction<{ uuid: string; kind: string }>) => {
+            state.notificationProviderAttributeDescriptors = [];
+            state.isFetchingNotificationProviderAttributeDescriptors = true;
+        },
+
+        getNotificationAttributesDescriptorsSuccess: (
+            state,
+            action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>,
+        ) => {
+            state.notificationProviderAttributeDescriptors = action.payload.attributeDescriptor;
+            state.isFetchingNotificationProviderAttributeDescriptors = false;
+        },
+
+        getNotificationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingNotificationProviderAttributeDescriptors = false;
+        },
+
+        getNotificationInstance: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isFetchingNotificationInstances = true;
+        },
+
+        getNotificationInstanceSuccess: (state, action: PayloadAction<NotificationInstanceModel>) => {
+            state.notificationInstanceDetail = action.payload;
+            state.isFetchingNotificationInstances = false;
+        },
+
+        getNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingNotificationInstances = false;
+        },
+
+        createNotificationInstance: (state, action: PayloadAction<NotificationInstanceRequestModel>) => {
+            state.isCreatingNotificationInstance = true;
+        },
+
+        createNotificationInstanceSuccess: (state, action: PayloadAction<void>) => {
+            state.isCreatingNotificationInstance = false;
+        },
+
+        createNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreatingNotificationInstance = false;
         },
     },
 });
@@ -102,7 +169,12 @@ const state = createFeatureSelector<State>(slice.name);
 const overviewNotifications = createSelector(state, (state) => state.overviewNotifications);
 const notifications = createSelector(state, (state) => state.notifications);
 const notificationInstances = createSelector(state, (state) => state.notificationInstances);
+const notificationInstanceDetail = createSelector(state, (state) => state.notificationInstanceDetail);
+const notificationInstanceProviders = createSelector(state, (state) => state.notificationProviders);
+const notificationProviderAttributesDescriptors = createSelector(state, (state) => state.notificationProviderAttributeDescriptors);
 
+const isCreatingNotificationInstance = createSelector(state, (state) => state.isCreatingNotificationInstance);
+const isFetchingNotificationInstanceDetail = createSelector(state, (state) => state.isFetchingNotificationInstanceDetail);
 const isFetchingNotificationInstances = createSelector(state, (state) => state.isFetchingNotificationInstances);
 const isFetchingOverview = createSelector(state, (state) => state.isFetchingOverview);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
@@ -110,11 +182,15 @@ const isMarking = createSelector(state, (state) => state.isMarking);
 
 export const selectors = {
     state,
-
+    notificationInstanceDetail,
     overviewNotifications,
     notifications,
     notificationInstances,
+    notificationInstanceProviders,
+    notificationProviderAttributesDescriptors,
 
+    isCreatingNotificationInstance,
+    isFetchingNotificationInstanceDetail,
     isFetchingNotificationInstances,
     isFetchingOverview,
     isDeleting,

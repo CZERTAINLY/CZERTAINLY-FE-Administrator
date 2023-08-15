@@ -41,6 +41,7 @@ export default function Sidebar() {
                             { _key: "/groups", name: "Groups", link: "/groups" },
                             { _key: "/entities", name: "Entities", link: "/entities" },
                             { _key: "/locations", name: "Locations", link: "/locations" },
+                            { _key: "/notificationInstances", name: "Notifications", link: "/notificationinstances" },
                         ]}
                     />
 
