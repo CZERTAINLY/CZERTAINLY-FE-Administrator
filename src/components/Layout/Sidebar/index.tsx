@@ -41,7 +41,6 @@ export default function Sidebar() {
                             { _key: "/groups", name: "Groups", link: "/groups" },
                             { _key: "/entities", name: "Entities", link: "/entities" },
                             { _key: "/locations", name: "Locations", link: "/locations" },
-                            { _key: "/notificationInstances", name: "Notifications", link: "/notificationinstances" },
                         ]}
                     />
 
@@ -77,7 +76,7 @@ export default function Sidebar() {
                             { _key: "/settings", name: "Platform", link: "/settings" },
                             { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
                             { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
-                            { _key: "/notificationsSetting", name: "Notifications", link: "/notificationssetting" },
+                            { _key: "/notificationsSetting", name: "Notifications", link: "/notificationssettings" },
                         ]}
                     />
 

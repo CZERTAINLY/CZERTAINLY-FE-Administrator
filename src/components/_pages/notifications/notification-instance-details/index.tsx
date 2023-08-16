@@ -6,7 +6,7 @@ import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { Badge, Col, Row } from "reactstrap";
-const NotificationInstanceList = () => {
+const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const notificationInstance = useSelector(notificationsSelectors.notificationInstanceDetail);
@@ -86,4 +86,4 @@ const NotificationInstanceList = () => {
     );
 };
 
-export default NotificationInstanceList;
+export default NotificationInstanceDetails;

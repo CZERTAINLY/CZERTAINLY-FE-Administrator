@@ -19,6 +19,7 @@ export type State = {
     isFetchingOverview: boolean;
     isFetchingNotificationInstances: boolean;
     isCreatingNotificationInstance: boolean;
+    isEditingNotificationInstance: boolean;
     isDeleting: boolean;
     isMarking: boolean;
 };
@@ -34,6 +35,7 @@ export const initialState: State = {
     isFetchingNotificationInstances: false,
     isCreatingNotificationInstance: false,
     isFetchingOverview: false,
+    isEditingNotificationInstance: false,
     isDeleting: false,
     isMarking: false,
 };
@@ -160,6 +162,21 @@ export const slice = createSlice({
 
         createNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingNotificationInstance = false;
+        },
+
+        editNotificationInstance: (
+            state,
+            action: PayloadAction<{ notificationInstance: NotificationInstanceRequestModel; uuid: string }>,
+        ) => {
+            state.isEditingNotificationInstance = true;
+        },
+
+        editNotificationInstanceSuccess: (state, action: PayloadAction<void>) => {
+            state.isEditingNotificationInstance = false;
+        },
+
+        editNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEditingNotificationInstance = false;
         },
     },
 });

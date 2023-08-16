@@ -1,3 +1,4 @@
+import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 import { actions as enumActions, selectors as enumSelectors } from "ducks/enums";
@@ -9,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
+import NotificationInstanceList from "../notifications-instances";
 
 type FormValues = {
     notificationsMapping: {
@@ -88,51 +90,69 @@ const NotificationsSetting = () => {
 
     return (
         <Container>
-            <Widget title="Notifications Setting" titleSize="larger" busy={isBusy}>
-                <Form initialValues={initialValues} onSubmit={onSubmit}>
-                    {({ handleSubmit, pristine, submitting, valid, values }) => (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <Row>
-                                {notificationsSelects.map((notificationSelect) => (
-                                    <Col key={notificationSelect.code} md={6}>
-                                        <Field name={`notificationsMapping[${notificationSelect.code}]`}>
-                                            {({ input, meta }) => (
-                                                <FormGroup>
-                                                    <Label for="raProfile">{notificationSelect.label}</Label>
-                                                    <Select
-                                                        {...input}
-                                                        id="raProfile"
-                                                        maxMenuHeight={140}
-                                                        menuPlacement="auto"
-                                                        options={notificationsOptions}
-                                                        placeholder={`Select to change ${notificationSelect.label}`}
-                                                        isClearable={true}
-                                                    />
-                                                </FormGroup>
-                                            )}
-                                        </Field>
-                                    </Col>
-                                ))}
-                            </Row>
-                            {
-                                <div className="d-flex justify-content-end">
-                                    <ButtonGroup>
-                                        <ProgressButton
-                                            title={"Submit"}
-                                            inProgressTitle={"Submitting"}
-                                            disabled={submitting || isUpdatingNotificationsSetting}
-                                            inProgress={submitting || isUpdatingNotificationsSetting}
-                                            type="submit"
-                                        />
-                                    </ButtonGroup>
-                                    <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </div>
-                            }
-                        </BootstrapForm>
-                    )}
-                </Form>
+            <Widget busy={isBusy}>
+                <TabLayout
+                    tabs={[
+                        {
+                            title: "Notification Instances",
+                            content: <NotificationInstanceList />,
+                        },
+                        {
+                            title: "Setting",
+                            content: (
+                                <Widget title="Notifications Instances Settings">
+                                    <Form initialValues={initialValues} onSubmit={onSubmit}>
+                                        {({ handleSubmit, pristine, submitting, valid, values }) => (
+                                            <BootstrapForm onSubmit={handleSubmit} className="mt-2">
+                                                <Row>
+                                                    {notificationsSelects.map((notificationSelect) => (
+                                                        <Col key={notificationSelect.code} md={6}>
+                                                            <Field name={`notificationsMapping[${notificationSelect.code}]`}>
+                                                                {({ input, meta }) => (
+                                                                    <FormGroup>
+                                                                        <Label for="raProfile">{notificationSelect.label}</Label>
+                                                                        <Select
+                                                                            {...input}
+                                                                            id="raProfile"
+                                                                            maxMenuHeight={140}
+                                                                            menuPlacement="auto"
+                                                                            options={notificationsOptions}
+                                                                            placeholder={`Select to change ${notificationSelect.label}`}
+                                                                            isClearable={true}
+                                                                        />
+                                                                        <small className="form-text text-dark">
+                                                                            {notificationSelect?.description}
+                                                                        </small>
+                                                                    </FormGroup>
+                                                                )}
+                                                            </Field>
+                                                        </Col>
+                                                    ))}
+                                                </Row>
+                                                {
+                                                    <div className="d-flex justify-content-end">
+                                                        <ButtonGroup>
+                                                            <ProgressButton
+                                                                title={"Submit"}
+                                                                inProgressTitle={"Submitting"}
+                                                                disabled={submitting || isUpdatingNotificationsSetting}
+                                                                inProgress={submitting || isUpdatingNotificationsSetting}
+                                                                type="submit"
+                                                            />
+                                                        </ButtonGroup>
+                                                        <Button color="default" onClick={onCancelClick} disabled={submitting}>
+                                                            Cancel
+                                                        </Button>
+                                                    </div>
+                                                }
+                                            </BootstrapForm>
+                                        )}
+                                    </Form>
+                                </Widget>
+                            ),
+                        },
+                    ]}
+                />
             </Widget>
         </Container>
     );

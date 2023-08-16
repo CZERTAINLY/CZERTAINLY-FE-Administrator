@@ -217,6 +217,36 @@ const createNotificationInstance: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const editNotificationInstance: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.editNotificationInstance.match),
+        mergeMap((action) =>
+            deps.apiClients.notificationManagement
+                .editNotificationInstance({
+                    uuid: action.payload.uuid,
+                    notificationInstanceUpdateRequestDto: transformNotificationInstanceModelToDto(action.payload.notificationInstance),
+                })
+                .pipe(
+                    mergeMap((res) =>
+                        of(
+                            slice.actions.editNotificationInstanceSuccess(),
+                            alertActions.success("Notifications Instance updated successfully."),
+                            appRedirectActions.redirect({ url: `/notificationinstances/detail/${res.uuid}` }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.editNotificationInstanceFailure({
+                                error: extractError(err, "Failed to edit notification instance"),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to edit notification instance" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const getNotificationAttributesDescriptors: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getNotificationAttributesDescriptors.match),
@@ -260,6 +290,7 @@ const epics = [
     createNotificationInstance,
     listNotificationProviders,
     getNotificationAttributesDescriptors,
+    editNotificationInstance,
 ];
 
 export default epics;

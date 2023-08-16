@@ -6,7 +6,7 @@ import { FormApi } from "final-form";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
@@ -24,17 +24,26 @@ interface SelectChangeValue {
 const NotificationInstanceForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { id } = useParams();
+
     const notificationInstanceProviders = useSelector(notificationSelectors.notificationInstanceProviders);
     const [selectedNotificationInstanceProvider, setSelectedNotificationInstanceProvider] = useState<SelectChangeValue | null>(null);
     const [selectedKind, setSelectedKind] = useState<SelectChangeValue | null>(null);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
+    const notificationDetails = useSelector(notificationSelectors.notificationInstanceDetail);
 
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
+    const editMode = useMemo(() => !!id, [id]);
 
     useEffect(() => {
         dispatch(notificationsActions.listNotificationProviders());
     }, []);
+
+    useEffect(() => {
+        if (!id) return;
+        dispatch(notificationsActions.getNotificationInstance({ uuid: id }));
+    }, [id]);
 
     const onSubmit = (values: NotificationInstanceRequestModel) => {
         const attributes = collectFormAttributes(
@@ -43,13 +52,26 @@ const NotificationInstanceForm = () => {
             values,
         );
 
-        dispatch(
-            notificationsActions.createNotificationInstance({
-                ...values,
-                attributes,
-                attributeMappings: [],
-            }),
-        );
+        if (editMode && id) {
+            dispatch(
+                notificationsActions.editNotificationInstance({
+                    notificationInstance: {
+                        ...values,
+                        attributes,
+                        attributeMappings: [],
+                    },
+                    uuid: id,
+                }),
+            );
+        } else {
+            dispatch(
+                notificationsActions.createNotificationInstance({
+                    ...values,
+                    attributes,
+                    attributeMappings: [],
+                }),
+            );
+        }
     };
 
     const onCancel = useCallback(() => {
@@ -64,6 +86,21 @@ const NotificationInstanceForm = () => {
             })),
         [notificationInstanceProviders],
     );
+
+    const kindOptions = useMemo(() => {
+        const selectedProvider = notificationInstanceProviders?.find(
+            (provider) => provider.uuid === selectedNotificationInstanceProvider?.value,
+        );
+        const kindOptions =
+            selectedProvider?.functionGroups
+                .find((fg) => fg.functionGroupCode === FunctionGroupCode.NotificationProvider)
+                ?.kinds.map((kind) => ({
+                    label: kind,
+                    value: kind,
+                })) ?? [];
+
+        return kindOptions;
+    }, [selectedNotificationInstanceProvider, notificationInstanceProviders]);
 
     const onInstanceNotificationProviderChange = (
         changedValue: SelectChangeValue | null,
@@ -93,32 +130,64 @@ const NotificationInstanceForm = () => {
         );
     }, [selectedKind]);
 
-    const kindOptions = useMemo(() => {
-        const selectedProvider = notificationInstanceProviders?.find(
-            (provider) => provider.uuid === selectedNotificationInstanceProvider?.value,
-        );
-        const kindOptions =
-            selectedProvider?.functionGroups
-                .find((fg) => fg.functionGroupCode === FunctionGroupCode.NotificationProvider)
-                ?.kinds.map((kind) => ({
-                    label: kind,
-                    value: kind,
-                })) ?? [];
+    const defaultValues: NotificationInstanceRequestModel = useMemo(() => {
+        if (editMode && notificationDetails) {
+            return {
+                ...notificationDetails,
+                attributeMappings: [],
+                attributes: notificationDetails.attributes.map((attribute) => ({
+                    name: attribute.name,
+                    content: attribute.content ?? [],
+                })),
+                selectedNotificationInstanceProvider: { value: notificationDetails.connectorUuid },
+            };
+        } else {
+            return {
+                attributes: [],
+                attributeMappings: [],
+                connectorUuid: "",
+                description: "",
+                kind: "",
+                name: "",
+                connectorName: "",
+            };
+        }
+    }, [editMode, notificationDetails]);
 
-        return kindOptions;
-    }, [selectedNotificationInstanceProvider, notificationInstanceProviders]);
+    useEffect(() => {
+        if (!editMode) return;
+
+        if (optionsForNotificationProviders && !selectedNotificationInstanceProvider) {
+            const initialProvider = optionsForNotificationProviders.find(
+                (provider) => provider.value === notificationDetails?.connectorUuid,
+            );
+            if (initialProvider) {
+                setSelectedNotificationInstanceProvider(initialProvider);
+            }
+        }
+
+        if (kindOptions && !selectedKind) {
+            const initialKind = kindOptions.find((kind) => kind.value === notificationDetails?.kind);
+            if (initialKind) {
+                setSelectedKind(initialKind);
+            }
+        }
+    }, [selectedKind, selectedNotificationInstanceProvider, notificationDetails, , optionsForNotificationProviders, kindOptions, editMode]);
+
+    const widgetTitle = useMemo(() => (editMode ? "Update Notification Instance" : "Add Notification Instance"), [editMode]);
 
     return (
-        <Widget>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators<NotificationInstanceRequestModel>() }}>
+        <Widget title={widgetTitle} titleSize="larger">
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<NotificationInstanceRequestModel>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Notification Instance</Label>
+                                    <Label for="name">Notification Instance Name</Label>
 
                                     <Input
+                                        disabled={editMode}
                                         {...input}
                                         id="name"
                                         type="text"
@@ -203,6 +272,7 @@ const NotificationInstanceForm = () => {
                                 connectorUuid={selectedNotificationInstanceProvider?.value}
                                 functionGroupCode={FunctionGroupCode.NotificationProvider}
                                 kind={values.kind}
+                                attributes={editMode ? notificationDetails?.attributes : undefined}
                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                             />
@@ -213,7 +283,11 @@ const NotificationInstanceForm = () => {
                         {
                             <div className="d-flex justify-content-end">
                                 <ButtonGroup>
-                                    <ProgressButton title={"Submit"} inProgress={submitting} disabled={!valid} />
+                                    <ProgressButton
+                                        title={"Submit"}
+                                        inProgress={submitting}
+                                        disabled={!valid || isCreatingNotificationInstance}
+                                    />
                                     <Button color="default" onClick={onCancel} disabled={submitting}>
                                         Cancel
                                     </Button>

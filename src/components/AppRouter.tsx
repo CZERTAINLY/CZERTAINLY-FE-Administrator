@@ -313,7 +313,7 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Jobs.toLowerCase()}/detail/:id`} element={<SchedulerJobDetail />} />
 
                     <Route path={`/notifications`} element={<NotificationsList />} />
-                    <Route path={`/notificationssetting`} element={<NotificationsSetting />} />
+                    <Route path={`/notificationssettings`} element={<NotificationsSetting />} />
                     <Route path={`/notificationinstances`} element={<NotificationInstanceList />} />
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />

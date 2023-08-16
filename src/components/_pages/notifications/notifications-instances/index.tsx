@@ -5,7 +5,7 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { Badge } from "reactstrap";
 
 const NotificationInstanceList = () => {
     const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const NotificationInstanceList = () => {
     }, [getFreshNotificationInstances]);
 
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
+        navigate(`../../../notificationinstances/add`);
     }, [navigate]);
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -84,17 +84,15 @@ const NotificationInstanceList = () => {
     );
 
     return (
-        <Container>
-            <Widget
-                titleSize="larger"
-                title="Notification Instances"
-                refreshAction={getFreshNotificationInstances}
-                busy={isFetchingNotificationInstances}
-                widgetButtons={buttons}
-            >
-                <CustomTable data={notificationInstanceData} headers={notificationInstanceHeaders} />
-            </Widget>
-        </Container>
+        <Widget
+            titleSize="larger"
+            title="Notification Instances List"
+            refreshAction={getFreshNotificationInstances}
+            // busy={isFetchingNotificationInstances}
+            widgetButtons={buttons}
+        >
+            <CustomTable data={notificationInstanceData} headers={notificationInstanceHeaders} />
+        </Widget>
     );
 };
 
