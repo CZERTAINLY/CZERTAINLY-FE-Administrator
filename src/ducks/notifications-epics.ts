@@ -280,6 +280,32 @@ const getNotificationAttributesDescriptors: AppEpic = (action$, state$, deps) =>
     );
 };
 
+const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteNotificationInstance.match),
+        mergeMap((action) =>
+            deps.apiClients.notificationManagement.deleteNotificationInstance({ uuid: action.payload.uuid }).pipe(
+                mergeMap((res) =>
+                    of(
+                        slice.actions.deleteNotificationInstanceSuccess(),
+                        alertActions.success("Notifications Instance deleted successfully."),
+                        slice.actions.listNotificationInstances(),
+                        appRedirectActions.redirect({ url: `../../../notificationssettings` }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteNotificationInstanceFailure({
+                            error: extractError(err, "Failed to delete notification instance"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to delete notification instance" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listOverviewNotifications,
     listNotifications,
@@ -291,6 +317,7 @@ const epics = [
     listNotificationProviders,
     getNotificationAttributesDescriptors,
     editNotificationInstance,
+    deleteNotificationInstance,
 ];
 
 export default epics;

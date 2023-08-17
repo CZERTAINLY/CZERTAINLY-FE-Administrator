@@ -32,9 +32,15 @@ const NotificationInstanceForm = () => {
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
     const notificationDetails = useSelector(notificationSelectors.notificationInstanceDetail);
-
+    const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
     const editMode = useMemo(() => !!id, [id]);
+    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+
+    const isBusy = useMemo(
+        () => isCreatingNotificationInstance || isFetchingNotificationInstanceDetail,
+        [isCreatingNotificationInstance, isFetchingNotificationInstanceDetail],
+    );
 
     useEffect(() => {
         dispatch(notificationsActions.listNotificationProviders());
@@ -177,7 +183,7 @@ const NotificationInstanceForm = () => {
     const widgetTitle = useMemo(() => (editMode ? "Update Notification Instance" : "Add Notification Instance"), [editMode]);
 
     return (
-        <Widget title={widgetTitle} titleSize="larger">
+        <Widget title={widgetTitle} titleSize="larger" busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<NotificationInstanceRequestModel>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
@@ -284,7 +290,7 @@ const NotificationInstanceForm = () => {
                             <div className="d-flex justify-content-end">
                                 <ButtonGroup>
                                     <ProgressButton
-                                        title={"Submit"}
+                                        title={submitTitle}
                                         inProgress={submitting}
                                         disabled={!valid || isCreatingNotificationInstance}
                                     />

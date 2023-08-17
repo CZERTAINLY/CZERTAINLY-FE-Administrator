@@ -1,21 +1,70 @@
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import Dialog from "components/Dialog";
 import Widget from "components/Widget";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as notificationsActions, selectors as notificationsSelectors } from "ducks/notifications";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import { Badge, Col, Row } from "reactstrap";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Col, Container, Row } from "reactstrap";
 const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const notificationInstance = useSelector(notificationsSelectors.notificationInstanceDetail);
     const isFetchingNotificationInstanceDetail = useSelector(notificationsSelectors.isFetchingNotificationInstanceDetail);
+    const navigate = useNavigate();
+    const isDeleting = useSelector(notificationsSelectors.isDeleting);
 
-    useEffect(() => {
+    const deleteErrorMessage = useSelector(notificationsSelectors.deleteErrorMessage);
+
+    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+
+    const isBusy = useMemo(() => isFetchingNotificationInstanceDetail || isDeleting, [isFetchingNotificationInstanceDetail, isDeleting]);
+
+    const onDeleteConfirmed = useCallback(() => {
+        if (!notificationInstance) return;
+        dispatch(notificationsActions.clearDeleteErrorMessages());
+        dispatch(notificationsActions.deleteNotificationInstance({ uuid: notificationInstance.uuid }));
+        setConfirmDelete(false);
+    }, [dispatch, notificationInstance]);
+
+    const getFreshNotificationInstanceDetail = useCallback(() => {
         if (!id) return;
         dispatch(notificationsActions.getNotificationInstance({ uuid: id }));
-    }, [id]);
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshNotificationInstanceDetail();
+    }, [getFreshNotificationInstanceDetail]);
+
+    const onEditClick = useCallback(() => {
+        if (!id) return;
+        navigate(`../../../notificationinstances/edit/${id}`);
+    }, [navigate, id]);
+
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: "pencil",
+                disabled: false,
+                tooltip: "Edit",
+                onClick: () => {
+                    onEditClick();
+                },
+            },
+            {
+                icon: "trash",
+                disabled: false,
+                tooltip: "Delete",
+                onClick: () => {
+                    setConfirmDelete(true);
+                },
+            },
+        ],
+        [onEditClick],
+    );
+
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -40,6 +89,10 @@ const NotificationInstanceDetails = () => {
                           columns: ["UUID", notificationInstance.uuid],
                       },
                       {
+                          id: "notificationProviderUuid",
+                          columns: ["Notification Provider Uuid", notificationInstance.connectorUuid],
+                      },
+                      {
                           id: "name",
                           columns: ["Name", notificationInstance.name],
                       },
@@ -48,27 +101,33 @@ const NotificationInstanceDetails = () => {
                           columns: ["Description", notificationInstance.description || ""],
                       },
                       {
-                          id: "connectorName",
-                          columns: [
-                              "Type",
-                              <Link to={`../../../connectors/detail/${notificationInstance.connectorUuid}`}>
-                                  <Badge color="primary">{notificationInstance.connectorName}</Badge>
-                              </Link>,
-                          ],
+                          id: "kind",
+                          columns: ["Kind", notificationInstance.kind || ""],
                       },
                       {
-                          id: "kind",
-                          columns: ["Config", notificationInstance.kind || ""],
+                          id: "notificationProviderName",
+                          columns: [
+                              "Notification Provider Name",
+                              <Link to={`../../../connectors/detail/${notificationInstance.connectorUuid}`}>
+                                  {notificationInstance.connectorName}
+                              </Link>,
+                          ],
                       },
                   ],
         [notificationInstance],
     );
 
     return (
-        <Widget>
+        <Container className="themed-container" fluid>
             <Row>
                 <Col>
-                    <Widget title="Notification Instance Details" titleSize="large" busy={isFetchingNotificationInstanceDetail}>
+                    <Widget
+                        widgetButtons={buttons}
+                        refreshAction={getFreshNotificationInstanceDetail}
+                        title="Notification Instance Details"
+                        titleSize="large"
+                        busy={isBusy}
+                    >
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
                 </Col>
@@ -82,7 +141,17 @@ const NotificationInstanceDetails = () => {
                     )}
                 </Col>
             </Row>
-        </Widget>
+            <Dialog
+                isOpen={confirmDelete}
+                caption={`Delete a Notification Instance`}
+                body={`You are about to delete a Notification Instance. Is this what you want to do?`}
+                toggle={() => setConfirmDelete(false)}
+                buttons={[
+                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                ]}
+            />
+        </Container>
     );
 };
 
