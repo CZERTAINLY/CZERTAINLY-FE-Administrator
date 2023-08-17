@@ -34,6 +34,7 @@ const NotificationInstanceForm = () => {
     const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
     const notificationDetails = useSelector(notificationSelectors.notificationInstanceDetail);
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
+    const isEditingNotificationInstance = useSelector(notificationSelectors.isEditingNotificationInstance);
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
     const editMode = useMemo(() => !!id, [id]);
     const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
@@ -184,7 +185,7 @@ const NotificationInstanceForm = () => {
     const widgetTitle = useMemo(() => (editMode ? "Update Notification Instance" : "Add Notification Instance"), [editMode]);
 
     return (
-        <Widget title={widgetTitle} titleSize="larger" busy={isBusy}>
+        <Widget title={widgetTitle} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<NotificationInstanceRequestModel>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
@@ -302,7 +303,7 @@ const NotificationInstanceForm = () => {
                                     <ProgressButton
                                         title={submitTitle}
                                         inProgress={submitting}
-                                        disabled={!valid || isCreatingNotificationInstance}
+                                        disabled={!valid || isCreatingNotificationInstance || submitting || isEditingNotificationInstance}
                                     />
                                     <Button color="default" onClick={onCancel} disabled={submitting}>
                                         Cancel

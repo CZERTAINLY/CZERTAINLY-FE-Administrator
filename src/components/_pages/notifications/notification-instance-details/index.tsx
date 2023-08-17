@@ -7,7 +7,7 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container } from "reactstrap";
+import { Container, Label } from "reactstrap";
 const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -15,8 +15,6 @@ const NotificationInstanceDetails = () => {
     const isFetchingNotificationInstanceDetail = useSelector(notificationsSelectors.isFetchingNotificationInstanceDetail);
     const navigate = useNavigate();
     const isDeleting = useSelector(notificationsSelectors.isDeleting);
-
-    const deleteErrorMessage = useSelector(notificationsSelectors.deleteErrorMessage);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -101,6 +99,10 @@ const NotificationInstanceDetails = () => {
                           columns: ["Kind", notificationInstance.kind || ""],
                       },
                       {
+                          id: "notificationProviderUuid",
+                          columns: ["Notification Provider Uuid", notificationInstance.connectorUuid],
+                      },
+                      {
                           id: "notificationProviderName",
                           columns: [
                               "Notification Provider Name",
@@ -108,10 +110,6 @@ const NotificationInstanceDetails = () => {
                                   {notificationInstance.connectorName}
                               </Link>,
                           ],
-                      },
-                      {
-                          id: "notificationProviderUuid",
-                          columns: ["Notification Provider Uuid", notificationInstance.connectorUuid],
                       },
                   ],
         [notificationInstance],
@@ -126,11 +124,16 @@ const NotificationInstanceDetails = () => {
                 titleSize="larger"
                 busy={isBusy}
             >
+                <br />
+
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
             {notificationInstance?.attributes?.length ? (
-                <Widget title="Notification Instance Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                <Widget title="Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                    <br />
+                    <Label>Notification Instance Attributes</Label>
+
                     <AttributeViewer attributes={notificationInstance.attributes} viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} />
                 </Widget>
             ) : (

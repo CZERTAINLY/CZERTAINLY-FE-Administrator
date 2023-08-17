@@ -7,7 +7,6 @@ import { actions as settingsActions, selectors as settingsSelectors } from "duck
 import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
 import NotificationInstanceList from "../notifications-instances";
@@ -22,23 +21,27 @@ type FormValues = {
 
 const NotificationsSetting = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const notificationsSettings = useSelector(settingsSelectors.notificationsSettings);
     const isUpdatingNotificationsSetting = useSelector(settingsSelectors.isUpdatingNotificationsSetting);
     const { NotificationType } = useSelector(enumSelectors.platformEnums);
     const notificationInstances = useSelector(notificationsSelectors.notificationInstances);
     const isFetchingInstances = useSelector(notificationsSelectors.isFetchingNotificationInstances);
+    const isFetchingNotificationsSetting = useSelector(settingsSelectors.isFetchingNotificationsSetting);
 
-    useEffect(() => {
+    const getFreshNotificationSettings = useCallback(() => {
         dispatch(settingsActions.getNotificationsSettings());
         dispatch(enumActions.getPlatformEnums());
+    }, [dispatch]);
+
+    useEffect(() => {
+        getFreshNotificationSettings();
         dispatch(notificationsActions.listNotificationInstances());
-    }, []);
+    }, [getFreshNotificationSettings]);
 
     const isBusy = useMemo(
-        () => isFetchingInstances || isUpdatingNotificationsSetting,
-        [isFetchingInstances, isUpdatingNotificationsSetting],
+        () => isFetchingInstances || isUpdatingNotificationsSetting || isFetchingNotificationsSetting,
+        [isFetchingInstances, isUpdatingNotificationsSetting, isFetchingNotificationsSetting],
     );
 
     const notificationsSelects = useMemo(() => {
@@ -107,7 +110,13 @@ const NotificationsSetting = () => {
                     {
                         title: "Configuration",
                         content: (
-                            <Widget title="Notifications Instances Settings">
+                            <Widget
+                                refreshAction={getFreshNotificationSettings}
+                                title="Notifications Instances Settings"
+                                titleSize="larger"
+                                busy={isBusy}
+                            >
+                                <br />
                                 <Form initialValues={initialValues} onSubmit={onSubmit}>
                                     {({ handleSubmit, pristine, submitting, valid, values }) => (
                                         <BootstrapForm onSubmit={handleSubmit} className="mt-2">

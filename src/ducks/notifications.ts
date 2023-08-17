@@ -212,6 +212,7 @@ const notificationProviderAttributesDescriptors = createSelector(state, (state) 
 
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const isCreatingNotificationInstance = createSelector(state, (state) => state.isCreatingNotificationInstance);
+const isEditingNotificationInstance = createSelector(state, (state) => state.isEditingNotificationInstance);
 const isFetchingNotificationInstanceDetail = createSelector(state, (state) => state.isFetchingNotificationInstanceDetail);
 const isFetchingNotificationInstances = createSelector(state, (state) => state.isFetchingNotificationInstances);
 const isFetchingOverview = createSelector(state, (state) => state.isFetchingOverview);
@@ -229,6 +230,7 @@ export const selectors = {
 
     deleteErrorMessage,
     isCreatingNotificationInstance,
+    isEditingNotificationInstance,
     isFetchingNotificationInstanceDetail,
     isFetchingNotificationInstances,
     isFetchingOverview,

@@ -70,7 +70,7 @@ const NotificationInstanceList = () => {
     const notificationInstanceHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
+                id: "notificationInstanceName",
                 content: "Name",
                 sortable: true,
                 sort: "asc",
@@ -80,21 +80,19 @@ const NotificationInstanceList = () => {
                 id: "description",
                 content: "Description",
                 sortable: true,
-                sort: "asc",
                 width: "auto",
             },
             {
                 id: "notificationProvider",
                 content: "Notification Provider",
+                align: "center",
                 sortable: true,
-                sort: "asc",
                 width: "15%",
             },
             {
-                id: "kind",
-                content: "Kind",
-                sortable: true,
-                sort: "asc",
+                id: "kinds",
+                content: "Kinds",
+                align: "center",
                 width: "15%",
             },
         ],
@@ -130,6 +128,7 @@ const NotificationInstanceList = () => {
                 busy={isBusy}
                 widgetButtons={buttons}
             >
+                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
