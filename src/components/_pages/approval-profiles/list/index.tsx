@@ -101,7 +101,7 @@ export default function ApprovalProfilesList() {
 
                     <>{approvalProfile.numberOfSteps}</>,
 
-                    approvalProfile?.associations ? approvalProfile?.associations.toString() : "0",
+                    <>{approvalProfile.associations.toString()}</>,
                 ],
             })),
         [profileApprovalList],
