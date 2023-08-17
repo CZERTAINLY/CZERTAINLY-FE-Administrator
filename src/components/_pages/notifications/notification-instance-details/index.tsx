@@ -7,7 +7,7 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Col, Container, Row } from "reactstrap";
+import { Container } from "reactstrap";
 const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -89,10 +89,6 @@ const NotificationInstanceDetails = () => {
                           columns: ["UUID", notificationInstance.uuid],
                       },
                       {
-                          id: "notificationProviderUuid",
-                          columns: ["Notification Provider Uuid", notificationInstance.connectorUuid],
-                      },
-                      {
                           id: "name",
                           columns: ["Name", notificationInstance.name],
                       },
@@ -113,34 +109,33 @@ const NotificationInstanceDetails = () => {
                               </Link>,
                           ],
                       },
+                      {
+                          id: "notificationProviderUuid",
+                          columns: ["Notification Provider Uuid", notificationInstance.connectorUuid],
+                      },
                   ],
         [notificationInstance],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Row>
-                <Col>
-                    <Widget
-                        widgetButtons={buttons}
-                        refreshAction={getFreshNotificationInstanceDetail}
-                        title="Notification Instance Details"
-                        titleSize="large"
-                        busy={isBusy}
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-                <Col>
-                    {notificationInstance?.attributes?.length ? (
-                        <Widget title="Notification Instance Attributes" busy={isFetchingNotificationInstanceDetail}>
-                            <AttributeViewer attributes={notificationInstance.attributes} viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} />
-                        </Widget>
-                    ) : (
-                        <></>
-                    )}
-                </Col>
-            </Row>
+            <Widget
+                widgetButtons={buttons}
+                refreshAction={getFreshNotificationInstanceDetail}
+                title="Notification Instance Details"
+                titleSize="larger"
+                busy={isBusy}
+            >
+                <CustomTable headers={detailHeaders} data={detailData} />
+            </Widget>
+
+            {notificationInstance?.attributes?.length ? (
+                <Widget title="Notification Instance Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                    <AttributeViewer attributes={notificationInstance.attributes} viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} />
+                </Widget>
+            ) : (
+                <></>
+            )}
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Notification Instance`}

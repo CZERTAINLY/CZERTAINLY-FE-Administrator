@@ -35,7 +35,6 @@ const NotificationsSetting = () => {
         dispatch(enumActions.getPlatformEnums());
         dispatch(notificationsActions.listNotificationInstances());
     }, []);
-    const onCancelClick = useCallback(() => navigate(-1), [navigate]);
 
     const isBusy = useMemo(
         () => isFetchingInstances || isUpdatingNotificationsSetting,
@@ -89,6 +88,14 @@ const NotificationsSetting = () => {
         [dispatch],
     );
 
+    const areDefaultValuesSame = useCallback(
+        (values: FormValues) => {
+            const isObjectSame = JSON.stringify(values) === JSON.stringify(initialValues);
+            return isObjectSame;
+        },
+        [initialValues],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <TabLayout
@@ -135,7 +142,9 @@ const NotificationsSetting = () => {
                                                         <ProgressButton
                                                             title={"Apply"}
                                                             inProgressTitle={"Applying.."}
-                                                            disabled={submitting || isUpdatingNotificationsSetting}
+                                                            disabled={
+                                                                submitting || isUpdatingNotificationsSetting || areDefaultValuesSame(values)
+                                                            }
                                                             inProgress={submitting || isUpdatingNotificationsSetting}
                                                             type="submit"
                                                         />

@@ -1,4 +1,5 @@
 import AttributeEditor from "components/Attributes/AttributeEditor";
+import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 import { selectors as notificationSelectors, actions as notificationsActions } from "ducks/notifications";
@@ -163,7 +164,7 @@ const NotificationInstanceForm = () => {
     useEffect(() => {
         if (!editMode) return;
 
-        if (optionsForNotificationProviders && !selectedNotificationInstanceProvider) {
+        if (optionsForNotificationProviders) {
             const initialProvider = optionsForNotificationProviders.find(
                 (provider) => provider.value === notificationDetails?.connectorUuid,
             );
@@ -172,13 +173,13 @@ const NotificationInstanceForm = () => {
             }
         }
 
-        if (kindOptions && !selectedKind) {
+        if (kindOptions) {
             const initialKind = kindOptions.find((kind) => kind.value === notificationDetails?.kind);
             if (initialKind) {
                 setSelectedKind(initialKind);
             }
         }
-    }, [selectedKind, selectedNotificationInstanceProvider, notificationDetails, , optionsForNotificationProviders, kindOptions, editMode]);
+    }, [selectedKind, selectedNotificationInstanceProvider, notificationDetails, optionsForNotificationProviders, kindOptions, editMode]);
 
     const widgetTitle = useMemo(() => (editMode ? "Update Notification Instance" : "Add Notification Instance"), [editMode]);
 
@@ -243,6 +244,7 @@ const NotificationInstanceForm = () => {
                                             input.onChange(e);
                                             onInstanceNotificationProviderChange(e, form);
                                         }}
+                                        isDisabled={editMode}
                                         value={selectedNotificationInstanceProvider}
                                     />
                                 </FormGroup>
@@ -265,26 +267,34 @@ const NotificationInstanceForm = () => {
                                             input.onChange(e);
                                             onNotificationInstanceKindChange(e, form);
                                         }}
+                                        isDisabled={editMode}
                                         value={selectedKind}
                                     />
                                 </FormGroup>
                             )}
                         </Field>
-
-                        {notificationProviderAttributesDescriptors?.length && values?.kind ? (
-                            <AttributeEditor
-                                id="notification"
-                                attributeDescriptors={notificationProviderAttributesDescriptors}
-                                connectorUuid={selectedNotificationInstanceProvider?.value}
-                                functionGroupCode={FunctionGroupCode.NotificationProvider}
-                                kind={values.kind}
-                                attributes={editMode ? notificationDetails?.attributes : undefined}
-                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                            />
-                        ) : (
-                            <></>
-                        )}
+                        <TabLayout
+                            tabs={[
+                                {
+                                    title: "Attributes",
+                                    content:
+                                        notificationProviderAttributesDescriptors?.length && values?.kind ? (
+                                            <AttributeEditor
+                                                id="notification"
+                                                attributeDescriptors={notificationProviderAttributesDescriptors}
+                                                connectorUuid={selectedNotificationInstanceProvider?.value}
+                                                functionGroupCode={FunctionGroupCode.NotificationProvider}
+                                                kind={values.kind}
+                                                attributes={editMode ? notificationDetails?.attributes : undefined}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ) : (
+                                            <></>
+                                        ),
+                                },
+                            ]}
+                        />
 
                         {
                             <div className="d-flex justify-content-end">
