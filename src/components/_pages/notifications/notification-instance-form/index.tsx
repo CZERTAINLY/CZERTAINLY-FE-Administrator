@@ -276,7 +276,7 @@ const NotificationInstanceForm = () => {
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Attributes",
+                                    title: "Connector Attributes",
                                     content:
                                         notificationProviderAttributesDescriptors?.length && values?.kind ? (
                                             <AttributeEditor
