@@ -65,6 +65,10 @@ export default function ApprovalProfilesList() {
                 content: "Description",
             },
             {
+                id: "associations",
+                content: "Associations",
+            },
+            {
                 id: "isEnabled",
                 content: "Enabled",
             },
@@ -90,6 +94,8 @@ export default function ApprovalProfilesList() {
                     <Link to={`./detail/${approvalProfile.uuid}`}>{approvalProfile.name}</Link>,
 
                     approvalProfile.description || "",
+
+                    approvalProfile?.associations ? approvalProfile?.associations.toString() : "",
 
                     <StatusBadge enabled={approvalProfile.enabled} />,
 
