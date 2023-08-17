@@ -207,7 +207,7 @@ const NotificationInstanceForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
