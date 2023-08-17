@@ -65,10 +65,6 @@ export default function ApprovalProfilesList() {
                 content: "Description",
             },
             {
-                id: "associations",
-                content: "Associations",
-            },
-            {
                 id: "isEnabled",
                 content: "Enabled",
             },
@@ -80,6 +76,10 @@ export default function ApprovalProfilesList() {
             {
                 id: "approvalSteps",
                 content: "Approval Steps",
+            },
+            {
+                id: "associations",
+                content: "Associations",
             },
         ],
         [],
@@ -95,13 +95,13 @@ export default function ApprovalProfilesList() {
 
                     approvalProfile.description || "",
 
-                    approvalProfile?.associations ? approvalProfile?.associations.toString() : "",
-
                     <StatusBadge enabled={approvalProfile.enabled} />,
 
                     <>{approvalProfile.version}</>,
 
                     <>{approvalProfile.numberOfSteps}</>,
+
+                    approvalProfile?.associations ? approvalProfile?.associations.toString() : "",
                 ],
             })),
         [profileApprovalList],
