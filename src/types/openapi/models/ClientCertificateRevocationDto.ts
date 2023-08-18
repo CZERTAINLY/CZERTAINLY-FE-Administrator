@@ -43,14 +43,14 @@ export interface ClientCertificateRevocationDto {
  * @enum {string}
  */
 export enum ClientCertificateRevocationDtoReasonEnum {
-    Unspecified = "UNSPECIFIED",
-    KeyCompromise = "KEY_COMPROMISE",
-    CaCompromise = "CA_COMPROMISE",
-    AffiliationChanged = "AFFILIATION_CHANGED",
-    Superseded = "SUPERSEDED",
-    CessationOfOperation = "CESSATION_OF_OPERATION",
-    CertificateHold = "CERTIFICATE_HOLD",
-    RemoveFromCrl = "REMOVE_FROM_CRL",
-    PrivilegesWithdrawn = "PRIVILEGES_WITHDRAWN",
-    AaCompromise = "AA_COMPROMISE",
+    Unspecified = "unspecified",
+    KeyCompromise = "keyCompromise",
+    CACompromise = "cACompromise",
+    AffiliationChanged = "affiliationChanged",
+    Superseded = "superseded",
+    CessationOfOperation = "cessationOfOperation",
+    CertificateHold = "certificateHold",
+    RemoveFromCrl = "removeFromCRL",
+    PrivilegeWithdrawn = "privilegeWithdrawn",
+    AACompromise = "aACompromise",
 }

@@ -26,7 +26,7 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listOverviewNotifications.match),
         switchMap((action) =>
-            deps.apiClients.notifications.listNotifications({ request: { unread: true } }).pipe(
+            deps.apiClients.internalNotificationApi.listNotifications({ request: { unread: true } }).pipe(
                 mergeMap((response) =>
                     of(
                         slice.actions.listOverviewNotificationsSuccess(response.items.map(transformNotificationDtoToModel)),
@@ -53,7 +53,7 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listNotifications.match),
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.NOTIFICATIONS));
-            return deps.apiClients.notifications
+            return deps.apiClients.internalNotificationApi
                 .listNotifications({
                     request: { unread: action.payload.unread, ...transformSearchRequestModelToDto(action.payload.pagination) },
                 })
@@ -82,7 +82,7 @@ const deleteNotification: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteNotification.match),
         mergeMap((action) =>
-            deps.apiClients.notifications.deleteNotification({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.internalNotificationApi.deleteNotification({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
                     of(slice.actions.deleteNotificationSuccess({ uuid: action.payload.uuid }), slice.actions.listOverviewNotifications()),
                 ),
@@ -102,7 +102,7 @@ const markAsReadNotification: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.markAsReadNotification.match),
         mergeMap((action) =>
-            deps.apiClients.notifications.markNotificationAsRead({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.internalNotificationApi.markNotificationAsRead({ uuid: action.payload.uuid }).pipe(
                 mergeMap((res) =>
                     of(
                         slice.actions.markAsReadNotificationSuccess(transformNotificationDtoToModel(res)),
@@ -125,7 +125,7 @@ const listNotificationInstances: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listNotificationInstances.match),
         mergeMap((action) =>
-            deps.apiClients.notificationManagement.listNotificationInstances().pipe(
+            deps.apiClients.externalNotificationManagementApi.listNotificationInstances().pipe(
                 mergeMap((res) => of(slice.actions.listNotificationInstancesSuccess(res.map(transformNotificationInstanceDtoToModel)))),
 
                 catchError((err) =>
@@ -173,7 +173,7 @@ const getNotificationInstance: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getNotificationInstance.match),
         mergeMap((action) =>
-            deps.apiClients.notificationManagement.getNotificationInstance({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.externalNotificationManagementApi.getNotificationInstance({ uuid: action.payload.uuid }).pipe(
                 mergeMap((res) => of(slice.actions.getNotificationInstanceSuccess(transformNotificationInstanceDtoToModel(res)))),
 
                 catchError((err) =>
@@ -194,7 +194,7 @@ const createNotificationInstance: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createNotificationInstance.match),
         mergeMap((action) =>
-            deps.apiClients.notificationManagement
+            deps.apiClients.externalNotificationManagementApi
                 .createNotificationInstance({ notificationInstanceRequestDto: transformNotificationInstanceModelToDto(action.payload) })
                 .pipe(
                     mergeMap((res) =>
@@ -221,7 +221,7 @@ const editNotificationInstance: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.editNotificationInstance.match),
         mergeMap((action) =>
-            deps.apiClients.notificationManagement
+            deps.apiClients.externalNotificationManagementApi
                 .editNotificationInstance({
                     uuid: action.payload.uuid,
                     notificationInstanceUpdateRequestDto: transformNotificationInstanceModelToDto(action.payload.notificationInstance),
@@ -284,7 +284,7 @@ const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteNotificationInstance.match),
         mergeMap((action) =>
-            deps.apiClients.notificationManagement.deleteNotificationInstance({ uuid: action.payload.uuid }).pipe(
+            deps.apiClients.externalNotificationManagementApi.deleteNotificationInstance({ uuid: action.payload.uuid }).pipe(
                 mergeMap((res) =>
                     of(
                         slice.actions.deleteNotificationInstanceSuccess({ uuid: action.payload.uuid }),
@@ -305,6 +305,25 @@ const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const listMappingAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listMappingAttributes.match),
+        mergeMap((action) =>
+            deps.apiClients.externalNotificationManagementApi.listMappingAttributes({ ...action.payload }).pipe(
+                mergeMap((res) => of(slice.actions.listMappingAttributesSuccess({ mappingAttributes: res }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listMappingAttributesFailure({
+                            error: extractError(err, "Failed to get mapping attributes"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get mapping attributes" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listOverviewNotifications,
     listNotifications,
@@ -317,6 +336,7 @@ const epics = [
     getNotificationAttributesDescriptors,
     editNotificationInstance,
     deleteNotificationInstance,
+    listMappingAttributes,
 ];
 
 export default epics;

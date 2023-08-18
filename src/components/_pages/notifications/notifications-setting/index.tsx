@@ -9,6 +9,7 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
+import { removeNullValues } from "utils/common-utils";
 import NotificationInstanceList from "../notifications-instances";
 
 type FormValues = {
@@ -95,7 +96,8 @@ const NotificationsSetting = () => {
 
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
-            const isObjectSame = JSON.stringify(values) === JSON.stringify(initialValues);
+            const nonNullValues = removeNullValues(values);
+            const isObjectSame = JSON.stringify(nonNullValues) === JSON.stringify(initialValues);
             return isObjectSame;
         },
         [initialValues],
@@ -128,10 +130,12 @@ const NotificationsSetting = () => {
                                                         <Field name={`notificationsMapping[${notificationSelect.code}]`}>
                                                             {({ input, meta }) => (
                                                                 <FormGroup>
-                                                                    <Label for="raProfile">{notificationSelect.label}</Label>
+                                                                    <Label for={`notificationInstanceSelect${notificationSelect.code}`}>
+                                                                        {notificationSelect.label}
+                                                                    </Label>
                                                                     <Select
                                                                         {...input}
-                                                                        id="raProfile"
+                                                                        id={`notificationInstanceSelect${notificationSelect.code}`}
                                                                         maxMenuHeight={140}
                                                                         menuPlacement="auto"
                                                                         options={notificationsOptions}

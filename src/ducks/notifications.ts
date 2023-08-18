@@ -1,8 +1,9 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
+import { AttributeDescriptorModel, DataAttributeModel } from "types/attributes";
 import { SearchRequestModel } from "types/certificate";
 import { ConnectorResponseModel } from "types/connectors";
 import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from "types/notifications";
+import { ListMappingAttributesRequest } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
@@ -13,7 +14,9 @@ export type State = {
     notificationInstanceProviders?: ConnectorResponseModel[];
     notificationProviderAttributesDescriptors?: AttributeDescriptorModel[];
     deleteErrorMessage?: string;
+    mappingAttributes?: DataAttributeModel[];
 
+    isFetchingMappingAttributes: boolean;
     isFetchingnotificationProviderAttributesDescriptors: boolean;
     isDeletingNotificationInstance: boolean;
     isFetchingNotificationProviders: boolean;
@@ -31,6 +34,7 @@ export const initialState: State = {
     notifications: [],
     notificationInstances: [],
 
+    isFetchingMappingAttributes: false,
     isFetchingnotificationProviderAttributesDescriptors: false,
     isDeletingNotificationInstance: false,
     isFetchingNotificationProviders: false,
@@ -198,8 +202,26 @@ export const slice = createSlice({
             state.isDeletingNotificationInstance = false;
             state.deleteErrorMessage = action.payload.error;
         },
+
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
             state.deleteErrorMessage = undefined;
+        },
+
+        clearNotificationInstanceDetail: (state, action: PayloadAction<void>) => {
+            state.notificationInstanceDetail = undefined;
+        },
+
+        listMappingAttributes: (state, action: PayloadAction<ListMappingAttributesRequest>) => {
+            state.isFetchingMappingAttributes = true;
+        },
+
+        listMappingAttributesSuccess: (state, action: PayloadAction<{ mappingAttributes: DataAttributeModel[] }>) => {
+            state.isFetchingMappingAttributes = false;
+            state.mappingAttributes = action.payload.mappingAttributes;
+        },
+
+        listMappingAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingMappingAttributes = false;
         },
     },
 });
@@ -212,7 +234,9 @@ const notificationInstances = createSelector(state, (state) => state.notificatio
 const notificationInstanceDetail = createSelector(state, (state) => state.notificationInstanceDetail);
 const notificationInstanceProviders = createSelector(state, (state) => state.notificationInstanceProviders);
 const notificationProviderAttributesDescriptors = createSelector(state, (state) => state.notificationProviderAttributesDescriptors);
+const mappingAttributes = createSelector(state, (state) => state.mappingAttributes);
 
+const isFetchingMappingAttributes = createSelector(state, (state) => state.isFetchingMappingAttributes);
 const isFetchingNotificationProviders = createSelector(state, (state) => state.isFetchingNotificationProviders);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const isCreatingNotificationInstance = createSelector(state, (state) => state.isCreatingNotificationInstance);
@@ -231,7 +255,9 @@ export const selectors = {
     notificationInstances,
     notificationInstanceProviders,
     notificationProviderAttributesDescriptors,
+    mappingAttributes,
 
+    isFetchingMappingAttributes,
     deleteErrorMessage,
     isFetchingNotificationProviders,
     isCreatingNotificationInstance,

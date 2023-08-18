@@ -20,8 +20,8 @@ import {
 const listCustomAttributes: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listCustomAttributes.match),
-        switchMap(() =>
-            deps.apiClients.customAttributes.listCustomAttributes().pipe(
+        switchMap((action) =>
+            deps.apiClients.customAttributes.listCustomAttributes({ attributeContentType: action.payload.attributeContentType }).pipe(
                 switchMap((list) =>
                     of(
                         slice.actions.listCustomAttributesSuccess(list.map(transformCustomAttributeResponseDtoToModel)),

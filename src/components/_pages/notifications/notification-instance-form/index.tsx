@@ -2,6 +2,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
 import { selectors as notificationSelectors, actions as notificationsActions } from "ducks/notifications";
 import { FormApi } from "final-form";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,9 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
+import { AttributeDescriptorModel, AttributeMappingModel } from "types/attributes";
 import { NotificationInstanceRequestModel } from "types/notifications";
-import { FunctionGroupCode } from "types/openapi";
+import { AttributeContentType, FunctionGroupCode } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { composeValidators, validateAlphaNumeric, validateAlphaNumericWithoutAccents, validateRequired } from "utils/validators";
@@ -33,9 +34,15 @@ const NotificationInstanceForm = () => {
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
     const notificationDetails = useSelector(notificationSelectors.notificationInstanceDetail);
+    const customAttributes = useSelector(customAttributesSelectors.customAttributes);
+    const mappingAttributes = useSelector(notificationSelectors.mappingAttributes);
+    const [selectedCustomAttributes, setSelectedCustomAttributes] = useState<SelectChangeValue[]>([]);
+    // Array<AttributeMappingModel>
+    const [attributeMappingValues, setAttributeMappingValues] = useState<AttributeMappingModel[]>([]);
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
     const isEditingNotificationInstance = useSelector(notificationSelectors.isEditingNotificationInstance);
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
+
     const editMode = useMemo(() => !!id, [id]);
     const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
 
@@ -45,13 +52,42 @@ const NotificationInstanceForm = () => {
     );
 
     useEffect(() => {
+        dispatch(customAttributesActions.listCustomAttributes({}));
+    }, []);
+
+    useEffect(() => {
+        if (!selectedNotificationInstanceProvider?.value || !selectedKind?.value) return;
+
+        dispatch(
+            notificationsActions.listMappingAttributes({
+                connectorUuid: selectedNotificationInstanceProvider?.value,
+                kind: selectedKind?.value,
+            }),
+        );
+    }, [selectedKind, selectedNotificationInstanceProvider]);
+
+    useEffect(() => {
         if (notificationProviderAttributesDescriptors) return;
         dispatch(notificationsActions.listNotificationProviders());
     }, [notificationProviderAttributesDescriptors]);
 
+    const getContentTypeOptions = useCallback(
+        (contentType: AttributeContentType) => {
+            const contentTypeCustomAttributes = customAttributes.filter((customAttribute) => customAttribute.contentType === contentType);
+            return contentTypeCustomAttributes.map((contentTypeCustomAttribute) => ({
+                label: contentTypeCustomAttribute.name,
+                value: contentTypeCustomAttribute.uuid,
+            }));
+        },
+        [customAttributes],
+    );
+
     useEffect(() => {
-        if (!id) return;
-        dispatch(notificationsActions.getNotificationInstance({ uuid: id }));
+        if (id) {
+            dispatch(notificationsActions.getNotificationInstance({ uuid: id }));
+        } else {
+            dispatch(notificationsActions.clearNotificationInstanceDetail());
+        }
     }, [id]);
 
     const onSubmit = (values: NotificationInstanceRequestModel) => {
@@ -67,7 +103,7 @@ const NotificationInstanceForm = () => {
                     notificationInstance: {
                         ...values,
                         attributes,
-                        attributeMappings: [],
+                        attributeMappings: attributeMappingValues,
                     },
                     uuid: id,
                 }),
@@ -77,7 +113,7 @@ const NotificationInstanceForm = () => {
                 notificationsActions.createNotificationInstance({
                     ...values,
                     attributes,
-                    attributeMappings: [],
+                    attributeMappings: attributeMappingValues,
                 }),
             );
         }
@@ -139,6 +175,29 @@ const NotificationInstanceForm = () => {
         );
     }, [selectedKind, selectedNotificationInstanceProvider]);
 
+    useEffect(() => {
+        if (!editMode || !notificationDetails || !optionsForNotificationProviders || !kindOptions) return;
+
+        const initialProvider = optionsForNotificationProviders.find((provider) => provider.value === notificationDetails.connectorUuid);
+        if (!initialProvider) return;
+        setSelectedNotificationInstanceProvider(initialProvider);
+
+        const initialKind = kindOptions.find((kind) => kind.value === notificationDetails.kind);
+        if (!initialKind) return;
+        setSelectedKind(initialKind);
+
+        if (notificationDetails?.attributeMappings) {
+            setAttributeMappingValues(notificationDetails.attributeMappings);
+            const selectedCustomAttributesFetched = notificationDetails.attributeMappings.map((attributeMapping) => {
+                return {
+                    value: attributeMapping.customAttributeUuid,
+                    label: attributeMapping.customAttributeLabel,
+                };
+            });
+            setSelectedCustomAttributes(selectedCustomAttributesFetched);
+        }
+    }, [notificationDetails, optionsForNotificationProviders, kindOptions, editMode]);
+
     const defaultValues: NotificationInstanceRequestModel = useMemo(() => {
         if (editMode && notificationDetails) {
             return {
@@ -163,27 +222,49 @@ const NotificationInstanceForm = () => {
         }
     }, [editMode, notificationDetails]);
 
-    useEffect(() => {
-        if (!editMode) return;
-
-        if (optionsForNotificationProviders) {
-            const initialProvider = optionsForNotificationProviders.find(
-                (provider) => provider.value === notificationDetails?.connectorUuid,
-            );
-            if (initialProvider) {
-                setSelectedNotificationInstanceProvider(initialProvider);
-            }
-        }
-
-        if (kindOptions) {
-            const initialKind = kindOptions.find((kind) => kind.value === notificationDetails?.kind);
-            if (initialKind) {
-                setSelectedKind(initialKind);
-            }
-        }
-    }, [selectedKind, selectedNotificationInstanceProvider, notificationDetails, optionsForNotificationProviders, kindOptions, editMode]);
-
     const widgetTitle = useMemo(() => (editMode ? "Update Notification Instance" : "Add Notification Instance"), [editMode]);
+
+    const handleMappingAttributeChange = (
+        event: SelectChangeValue | null,
+        i: number,
+        mappingAttributeUuid: string,
+        mappingAttributeName: string,
+    ) => {
+        if (!event) return;
+
+        const newAttributeMappingValues = {
+            customAttributeLabel: event.label,
+            customAttributeUuid: event.value,
+            mappingAttributeUuid,
+            mappingAttributeName,
+        };
+        const newAttributeMappingValuesArray = [...attributeMappingValues];
+        newAttributeMappingValuesArray[i] = newAttributeMappingValues;
+        setAttributeMappingValues(newAttributeMappingValuesArray);
+        const newSelectedCustomAttribute = [...selectedCustomAttributes];
+        newSelectedCustomAttribute[i] = event;
+        setSelectedCustomAttributes(newSelectedCustomAttribute);
+    };
+
+    const renderAttributeEditor = useCallback(
+        (kind: string | undefined) => {
+            if (!notificationProviderAttributesDescriptors || !selectedNotificationInstanceProvider) return <></>;
+
+            return (
+                <AttributeEditor
+                    id="notification"
+                    attributeDescriptors={notificationProviderAttributesDescriptors}
+                    connectorUuid={selectedNotificationInstanceProvider.value}
+                    functionGroupCode={FunctionGroupCode.NotificationProvider}
+                    kind={kind}
+                    attributes={editMode && notificationDetails?.attributes ? notificationDetails.attributes : undefined}
+                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                />
+            );
+        },
+        [notificationProviderAttributesDescriptors, customAttributes, selectedCustomAttributes, attributeMappingValues],
+    );
 
     return (
         <Widget title={widgetTitle} busy={isBusy}>
@@ -279,21 +360,50 @@ const NotificationInstanceForm = () => {
                             tabs={[
                                 {
                                     title: "Connector Attributes",
-                                    content:
-                                        notificationProviderAttributesDescriptors?.length && values?.kind ? (
-                                            <AttributeEditor
-                                                id="notification"
-                                                attributeDescriptors={notificationProviderAttributesDescriptors}
-                                                connectorUuid={selectedNotificationInstanceProvider?.value}
-                                                functionGroupCode={FunctionGroupCode.NotificationProvider}
-                                                kind={values.kind}
-                                                attributes={editMode ? notificationDetails?.attributes : undefined}
-                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                            />
-                                        ) : (
-                                            <></>
-                                        ),
+                                    content: renderAttributeEditor(selectedKind?.value),
+                                },
+                                {
+                                    title: "Attribute Mappings",
+                                    content: mappingAttributes?.length ? (
+                                        <Widget>
+                                            {mappingAttributes.map((mappingAttribute, i) => (
+                                                <Field key={mappingAttribute.uuid} name={`attributeMappings[${i}].customAttributeUuid`}>
+                                                    {({ input, meta }) => (
+                                                        <FormGroup>
+                                                            <Label for={`attributeMappings[${i}].${mappingAttribute.name}`}>
+                                                                {mappingAttribute.name} {`(${mappingAttribute.contentType})`}
+                                                            </Label>
+                                                            <Select
+                                                                {...input}
+                                                                id={`attributeMappings[i].${mappingAttribute.name}`}
+                                                                maxMenuHeight={140}
+                                                                menuPlacement="auto"
+                                                                options={
+                                                                    getContentTypeOptions(mappingAttribute.contentType) as readonly {
+                                                                        label: string;
+                                                                        value: string;
+                                                                    }[]
+                                                                }
+                                                                onChange={(event) => {
+                                                                    handleMappingAttributeChange(
+                                                                        event,
+                                                                        i,
+                                                                        mappingAttribute.uuid,
+                                                                        mappingAttribute.name,
+                                                                    );
+                                                                }}
+                                                                value={selectedCustomAttributes?.[i] || null}
+                                                                placeholder={`Select Custom Attribute for ${mappingAttribute.name}`}
+                                                            />
+                                                            <small className="form-text text-dark">{mappingAttribute?.description}</small>
+                                                        </FormGroup>
+                                                    )}
+                                                </Field>
+                                            ))}
+                                        </Widget>
+                                    ) : (
+                                        <></>
+                                    ),
                                 },
                             ]}
                         />
