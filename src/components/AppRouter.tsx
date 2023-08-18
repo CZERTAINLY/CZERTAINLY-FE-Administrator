@@ -106,7 +106,6 @@ import { Resource } from "types/openapi";
 import NotificationsList from "./_pages/notifications/list";
 import NotificationInstanceDetail from "./_pages/notifications/notification-instance-details";
 import NotificationInstanceForm from "./_pages/notifications/notification-instance-form";
-import NotificationInstanceList from "./_pages/notifications/notifications-instances";
 import NotificationsSetting from "./_pages/notifications/notifications-setting";
 
 import SchedulerJobDetail from "./_pages/scheduler/detail";
@@ -314,7 +313,6 @@ export default function AppRouter() {
 
                     <Route path={`/notifications`} element={<NotificationsList />} />
                     <Route path={`/notificationssettings`} element={<NotificationsSetting />} />
-                    <Route path={`/notificationinstances`} element={<NotificationInstanceList />} />
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />

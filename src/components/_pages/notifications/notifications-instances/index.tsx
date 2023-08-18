@@ -36,14 +36,11 @@ const NotificationInstanceList = () => {
         navigate(`../../../notificationinstances/add`);
     }, [navigate]);
 
-    const onDeleteClick = useCallback(() => {
-        dispatch(notificationsActions.deleteNotificationInstance({ uuid: checkedRows[0] }));
-    }, [checkedRows]);
-
     const onDeleteConfirmed = useCallback(() => {
         dispatch(notificationsActions.clearDeleteErrorMessages());
         dispatch(notificationsActions.deleteNotificationInstance({ uuid: checkedRows[0] }));
         setConfirmDelete(false);
+        setCheckedRows([]);
     }, [dispatch, checkedRows]);
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -154,40 +151,6 @@ const NotificationInstanceList = () => {
                     { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
                 ]}
             />
-
-            {/* <Dialog
-                isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? "Authorities" : "an Authority"}`}
-                body={forceDeleteBody}
-                toggle={() => setConfirmForceDelete(false)}
-                buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
-                ]}
-            /> */}
-            {/* <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Certification Authority"
-                body="You are about to delete Authority. If you continue, connectors
-                  related to the authority will fail. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-                ]}
-            />
-
-            <Dialog
-                isOpen={deleteErrorMessage !== ""}
-                caption="Delete Authority"
-                body={
-                    <>
-                        Failed to delete the Authority Instance as it has dependent objects. Please find the details below:
-                        <br />
-                        <br />
-                        {deleteErrorMessage}
-                    </>
-                } */}
         </>
     );
 };
