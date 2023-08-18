@@ -89,6 +89,7 @@ const NotificationInstanceList = () => {
             {
                 id: "kinds",
                 content: "Kinds",
+                sortable: true,
                 align: "center",
                 width: "15%",
             },
