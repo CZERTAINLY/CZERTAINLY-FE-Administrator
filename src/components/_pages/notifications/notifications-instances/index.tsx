@@ -3,7 +3,7 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as notificationsActions, selectors as notificationsSelectors } from "ducks/notifications";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "reactstrap";
@@ -27,10 +27,6 @@ const NotificationInstanceList = () => {
     const getFreshNotificationInstances = useCallback(() => {
         dispatch(notificationsActions.listNotificationInstances());
     }, [dispatch]);
-
-    useEffect(() => {
-        getFreshNotificationInstances();
-    }, [getFreshNotificationInstances]);
 
     const onAddClick = useCallback(() => {
         navigate(`../../../notificationinstances/add`);

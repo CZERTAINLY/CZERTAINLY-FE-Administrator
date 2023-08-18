@@ -1,8 +1,8 @@
 import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
-import { actions as enumActions, selectors as enumSelectors } from "ducks/enums";
-import { actions as notificationsActions, selectors as notificationsSelectors } from "ducks/notifications";
+import { selectors as enumSelectors } from "ducks/enums";
+import { actions as notificationActions, selectors as notificationsSelectors } from "ducks/notifications";
 import { actions as settingsActions, selectors as settingsSelectors } from "ducks/settings";
 import { useCallback, useEffect, useMemo } from "react";
 import { Field, Form } from "react-final-form";
@@ -31,13 +31,15 @@ const NotificationsSetting = () => {
 
     const getFreshNotificationSettings = useCallback(() => {
         dispatch(settingsActions.getNotificationsSettings());
-        dispatch(enumActions.getPlatformEnums());
     }, [dispatch]);
 
     useEffect(() => {
         getFreshNotificationSettings();
-        dispatch(notificationsActions.listNotificationInstances());
     }, [getFreshNotificationSettings]);
+
+    useEffect(() => {
+        dispatch(notificationActions.listNotificationInstances());
+    }, []);
 
     const isBusy = useMemo(
         () => isFetchingInstances || isUpdatingNotificationsSetting || isFetchingNotificationsSetting,

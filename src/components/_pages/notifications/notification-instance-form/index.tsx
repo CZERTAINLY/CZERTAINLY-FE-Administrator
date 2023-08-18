@@ -45,8 +45,9 @@ const NotificationInstanceForm = () => {
     );
 
     useEffect(() => {
+        if (notificationProviderAttributesDescriptors) return;
         dispatch(notificationsActions.listNotificationProviders());
-    }, []);
+    }, [notificationProviderAttributesDescriptors]);
 
     useEffect(() => {
         if (!id) return;
@@ -136,7 +137,7 @@ const NotificationInstanceForm = () => {
                 uuid: selectedNotificationInstanceProvider?.value,
             }),
         );
-    }, [selectedKind]);
+    }, [selectedKind, selectedNotificationInstanceProvider]);
 
     const defaultValues: NotificationInstanceRequestModel = useMemo(() => {
         if (editMode && notificationDetails) {

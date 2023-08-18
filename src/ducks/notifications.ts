@@ -10,11 +10,11 @@ export type State = {
     notifications: NotificationModel[];
     notificationInstances: NotificationInstanceModel[];
     notificationInstanceDetail?: NotificationInstanceModel;
-    notificationProviders?: ConnectorResponseModel[];
-    notificationProviderAttributeDescriptors?: AttributeDescriptorModel[];
+    notificationInstanceProviders?: ConnectorResponseModel[];
+    notificationProviderAttributesDescriptors?: AttributeDescriptorModel[];
     deleteErrorMessage?: string;
 
-    isFetchingNotificationProviderAttributeDescriptors: boolean;
+    isFetchingnotificationProviderAttributesDescriptors: boolean;
     isDeletingNotificationInstance: boolean;
     isFetchingNotificationProviders: boolean;
     isFetchingNotificationInstanceDetail: boolean;
@@ -31,7 +31,7 @@ export const initialState: State = {
     notifications: [],
     notificationInstances: [],
 
-    isFetchingNotificationProviderAttributeDescriptors: false,
+    isFetchingnotificationProviderAttributesDescriptors: false,
     isDeletingNotificationInstance: false,
     isFetchingNotificationProviders: false,
     isFetchingNotificationInstanceDetail: false,
@@ -118,7 +118,7 @@ export const slice = createSlice({
 
         listNotificationProvidersSuccess: (state, action: PayloadAction<{ providers: ConnectorResponseModel[] }>) => {
             state.isFetchingNotificationProviders = false;
-            state.notificationProviders = action.payload.providers;
+            state.notificationInstanceProviders = action.payload.providers;
         },
 
         listNotificationProvidersFailure: (state, action: PayloadAction<{ error: string }>) => {
@@ -126,20 +126,20 @@ export const slice = createSlice({
         },
 
         getNotificationAttributesDescriptors: (state, action: PayloadAction<{ uuid: string; kind: string }>) => {
-            state.notificationProviderAttributeDescriptors = [];
-            state.isFetchingNotificationProviderAttributeDescriptors = true;
+            state.notificationProviderAttributesDescriptors = [];
+            state.isFetchingnotificationProviderAttributesDescriptors = true;
         },
 
         getNotificationAttributesDescriptorsSuccess: (
             state,
             action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>,
         ) => {
-            state.notificationProviderAttributeDescriptors = action.payload.attributeDescriptor;
-            state.isFetchingNotificationProviderAttributeDescriptors = false;
+            state.notificationProviderAttributesDescriptors = action.payload.attributeDescriptor;
+            state.isFetchingnotificationProviderAttributesDescriptors = false;
         },
 
         getNotificationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingNotificationProviderAttributeDescriptors = false;
+            state.isFetchingnotificationProviderAttributesDescriptors = false;
         },
 
         getNotificationInstance: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -187,8 +187,11 @@ export const slice = createSlice({
             state.deleteErrorMessage = undefined;
         },
 
-        deleteNotificationInstanceSuccess: (state, action: PayloadAction<void>) => {
+        deleteNotificationInstanceSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeletingNotificationInstance = false;
+            const index = state.notificationInstances.findIndex((a) => a.uuid === action.payload.uuid);
+            if (index !== -1) state.notificationInstances.splice(index, 1);
+            state.deleteErrorMessage = undefined;
         },
 
         deleteNotificationInstanceFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -207,9 +210,10 @@ const overviewNotifications = createSelector(state, (state) => state.overviewNot
 const notifications = createSelector(state, (state) => state.notifications);
 const notificationInstances = createSelector(state, (state) => state.notificationInstances);
 const notificationInstanceDetail = createSelector(state, (state) => state.notificationInstanceDetail);
-const notificationInstanceProviders = createSelector(state, (state) => state.notificationProviders);
-const notificationProviderAttributesDescriptors = createSelector(state, (state) => state.notificationProviderAttributeDescriptors);
+const notificationInstanceProviders = createSelector(state, (state) => state.notificationInstanceProviders);
+const notificationProviderAttributesDescriptors = createSelector(state, (state) => state.notificationProviderAttributesDescriptors);
 
+const isFetchingNotificationProviders = createSelector(state, (state) => state.isFetchingNotificationProviders);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const isCreatingNotificationInstance = createSelector(state, (state) => state.isCreatingNotificationInstance);
 const isEditingNotificationInstance = createSelector(state, (state) => state.isEditingNotificationInstance);
@@ -229,6 +233,7 @@ export const selectors = {
     notificationProviderAttributesDescriptors,
 
     deleteErrorMessage,
+    isFetchingNotificationProviders,
     isCreatingNotificationInstance,
     isEditingNotificationInstance,
     isFetchingNotificationInstanceDetail,

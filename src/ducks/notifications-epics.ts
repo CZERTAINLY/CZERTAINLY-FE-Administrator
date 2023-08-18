@@ -287,9 +287,8 @@ const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
             deps.apiClients.notificationManagement.deleteNotificationInstance({ uuid: action.payload.uuid }).pipe(
                 mergeMap((res) =>
                     of(
-                        slice.actions.deleteNotificationInstanceSuccess(),
+                        slice.actions.deleteNotificationInstanceSuccess({ uuid: action.payload.uuid }),
                         alertActions.success("Notifications Instance deleted successfully."),
-                        slice.actions.listNotificationInstances(),
                         appRedirectActions.redirect({ url: `../../../notificationssettings` }),
                     ),
                 ),
