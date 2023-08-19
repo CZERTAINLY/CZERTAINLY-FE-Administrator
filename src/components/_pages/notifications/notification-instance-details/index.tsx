@@ -169,16 +169,16 @@ const NotificationInstanceDetails = () => {
                 sortable: true,
                 width: "auto",
             },
-            // {
-            //     id: "customAttributeUuid",
-            //     content: "Custom Attribute Uuid",
-            //     width: "auto",
-            // },
             {
-                id: "customAttributeLabel",
-                content: "Custom Attribute Label",
+                id: "customAttributeUuid",
+                content: "Custom Attribute Uuid",
                 width: "auto",
             },
+            // {
+            //     id: "customAttributeLabel",
+            //     content: "Custom Attribute Label",
+            //     width: "auto",
+            // },
             {
                 id: "contentType",
                 content: "Content Type",
@@ -198,9 +198,11 @@ const NotificationInstanceDetails = () => {
                           columns: [
                               attribute.mappingAttributeName,
                               attribute.mappingAttributeUuid,
-                              getCustomAttributeName(attribute.customAttributeUuid),
-                              //   attribute.customAttributeUuid,
-                              attribute.customAttributeLabel,
+                              <Link to={`../../../customattributes/detail/${attribute.customAttributeUuid}`}>
+                                  {getCustomAttributeName(attribute.customAttributeUuid)}
+                              </Link>,
+                              attribute.customAttributeUuid,
+                              //   attribute.customAttributeLabel,
                               getMappingAttributesContentType(attribute.mappingAttributeUuid),
                           ],
                       };
