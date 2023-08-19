@@ -3,6 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
 import { actions as notificationsActions, selectors as notificationsSelectors } from "ducks/notifications";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,8 +13,12 @@ const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const notificationInstance = useSelector(notificationsSelectors.notificationInstanceDetail);
-    const isFetchingNotificationInstanceDetail = useSelector(notificationsSelectors.isFetchingNotificationInstanceDetail);
+    const mappingAttributes = useSelector(notificationsSelectors.mappingAttributes);
+
     const navigate = useNavigate();
+
+    const customAttributes = useSelector(customAttributesSelectors.customAttributes);
+    const isFetchingNotificationInstanceDetail = useSelector(notificationsSelectors.isFetchingNotificationInstanceDetail);
     const isDeleting = useSelector(notificationsSelectors.isDeleting);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -35,6 +40,19 @@ const NotificationInstanceDetails = () => {
     useEffect(() => {
         getFreshNotificationInstanceDetail();
     }, [getFreshNotificationInstanceDetail]);
+
+    console.log("customattr", customAttributes);
+
+    useEffect(() => {
+        if (!notificationInstance) return;
+        dispatch(
+            notificationsActions.listMappingAttributes({
+                kind: notificationInstance.kind,
+                connectorUuid: notificationInstance.connectorUuid,
+            }),
+        );
+        dispatch(customAttributesActions.listCustomAttributes({}));
+    }, [dispatch, notificationInstance]);
 
     const onEditClick = useCallback(() => {
         if (!id) return;
@@ -115,6 +133,82 @@ const NotificationInstanceDetails = () => {
         [notificationInstance],
     );
 
+    const getMappingAttributesContentType = useCallback(
+        (attributeUuid: string) => {
+            const mappingAttribute = mappingAttributes?.find((mappingAttribute) => mappingAttribute.uuid === attributeUuid);
+            return mappingAttribute?.contentType || "";
+        },
+        [mappingAttributes],
+    );
+
+    const getCustomAttributeName = useCallback(
+        (attributeUuid: string) => {
+            const customAttribute = customAttributes?.find((customAttribute) => customAttribute.uuid === attributeUuid);
+            return customAttribute?.name || "";
+        },
+        [customAttributes],
+    );
+
+    const attributeHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: "attributeName",
+                content: "Attribute Name",
+                sort: "asc",
+                sortable: true,
+                width: "auto",
+            },
+            {
+                id: "attributeUuid",
+                content: "Attribute Uuid",
+                width: "auto",
+            },
+            {
+                id: "customAttributeName",
+                content: "Custom Attribute Name",
+                sortable: true,
+                width: "auto",
+            },
+            // {
+            //     id: "customAttributeUuid",
+            //     content: "Custom Attribute Uuid",
+            //     width: "auto",
+            // },
+            {
+                id: "customAttributeLabel",
+                content: "Custom Attribute Label",
+                width: "auto",
+            },
+            {
+                id: "contentType",
+                content: "Content Type",
+                width: "12.5%",
+                align: "center",
+            },
+        ],
+        [],
+    );
+
+    const rolesTableData: TableDataRow[] = useMemo(
+        () =>
+            notificationInstance?.attributeMappings
+                ? notificationInstance?.attributeMappings.map((attribute) => {
+                      return {
+                          id: attribute.mappingAttributeUuid,
+                          columns: [
+                              attribute.mappingAttributeName,
+                              attribute.mappingAttributeUuid,
+                              getCustomAttributeName(attribute.customAttributeUuid),
+                              //   attribute.customAttributeUuid,
+                              attribute.customAttributeLabel,
+                              getMappingAttributesContentType(attribute.mappingAttributeUuid),
+                          ],
+                      };
+                  })
+                : [],
+        [notificationInstance, getMappingAttributesContentType, getCustomAttributeName],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <Widget
@@ -135,6 +229,16 @@ const NotificationInstanceDetails = () => {
                     <Label>Notification Instance Attributes</Label>
 
                     <AttributeViewer attributes={notificationInstance.attributes} viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} />
+                </Widget>
+            ) : (
+                <></>
+            )}
+            {notificationInstance?.attributeMappings?.length ? (
+                <Widget title="Attribute Mappings" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                    <br />
+                    <Label>Notification Instance Attribute Mappings</Label>
+
+                    <CustomTable headers={attributeHeaders} data={rolesTableData} />
                 </Widget>
             ) : (
                 <></>

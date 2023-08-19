@@ -88,7 +88,7 @@ const NotificationInstanceForm = () => {
         } else {
             dispatch(notificationsActions.clearNotificationInstanceDetail());
         }
-    }, [id]);
+    }, [id, dispatch]);
 
     const onSubmit = (values: NotificationInstanceRequestModel) => {
         const attributes = collectFormAttributes(
