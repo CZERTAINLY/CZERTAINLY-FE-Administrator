@@ -32,6 +32,15 @@ const NotificationInstanceDetails = () => {
         setConfirmDelete(false);
     }, [dispatch, notificationInstance]);
 
+    const clearNotificationInstanceDetail = () => {
+        dispatch(notificationsActions.clearNotificationInstanceDetail());
+    };
+
+    useEffect(() => {
+        clearNotificationInstanceDetail();
+        return clearNotificationInstanceDetail;
+    }, []);
+
     const getFreshNotificationInstanceDetail = useCallback(() => {
         if (!id) return;
         dispatch(notificationsActions.getNotificationInstance({ uuid: id }));
@@ -40,8 +49,6 @@ const NotificationInstanceDetails = () => {
     useEffect(() => {
         getFreshNotificationInstanceDetail();
     }, [getFreshNotificationInstanceDetail]);
-
-    console.log("customattr", customAttributes);
 
     useEffect(() => {
         if (!notificationInstance) return;
@@ -159,30 +166,15 @@ const NotificationInstanceDetails = () => {
                 width: "auto",
             },
             {
-                id: "attributeUuid",
-                content: "Attribute Uuid",
-                width: "auto",
-            },
-            {
                 id: "customAttributeName",
                 content: "Custom Attribute Name",
                 sortable: true,
                 width: "auto",
             },
             {
-                id: "customAttributeUuid",
-                content: "Custom Attribute Uuid",
-                width: "auto",
-            },
-            // {
-            //     id: "customAttributeLabel",
-            //     content: "Custom Attribute Label",
-            //     width: "auto",
-            // },
-            {
                 id: "contentType",
                 content: "Content Type",
-                width: "12.5%",
+                width: "auto",
                 align: "center",
             },
         ],
@@ -197,18 +189,13 @@ const NotificationInstanceDetails = () => {
                           id: attribute.mappingAttributeUuid,
                           columns: [
                               attribute.mappingAttributeName,
-                              attribute.mappingAttributeUuid,
-                              <Link to={`../../../customattributes/detail/${attribute.customAttributeUuid}`}>
-                                  {getCustomAttributeName(attribute.customAttributeUuid)}
-                              </Link>,
-                              attribute.customAttributeUuid,
-                              //   attribute.customAttributeLabel,
+                              attribute.customAttributeLabel,
                               getMappingAttributesContentType(attribute.mappingAttributeUuid),
                           ],
                       };
                   })
                 : [],
-        [notificationInstance, getMappingAttributesContentType, getCustomAttributeName],
+        [notificationInstance, getMappingAttributesContentType],
     );
 
     return (

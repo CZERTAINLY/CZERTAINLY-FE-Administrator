@@ -2,7 +2,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+import { selectors as customAttributesSelectors } from "ducks/customAttributes";
 import { selectors as notificationSelectors, actions as notificationsActions } from "ducks/notifications";
 import { FormApi } from "final-form";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -51,8 +51,13 @@ const NotificationInstanceForm = () => {
         [isCreatingNotificationInstance, isFetchingNotificationInstanceDetail],
     );
 
+    const clearNotificationInstanceDetail = () => {
+        dispatch(notificationsActions.clearNotificationInstanceDetail());
+    };
+
     useEffect(() => {
-        dispatch(customAttributesActions.listCustomAttributes({}));
+        clearNotificationInstanceDetail();
+        return clearNotificationInstanceDetail;
     }, []);
 
     useEffect(() => {
@@ -120,6 +125,7 @@ const NotificationInstanceForm = () => {
     };
 
     const onCancel = useCallback(() => {
+        clearNotificationInstanceDetail();
         navigate(-1);
     }, [navigate]);
 
