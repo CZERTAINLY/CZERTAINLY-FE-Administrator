@@ -66,10 +66,14 @@ const NotificationsSetting = () => {
 
     const initialValues = useMemo(() => {
         if (!notificationsSettings) return {};
-        const notificationsMapping = Object.entries(notificationsSettings.notificationsMapping).reduce((acc, [key, value]) => {
-            acc[key] = { value, label: notificationsOptions.find((option) => option.value === value)?.label ?? "" };
-            return acc;
-        }, {} as { [key: string]: { value: string; label: string } });
+        const notificationsMapping = Object.entries(notificationsSettings.notificationsMapping)
+            .filter(([key, value]) => notificationsOptions.find((option) => option.value === value)?.label !== undefined)
+            .reduce((acc, [key, value]) => {
+                const option = notificationsOptions.find((option) => option.value === value);
+                acc[key] = { value, label: option?.label ?? "" };
+                return acc;
+            }, {} as { [key: string]: { value: string; label: string } });
+
         return { notificationsMapping };
     }, [notificationsSettings, notificationsOptions]);
 
