@@ -189,7 +189,9 @@ const NotificationInstanceDetails = () => {
                           id: attribute.mappingAttributeUuid,
                           columns: [
                               attribute.mappingAttributeName,
-                              attribute.customAttributeLabel,
+                              <Link to={`../../../customattributes/detail/${attribute.customAttributeUuid}`}>
+                                  {getCustomAttributeName(attribute.customAttributeUuid)}
+                              </Link>,
                               getMappingAttributesContentType(attribute.mappingAttributeUuid),
                           ],
                       };
