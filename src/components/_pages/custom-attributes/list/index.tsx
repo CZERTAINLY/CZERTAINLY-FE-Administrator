@@ -34,7 +34,7 @@ export default function CustomAttributesList() {
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listCustomAttributes());
+        dispatch(actions.listCustomAttributes({}));
     }, [dispatch]);
 
     useEffect(() => {

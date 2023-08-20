@@ -20,10 +20,10 @@ import {
     DiscoveryManagementApi,
     EntityManagementApi,
     EnumsApi,
+    ExternalNotificationManagementApi,
     GlobalMetadataApi,
+    InternalNotificationApi,
     LocationManagementApi,
-    NotificationManagementApi,
-    NotificationsApi,
     RAProfileManagementApi,
     RoleManagementApi,
     SCEPProfileManagementApi,
@@ -71,8 +71,8 @@ export interface ApiClients {
     scheduler: ScheduledJobsManagementApi;
     approvalProfiles: ApprovalProfileInventoryApi;
     approvals: ApprovalInventoryApi;
-    notifications: NotificationsApi;
-    notificationManagement: NotificationManagementApi;
+    internalNotificationApi: InternalNotificationApi;
+    externalNotificationManagementApi: ExternalNotificationManagementApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
@@ -111,8 +111,8 @@ export const backendClient: ApiClients = {
     scheduler: new ScheduledJobsManagementApi(configuration),
     approvalProfiles: new ApprovalProfileInventoryApi(configuration),
     approvals: new ApprovalInventoryApi(configuration),
-    notifications: new NotificationsApi(configuration),
-    notificationManagement: new NotificationManagementApi(configuration),
+    internalNotificationApi: new InternalNotificationApi(configuration),
+    externalNotificationManagementApi: new ExternalNotificationManagementApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),

@@ -14,8 +14,9 @@
 import type { Observable } from "rxjs";
 import type { AjaxResponse } from "rxjs/ajax";
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
 import type {
+    AttributeContentType,
     AuthenticationServiceExceptionDto,
     BaseAttributeContentDto,
     CustomAttribute,
@@ -74,6 +75,10 @@ export interface GetCustomAttributeRequest {
 
 export interface GetResourceCustomAttributesRequest {
     resource: Resource;
+}
+
+export interface ListCustomAttributesRequest {
+    attributeContentType?: AttributeContentType;
 }
 
 export interface UpdateAttributeContentForResourceRequest {
@@ -388,15 +393,26 @@ export class CustomAttributesApi extends BaseAPI {
     /**
      * List Custom Attributes
      */
-    listCustomAttributes(): Observable<Array<CustomAttributeDefinitionDto>>;
-    listCustomAttributes(opts?: OperationOpts): Observable<AjaxResponse<Array<CustomAttributeDefinitionDto>>>;
+    listCustomAttributes({ attributeContentType }: ListCustomAttributesRequest): Observable<Array<CustomAttributeDefinitionDto>>;
     listCustomAttributes(
+        { attributeContentType }: ListCustomAttributesRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<CustomAttributeDefinitionDto>>>;
+    listCustomAttributes(
+        { attributeContentType }: ListCustomAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<CustomAttributeDefinitionDto> | AjaxResponse<Array<CustomAttributeDefinitionDto>>> {
+        const query: HttpQuery = {};
+
+        if (attributeContentType != null) {
+            query["attributeContentType"] = attributeContentType;
+        }
+
         return this.request<Array<CustomAttributeDefinitionDto>>(
             {
                 url: "/v1/attributes/custom",
                 method: "GET",
+                query,
             },
             opts?.responseOpts,
         );

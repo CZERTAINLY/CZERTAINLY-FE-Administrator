@@ -48,7 +48,6 @@ export default function AttributeViewer({
     const getContent = useCallback(getAttributeContent, []);
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
-
     const tableHeaders = (viewerType: ATTRIBUTE_VIEWER_TYPE) => {
         const result = [];
         if (viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT) {

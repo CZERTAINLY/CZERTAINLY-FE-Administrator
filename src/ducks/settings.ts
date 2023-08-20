@@ -50,16 +50,16 @@ export const slice = createSlice({
         },
 
         getNotificationsSettings: (state, action: PayloadAction<void>) => {
-            state.isFetchingPlatform = true;
+            state.isFetchingNotificationsSetting = true;
         },
 
         getNotificationsSettingsSuccess: (state, action: PayloadAction<NotificationSettingsDto>) => {
             state.notificationsSettings = action.payload;
-            state.isFetchingPlatform = false;
+            state.isFetchingNotificationsSetting = false;
         },
 
         getNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingPlatform = false;
+            state.isFetchingNotificationsSetting = false;
         },
 
         updateNotificationsSettings: (state, action: PayloadAction<NotificationSettingsDto>) => {

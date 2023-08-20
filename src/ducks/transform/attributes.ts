@@ -3,6 +3,7 @@ import {
     AttributeDescriptorCollectionModel,
     AttributeDescriptorDto,
     AttributeDescriptorModel,
+    AttributeMappingModel,
     AttributeRequestDto,
     AttributeRequestModel,
     AttributeResponseDto,
@@ -11,6 +12,7 @@ import {
     CustomAttributeModel,
 } from "types/attributes";
 import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from "types/connectors";
+import { AttributeMappingDto } from "types/openapi";
 
 export function transformAttributeResponseDtoToModel(attribute: AttributeResponseDto): AttributeResponseModel {
     return {
@@ -31,6 +33,14 @@ export function transformCustomAttributeDtoToModel(attribute: CustomAttributeDto
         ...attribute,
         content: attribute.content ? JSON.parse(JSON.stringify(attribute.content)) : undefined,
     };
+}
+
+export function transformAttributeMappingDtoToModel(attributeMapping: AttributeMappingDto): AttributeMappingModel {
+    return { ...attributeMapping };
+}
+
+export function transformAttributeMappingModelToDto(attributeMapping: AttributeMappingModel): AttributeMappingDto {
+    return { ...attributeMapping };
 }
 
 export function transformAttributeDescriptorDtoToModel(attributeDescriptor: AttributeDescriptorDto): AttributeDescriptorModel {

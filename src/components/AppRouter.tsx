@@ -104,6 +104,8 @@ import AppRedirect from "./AppRedirect";
 import { Resource } from "types/openapi";
 
 import NotificationsList from "./_pages/notifications/list";
+import NotificationInstanceDetail from "./_pages/notifications/notification-instance-details";
+import NotificationInstanceForm from "./_pages/notifications/notification-instance-form";
 import NotificationsSetting from "./_pages/notifications/notifications-setting";
 
 import SchedulerJobDetail from "./_pages/scheduler/detail";
@@ -310,7 +312,10 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Jobs.toLowerCase()}/detail/:id`} element={<SchedulerJobDetail />} />
 
                     <Route path={`/notifications`} element={<NotificationsList />} />
-                    <Route path={`/notificationssetting`} element={<NotificationsSetting />} />
+                    <Route path={`/notificationssettings`} element={<NotificationsSetting />} />
+                    <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
+                    <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
+                    <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
                 </Route>
 
                 {/*
