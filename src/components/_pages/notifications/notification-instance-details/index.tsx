@@ -197,7 +197,7 @@ const NotificationInstanceDetails = () => {
                       };
                   })
                 : [],
-        [notificationInstance, getMappingAttributesContentType],
+        [notificationInstance, getMappingAttributesContentType, getCustomAttributeName],
     );
 
     return (
