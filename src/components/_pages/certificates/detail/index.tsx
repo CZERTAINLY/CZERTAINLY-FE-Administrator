@@ -151,7 +151,17 @@ export default function CertificateDetail() {
             isRenewing ||
             isRekeying ||
             isFetchingApprovals,
-        [isFetching, isDeleting, isUpdatingGroup, isUpdatingRaProfile, isUpdatingOwner, isRevoking, isRenewing, isRekeying],
+        [
+            isFetching,
+            isDeleting,
+            isUpdatingGroup,
+            isUpdatingRaProfile,
+            isUpdatingOwner,
+            isRevoking,
+            isRenewing,
+            isRekeying,
+            isFetchingApprovals,
+        ],
     );
 
     const { nodes: certificateNodes, edges: certificateEdges } = transformCertifacetObjectToNodesAndEdges(
@@ -266,10 +276,12 @@ export default function CertificateDetail() {
 
     useEffect(() => {
         if (!certificateRevocationReason) return;
-        const certificateRevokeReasonOptions = Object.keys(certificateRevocationReason).map((key) => ({
-            value: certificateRevocationReason[key].code,
-            label: certificateRevocationReason[key].label,
-        }));
+        const certificateRevokeReasonOptions = Object.keys(certificateRevocationReason)
+            .map((key) => ({
+                value: certificateRevocationReason[key].code,
+                label: certificateRevocationReason[key].label,
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label));
         setCertificateRevokeReasonOptions(certificateRevokeReasonOptions);
     }, [dispatch, certificateRevocationReason]);
 
