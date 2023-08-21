@@ -173,19 +173,22 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         setSelectedTab(newApprovalSteps.length - 1);
     };
 
-    const handleRemoveStepClick = (index: number): void => {
-        if (approvalSteps.length === 1) return;
+    const handleRemoveStepClick = useCallback(
+        (index: number): void => {
+            if (approvalSteps.length === 1) return;
 
-        const newApprovalSteps = approvalSteps.filter((step, i) => i !== index);
-        const orderedApprovalSteps = newApprovalSteps.map((step, i) => ({ ...step, order: i + 1 }));
+            const newApprovalSteps = approvalSteps.filter((step, i) => i !== index);
+            const orderedApprovalSteps = newApprovalSteps.map((step, i) => ({ ...step, order: i + 1 }));
 
-        form.change("approvalSteps", orderedApprovalSteps);
-        updateAppoverAfterRemove(index);
+            form.change("approvalSteps", orderedApprovalSteps);
+            updateAppoverAfterRemove(index);
 
-        if (selectedTab === approvalSteps.length - 1) {
-            setSelectedTab(selectedTab - 1);
-        }
-    };
+            if (selectedTab === approvalSteps.length - 1) {
+                setSelectedTab(selectedTab - 1);
+            }
+        },
+        [approvalSteps, form, selectedTab, updateAppoverAfterRemove],
+    );
 
     const renderApprovalSteps = useCallback(
         (index: number) => {

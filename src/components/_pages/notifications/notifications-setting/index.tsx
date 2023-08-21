@@ -9,6 +9,7 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
+import { PlatformEnum } from "types/openapi";
 import { removeNullValues } from "utils/common-utils";
 import NotificationInstanceList from "../notifications-instances";
 
@@ -25,7 +26,7 @@ const NotificationsSetting = () => {
 
     const notificationsSettings = useSelector(settingsSelectors.notificationsSettings);
     const isUpdatingNotificationsSetting = useSelector(settingsSelectors.isUpdatingNotificationsSetting);
-    const { NotificationType } = useSelector(enumSelectors.platformEnums);
+    const notificationType = useSelector(enumSelectors.platformEnum(PlatformEnum.NotificationType));
     const notificationInstances = useSelector(notificationsSelectors.notificationInstances);
     const isFetchingInstances = useSelector(notificationsSelectors.isFetchingNotificationInstances);
     const isFetchingNotificationsSetting = useSelector(settingsSelectors.isFetchingNotificationsSetting);
@@ -48,11 +49,11 @@ const NotificationsSetting = () => {
     );
 
     const notificationsSelects = useMemo(() => {
-        if (NotificationType) {
-            return Object.values(NotificationType);
+        if (notificationType) {
+            return Object.values(notificationType);
         }
         return [];
-    }, [NotificationType]);
+    }, [notificationType]);
 
     const notificationsOptions = useMemo(() => {
         if (notificationInstances) {

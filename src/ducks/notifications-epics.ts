@@ -188,7 +188,6 @@ const getNotificationInstance: AppEpic = (action$, state$, deps) => {
         ),
     );
 };
-// alertActions.success("Notifications settings updated successfully."),
 
 const createNotificationInstance: AppEpic = (action$, state$, deps) => {
     return action$.pipe(

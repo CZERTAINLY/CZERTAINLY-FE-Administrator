@@ -85,7 +85,7 @@ function RoleForm() {
             description: editMode ? roleSelector?.description || "" : "",
             email: editMode ? roleSelector?.email || "" : "",
         }),
-        [editMode, roleSelector?.description, roleSelector?.name],
+        [editMode, roleSelector],
     );
 
     const title = useMemo(() => (editMode ? "Edit Role" : "Add Role"), [editMode]);
@@ -135,23 +135,23 @@ function RoleForm() {
                             </Field>
 
                             <Field name="email" validate={composeValidators(validateEmail())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="email">E-mail</Label>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="email">E-mail</Label>
 
-                                    <Input
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        id="email"
-                                        placeholder="Enter e-mail of the role"
-                                    />
+                                        <Input
+                                            {...input}
+                                            valid={!meta.error && meta.touched}
+                                            invalid={!!meta.error && meta.touched}
+                                            type="text"
+                                            id="email"
+                                            placeholder="Enter e-mail of the role"
+                                        />
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
 
                             <br />
 

@@ -70,7 +70,7 @@ export default function ComplianceProfileDetail() {
     const getComplianceRulesAndGroups = useCallback(() => {
         dispatch(actions.listComplianceRules());
         dispatch(actions.listComplianceGroups());
-    }, [id, dispatch]);
+    }, [dispatch]);
 
     useEffect(() => {
         getFreshComplianceProfileDetails();

@@ -33,28 +33,36 @@ function StatusBadge({ enabled, style, textStatus }: Props) {
         }
     }
     switch (textStatus) {
-        case ApprovalDetailDtoStatusEnum.Approved || ApprovalStepRecipientDtoStatusEnum.Approved || ApprovalDtoStatusEnum.Approved:
+        case ApprovalDetailDtoStatusEnum.Approved:
+        case ApprovalStepRecipientDtoStatusEnum.Approved:
+        case ApprovalDtoStatusEnum.Approved:
             return (
                 <Badge style={style} color="success">
                     Approved
                 </Badge>
             );
 
-        case ApprovalDetailDtoStatusEnum.Rejected || ApprovalStepRecipientDtoStatusEnum.Rejected || ApprovalDtoStatusEnum.Rejected:
+        case ApprovalDetailDtoStatusEnum.Rejected:
+        case ApprovalStepRecipientDtoStatusEnum.Rejected:
+        case ApprovalDtoStatusEnum.Rejected:
             return (
                 <Badge style={style} color="danger">
                     Rejected
                 </Badge>
             );
 
-        case ApprovalDetailDtoStatusEnum.Pending || ApprovalStepRecipientDtoStatusEnum.Pending || ApprovalDtoStatusEnum.Pending:
+        case ApprovalDetailDtoStatusEnum.Pending:
+        case ApprovalStepRecipientDtoStatusEnum.Pending:
+        case ApprovalDtoStatusEnum.Pending:
             return (
                 <Badge style={style} color="secondary">
                     Pending
                 </Badge>
             );
 
-        case ApprovalDtoStatusEnum.Expired || ApprovalStepRecipientDtoStatusEnum.Expired || ApprovalDtoStatusEnum.Expired:
+        case ApprovalDtoStatusEnum.Expired:
+        case ApprovalStepRecipientDtoStatusEnum.Expired:
+        case ApprovalDtoStatusEnum.Expired:
             return (
                 <Badge style={style} color="danger">
                     Expired

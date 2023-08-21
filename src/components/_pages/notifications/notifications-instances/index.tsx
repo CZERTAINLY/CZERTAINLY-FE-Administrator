@@ -18,8 +18,6 @@ const NotificationInstanceList = () => {
 
     const isDeleting = useSelector(notificationsSelectors.isDeleting);
 
-    const deleteErrorMessage = useSelector(notificationsSelectors.deleteErrorMessage);
-
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetchingNotificationInstances || isDeleting, [isFetchingNotificationInstances, isDeleting]);
@@ -58,7 +56,7 @@ const NotificationInstanceList = () => {
                 },
             },
         ],
-        [checkedRows],
+        [checkedRows, onAddClick],
     );
     const notificationInstanceHeaders: TableHeader[] = useMemo(
         () => [

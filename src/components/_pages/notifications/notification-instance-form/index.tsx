@@ -37,7 +37,6 @@ const NotificationInstanceForm = () => {
     const customAttributes = useSelector(customAttributesSelectors.customAttributes);
     const mappingAttributes = useSelector(notificationSelectors.mappingAttributes);
     const [selectedCustomAttributes, setSelectedCustomAttributes] = useState<SelectChangeValue[]>([]);
-    // Array<AttributeMappingModel>
     const [attributeMappingValues, setAttributeMappingValues] = useState<AttributeMappingModel[]>([]);
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
     const isEditingNotificationInstance = useSelector(notificationSelectors.isEditingNotificationInstance);
@@ -51,14 +50,14 @@ const NotificationInstanceForm = () => {
         [isCreatingNotificationInstance, isFetchingNotificationInstanceDetail],
     );
 
-    const clearNotificationInstanceDetail = () => {
+    const clearNotificationInstanceDetail = useCallback(() => {
         dispatch(notificationsActions.clearNotificationInstanceDetail());
-    };
+    }, [dispatch]);
 
     useEffect(() => {
         clearNotificationInstanceDetail();
         return clearNotificationInstanceDetail;
-    }, []);
+    }, [clearNotificationInstanceDetail]);
 
     useEffect(() => {
         if (!selectedNotificationInstanceProvider?.value || !selectedKind?.value) return;
@@ -69,12 +68,12 @@ const NotificationInstanceForm = () => {
                 kind: selectedKind?.value,
             }),
         );
-    }, [selectedKind, selectedNotificationInstanceProvider]);
+    }, [selectedKind, selectedNotificationInstanceProvider, dispatch]);
 
     useEffect(() => {
         if (notificationProviderAttributesDescriptors) return;
         dispatch(notificationsActions.listNotificationProviders());
-    }, [notificationProviderAttributesDescriptors]);
+    }, [notificationProviderAttributesDescriptors, dispatch]);
 
     const getContentTypeOptions = useCallback(
         (contentType: AttributeContentType) => {
@@ -127,7 +126,7 @@ const NotificationInstanceForm = () => {
     const onCancel = useCallback(() => {
         clearNotificationInstanceDetail();
         navigate(-1);
-    }, [navigate]);
+    }, [navigate, clearNotificationInstanceDetail]);
 
     const optionsForNotificationProviders = useMemo(
         () =>
@@ -179,7 +178,7 @@ const NotificationInstanceForm = () => {
                 uuid: selectedNotificationInstanceProvider?.value,
             }),
         );
-    }, [selectedKind, selectedNotificationInstanceProvider]);
+    }, [selectedKind, selectedNotificationInstanceProvider, dispatch]);
 
     useEffect(() => {
         if (!editMode || !notificationDetails || !optionsForNotificationProviders || !kindOptions) return;
@@ -269,7 +268,13 @@ const NotificationInstanceForm = () => {
                 />
             );
         },
-        [notificationProviderAttributesDescriptors, customAttributes, selectedCustomAttributes, attributeMappingValues],
+        [
+            notificationProviderAttributesDescriptors,
+            editMode,
+            groupAttributesCallbackAttributes,
+            notificationDetails,
+            selectedNotificationInstanceProvider,
+        ],
     );
 
     return (

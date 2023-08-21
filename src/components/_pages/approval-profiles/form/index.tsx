@@ -45,7 +45,7 @@ function ApprovalProfileForm() {
     useEffect(() => {
         if (!id) return;
         dispatch(profileApprovalActions.getApprovalProfile({ uuid: id }));
-    }, [id]);
+    }, [id, dispatch]);
 
     const defaultValues: ProfileApprovalRequestModel = useMemo(
         () =>
@@ -77,7 +77,7 @@ function ApprovalProfileForm() {
                 dispatch(profileApprovalActions.editApprovalProfile({ editProfileApproval: values, uuid: id }));
             }
         },
-        [dispatch],
+        [dispatch, editMode, id],
     );
 
     const onCancelClick = useCallback(() => {
