@@ -71,7 +71,7 @@ export default function SchedulerJobDetail() {
             },
             {
                 icon: "times",
-                disabled: schedulerJob?.enabled === false ?? true,
+                disabled: !Boolean(schedulerJob?.enabled),
                 tooltip: "Disable",
                 onClick: () => {
                     dispatch(actions.disableSchedulerJob({ uuid: schedulerJob!.uuid }));

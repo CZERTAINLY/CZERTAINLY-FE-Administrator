@@ -62,7 +62,6 @@ function StatusBadge({ enabled, style, textStatus }: Props) {
 
         case ApprovalDtoStatusEnum.Expired:
         case ApprovalStepRecipientDtoStatusEnum.Expired:
-        case ApprovalDtoStatusEnum.Expired:
             return (
                 <Badge style={style} color="danger">
                     Expired
