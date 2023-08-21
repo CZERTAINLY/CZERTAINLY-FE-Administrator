@@ -64,7 +64,7 @@ export default function ApprovalDetails() {
             }),
         );
         setRecipientApproveDialog(false);
-    }, [dispatch, approvalDetails, setRecipientApproveDialog]);
+    }, [dispatch, approvalDetails, setRecipientApproveDialog, comment]);
 
     const onRejectRecipient = useCallback(() => {
         if (!approvalDetails?.approvalUuid) return;
@@ -77,7 +77,7 @@ export default function ApprovalDetails() {
             }),
         );
         setRecipientApproveDialog(false);
-    }, [dispatch, approvalDetails, setRecipientApproveDialog]);
+    }, [dispatch, approvalDetails, setRecipientApproveDialog, comment]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -98,7 +98,7 @@ export default function ApprovalDetails() {
                 },
             },
         ],
-        [recipientApproveDialog, recipientRejectDialog, approvalDetails],
+        [approvalDetails],
     );
     const getApprovalType = (approvalStep: DetailApprovalStepModel) => {
         if (approvalStep.userUuid) {
@@ -225,7 +225,7 @@ export default function ApprovalDetails() {
                           columns: ["Version", approvalDetails?.version.toString() || ""],
                       },
                   ],
-        [approvalDetails, getUserName],
+        [approvalDetails, getUserName, navigate],
     );
 
     const stepsHeaders: TableHeader[] = useMemo(
@@ -266,7 +266,7 @@ export default function ApprovalDetails() {
                 return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{getGroupName(appovalProfileStep.groupUuid)}</Link>;
             }
         },
-        [getUserName, getRoleName, getGroupName, approvalDetails],
+        [getUserName, getRoleName, getGroupName],
     );
 
     const renderRecipiensDetails = (approvalStep: DetailApprovalStepModel) => {
@@ -328,7 +328,7 @@ export default function ApprovalDetails() {
                           approvalStep.approvalStepRecipients.length ? renderRecipiensDetails(approvalStep) : "",
                       ],
                   })),
-        [approvalDetails, renderApproverRedirect],
+        [approvalDetails, renderApproverRedirect, renderRecipiensDetails],
     );
 
     return (

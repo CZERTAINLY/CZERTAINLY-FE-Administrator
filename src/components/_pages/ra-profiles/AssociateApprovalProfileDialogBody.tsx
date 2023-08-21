@@ -54,7 +54,7 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
             );
             onClose();
         },
-        [onClose, authorityUuid, raProfile],
+        [onClose, authorityUuid, raProfile, dispatch],
     );
 
     return (

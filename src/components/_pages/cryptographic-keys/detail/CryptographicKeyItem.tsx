@@ -62,7 +62,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const getFreshHistory = useCallback(() => {
         if (!keyItem) return;
         dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, tokenInstanceUuid: tokenInstanceUuid, keyUuid: keyUuid }));
-    }, [dispatch, keyItem.uuid, tokenInstanceUuid, keyUuid, keyItem]);
+    }, [dispatch, tokenInstanceUuid, keyUuid, keyItem]);
 
     useEffect(() => {
         getFreshHistory();

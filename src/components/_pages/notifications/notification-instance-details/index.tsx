@@ -32,14 +32,14 @@ const NotificationInstanceDetails = () => {
         setConfirmDelete(false);
     }, [dispatch, notificationInstance]);
 
-    const clearNotificationInstanceDetail = () => {
+    const clearNotificationInstanceDetail = useCallback(() => {
         dispatch(notificationsActions.clearNotificationInstanceDetail());
-    };
+    }, [dispatch]);
 
     useEffect(() => {
         clearNotificationInstanceDetail();
         return clearNotificationInstanceDetail;
-    }, []);
+    }, [clearNotificationInstanceDetail]);
 
     const getFreshNotificationInstanceDetail = useCallback(() => {
         if (!id) return;

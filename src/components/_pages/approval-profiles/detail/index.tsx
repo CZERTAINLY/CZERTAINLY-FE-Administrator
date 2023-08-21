@@ -98,7 +98,7 @@ const ApprovalProfileDetails = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [profileApprovalDetail, , onDisableClick, onEnableClick],
+        [profileApprovalDetail, , onDisableClick, onEnableClick, onEditClick],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -227,7 +227,7 @@ const ApprovalProfileDetails = () => {
                 return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{getGroupName(appovalProfileStep.groupUuid)}</Link>;
             }
         },
-        [getUserName, getRoleName, getGroupName, profileApprovalDetail],
+        [getUserName, getRoleName, getGroupName],
     );
 
     const stepsRows: TableDataRow[] = useMemo(

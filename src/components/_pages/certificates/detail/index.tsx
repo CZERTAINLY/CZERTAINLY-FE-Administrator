@@ -90,9 +90,11 @@ export default function CertificateDetail() {
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
+    const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
     const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
+    const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
 
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
@@ -261,6 +263,15 @@ export default function CertificateDetail() {
     useEffect(() => {
         setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ":#" + group.authorityInstanceUuid, label: group.name })));
     }, [dispatch, raProfiles]);
+
+    useEffect(() => {
+        if (!certificateRevocationReason) return;
+        const certificateRevokeReasonOptions = Object.keys(certificateRevocationReason).map((key) => ({
+            value: certificateRevocationReason[key].code,
+            label: certificateRevocationReason[key].label,
+        }));
+        setCertificateRevokeReasonOptions(certificateRevokeReasonOptions);
+    }, [dispatch, certificateRevocationReason]);
 
     useEffect(() => {
         if (!id || !updateGroup) return;
@@ -620,61 +631,18 @@ export default function CertificateDetail() {
     }, [raProfileOptions, updateRaAndAuthorityState]);
 
     const revokeBody = useMemo(() => {
-        let options = [
-            {
-                label: "UNSPECIFIED",
-                value: "UNSPECIFIED",
-            },
-            {
-                label: "KEY_COMPROMISE",
-                value: "KEY_COMPROMISE",
-            },
-            {
-                label: "CA_COMPROMISE",
-                value: "CA_COMPROMISE",
-            },
-            {
-                label: "AFFILIATION_CHANGED",
-                value: "AFFILIATION_CHANGED",
-            },
-            {
-                label: "SUPERSEDED",
-                value: "SUPERSEDED",
-            },
-            {
-                label: "CESSATION_OF_OPERATION",
-                value: "CESSATION_OF_OPERATION",
-            },
-            {
-                label: "CERTIFICATE_HOLD",
-                value: "CERTIFICATE_HOLD",
-            },
-            {
-                label: "PRIVILEGE_WITHDRAWN",
-                value: "PRIVILEGE_WITHDRAWN",
-            },
-            {
-                label: "A_A_COMPROMISE",
-                value: "A_A_COMPROMISE",
-            },
-            {
-                label: "REMOVE_FROM_CRL",
-                value: "REMOVE_FROM_CRL",
-            },
-        ];
-
         return (
             <div>
                 <Select
                     maxMenuHeight={140}
                     menuPlacement="auto"
-                    options={options}
+                    options={certificateRevokeReasonOptions}
                     placeholder={`Select Revocation Reason`}
                     onChange={(event: any) => setRevokeReason(event?.value as ClientCertificateRevocationDtoReasonEnum)}
                 />
             </div>
         );
-    }, [setRevokeReason]);
+    }, [setRevokeReason, certificateRevokeReasonOptions]);
 
     const certificateTitle = useMemo(
         () => (certificate?.status === CertStatus.New ? "CSR Properties" : "Certificate Properties"),
