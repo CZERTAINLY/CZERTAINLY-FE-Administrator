@@ -167,8 +167,9 @@ function UserForm() {
 
             setSelectedCertificate({
                 label:
-                    `${certificateDetail.commonName} (${certificateDetail.fingerprint})` ||
-                    `( empty ) ( ${certificateDetail.fingerprint} )`,
+                    certificateDetail.commonName && certificateDetail.fingerprint
+                        ? `${certificateDetail.commonName} (${certificateDetail.fingerprint})`
+                        : `( empty ) ( ${certificateDetail.commonName} )`,
                 value: certificateDetail.uuid,
             });
 
@@ -202,7 +203,10 @@ function UserForm() {
             loadedCerts
                 .filter((e) => e.status !== CertStatus.New)
                 .map((loadedCert) => ({
-                    label: `${loadedCert.commonName} (${loadedCert.serialNumber})` || `( empty ) ( ${loadedCert.serialNumber} )`,
+                    label:
+                        loadedCert.commonName && loadedCert.serialNumber
+                            ? `${loadedCert.commonName} (${loadedCert.serialNumber})`
+                            : `( ${loadedCert.commonName} ) ( empty )`,
                     value: loadedCert.uuid,
                 })),
         );
