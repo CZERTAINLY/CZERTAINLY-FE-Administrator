@@ -44,7 +44,7 @@ export const validateAlphaNumeric = () => {
 export const validateEmail = () => validatePattern(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+$/, "Value must be a valid email address");
 
 export const validateUrl = () =>
-    validatePattern(/^((http(s?)?):\/\/)?[a-zA-Z0-9\-.]+:[0-9]+?$/g, "Value must be a valid url. Example: http://localhost:8443"); // NOSONAR
+    validatePattern(/^((http(s?)?):\/\/)?[a-zA-Z0-9\-.]+:[0-9]+?$/g, "Value must be a valid url. Example: http://localhost:8443");
 
 export const validateCustom = (pattern: string, value: string) => {
     return !value || new RegExp(pattern).test(value) ? undefined : `Value must conform to '${pattern}'`;
