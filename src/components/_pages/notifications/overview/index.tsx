@@ -68,13 +68,7 @@ function NotificationsOverview() {
         <Dropdown isOpen={isOpenNotifications} toggle={toggleNotificationsDropdown}>
             <DropdownToggle nav>
                 <i
-                    className={
-                        isFetchingOverview
-                            ? "fa fa-spinner pt-1 mt-2"
-                            : overviewNotifications.length > 0
-                            ? "fa fa-bell pt-1 mt-2 text-warning"
-                            : "fa fa-bell-slash pt-1 mt-2"
-                    }
+                    className={overviewNotifications.length > 0 ? "fa fa-bell pt-1 mt-2 text-warning" : "fa fa-bell-slash pt-1 mt-2"}
                     style={{ color: "white" }}
                 />
             </DropdownToggle>
