@@ -55,7 +55,6 @@ export const slice = createSlice({
     reducers: {
         listOverviewNotifications: (state, action: PayloadAction<void>) => {
             state.isFetchingOverview = true;
-            state.overviewNotifications = [];
         },
 
         listOverviewNotificationsSuccess: (state, action: PayloadAction<NotificationModel[]>) => {
