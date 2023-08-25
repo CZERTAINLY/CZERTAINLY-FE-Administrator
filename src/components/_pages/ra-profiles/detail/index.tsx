@@ -40,6 +40,7 @@ export default function RaProfileDetail() {
     const scepDetails = useSelector(raProfilesSelectors.scepDetails);
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
+
     const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
     const isfetchingApprvoalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
@@ -122,16 +123,17 @@ export default function RaProfileDetail() {
     useEffect(() => {
         getFreshRaProfileDetail();
         getFreshComplianceRaProfileDetail();
-        getFreshAvailableProtocols();
         getFreshAssociatedApprovalProfiles();
         getFreshAllApprovalProfiles();
-    }, [
-        getFreshRaProfileDetail,
-        getFreshComplianceRaProfileDetail,
-        getFreshAvailableProtocols,
-        getFreshAllApprovalProfiles,
-        getFreshAssociatedApprovalProfiles,
-    ]);
+    }, [getFreshRaProfileDetail, getFreshComplianceRaProfileDetail, getFreshAllApprovalProfiles, getFreshAssociatedApprovalProfiles]);
+
+    useEffect(() => {
+        if (!raProfile) return;
+
+        if (!raProfile?.legacyAuthority) {
+            getFreshAvailableProtocols();
+        }
+    }, [raProfile, getFreshAvailableProtocols]);
 
     useEffect(() => {
         if (!id || !authorityId) return;
@@ -141,8 +143,6 @@ export default function RaProfileDetail() {
         if (authorityId === "unknown" || authorityId === "undefined") return;
 
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
-        dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: authorityId, uuid: id }));
-        dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
     const onEditClick = useCallback(() => {
