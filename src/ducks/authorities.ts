@@ -4,6 +4,7 @@ import { createFeatureSelector } from "utils/ducks";
 import { AttributeDescriptorModel } from "types/attributes";
 import { AuthorityRequestModel, AuthorityResponseModel, AuthorityUpdateRequestModel } from "types/authorities";
 import { BulkActionModel, ConnectorResponseModel } from "types/connectors";
+import { FunctionGroupCode } from "types/openapi";
 
 export type State = {
     checkedRows: string[];
@@ -99,7 +100,10 @@ export const slice = createSlice({
             state.isFetchingAuthorityProviders = false;
         },
 
-        getAuthorityProviderAttributesDescriptors: (state, action: PayloadAction<{ uuid: string; kind: string }>) => {
+        getAuthorityProviderAttributesDescriptors: (
+            state,
+            action: PayloadAction<{ uuid: string; kind: string; functionGroup: FunctionGroupCode }>,
+        ) => {
             state.authorityProviderAttributeDescriptors = [];
             state.isFetchingAuthorityProviderAttributeDescriptors = true;
         },

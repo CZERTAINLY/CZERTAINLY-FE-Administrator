@@ -104,10 +104,12 @@ export default function AuthorityForm() {
 
             if (provider) {
                 setAuthorityProvider(provider);
+                const functionGroup = provider.functionGroups[0].functionGroupCode;
                 dispatch(
                     authorityActions.getAuthorityProviderAttributesDescriptors({
                         uuid: authoritySelector!.connectorUuid,
                         kind: authoritySelector!.kind,
+                        functionGroup,
                     }),
                 );
             } else {
@@ -149,7 +151,14 @@ export default function AuthorityForm() {
 
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            dispatch(authorityActions.getAuthorityProviderAttributesDescriptors({ uuid: authorityProvider.uuid, kind: event.value }));
+            const functionGroup = authorityProvider.functionGroups[0].functionGroupCode;
+            dispatch(
+                authorityActions.getAuthorityProviderAttributesDescriptors({
+                    uuid: authorityProvider.uuid,
+                    kind: event.value,
+                    functionGroup,
+                }),
+            );
         },
         [dispatch, authorityProvider],
     );

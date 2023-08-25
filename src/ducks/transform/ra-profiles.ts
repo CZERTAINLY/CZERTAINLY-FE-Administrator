@@ -21,7 +21,7 @@ import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToMod
 export function transformRaProfileResponseDtoToModel(raResponse: RaProfileResponseDto): RaProfileResponseModel {
     return {
         ...raResponse,
-        attributes: raResponse.attributes.map(transformAttributeResponseDtoToModel),
+        attributes: raResponse?.attributes?.length ? raResponse.attributes.map(transformAttributeResponseDtoToModel) : [],
         customAttributes: raResponse.customAttributes?.map(transformAttributeResponseDtoToModel),
     };
 }
