@@ -6,7 +6,7 @@
     "dependencies": {
         "@openapitools/openapi-generator-cli": "^2.6.0",
         "@reduxjs/toolkit": "^1.9.3",
-        "@testing-library/jest-dom": "^5.16.5",
+        "@testing-library/jest-dom": "^6.0.0",
         "@testing-library/react": "^14.0.0",
         "@testing-library/user-event": "^14.4.3",
         "@types/dagre": "^0.7.48",
