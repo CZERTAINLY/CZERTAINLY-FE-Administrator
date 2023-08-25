@@ -40,7 +40,6 @@ export default function RaProfileDetail() {
     const scepDetails = useSelector(raProfilesSelectors.scepDetails);
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
-
     const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
     const isfetchingApprvoalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
@@ -99,13 +98,6 @@ export default function RaProfileDetail() {
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
-    const getFreshAttributes = useCallback(() => {
-        if (!id || !authorityId) return;
-        if (authorityId === "unknown" || authorityId === "undefined") return;
-        dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
-        dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
-    }, [id, dispatch, authorityId]);
-
     const getFreshAvailableProtocols = useCallback(() => {
         if (!id || !authorityId) return;
         if (authorityId === "unknown" || authorityId === "undefined") return;
@@ -130,14 +122,12 @@ export default function RaProfileDetail() {
     useEffect(() => {
         getFreshRaProfileDetail();
         getFreshComplianceRaProfileDetail();
-        getFreshAttributes();
         getFreshAvailableProtocols();
         getFreshAssociatedApprovalProfiles();
         getFreshAllApprovalProfiles();
     }, [
         getFreshRaProfileDetail,
         getFreshComplianceRaProfileDetail,
-        getFreshAttributes,
         getFreshAvailableProtocols,
         getFreshAllApprovalProfiles,
         getFreshAssociatedApprovalProfiles,
@@ -151,8 +141,6 @@ export default function RaProfileDetail() {
         if (authorityId === "unknown" || authorityId === "undefined") return;
 
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
-        dispatch(raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
-        dispatch(raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityId, uuid: id }));
         dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: authorityId, uuid: id }));
         dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
@@ -721,7 +709,6 @@ export default function RaProfileDetail() {
                         title="Attributes"
                         busy={isBusy}
                         titleSize="large"
-                        refreshAction={getFreshAttributes}
                         widgetLockName={LockWidgetNameEnum.RaProfileDetails}
                         lockSize="large"
                     >
@@ -749,18 +736,19 @@ export default function RaProfileDetail() {
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col></Col>
             </Row>
+            {!raProfile?.legacyAuthority && (
+                <Widget
+                    title="Available protocols"
+                    busy={isBusy || isWorkingWithProtocol}
+                    titleSize="large"
+                    refreshAction={getFreshAvailableProtocols}
+                    widgetLockName={LockWidgetNameEnum.RaProfileDetails}
+                >
+                    <br />
 
-            <Widget
-                title="Available protocols"
-                busy={isBusy || isWorkingWithProtocol}
-                titleSize="large"
-                refreshAction={getFreshAvailableProtocols}
-                widgetLockName={LockWidgetNameEnum.RaProfileDetails}
-            >
-                <br />
-
-                <CustomTable hasDetails={true} headers={availableProtocolsHeaders} data={availableProtocolsData} />
-            </Widget>
+                    <CustomTable hasDetails={true} headers={availableProtocolsHeaders} data={availableProtocolsData} />
+                </Widget>
+            )}
 
             <Dialog
                 isOpen={confirmDelete}

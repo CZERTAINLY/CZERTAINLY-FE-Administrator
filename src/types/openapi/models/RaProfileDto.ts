@@ -50,23 +50,30 @@ export interface RaProfileDto {
      */
     authorityInstanceName: string;
     /**
-     * List of RA Profiles attributes
-     * @type {Array<ResponseAttributeDto>}
+     * Has Authority of legacy authority provider
+     * @type {boolean}
      * @memberof RaProfileDto
      */
-    attributes: Array<ResponseAttributeDto>;
-    /**
-     * List of Custom Attributes
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof RaProfileDto
-     */
-    customAttributes?: Array<ResponseAttributeDto>;
+    legacyAuthority?: boolean;
     /**
      * Enabled flag - true = enabled; false = disabled
      * @type {boolean}
      * @memberof RaProfileDto
      */
     enabled: boolean;
+    /**
+     * List of RA Profiles attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof RaProfileDto
+     */
+    attributes?: Array<ResponseAttributeDto>;
+    /**
+     * List of Custom Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof RaProfileDto
+     */
+    customAttributes?: Array<ResponseAttributeDto>;
+
     /**
      * List of protocols enabled
      * @type {Array<string>}
