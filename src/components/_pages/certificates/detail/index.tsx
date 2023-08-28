@@ -575,7 +575,7 @@ export default function CertificateDetail() {
                         onClick={() =>
                             downloadFile(
                                 formatPEM(certificate?.certificateRequest?.content ?? "", true),
-                                fileNameToDownload + "_CSR_" + ".pem",
+                                fileNameToDownload + "_CSR" + ".pem",
                             )
                         }
                     >
@@ -587,7 +587,7 @@ export default function CertificateDetail() {
                         onClick={() =>
                             downloadFile(
                                 Buffer.from(certificate?.certificateRequest?.content ?? "", "base64"),
-                                fileNameToDownload + "_CSR_" + ".cer",
+                                fileNameToDownload + "_CSR" + ".cer",
                             )
                         }
                     >
@@ -1510,6 +1510,7 @@ export default function CertificateDetail() {
                                             busy={isBusy}
                                             titleSize="large"
                                             lockSize="large"
+                                            refreshAction={getFreshCertificateDetail}
                                         >
                                             <br />
                                             <CustomTable headers={detailHeaders} data={csrPropertiesData} />
