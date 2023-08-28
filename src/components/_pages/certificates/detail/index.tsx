@@ -476,11 +476,7 @@ export default function CertificateDetail() {
                 <DropdownMenu>
                     <DropdownItem
                         key="pem"
-                        onClick={() =>
-                            certificate?.status === CertStatus.New
-                                ? downloadFile(formatPEM(certificate?.certificateRequest?.content ?? "", true), fileNameToDownload + ".pem")
-                                : downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")
-                        }
+                        onClick={() => downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")}
                     >
                         PEM (.pem)
                     </DropdownItem>
@@ -488,12 +484,7 @@ export default function CertificateDetail() {
                     <DropdownItem
                         key="der"
                         onClick={() =>
-                            certificate?.status === CertStatus.New
-                                ? downloadFile(
-                                      Buffer.from(certificate?.certificateRequest?.content ?? "", "base64"),
-                                      fileNameToDownload + ".cer",
-                                  )
-                                : downloadFile(Buffer.from(certificate?.certificateContent ?? "", "base64"), fileNameToDownload + ".cer")
+                            downloadFile(Buffer.from(certificate?.certificateContent ?? "", "base64"), fileNameToDownload + ".cer")
                         }
                     >
                         DER (.cer)
@@ -569,6 +560,56 @@ export default function CertificateDetail() {
             },
         ],
         [certificate, downloadDropDown, onComplianceCheck, dispatch],
+    );
+
+    const downloadCSRDropDown = useMemo(
+        () => (
+            <UncontrolledButtonDropdown>
+                <DropdownToggle color="light" caret className="btn btn-link" title="Download">
+                    <i className="fa fa-download" aria-hidden="true" />
+                </DropdownToggle>
+
+                <DropdownMenu>
+                    <DropdownItem
+                        key="pem"
+                        onClick={() =>
+                            downloadFile(
+                                formatPEM(certificate?.certificateRequest?.content ?? "", true),
+                                fileNameToDownload + "_CSR_" + ".pem",
+                            )
+                        }
+                    >
+                        PEM (.pem)
+                    </DropdownItem>
+
+                    <DropdownItem
+                        key="der"
+                        onClick={() =>
+                            downloadFile(
+                                Buffer.from(certificate?.certificateRequest?.content ?? "", "base64"),
+                                fileNameToDownload + "_CSR_" + ".cer",
+                            )
+                        }
+                    >
+                        DER (.cer)
+                    </DropdownItem>
+                </DropdownMenu>
+            </UncontrolledButtonDropdown>
+        ),
+        [certificate, fileNameToDownload],
+    );
+
+    const buttonsCSR: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: "download",
+                disabled: false,
+                tooltip: "Download",
+                custom: downloadCSRDropDown,
+                onClick: () => {},
+            },
+        ],
+        [certificate, downloadCSRDropDown, onComplianceCheck, dispatch],
     );
 
     const buttonsLocations: WidgetButtonProps[] = useMemo(
@@ -1463,7 +1504,13 @@ export default function CertificateDetail() {
                             <Widget>
                                 <Row xs="1" sm="1" md="2" lg="2" xl="2">
                                     <Col>
-                                        <Widget title="Properties" busy={isBusy} titleSize="large" lockSize="large">
+                                        <Widget
+                                            widgetButtons={buttonsCSR}
+                                            title="Properties"
+                                            busy={isBusy}
+                                            titleSize="large"
+                                            lockSize="large"
+                                        >
                                             <br />
                                             <CustomTable headers={detailHeaders} data={csrPropertiesData} />
                                         </Widget>
