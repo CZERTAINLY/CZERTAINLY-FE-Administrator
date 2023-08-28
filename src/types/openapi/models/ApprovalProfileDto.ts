@@ -58,4 +58,10 @@ export interface ApprovalProfileDto {
      * @memberof ApprovalProfileDto
      */
     numberOfSteps: number;
+    /**
+     * Number of associated objects
+     * @type {number}
+     * @memberof ApprovalProfileDto
+     */
+    associations: number;
 }

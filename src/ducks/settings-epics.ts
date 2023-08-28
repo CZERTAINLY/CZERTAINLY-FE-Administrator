@@ -5,6 +5,7 @@ import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { updateBackendUtilsClients } from "../api";
+import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./settings";
 import { transformSettingsPlatformDtoToModel } from "./transform/settings";
@@ -55,6 +56,49 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [getPlatformSettings, updatePlatformSettings];
+const getNotificationsSettings: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getNotificationsSettings.match),
+        switchMap(() =>
+            deps.apiClients.settings.getNotificationsSettings().pipe(
+                switchMap((notificationsSettings) => {
+                    return of(slice.actions.getNotificationsSettingsSuccess(notificationsSettings));
+                }),
+                catchError((err) =>
+                    of(
+                        slice.actions.getNotificationsSettingsFailure({ error: extractError(err, "Failed to get notifications settings") }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to get notifications settings" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateNotificationsSettings.match),
+        switchMap((action) =>
+            deps.apiClients.settings.updateNotificationsSettings({ notificationSettingsDto: action.payload }).pipe(
+                mergeMap(() => {
+                    return of(
+                        slice.actions.updateNotificationsSettingsSuccess(action.payload),
+                        alertActions.success("Notifications settings updated successfully."),
+                    );
+                }),
+                catchError((err) =>
+                    of(
+                        slice.actions.updateNotificationsSettingsFailure({
+                            error: extractError(err, "Failed to update notifications settings"),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: "Failed to update notifications settings" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const epics = [getPlatformSettings, updatePlatformSettings, getNotificationsSettings, updateNotificationsSettings];
 
 export default epics;

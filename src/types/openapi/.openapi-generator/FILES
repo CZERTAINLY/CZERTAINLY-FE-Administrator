@@ -21,11 +21,11 @@ apis/CustomAttributesApi.ts
 apis/DiscoveryManagementApi.ts
 apis/EntityManagementApi.ts
 apis/EnumsApi.ts
+apis/ExternalNotificationManagementApi.ts
 apis/GlobalMetadataApi.ts
+apis/InternalNotificationApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
-apis/NotificationManagementApi.ts
-apis/NotificationsApi.ts
 apis/RAProfileManagementApi.ts
 apis/RoleManagementApi.ts
 apis/SCEPProfileManagementApi.ts

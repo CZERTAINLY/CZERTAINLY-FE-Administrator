@@ -77,6 +77,10 @@ export default function ApprovalProfilesList() {
                 id: "approvalSteps",
                 content: "Approval Steps",
             },
+            {
+                id: "associations",
+                content: "Associations",
+            },
         ],
         [],
     );
@@ -96,6 +100,8 @@ export default function ApprovalProfilesList() {
                     <>{approvalProfile.version}</>,
 
                     <>{approvalProfile.numberOfSteps}</>,
+
+                    <>{approvalProfile.associations.toString()}</>,
                 ],
             })),
         [profileApprovalList],

@@ -56,10 +56,12 @@ export default function ApprovalsList() {
                 paginationRequestDto: { itemsPerPage: pageSize, pageNumber },
             }),
         );
+        setCheckedRows([]);
     }, [dispatch, pageNumber, pageSize, showHistory]);
 
     const listApprovals = useCallback(() => {
         dispatch(approvalActions.listApprovals({ itemsPerPage: pageSize, pageNumber }));
+        setCheckedRows([]);
     }, [dispatch, pageNumber, pageSize]);
 
     const getFreshData = useCallback(() => {
@@ -110,6 +112,7 @@ export default function ApprovalsList() {
                 icon: "check",
                 disabled: !checkedRows.length || selectedApprovalStatus !== ApprovalDtoStatusEnum.Pending,
                 tooltip: "Approve",
+                hidden: !showAllApprovals,
                 onClick: () => {
                     setApproveApprovalDialogOpen(true);
                 },
@@ -117,6 +120,7 @@ export default function ApprovalsList() {
             {
                 icon: "times",
                 disabled: !checkedRows.length || selectedApprovalStatus !== ApprovalDtoStatusEnum.Pending,
+                hidden: !showAllApprovals,
                 tooltip: "Reject",
                 onClick: () => {
                     setRejectApprovalDialogOpen(true);
@@ -126,6 +130,7 @@ export default function ApprovalsList() {
                 icon: "history",
                 tooltip: "Show History",
                 disabled: showAllApprovals,
+                hidden: showAllApprovals,
                 onClick: () => {
                     setShowHistory(!showHistory);
                 },
@@ -183,7 +188,7 @@ export default function ApprovalsList() {
             id: approval.approvalUuid,
             columns: [
                 <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
-                <Link to={`/approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
+                <Link to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
                 (
                     <>
                         <StatusBadge textStatus={approval.status} />
@@ -216,7 +221,7 @@ export default function ApprovalsList() {
                         title: "My Approvals",
                         content: (
                             <Widget
-                                title="List of User Approvals"
+                                title="My Approvals"
                                 busy={isBusy}
                                 widgetButtons={buttons}
                                 titleSize="large"
@@ -227,7 +232,7 @@ export default function ApprovalsList() {
                                     headers={approvalProfilesTableHeader}
                                     data={approvalProfilesTableData}
                                     hasPagination={true}
-                                    hasCheckboxes
+                                    hasCheckboxes={false}
                                     checkedRows={checkedRows}
                                     onCheckedRowsChanged={(checkedRows) => {
                                         setCheckedRows(checkedRows as string[]);
@@ -248,6 +253,8 @@ export default function ApprovalsList() {
                         ),
                         onClick: () => {
                             setShowAllApprovals(false);
+                            setPageSize(10);
+                            setPageNumber(1);
                         },
                     },
                     {
@@ -286,6 +293,8 @@ export default function ApprovalsList() {
                         ),
                         onClick: () => {
                             setShowAllApprovals(true);
+                            setPageSize(10);
+                            setPageNumber(1);
                         },
                     },
                 ]}
@@ -293,8 +302,8 @@ export default function ApprovalsList() {
 
             <Dialog
                 isOpen={approveApprovalDialogOpen}
-                caption="Approve the selected Approval?"
-                body="Are you sure you want to approve the selected Approval?"
+                caption="Accept the selected Approval?"
+                body="Are you sure you want to accept the selected Approval?"
                 toggle={() => setApproveApprovalDialogOpen(false)}
                 buttons={[
                     { color: "primary", onClick: onApproveApprover, body: "Yes, approve" },

@@ -749,6 +749,26 @@ const getCertificateContent: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const listCertificateApprovals: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listCertificateApprovals.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.listCertificateApprovals(action.payload).pipe(
+                map((response) => slice.actions.listCertificateApprovalsSuccess({ approvals: response.approvals })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.listCertificateApprovalsFailure({
+                            error: extractError(error, "Failed to list certificate approvals"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to list certificate approvals" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCertificates,
     getCertificateDetail,
@@ -774,6 +794,7 @@ const epics = [
     checkCompliance,
     getCsrAttributes,
     getCertificateContent,
+    listCertificateApprovals,
 ];
 
 export default epics;

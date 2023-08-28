@@ -35,4 +35,10 @@ export interface AttributeMappingDto {
      * @memberof AttributeMappingDto
      */
     customAttributeUuid: string;
+    /**
+     * Custom Attribute Label
+     * @type {string}
+     * @memberof AttributeMappingDto
+     */
+    customAttributeLabel: string;
 }

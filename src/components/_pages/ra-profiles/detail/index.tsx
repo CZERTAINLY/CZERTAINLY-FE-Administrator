@@ -862,14 +862,27 @@ export default function RaProfileDetail() {
                 toggle={() => setAssociateApprovalProfileDialog(false)}
                 buttons={[]}
             />
+
             <Dialog
                 isOpen={confirmDeassociateApprovalProfileDialog?.isDialogOpen || false}
                 caption={`Deassociate Approval Profile`}
-                body={`Are you sure you want to deassociate Approval Profile ${confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileName}?`}
+                body={
+                    <div>
+                        <p>
+                            You are about to deassociate approval profile
+                            <b>{` ${confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileName} `}</b>
+                            from RA profile {raProfile?.name}. Is this what you want to do?
+                        </p>
+                        <p>
+                            <b className="text-danger">Warning:</b> This will remove all authorizations for this approval profile from all
+                            clients.
+                        </p>
+                    </div>
+                }
                 toggle={() => setConfirmDeassociateApprovalProfileDialog(undefined)}
                 buttons={[
                     {
-                        color: "primary",
+                        color: "danger",
                         onClick: () =>
                             confirmDeassociateApprovalProfileDialog
                                 ? onDissociateApprovalProfile(confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileUuid)

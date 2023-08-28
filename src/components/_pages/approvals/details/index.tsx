@@ -98,7 +98,7 @@ export default function ApprovalDetails() {
                 },
             },
         ],
-        [recipientApproveDialog, recipientRejectDialog],
+        [recipientApproveDialog, recipientRejectDialog, approvalDetails],
     );
     const getApprovalType = (approvalStep: DetailApprovalStepModel) => {
         if (approvalStep.userUuid) {
@@ -161,7 +161,7 @@ export default function ApprovalDetails() {
                           columns: [
                               "Name",
                               approvalDetails.approvalProfileUuid ? (
-                                  <Link to={`/approvalprofiles/detail/${approvalDetails.approvalProfileUuid}`}>
+                                  <Link to={`../../../approvalprofiles/detail/${approvalDetails.approvalProfileUuid}`}>
                                       {approvalDetails.approvalProfileName}
                                   </Link>
                               ) : (
@@ -225,7 +225,7 @@ export default function ApprovalDetails() {
                           columns: ["Version", approvalDetails?.version.toString() || ""],
                       },
                   ],
-        [approvalDetails],
+        [approvalDetails, getUserName],
     );
 
     const stepsHeaders: TableHeader[] = useMemo(
@@ -352,11 +352,11 @@ export default function ApprovalDetails() {
                 isOpen={recipientApproveDialog}
                 body={
                     <div>
-                        <span>comment:</span>
+                        <span>Comment (optional) :</span>
                         <Input type="textarea" value={comment} onChange={(e) => setcomment(e.currentTarget.value)} />
                     </div>
                 }
-                caption="Approve Recipients?"
+                caption="Accept approval?"
                 toggle={() => setRecipientApproveDialog(false)}
                 buttons={[
                     { color: "primary", onClick: onApproveRecipient, body: "Yes, approve" },
@@ -366,11 +366,11 @@ export default function ApprovalDetails() {
 
             <Dialog
                 isOpen={recipientRejectDialog}
-                caption="Reject Recipients?"
+                caption="Reject approval?"
                 toggle={() => setRecipientRejectDialog(false)}
                 body={
                     <div>
-                        <span>comment:</span>
+                        <span>Comment (optional) :</span>
                         <Input type="textarea" value={comment} onChange={(e) => setcomment(e.currentTarget.value)} />
                     </div>
                 }
