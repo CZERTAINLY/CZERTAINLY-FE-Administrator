@@ -19,6 +19,7 @@
 export enum CertificateStatus {
     Unknown = "unknown",
     New = "new",
+    Rejected = "rejected",
     Valid = "valid",
     Invalid = "invalid",
     Revoked = "revoked",
