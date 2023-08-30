@@ -70,13 +70,13 @@ export default function ApprovalDetails() {
         if (!approvalDetails?.approvalUuid) return;
         dispatch(
             approvalActions.rejectApprovalRecipient({
-                uuid: approvalDetails?.approvalUuid,
+                uuid: approvalDetails.approvalUuid,
                 userApproval: {
                     comment,
                 },
             }),
         );
-        setRecipientApproveDialog(false);
+        setRecipientRejectDialog(false);
     }, [dispatch, approvalDetails, setRecipientApproveDialog, comment]);
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -375,7 +375,7 @@ export default function ApprovalDetails() {
                     </div>
                 }
                 buttons={[
-                    { color: "primary", onClick: onRejectRecipient, body: "Yes, rejects" },
+                    { color: "primary", onClick: onRejectRecipient, body: "Yes, reject" },
                     { color: "secondary", onClick: () => setRecipientRejectDialog(false), body: "Cancel" },
                 ]}
             />

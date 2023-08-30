@@ -193,12 +193,12 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!id) return;
         getFreshRaProfileDetail();
-    }, [dispatch, id, certificate, getFreshRaProfileDetail]);
+    }, [dispatch, id, certificate]);
 
     useEffect(() => {
         if (!settings?.utils.utilsServiceUrl) return;
         dispatch(utilsActuatorActions.health());
-    }, [dispatch, settings, health]);
+    }, [dispatch, settings]);
 
     const getFreshCertificateHistory = useCallback(() => {
         if (!id) return;
@@ -1217,7 +1217,7 @@ export default function CertificateDetail() {
             });
         }
         return certDetail;
-    }, [certificate]);
+    }, [certificate, health]);
 
     const locationsHeaders: TableHeader[] = useMemo(
         () => [

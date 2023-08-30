@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ApprovalModel, ApprovalUserModel, DetailApprovalModel, ResponseApprovalModel, UserApprovalModel } from "types/approvals";
-import { ApprovalDtoStatusEnum } from "types/openapi";
+import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum } from "types/openapi";
 import { createFeatureSelector } from "utils/ducks";
 
 export type State = {
@@ -155,6 +155,11 @@ export const slice = createSlice({
             if (userApproval) {
                 userApproval.status = ApprovalDtoStatusEnum.Approved;
             }
+
+            const approvalDetails = state.approvalDetails;
+            if (approvalDetails?.approvalUuid === action.payload.uuid) {
+                approvalDetails.status = ApprovalDetailDtoStatusEnum.Rejected;
+            }
             state.isApproving = false;
         },
 
@@ -175,6 +180,11 @@ export const slice = createSlice({
             const userApproval = state.userApprovals.find((approval) => approval.approvalUuid === action.payload.uuid);
             if (userApproval) {
                 userApproval.status = ApprovalDtoStatusEnum.Rejected;
+            }
+
+            const approvalDetails = state.approvalDetails;
+            if (approvalDetails?.approvalUuid === action.payload.uuid) {
+                approvalDetails.status = ApprovalDetailDtoStatusEnum.Rejected;
             }
         },
 

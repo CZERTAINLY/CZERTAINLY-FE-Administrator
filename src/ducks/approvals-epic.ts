@@ -135,6 +135,38 @@ const rejectApproval: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [getApproval, listApprovals, listUserApprovals, approveApproval, approveApprovalRecipient, rejectApproval];
+const rejectApprovalRecipient: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.rejectApprovalRecipient.match),
+
+        switchMap((action) =>
+            deps.apiClients.approvals
+                .rejectApprovalRecipient({
+                    uuid: action.payload.uuid,
+                    userApprovalDto: action.payload.userApproval,
+                })
+                .pipe(
+                    switchMap(() => of(slice.actions.rejectApprovalRecipientSuccess({ uuid: action.payload.uuid }))),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.rejectApprovalFailure({ error: extractError(err, "Failed to reject Approval recipient") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to reject approval recipient" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const epics = [
+    getApproval,
+    listApprovals,
+    listUserApprovals,
+    approveApproval,
+    approveApprovalRecipient,
+    rejectApproval,
+    rejectApprovalRecipient,
+];
 
 export default epics;

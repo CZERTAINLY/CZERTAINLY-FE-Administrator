@@ -44,13 +44,13 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
         if (parsedCertificate && !isCSR) {
             setAsn1(transformParseCertificateResponseDtoToAsn1String(parsedCertificate));
         }
-    }, [parsedCertificate, isCSR]);
+    }, [parsedCertificate]);
 
     useEffect(() => {
         if (parsedCertificateRequest && isCSR) {
             setAsn1(transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest));
         }
-    }, [parsedCertificateRequest, isCSR]);
+    }, [parsedCertificateRequest]);
 
     return (
         <>
