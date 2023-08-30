@@ -507,7 +507,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "cubes",
-                disabled: !certificate?.raProfile || certificate?.status !== CertStatus.New,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Rejected || certificate?.status !== CertStatus.New,
                 tooltip: "Issue",
                 onClick: () => {
                     dispatch(
@@ -583,15 +583,15 @@ export default function CertificateDetail() {
                     </DropdownItem>
 
                     <DropdownItem
-                        key="der"
+                        key="req"
                         onClick={() =>
                             downloadFile(
                                 Buffer.from(certificate?.certificateRequest?.content ?? "", "base64"),
-                                fileNameToDownload + "_CSR" + ".cer",
+                                fileNameToDownload + "_CSR" + ".req",
                             )
                         }
                     >
-                        DER (.cer)
+                        REQ (.req)
                     </DropdownItem>
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
@@ -609,7 +609,7 @@ export default function CertificateDetail() {
                 onClick: () => {},
             },
         ],
-        [certificate, downloadCSRDropDown, onComplianceCheck, dispatch],
+        [downloadCSRDropDown],
     );
 
     const buttonsLocations: WidgetButtonProps[] = useMemo(
@@ -1055,18 +1055,7 @@ export default function CertificateDetail() {
                   },
               ]
             : [];
-    }, [certificate?.certificateRequest]);
-
-    const csrRequestAttributesData: TableDataRow[] = useMemo(() => {
-        return certificate?.certificateRequest
-            ? [
-                  {
-                      id: "Common Name",
-                      columns: ["Common Name", certificate?.certificateRequest?.commonName || ""],
-                  },
-              ]
-            : [];
-    }, [certificate?.certificateRequest]);
+    }, [certificate?.certificateRequest, certificateRequestFormatEnum, certificateTypeEnum]);
 
     const validationData: TableDataRow[] = useMemo(
         () =>
@@ -1448,7 +1437,7 @@ export default function CertificateDetail() {
                 approval.closedAt ? dateFormatter(approval.closedAt) : "",
             ],
         }));
-    }, [approvals, getUserName]);
+    }, [approvals, getUserName, navigate]);
 
     const defaultViewPort = useMemo(
         () => ({
@@ -1459,247 +1448,239 @@ export default function CertificateDetail() {
         [deviceType],
     );
 
-    const getCertificateTabs = useMemo(()=>{
-        const tabs= [
-            {
-                title: "Details",
-                content: (
-                    <Widget>
-                        <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                            <Col>
-                                <Widget
-                                    title={certificateTitle}
-                                    busy={isBusy}
-                                    widgetButtons={buttons}
-                                    titleSize="large"
-                                    lockSize="large"
-                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                    refreshAction={getFreshCertificateDetail}
-                                >
-                                    <br />
-                                    <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
-                                </Widget>
-                            </Col>
-
-                            <Col>
-                                <Widget title="Subject Alternative Names" busy={isBusy} titleSize="large">
-                                    <br />
-                                    <CustomTable headers={detailHeaders} data={sanData} />
-                                </Widget>
-
-                                <Widget title="Other Properties" titleSize="large">
-                                    <br />
-                                    <CustomTable headers={propertiesHeaders} data={propertiesData} />
-                                </Widget>
-                            </Col>
-                        </Row>
-                    </Widget>
-                ),
-            },
-            {
-                title: "Request",
-                content: (
-                    <Widget>
-                        <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                            <Col>
-                                <Widget
-                                    widgetButtons={buttonsCSR}
-                                    title="Properties"
-                                    busy={isBusy}
-                                    titleSize="large"
-                                    lockSize="large"
-                                    refreshAction={getFreshCertificateDetail}
-                                >
-                                    <br />
-                                    <CustomTable headers={detailHeaders} data={csrPropertiesData} />
-                                </Widget>
-                            </Col>
-
-                            <Col>
-                                <Widget title="Request Attributes" busy={isBusy} titleSize="large">
-                                    <br />
-                                    <AttributeViewer
-                                        viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
-                                        attributes={certificate?.certificateRequest?.attributes}
-                                    />
-                                </Widget>
-
-                                <Widget title="Signature attributes" titleSize="large">
-                                    <br />
-                                    <AttributeViewer
-                                        viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
-                                        attributes={certificate?.certificateRequest?.signatureAttributes}
-                                    />
-                                </Widget>
-                            </Col>
-                        </Row>
-                    </Widget>
-                ),
-            },
-            {
-                title: "Attributes",
-                content: (
-                    <Widget>
-                        <Widget title="Metadata" titleSize="large" widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}>
-                            <br />
-                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
-                        </Widget>
-
-                        {certificate?.certificateRequest?.attributes && certificate.certificateRequest.attributes.length > 0 ? (
-                            <Widget title="CSR" titleSize="large" busy={isBusy}>
-                                <AttributeViewer attributes={certificate.certificateRequest.attributes} />
-                            </Widget>
-                        ) : null}
-
-                        {certificate?.issueAttributes && certificate.issueAttributes.length > 0 ? (
-                            <Widget title="Issue Attributes" titleSize="large" busy={isBusy}>
-                                <AttributeViewer attributes={certificate.issueAttributes} />
-                            </Widget>
-                        ) : null}
-
-                        {certificate?.revokeAttributes && certificate.revokeAttributes.length > 0 ? (
-                            <Widget title="Revoke Attributes" titleSize="large" busy={isBusy}>
-                                <AttributeViewer attributes={certificate.revokeAttributes} />
-                            </Widget>
-                        ) : null}
-
-                        {certificate && (
-                            <CustomAttributeWidget
-                                resource={Resource.Certificates}
-                                resourceUuid={certificate.uuid}
-                                attributes={certificate.customAttributes}
-                            />
-                        )}
-                    </Widget>
-                ),
-            },
-            {
-                title: "Validation",
-                hidden: certificate?.status === CertStatus.New,
-                content: (
-                    <Widget>
-                        <Widget
-                            title="Validation Status"
-                            busy={isFetchingValidationResult}
-                            titleSize="large"
-                            refreshAction={certificate && getFreshCertificateValidations}
-                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                        >
-                            <br />
-                            <CustomTable headers={validationHeaders} data={validationData} />
-                        </Widget>
-                        <Widget
-                            title="Compliance Status"
-                            busy={isFetching}
-                            titleSize="large"
-                            lockSize="normal"
-                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                        >
-                            <br />
-                            <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
-                        </Widget>
-                    </Widget>
-                ),
-            },
-            {
-                title: "Approvals",
-                content: (
-                    <Widget>
-                        <Widget
-                            title="Certificate Approvals"
-                            busy={isFetchingApprovals}
-                            titleSize="large"
-                            refreshAction={getFreshApprovalList}
-                        >
-                            <br />
-                            <CustomTable headers={approvalsHeader} data={approvalsTableData} />
-                        </Widget>
-                    </Widget>
-                ),
-            },
-            {
-                title: "Locations",
-                hidden: certificate?.status === CertStatus.New,
-                content: (
-                    <Widget>
-                        <Widget
-                            title="Certificate Locations"
-                            busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
-                            widgetButtons={buttonsLocations}
-                            titleSize="large"
-                            refreshAction={getFreshCertificateLocations}
-                            widgetLockName={LockWidgetNameEnum.CertificationLocations}
-                        >
-                            <br />
-                            <CustomTable
-                                headers={locationsHeaders}
-                                data={locationsData}
-                                hasCheckboxes={true}
-                                onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
-                            />
-                        </Widget>
-                    </Widget>
-                ),
-            },
-            {
-                title: "History",
-                content: (
-                    <Widget>
-                        <Widget
-                            title="Event History"
-                            busy={isFetchingHistory}
-                            titleSize="large"
-                            refreshAction={getFreshCertificateHistory}
-                            widgetLockName={LockWidgetNameEnum.CertificateEventHistory}
-                        >
-                            <br />
-                            <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
-                        </Widget>
-                    </Widget>
-                ),
-            },
-            {
-                title: "Flow",
-                content: certificateNodes.length ? (
-                    <FlowChart
-                        flowChartTitle="Certificate Flow"
-                        flowChartEdges={certificateEdges}
-                        flowChartNodes={certificateNodes}
-                        defaultViewport={defaultViewPort}
-                    />
-                ) : (
-                    // Todo: Add a placeholder for the flow chart
-                    <></>
-                ),
-            },
-            {
-                title: "Related Certificates",
-                hidden: !certificate?.relatedCertificates?.length,
-                content: (
-                    <Widget>
-                        <Widget
-                            title="Related Certificates"
-                            titleSize="large"
-                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                        >
-                            <br />
-                            <CustomTable headers={relatedCertificatesHeaders} data={relatedCertificatesData} />
-                        </Widget>
-                    </Widget>
-                ),
-            },
-        ]
-
-        if(!certificate?.certificateRequest?.content){
-            tabs.splice(1,1)
-        }
-        return tabs
-    },[certificate])
-
     return (
         <Container className={cx("themed-container", styles.certificateContainer)} fluid>
             <TabLayout
-                tabs={getCertificateTabs}
+                tabs={[
+                    {
+                        title: "Details",
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget
+                                            title={certificateTitle}
+                                            busy={isBusy}
+                                            widgetButtons={buttons}
+                                            titleSize="large"
+                                            lockSize="large"
+                                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                            refreshAction={getFreshCertificateDetail}
+                                        >
+                                            <br />
+                                            <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
+                                        </Widget>
+                                    </Col>
+
+                                    <Col>
+                                        <Widget title="Subject Alternative Names" busy={isBusy} titleSize="large">
+                                            <br />
+                                            <CustomTable headers={detailHeaders} data={sanData} />
+                                        </Widget>
+
+                                        <Widget title="Other Properties" titleSize="large">
+                                            <br />
+                                            <CustomTable headers={propertiesHeaders} data={propertiesData} />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Request",
+                        hidden: !certificate?.certificateRequest?.content,
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget
+                                            widgetButtons={buttonsCSR}
+                                            title="Properties"
+                                            busy={isBusy}
+                                            titleSize="large"
+                                            lockSize="large"
+                                            refreshAction={getFreshCertificateDetail}
+                                        >
+                                            <br />
+                                            <CustomTable headers={detailHeaders} data={csrPropertiesData} />
+                                        </Widget>
+                                    </Col>
+
+                                    <Col>
+                                        <Widget title="Request Attributes" busy={isBusy} titleSize="large">
+                                            <br />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
+                                                attributes={certificate?.certificateRequest?.attributes}
+                                            />
+                                        </Widget>
+
+                                        <Widget title="Signature attributes" titleSize="large">
+                                            <br />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
+                                                attributes={certificate?.certificateRequest?.signatureAttributes}
+                                            />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Attributes",
+                        content: (
+                            <Widget>
+                                <Widget title="Metadata" titleSize="large" widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}>
+                                    <br />
+                                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
+                                </Widget>
+
+                                {certificate?.certificateRequest?.attributes && certificate.certificateRequest.attributes.length > 0 ? (
+                                    <Widget title="CSR" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.certificateRequest.attributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate?.issueAttributes && certificate.issueAttributes.length > 0 ? (
+                                    <Widget title="Issue Attributes" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.issueAttributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate?.revokeAttributes && certificate.revokeAttributes.length > 0 ? (
+                                    <Widget title="Revoke Attributes" titleSize="large" busy={isBusy}>
+                                        <AttributeViewer attributes={certificate.revokeAttributes} />
+                                    </Widget>
+                                ) : null}
+
+                                {certificate && (
+                                    <CustomAttributeWidget
+                                        resource={Resource.Certificates}
+                                        resourceUuid={certificate.uuid}
+                                        attributes={certificate.customAttributes}
+                                    />
+                                )}
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Validation",
+                        hidden: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Validation Status"
+                                    busy={isFetchingValidationResult}
+                                    titleSize="large"
+                                    refreshAction={certificate && getFreshCertificateValidations}
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                >
+                                    <br />
+                                    <CustomTable headers={validationHeaders} data={validationData} />
+                                </Widget>
+                                <Widget
+                                    title="Compliance Status"
+                                    busy={isFetching}
+                                    titleSize="large"
+                                    lockSize="normal"
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                >
+                                    <br />
+                                    <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Approvals",
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Certificate Approvals"
+                                    busy={isFetchingApprovals}
+                                    titleSize="large"
+                                    refreshAction={getFreshApprovalList}
+                                >
+                                    <br />
+                                    <CustomTable headers={approvalsHeader} data={approvalsTableData} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Locations",
+                        hidden: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Certificate Locations"
+                                    busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
+                                    widgetButtons={buttonsLocations}
+                                    titleSize="large"
+                                    refreshAction={getFreshCertificateLocations}
+                                    widgetLockName={LockWidgetNameEnum.CertificationLocations}
+                                >
+                                    <br />
+                                    <CustomTable
+                                        headers={locationsHeaders}
+                                        data={locationsData}
+                                        hasCheckboxes={true}
+                                        onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
+                                    />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "History",
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Event History"
+                                    busy={isFetchingHistory}
+                                    titleSize="large"
+                                    refreshAction={getFreshCertificateHistory}
+                                    widgetLockName={LockWidgetNameEnum.CertificateEventHistory}
+                                >
+                                    <br />
+                                    <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Flow",
+                        content: certificateNodes.length ? (
+                            <FlowChart
+                                flowChartTitle="Certificate Flow"
+                                flowChartEdges={certificateEdges}
+                                flowChartNodes={certificateNodes}
+                                defaultViewport={defaultViewPort}
+                            />
+                        ) : (
+                            // Todo: Add a placeholder for the flow chart
+                            <></>
+                        ),
+                    },
+                    {
+                        title: "Related Certificates",
+                        hidden: !certificate?.relatedCertificates?.length,
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Related Certificates"
+                                    titleSize="large"
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                >
+                                    <br />
+                                    <CustomTable headers={relatedCertificatesHeaders} data={relatedCertificatesData} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                ]}
             />
 
             <Dialog
