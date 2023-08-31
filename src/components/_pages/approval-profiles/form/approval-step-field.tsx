@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
-import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
+import { ApprovalStepRequestModel, ApproverType } from "types/approval-profiles";
 import {
     composeValidators,
     validateAlphaNumeric,
@@ -20,7 +20,7 @@ import {
 import styles from "./approvalProfile.module.scss";
 
 type Props = {
-    approvalSteps: ProfileApprovalStepModel[];
+    approvalSteps: ApprovalStepRequestModel[];
     inProgress: boolean;
     onCancelClick: () => void;
 };
@@ -165,7 +165,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
     );
 
     const handleAddStepClick = (): void => {
-        const newStep: ProfileApprovalStepModel = {
+        const newStep: ApprovalStepRequestModel = {
             order: approvalSteps.length + 1,
         };
         const newApprovalSteps = [...approvalSteps, newStep];

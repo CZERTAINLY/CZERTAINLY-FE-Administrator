@@ -24,6 +24,7 @@ export * from "./ApprovalProfileUpdateRequestDto";
 export * from "./ApprovalResponseDto";
 export * from "./ApprovalStepDto";
 export * from "./ApprovalStepRecipientDto";
+export * from "./ApprovalStepRequestDto";
 export * from "./ApprovalUserDto";
 export * from "./AttributeCallback";
 export * from "./AttributeCallbackMapping";

@@ -46,7 +46,7 @@ export function transformAttributeMappingModelToDto(attributeMapping: AttributeM
 export function transformAttributeDescriptorDtoToModel(attributeDescriptor: AttributeDescriptorDto): AttributeDescriptorModel {
     return {
         ...attributeDescriptor,
-        content: attributeDescriptor.content ? JSON.parse(JSON.stringify(attributeDescriptor.content)) : undefined,
+        content: attributeDescriptor?.content ? JSON.parse(JSON.stringify(attributeDescriptor.content)) : undefined,
     };
 }
 

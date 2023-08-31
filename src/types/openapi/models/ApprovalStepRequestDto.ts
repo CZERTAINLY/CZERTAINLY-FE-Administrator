@@ -14,67 +14,43 @@
 /**
  * List of Approval steps for the Approval profile
  * @export
- * @interface ApprovalStepDto
+ * @interface ApprovalStepRequestDto
  */
-export interface ApprovalStepDto {
+export interface ApprovalStepRequestDto {
     /**
      * UUID of the responsible user to approve action in approval step
      * @type {string}
-     * @memberof ApprovalStepDto
+     * @memberof ApprovalStepRequestDto
      */
     userUuid?: string;
     /**
      * UUID of the responsible role of the users to approve action in approval step
      * @type {string}
-     * @memberof ApprovalStepDto
+     * @memberof ApprovalStepRequestDto
      */
     roleUuid?: string;
     /**
      * UUID of the responsible group of the users to approve action in approval step
      * @type {string}
-     * @memberof ApprovalStepDto
+     * @memberof ApprovalStepRequestDto
      */
     groupUuid?: string;
     /**
      * Description of the approval step
      * @type {string}
-     * @memberof ApprovalStepDto
+     * @memberof ApprovalStepRequestDto
      */
     description?: string;
     /**
      * Order of the position in the approval steps flow
      * @type {number}
-     * @memberof ApprovalStepDto
+     * @memberof ApprovalStepRequestDto
      */
     order: number;
     /**
      * Count of the required approvals for the approval step, by default there is 1 approval needed.
      * @type {number}
-     * @memberof ApprovalStepDto
+     * @memberof ApprovalStepRequestDto
      */
     requiredApprovals?: number;
-    /**
-     * UUID of the Approval step
-     * @type {string}
-     * @memberof ApprovalStepDto
-     */
-    uuid: string;
-    /**
-     * Username of the responsible user to approve action in approval step
-     * @type {string}
-     * @memberof ApprovalStepDto
-     */
-    username?: string;
-    /**
-     * Name of the responsible role of the users to approve action in approval step
-     * @type {string}
-     * @memberof ApprovalStepDto
-     */
-    roleName?: string;
-    /**
-     * Name of the responsible group of the users to approve action in approval step
-     * @type {string}
-     * @memberof ApprovalStepDto
-     */
-    groupName?: string;
 }

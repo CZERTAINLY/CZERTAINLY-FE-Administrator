@@ -1,5 +1,4 @@
 import { actions as approvalActions, selectors as approvalSelectors } from "ducks/approvals";
-import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,26 +25,17 @@ export default function ApprovalsList() {
     const userApprovalsTotalItems = useSelector(approvalSelectors.userApprovalsTotalItems);
 
     const isFetching = useSelector(approvalSelectors.isFetchingList);
-    const isFetchingUserList = useSelector(approvalSelectors.isFetchingUserList);
 
     const [approveApprovalDialogOpen, setApproveApprovalDialogOpen] = useState<boolean>(false);
     const [rejectApprovalDialogOpen, setRejectApprovalDialogOpen] = useState<boolean>(false);
 
-    const userList = useSelector(userSelectors.users);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [showAllApprovals, setShowAllApprovals] = useState<boolean>(false);
     const [showHistory, setShowHistory] = useState<boolean>(false);
 
-    const isBusy = useMemo(() => isFetching || isFetchingUserList, [isFetching, isFetchingUserList]);
-
-    const getUserName = useCallback(
-        (userUuid: string) => {
-            return userList.find((user) => user.uuid === userUuid)?.username;
-        },
-        [userList],
-    );
+    const isBusy = useMemo(() => isFetching, [isFetching]);
 
     const listUserApprovals = useCallback(() => {
         dispatch(
@@ -75,10 +65,6 @@ export default function ApprovalsList() {
     useEffect(() => {
         getFreshData();
     }, [getFreshData]);
-
-    useEffect(() => {
-        dispatch(userAction.list());
-    }, []);
 
     const onApproveApprover = useCallback(() => {
         if (!checkedRows) return;
@@ -204,7 +190,7 @@ export default function ApprovalsList() {
                         </Button>
                     </>
                 ) || "",
-                getUserName(approval.creatorUuid) || "",
+                approval.creatorUsername || "",
                 approval.resource || "",
                 approval.resourceAction || "",
                 approval.createdAt ? dateFormatter(approval.createdAt) : "",

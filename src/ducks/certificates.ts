@@ -207,7 +207,7 @@ export const slice = createSlice({
             state,
             action: PayloadAction<{
                 uuid: string;
-                certificateData: string;
+                certificateData?: string;
             }>,
         ) => {
             state.isIssuing = false;

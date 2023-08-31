@@ -20,25 +20,25 @@ import type { ApprovalStepRecipientDto } from "./";
  */
 export interface ApprovalDetailStepDto {
     /**
-     * Reference to responsible user to Approved the action
+     * UUID of the responsible user to approve action in approval step
      * @type {string}
      * @memberof ApprovalDetailStepDto
      */
     userUuid?: string;
     /**
-     * Reference to responsible role of the users to Approved the action
+     * UUID of the responsible role of the users to approve action in approval step
      * @type {string}
      * @memberof ApprovalDetailStepDto
      */
     roleUuid?: string;
     /**
-     * Reference to responsible group of the users to Approved the action
+     * UUID of the responsible group of the users to approve action in approval step
      * @type {string}
      * @memberof ApprovalDetailStepDto
      */
     groupUuid?: string;
     /**
-     * Description of the Approval step
+     * Description of the approval step
      * @type {string}
      * @memberof ApprovalDetailStepDto
      */
@@ -50,7 +50,7 @@ export interface ApprovalDetailStepDto {
      */
     order: number;
     /**
-     * Count of the required approvals for the Approval step, by default there is 1 approval needed.
+     * Count of the required approvals for the approval step, by default there is 1 approval needed.
      * @type {number}
      * @memberof ApprovalDetailStepDto
      */
@@ -60,7 +60,25 @@ export interface ApprovalDetailStepDto {
      * @type {string}
      * @memberof ApprovalDetailStepDto
      */
-    approvalStepUuid: string;
+    uuid: string;
+    /**
+     * Username of the responsible user to approve action in approval step
+     * @type {string}
+     * @memberof ApprovalDetailStepDto
+     */
+    username?: string;
+    /**
+     * Name of the responsible role of the users to approve action in approval step
+     * @type {string}
+     * @memberof ApprovalDetailStepDto
+     */
+    roleName?: string;
+    /**
+     * Name of the responsible group of the users to approve action in approval step
+     * @type {string}
+     * @memberof ApprovalDetailStepDto
+     */
+    groupName?: string;
     /**
      * List of the approval recipient related for this step
      * @type {Array<ApprovalStepRecipientDto>}

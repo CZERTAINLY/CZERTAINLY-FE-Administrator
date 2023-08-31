@@ -24,11 +24,17 @@ export interface ApprovalStepRecipientDto {
      */
     approvalRecipientUuid: string;
     /**
-     * UUID of the user
+     * UUID of the recipient user
      * @type {string}
      * @memberof ApprovalStepRecipientDto
      */
     userUuid: string;
+    /**
+     * Username of the recipient
+     * @type {string}
+     * @memberof ApprovalStepRecipientDto
+     */
+    username?: string;
     /**
      * Creating date of the approval recipient
      * @type {string}
