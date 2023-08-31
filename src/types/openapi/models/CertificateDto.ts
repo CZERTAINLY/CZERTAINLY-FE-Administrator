@@ -113,6 +113,12 @@ export interface CertificateDto {
      */
     owner?: string;
     /**
+     * Certificate Owner UUID
+     * @type {string}
+     * @memberof CertificateDto
+     */
+    ownerUuid?: string;
+    /**
      * @type {CertificateType}
      * @memberof CertificateDto
      */

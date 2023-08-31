@@ -890,7 +890,6 @@ export default function CertificateDetail() {
     );
 
     const propertiesData: TableDataRow[] = useMemo(() => {
-        const userUuid = users.find((u) => u.username === certificate?.owner)?.uuid;
         return !certificate
             ? []
             : [
@@ -915,8 +914,8 @@ export default function CertificateDetail() {
                       id: "owner",
                       columns: [
                           "Owner",
-                          userUuid ? (
-                              <Link to={`../../users/detail/${userUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                          certificate?.ownerUuid ? (
+                              <Link to={`../../users/detail/${certificate.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
                           ) : (
                               certificate.owner ?? "Unassigned"
                           ),
@@ -990,7 +989,7 @@ export default function CertificateDetail() {
                       columns: ["Type", certificate.certificateType || "", ""],
                   },
               ];
-    }, [certificate, users]);
+    }, [certificate]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];

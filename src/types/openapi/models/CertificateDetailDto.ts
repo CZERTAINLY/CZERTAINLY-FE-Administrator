@@ -125,6 +125,12 @@ export interface CertificateDetailDto {
      */
     owner?: string;
     /**
+     * Certificate Owner UUID
+     * @type {string}
+     * @memberof CertificateDetailDto
+     */
+    ownerUuid?: string;
+    /**
      * @type {CertificateType}
      * @memberof CertificateDetailDto
      */

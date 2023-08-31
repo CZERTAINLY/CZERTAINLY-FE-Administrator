@@ -83,6 +83,9 @@ export default function CertificateList({
 
     useEffect(() => {
         dispatch(actions.clearDeleteErrorMessages());
+    }, [dispatch]);
+
+    const getUserList = useCallback(() => {
         dispatch(userAction.list());
     }, [dispatch]);
 
@@ -162,6 +165,7 @@ export default function CertificateList({
                           disabled: checkedRows.length === 0,
                           tooltip: "Update Owner",
                           onClick: () => {
+                              getUserList();
                               setUpdateOwner(true);
                           },
                       },
@@ -283,7 +287,6 @@ export default function CertificateList({
     const certificateList: TableDataRow[] = useMemo(
         () =>
             certificates.map((certificate) => {
-                const userUuid = users.find((u) => u.username === certificate.owner)?.uuid;
                 return {
                     id: certificate.uuid,
                     columns: [
@@ -302,8 +305,8 @@ export default function CertificateList({
                         certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
                         certificate.group?.name || "Unassigned",
                         <span style={{ whiteSpace: "nowrap" }}>{certificate.raProfile?.name || "Unassigned"}</span>,
-                        userUuid ? (
-                            <Link to={`../users/detail/${userUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                        certificate?.ownerUuid ? (
+                            <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
                         ) : (
                             certificate.owner ?? "Unassigned"
                         ),
@@ -321,7 +324,7 @@ export default function CertificateList({
                     ],
                 };
             }),
-        [certificates, selectCertsOnly, certificateTypeEnum, users],
+        [certificates, selectCertsOnly, certificateTypeEnum],
     );
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCertificates(filters)), [dispatch]);
