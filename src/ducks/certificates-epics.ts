@@ -578,7 +578,7 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
                     mergeMap((result) =>
                         of(
                             slice.actions.bulkDeleteSuccess({ response: transformCertificateBulkDeleteResponseDtoToModel(result) }),
-                            alertActions.success("Selected certificates successfully deleted."),
+                            alertActions.success("Delete operation for selected certificates initiated."),
                         ),
                     ),
 
