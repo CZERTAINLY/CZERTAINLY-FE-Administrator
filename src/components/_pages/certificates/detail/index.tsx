@@ -546,9 +546,10 @@ export default function CertificateDetail() {
             },
             {
                 icon: "download",
-                disabled: false,
+                disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
                 tooltip: "Download",
-                custom: downloadDropDown,
+                custom:
+                    certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected ? undefined : downloadDropDown,
                 onClick: () => {},
             },
         ],
@@ -1417,16 +1418,6 @@ export default function CertificateDetail() {
                 (
                     <>
                         <StatusBadge textStatus={approval.status} />
-                        <Button
-                            color="white"
-                            size="sm"
-                            className="p-0 ms-1"
-                            onClick={() => {
-                                navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
-                            }}
-                        >
-                            <i className="fa fa-circle-arrow-right"></i>
-                        </Button>
                     </>
                 ) || "",
                 approval.creatorUsername || "",

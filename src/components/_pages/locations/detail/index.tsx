@@ -461,8 +461,17 @@ export default function LocationDetail() {
                           <></>,
                           <></>,
                           <></>,
-                          <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />,
-                          <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />,
+                          <></>,
+                          cert.metadata?.length ? (
+                              <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />
+                          ) : (
+                              <></>
+                          ),
+                          cert.csrAttributes?.length ? (
+                              <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />
+                          ) : (
+                              <></>
+                          ),
                       ],
                   })),
         [location],
