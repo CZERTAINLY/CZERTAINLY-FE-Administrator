@@ -2,8 +2,9 @@ import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { actions as appRedirectActions } from "./app-redirect";
-// import { actions as widgetLockActions } from "./widget-locks";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { slice } from "./approval-profiles";
 import {
@@ -24,13 +25,16 @@ const getApprovalProfile: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     switchMap((response) =>
-                        of(slice.actions.getApprovalProfileSuccess(transformProfileApprovalDetailDtoToModel(response))),
+                        of(
+                            slice.actions.getApprovalProfileSuccess(transformProfileApprovalDetailDtoToModel(response)),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ApprovalProfileDetails),
+                        ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getApprovalProfileFailure({ error: extractError(err, "Failed to get Approval Profile details") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get approval profile detail" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ApprovalProfileDetails),
                         ),
                     ),
                 ),
@@ -70,12 +74,16 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.approvalProfiles.listApprovalProfiles({ paginationRequestDto: action.payload || {} }).pipe(
-                switchMap((response) => of(slice.actions.listApprovalProfilesSuccess(response))),
+                switchMap((response) =>
+                    of(
+                        slice.actions.listApprovalProfilesSuccess(response),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+                    ),
+                ),
 
                 catchError((err) =>
                     of(
-                        appRedirectActions.fetchError({ error: err, message: "Failed to list approvalprofiles" }),
-
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
                         slice.actions.listApprovalProfilesFailure({ error: extractError(err, "Failed to get Approval Profiles list") }),
                     ),
                 ),

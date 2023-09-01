@@ -124,14 +124,19 @@ const listNotificationInstances: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listNotificationInstances.match),
         mergeMap((action) =>
             deps.apiClients.externalNotificationManagementApi.listNotificationInstances().pipe(
-                mergeMap((res) => of(slice.actions.listNotificationInstancesSuccess(res.map(transformNotificationInstanceDtoToModel)))),
+                mergeMap((res) =>
+                    of(
+                        slice.actions.listNotificationInstancesSuccess(res.map(transformNotificationInstanceDtoToModel)),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.NotificationStore),
+                    ),
+                ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listNotificationInstancesFailure({
                             error: extractError(err, "Failed to list notification instances"),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to list notification instances" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationStore),
                     ),
                 ),
             ),

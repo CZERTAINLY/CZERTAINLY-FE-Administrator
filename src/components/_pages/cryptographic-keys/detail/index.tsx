@@ -30,8 +30,7 @@ export default function CryptographicKeyDetail() {
     const relativePath = keyItemUuid ? "../../../.." : "../../..";
 
     const cryptographicKey = useSelector(selectors.cryptographicKey);
-
-    const isFetchingProfile = useSelector(selectors.isFetchingDetail);
+    const state = useSelector(selectors.state);
     const isUpdatingKeyUsage = useSelector(selectors.isUpdatingKeyUsage);
 
     const isDeleting = useSelector(selectors.isDeleting);
@@ -52,8 +51,8 @@ export default function CryptographicKeyDetail() {
     const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
 
     const isBusy = useMemo(
-        () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
-        [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying],
+        () => state.isFetchingDetail || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
+        [isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying, state.isFetchingDetail],
     );
 
     const getFreshCryptographicKeyDetails = useCallback(() => {

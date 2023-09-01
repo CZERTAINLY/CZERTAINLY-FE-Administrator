@@ -109,7 +109,7 @@ export default function ApprovalProfilesList() {
             <Widget
                 title="List of Approval Profiles"
                 busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfComplianceProfiles}
+                widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshData}

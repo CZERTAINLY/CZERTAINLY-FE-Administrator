@@ -608,7 +608,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.getAssociatedApprovalProfilesSuccess({
                             associatedApprovalProfiles: approvalProfiles.map(transformProfileApprovalDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ApprovalProfiles),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
                     ),
                 ),
 
@@ -617,7 +617,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.getAssociatedApprovalProfilesFailure({
                             error: extractError(err, "Failed to get associated Approval Profiles"),
                         }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ApprovalProfiles),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
                     ),
                 ),
             ),

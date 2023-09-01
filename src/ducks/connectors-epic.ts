@@ -104,16 +104,18 @@ const getConnectorAllAttributesDescriptors: AppEpic = (action$, state, deps) => 
         filter(slice.actions.getConnectorAllAttributesDescriptors.match),
         switchMap((action) =>
             deps.apiClients.connectors.getAttributesAll({ uuid: action.payload.uuid }).pipe(
-                map((descColl) =>
-                    slice.actions.getConnectorAllAttributesDescriptorsSuccess({
-                        attributeDescriptorCollection: transformAttributeDescriptorCollectionDtoToModel(descColl),
-                    }),
+                map(
+                    (descColl) =>
+                        slice.actions.getConnectorAllAttributesDescriptorsSuccess({
+                            attributeDescriptorCollection: transformAttributeDescriptorCollectionDtoToModel(descColl),
+                        }),
+                    widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorAttributes),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getAllConnectorAllAttributesDescriptorsFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get all connector attributes" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorAttributes),
                     ),
                 ),
             ),

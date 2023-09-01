@@ -2,7 +2,9 @@ import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, switchMap } from "rxjs/operators";
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { slice } from "./approvals";
 import { transformDetailApprovalDtoToModel } from "./transform/approvals";
@@ -36,12 +38,17 @@ const listApprovals: AppEpic = (action$, state$, deps) => {
                     paginationRequestDto: action.payload,
                 })
                 .pipe(
-                    switchMap((response) => of(slice.actions.listApprovalsSuccess(response))),
+                    switchMap((response) =>
+                        of(
+                            slice.actions.listApprovalsSuccess(response),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovals),
+                        ),
+                    ),
 
                     catchError((err) =>
                         of(
                             slice.actions.listApprovalsFailure({ error: extractError(err, "Failed to list Approvals") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to list approvals" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovals),
                         ),
                     ),
                 ),
