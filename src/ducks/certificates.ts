@@ -20,7 +20,7 @@ import {
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
-import { ApprovalDto, CertificateStatus, ListCertificateApprovalsRequest } from "types/openapi";
+import { ApprovalDto, ListCertificateApprovalsRequest } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
 import { downloadFileZip } from "utils/download";
@@ -235,8 +235,6 @@ export const slice = createSlice({
             const cerificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
 
             if (cerificateIndex >= 0) state.certificates.splice(cerificateIndex, 1);
-
-            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.status = CertificateStatus.Revoked;
         },
 
         revokeCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

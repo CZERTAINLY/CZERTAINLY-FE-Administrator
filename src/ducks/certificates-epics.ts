@@ -179,6 +179,7 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap(() =>
                         of(
                             slice.actions.revokeCertificateSuccess({ uuid: action.payload.uuid }),
+                            alertActions.success("Revoke certificate operation successfully initiated"),
                             slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
                         ),
                     ),
