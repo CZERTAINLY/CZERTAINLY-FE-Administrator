@@ -5,9 +5,11 @@ import {
     ApprovalProfileResponseDto,
     ApprovalProfileUpdateRequestDto,
     ApprovalStepDto,
+    ApprovalStepRequestDto,
 } from "./openapi";
 export type ProfileApprovalStepDto = ApprovalStepDto;
 export type ProfileApprovalStepModel = ProfileApprovalStepDto;
+export type ApprovalStepRequestModel = ApprovalStepRequestDto;
 
 export type ProfileApprovalDetailDto = ApprovalProfileDetailDto;
 export type ProfileApprovalDetailModel = Omit<ProfileApprovalDetailDto, "approvalSteps"> & {
@@ -19,7 +21,7 @@ export type ProfileApprovalModel = ProfileApprovalDto;
 
 export type ProfileApprovalRequestDto = ApprovalProfileRequestDto;
 export type ProfileApprovalRequestModel = Omit<ProfileApprovalRequestDto, "approvalSteps"> & {
-    approvalSteps: Array<ProfileApprovalStepModel>;
+    approvalSteps: Array<ApprovalStepRequestModel>;
 };
 
 export type ProfileApprovalResponseDto = ApprovalProfileResponseDto;
@@ -29,7 +31,7 @@ export type ProfileApprovalResponseModel = Omit<ProfileApprovalResponseDto, "app
 
 export type ProfileApprovalUpdateRequestDto = ApprovalProfileUpdateRequestDto;
 export type ProfileApprovalUpdateRequestModel = Omit<ProfileApprovalUpdateRequestDto, "approvalSteps"> & {
-    approvalSteps: Array<ProfileApprovalStepModel>;
+    approvalSteps: Array<ApprovalStepRequestDto>;
 };
 
 export enum ApproverType {

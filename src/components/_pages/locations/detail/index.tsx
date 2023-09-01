@@ -27,9 +27,13 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { validateRequired } from "utils/validators";
-import { Resource } from "../../../../types/openapi";
+import { CertificateStatus, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
+import CertificateStatusBadge from "../../../_pages/certificates/CertificateStatus";
+
+import cx from "classnames";
+import style from "./locationDetail.module.scss";
 
 export default function LocationDetail() {
     const dispatch = useDispatch();
@@ -275,6 +279,11 @@ export default function LocationDetail() {
         [location?.enabled, onDisableClick, onEditClick, onEnableClick],
     );
 
+    const selectedCertificateDetails = useMemo(() => {
+        const selectedCert = location?.certificates.find((c) => c.certificateUuid === certCheckedRows[0]);
+        return selectedCert;
+    }, [location, certCheckedRows]);
+
     const certButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -303,7 +312,7 @@ export default function LocationDetail() {
             },
             {
                 icon: "retweet",
-                disabled: certCheckedRows.length === 0,
+                disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.status === CertificateStatus.New,
                 tooltip: "Renew",
                 onClick: () => {
                     onRenewClick();
@@ -384,6 +393,12 @@ export default function LocationDetail() {
                 width: "15%",
             },
             {
+                id: "cs",
+                content: "Status",
+                sortable: true,
+                width: "15%",
+            },
+            {
                 id: "pk",
                 align: "center",
                 content: "Private Key",
@@ -411,15 +426,23 @@ export default function LocationDetail() {
                 : location.certificates.map((cert) => ({
                       id: cert.certificateUuid,
                       columns: [
-                          <Link key={cert.certificateUuid} to={`../../../certificates/detail/${cert.certificateUuid}`}>
+                          <Link
+                              className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                              key={cert.certificateUuid}
+                              to={`../../../certificates/detail/${cert.certificateUuid}`}
+                          >
                               {cert.commonName || "empty"}
                           </Link>,
+                          <CertificateStatusBadge status={cert.status} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                           !cert.metadata || cert.metadata.length === 0 ? (
                               ""
                           ) : (
-                              <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                              <div
+                                  style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}
+                                  className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                              >
                                   {cert.metadata.map((atr) => atr.connectorName + " (" + atr.items.length + ")").join(", ")}
                               </div>
                           ),
@@ -438,8 +461,17 @@ export default function LocationDetail() {
                           <></>,
                           <></>,
                           <></>,
-                          <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />,
-                          <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />,
+                          <></>,
+                          cert.metadata?.length ? (
+                              <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />
+                          ) : (
+                              <></>
+                          ),
+                          cert.csrAttributes?.length ? (
+                              <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />
+                          ) : (
+                              <></>
+                          ),
                       ],
                   })),
         [location],

@@ -1,4 +1,5 @@
 import {
+    ApprovalStepRequestModel,
     ProfileApprovalDetailDto,
     ProfileApprovalDetailModel,
     ProfileApprovalDto,
@@ -12,9 +13,14 @@ import {
     ProfileApprovalUpdateRequestDto,
     ProfileApprovalUpdateRequestModel,
 } from "types/approval-profiles";
+import { ApprovalStepRequestDto } from "types/openapi";
 
 export function transformProfileApprovalStepDtoToModel(profileApprovalStep: ProfileApprovalStepDto): ProfileApprovalStepModel {
     return { ...profileApprovalStep };
+}
+
+export function transformApprovalStepRequestDtoToModel(approvalStepRequest: ApprovalStepRequestDto): ApprovalStepRequestModel {
+    return { ...approvalStepRequest };
 }
 
 export function transformProfileApprovalDetailDtoToModel(profileApprovalDetail: ProfileApprovalDetailDto): ProfileApprovalDetailModel {
@@ -31,7 +37,7 @@ export function transformProfileApprovalDtoToModel(profileApproval: ProfileAppro
 export function transformProfileApprovalRequestDtoToModel(profileApprovalRequest: ProfileApprovalRequestDto): ProfileApprovalRequestModel {
     return {
         ...profileApprovalRequest,
-        approvalSteps: profileApprovalRequest.approvalSteps?.map(transformProfileApprovalStepDtoToModel) || [],
+        approvalSteps: profileApprovalRequest.approvalSteps?.map(transformApprovalStepRequestDtoToModel) || [],
     };
 }
 
@@ -49,7 +55,7 @@ export function transformProfileApprovalUpdateRequestDtoToModel(
 ): ProfileApprovalUpdateRequestModel {
     return {
         ...profileApprovalUpdateRequest,
-        approvalSteps: profileApprovalUpdateRequest.approvalSteps?.map(transformProfileApprovalStepDtoToModel) || [],
+        approvalSteps: profileApprovalUpdateRequest.approvalSteps?.map(transformApprovalStepRequestDtoToModel) || [],
     };
 }
 

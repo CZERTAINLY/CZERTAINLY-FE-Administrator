@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 
-import { ProfileApprovalRequestModel, ProfileApprovalStepModel } from "types/approval-profiles";
+import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from "types/approval-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import {
     composeValidators,
@@ -21,7 +21,7 @@ import {
 } from "utils/validators";
 import ApprovalStepField from "./approval-step-field";
 
-const defaultApprovalSteps: ProfileApprovalStepModel[] = [
+const defaultApprovalSteps: ApprovalStepRequestModel[] = [
     {
         order: 1,
     },

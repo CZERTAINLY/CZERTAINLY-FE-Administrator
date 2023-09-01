@@ -4,9 +4,6 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from "ducks/approval-profiles";
-import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -23,18 +20,9 @@ const ApprovalProfileDetails = () => {
     const isEnabling = useSelector(profileApprovalSelectors.isEnabling);
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
-    const groupList = useSelector(groupSelectors.certificateGroups);
-    const isFetchingGroups = useSelector(groupSelectors.isFetchingList);
-    const userList = useSelector(userSelectors.users);
-    const isFetchingUsers = useSelector(userSelectors.isFetchingList);
-    const roleList = useSelector(rolesSelectors.roles);
-    const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-    const isBusy = useMemo(
-        () => isFetchingDetail || isEnabling || isDeleting || isFetchingGroups || isFetchingUsers || isFetchingRoles,
-        [isFetchingDetail, isEnabling, isDeleting, isFetchingGroups, isFetchingUsers, isFetchingRoles],
-    );
+    const isBusy = useMemo(() => isFetchingDetail || isEnabling || isDeleting, [isFetchingDetail, isEnabling, isDeleting]);
 
     const getFreshData = useCallback(() => {
         if (!id) return;
@@ -44,9 +32,6 @@ const ApprovalProfileDetails = () => {
     useEffect(() => {
         if (id) {
             getFreshData();
-            dispatch(userAction.list());
-            dispatch(groupAction.listGroups());
-            dispatch(rolesActions.list());
         }
     }, [id, dispatch, version, getFreshData]);
 
@@ -194,41 +179,17 @@ const ApprovalProfileDetails = () => {
         }
     };
 
-    const getUserName = useCallback(
-        (userUuid: string) => {
-            return userList.find((user) => user.uuid === userUuid)?.username;
-        },
-        [userList],
-    );
-
-    const getRoleName = useCallback(
-        (roleUuid: string) => {
-            return roleList.find((role) => role.uuid === roleUuid)?.name;
-        },
-        [roleList],
-    );
-
-    const getGroupName = useCallback(
-        (groupUuid: string) => {
-            return groupList.find((group) => group.uuid === groupUuid)?.name;
-        },
-        [groupList],
-    );
-
-    const renderApproverRedirect = useCallback(
-        (appovalProfileStep: ProfileApprovalStepModel) => {
-            if (appovalProfileStep.userUuid) {
-                return <Link to={`../users/detail/${appovalProfileStep.userUuid}`}>{getUserName(appovalProfileStep.userUuid)}</Link>;
-            }
-            if (appovalProfileStep.roleUuid) {
-                return <Link to={`../roles/detail/${appovalProfileStep.roleUuid}`}>{getRoleName(appovalProfileStep.roleUuid)}</Link>;
-            }
-            if (appovalProfileStep.groupUuid) {
-                return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{getGroupName(appovalProfileStep.groupUuid)}</Link>;
-            }
-        },
-        [getUserName, getRoleName, getGroupName],
-    );
+    const renderApproverRedirect = useCallback((appovalProfileStep: ProfileApprovalStepModel) => {
+        if (appovalProfileStep.userUuid) {
+            return <Link to={`../users/detail/${appovalProfileStep.userUuid}`}>{appovalProfileStep.username}</Link>;
+        }
+        if (appovalProfileStep.roleUuid) {
+            return <Link to={`../roles/detail/${appovalProfileStep.roleUuid}`}>{appovalProfileStep.roleName}</Link>;
+        }
+        if (appovalProfileStep.groupUuid) {
+            return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{appovalProfileStep.roleName}</Link>;
+        }
+    }, []);
 
     const stepsRows: TableDataRow[] = useMemo(
         () =>

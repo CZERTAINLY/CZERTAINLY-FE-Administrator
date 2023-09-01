@@ -63,6 +63,7 @@ models/ApprovalProfileUpdateRequestDto.ts
 models/ApprovalResponseDto.ts
 models/ApprovalStepDto.ts
 models/ApprovalStepRecipientDto.ts
+models/ApprovalStepRequestDto.ts
 models/ApprovalUserDto.ts
 models/AttributeCallback.ts
 models/AttributeCallbackMapping.ts

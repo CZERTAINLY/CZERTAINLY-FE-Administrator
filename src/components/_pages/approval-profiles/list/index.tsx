@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from "ducks/approval-profiles";
-import { actions } from "ducks/compliance-profiles";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import StatusBadge from "components/StatusBadge";
@@ -25,8 +24,6 @@ export default function ApprovalProfilesList() {
     const isBusy = useMemo(() => isFetchingList, [isFetchingList]);
 
     const getFreshData = useCallback(() => {
-        dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listComplianceProfiles());
         dispatch(profileApprovalActions.listApprovalProfiles({ itemsPerPage: pageSize, pageNumber }));
     }, [dispatch, pageNumber, pageSize]);
 

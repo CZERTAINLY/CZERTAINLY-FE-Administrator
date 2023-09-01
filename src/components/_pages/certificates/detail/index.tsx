@@ -183,13 +183,6 @@ export default function CertificateDetail() {
         );
     }, [id, dispatch, certificate]);
 
-    const getUserName = useCallback(
-        (userUuid: string) => {
-            return users.find((user) => user.uuid === userUuid)?.username;
-        },
-        [users],
-    );
-
     useEffect(() => {
         if (!id) return;
         getFreshRaProfileDetail();
@@ -285,12 +278,12 @@ export default function CertificateDetail() {
         setCertificateRevokeReasonOptions(certificateRevokeReasonOptions);
     }, [dispatch, certificateRevocationReason]);
 
-    useEffect(() => {
-        if (!id || !updateGroup) return;
+    const getGroupList = useCallback(() => {
+        if (!id) return;
         dispatch(groupAction.listGroups());
-    }, [dispatch, updateGroup, id]);
+    }, [dispatch, id]);
 
-    useEffect(() => {
+    const getUserList = useCallback(() => {
         if (!id) {
             return;
         }
@@ -307,10 +300,10 @@ export default function CertificateDetail() {
         );
     }, [dispatch, revoke, id, certificate?.raProfile?.uuid, certificate?.raProfile?.authorityInstanceUuid]);
 
-    useEffect(() => {
-        if (!id || !updateRaProfile) return;
+    const getRaProfileList = useCallback(() => {
+        if (!id) return;
         dispatch(raProfileAction.listRaProfiles());
-    }, [dispatch, updateRaProfile, id]);
+    }, [dispatch, id]);
 
     useEffect(() => {
         dispatch(connectorActions.clearCallbackData());
@@ -553,9 +546,10 @@ export default function CertificateDetail() {
             },
             {
                 icon: "download",
-                disabled: false,
+                disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
                 tooltip: "Download",
-                custom: downloadDropDown,
+                custom:
+                    certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected ? undefined : downloadDropDown,
                 onClick: () => {},
             },
         ],
@@ -897,7 +891,6 @@ export default function CertificateDetail() {
     );
 
     const propertiesData: TableDataRow[] = useMemo(() => {
-        const userUuid = users.find((u) => u.username === certificate?.owner)?.uuid;
         return !certificate
             ? []
             : [
@@ -922,8 +915,8 @@ export default function CertificateDetail() {
                       id: "owner",
                       columns: [
                           "Owner",
-                          userUuid ? (
-                              <Link to={`../../users/detail/${userUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                          certificate?.ownerUuid ? (
+                              <Link to={`../../users/detail/${certificate.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
                           ) : (
                               certificate.owner ?? "Unassigned"
                           ),
@@ -933,6 +926,7 @@ export default function CertificateDetail() {
                               color="secondary"
                               onClick={() => {
                                   setOwnerUuid(undefined);
+                                  getUserList();
                                   setUpdateOwner(true);
                               }}
                               title="Update Owner"
@@ -954,7 +948,10 @@ export default function CertificateDetail() {
                               className="btn btn-link"
                               size="sm"
                               color="secondary"
-                              onClick={() => setUpdateGroup(true)}
+                              onClick={() => {
+                                  getGroupList();
+                                  setUpdateGroup(true);
+                              }}
                               title="Update Group"
                           >
                               <i className="fa fa-pencil-square-o" />
@@ -978,7 +975,10 @@ export default function CertificateDetail() {
                               className="btn btn-link"
                               size="sm"
                               color="secondary"
-                              onClick={() => setUpdateRaProfile(true)}
+                              onClick={() => {
+                                  getRaProfileList();
+                                  setUpdateRaProfile(true);
+                              }}
                               title="Update RA Profile"
                           >
                               <i className="fa fa-pencil-square-o" />
@@ -990,7 +990,7 @@ export default function CertificateDetail() {
                       columns: ["Type", certificate.certificateType || "", ""],
                   },
               ];
-    }, [certificate, users]);
+    }, [certificate]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];
@@ -1418,26 +1418,16 @@ export default function CertificateDetail() {
                 (
                     <>
                         <StatusBadge textStatus={approval.status} />
-                        <Button
-                            color="white"
-                            size="sm"
-                            className="p-0 ms-1"
-                            onClick={() => {
-                                navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
-                            }}
-                        >
-                            <i className="fa fa-circle-arrow-right"></i>
-                        </Button>
                     </>
                 ) || "",
-                getUserName(approval.creatorUuid) || "",
+                approval.creatorUsername || "",
                 approval.resource || "",
                 approval.resourceAction || "",
                 approval.createdAt ? dateFormatter(approval.createdAt) : "",
                 approval.closedAt ? dateFormatter(approval.closedAt) : "",
             ],
         }));
-    }, [approvals, getUserName, navigate]);
+    }, [approvals, navigate]);
 
     const defaultViewPort = useMemo(
         () => ({

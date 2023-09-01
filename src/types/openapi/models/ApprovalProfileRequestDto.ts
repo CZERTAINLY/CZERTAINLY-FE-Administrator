@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ApprovalStepDto } from "./";
+import type { ApprovalStepRequestDto } from "./";
 
 /**
  * @export
@@ -44,8 +44,8 @@ export interface ApprovalProfileRequestDto {
     expiry?: number;
     /**
      * List of Approval steps for the Approval profile
-     * @type {Array<ApprovalStepDto>}
+     * @type {Array<ApprovalStepRequestDto>}
      * @memberof ApprovalProfileRequestDto
      */
-    approvalSteps: Array<ApprovalStepDto>;
+    approvalSteps: Array<ApprovalStepRequestDto>;
 }

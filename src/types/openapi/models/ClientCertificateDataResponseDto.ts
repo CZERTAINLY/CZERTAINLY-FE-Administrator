@@ -21,7 +21,7 @@ export interface ClientCertificateDataResponseDto {
      * @type {string}
      * @memberof ClientCertificateDataResponseDto
      */
-    certificateData: string;
+    certificateData?: string;
     /**
      * UUID of Certificate
      * @type {string}

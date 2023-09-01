@@ -11,7 +11,19 @@
  * Do not edit the class manually.
  */
 
-import type { CustomAttribute, DataAttribute, GroupAttribute, InfoAttribute, MetadataAttribute } from "./";
+import type {
+    AttributeCallback,
+    AttributeContentType,
+    AttributeType,
+    BaseAttributeConstraint,
+    BaseAttributeContentDto,
+    CustomAttribute,
+    CustomAttributeProperties,
+    DataAttribute,
+    GroupAttribute,
+    InfoAttribute,
+    MetadataAttribute,
+} from "./";
 
 /**
  * @type BaseAttributeDto

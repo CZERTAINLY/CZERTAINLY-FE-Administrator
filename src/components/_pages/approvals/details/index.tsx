@@ -4,10 +4,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as approvalActions, selectors as approvalSelectors } from "ducks/approvals";
-import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
 
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -24,20 +21,11 @@ export default function ApprovalDetails() {
 
     const approvalDetails = useSelector(approvalSelectors.approvalDetails);
     const isFetchingDetail = useSelector(approvalSelectors.isFetchingDetail);
-    const groupList = useSelector(groupSelectors.certificateGroups);
-    const isFetchingGroups = useSelector(groupSelectors.isFetchingList);
-    const userList = useSelector(userSelectors.users);
-    const isFetchingUsers = useSelector(userSelectors.isFetchingList);
-    const roleList = useSelector(rolesSelectors.roles);
-    const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
     const [recipientApproveDialog, setRecipientApproveDialog] = useState(false);
     const [recipientRejectDialog, setRecipientRejectDialog] = useState(false);
     const [comment, setcomment] = useState<string>();
-    const isBusy = useMemo(
-        () => isFetchingDetail || isFetchingGroups || isFetchingUsers || isFetchingRoles,
-        [isFetchingDetail, isFetchingGroups, isFetchingUsers, isFetchingRoles],
-    );
+    const isBusy = useMemo(() => isFetchingDetail, [isFetchingDetail]);
 
     const getFreshData = useCallback(() => {
         if (!id) return;
@@ -47,9 +35,6 @@ export default function ApprovalDetails() {
     useEffect(() => {
         if (id) {
             getFreshData();
-            dispatch(userAction.list());
-            dispatch(groupAction.listGroups());
-            dispatch(rolesActions.list());
         }
     }, [id, dispatch, getFreshData]);
 
@@ -112,27 +97,6 @@ export default function ApprovalDetails() {
         }
     };
 
-    const getUserName = useCallback(
-        (userUuid: string) => {
-            return userList.find((user) => user.uuid === userUuid)?.username;
-        },
-        [userList],
-    );
-
-    const getRoleName = useCallback(
-        (roleUuid: string) => {
-            return roleList.find((role) => role.uuid === roleUuid)?.name;
-        },
-        [roleList],
-    );
-
-    const getGroupName = useCallback(
-        (groupUuid: string) => {
-            return groupList.find((group) => group.uuid === groupUuid)?.name;
-        },
-        [groupList],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -175,7 +139,7 @@ export default function ApprovalDetails() {
                       },
                       {
                           id: "requestedBy",
-                          columns: ["Requested By", getUserName(approvalDetails.creatorUuid) || ""],
+                          columns: ["Requested By", approvalDetails.creatorUsername || ""],
                       },
                       {
                           id: "status",
@@ -225,7 +189,7 @@ export default function ApprovalDetails() {
                           columns: ["Version", approvalDetails?.version.toString() || ""],
                       },
                   ],
-        [approvalDetails, getUserName, navigate],
+        [approvalDetails, navigate],
     );
 
     const stepsHeaders: TableHeader[] = useMemo(
@@ -254,26 +218,23 @@ export default function ApprovalDetails() {
         [],
     );
 
-    const renderApproverRedirect = useCallback(
-        (appovalProfileStep: ProfileApprovalStepModel) => {
-            if (appovalProfileStep.userUuid) {
-                return <Link to={`../users/detail/${appovalProfileStep.userUuid}`}>{getUserName(appovalProfileStep.userUuid)}</Link>;
-            }
-            if (appovalProfileStep.roleUuid) {
-                return <Link to={`../roles/detail/${appovalProfileStep.roleUuid}`}>{getRoleName(appovalProfileStep.roleUuid)}</Link>;
-            }
-            if (appovalProfileStep.groupUuid) {
-                return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{getGroupName(appovalProfileStep.groupUuid)}</Link>;
-            }
-        },
-        [getUserName, getRoleName, getGroupName],
-    );
+    const renderApproverRedirect = useCallback((appovalProfileStep: ProfileApprovalStepModel) => {
+        if (appovalProfileStep.userUuid) {
+            return <Link to={`../users/detail/${appovalProfileStep.userUuid}`}>{appovalProfileStep.username}</Link>;
+        }
+        if (appovalProfileStep.roleUuid) {
+            return <Link to={`../roles/detail/${appovalProfileStep.roleUuid}`}>{appovalProfileStep.roleUuid}</Link>;
+        }
+        if (appovalProfileStep.groupUuid) {
+            return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{appovalProfileStep.groupUuid}</Link>;
+        }
+    }, []);
 
     const renderRecipiensDetails = (approvalStep: DetailApprovalStepModel) => {
         const data = approvalStep.approvalStepRecipients.map((recipient, i) => ({
             id: recipient.approvalRecipientUuid,
             columns: [
-                <Link to={`../users/detail/${approvalStep.userUuid}`}>{getUserName(recipient.userUuid)}</Link>,
+                <Link to={`../users/detail/${approvalStep.userUuid}`}>{recipient.username}</Link>,
                 recipient.closedAt ? dateFormatter(recipient.closedAt) : "",
                 <StatusBadge textStatus={recipient.status} />,
                 recipient.comment || "",
