@@ -89,7 +89,6 @@ const listEntities: AppEpic = (action$, state$, deps) => {
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.ENTITY),
-                            appRedirectActions.fetchError({ error, message: "Failed to get list of Entities" }),
                             widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityStore),
                         ),
                     ),
@@ -113,7 +112,6 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getEntityDetailFailure({ error: extractError(error, "Failed to get Entity detail") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Entity detail" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityDetails),
                     ),
                 ),

@@ -39,7 +39,6 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                         slice.actions.listOverviewNotificationsFailure({
                             error: extractError(err, "Failed to list overview notification"),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to list overview notifications" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),
@@ -69,7 +68,6 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.NOTIFICATIONS),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get list of notifications" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfNotifications),
                         ),
                     ),

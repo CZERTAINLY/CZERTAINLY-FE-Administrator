@@ -40,11 +40,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                 ),
 
                 catchError((error) =>
-                    of(
-                        slice.actions.listConnectorsFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get connector list" }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
-                    ),
+                    of(slice.actions.listConnectorsFailure(), widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore)),
                 ),
             ),
         ),
@@ -65,7 +61,6 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getConnectorDetailFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get connector detail" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),

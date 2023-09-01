@@ -28,7 +28,6 @@ const listGroups: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listGroupsFailure({ error: extractError(err, "Failed to get Group list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Group list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),
@@ -54,7 +53,6 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getGroupDetailFailure({ error: extractError(err, "Failed to get Group detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Group detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
                     ),
                 ),

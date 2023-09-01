@@ -39,7 +39,6 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         pagingActions.listFailure(EntityType.DISCOVERY),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
@@ -63,7 +62,6 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getDiscoveryDetailFailure({ error: extractError(err, "Failed to get Discovery detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveryDetails),
                     ),
                 ),

@@ -39,7 +39,6 @@ const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listComplianceProfilesFailed({
                             error: extractError(error, "Failed to get Compliance Profiles list"),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Compliance Profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfComplianceProfiles),
                     ),
                 ),
@@ -68,7 +67,6 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
                         slice.actions.getComplianceProfileFailed({
                             error: extractError(error, "Failed to get Compliance Profile details"),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Compliance Profile details" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
@@ -404,7 +402,6 @@ const getRules: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listComplianceRulesFailed({ error: extractError(error, "Failed to get compliance rules") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get compliance rules" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
@@ -425,7 +422,6 @@ const getGroups: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listComplianceGroupsFailed({ error: extractError(error, "Failed to get compliance groups") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get compliance groups" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),

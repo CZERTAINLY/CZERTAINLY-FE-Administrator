@@ -32,7 +32,6 @@ const listTokenProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listTokenProfilesFailure({ error: extractError(error, "Failed to get Token profiles list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Token profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),
@@ -60,7 +59,6 @@ const getTokenProfileDetail: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.getTokenProfileDetailFailure({ error: extractError(err, "Failed to get Token Profile detail") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get Token Profile detail" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenProfileDetails),
                         ),
                     ),

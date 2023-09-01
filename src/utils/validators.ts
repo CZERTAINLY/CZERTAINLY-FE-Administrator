@@ -3,7 +3,7 @@ export const composeValidators =
     (value: any) =>
         validators.reduce((error, validator) => error || validator(value), undefined);
 
-export const validateRequired = () => (value: any) => (Array.isArray(value) ? value.length > 0 : value) ? undefined : "Required Field";
+export const validateRequired = () => (value: any) => ((Array.isArray(value) ? value.length > 0 : value) ? undefined : "Required Field");
 
 const getValueFromObject = (value: any) => {
     if (typeof value === "object" && value && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
@@ -36,8 +36,8 @@ export const validateAlphaNumericWithoutAccents = () => {
 
 export const validateAlphaNumeric = () => {
     return validatePattern(
-        /^[a-zA-Z0-9À-ž]+([ '-/_][a-zA-Z0-9À-ž]+)*$/,
-        "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe or slash and underscore",
+        /^[a-zA-Z0-9À-ž]+([ '-/_.,?!][a-zA-Z0-9À-ž]+)*$/,
+        "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe, slash, underscore, period, comma, question mark, or exclamation point",
     );
 };
 

@@ -33,7 +33,6 @@ const listScepProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listScepProfilesFailure({ error: extractError(error, "Failed to get SCEP Profiles list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get SCEP Profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSCEPProfiles),
                     ),
                 ),
@@ -82,7 +81,6 @@ const getScepProfileDetail: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getScepProfileFailure({ error: extractError(error, "Failed to get SCEP Profile details") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get SCEP Profile details" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.SCEPProfileDetails),
                     ),
                 ),

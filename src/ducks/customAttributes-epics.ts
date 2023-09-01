@@ -31,7 +31,6 @@ const listCustomAttributes: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listCustomAttributesFailure({ error: extractError(err, "Failed to get Custom Attributes list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Custom Attributes list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCustomAttributes),
                     ),
                 ),
@@ -231,7 +230,6 @@ const getCustomAttribute: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getCustomAttributeFailure({ error: extractError(err, "Failed to get custom attribute detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get custom attribute detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CustomAttributeDetails),
                     ),
                 ),

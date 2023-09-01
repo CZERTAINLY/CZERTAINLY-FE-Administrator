@@ -34,7 +34,6 @@ const listSchedulerJobs: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         pagingActions.listFailure(EntityType.SCHEDULER),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Scheduled Jobs list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfScheduler),
                     ),
                 ),
@@ -59,7 +58,6 @@ const getSchedulerJob: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getSchedulerJobDetailFailure({ error: extractError(err, "Failed to get Scheduled Job detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Scheduled Job detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.SchedulerJobDetail),
                     ),
                 ),
@@ -92,7 +90,6 @@ const listSchedulerJobHistory: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.SCHEDULER_HISTORY),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get Scheduled Job History list" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfSchedulerHistory),
                         ),
                     ),

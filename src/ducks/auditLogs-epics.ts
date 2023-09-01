@@ -32,11 +32,7 @@ const listLogs: AppEpic = (action$, state, deps) => {
                     switchMap((actions) => from(actions)),
 
                     catchError((error) =>
-                        of(
-                            slice.actions.listLogsFailure(),
-                            appRedirectActions.fetchError({ error, message: "Failed to get audit logs list" }),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.AuditLogs),
-                        ),
+                        of(slice.actions.listLogsFailure(), widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.AuditLogs)),
                     ),
                 ),
         ),

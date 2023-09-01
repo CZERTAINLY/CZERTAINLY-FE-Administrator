@@ -145,6 +145,7 @@ function ApprovalProfileForm() {
                                                 valid={!meta.error && meta.touched}
                                                 invalid={!!meta.error && meta.touched}
                                             />
+                                            <FormFeedback>{meta.error}</FormFeedback>
                                         </FormGroup>
                                     )}
                                 </Field>
@@ -164,6 +165,7 @@ function ApprovalProfileForm() {
                                         id="description"
                                         placeholder="Approval Profile Description"
                                     />
+                                    <FormFeedback>{meta.error}</FormFeedback>
                                 </FormGroup>
                             )}
                         </Field>

@@ -38,7 +38,6 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listRaProfilesFailure({ error: extractError(error, "Failed to get RA profiles list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get RA profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfRAProfiles),
                     ),
                 ),
@@ -66,7 +65,6 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get RA Profile detail" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
                         ),
                     ),
@@ -592,7 +590,6 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
                             slice.actions.getComplianceProfilesForRaProfileFailure({
                                 error: extractError(err, "Failed to get associated Compliance Profiles"),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get associated Compliance Profiles" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
                         ),
                     ),
@@ -611,6 +608,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.getAssociatedApprovalProfilesSuccess({
                             associatedApprovalProfiles: approvalProfiles.map(transformProfileApprovalDtoToModel),
                         }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ApprovalProfiles),
                     ),
                 ),
 
@@ -619,7 +617,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.getAssociatedApprovalProfilesFailure({
                             error: extractError(err, "Failed to get associated Approval Profiles"),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get associated Approval Profiles" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ApprovalProfiles),
                     ),
                 ),
             ),

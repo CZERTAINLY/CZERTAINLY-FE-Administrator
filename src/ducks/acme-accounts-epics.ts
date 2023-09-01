@@ -26,7 +26,6 @@ const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeAccountsFailed({ error: extractError(error, "Failed to get ACME Accounts list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get ACME Accounts list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEAccounts),
                     ),
                 ),
@@ -52,7 +51,6 @@ const getAccountDetail: AppEpic = (action$, state$, deps) => {
                     catchError((error) =>
                         of(
                             slice.actions.getAcmeAccountFailed({ error: extractError(error, "Failed to get ACME Account details") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to get ACME Account details" }),
                             widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEAccountDetails),
                         ),
                     ),

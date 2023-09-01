@@ -53,7 +53,6 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.CERTIFICATE),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get certificates list" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCertificates),
                         ),
                     ),
@@ -78,7 +77,6 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get certificate detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
                     ),
                 ),
@@ -273,7 +271,6 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateHistoryFailure({ error: extractError(err, "Failed to get certificate history") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get certificate history" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateEventHistory),
                     ),
                 ),
@@ -299,7 +296,6 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to list certificate locations" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationLocations),
                     ),
                 ),

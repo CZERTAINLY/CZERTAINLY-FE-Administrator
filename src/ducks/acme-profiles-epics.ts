@@ -32,7 +32,6 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeProfilesFailure({ error: extractError(error, "Failed to get ACME Profiles list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get ACME Profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEProfiles),
                     ),
                 ),

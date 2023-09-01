@@ -33,7 +33,6 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listAuthoritiesFailure({ error: extractError(err, "Failed to get Authorities list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Authorities list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.AuthorityStore),
                     ),
                 ),
@@ -58,7 +57,6 @@ const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getAuthorityDetailFailure({ error: extractError(err, "Failed to get Authority detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Authority detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationAuthorityDetails),
                     ),
                 ),

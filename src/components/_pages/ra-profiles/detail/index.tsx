@@ -699,6 +699,7 @@ export default function RaProfileDetail() {
                         titleSize="large"
                         refreshAction={getFreshAssociatedApprovalProfiles}
                         lockSize="large"
+                        widgetLockName={LockWidgetNameEnum.ApprovalProfiles}
                     >
                         <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
                     </Widget>

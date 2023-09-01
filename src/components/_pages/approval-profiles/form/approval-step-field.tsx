@@ -8,7 +8,7 @@ import { Field, useForm } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Select from "react-select";
-import { Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
+import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { ApprovalStepRequestModel, ApproverType } from "types/approval-profiles";
 import {
     composeValidators,
@@ -213,6 +213,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
                                         />
+                                        <FormFeedback>{meta.error}</FormFeedback>
                                     </FormGroup>
                                 )}
                             </Field>
@@ -257,6 +258,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
                                         />
+                                        <FormFeedback>{meta.error}</FormFeedback>
                                     </FormGroup>
                                 )}
                             </Field>

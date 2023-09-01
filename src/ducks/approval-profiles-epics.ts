@@ -77,7 +77,6 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         appRedirectActions.fetchError({ error: err, message: "Failed to list approvalprofiles" }),
 
                         slice.actions.listApprovalProfilesFailure({ error: extractError(err, "Failed to get Approval Profiles list") }),
-                        // widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.SchedulerJobDetail),
                     ),
                 ),
             ),

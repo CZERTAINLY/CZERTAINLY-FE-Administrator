@@ -33,7 +33,6 @@ const listGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listGlobalMetadataFailure({ error: extractError(err, "Failed to get Global Metadata list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Global Metadata list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGlobalMetadata),
                     ),
                 ),
@@ -111,7 +110,6 @@ const getGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getGlobalMetadataFailure({ error: extractError(err, "Failed to get global metadata detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get global metadata detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GlobalMetadataDetails),
                     ),
                 ),
