@@ -23,7 +23,13 @@ import { UserDetailModel } from "types/auth";
 import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
 import { EntityType } from "ducks/filters";
-import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumeric,
+    validateEmail,
+    validateLength,
+    validateRequired
+} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -430,7 +436,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="description" validate={composeValidators(validateLength(0,300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>

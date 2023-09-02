@@ -36,8 +36,8 @@ export const validateAlphaNumericWithoutAccents = () => {
 
 export const validateAlphaNumeric = () => {
     return validatePattern(
-        /^[a-zA-Z0-9À-ž]+([ '-/_.,?!][a-zA-Z0-9À-ž]+)*$/,
-        "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe, slash, underscore, period, comma, question mark, or exclamation point",
+        /^[a-zA-Z0-9À-ž]+([ '-/_][a-zA-Z0-9À-ž]+)*$/,
+        "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe or slash and underscore",
     );
 };
 
@@ -73,3 +73,10 @@ export const validateCustomPort = (value: string) => {
         ? undefined
         : "Value must be a valid port";
 };
+
+export const validateLength = (min: number, max: number) => (value: any) => {
+    const validationInput = getValueFromObject(value);
+    return !validationInput || (validationInput.length >= min && validationInput.length <= max)
+        ? undefined
+        : `Value must be between ${min} and ${max} characters long`;
+}

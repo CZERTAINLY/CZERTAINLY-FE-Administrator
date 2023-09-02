@@ -20,7 +20,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { EntityType } from "ducks/filters";
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {composeValidators, validateAlphaNumeric, validateLength, validateRequired} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { selectors as pagingSelectors } from "../../../../ducks/paging";
 import { Resource } from "../../../../types/openapi";
@@ -210,7 +210,7 @@ export default function LocationForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="name">Location Description</Label>

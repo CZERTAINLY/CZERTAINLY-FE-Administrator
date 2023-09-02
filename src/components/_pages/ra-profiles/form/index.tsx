@@ -20,7 +20,7 @@ import { RaProfileResponseModel } from "types/ra-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {composeValidators, validateAlphaNumeric, validateLength, validateRequired} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
@@ -183,7 +183,7 @@ export default function RaProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>

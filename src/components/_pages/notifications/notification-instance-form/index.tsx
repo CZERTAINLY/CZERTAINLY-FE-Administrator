@@ -16,7 +16,13 @@ import { NotificationInstanceRequestModel } from "types/notifications";
 import { AttributeContentType, FunctionGroupCode } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
-import { composeValidators, validateAlphaNumeric, validateAlphaNumericWithoutAccents, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumeric,
+    validateAlphaNumericWithoutAccents,
+    validateLength,
+    validateRequired
+} from "utils/validators";
 
 interface SelectChangeValue {
     value: string;
@@ -302,7 +308,7 @@ const NotificationInstanceForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>

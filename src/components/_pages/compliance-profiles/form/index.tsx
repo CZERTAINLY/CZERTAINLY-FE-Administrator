@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {composeValidators, validateAlphaNumeric, validateLength, validateRequired} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { Resource } from "../../../../types/openapi";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
@@ -86,7 +86,7 @@ function ComplianceProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description">
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Profile Description</Label>

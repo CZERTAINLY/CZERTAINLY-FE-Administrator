@@ -12,7 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from "types/globalMetadata";
 import { AttributeContentType, PlatformEnum } from "types/openapi";
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {composeValidators, validateAlphaNumeric, validateLength, validateRequired} from "utils/validators";
 
 export default function GlobalMetadataForm() {
     const dispatch = useDispatch();
@@ -80,7 +80,7 @@ export default function GlobalMetadataForm() {
                             validators={[validateRequired(), validateAlphaNumeric()]}
                         />
                         <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumeric()]} />
-                        <TextField label={"Description"} id={"description"} validators={[validateAlphaNumeric()]} />
+                        <TextField label={"Description"} id={"description"} validators={[validateLength(0,300)]} />
 
                         <Field name="contentType" validate={composeValidators(validateRequired())}>
                             {({ input, meta }) => (

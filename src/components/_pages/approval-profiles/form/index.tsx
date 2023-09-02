@@ -14,7 +14,7 @@ import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from "types/app
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import {
     composeValidators,
-    validateAlphaNumeric,
+    validateAlphaNumeric, validateLength,
     validateNonZeroInteger,
     validatePositiveInteger,
     validateRequired,
@@ -152,7 +152,7 @@ function ApprovalProfileForm() {
                             </Col>
                         </Row>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label htmlFor="description">Profile Description</Label>

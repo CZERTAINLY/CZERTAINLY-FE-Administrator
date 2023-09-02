@@ -9,7 +9,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumeric,
+    validateEmail,
+    validateLength,
+    validateRequired
+} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -115,7 +121,7 @@ function RoleForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="description" validate={composeValidators(validateLength(0,300))} >
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>

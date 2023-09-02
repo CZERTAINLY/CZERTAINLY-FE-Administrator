@@ -14,7 +14,13 @@ import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { Resource } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
-import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumeric,
+    validateEmail,
+    validateLength,
+    validateRequired
+} from "utils/validators";
 import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
@@ -120,7 +126,7 @@ export default function GroupForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Group Description</Label>
