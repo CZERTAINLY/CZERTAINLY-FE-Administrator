@@ -57,7 +57,7 @@ function RoleForm() {
                         roleRequest: {
                             name: values.name,
                             description: values.description,
-                            email: values.email,
+                            email: values.email ? values.email : undefined,
                             customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
                         },
                     }),
@@ -67,7 +67,7 @@ function RoleForm() {
                     rolesActions.create({
                         name: values.name,
                         description: values.description,
-                        email: values.email,
+                        email: values.email ? values.email : undefined,
                         customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
                     }),
                 );
