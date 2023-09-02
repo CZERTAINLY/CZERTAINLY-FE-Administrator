@@ -17,7 +17,7 @@ import { AuthType, ConnectorStatus, PlatformEnum, Resource } from "types/openapi
 
 import { attributeFieldNameTransform, collectFormAttributes } from "utils/attributes/attributes";
 
-import { composeValidators, validateAlphaNumeric, validateRequired, validateUrl } from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateUrl } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
@@ -416,7 +416,7 @@ export default function ConnectorForm() {
 
                                     {connectionDetails && connectionDetails.length > 0 ? (
                                         <div>
-                                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                                                 {({ input, meta }) => (
                                                     <FormGroup>
                                                         <Label for="name">Connector Name</Label>

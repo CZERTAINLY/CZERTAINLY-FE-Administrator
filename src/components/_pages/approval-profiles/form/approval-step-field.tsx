@@ -12,7 +12,7 @@ import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactst
 import { ApprovalStepRequestModel, ApproverType } from "types/approval-profiles";
 import {
     composeValidators,
-    validateAlphaNumeric, validateLength,
+    validateAlphaNumericWithSpecialChars, validateLength,
     validateNonZeroInteger,
     validatePositiveInteger,
     validateRequired,

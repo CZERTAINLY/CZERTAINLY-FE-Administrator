@@ -25,7 +25,7 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import {
     composeValidators,
-    validateAlphaNumeric,
+    validateAlphaNumericWithSpecialChars,
     validateAlphaNumericWithoutAccents,
     validateCustomIp,
     validateCustomUrl,

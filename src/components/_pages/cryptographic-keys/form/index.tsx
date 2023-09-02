@@ -24,7 +24,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import {composeValidators, validateAlphaNumeric, validateLength, validateRequired} from "utils/validators";
+import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { KeyRequestType, PlatformEnum, Resource } from "../../../../types/openapi";
 
@@ -271,7 +271,7 @@ export default function CryptographicKeyForm() {
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="name">Key Name</Label>
@@ -310,7 +310,7 @@ export default function CryptographicKeyForm() {
                             )}
                         </Field>
 
-                        <Field name="owner" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="owner">Owner</Label>

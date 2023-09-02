@@ -26,7 +26,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import {
-    validateAlphaNumeric,
+    validateAlphaNumericWithSpecialChars,
     validateAlphaNumericWithoutAccents,
     validateInteger,
     validateLength,

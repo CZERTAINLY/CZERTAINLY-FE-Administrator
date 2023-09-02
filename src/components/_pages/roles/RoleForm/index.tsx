@@ -11,7 +11,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import {
     composeValidators,
-    validateAlphaNumeric,
+    validateAlphaNumericWithSpecialChars,
     validateEmail,
     validateLength,
     validateRequired
@@ -102,7 +102,7 @@ function RoleForm() {
                 <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, values, valid }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="name">Role Name</Label>

@@ -25,7 +25,7 @@ import { CertificateDetailResponseModel, CertificateListResponseModel } from "ty
 import { EntityType } from "ducks/filters";
 import {
     composeValidators,
-    validateAlphaNumeric,
+    validateAlphaNumericWithSpecialChars,
     validateEmail,
     validateLength,
     validateRequired
@@ -455,7 +455,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="firstName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="firstName">First Name</Label>
@@ -474,7 +474,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="lastName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="lastName">Last Name</Label>

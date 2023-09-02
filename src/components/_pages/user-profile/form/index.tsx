@@ -10,7 +10,7 @@ import Widget from "components/Widget";
 
 import { actions, selectors } from "ducks/auth";
 
-import {composeValidators, validateAlphaNumeric, validateEmail, validateLength} from "utils/validators";
+import {composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength} from "utils/validators";
 
 interface FormValues {
     description: string;
@@ -86,7 +86,7 @@ export default function UserProfileForm() {
                                 )}
                             </Field>
 
-                            <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="firstName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="firstName">First Name</Label>
@@ -104,7 +104,7 @@ export default function UserProfileForm() {
                                 )}
                             </Field>
 
-                            <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="lastName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="lastName">Last Name</Label>
