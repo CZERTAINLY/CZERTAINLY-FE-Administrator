@@ -179,7 +179,7 @@ export default function DiscoveryForm() {
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
-                                    validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
+                                    validators={[validateRequired(), validateQuartzCronExpression()]}
                                     // description={getCronExpression(values.cronExpression)}
                                 />
                                 <SwitchField id="oneTime" label="One Time Only" />

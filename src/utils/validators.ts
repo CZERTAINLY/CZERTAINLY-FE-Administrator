@@ -1,6 +1,4 @@
 import cronValidator from "cron-expression-validator";
-import { Simulate } from "react-dom/test-utils";
-import error = Simulate.error;
 
 export const composeValidators =
     (...validators: any[]) =>
@@ -89,12 +87,7 @@ export const validateUrlSafe = () => {
     return validatePattern(/^[a-zA-Z0-9-._~]+$/, "Value can only contain numbers or letters, dash, underscore, dot or tilde.");
 };
 
-export const validateQuartzCronExpression = (cronExpression: string | undefined) => (value: any) => {
+export const validateQuartzCronExpression = () => (value: any) => {
     const validationInput = getValueFromObject(value);
-    let validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, { error: true });
-    return !validationInput || validObj.isValid
-        ? undefined
-        : Array.isArray(validObj.errorMessage)
-        ? Array.from(new Set(validObj.errorMessage)).join(", ")
-        : validObj.errorMessage;
+    return !validationInput || cronValidator.isValidCronExpression(validationInput) ? undefined : "Value must be a valid cron expression";
 };
