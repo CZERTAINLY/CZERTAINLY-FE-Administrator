@@ -24,7 +24,13 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { getCronExpression } from "utils/dateUtil";
 
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateLength,
+    validateQuartzCronExpression,
+    validateRequired
+} from "utils/validators";
 
 interface FormValues {
     name: string | undefined;
@@ -173,8 +179,8 @@ export default function DiscoveryForm() {
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
-                                    validators={[validateLength(0,300)]}
-                                    description={getCronExpression(values.cronExpression)}
+                                    validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
+                                    // description={getCronExpression(values.cronExpression)}
                                 />
                                 <SwitchField id="oneTime" label="One Time Only" />
                             </>
