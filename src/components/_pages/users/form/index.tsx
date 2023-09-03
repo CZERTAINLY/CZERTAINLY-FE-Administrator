@@ -28,7 +28,7 @@ import {
     validateAlphaNumericWithSpecialChars,
     validateEmail,
     validateLength,
-    validateRequired
+    validateRequired, validateUrlSafe
 } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
@@ -401,7 +401,7 @@ function UserForm() {
                             }
                             widgetExtraTopNode={enableCheckButton}
                         >
-                            <Field name="username" validate={validateRequired()}>
+                            <Field name="username" validate={composeValidators(validateRequired(),validateUrlSafe())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="username">Username</Label>
