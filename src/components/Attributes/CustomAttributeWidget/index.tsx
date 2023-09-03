@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
-import { Col, Form as BootstrapForm, Row } from "reactstrap";
+import { Form as BootstrapForm, Col, Row } from "reactstrap";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../ducks/customAttributes";
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "../../../types/attributes";
 import { Resource } from "../../../types/openapi";
@@ -69,7 +69,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
     );
 
     return (
-        <Widget title={"Custom Attributes"} busy={isFetchingResourceCustomAttributes || isUpdatingContent}>
+        <Widget title={"Custom Attributes"} busy={isFetchingResourceCustomAttributes || isUpdatingContent} titleSize="large">
             <AttributeViewer
                 attributes={loadedAttributes}
                 descriptors={resourceCustomAttributes}

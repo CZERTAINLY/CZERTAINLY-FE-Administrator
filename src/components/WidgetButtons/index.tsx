@@ -8,6 +8,7 @@ export type IconName =
     | "check"
     | "plug"
     | "pencil"
+    | "history"
     | "cross-circle"
     | "upload"
     | "download"
@@ -41,6 +42,7 @@ export interface WidgetButtonProps {
     icon: IconName;
     id?: string;
     tooltip?: any;
+    hidden?: boolean;
     disabled: boolean;
     custom?: React.ReactNode;
     onClick: (event: React.MouseEvent) => void;
@@ -57,6 +59,7 @@ const colors = {
     check: "green",
     plug: "auto",
     pencil: "auto",
+    history: "auto",
     "cross-circle": "black",
     upload: "auto",
     download: "auto",
@@ -94,6 +97,7 @@ const classNames = {
     check: "fa fa-check",
     plug: "fa fa-plug",
     pencil: "fa fa-pencil-square-o",
+    history: "fa fa-history",
     "cross-circle": "fa fa-times-circle",
     upload: "fa fa-upload",
     download: "fa fa-download",
@@ -146,7 +150,7 @@ function WidgetButtons({ buttons }: Props) {
         return button.custom ? (
             <span key={button.icon + button.tooltip}>{button.custom}</span>
         ) : (
-            <Button {...btnProps} title={button.tooltip}>
+            <Button {...btnProps} title={button.tooltip} hidden={button.hidden}>
                 <i className={classNames[button.icon]} style={style} />
                 {toolTip}
             </Button>

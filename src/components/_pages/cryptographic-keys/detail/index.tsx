@@ -4,7 +4,7 @@ import Dialog from "components/Dialog";
 import TabLayout from "components/Layout/TabLayout";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/cryptographic-keys";
 
@@ -17,6 +17,7 @@ import Select from "react-select";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Col, Container, Label, Row } from "reactstrap";
 import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import CryptographicKeyItem from "./CryptographicKeyItem";
@@ -29,8 +30,7 @@ export default function CryptographicKeyDetail() {
     const relativePath = keyItemUuid ? "../../../.." : "../../..";
 
     const cryptographicKey = useSelector(selectors.cryptographicKey);
-
-    const isFetchingProfile = useSelector(selectors.isFetchingDetail);
+    const state = useSelector(selectors.state);
     const isUpdatingKeyUsage = useSelector(selectors.isUpdatingKeyUsage);
 
     const isDeleting = useSelector(selectors.isDeleting);
@@ -39,7 +39,7 @@ export default function CryptographicKeyDetail() {
     const isCompromising = useSelector(selectors.isBulkCompromising);
     const isDestroying = useSelector(selectors.isBulkDestroying);
     const isFetchingHistory = useSelector(selectors.isFetchingHistory);
-
+    const [selectedTab, setSelectedTab] = useState(0);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
@@ -51,15 +51,19 @@ export default function CryptographicKeyDetail() {
     const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
 
     const isBusy = useMemo(
-        () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
-        [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying],
+        () => state.isFetchingDetail || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
+        [isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage, isCompromising, isDestroying, state.isFetchingDetail],
     );
 
-    useEffect(() => {
+    const getFreshCryptographicKeyDetails = useCallback(() => {
         if (!id || !tokenId) return;
 
         dispatch(actions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId, uuid: id }));
     }, [id, dispatch, tokenId]);
+
+    useEffect(() => {
+        getFreshCryptographicKeyDetails();
+    }, [getFreshCryptographicKeyDetails, id, tokenId]);
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
@@ -197,32 +201,6 @@ export default function CryptographicKeyDetail() {
         [cryptographicKey, onEditClick, onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy],
     );
 
-    const cryptographicKeyTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Key <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const associationTitle = useMemo(
-        () => (
-            <div>
-                <h5>
-                    Key <span className="fw-semi-bold">Associations</span>
-                </h5>
-            </div>
-        ),
-        [],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -358,9 +336,16 @@ export default function CryptographicKeyDetail() {
         const keyItems = [...(cryptographicKey?.items ?? [])].sort(
             (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
         );
-        const selectedTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
-        const tabs = keyItems.map((item) => ({
-            title: getEnumLabel(keyTypeEnum, item.type),
+
+        const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
+        setSelectedTab(keyTab < 0 ? 0 : keyTab);
+
+        const tabs = keyItems.map((item, i) => ({
+            title: (
+                <div className="d-flex p-2 px-3" onClick={() => setSelectedTab(i)}>
+                    {getEnumLabel(keyTypeEnum, item.type)}
+                </div>
+            ),
             content: (
                 <Widget busy={isBusy || isFetchingHistory}>
                     <CryptographicKeyItem
@@ -374,14 +359,22 @@ export default function CryptographicKeyDetail() {
                 </Widget>
             ),
         }));
-        return { tabs, selectedTab: selectedTab !== -1 ? selectedTab : 0 };
+        return { tabs };
     }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum, keyItemUuid]);
 
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title={cryptographicKeyTitle} busy={isBusy}>
+                    <Widget
+                        title="Key Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshCryptographicKeyDetails}
+                        widgetLockName={LockWidgetNameEnum.keyDetails}
+                        lockSize="large"
+                    >
                         <br />
 
                         <CustomTable headers={detailHeaders} data={detailData} />
@@ -389,7 +382,7 @@ export default function CryptographicKeyDetail() {
                 </Col>
 
                 <Col>
-                    <Widget title="Attributes" busy={isBusy}>
+                    <Widget title="Attributes" busy={isBusy} titleSize="large">
                         <br />
                         <Label>Key Attributes</Label>
                         <AttributeViewer attributes={cryptographicKey?.attributes} />
@@ -405,9 +398,9 @@ export default function CryptographicKeyDetail() {
                 </Col>
             </Row>
 
-            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={itemTabs.selectedTab} />}
+            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
 
-            <Widget title={associationTitle} busy={isBusy}>
+            <Widget title="Key Associations" busy={isBusy} titleSize="large">
                 <br />
 
                 <CustomTable headers={associationHeaders} data={associationBody} />

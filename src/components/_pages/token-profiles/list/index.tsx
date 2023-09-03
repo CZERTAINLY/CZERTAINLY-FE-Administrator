@@ -9,7 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import Select from "react-select";
@@ -50,10 +50,14 @@ function TokenProfileList() {
 
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.listTokenProfiles({}));
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -140,21 +144,6 @@ function TokenProfileList() {
         }
         return options;
     };
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Token Profiles</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
 
     const keyUsageBody = (
         <div>
@@ -256,7 +245,14 @@ function TokenProfileList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfTokenProfiles}>
+            <Widget
+                title="List of Token Profiles"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfTokenProfiles}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={tokenProfilesTableHeaders}

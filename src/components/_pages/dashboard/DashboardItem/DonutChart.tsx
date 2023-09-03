@@ -51,7 +51,7 @@ function DonutChart({ title, data = {}, entity, redirect, onSetFilter: onLegendC
     };
 
     return (
-        <Widget title={<p style={{ fontWeight: 700 }}>{title}</p>}>
+        <Widget title={title} titleBoldness="bold">
             <ReactApexChart options={options} series={getValues(data)} type="donut" height="100%" width="100%" />
         </Widget>
     );

@@ -23,6 +23,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
+import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { validateRequired } from "utils/validators";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
 import {
@@ -191,14 +192,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, valid, submitting, values, form }) => (
                 <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget
-                        title={
-                            <h5>
-                                Rekey <span className="fw-semi-bold">Certificate</span>
-                            </h5>
-                        }
-                        busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}
-                    >
+                    <Widget title="Rekey Certificate" busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}>
                         <Field name="uploadCsr">
                             {({ input, meta, onChange }) => (
                                 <FormGroup>
@@ -221,13 +215,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                         </Field>
                     </Widget>
 
-                    <Widget
-                        title={
-                            <h5>
-                                <span className="fw-semi-bold">Request Properties</span>
-                            </h5>
-                        }
-                    >
+                    <Widget title="Request Properties">
                         {values.uploadCsr?.value && certificate?.raProfile ? (
                             <>
                                 <FileUpload
@@ -235,7 +223,12 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                     onFileContentLoaded={(fileContent) => {
                                         setFileContent(fileContent);
                                         if (health) {
-                                            dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent));
+                                            dispatch(
+                                                utilsCertificateRequestActions.parseCertificateRequest({
+                                                    content: fileContent,
+                                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                }),
+                                            );
                                         }
                                     }}
                                 />

@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/globalMetadata";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -24,6 +25,11 @@ export default function GlobalMetadataDetail() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+
+    const getFreshGlobalMetadata = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getGlobalMetadata(id));
+    }, [id, dispatch]);
 
     useEffect(() => {
         if (!id) return;
@@ -62,20 +68,6 @@ export default function GlobalMetadataDetail() {
             },
         ],
         [onEditClick],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-                <h5>
-                    Global Metadata <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -134,7 +126,14 @@ export default function GlobalMetadataDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingDetail}>
+            <Widget
+                title="Global Metadata Details"
+                busy={isFetchingDetail}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshGlobalMetadata}
+                widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 

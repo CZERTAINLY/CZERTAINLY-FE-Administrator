@@ -59,10 +59,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
     const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
 
-    useEffect(() => {
+    const getFreshHistory = useCallback(() => {
         if (!keyItem) return;
         dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, tokenInstanceUuid: tokenInstanceUuid, keyUuid: keyUuid }));
-    }, [dispatch, keyItem.uuid, tokenInstanceUuid, keyUuid, keyItem]);
+    }, [dispatch, tokenInstanceUuid, keyUuid, keyItem]);
+
+    useEffect(() => {
+        getFreshHistory();
+    }, [getFreshHistory, tokenInstanceUuid, keyUuid]);
 
     useEffect(() => {
         if (history) {
@@ -466,13 +470,13 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
                 {keyItem.metadata && keyItem.metadata.length > 0 ? (
                     <Col>
-                        <Widget title="Metadata" className="mt-3">
+                        <Widget title="Metadata" className="mt-3" titleSize="large">
                             <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={keyItem.metadata} />
                         </Widget>
                     </Col>
                 ) : null}
             </Row>
-            <Widget title="Event History" className="mt-3">
+            <Widget title="Event History" className="mt-3" titleSize="large" refreshAction={getFreshHistory}>
                 <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
             </Widget>
 

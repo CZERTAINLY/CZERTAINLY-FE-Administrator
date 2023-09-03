@@ -9,12 +9,18 @@ import { initialState as initialScepProfilesState, slice as scepProfilesSlice } 
 import scepProfilesEpics from "./scep-profiles-epics";
 
 import { slice as alertsSlice, initialState as initialAlertsState } from "./alerts";
-import { slice as widgetLockSlice, initialState as initialWidgetLockState } from "./widget-locks";
 import { slice as appRedirectSlice, initialState as initialAppRedirectState } from "./app-redirect";
 import appRedirectEpics from "./app-redirect-epics";
 import { slice as auditLogsSlice, initialState as initialAuditLogsState } from "./auditLogs";
 import auditLogsEpics from "./auditLogs-epics";
 import { slice as authSlice, initialState as initialAuthState } from "./auth";
+import { initialState as initialWidgetLockState, slice as widgetLockSlice } from "./widget-locks";
+
+import { initialState as initialProfileApprovalState, slice as profileApprovalSlice } from "./approval-profiles";
+import profileApprovalEpics from "./approval-profiles-epics";
+
+import { slice as approvalSlice, initialState as initialApprovalState } from "./approvals";
+import approvalsEpic from "./approvals-epic";
 
 import authEpics from "./auth-epics";
 import { slice as authoritiesSlice, initialState as initialAuthoritiesState } from "./authorities";
@@ -50,11 +56,15 @@ import { slice as globalMetadataSlice, initialState as initialGlobalMetadataStat
 import globalMetadataEpics from "./globalMetadata-epics";
 import { slice as initialLocationsSlice, initialState as initialLocationsState } from "./locations";
 import locationsEpics from "./locations-epics";
+import { initialState as initialNotificationsState, slice as notificationsSlice } from "./notifications";
+import notificationsEpics from "./notifications-epics";
 import { initialState as initialPagingState, slice as pagingSlice } from "./paging";
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
 import raProfilesEpics from "./ra-profiles-epics";
 import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
 import rolesEpics from "./roles-epics";
+import { initialState as initialSchedulerState, slice as schedulerSlice } from "./scheduler";
+import schedulerEpics from "./scheduler-epics";
 import { initialState as initialSettingsState, slice as settingsSlice } from "./settings";
 import settingsEpics from "./settings-epics";
 import startupEpics from "./startup-epics";
@@ -110,6 +120,10 @@ export const initialState = {
     [customAttributesSlice.name]: initialCustomAttributesState,
     [globalMetadataSlice.name]: initialGlobalMetadataState,
     [settingsSlice.name]: initialSettingsState,
+    [schedulerSlice.name]: initialSchedulerState,
+    [profileApprovalSlice.name]: initialProfileApprovalState,
+    [approvalSlice.name]: initialApprovalState,
+    [notificationsSlice.name]: initialNotificationsState,
     [enumsSlice.name]: initialEnumsState,
     [tokenSlice.name]: initialTokenAttributesState,
     [tokenProfileSlice.name]: initialTokenProfileAttributesState,
@@ -148,6 +162,10 @@ export const reducers = combineReducers<typeof initialState, any>({
     [customAttributesSlice.name]: customAttributesSlice.reducer,
     [globalMetadataSlice.name]: globalMetadataSlice.reducer,
     [settingsSlice.name]: settingsSlice.reducer,
+    [schedulerSlice.name]: schedulerSlice.reducer,
+    [profileApprovalSlice.name]: profileApprovalSlice.reducer,
+    [approvalSlice.name]: approvalSlice.reducer,
+    [notificationsSlice.name]: notificationsSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
@@ -184,6 +202,10 @@ export const epics = combineEpics(
     ...customAttributesEpics,
     ...globalMetadataEpics,
     ...settingsEpics,
+    ...schedulerEpics,
+    ...profileApprovalEpics,
+    ...approvalsEpic,
+    ...notificationsEpics,
     ...enumsEpics,
     ...tokenEpics,
     ...tokenProfileEpics,

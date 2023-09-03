@@ -14,7 +14,7 @@ import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from "types/customAttributes";
 import { AttributeContentType, PlatformEnum } from "types/openapi";
-import { validateAlphaNumeric, validateRequired } from "utils/validators";
+import {validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
 
 export default function CustomAttributeForm() {
     const dispatch = useDispatch();
@@ -106,11 +106,11 @@ export default function CustomAttributeForm() {
                             label={"Name"}
                             id={"name"}
                             disabled={editMode}
-                            validators={[validateRequired(), validateAlphaNumeric()]}
+                            validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
                         />
-                        <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumeric()]} />
-                        <TextField label={"Description"} id={"description"} validators={[validateAlphaNumeric()]} />
-                        <TextField label={"Group"} id={"group"} validators={[validateAlphaNumeric()]} />
+                        <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
+                        <TextField label={"Description"} id={"description"} validators={[validateLength(0,300)]} />
+                        <TextField label={"Group"} id={"group"} validators={[validateAlphaNumericWithSpecialChars()]} />
 
                         <Field name="resources" type={"text"}>
                             {({ input }) => (

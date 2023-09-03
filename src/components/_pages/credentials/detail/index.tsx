@@ -3,13 +3,14 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/credentials";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -28,10 +29,15 @@ function CredentialDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshCredentialDetails = useCallback(() => {
         if (!id) return;
+        dispatch(actions.resetState());
         dispatch(actions.getCredentialDetail({ uuid: id }));
     }, [id, dispatch]);
+
+    useEffect(() => {
+        getFreshCredentialDetails();
+    }, [getFreshCredentialDetails, id]);
 
     const onEditClick = useCallback(() => {
         if (!credential) return;
@@ -70,21 +76,6 @@ function CredentialDetail() {
             },
         ],
         [onEditClick, setConfirmDelete],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={widgetButtons} />
-                </div>
-
-                <h5>
-                    Credential <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [widgetButtons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -139,14 +130,21 @@ function CredentialDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetching || isDeleting}>
+            <Widget
+                title="Credential Details"
+                busy={isFetching || isDeleting}
+                widgetButtons={widgetButtons}
+                titleSize="large"
+                refreshAction={getFreshCredentialDetails}
+                widgetLockName={LockWidgetNameEnum.CredentialDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
             {credential && credential.attributes && credential.attributes.length > 0 && (
-                <Widget title="Credential Attributes">
+                <Widget title="Credential Attributes" titleSize="large">
                     <br />
                     <AttributeViewer attributes={credential?.attributes} />
                 </Widget>

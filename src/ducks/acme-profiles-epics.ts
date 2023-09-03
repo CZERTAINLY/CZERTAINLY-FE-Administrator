@@ -3,17 +3,17 @@ import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./acme-profiles";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import {
     transformAcmeProfileAddRequestModelToDto,
     transformAcmeProfileEditRequestModelToDto,
     transformAcmeProfileListResponseDtoToModel,
     transformAcmeProfileResponseDtoToModel,
 } from "./transform/acme-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -32,7 +32,6 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeProfilesFailure({ error: extractError(error, "Failed to get ACME Profiles list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get ACME Profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEProfiles),
                     ),
                 ),
@@ -47,12 +46,18 @@ const getAcmeProfileDetail: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.acmeProfiles.getAcmeProfile({ uuid: action.payload.uuid }).pipe(
-                map((detail) => slice.actions.getAcmeProfileSuccess({ acmeProfile: transformAcmeProfileResponseDtoToModel(detail) })),
+                switchMap((detail) =>
+                    of(
+                        slice.actions.getAcmeProfileSuccess({ acmeProfile: transformAcmeProfileResponseDtoToModel(detail) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ACMEProfileDetails),
+                    ),
+                ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getAcmeProfileFailure({ error: extractError(error, "Failed to get ACME Profile details") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get ACME Profile details" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEProfileDetails),
                     ),
                 ),
             ),

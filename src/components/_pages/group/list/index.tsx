@@ -7,7 +7,7 @@ import { actions, selectors } from "ducks/certificateGroups";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { Container } from "reactstrap";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
@@ -27,10 +27,14 @@ export default function GroupList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.listGroups());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -70,21 +74,6 @@ export default function GroupList() {
         [checkedRows, onAddClick],
     );
 
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Groups</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const groupsTableHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -99,6 +88,13 @@ export default function GroupList() {
                 content: "Description",
                 sortable: true,
             },
+            {
+                id: "email",
+                content: "Email",
+                sortable: true,
+                sort: "asc",
+                width: "15%",
+            }
         ],
         [],
     );
@@ -108,14 +104,21 @@ export default function GroupList() {
             groups.map((group) => ({
                 id: group.uuid,
 
-                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || ""],
+                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || "", group.email || ""],
             })),
         [groups],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfGroups}>
+            <Widget
+                title="List of Groups"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfGroups}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={groupsTableHeaders}

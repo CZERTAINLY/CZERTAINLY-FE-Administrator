@@ -8,7 +8,7 @@ type Props = {
     label: string;
     disabled?: boolean;
     inputType?: InputType;
-    description?: string;
+    description?: string | JSX.Element;
     validators: ((value: any) => string | undefined | Promise<string | undefined>)[];
 };
 

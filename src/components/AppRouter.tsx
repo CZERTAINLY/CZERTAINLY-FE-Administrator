@@ -25,6 +25,13 @@ import ComplianceProfilesList from "./_pages/compliance-profiles/list";
 import ConnectorDetail from "./_pages/connectors/detail";
 import ConnectorEdit from "./_pages/connectors/form";
 
+import ApprovalProfileDetails from "./_pages/approval-profiles/detail";
+import ApprovalProfilesForm from "./_pages/approval-profiles/form";
+import ApprovalProfiles from "./_pages/approval-profiles/list";
+
+import ApprovalDetails from "./_pages/approvals/details";
+import ApprovalsList from "./_pages/approvals/list";
+
 import ConnectorsList from "./_pages/connectors/list";
 import CredentialDetail from "./_pages/credentials/detail";
 import CredentialEdit from "./_pages/credentials/form";
@@ -94,6 +101,15 @@ import AppLogin from "./AppLogin/AppLogin";
 
 import AppRedirect from "./AppRedirect";
 
+import { Resource } from "types/openapi";
+
+import NotificationsList from "./_pages/notifications/list";
+import NotificationInstanceDetail from "./_pages/notifications/notification-instance-details";
+import NotificationInstanceForm from "./_pages/notifications/notification-instance-form";
+import NotificationsSetting from "./_pages/notifications/notifications-setting";
+
+import SchedulerJobDetail from "./_pages/scheduler/detail";
+import SchedulerJobsList from "./_pages/scheduler/list";
 import Layout from "./Layout";
 import Spinner from "./Spinner";
 
@@ -104,140 +120,207 @@ export default function AppRouter() {
         () => (
             <>
                 <Route element={<Layout />}>
-                    <Route path="" element={<Navigate to="/dashboard" />} />
-                    <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="" element={<Navigate to={`/${Resource.Dashboard.toLowerCase()}`} />} />
+                    <Route path={`/`} element={<Navigate to={`/${Resource.Dashboard.toLowerCase()}`} />} />
 
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path={`/${Resource.Dashboard.toLowerCase()}`} element={<Dashboard />} />
 
-                    <Route path="/users" element={<UsersList />} />
-                    <Route path="/users/list" element={<Navigate to="/users" />} />
-                    <Route path="/users/detail/:id" element={<UserDetail />} />
-                    <Route path="/users/add" element={<UserEdit />} />
-                    <Route path="/users/edit/:id" element={<UserEdit />} />
+                    <Route path={`/${Resource.Users.toLowerCase()}`} element={<UsersList />} />
+                    <Route path={`/${Resource.Users.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Users.toLowerCase()}`} />} />
+                    <Route path={`/${Resource.Users.toLowerCase()}/detail/:id`} element={<UserDetail />} />
+                    <Route path={`/${Resource.Users.toLowerCase()}/add`} element={<UserEdit />} />
+                    <Route path={`/${Resource.Users.toLowerCase()}/edit/:id`} element={<UserEdit />} />
 
-                    <Route path="/roles" element={<RolesList />} />
-                    <Route path="/roles/list" element={<Navigate to="/roles" />} />
-                    <Route path="/roles/detail/:id" element={<RoleDetail />} />
-                    <Route path="/roles/add" element={<RoleEdit />} />
-                    <Route path="/roles/edit/:id" element={<RoleEdit />} />
-                    <Route path="/roles/users/:id" element={<RoleUsers />} />
-                    <Route path="/roles/permissions/:id" element={<RolePermissions />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}`} element={<RolesList />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Roles.toLowerCase()}`} />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}/detail/:id`} element={<RoleDetail />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}/add`} element={<RoleEdit />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}/edit/:id`} element={<RoleEdit />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}/users/:id`} element={<RoleUsers />} />
+                    <Route path={`/${Resource.Roles.toLowerCase()}/permissions/:id`} element={<RolePermissions />} />
 
-                    <Route path="/certificates" element={<CertificatesList />} />
-                    <Route path="/certificates/list" element={<Navigate to="/certificates" />} />
-                    <Route path="/certificates/detail/:id" element={<CertificateDetail />} />
-                    <Route path="/certificates/add" element={<CertificateEdit />} />
+                    <Route path={`/${Resource.Certificates.toLowerCase()}`} element={<CertificatesList />} />
+                    <Route
+                        path={`/${Resource.Certificates.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Certificates.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Certificates.toLowerCase()}/detail/:id`} element={<CertificateDetail />} />
+                    <Route path={`/${Resource.Certificates.toLowerCase()}/add`} element={<CertificateEdit />} />
 
-                    <Route path="/connectors" element={<ConnectorsList />} />
-                    <Route path="/connectors/list" element={<Navigate to="/connectors" />} />
-                    <Route path="/connectors/detail/:id" element={<ConnectorDetail />} />
-                    <Route path="/connectors/add" element={<ConnectorEdit />} />
-                    <Route path="/connectors/edit/:id" element={<ConnectorEdit />} />
+                    <Route path={`/${Resource.Connectors.toLowerCase()}`} element={<ConnectorsList />} />
+                    <Route
+                        path={`/${Resource.Connectors.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Connectors.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Connectors.toLowerCase()}/detail/:id`} element={<ConnectorDetail />} />
+                    <Route path={`/${Resource.Connectors.toLowerCase()}/add`} element={<ConnectorEdit />} />
+                    <Route path={`/${Resource.Connectors.toLowerCase()}/edit/:id`} element={<ConnectorEdit />} />
 
-                    <Route path="/discoveries" element={<DiscoveriesList />} />
-                    <Route path="/discoveries/list" element={<Navigate to="/discoveries" />} />
-                    <Route path="/discoveries/detail/:id" element={<DiscoveryDetail />} />
-                    <Route path="/discoveries/add" element={<DiscoveryEdit />} />
+                    <Route path={`/${Resource.Discoveries.toLowerCase()}`} element={<DiscoveriesList />} />
+                    <Route
+                        path={`/${Resource.Discoveries.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Discoveries.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Discoveries.toLowerCase()}/detail/:id`} element={<DiscoveryDetail />} />
+                    <Route path={`/${Resource.Discoveries.toLowerCase()}/add`} element={<DiscoveryEdit />} />
 
-                    <Route path="/authorities" element={<AuthoritiesList />} />
-                    <Route path="/authorities/list" element={<Navigate to="/authorities" />} />
-                    <Route path="/authorities/detail/:id" element={<AuthorityDetail />} />
-                    <Route path="/authorities/add" element={<AuthorityEdit />} />
-                    <Route path="/authorities/edit/:id" element={<AuthorityEdit />} />
+                    <Route path={`/${Resource.Authorities.toLowerCase()}`} element={<AuthoritiesList />} />
+                    <Route
+                        path={`/${Resource.Authorities.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Authorities.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Authorities.toLowerCase()}/detail/:id`} element={<AuthorityDetail />} />
+                    <Route path={`/${Resource.Authorities.toLowerCase()}/add`} element={<AuthorityEdit />} />
+                    <Route path={`/${Resource.Authorities.toLowerCase()}/edit/:id`} element={<AuthorityEdit />} />
 
-                    <Route path="/raprofiles" element={<RaProfilesList />} />
-                    <Route path="/raprofiles/list" element={<Navigate to="/raprofiles" />} />
-                    <Route path="/raprofiles/detail/:authorityId/:id" element={<RaProfileDetail />} />
-                    <Route path="/raprofiles/add" element={<RaProfileEdit />} />
-                    <Route path="/raprofiles/edit/:authorityId/:id" element={<RaProfileEdit />} />
+                    <Route path={`/${Resource.RaProfiles.toLowerCase()}`} element={<RaProfilesList />} />
+                    <Route
+                        path={`/${Resource.RaProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.RaProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.RaProfiles.toLowerCase()}/detail/:authorityId/:id`} element={<RaProfileDetail />} />
+                    <Route path={`/${Resource.RaProfiles.toLowerCase()}/add`} element={<RaProfileEdit />} />
+                    <Route path={`/${Resource.RaProfiles.toLowerCase()}/edit/:authorityId/:id`} element={<RaProfileEdit />} />
 
-                    <Route path="/complianceprofiles" element={<ComplianceProfilesList />} />
-                    <Route path="/complianceprofiles/list" element={<Navigate to="/complianceprofiles" />} />
-                    <Route path="/complianceprofiles/detail/:id" element={<ComplianceProfileDetail />} />
-                    <Route path="/complianceprofiles/add" element={<ComplianceProfileEdit />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}`} element={<ApprovalProfiles />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/add`} element={<ApprovalProfilesForm />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/:id`} element={<ApprovalProfileDetails />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/detail/:id/:version`} element={<ApprovalProfileDetails />} />
+                    <Route path={`/${Resource.ApprovalProfiles.toLowerCase()}/edit/:id`} element={<ApprovalProfilesForm />} />
 
-                    <Route path="/acmeprofiles" element={<AcmeProfilesList />} />
-                    <Route path="/acmeprofiles/list" element={<Navigate to="/acmeprofiles" />} />
-                    <Route path="/acmeprofiles/detail/:id" element={<AcmeProfileDetail />} />
-                    <Route path="/acmeprofiles/edit/:id" element={<AcmeProfileEdit />} />
-                    <Route path="/acmeprofiles/add" element={<AcmeProfileEdit />} />
+                    <Route path={`/${Resource.Approvals.toLowerCase()}`} element={<ApprovalsList />} />
+                    <Route path={`/${Resource.Approvals.toLowerCase()}/detail/:id`} element={<ApprovalDetails />} />
 
-                    <Route path="/acmeaccounts" element={<AcmeAccountsList />} />
-                    <Route path="/acmeaccounts/list" element={<Navigate to="/acmeaccounts" />} />
-                    <Route path="/acmeaccounts/detail/:acmeProfileId/:id" element={<AcmeAccountDetail />} />
+                    <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}`} element={<ComplianceProfilesList />} />
+                    <Route
+                        path={`/${Resource.ComplianceProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.ComplianceProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}/detail/:id`} element={<ComplianceProfileDetail />} />
+                    <Route path={`/${Resource.ComplianceProfiles.toLowerCase()}/add`} element={<ComplianceProfileEdit />} />
 
-                    <Route path="/scepprofiles" element={<ScepProfilesList />} />
-                    <Route path="/scepprofiles/list" element={<Navigate to="/scepprofiles" />} />
-                    <Route path="/scepprofiles/detail/:id" element={<ScepProfileDetail />} />
-                    <Route path="/scepprofiles/edit/:id" element={<ScepProfileEdit />} />
-                    <Route path="/scepprofiles/add" element={<ScepProfileEdit />} />
+                    <Route path={`/${Resource.AcmeProfiles.toLowerCase()}`} element={<AcmeProfilesList />} />
+                    <Route
+                        path={`/${Resource.AcmeProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.AcmeProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.AcmeProfiles.toLowerCase()}/detail/:id`} element={<AcmeProfileDetail />} />
+                    <Route path={`/${Resource.AcmeProfiles.toLowerCase()}/edit/:id`} element={<AcmeProfileEdit />} />
+                    <Route path={`/${Resource.AcmeProfiles.toLowerCase()}/add`} element={<AcmeProfileEdit />} />
 
-                    <Route path="/groups" element={<GroupList />} />
-                    <Route path="/groups/list" element={<Navigate to="/groups" />} />
-                    <Route path="/groups/detail/:id" element={<GroupDetail />} />
-                    <Route path="/groups/add" element={<GroupEdit />} />
-                    <Route path="/groups/edit/:id" element={<GroupEdit />} />
+                    <Route path={`/${Resource.AcmeAccounts.toLowerCase()}`} element={<AcmeAccountsList />} />
+                    <Route
+                        path={`/${Resource.AcmeAccounts.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.AcmeAccounts.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.AcmeAccounts.toLowerCase()}/detail/:acmeProfileId/:id`} element={<AcmeAccountDetail />} />
 
-                    <Route path="/credentials" element={<CredentialsList />} />
-                    <Route path="/credentials/list" element={<Navigate to="/credentials" />} />
-                    <Route path="/credentials/detail/:id" element={<CredentialDetail />} />
-                    <Route path="/credentials/add" element={<CredentialEdit />} />
-                    <Route path="/credentials/edit/:id" element={<CredentialEdit />} />
+                    <Route path={`/${Resource.ScepProfiles.toLowerCase()}`} element={<ScepProfilesList />} />
+                    <Route
+                        path={`/${Resource.ScepProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.ScepProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.ScepProfiles.toLowerCase()}/detail/:id`} element={<ScepProfileDetail />} />
+                    <Route path={`/${Resource.ScepProfiles.toLowerCase()}/edit/:id`} element={<ScepProfileEdit />} />
+                    <Route path={`/${Resource.ScepProfiles.toLowerCase()}/add`} element={<ScepProfileEdit />} />
 
-                    <Route path="/entities" element={<EntitiesList />} />
-                    <Route path="/entities/list" element={<Navigate to="/entities" />} />
-                    <Route path="/entities/detail/:id" element={<EntityDetail />} />
-                    <Route path="/entities/add" element={<EntityEdit />} />
-                    <Route path="/entities/edit/:id" element={<EntityEdit />} />
+                    <Route path={`/${Resource.Groups.toLowerCase()}`} element={<GroupList />} />
+                    <Route
+                        path={`/${Resource.Groups.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Groups.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Groups.toLowerCase()}/detail/:id`} element={<GroupDetail />} />
+                    <Route path={`/${Resource.Groups.toLowerCase()}/add`} element={<GroupEdit />} />
+                    <Route path={`/${Resource.Groups.toLowerCase()}/edit/:id`} element={<GroupEdit />} />
 
-                    <Route path="/locations" element={<LocationsList />} />
-                    <Route path="/locations/list" element={<Navigate to="/locations" />} />
-                    <Route path="/locations/detail/:entityId/:id" element={<LocationDetail />} />
-                    <Route path="/locations/add" element={<LocationEdit />} />
-                    <Route path="/locations/edit/:entityId/:id" element={<LocationEdit />} />
+                    <Route path={`/${Resource.Credentials.toLowerCase()}`} element={<CredentialsList />} />
+                    <Route
+                        path={`/${Resource.Credentials.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Credentials.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Credentials.toLowerCase()}/detail/:id`} element={<CredentialDetail />} />
+                    <Route path={`/${Resource.Credentials.toLowerCase()}/add`} element={<CredentialEdit />} />
+                    <Route path={`/${Resource.Credentials.toLowerCase()}/edit/:id`} element={<CredentialEdit />} />
 
-                    <Route path="/userprofile" element={<UserProfileDetail />} />
-                    <Route path="/userprofile/edit" element={<UserProfileEdit />} />
+                    <Route path={`/${Resource.Entities.toLowerCase()}`} element={<EntitiesList />} />
+                    <Route
+                        path={`/${Resource.Entities.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Entities.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Entities.toLowerCase()}/detail/:id`} element={<EntityDetail />} />
+                    <Route path={`/${Resource.Entities.toLowerCase()}/add`} element={<EntityEdit />} />
+                    <Route path={`/${Resource.Entities.toLowerCase()}/edit/:id`} element={<EntityEdit />} />
 
-                    <Route path="/audit" element={<AuditLogs />} />
+                    <Route path={`/${Resource.Locations.toLowerCase()}`} element={<LocationsList />} />
+                    <Route
+                        path={`/${Resource.Locations.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Locations.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Locations.toLowerCase()}/detail/:entityId/:id`} element={<LocationDetail />} />
+                    <Route path={`/${Resource.Locations.toLowerCase()}/add`} element={<LocationEdit />} />
+                    <Route path={`/${Resource.Locations.toLowerCase()}/edit/:entityId/:id`} element={<LocationEdit />} />
 
-                    <Route path="/customattributes" element={<CustomAttributesList />} />
-                    <Route path="/customattributes/list" element={<Navigate to="/customattributes" />} />
-                    <Route path="/customattributes/detail/:id" element={<CustomAttributesDetail />} />
-                    <Route path="/customattributes/add" element={<CustomAttributesEdit />} />
-                    <Route path="/customattributes/edit/:id" element={<CustomAttributesEdit />} />
+                    <Route path={`/userprofile`} element={<UserProfileDetail />} />
+                    <Route path={`/userprofile/edit`} element={<UserProfileEdit />} />
 
-                    <Route path="/globalmetadata" element={<GlobalMetadataList />} />
-                    <Route path="/globalmetadata/list" element={<Navigate to="/globalmetadata" />} />
-                    <Route path="/globalmetadata/detail/:id" element={<GlobalMetadataDetail />} />
-                    <Route path="/globalmetadata/add" element={<GlobalMetadataEdit />} />
-                    <Route path="/globalmetadata/edit/:id" element={<GlobalMetadataEdit />} />
+                    <Route path={`/${Resource.AuditLogs.toLowerCase()}`} element={<AuditLogs />} />
 
-                    <Route path="/tokens" element={<TokenList />} />
-                    <Route path="/tokens/list" element={<Navigate to="/tokens" />} />
-                    <Route path="/tokens/detail/:id" element={<TokenDetail />} />
-                    <Route path="/tokens/add" element={<TokenEdit />} />
-                    <Route path="/tokens/edit/:id" element={<TokenEdit />} />
+                    <Route path={`/customattributes`} element={<CustomAttributesList />} />
+                    <Route path={`/customattributes/list`} element={<Navigate to={`/customattributes`} />} />
+                    <Route path={`/customattributes/detail/:id`} element={<CustomAttributesDetail />} />
+                    <Route path={`/customattributes/add`} element={<CustomAttributesEdit />} />
+                    <Route path={`/customattributes/edit/:id`} element={<CustomAttributesEdit />} />
 
-                    <Route path="/tokenprofiles" element={<TokenProfileList />} />
-                    <Route path="/tokenprofiles/list" element={<Navigate to="/tokenprofiles" />} />
-                    <Route path="/tokenprofiles/detail/:tokenId/:id" element={<TokenProfileDetail />} />
-                    <Route path="/tokenprofiles/add" element={<TokenProfileForm />} />
-                    <Route path="/tokenprofiles/edit/:tokenId/:id" element={<TokenProfileForm />} />
+                    <Route path={`/globalmetadata`} element={<GlobalMetadataList />} />
+                    <Route path={`/globalmetadata/list`} element={<Navigate to={`/globalmetadata`} />} />
+                    <Route path={`/globalmetadata/detail/:id`} element={<GlobalMetadataDetail />} />
+                    <Route path={`/globalmetadata/add`} element={<GlobalMetadataEdit />} />
+                    <Route path={`/globalmetadata/edit/:id`} element={<GlobalMetadataEdit />} />
 
-                    <Route path="/cryptographickeys" element={<CryptographicKeyList />} />
-                    <Route path="/cryptographickeys/list" element={<Navigate to="/cryptographickeys" />} />
-                    <Route path="/cryptographickeys/detail/:tokenId/:id/:keyItemUuid?" element={<CryptographicKeyDetail />} />
-                    <Route path="/cryptographickeys/add" element={<CryptographicKeyForm />} />
-                    <Route path="/cryptographickeys/edit/:tokenId/:id" element={<CryptographicKeyForm />} />
+                    <Route path={`/${Resource.Tokens.toLowerCase()}`} element={<TokenList />} />
+                    <Route
+                        path={`/${Resource.Tokens.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.Tokens.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.Tokens.toLowerCase()}/detail/:id`} element={<TokenDetail />} />
+                    <Route path={`/${Resource.Tokens.toLowerCase()}/add`} element={<TokenEdit />} />
+                    <Route path={`/${Resource.Tokens.toLowerCase()}/edit/:id`} element={<TokenEdit />} />
 
-                    <Route path="/platform" element={<PlatformSettingsDetail />} />
-                    <Route path="/platform/edit" element={<PlatformSettingsEdit />} />
+                    <Route path={`/${Resource.TokenProfiles.toLowerCase()}`} element={<TokenProfileList />} />
+                    <Route
+                        path={`/${Resource.TokenProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.TokenProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.TokenProfiles.toLowerCase()}/detail/:tokenId/:id`} element={<TokenProfileDetail />} />
+                    <Route path={`/${Resource.TokenProfiles.toLowerCase()}/add`} element={<TokenProfileForm />} />
+                    <Route path={`/${Resource.TokenProfiles.toLowerCase()}/edit/:tokenId/:id`} element={<TokenProfileForm />} />
+
+                    <Route path={`/${Resource.Keys.toLowerCase()}`} element={<CryptographicKeyList />} />
+                    <Route path={`/${Resource.Keys.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Keys.toLowerCase()}`} />} />
+                    <Route
+                        path={`/${Resource.Keys.toLowerCase()}/detail/:tokenId/:id/:keyItemUuid?`}
+                        element={<CryptographicKeyDetail />}
+                    />
+                    <Route path={`/${Resource.Keys.toLowerCase()}/add`} element={<CryptographicKeyForm />} />
+                    <Route path={`/${Resource.Keys.toLowerCase()}/edit/:tokenId/:id`} element={<CryptographicKeyForm />} />
+
+                    <Route path={`/${Resource.Settings.toLowerCase()}`} element={<PlatformSettingsDetail />} />
+                    <Route path={`/${Resource.Settings.toLowerCase()}/edit`} element={<PlatformSettingsEdit />} />
+
+                    <Route path={`/${Resource.Jobs.toLowerCase()}`} element={<SchedulerJobsList />} />
+                    <Route path={`/${Resource.Jobs.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Jobs.toLowerCase()}`} />} />
+                    <Route path={`/${Resource.Jobs.toLowerCase()}/detail/:id`} element={<SchedulerJobDetail />} />
+
+                    <Route path={`/notifications`} element={<NotificationsList />} />
+                    <Route path={`/notificationssettings`} element={<NotificationsSetting />} />
+                    <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
+                    <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
+                    <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
                 </Route>
 
                 {/*
                Please keep this remarked until migration is finished
-               <Route path="*" element={<Navigate to="/home"/>}/>
+               <Route path="*" element={<Navigate to={`/home`/>}/>
                */}
                 <Route path="*" element={<h1>404</h1>} />
             </>

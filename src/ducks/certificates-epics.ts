@@ -4,13 +4,13 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 
 import * as slice from "./certificates";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from "./transform/attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 import { store } from "index";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
 import {
@@ -32,7 +32,7 @@ import {
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -53,7 +53,6 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.CERTIFICATE),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get certificates list" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCertificates),
                         ),
                     ),
@@ -67,14 +66,18 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getCertificateDetail.match),
         switchMap((action) =>
             deps.apiClients.certificates.getCertificate({ uuid: action.payload.uuid }).pipe(
-                map((certificate) =>
-                    slice.actions.getCertificateDetailSuccess({ certificate: transformCertificateDetailResponseDtoToModel(certificate) }),
+                switchMap((certificate) =>
+                    of(
+                        slice.actions.getCertificateDetailSuccess({
+                            certificate: transformCertificateDetailResponseDtoToModel(certificate),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificateDetailsWidget),
+                    ),
                 ),
-
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get certificate detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
                     ),
                 ),
             ),
@@ -145,7 +148,8 @@ const issueCertificateNew: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
-                            appRedirectActions.redirect({ url: `../detail/${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            alertActions.success("Issue new certificate operation successfully initiated"),
                         ),
                     ),
 
@@ -175,6 +179,7 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap(() =>
                         of(
                             slice.actions.revokeCertificateSuccess({ uuid: action.payload.uuid }),
+                            alertActions.success("Revoke certificate operation successfully initiated"),
                             slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
                         ),
                     ),
@@ -255,16 +260,19 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getCertificateHistory.match),
         switchMap((action) =>
             deps.apiClients.certificates.getCertificateEventHistory({ uuid: action.payload.uuid }).pipe(
-                map((records) =>
-                    slice.actions.getCertificateHistorySuccess({
-                        certificateHistory: records.map((record) => transformCertificateHistoryDtoToModel(record)),
-                    }),
+                mergeMap((records) =>
+                    of(
+                        slice.actions.getCertificateHistorySuccess({
+                            certificateHistory: records.map((record) => transformCertificateHistoryDtoToModel(record)),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificateEventHistory),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateHistoryFailure({ error: extractError(err, "Failed to get certificate history") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get certificate history" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateEventHistory),
                     ),
                 ),
             ),
@@ -277,16 +285,19 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
         filter(slice.actions.listCertificateLocations.match),
         switchMap((action) =>
             deps.apiClients.certificates.listCertificateLocations({ certificateUuid: action.payload.uuid }).pipe(
-                map((locations) =>
-                    slice.actions.listCertificateLocationsSuccess({
-                        certificateLocations: locations.map((location) => transformLocationResponseDtoToModel(location)),
-                    }),
+                switchMap((locations) =>
+                    of(
+                        slice.actions.listCertificateLocationsSuccess({
+                            certificateLocations: locations.map((location) => transformLocationResponseDtoToModel(location)),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificationLocations),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to list certificate locations" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationLocations),
                     ),
                 ),
             ),
@@ -422,7 +433,7 @@ const updateOwner: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.updateOwnerSuccess({
                                 uuid: action.payload.uuid,
-                                owner: action.payload.updateOwnerRequest.owner!,
+                                user: action.payload.user,
                             }),
                             slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
                         ),
@@ -496,7 +507,12 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
                                 map((raProfile) =>
                                     slice.actions.bulkUpdateRaProfileSuccess({
                                         uuids: action.payload.raProfileRequest.certificateUuids!,
-                                        raProfile,
+                                        raProfile: {
+                                            ...raProfile,
+                                            attributes: raProfile?.attributes?.length
+                                                ? raProfile.attributes.map(transformAttributeResponseDtoToModel)
+                                                : [],
+                                        },
                                     }),
                                 ),
 
@@ -528,13 +544,13 @@ const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.certificates
                 .bulkUpdateCertificateObjects({
-                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload),
+                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload.request),
                 })
                 .pipe(
                     map(() =>
                         slice.actions.bulkUpdateOwnerSuccess({
-                            uuids: action.payload.certificateUuids!,
-                            owner: action.payload.owner!,
+                            uuids: action.payload.request.certificateUuids!,
+                            user: action.payload.user,
                         }),
                     ),
 
@@ -559,7 +575,7 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
                     mergeMap((result) =>
                         of(
                             slice.actions.bulkDeleteSuccess({ response: transformCertificateBulkDeleteResponseDtoToModel(result) }),
-                            alertActions.success("Selected certificates successfully deleted."),
+                            alertActions.success("Delete operation for selected certificates initiated."),
                         ),
                     ),
 
@@ -736,6 +752,26 @@ const getCertificateContent: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const listCertificateApprovals: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listCertificateApprovals.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.listCertificateApprovals(action.payload).pipe(
+                map((response) => slice.actions.listCertificateApprovalsSuccess({ approvals: response.approvals })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.listCertificateApprovalsFailure({
+                            error: extractError(error, "Failed to list certificate approvals"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to list certificate approvals" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCertificates,
     getCertificateDetail,
@@ -761,6 +797,7 @@ const epics = [
     checkCompliance,
     getCsrAttributes,
     getCertificateContent,
+    listCertificateApprovals,
 ];
 
 export default epics;

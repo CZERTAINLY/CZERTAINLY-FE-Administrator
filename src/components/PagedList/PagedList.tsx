@@ -2,15 +2,13 @@ import { EntityType, selectors as filterSelectors } from "ducks/filters";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Container } from "reactstrap";
 
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { ApiClients } from "api";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import FilterWidget from "components/FilterWidget";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { IconName, WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/paging";
 import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
@@ -20,36 +18,42 @@ interface Props {
     entity: EntityType;
     headers: TableHeader[];
     data: TableDataRow[];
-    isBusy: boolean;
+    isBusy?: boolean;
     multiSelect?: boolean;
-    onDeleteCallback: (uuids: string[], filters: SearchFilterModel[]) => void;
-    listAction: ActionCreatorWithPayload<SearchRequestModel>;
-    getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
+    onDeleteCallback?: (uuids: string[], filters: SearchFilterModel[]) => void;
+    onListCallback: (filters: SearchRequestModel) => void;
+    getAvailableFiltersApi?: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     title: string;
-    filterTitle: string;
-    entityNameSingular: string;
-    entityNamePlural: string;
+    filterTitle?: string;
+    addHidden?: boolean;
+    entityNameSingular?: string;
+    entityNamePlural?: string;
     additionalButtons?: WidgetButtonProps[];
     pageWidgetLockName?: LockWidgetNameEnum;
-    topActionsHidden?: boolean;
+    hideWidgetButtons?: boolean;
+    hasCheckboxes?: boolean;
+    hasDetails?: boolean;
 }
 
 function PagedList({
     headers,
     data,
     filterTitle,
+    addHidden,
     entity,
     title,
-    isBusy,
+    isBusy = false,
     multiSelect = true,
     onDeleteCallback,
     getAvailableFiltersApi,
-    listAction,
+    onListCallback,
     entityNamePlural,
     entityNameSingular,
     additionalButtons,
     pageWidgetLockName,
-    topActionsHidden = false,
+    hideWidgetButtons = false,
+    hasCheckboxes = true,
+    hasDetails = false,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -71,6 +75,11 @@ function PagedList({
         [dispatch, entity],
     );
 
+    const getFreshData = useCallback(() => {
+        onListCallback({ itemsPerPage: pageSize, pageNumber, filters: currentFilters });
+        onCheckedRowsChanged([]);
+    }, [currentFilters, pageSize, pageNumber, onListCallback, onCheckedRowsChanged]);
+
     const onPageSizeChanged = useCallback(
         (pageSize: number) => {
             setPageSize(pageSize);
@@ -81,7 +90,7 @@ function PagedList({
 
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
-        onDeleteCallback(checkedRows, currentFilters);
+        onDeleteCallback!(checkedRows, currentFilters);
         onCheckedRowsChanged([]);
     }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged]);
 
@@ -90,44 +99,32 @@ function PagedList({
     }, [currentFilters]);
 
     useEffect(() => {
-        dispatch(listAction({ itemsPerPage: pageSize, pageNumber, filters: currentFilters }));
-        onCheckedRowsChanged([]);
-    }, [dispatch, currentFilters, pageSize, pageNumber, listAction, onCheckedRowsChanged]);
+        getFreshData();
+    }, [getFreshData]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: "plus",
+    const buttons: WidgetButtonProps[] = useMemo(() => {
+        const result = [];
+        if (!addHidden) {
+            result.push({
+                icon: "plus" as IconName,
                 disabled: false,
                 tooltip: "Create",
                 onClick: () => navigate(`./add`),
-            },
-            {
-                icon: "trash",
+            });
+        }
+        if (onDeleteCallback) {
+            result.push({
+                icon: "trash" as IconName,
                 disabled: checkedRows.length === 0,
                 tooltip: "Delete",
                 onClick: () => setConfirmDelete(true),
-            },
-            ...(additionalButtons ?? []),
-        ],
-        [checkedRows, additionalButtons, navigate],
-    );
-
-    const tableTitle = useMemo(
-        () => (
-            <div>
-                {!topActionsHidden && (
-                    <div className="fa-pull-right mt-n-xs">
-                        <WidgetButtons buttons={buttons} />
-                    </div>
-                )}
-                <h5 className="mt-0">
-                    <span className="fw-semi-bold">{title}</span>
-                </h5>
-            </div>
-        ),
-        [buttons, title, topActionsHidden],
-    );
+            });
+        }
+        if (additionalButtons) {
+            result.push(...additionalButtons);
+        }
+        return result;
+    }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
     const paginationData = useMemo(
         () => ({
@@ -142,14 +139,25 @@ function PagedList({
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <FilterWidget entity={entity} title={filterTitle} getAvailableFiltersApi={getAvailableFiltersApi} />
+        <>
+            {getAvailableFiltersApi && filterTitle && (
+                <FilterWidget entity={entity} title={filterTitle} getAvailableFiltersApi={getAvailableFiltersApi} />
+            )}
 
-            <Widget title={tableTitle} busy={isBusy || isFetchingList} widgetLockName={pageWidgetLockName}>
+            <Widget
+                title={title}
+                busy={isBusy || isFetchingList}
+                widgetLockName={pageWidgetLockName}
+                refreshAction={getFreshData}
+                widgetButtons={buttons}
+                titleSize="large"
+                hideWidgetButtons={hideWidgetButtons}
+            >
                 <CustomTable
                     headers={headers}
                     data={data}
-                    hasCheckboxes={true}
+                    hasCheckboxes={hasCheckboxes}
+                    hasDetails={hasDetails}
                     hasPagination={true}
                     multiSelect={multiSelect}
                     paginationData={paginationData}
@@ -159,19 +167,21 @@ function PagedList({
                 />
             </Widget>
 
-            <Dialog
-                isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? entityNamePlural : entityNameSingular}`}
-                body={`You are about to delete ${
-                    checkedRows.length > 1 ? entityNamePlural : entityNameSingular
-                }. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
-                ]}
-            />
-        </Container>
+            {onDeleteCallback && (
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption={`Delete ${checkedRows.length > 1 ? entityNamePlural : entityNameSingular}`}
+                    body={`You are about to delete ${
+                        checkedRows.length > 1 ? entityNamePlural : entityNameSingular
+                    }. Is this what you want to do?`}
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
+                        { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    ]}
+                />
+            )}
+        </>
     );
 }
 

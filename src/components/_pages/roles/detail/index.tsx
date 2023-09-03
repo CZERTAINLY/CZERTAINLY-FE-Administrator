@@ -2,13 +2,14 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/roles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -26,19 +27,29 @@ export default function UserDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
+    const memoizedRole = useMemo(() => role, [role]);
+
     useEffect(() => {
         dispatch(actions.resetState());
     }, [dispatch]);
 
-    useEffect(() => {
+    const getFreshDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.getDetail({ uuid: id }));
     }, [dispatch, id]);
 
     useEffect(() => {
+        getFreshDetails();
+    }, [getFreshDetails]);
+
+    const getFreshPermissions = useCallback(() => {
         if (!role || role.uuid !== id || permissions?.uuid === id || isFetchingPermissions) return;
         dispatch(actions.getPermissions({ uuid: id }));
-    }, [role, dispatch, permissions?.uuid, isFetchingPermissions, id]);
+    }, [dispatch, id, role, permissions, isFetchingPermissions]);
+
+    useEffect(() => {
+        getFreshPermissions();
+    }, [getFreshPermissions]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../roles/edit/${role?.uuid}`);
@@ -97,39 +108,6 @@ export default function UserDetail() {
         [role?.systemRole, onEditClick, onEditRoleUsersClick, onEditRolePermissionsClick],
     );
 
-    const attributesTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Role <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const usersTitle = useMemo(
-        () => (
-            <h5>
-                Assigned <span className="fw-semi-bold">Users</span>
-            </h5>
-        ),
-        [],
-    );
-
-    const permissionsTitle = useMemo(
-        () => (
-            <h5>
-                Role <span className="fw-semi-bold">Permissions</span>
-            </h5>
-        ),
-        [],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -156,6 +134,10 @@ export default function UserDetail() {
                       {
                           id: "description",
                           columns: ["Description", role.description || ""],
+                      },
+                      {
+                          id: "email",
+                          columns: ["Email", role.email || ""],
                       },
                       {
                           id: "systemRole",
@@ -279,19 +261,37 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={attributesTitle} busy={isFetchingDetail}>
+            <Widget
+                title="Role Details"
+                busy={isFetchingDetail}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshDetails}
+                widgetLockName={LockWidgetNameEnum.RoleDetails}
+            >
                 <br />
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title={usersTitle} busy={isFetchingDetail}>
+            <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
                 <br />
                 <CustomTable headers={usersHeaders} data={usersData} />
             </Widget>
 
-            {role && <CustomAttributeWidget resource={Resource.Roles} resourceUuid={role.uuid} attributes={role.customAttributes} />}
+            {memoizedRole && (
+                <CustomAttributeWidget
+                    resource={Resource.Roles}
+                    resourceUuid={memoizedRole.uuid}
+                    attributes={memoizedRole.customAttributes}
+                />
+            )}
 
-            <Widget title={permissionsTitle} busy={isFetchingDetail || isFetchingPermissions}>
+            <Widget
+                title="Role Permissions"
+                busy={isFetchingDetail || isFetchingPermissions}
+                titleSize="large"
+                refreshAction={role && getFreshPermissions}
+            >
                 <br />
                 {!permissions ? (
                     <></>

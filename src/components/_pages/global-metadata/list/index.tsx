@@ -1,7 +1,7 @@
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { actions, selectors } from "ducks/globalMetadata";
@@ -10,8 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
-import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
 import { LockWidgetNameEnum } from "types/widget-locks";
+import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
 
 export default function GlobalMetadataList() {
     const dispatch = useDispatch();
@@ -29,10 +29,14 @@ export default function GlobalMetadataList() {
     const [showPromote, setShowPromote] = useState<boolean>(false);
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.listGlobalMetadata());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(actions.bulkDeleteGlobalMetadata(checkedRows));
@@ -53,21 +57,6 @@ export default function GlobalMetadataList() {
             { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true) },
         ],
         [checkedRows, navigate],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Global Metadata</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const globalMetadataTableHeaders: TableHeader[] = useMemo(
@@ -110,7 +99,14 @@ export default function GlobalMetadataList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfGlobalMetadata}>
+            <Widget
+                title="List of Global Metadata"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfGlobalMetadata}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={globalMetadataTableHeaders}

@@ -1,6 +1,7 @@
 import {
     AttributeCallback,
     AttributeCallbackMapping,
+    AttributeMappingDto,
     AttributeType,
     BaseAttributeConstraint,
     BaseAttributeContentDto as BaseAttributeContent,
@@ -111,6 +112,9 @@ export type BaseAttributeContentModel =
 
 export type AttributeRequestDto = RequestAttributeDto;
 export type AttributeRequestModel = Omit<AttributeRequestDto, "content"> & { content: Array<BaseAttributeContentModel> };
+
+export type MappingAttributeDto = AttributeMappingDto;
+export type AttributeMappingModel = MappingAttributeDto;
 
 export type AttributeResponseDto = ResponseAttributeDto;
 export type AttributeResponseModel = Omit<AttributeResponseDto, "content"> & { content?: Array<BaseAttributeContentModel> };

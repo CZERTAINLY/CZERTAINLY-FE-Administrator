@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/customAttributes";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -32,10 +32,14 @@ export default function CustomAttributesList() {
     const resourcesEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listCustomAttributes());
+        dispatch(actions.listCustomAttributes({}));
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -71,21 +75,6 @@ export default function CustomAttributesList() {
             },
         ],
         [checkedRows, onAddClick, dispatch],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Custom Attributes</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const customAttributesTableHeaders: TableHeader[] = useMemo(
@@ -148,7 +137,14 @@ export default function CustomAttributesList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfCustomAttributes}>
+            <Widget
+                title="List of Custom Attributes"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfCustomAttributes}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={customAttributesTableHeaders}

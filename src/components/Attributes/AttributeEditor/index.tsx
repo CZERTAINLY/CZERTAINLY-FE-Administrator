@@ -582,7 +582,7 @@ export default function AttributeEditor({
 
         for (const group in groupedAttributesDescriptors)
             attrs.push(
-                <Widget key={group} title={<h6>{group === "__" ? "" : group}</h6>} busy={isRunningCb}>
+                <Widget key={group} title={group === "__" ? "" : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
                         <div key={descriptor.name}>
                             <Attribute

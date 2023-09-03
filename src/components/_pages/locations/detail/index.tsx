@@ -8,7 +8,7 @@ import StatusBadge from "components/StatusBadge";
 import CertificateList from "components/_pages/certificates/list";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/locations";
 import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
@@ -25,10 +25,15 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { validateRequired } from "utils/validators";
-import { Resource } from "../../../../types/openapi";
+import { CertificateStatus, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
+import CertificateStatusBadge from "../../../_pages/certificates/CertificateStatus";
+
+import cx from "classnames";
+import style from "./locationDetail.module.scss";
 
 export default function LocationDetail() {
     const dispatch = useDispatch();
@@ -82,12 +87,16 @@ export default function LocationDetail() {
         [isFetching, isDeleting, isFetchingPushAttributeDescriptors, isFetchingCSRAttributeDescriptors, isFetchingResourceCustomAttributes],
     );
 
-    useEffect(() => {
+    const getFreshLocationDetails = useCallback(() => {
         dispatch(customAttributesActions.listSecondaryResourceCustomAttributes(Resource.Certificates));
 
         if (!id || !entityId) return;
         dispatch(actions.getLocationDetail({ entityUuid: entityId!, uuid: id! }));
-    }, [dispatch, id, entityId]);
+    }, [dispatch, entityId, id]);
+
+    useEffect(() => {
+        getFreshLocationDetails();
+    }, [id, getFreshLocationDetails]);
 
     useEffect(() => {
         if (!id || !entityId || !location || !location.uuid) return;
@@ -270,20 +279,10 @@ export default function LocationDetail() {
         [location?.enabled, onDisableClick, onEditClick, onEnableClick],
     );
 
-    const locationTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Location <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
+    const selectedCertificateDetails = useMemo(() => {
+        const selectedCert = location?.certificates.find((c) => c.certificateUuid === certCheckedRows[0]);
+        return selectedCert;
+    }, [location, certCheckedRows]);
 
     const certButtons: WidgetButtonProps[] = useMemo(
         () => [
@@ -313,7 +312,7 @@ export default function LocationDetail() {
             },
             {
                 icon: "retweet",
-                disabled: certCheckedRows.length === 0,
+                disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.status === CertificateStatus.New,
                 tooltip: "Renew",
                 onClick: () => {
                     onRenewClick();
@@ -329,21 +328,6 @@ export default function LocationDetail() {
             },
         ],
         [certCheckedRows.length, location, onRenewClick, onSyncClick],
-    );
-
-    const certsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={certButtons} />
-                </div>
-
-                <h5>
-                    Location <span className="fw-semi-bold">Certificates</span>
-                </h5>
-            </div>
-        ),
-        [certButtons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -409,6 +393,12 @@ export default function LocationDetail() {
                 width: "15%",
             },
             {
+                id: "cs",
+                content: "Status",
+                sortable: true,
+                width: "15%",
+            },
+            {
                 id: "pk",
                 align: "center",
                 content: "Private Key",
@@ -436,15 +426,23 @@ export default function LocationDetail() {
                 : location.certificates.map((cert) => ({
                       id: cert.certificateUuid,
                       columns: [
-                          <Link key={cert.certificateUuid} to={`../../../certificates/detail/${cert.certificateUuid}`}>
+                          <Link
+                              className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                              key={cert.certificateUuid}
+                              to={`../../../certificates/detail/${cert.certificateUuid}`}
+                          >
                               {cert.commonName || "empty"}
                           </Link>,
+                          <CertificateStatusBadge status={cert.status} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                           !cert.metadata || cert.metadata.length === 0 ? (
                               ""
                           ) : (
-                              <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
+                              <div
+                                  style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}
+                                  className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                              >
                                   {cert.metadata.map((atr) => atr.connectorName + " (" + atr.items.length + ")").join(", ")}
                               </div>
                           ),
@@ -463,8 +461,17 @@ export default function LocationDetail() {
                           <></>,
                           <></>,
                           <></>,
-                          <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />,
-                          <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />,
+                          <></>,
+                          cert.metadata?.length ? (
+                              <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT} metadata={cert.metadata} />
+                          ) : (
+                              <></>
+                          ),
+                          cert.csrAttributes?.length ? (
+                              <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE} attributes={cert.csrAttributes} />
+                          ) : (
+                              <></>
+                          ),
                       ],
                   })),
         [location],
@@ -472,13 +479,20 @@ export default function LocationDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={locationTitle} busy={isBusy}>
+            <Widget
+                title="Location Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshLocationDetails}
+                widgetLockName={LockWidgetNameEnum.LocationDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Attributes">
+            <Widget title="Attributes" titleSize="large">
                 <br />
 
                 <Label>Location Attributes</Label>
@@ -489,7 +503,9 @@ export default function LocationDetail() {
             )}
 
             <Widget
-                title={certsTitle}
+                title="Location Certificates"
+                titleSize="large"
+                widgetButtons={certButtons}
                 busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}
             >
                 <br />
@@ -559,8 +575,8 @@ export default function LocationDetail() {
                     <>
                         <CertificateList
                             selectCertsOnly={true}
-                            topActionsHidden={true}
                             multiSelect={false}
+                            hideWidgetButtons
                             onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
                         />
 

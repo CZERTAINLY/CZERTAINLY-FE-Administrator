@@ -9,7 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
 export default function UsersList() {
@@ -29,11 +29,15 @@ export default function UsersList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.resetState());
         dispatch(actions.setUserListCheckedRows({ checkedRows: [] }));
         dispatch(actions.list());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -119,21 +123,6 @@ export default function UsersList() {
         [checkedRows.length, isSystemUserSelected, canEnable, canDisable, onAddClick, onEnableClick, onDisableClick],
     );
 
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    List of <span className="fw-semi-bold">Users</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const userTableHeader: TableHeader[] = useMemo(
         () => [
             {
@@ -142,6 +131,11 @@ export default function UsersList() {
                 sortable: true,
                 sort: "asc",
                 width: "10%",
+            },
+            {
+                id: "group",
+                content: "Group",
+                sortable: true,
             },
             {
                 id: "description",
@@ -194,6 +188,10 @@ export default function UsersList() {
                         <Link to={`./detail/${user.uuid}`}>{user.username}</Link>
                     </span>,
 
+                    <span style={{ whiteSpace: "nowrap" }}>
+                        {user.groupUuid ? <Link to={`../groups/detail/${user.groupUuid}`}>{user.groupName}</Link> : user.groupName}
+                    </span>,
+
                     <span style={{ whiteSpace: "nowrap" }}>{user.description || ""}</span>,
 
                     <span style={{ whiteSpace: "nowrap" }}>{user.firstName || ""}</span>,
@@ -212,7 +210,14 @@ export default function UsersList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.ListOfUsers}>
+            <Widget
+                title="List of Users"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.ListOfUsers}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
                 <CustomTable
                     headers={userTableHeader}

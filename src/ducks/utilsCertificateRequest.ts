@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createFeatureSelector } from "utils/ducks";
-import { ParseRequestResponseDto } from "../types/openapi/utils";
+import { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from "../types/openapi/utils";
 
 export type State = {
     parsedCertificateRequest?: ParseRequestResponseDto;
@@ -18,7 +18,10 @@ export const slice = createSlice({
         reset: (state) => {
             state.parsedCertificateRequest = undefined;
         },
-        parseCertificateRequest: (state, action: PayloadAction<string>) => {
+        parseCertificateRequest: (
+            state,
+            action: PayloadAction<{ content: string; requestParseType: ParseRequestRequestDtoParseTypeEnum }>,
+        ) => {
             state.parsedCertificateRequest = undefined;
             state.isFetchingDetail = true;
         },

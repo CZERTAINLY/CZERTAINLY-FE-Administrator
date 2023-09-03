@@ -8,7 +8,7 @@ import { actions, selectors } from "ducks/authorities";
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { LockWidgetNameEnum } from "types/widget-locks";
 
 function AuthorityList() {
@@ -31,11 +31,15 @@ function AuthorityList() {
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkForceDeleting;
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.clearDeleteErrorMessages());
         dispatch(actions.listAuthorities());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     useEffect(() => {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
@@ -83,21 +87,6 @@ function AuthorityList() {
             },
         ],
         [checkedRows, onAddClick],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    <span className="fw-semi-bold">Authority Store</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const authoritiesRowHeaders: TableHeader[] = useMemo(
@@ -176,7 +165,14 @@ function AuthorityList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.AuthorityStore}>
+            <Widget
+                title="Authority Store"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.AuthorityStore}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
 
                 <CustomTable

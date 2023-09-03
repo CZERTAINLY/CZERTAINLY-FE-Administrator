@@ -37,12 +37,6 @@ export default function DiscoveryCertificates({ id }: Props) {
         [dispatch, id, newlyDiscovered],
     );
 
-    const discoveryCertificatesTitle = (
-        <h5>
-            <span className="fw-semi-bold">Discovered Certificates</span>
-        </h5>
-    );
-
     const discoveryCertificatesHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -99,7 +93,7 @@ export default function DiscoveryCertificates({ id }: Props) {
     );
 
     return (
-        <Widget title={discoveryCertificatesTitle} busy={isFetchingDiscoveryCertificates}>
+        <Widget title="Discovered Certificates" busy={isFetchingDiscoveryCertificates}>
             <br />
 
             <TabLayout

@@ -4,13 +4,14 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/acme-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -31,10 +32,14 @@ export default function AdministratorDetail() {
 
     const isBusy = useMemo(() => isFetchingDetail || isDisabling || isEnabling, [isFetchingDetail, isDisabling, isEnabling]);
 
-    useEffect(() => {
+    const getFreshAcmeProfile = useCallback(() => {
         if (!id) return;
         dispatch(actions.getAcmeProfile({ uuid: id }));
-    }, [id, dispatch]);
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshAcmeProfile();
+    }, [id, getFreshAcmeProfile]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../acmeprofiles/edit/${acmeProfile?.uuid}`);
@@ -101,21 +106,6 @@ export default function AdministratorDetail() {
             },
         ],
         [acmeProfile, onEditClick, onDisableClick, onEnableClick],
-    );
-
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    ACME Profile <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const tableHeader: TableHeader[] = useMemo(
@@ -264,21 +254,34 @@ export default function AdministratorDetail() {
         [acmeProfile],
     );
 
+    const raProfileText = useMemo(
+        () => (raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"),
+        [raProfileDetailData],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title={detailsTitle} busy={isBusy}>
+                    <Widget
+                        title="ACME Profile Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshAcmeProfile}
+                        widgetLockName={LockWidgetNameEnum.ACMEProfileDetails}
+                        lockSize="large"
+                    >
                         <CustomTable headers={tableHeader} data={acmeProfileDetailData} />
                     </Widget>
                 </Col>
 
                 <Col>
-                    <Widget title="DNS" busy={isBusy}>
+                    <Widget title="DNS" busy={isBusy} titleSize="large">
                         <CustomTable headers={tableHeader} data={dnsData} />
                     </Widget>
 
-                    <Widget title="Terms of Service" busy={isBusy}>
+                    <Widget title="Terms of Service" busy={isBusy} titleSize="large">
                         <CustomTable headers={tableHeader} data={termsOfServiceData} />
                     </Widget>
                 </Col>
@@ -292,7 +295,7 @@ export default function AdministratorDetail() {
                 />
             )}
 
-            <Widget title={raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"} busy={isBusy}>
+            <Widget title={raProfileText} busy={isBusy} titleSize="large">
                 {raProfileDetailData.length === 0 ? (
                     <></>
                 ) : (

@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/certificateGroups";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -24,11 +25,14 @@ export default function GroupDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshGroupDetails = useCallback(() => {
         if (!id) return;
-
         dispatch(actions.getGroupDetail({ uuid: id }));
-    }, [dispatch, id]);
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        getFreshGroupDetails();
+    }, [getFreshGroupDetails, id]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${group?.uuid}`, { relative: "path" });
@@ -63,21 +67,6 @@ export default function GroupDetail() {
         [onEditClick],
     );
 
-    const detailsTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Group <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -106,6 +95,10 @@ export default function GroupDetail() {
                           columns: ["Name", group.name],
                       },
                       {
+                          id: "email",
+                          columns: ["Email", group.email || ""],
+                      },
+                      {
                           id: "description",
                           columns: ["Description", group.description || ""],
                       },
@@ -115,7 +108,14 @@ export default function GroupDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={detailsTitle} busy={isFetchingDetail}>
+            <Widget
+                title="Group Details"
+                busy={isFetchingDetail}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshGroupDetails}
+                widgetLockName={LockWidgetNameEnum.GroupDetails}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 

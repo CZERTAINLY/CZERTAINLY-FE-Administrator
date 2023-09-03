@@ -13,7 +13,11 @@ import { Link } from "react-router-dom";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
 
+import { ApiClients } from "api";
 import PagedList from "components/PagedList/PagedList";
+import { actions as userAction, selectors as userSelectors } from "ducks/users";
+import { SearchRequestModel } from "types/certificate";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";
@@ -23,25 +27,25 @@ import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
 import CertificateStatus from "../CertificateStatus";
 import CertificateUploadDialog from "../CertificateUploadDialog";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
-    topActionsHidden?: boolean;
+    hideWidgetButtons?: boolean;
 }
 
 export default function CertificateList({
+    hideWidgetButtons = false,
     selectCertsOnly = false,
     multiSelect = true,
     onCheckedRowsChanged,
-    topActionsHidden = false,
 }: Props) {
     const dispatch = useDispatch();
 
     const certificates = useSelector(selectors.certificates);
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.CERTIFICATE));
+    const users = useSelector(userSelectors.users);
 
     const isIssuing = useSelector(selectors.isIssuing);
     const isRevoking = useSelector(selectors.isRevoking);
@@ -79,6 +83,10 @@ export default function CertificateList({
 
     useEffect(() => {
         dispatch(actions.clearDeleteErrorMessages());
+    }, [dispatch]);
+
+    const getUserList = useCallback(() => {
+        dispatch(userAction.list());
     }, [dispatch]);
 
     useEffect(() => {
@@ -157,6 +165,7 @@ export default function CertificateList({
                           disabled: checkedRows.length === 0,
                           tooltip: "Update Owner",
                           onClick: () => {
+                              getUserList();
                               setUpdateOwner(true);
                           },
                       },
@@ -296,7 +305,11 @@ export default function CertificateList({
                         certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
                         certificate.group?.name || "Unassigned",
                         <span style={{ whiteSpace: "nowrap" }}>{certificate.raProfile?.name || "Unassigned"}</span>,
-                        certificate.owner || "Unassigned",
+                        certificate?.ownerUuid ? (
+                            <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                        ) : (
+                            certificate.owner ?? "Unassigned"
+                        ),
                         certificate.serialNumber || "",
                         certificate.signatureAlgorithm,
                         certificate.publicKeyAlgorithm,
@@ -314,13 +327,19 @@ export default function CertificateList({
         [certificates, selectCertsOnly, certificateTypeEnum],
     );
 
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCertificates(filters)), [dispatch]);
+
     return (
         <Container className="themed-container" fluid>
             <PagedList
+                hideWidgetButtons={hideWidgetButtons}
                 entity={EntityType.CERTIFICATE}
-                listAction={actions.listCertificates}
+                onListCallback={onListCallback}
                 onDeleteCallback={(uuids, filters) => dispatch(actions.bulkDelete({ uuids, filters }))}
-                getAvailableFiltersApi={useCallback((apiClients) => apiClients.certificates.getSearchableFieldInformation4(), [])}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.certificates.getSearchableFieldInformation4(),
+                    [],
+                )}
                 additionalButtons={buttons}
                 headers={certificatesRowHeaders}
                 data={certificateList}
@@ -330,7 +349,6 @@ export default function CertificateList({
                 entityNamePlural="Certificates"
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
-                topActionsHidden={topActionsHidden}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
             />
 
@@ -361,6 +379,7 @@ export default function CertificateList({
                 caption={`Update Owner`}
                 body={
                     <CertificateOwnerDialog
+                        users={users}
                         uuids={checkedRows}
                         onCancel={() => setUpdateOwner(false)}
                         onUpdate={() => setUpdateOwner(false)}

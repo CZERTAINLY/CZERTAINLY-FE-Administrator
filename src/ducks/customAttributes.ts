@@ -7,7 +7,7 @@ import {
 } from "types/customAttributes";
 import { createFeatureSelector } from "utils/ducks";
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "../types/attributes";
-import { Resource } from "../types/openapi";
+import { AttributeContentType, Resource } from "../types/openapi";
 
 type ResourceCustomAttributesContents = {
     resource: Resource;
@@ -70,7 +70,7 @@ export const slice = createSlice({
             state.checkedRows = action.payload.checkedRows;
         },
 
-        listCustomAttributes: (state, action: PayloadAction<void>) => {
+        listCustomAttributes: (state, action: PayloadAction<{ attributeContentType?: AttributeContentType }>) => {
             state.customAttributes = [];
             state.isFetchingList = true;
         },

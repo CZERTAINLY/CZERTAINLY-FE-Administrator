@@ -5,7 +5,7 @@ import StatusBadge from "components/StatusBadge";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -17,6 +17,7 @@ import Select from "react-select";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Col, Container, Label, Row } from "reactstrap";
 import { KeyUsage, PlatformEnum, Resource } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function TokenProfileDetail() {
@@ -46,11 +47,14 @@ export default function TokenProfileDetail() {
         [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage],
     );
 
-    useEffect(() => {
+    const getFreshTokenProfileDetails = useCallback(() => {
         if (!id || !tokenId) return;
-
         dispatch(tokenProfilesActions.getTokenProfileDetail({ tokenInstanceUuid: tokenId, uuid: id }));
     }, [id, dispatch, tokenId]);
+
+    useEffect(() => {
+        getFreshTokenProfileDetails();
+    }, [getFreshTokenProfileDetails, id, tokenId]);
 
     const onEditClick = useCallback(() => {
         if (!tokenProfile) return;
@@ -141,21 +145,6 @@ export default function TokenProfileDetail() {
             },
         ],
         [tokenProfile, onEditClick, onDisableClick, onEnableClick],
-    );
-
-    const tokenProfileTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Token Profile <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -263,7 +252,15 @@ export default function TokenProfileDetail() {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title={tokenProfileTitle} busy={isBusy}>
+                    <Widget
+                        title="Token Profile Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshTokenProfileDetails}
+                        widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
+                        lockSize="large"
+                    >
                         <br />
 
                         <CustomTable headers={detailHeaders} data={detailData} />
@@ -271,7 +268,7 @@ export default function TokenProfileDetail() {
                 </Col>
 
                 <Col>
-                    <Widget title="Attributes" busy={isBusy}>
+                    <Widget title="Attributes" busy={isBusy} titleSize="large">
                         <br />
                         <Label>Token Profile Attributes</Label>
                         <AttributeViewer attributes={tokenProfile?.attributes} />

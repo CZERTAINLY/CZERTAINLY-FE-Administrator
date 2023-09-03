@@ -5,8 +5,8 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 
 import { store } from "index";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice as certsSlice } from "./certificates";
 import { EntityType } from "./filters";
 import { slice } from "./locations";
@@ -19,7 +19,7 @@ import {
     transformLocationPushRequestModelToDto,
     transformLocationResponseDtoToModel,
 } from "./transform/locations";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions as widgetLockActions } from "./widget-locks";
 
 const listLocations: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -38,7 +38,6 @@ const listLocations: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         pagingActions.listFailure(EntityType.LOCATION),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Location list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.LocationsStore),
                     ),
                 ),
@@ -52,12 +51,17 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getLocationDetail.match),
         switchMap((action) =>
             deps.apiClients.locations.getLocation({ entityUuid: action.payload.entityUuid, locationUuid: action.payload.uuid }).pipe(
-                map((location) => slice.actions.getLocationDetailSuccess({ location: transformLocationResponseDtoToModel(location) })),
+                switchMap((location) =>
+                    of(
+                        slice.actions.getLocationDetailSuccess({ location: transformLocationResponseDtoToModel(location) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.LocationDetails),
+                    ),
+                ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getLocationDetailFailure({ error: extractError(error, "Failed to get Location detail") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Location detail" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.LocationDetails),
                     ),
                 ),
             ),

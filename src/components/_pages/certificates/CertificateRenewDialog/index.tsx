@@ -2,6 +2,7 @@ import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ButtonGroup, FormGroup, Label } from "reactstrap";
+import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
 import {
     actions as utilsCertificateRequestActions,
@@ -68,7 +69,12 @@ export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onR
                         onFileContentLoaded={(fileContent) => {
                             setFileContent(fileContent);
                             if (health) {
-                                dispatch(utilsCertificateRequestActions.parseCertificateRequest(fileContent));
+                                dispatch(
+                                    utilsCertificateRequestActions.parseCertificateRequest({
+                                        content: fileContent,
+                                        requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                    }),
+                                );
                             }
                         }}
                     />

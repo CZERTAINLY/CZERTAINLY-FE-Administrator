@@ -18,6 +18,7 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
     complianceProvider: "Compliance Provider",
     entityProvider: "Entity Provider",
     cryptographyProvider: "Cryptography Provider",
+    notificationProvider: "Notification Provider",
 };
 
 export const getAttributeContent = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {
@@ -186,16 +187,16 @@ export function collectFormAttributes(
             //
             // }
 
-            if (content === undefined || !content.data === undefined) continue;
+            if (typeof content === "undefined" || typeof content.data !== "undefined") {
+                const attr: AttributeRequestModel = {
+                    name: attributeName,
+                    content: Array.isArray(content) ? content : [content],
+                };
 
-            const attr: AttributeRequestModel = {
-                name: attributeName,
-                content: Array.isArray(content) ? content : [content],
-            };
+                if (attributeUuid) attr.uuid = attributeUuid;
 
-            if (attributeUuid) attr.uuid = attributeUuid;
-
-            attrs.push(attr);
+                attrs.push(attr);
+            }
         }
     }
 

@@ -9,10 +9,10 @@ import { actions as widgetLockActions } from "./widget-locks";
 
 import * as slice from "./roles";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { transformRoleResponseDtoToModel } from "./transform/auth";
 import { transformRoleDetailDtoToModel, transformRoleRequestModelToDto, transformSubjectPermissionsDtoToModel } from "./transform/roles";
 import { transformUserResponseDtoToModel } from "./transform/users";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const list: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -29,7 +29,6 @@ const list: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get roles list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfRoles),
                     ),
                 ),
@@ -43,12 +42,17 @@ const getDetail: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getDetail.match),
         switchMap((action) =>
             deps.apiClients.roles.getRole({ roleUuid: action.payload.uuid }).pipe(
-                map((role) => slice.actions.getDetailSuccess({ role: transformRoleDetailDtoToModel(role) })),
+                switchMap((role) =>
+                    of(
+                        slice.actions.getDetailSuccess({ role: transformRoleDetailDtoToModel(role) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RoleDetails),
+                    ),
+                ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getDetailFailure({ error: extractError(err, "Failed to get role detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get role detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RoleDetails),
                     ),
                 ),
             ),

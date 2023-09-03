@@ -25,11 +25,11 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import {
     composeValidators,
-    validateAlphaNumeric,
+    validateAlphaNumericWithSpecialChars,
     validateAlphaNumericWithoutAccents,
     validateCustomIp,
     validateCustomUrl,
-    validateInteger,
+    validateInteger, validateLength,
     validateRequired,
 } from "utils/validators";
 import { Resource } from "../../../../types/openapi";
@@ -245,7 +245,7 @@ export default function AcmeProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>

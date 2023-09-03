@@ -1,14 +1,14 @@
 import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, concatMap, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
-import { LockWidgetNameEnum } from "types/widget-locks";
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
+import { actions as widgetLockActions } from "./widget-locks";
 
 import { store } from "index";
 import { EntityType } from "./filters";
@@ -46,7 +46,6 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.KEY),
-                            appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
                             widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
@@ -84,16 +83,19 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
             deps.apiClients.cryptographicKeys
                 .getKey({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid })
                 .pipe(
-                    map((profileDto) =>
-                        slice.actions.getCryptographicKeyDetailSuccess({
-                            cryptographicKey: transformCryptographicKeyDetailResponseDtoToModel(profileDto),
-                        }),
+                    switchMap((profileDto) =>
+                        of(
+                            slice.actions.getCryptographicKeyDetailSuccess({
+                                cryptographicKey: transformCryptographicKeyDetailResponseDtoToModel(profileDto),
+                            }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.keyDetails),
+                        ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getCryptographicKeyDetailFailure({ error: extractError(err, "Failed to get Key detail") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get key detail" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.keyDetails),
                         ),
                     ),
                 ),

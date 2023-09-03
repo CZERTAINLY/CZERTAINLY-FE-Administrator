@@ -148,6 +148,7 @@ export const slice = createSlice({
         },
 
         getCryptographicKeyDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingDetail = false;
             state.isSyncing = false;
         },
 
@@ -307,7 +308,7 @@ export const slice = createSlice({
                     state.cryptographicKey = undefined;
                 }
             } else {
-                action.payload.keyItemUuid.map((keyUuid) => {
+                action.payload.keyItemUuid.forEach((keyUuid) => {
                     const keyItem = state.cryptographicKey?.items.find((keyItem) => keyItem.uuid === keyUuid);
                     if (keyItem) {
                         const keyItemIndex = state.cryptographicKey?.items.indexOf(keyItem);

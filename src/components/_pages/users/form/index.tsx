@@ -6,6 +6,7 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
+import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 import { selectors as pagingSelectors } from "ducks/paging";
 import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
@@ -22,7 +23,13 @@ import { UserDetailModel } from "types/auth";
 import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
 import { EntityType } from "ducks/filters";
-import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateEmail,
+    validateLength,
+    validateRequired, validateUrlSafe
+} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -32,6 +39,7 @@ import TabLayout from "../../../Layout/TabLayout";
 
 interface FormValues {
     username: string;
+    group: { label: string; value: string };
     description: string;
     firstName: string;
     lastName: string;
@@ -52,6 +60,7 @@ function UserForm() {
 
     const userSelector = useSelector(userSelectors.user);
     const rolesSelector = useSelector(rolesSelectors.roles);
+    const groups = useSelector(groupSelectors.certificateGroups);
     const certificates = useSelector(certSelectors.certificates);
     const certificateDetail = useSelector(certSelectors.certificateDetail);
 
@@ -89,10 +98,20 @@ function UserForm() {
         [],
     );
 
+    const optionsForGroup = useMemo(
+        () =>
+            groups.map((g) => ({
+                label: g.name,
+                value: g.uuid,
+            })),
+        [groups],
+    );
+
     const [selectedCertificate, setSelectedCertificate] = useState<{ label: string; value: string }>();
 
     const [certUploadDialog, setCertUploadDialog] = useState(false);
     const [certToUpload, setCertToUpload] = useState<CertificateDetailResponseModel>();
+    const [certFileContent, setCertFileContent] = useState<string>();
 
     /* Load first page of certificates & all roles available */
 
@@ -111,6 +130,7 @@ function UserForm() {
         );
 
         dispatch(rolesActions.list());
+        dispatch(groupActions.listGroups());
     }, [dispatch]);
 
     /* Load user */
@@ -153,8 +173,9 @@ function UserForm() {
 
             setSelectedCertificate({
                 label:
-                    `${certificateDetail.commonName} (${certificateDetail.fingerprint})` ||
-                    `( empty ) ( ${certificateDetail.fingerprint} )`,
+                    certificateDetail.commonName && certificateDetail.fingerprint
+                        ? `${certificateDetail.commonName} (${certificateDetail.fingerprint})`
+                        : `( empty ) ( ${certificateDetail.commonName} )`,
                 value: certificateDetail.uuid,
             });
 
@@ -188,7 +209,10 @@ function UserForm() {
             loadedCerts
                 .filter((e) => e.status !== CertStatus.New)
                 .map((loadedCert) => ({
-                    label: `${loadedCert.commonName} (${loadedCert.serialNumber})` || `( empty ) ( ${loadedCert.serialNumber} )`,
+                    label:
+                        loadedCert.commonName && loadedCert.serialNumber
+                            ? `${loadedCert.commonName} (${loadedCert.serialNumber})`
+                            : `( ${loadedCert.commonName} ) ( empty )`,
                     value: loadedCert.uuid,
                 })),
         );
@@ -206,13 +230,15 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email,
+                            groupUuid: values.group?.value ?? undefined,
                             certificateUuid:
                                 values.inputType.value === "select"
                                     ? values.certificate
                                         ? values.certificate.value
                                         : undefined
                                     : undefined,
-                            certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                            certificateData:
+                                values.inputType?.value === "upload" ? certToUpload?.certificateContent ?? certFileContent : undefined,
                             customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
                         },
                     }),
@@ -227,12 +253,14 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email || undefined,
+                            groupUuid: values.group?.value ?? undefined,
                             enabled: values.enabled,
-                            certificateData: values.inputType.value === "upload" ? certToUpload?.certificateContent : undefined,
+                            certificateData:
+                                values.inputType?.value === "upload" ? certToUpload?.certificateContent ?? certFileContent : undefined,
                             certificateUuid:
-                                values.inputType.value === "select"
+                                values.inputType?.value === "select"
                                     ? values.certificate
-                                        ? values.certificate.value
+                                        ? values.certificate?.value
                                         : undefined
                                     : undefined,
                             customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
@@ -242,7 +270,7 @@ function UserForm() {
             }
         },
 
-        [user, certToUpload, dispatch, editMode, userRoles, resourceCustomAttributes],
+        [user, certToUpload, certFileContent, dispatch, editMode, userRoles, resourceCustomAttributes],
     );
 
     const onCancel = useCallback(() => {
@@ -269,6 +297,7 @@ function UserForm() {
         () => ({
             username: editMode ? user?.username : "",
             description: editMode ? user?.description : "",
+            group: editMode && user?.groupName && user?.groupUuid ? { label: user.groupName, value: user.groupUuid } : undefined,
             firstName: editMode ? user?.firstName || "" : "",
             lastName: editMode ? user?.lastName : "",
             email: editMode ? user?.email : "",
@@ -334,29 +363,25 @@ function UserForm() {
         return userRoles.length !== usrRoleUuids.length || userRoles.some((roleUuid) => !usrRoleUuids.includes(roleUuid));
     }, [user, userRoles]);
 
-    const title = useMemo(
-        () => (
-            <>
-                {editMode ? (
-                    <></>
-                ) : (
-                    <div style={{ float: "right", color: "black" }}>
-                        <Field name="enabled">
-                            {({ input, meta }) => (
-                                <Label for="enabled">
-                                    <Input {...input} id="enabled" type="checkbox" label="Enabled" checked={input.value} />
-                                    &nbsp;&nbsp;Enabled
-                                </Label>
-                            )}
-                        </Field>
-                    </div>
-                )}
-
-                {editMode ? "Edit user" : "Create user"}
-            </>
-        ),
+    const enableCheckButton = useMemo(
+        () =>
+            editMode ? (
+                <></>
+            ) : (
+                <div className="ms-auto">
+                    <Field name="enabled">
+                        {({ input, meta }) => (
+                            <Label for="enabled">
+                                <Input {...input} id="enabled" type="checkbox" label="Enabled" checked={input.value} />
+                                &nbsp;&nbsp;Enabled
+                            </Label>
+                        )}
+                    </Field>
+                </div>
+            ),
         [editMode],
     );
+    const title = useMemo(() => (editMode ? "Edit user" : "Create user"), [editMode]);
 
     return (
         <>
@@ -374,8 +399,9 @@ function UserForm() {
                                 isCreatingUser ||
                                 isFetchingResourceCustomAttributes
                             }
+                            widgetExtraTopNode={enableCheckButton}
                         >
-                            <Field name="username" validate={validateRequired()}>
+                            <Field name="username" validate={composeValidators(validateRequired(),validateUrlSafe())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="username">Username</Label>
@@ -394,7 +420,23 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="group">
+                                {({ input }) => (
+                                    <FormGroup>
+                                        <Label for="group">Group</Label>
+
+                                        <Select
+                                            {...input}
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={optionsForGroup}
+                                            placeholder="Select Group"
+                                        />
+                                    </FormGroup>
+                                )}
+                            </Field>
+
+                            <Field name="description" validate={composeValidators(validateLength(0,300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>
@@ -413,7 +455,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="firstName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="firstName">First Name</Label>
@@ -432,7 +474,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="lastName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="lastName">Last Name</Label>
@@ -494,6 +536,8 @@ function UserForm() {
                                     <div>
                                         {certToUpload ? (
                                             <CertificateAttributes certificate={certToUpload} />
+                                        ) : certFileContent ? (
+                                            <>Certificate to be uploaded selected.&nbsp;&nbsp;&nbsp;</>
                                         ) : (
                                             <>Certificate to be uploaded not selected&nbsp;&nbsp;&nbsp;</>
                                         )}
@@ -612,6 +656,7 @@ function UserForm() {
                         onCancel={() => setCertUploadDialog(false)}
                         onUpload={(data) => {
                             setCertToUpload(data.certificate);
+                            setCertFileContent(data.fileContent);
                             setCertUploadDialog(false);
                         }}
                     />

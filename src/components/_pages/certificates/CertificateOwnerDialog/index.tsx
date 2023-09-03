@@ -3,52 +3,59 @@ import { useDispatch } from "react-redux";
 
 import { actions } from "ducks/certificates";
 
-import { Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { validateAlphaNumeric } from "utils/validators";
+import Select from "react-select";
+import { Button, ButtonGroup, FormGroup } from "reactstrap";
+import { UserResponseModel } from "types/users";
 
 interface Props {
     uuids: string[];
+    users: UserResponseModel[];
     onCancel: () => void;
     onUpdate: () => void;
 }
 
-export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate }: Props) {
+export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, users }: Props) {
     const dispatch = useDispatch();
 
-    const [owner, setOwner] = useState<string>("");
-    const [validationMessage, setValidationMessage] = useState<string | undefined>(undefined);
+    const [ownerUuid, setOwnerUuid] = useState<string>();
+    const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
 
     useEffect(() => {
-        if (!owner) return;
-        setValidationMessage(validateAlphaNumeric()(owner));
-    }, [owner]);
+        setUserOptions(
+            users.map((user) => ({
+                value: user.uuid,
+                label: `${user.firstName ? user.firstName + " " : ""}${user.lastName ? user.lastName + " " : ""}(${user.username})`,
+            })),
+        );
+    }, [dispatch, users]);
 
     const updateOwner = useCallback(() => {
-        if (!owner) return;
-        dispatch(actions.bulkUpdateOwner({ certificateUuids: uuids, owner, filters: [] }));
+        if (!ownerUuid || !users) {
+            return;
+        }
+        const user = users.find((u) => u.uuid === ownerUuid);
+        if (!user) {
+            return;
+        }
+        dispatch(actions.bulkUpdateOwner({ request: { certificateUuids: uuids, ownerUuid, filters: [] }, user }));
         onUpdate();
-    }, [dispatch, onUpdate, owner, uuids]);
+    }, [dispatch, onUpdate, ownerUuid, users, uuids]);
 
     return (
         <>
             <FormGroup>
-                <Label for="owner">Owner</Label>
-
-                <Input
-                    id="owner"
-                    type="text"
-                    value={owner}
-                    onChange={(e) => setOwner(e.target.value)}
-                    valid={validationMessage === undefined && owner !== ""}
-                    invalid={validationMessage !== undefined && owner !== ""}
+                <Select
+                    maxMenuHeight={140}
+                    menuPlacement="auto"
+                    options={userOptions}
+                    placeholder={`Select Owner`}
+                    onChange={(event) => setOwnerUuid(event?.value)}
                 />
-
-                <FormFeedback color="warn">{validationMessage}</FormFeedback>
             </FormGroup>
 
             <div className="d-flex justify-content-end">
                 <ButtonGroup>
-                    <Button color="primary" onClick={updateOwner} disabled={!owner || validationMessage !== undefined}>
+                    <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
                         Update
                     </Button>
 

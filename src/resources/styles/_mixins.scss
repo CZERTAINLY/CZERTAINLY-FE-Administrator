@@ -39,3 +39,21 @@
         }
     }
 }
+
+@mixin for-mobile {
+    @media (max-width: 768px) {
+        @content;
+    }
+}
+
+@mixin for-tablet {
+    @media (min-width: 769px) and (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin for-desktop {
+    @media (min-width: 1025px) {
+        @content;
+    }
+}

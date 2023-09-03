@@ -3,13 +3,14 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { actions, selectors } from "ducks/authorities";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -30,11 +31,15 @@ export default function AuthorityDetail() {
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
-    useEffect(() => {
+    const getFreshAuthorityDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getAuthorityDetail({ uuid: id }));
     }, [dispatch, id]);
+
+    useEffect(() => {
+        getFreshAuthorityDetails();
+    }, [getFreshAuthorityDetails, id]);
 
     const onEditClick = useCallback(() => {
         if (!authority) return;
@@ -74,21 +79,6 @@ export default function AuthorityDetail() {
             },
         ],
         [onEditClick],
-    );
-
-    const authorityTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    Certification Authority <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -143,13 +133,20 @@ export default function AuthorityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={authorityTitle} busy={isBusy}>
+            <Widget
+                title="Certification Authority Details"
+                busy={isBusy}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshAuthorityDetails}
+                widgetLockName={LockWidgetNameEnum.CertificationAuthorityDetails}
+            >
                 <br />
 
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title="Attributes">
+            <Widget title="Attributes" titleSize="large">
                 <br />
 
                 <Label>Certification Authority Attributes</Label>

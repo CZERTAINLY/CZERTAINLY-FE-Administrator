@@ -1,3 +1,4 @@
+import cx from "classnames";
 import {
     Button,
     Card,
@@ -11,9 +12,8 @@ import {
     Row,
     UncontrolledPopover,
 } from "reactstrap";
-import cx from "classnames";
-import styles from "./WidgetLock.module.scss";
 import { LockTypeEnum } from "types/widget-locks";
+import styles from "./WidgetLock.module.scss";
 interface Props {
     size?: "small" | "normal" | "large";
     lockTitle?: string;
@@ -55,17 +55,21 @@ const WidgetLock = ({
             </div>
         );
     };
+
+    const getMainColWidthLg = () =>
+        size === "small" ? { offset: 2, size: 5 } : size === "normal" ? { offset: 3, size: 6 } : { offset: 0, size: 12 };
+
     return (
         <Container fluid>
             <Row>
-                <Col xs={12} lg={{ offset: 3, size: 6 }} className="text-center">
+                <Col xs={12} lg={getMainColWidthLg()} className="text-center">
                     <Card className={styles.grayOut}>
                         <CardBody>
                             <Row>
-                                <Col xs={12} xl={{ offset: 2, size: 3 }}>
+                                <Col xs={12} xl={{ offset: 1, size: 3 }}>
                                     <i className={iconClasses} />
                                 </Col>
-                                <Col xs={12} xl={{ offset: 0, size: 5 }}>
+                                <Col xs={12} xl={{ offset: 0, size: 8 }}>
                                     <CardTitle
                                         className={cx(
                                             "d-flex justify-content-center align-content-center align-items-center",

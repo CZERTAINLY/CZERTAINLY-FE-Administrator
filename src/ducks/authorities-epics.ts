@@ -5,17 +5,17 @@ import { FunctionGroupCode } from "types/openapi";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./authorities";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
 import {
     transformAuthorityRequestModelToDto,
     transformAuthorityResponseDtoToModel,
     transformAuthorityUpdateRequestModelToDto,
 } from "./transform/authorities";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listAuthorities: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -33,7 +33,6 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listAuthoritiesFailure({ error: extractError(err, "Failed to get Authorities list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Authorities list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.AuthorityStore),
                     ),
                 ),
@@ -48,14 +47,17 @@ const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.authorities.getAuthorityInstance({ uuid: action.payload.uuid }).pipe(
-                map((authorityDto) =>
-                    slice.actions.getAuthorityDetailSuccess({ authority: transformAuthorityResponseDtoToModel(authorityDto) }),
+                switchMap((authorityDto) =>
+                    of(
+                        slice.actions.getAuthorityDetailSuccess({ authority: transformAuthorityResponseDtoToModel(authorityDto) }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificationAuthorityDetails),
+                    ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getAuthorityDetailFailure({ error: extractError(err, "Failed to get Authority detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Authority detail" }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationAuthorityDetails),
                     ),
                 ),
             ),
@@ -92,7 +94,7 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
             deps.apiClients.connectors
                 .getAttributes({
                     uuid: action.payload.uuid,
-                    functionGroup: FunctionGroupCode.AuthorityProvider,
+                    functionGroup: action.payload.functionGroup,
                     kind: action.payload.kind,
                 })
                 .pipe(

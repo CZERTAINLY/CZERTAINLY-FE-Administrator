@@ -9,7 +9,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateEmail,
+    validateLength,
+    validateRequired
+} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -20,6 +26,7 @@ import TabLayout from "../../../Layout/TabLayout";
 interface FormValues {
     name: string;
     description: string;
+    email: string;
 }
 
 function RoleForm() {
@@ -50,6 +57,7 @@ function RoleForm() {
                         roleRequest: {
                             name: values.name,
                             description: values.description,
+                            email: values.email ? values.email : undefined,
                             customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
                         },
                     }),
@@ -59,6 +67,7 @@ function RoleForm() {
                     rolesActions.create({
                         name: values.name,
                         description: values.description,
+                        email: values.email ? values.email : undefined,
                         customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
                     }),
                 );
@@ -80,8 +89,9 @@ function RoleForm() {
         () => ({
             name: editMode ? roleSelector?.name || "" : "",
             description: editMode ? roleSelector?.description || "" : "",
+            email: editMode ? roleSelector?.email || "" : "",
         }),
-        [editMode, roleSelector?.description, roleSelector?.name],
+        [editMode, roleSelector],
     );
 
     const title = useMemo(() => (editMode ? "Edit Role" : "Add Role"), [editMode]);
@@ -92,7 +102,7 @@ function RoleForm() {
                 <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, values, valid }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="name">Role Name</Label>
@@ -111,7 +121,7 @@ function RoleForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="description" validate={composeValidators(validateLength(0,300))} >
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>
@@ -123,6 +133,25 @@ function RoleForm() {
                                             type="text"
                                             placeholder="Enter description of the role"
                                             disabled={roleSelector?.systemRole}
+                                        />
+
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
+
+                            <Field name="email" validate={composeValidators(validateEmail())}>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="email">E-mail</Label>
+
+                                        <Input
+                                            {...input}
+                                            valid={!meta.error && meta.touched}
+                                            invalid={!!meta.error && meta.touched}
+                                            type="text"
+                                            id="email"
+                                            placeholder="Enter e-mail of the role"
                                         />
 
                                         <FormFeedback>{meta.error}</FormFeedback>

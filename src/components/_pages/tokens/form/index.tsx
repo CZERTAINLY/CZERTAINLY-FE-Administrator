@@ -23,7 +23,7 @@ import { TokenDetailResponseDto } from "types/tokens";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from "utils/validators";
 
 interface FormValues {
     name: string | undefined;
@@ -239,7 +239,7 @@ export default function TokenForm() {
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="name">Token Name</Label>

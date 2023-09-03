@@ -4,14 +4,15 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
 
 import { actions, selectors } from "ducks/users";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Container } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
@@ -32,17 +33,26 @@ export default function UserDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshUserDetails = useCallback(() => {
         if (!id) return;
         dispatch(certActions.clearCertificateDetail());
         dispatch(actions.getDetail({ uuid: id }));
         dispatch(actions.getRoles({ uuid: id }));
-    }, [dispatch, id]);
+    }, [id, dispatch]);
 
     useEffect(() => {
+        getFreshUserDetails();
+    }, [getFreshUserDetails, id]);
+
+    const getFreshCertificateDetails = useCallback(() => {
+        // TODO: Add Toast to notify user
         if (!user || !user.certificate || !user.certificate.uuid || user.uuid !== id) return;
         dispatch(certActions.getCertificateDetail({ uuid: user.certificate.uuid }));
     }, [user, dispatch, id]);
+
+    useEffect(() => {
+        getFreshCertificateDetails();
+    }, [getFreshCertificateDetails, id]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../edit/${user?.uuid}`, { relative: "path" });
@@ -105,30 +115,6 @@ export default function UserDetail() {
         [user, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const attributesTitle = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5>
-                    User <span className="fw-semi-bold">Details</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
-    );
-
-    const certificateTitle = useMemo(
-        () => (
-            <h5>
-                User Certificate <span className="fw-semi-bold">Details</span>
-            </h5>
-        ),
-        [],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -151,6 +137,17 @@ export default function UserDetail() {
                       {
                           id: "username",
                           columns: ["Username", user.username],
+                      },
+                      {
+                          id: "group",
+                          columns: [
+                              "Group",
+                              user.groupUuid ? (
+                                  <Link to={`../../groups/detail/${user.groupUuid}`}>{user.groupName}</Link>
+                              ) : (
+                                  user.groupName ?? ""
+                              ),
+                          ],
                       },
                       {
                           id: "description",
@@ -189,11 +186,23 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={attributesTitle} busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}>
+            <Widget
+                title="User Details"
+                busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshUserDetails}
+                widgetLockName={LockWidgetNameEnum.UserDetails}
+            >
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
-            <Widget title={certificateTitle} busy={isFetchingDetail || isFetchingCertificateDetail}>
+            <Widget
+                title="User Certificate Details"
+                busy={isFetchingDetail || isFetchingCertificateDetail}
+                titleSize="large"
+                refreshAction={user?.certificate?.uuid ? getFreshCertificateDetails : undefined}
+            >
                 <CertificateAttributes certificate={certificate} />
             </Widget>
 

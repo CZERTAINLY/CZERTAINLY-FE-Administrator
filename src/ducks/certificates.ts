@@ -20,8 +20,9 @@ import {
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
-import { CertificateStatus } from "types/openapi";
+import { ApprovalDto, ListCertificateApprovalsRequest } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
+import { UserResponseModel } from "types/users";
 import { downloadFileZip } from "utils/download";
 import { createFeatureSelector } from "utils/ducks";
 
@@ -36,12 +37,14 @@ export type State = {
     issuanceAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
     revocationAttributes: AttributeDescriptorModel[];
     validationResult: { [key: string]: CertificateValidationModel };
+    approvals?: ApprovalDto[];
 
     isFetchingValidationResult: boolean;
 
     isFetchingDetail: boolean;
     isFetchingHistory: boolean;
     isFetchingLocations: boolean;
+    isFetchingApprovals: boolean;
 
     isIssuing: boolean;
     isRevoking: boolean;
@@ -81,9 +84,11 @@ export const initialState: State = {
     issuanceAttributes: {},
     revocationAttributes: [],
     validationResult: {},
+    approvals: [],
 
     isFetchingValidationResult: false,
 
+    isFetchingApprovals: false,
     isFetchingDetail: false,
     isFetchingHistory: false,
     isFetchingLocations: false,
@@ -202,7 +207,7 @@ export const slice = createSlice({
             state,
             action: PayloadAction<{
                 uuid: string;
-                certificateData: string;
+                certificateData?: string;
             }>,
         ) => {
             state.isIssuing = false;
@@ -230,8 +235,6 @@ export const slice = createSlice({
             const cerificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
 
             if (cerificateIndex >= 0) state.certificates.splice(cerificateIndex, 1);
-
-            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.status = CertificateStatus.Revoked;
         },
 
         revokeCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -378,18 +381,21 @@ export const slice = createSlice({
             state.isUpdatingRaProfile = false;
         },
 
-        updateOwner: (state, action: PayloadAction<{ uuid: string; updateOwnerRequest: CertificateObjectModel }>) => {
+        updateOwner: (
+            state,
+            action: PayloadAction<{ uuid: string; user: UserResponseModel; updateOwnerRequest: CertificateObjectModel }>,
+        ) => {
             state.isUpdatingOwner = true;
         },
 
-        updateOwnerSuccess: (state, action: PayloadAction<{ uuid: string; owner: string }>) => {
+        updateOwnerSuccess: (state, action: PayloadAction<{ uuid: string; user: UserResponseModel }>) => {
             state.isUpdatingOwner = false;
 
             const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
 
-            if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.owner;
+            if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.owner = action.payload.owner;
+            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.owner = action.payload.user.username;
         },
 
         updateOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -436,19 +442,19 @@ export const slice = createSlice({
             state.isBulkUpdatingRaProfile = false;
         },
 
-        bulkUpdateOwner: (state, action: PayloadAction<CertificateBulkObjectModel>) => {
+        bulkUpdateOwner: (state, action: PayloadAction<{ user: UserResponseModel; request: CertificateBulkObjectModel }>) => {
             state.isBulkUpdatingOwner = true;
         },
 
-        bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[]; owner: string }>) => {
+        bulkUpdateOwnerSuccess: (state, action: PayloadAction<{ uuids: string[]; user: UserResponseModel }>) => {
             state.isBulkUpdatingOwner = false;
 
             action.payload.uuids.forEach((uuid) => {
                 const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
 
-                if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.owner;
+                if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.owner = action.payload.owner;
+                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.owner = action.payload.user.username;
             });
         },
 
@@ -555,6 +561,19 @@ export const slice = createSlice({
         getCertificateContentsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingContents = false;
         },
+
+        listCertificateApprovals: (state, action: PayloadAction<ListCertificateApprovalsRequest>) => {
+            state.isFetchingApprovals = true;
+        },
+
+        listCertificateApprovalsSuccess: (state, action: PayloadAction<{ approvals: ApprovalDto[] }>) => {
+            state.isFetchingApprovals = false;
+            state.approvals = action.payload.approvals;
+        },
+
+        listCertificateApprovalsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingApprovals = false;
+        },
     },
 });
 
@@ -569,7 +588,9 @@ const certificateHistory = createSelector(state, (state) => state.certificateHis
 const certificateLocations = createSelector(state, (state) => state.certificateLocations);
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
 const revocationAttributes = createSelector(state, (state) => state.revocationAttributes);
+const approvals = createSelector(state, (state) => state.approvals);
 
+const isFetchingApprovals = createSelector(state, (state) => state.isFetchingApprovals);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingHistory = createSelector(state, (state) => state.isFetchingHistory);
 const isFetchingLocations = createSelector(state, (state) => state.isFetchingLocations);
@@ -612,6 +633,7 @@ export const selectors = {
     certificateLocations,
     issuanceAttributes,
     revocationAttributes,
+    approvals,
     isFetchingDetail,
     isFetchingHistory,
     isFetchingLocations,
@@ -635,6 +657,7 @@ export const selectors = {
     isFetchingCsrAttributes,
     csrAttributeDescriptors,
     isFetchingContents,
+    isFetchingApprovals,
 };
 
 export const actions = slice.actions;

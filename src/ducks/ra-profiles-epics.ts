@@ -4,10 +4,12 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
 import { slice } from "./ra-profiles";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { actions as widgetLockActions } from "./widget-locks";
 
+import { LockWidgetNameEnum } from "types/widget-locks";
+import { transformProfileApprovalDtoToModel } from "./transform/approval-profiles";
 import {
     transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
@@ -18,7 +20,6 @@ import {
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
 } from "./transform/ra-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -37,7 +38,6 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listRaProfilesFailure({ error: extractError(error, "Failed to get RA profiles list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get RA profiles list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfRAProfiles),
                     ),
                 ),
@@ -53,16 +53,19 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
             deps.apiClients.raProfiles
                 .getRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
                 .pipe(
-                    map((profileDto) =>
-                        slice.actions.getRaProfileDetailSuccess({
-                            raProfile: transformRaProfileResponseDtoToModel(profileDto),
-                        }),
+                    switchMap((profileDto) =>
+                        of(
+                            slice.actions.getRaProfileDetailSuccess({
+                                raProfile: transformRaProfileResponseDtoToModel(profileDto),
+                            }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RaProfileDetails),
+                        ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get RA Profile detail" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
                         ),
                     ),
                 ),
@@ -573,10 +576,13 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
             deps.apiClients.raProfiles
                 .getAssociatedComplianceProfiles({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
                 .pipe(
-                    map((profileDto) =>
-                        slice.actions.getComplianceProfilesForRaProfileSuccess({
-                            complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel),
-                        }),
+                    switchMap((profileDto) =>
+                        of(
+                            slice.actions.getComplianceProfilesForRaProfileSuccess({
+                                complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel),
+                            }),
+                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RaProfileComplianceDetails),
+                        ),
                     ),
 
                     catchError((err) =>
@@ -584,7 +590,97 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
                             slice.actions.getComplianceProfilesForRaProfileFailure({
                                 error: extractError(err, "Failed to get associated Compliance Profiles"),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get associated Compliance Profiles" }),
+                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAssociatedApprovalProfiles.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles.getAssociatedApprovalProfiles({ ...action.payload }).pipe(
+                switchMap((approvalProfiles) =>
+                    of(
+                        slice.actions.getAssociatedApprovalProfilesSuccess({
+                            associatedApprovalProfiles: approvalProfiles.map(transformProfileApprovalDtoToModel),
+                        }),
+                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.getAssociatedApprovalProfilesFailure({
+                            error: extractError(err, "Failed to get associated Approval Profiles"),
+                        }),
+                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const associateRAProfileWithApprovalProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.associateRAProfileWithApprovalProfile.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .associateRAProfileWithApprovalProfile({
+                    ...action.payload,
+                })
+                .pipe(
+                    switchMap(() =>
+                        of(
+                            slice.actions.associateRAProfileWithApprovalProfileSuccess({
+                                ...action.payload,
+                            }),
+                            slice.actions.getAssociatedApprovalProfiles({
+                                ...action.payload,
+                            }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.associateRAProfileWithApprovalProfileFailure({
+                                error: extractError(err, "Failed to associate RA Profile with Approval Profile"),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: "Failed to associate RA Profile with Approval Profile",
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const disassociateRAProfileFromApprovalProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.disassociateRAProfileFromApprovalProfile.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .disassociateRAProfileFromApprovalProfile({
+                    ...action.payload,
+                })
+                .pipe(
+                    switchMap(() => of(slice.actions.disassociateRAProfileFromApprovalProfileSuccess({ ...action.payload }))),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.disassociateRAProfileFromApprovalProfileFailure({
+                                error: extractError(err, "Failed to disassociate RA Profile from Approval Profile"),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: "Failed to disassociate RA Profile from Approval Profile",
+                            }),
                         ),
                     ),
                 ),
@@ -615,6 +711,9 @@ const epics = [
     associateRaProfile,
     dissociateRaProfile,
     getComplianceProfilesForRaProfile,
+    getAssociatedApprovalProfiles,
+    associateRAProfileWithApprovalProfile,
+    disassociateRAProfileFromApprovalProfile,
 ];
 
 export default epics;

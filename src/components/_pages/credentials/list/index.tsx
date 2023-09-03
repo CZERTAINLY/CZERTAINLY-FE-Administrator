@@ -6,7 +6,7 @@ import { Badge, Container } from "reactstrap";
 import { actions, selectors } from "ducks/credentials";
 
 import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from "components/WidgetButtons";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
@@ -27,11 +27,15 @@ function CredentialList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
-    useEffect(() => {
+    const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
         dispatch(actions.clearDeleteErrorMessages());
         dispatch(actions.listCredentials());
     }, [dispatch]);
+
+    useEffect(() => {
+        getFreshData();
+    }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
         navigate(`./add`);
@@ -70,21 +74,6 @@ function CredentialList() {
             },
         ],
         [checkedRows, onAddClick],
-    );
-
-    const title = useMemo(
-        () => (
-            <div>
-                <div className="fa-pull-right mt-n-xs">
-                    <WidgetButtons buttons={buttons} />
-                </div>
-
-                <h5 className="mt-0">
-                    <span className="fw-semi-bold">Credential Store</span>
-                </h5>
-            </div>
-        ),
-        [buttons],
     );
 
     const credentialRowHeaders: TableHeader[] = useMemo(
@@ -132,7 +121,14 @@ function CredentialList() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={title} busy={isBusy} widgetLockName={LockWidgetNameEnum.CredentialStore}>
+            <Widget
+                title="Credential Store"
+                busy={isBusy}
+                widgetLockName={LockWidgetNameEnum.CredentialStore}
+                widgetButtons={buttons}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
                 <br />
 
                 <CustomTable

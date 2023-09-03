@@ -11,6 +11,10 @@ export const enum EntityType {
     CERTIFICATE,
     KEY,
     DISCOVERY,
+    NOTIFICATIONS,
+    SCHEDULER,
+    SCHEDULER_HISTORY,
+    APPROVAL_PROFILES,
 }
 
 export type Filter = {

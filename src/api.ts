@@ -1,6 +1,8 @@
 import {
     ACMEAccountManagementApi,
     ACMEProfileManagementApi,
+    ApprovalInventoryApi,
+    ApprovalProfileInventoryApi,
     AuditLogApi,
     AuthenticationManagementApi,
     AuthorityManagementApi,
@@ -18,11 +20,14 @@ import {
     DiscoveryManagementApi,
     EntityManagementApi,
     EnumsApi,
+    ExternalNotificationManagementApi,
     GlobalMetadataApi,
+    InternalNotificationApi,
     LocationManagementApi,
     RAProfileManagementApi,
     RoleManagementApi,
     SCEPProfileManagementApi,
+    ScheduledJobsManagementApi,
     SettingsApi,
     StatisticsDashboardApi,
     TokenProfileManagementApi,
@@ -63,6 +68,11 @@ export interface ApiClients {
     customAttributes: CustomAttributesApi;
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
+    scheduler: ScheduledJobsManagementApi;
+    approvalProfiles: ApprovalProfileInventoryApi;
+    approvals: ApprovalInventoryApi;
+    internalNotificationApi: InternalNotificationApi;
+    externalNotificationManagementApi: ExternalNotificationManagementApi;
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
@@ -98,6 +108,11 @@ export const backendClient: ApiClients = {
     customAttributes: new CustomAttributesApi(configuration),
     globalMetadata: new GlobalMetadataApi(configuration),
     settings: new SettingsApi(configuration),
+    scheduler: new ScheduledJobsManagementApi(configuration),
+    approvalProfiles: new ApprovalProfileInventoryApi(configuration),
+    approvals: new ApprovalInventoryApi(configuration),
+    internalNotificationApi: new InternalNotificationApi(configuration),
+    externalNotificationManagementApi: new ExternalNotificationManagementApi(configuration),
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),
