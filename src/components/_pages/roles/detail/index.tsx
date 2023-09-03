@@ -27,6 +27,8 @@ export default function UserDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
+    const memoizedRole = useMemo(() => role, [role]);
+
     useEffect(() => {
         dispatch(actions.resetState());
     }, [dispatch]);
@@ -41,15 +43,13 @@ export default function UserDetail() {
     }, [getFreshDetails]);
 
     const getFreshPermissions = useCallback(() => {
-        if (!id) return;
+        if (!role || role.uuid !== id || permissions?.uuid === id || isFetchingPermissions) return;
         dispatch(actions.getPermissions({ uuid: id }));
-    }, [dispatch, id]);
+    }, [dispatch, id, role, permissions, isFetchingPermissions]);
 
     useEffect(() => {
-        if (!role || role.uuid !== id || permissions?.uuid === id || isFetchingPermissions) return;
-        getFreshDetails();
-        dispatch(actions.getPermissions({ uuid: id }));
-    }, [role, dispatch, permissions?.uuid, isFetchingPermissions, id, getFreshDetails]);
+        getFreshPermissions();
+    }, [getFreshPermissions]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../roles/edit/${role?.uuid}`);
@@ -278,7 +278,13 @@ export default function UserDetail() {
                 <CustomTable headers={usersHeaders} data={usersData} />
             </Widget>
 
-            {role && <CustomAttributeWidget resource={Resource.Roles} resourceUuid={role.uuid} attributes={role.customAttributes} />}
+            {memoizedRole && (
+                <CustomAttributeWidget
+                    resource={Resource.Roles}
+                    resourceUuid={memoizedRole.uuid}
+                    attributes={memoizedRole.customAttributes}
+                />
+            )}
 
             <Widget
                 title="Role Permissions"

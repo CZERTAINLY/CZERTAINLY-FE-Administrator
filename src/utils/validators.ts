@@ -1,5 +1,5 @@
-import cronValidator from 'cron-expression-validator';
-import {Simulate} from "react-dom/test-utils";
+import cronValidator from "cron-expression-validator";
+import { Simulate } from "react-dom/test-utils";
 import error = Simulate.error;
 
 export const composeValidators =
@@ -83,21 +83,18 @@ export const validateLength = (min: number, max: number) => (value: any) => {
     return !validationInput || (validationInput.length >= min && validationInput.length <= max)
         ? undefined
         : `Value must be between ${min} and ${max} characters long`;
-}
+};
 
 export const validateUrlSafe = () => {
     return validatePattern(/^[a-zA-Z0-9-._~]+$/, "Value can only contain numbers or letters, dash, underscore, dot or tilde.");
-}
+};
 
 export const validateQuartzCronExpression = (cronExpression: string | undefined) => (value: any) => {
     const validationInput = getValueFromObject(value);
-    // console.log(validationInput)
-    let validObj: { isValid: boolean, errorMessage: Array<string> } = cronValidator.isValidCronExpression(
-        validationInput, { error: true }
-    );
-    // console.log(validObj)
-    // const errors : string[] = validObj.errorMessage.filter((item, index) => errors.indexOf(item) === index)
-    return !validationInput || validObj.isValid ? undefined : Array.isArray(validObj.errorMessage) ? validObj.errorMessage.join(', ') : validObj.errorMessage;
-    // return !validationInput || validObj.isValid ? undefined : Array.isArray(validObj.errorMessage) ? "array" : validObj.errorMessage;
-    // return !validationInput || validObj.isValid ? undefined : Array.isArray(validObj.errorMessage) ? validObj.errorMessage[0] : validObj.errorMessage;
-}
+    let validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, { error: true });
+    return !validationInput || validObj.isValid
+        ? undefined
+        : Array.isArray(validObj.errorMessage)
+        ? Array.from(new Set(validObj.errorMessage)).join(", ")
+        : validObj.errorMessage;
+};
