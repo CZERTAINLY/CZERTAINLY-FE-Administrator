@@ -27,7 +27,6 @@ const getPlatformSettings: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getPlatformSettingsFailure({ error: extractError(err, "Failed to get platform settings") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get platform settings" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.PlatformSettings),
                     ),
                 ),

@@ -14,7 +14,7 @@ import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from "types/app
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import {
     composeValidators,
-    validateAlphaNumeric,
+    validateAlphaNumericWithSpecialChars, validateLength,
     validateNonZeroInteger,
     validatePositiveInteger,
     validateRequired,
@@ -109,7 +109,7 @@ function ApprovalProfileForm() {
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Row>
                             <Col>
-                                <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                                <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label htmlFor="name">Profile Name</Label>
@@ -145,13 +145,14 @@ function ApprovalProfileForm() {
                                                 valid={!meta.error && meta.touched}
                                                 invalid={!!meta.error && meta.touched}
                                             />
+                                            <FormFeedback>{meta.error}</FormFeedback>
                                         </FormGroup>
                                     )}
                                 </Field>
                             </Col>
                         </Row>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label htmlFor="description">Profile Description</Label>
@@ -164,6 +165,7 @@ function ApprovalProfileForm() {
                                         id="description"
                                         placeholder="Approval Profile Description"
                                     />
+                                    <FormFeedback>{meta.error}</FormFeedback>
                                 </FormGroup>
                             )}
                         </Field>

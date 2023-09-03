@@ -1742,7 +1742,7 @@ export default function CertificateDetail() {
 
             <Dialog
                 isOpen={revoke}
-                caption={`revoke Certificate`}
+                caption={`Revoke Certificate`}
                 body={revokeBody}
                 toggle={() => setRevoke(false)}
                 buttons={[

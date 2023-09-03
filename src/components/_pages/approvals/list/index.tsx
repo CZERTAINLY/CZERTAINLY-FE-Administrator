@@ -12,6 +12,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { ApprovalDtoStatusEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 
 export default function ApprovalsList() {
@@ -36,6 +37,10 @@ export default function ApprovalsList() {
     const [showHistory, setShowHistory] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching, [isFetching]);
+
+    useEffect(() => {
+        // dispatch(rolesActions.getPermissions({ uuid:  }));
+    }, []);
 
     const listUserApprovals = useCallback(() => {
         dispatch(
@@ -250,6 +255,7 @@ export default function ApprovalsList() {
                                 title="List of Approvals"
                                 busy={isBusy}
                                 widgetButtons={buttons}
+                                widgetLockName={LockWidgetNameEnum.ListOfApprovals}
                                 titleSize="large"
                                 refreshAction={listApprovals}
                             >

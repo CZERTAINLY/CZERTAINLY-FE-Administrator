@@ -36,6 +36,7 @@ export default function ConnectorDetail() {
     const health = useSelector(selectors.connectorHealth);
     const attributes = useSelector(selectors.connectorAttributes);
 
+    const isFetchingAllAttributes = useSelector(selectors.isFetchingAllAttributes);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingHealth = useSelector(selectors.isFetchingHealth);
     const isFetchingAttributes = useSelector(selectors.isFetchingAttributes);
@@ -397,7 +398,14 @@ export default function ConnectorDetail() {
                     <CustomTable headers={endPointsHeaders} data={endPointsData} />
                 </Widget>
                 <hr />
-                <Widget title="Attributes" busy={isFetchingAttributes} titleSize="large" refreshAction={getFreshConnectorAttributesDesc}>
+                <Widget
+                    title="Attributes"
+                    busy={isFetchingAllAttributes}
+                    titleSize="large"
+                    refreshAction={getFreshConnectorAttributesDesc}
+                    widgetLockName={LockWidgetNameEnum.ConnectorAttributes}
+                    lockSize="large"
+                >
                     <Row xs="1" sm="2" md="3" lg="3" xl="4">
                         <Col>
                             <Select

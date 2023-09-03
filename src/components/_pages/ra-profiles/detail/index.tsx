@@ -124,8 +124,7 @@ export default function RaProfileDetail() {
         getFreshRaProfileDetail();
         getFreshComplianceRaProfileDetail();
         getFreshAssociatedApprovalProfiles();
-        getFreshAllApprovalProfiles();
-    }, [getFreshRaProfileDetail, getFreshComplianceRaProfileDetail, getFreshAllApprovalProfiles, getFreshAssociatedApprovalProfiles]);
+    }, [getFreshRaProfileDetail, getFreshComplianceRaProfileDetail, getFreshAssociatedApprovalProfiles]);
 
     useEffect(() => {
         if (!raProfile) return;
@@ -294,6 +293,7 @@ export default function RaProfileDetail() {
                 tooltip: "Associate Approval Profile",
                 onClick: () => {
                     setAssociateApprovalProfileDialog(true);
+                    getFreshAllApprovalProfiles();
                 },
             },
         ],
@@ -699,6 +699,7 @@ export default function RaProfileDetail() {
                         titleSize="large"
                         refreshAction={getFreshAssociatedApprovalProfiles}
                         lockSize="large"
+                        widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
                     >
                         <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
                     </Widget>

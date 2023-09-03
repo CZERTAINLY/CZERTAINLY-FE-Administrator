@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "reactstrap";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const NotificationInstanceList = () => {
     const dispatch = useDispatch();
@@ -119,6 +120,7 @@ const NotificationInstanceList = () => {
                 refreshAction={getFreshNotificationInstances}
                 busy={isBusy}
                 widgetButtons={buttons}
+                widgetLockName={LockWidgetNameEnum.NotificationStore}
             >
                 <br />
                 <CustomTable

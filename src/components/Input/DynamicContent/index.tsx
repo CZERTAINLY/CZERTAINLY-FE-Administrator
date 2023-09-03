@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
 import { AttributeContentType, PlatformEnum } from "types/openapi";
-import { composeValidators, validateAlphaNumeric, validateFloat, validateInteger, validateRequired } from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateFloat, validateInteger, validateRequired } from "utils/validators";
 import ContentDescriptorField from "./ContentDescriptorField";
 
 const AllowedAttributeContentType = [
@@ -27,12 +27,12 @@ export const ContentFieldConfiguration: {
     [key: string]: { validators?: ((value: any) => undefined | string)[]; type: InputType; initial: string | boolean | number };
 } = {
     [AttributeContentType.Text]: {
-        validators: [validateAlphaNumeric()],
+        validators: [validateAlphaNumericWithSpecialChars()],
         type: "textarea",
         initial: "",
     },
     [AttributeContentType.String]: {
-        validators: [validateAlphaNumeric()],
+        validators: [validateAlphaNumericWithSpecialChars()],
         type: "text",
         initial: "",
     },

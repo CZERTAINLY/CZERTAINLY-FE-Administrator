@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
 import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
+import { LockWidgetNameEnum } from "types/widget-locks";
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
@@ -222,12 +223,13 @@ const ApprovalProfileDetails = () => {
                         titleSize="large"
                         widgetButtons={buttons}
                         refreshAction={getFreshData}
+                        widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}
                     >
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget title="Approval Profile Steps" busy={isBusy}>
+                    <Widget title="Approval Profile Steps" busy={isBusy} widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}>
                         <CustomTable headers={stepsHeaders} data={stepsRows} />
                     </Widget>
                 </Col>

@@ -46,7 +46,6 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.KEY),
-                            appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
                             widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
@@ -96,7 +95,6 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.getCryptographicKeyDetailFailure({ error: extractError(err, "Failed to get Key detail") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get key detail" }),
                             widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.keyDetails),
                         ),
                     ),

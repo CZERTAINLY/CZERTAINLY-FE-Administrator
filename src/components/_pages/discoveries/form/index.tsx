@@ -24,7 +24,13 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { getCronExpression } from "utils/dateUtil";
 
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateLength,
+    validateQuartzCronExpression,
+    validateRequired
+} from "utils/validators";
 
 interface FormValues {
     name: string | undefined;
@@ -169,12 +175,12 @@ export default function DiscoveryForm() {
                     >
                         {values.scheduled && (
                             <>
-                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumeric()]} />
+                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
-                                    validators={[validateRequired()]}
-                                    description={getCronExpression(values.cronExpression)}
+                                    validators={[validateRequired(), validateQuartzCronExpression()]}
+                                    // description={getCronExpression(values.cronExpression)}
                                 />
                                 <SwitchField id="oneTime" label="One Time Only" />
                             </>
@@ -182,7 +188,7 @@ export default function DiscoveryForm() {
                     </Widget>
 
                     <Widget title="Add discovery" busy={isBusy}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="name">Discovery Name</Label>

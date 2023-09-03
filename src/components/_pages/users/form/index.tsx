@@ -23,7 +23,13 @@ import { UserDetailModel } from "types/auth";
 import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
 
 import { EntityType } from "ducks/filters";
-import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateEmail,
+    validateLength,
+    validateRequired, validateUrlSafe
+} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -395,7 +401,7 @@ function UserForm() {
                             }
                             widgetExtraTopNode={enableCheckButton}
                         >
-                            <Field name="username" validate={validateRequired()}>
+                            <Field name="username" validate={composeValidators(validateRequired(),validateUrlSafe())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="username">Username</Label>
@@ -430,7 +436,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="description" validate={composeValidators(validateLength(0,300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>
@@ -449,7 +455,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="firstName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="firstName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="firstName">First Name</Label>
@@ -468,7 +474,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="lastName" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="lastName" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="lastName">Last Name</Label>

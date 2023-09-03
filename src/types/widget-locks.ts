@@ -24,6 +24,11 @@ export const ErrorCodeDetailMap = {
     ACCESS_DENIED: "Please contact your admin to get access",
 };
 export enum LockWidgetNameEnum {
+    ConnectorAttributes,
+    NotificationStore,
+    ApprovalProfileDetails,
+    ListOfApprovals,
+    ListOfApprovalProfiles,
     ListOfCertificates,
     CertificateDetailsWidget,
     CertificateEventHistory,

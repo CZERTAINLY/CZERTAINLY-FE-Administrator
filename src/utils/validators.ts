@@ -1,9 +1,11 @@
+import cronValidator from "cron-expression-validator";
+
 export const composeValidators =
     (...validators: any[]) =>
     (value: any) =>
         validators.reduce((error, validator) => error || validator(value), undefined);
 
-export const validateRequired = () => (value: any) => (Array.isArray(value) ? value.length > 0 : value) ? undefined : "Required Field";
+export const validateRequired = () => (value: any) => ((Array.isArray(value) ? value.length > 0 : value) ? undefined : "Required Field");
 
 const getValueFromObject = (value: any) => {
     if (typeof value === "object" && value && value.hasOwnProperty("label") && value.hasOwnProperty("value")) {
@@ -34,7 +36,7 @@ export const validateAlphaNumericWithoutAccents = () => {
     return validatePattern(/^[a-zA-Z0-9-._~]+$/, "Value can only contain numbers or letters, dash, underscore, dot or tilde.");
 };
 
-export const validateAlphaNumeric = () => {
+export const validateAlphaNumericWithSpecialChars = () => {
     return validatePattern(
         /^[a-zA-Z0-9À-ž]+([ '-/_][a-zA-Z0-9À-ž]+)*$/,
         "Value can only contain numbers or letters eventually separated by a space, dash, apostrophe or slash and underscore",
@@ -72,4 +74,20 @@ export const validateCustomPort = (value: string) => {
     return !value || new RegExp(/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/).test(value)
         ? undefined
         : "Value must be a valid port";
+};
+
+export const validateLength = (min: number, max: number) => (value: any) => {
+    const validationInput = getValueFromObject(value);
+    return !validationInput || (validationInput.length >= min && validationInput.length <= max)
+        ? undefined
+        : `Value must be between ${min} and ${max} characters long`;
+};
+
+export const validateUrlSafe = () => {
+    return validatePattern(/^[a-zA-Z0-9-._~]+$/, "Value can only contain numbers or letters, dash, underscore, dot or tilde.");
+};
+
+export const validateQuartzCronExpression = () => (value: any) => {
+    const validationInput = getValueFromObject(value);
+    return !validationInput || cronValidator.isValidCronExpression(validationInput) ? undefined : "Value must be a valid quartz cron expression";
 };

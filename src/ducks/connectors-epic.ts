@@ -40,11 +40,7 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                 ),
 
                 catchError((error) =>
-                    of(
-                        slice.actions.listConnectorsFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get connector list" }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
-                    ),
+                    of(slice.actions.listConnectorsFailure(), widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore)),
                 ),
             ),
         ),
@@ -65,7 +61,6 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getConnectorDetailFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get connector detail" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),
@@ -109,16 +104,18 @@ const getConnectorAllAttributesDescriptors: AppEpic = (action$, state, deps) => 
         filter(slice.actions.getConnectorAllAttributesDescriptors.match),
         switchMap((action) =>
             deps.apiClients.connectors.getAttributesAll({ uuid: action.payload.uuid }).pipe(
-                map((descColl) =>
-                    slice.actions.getConnectorAllAttributesDescriptorsSuccess({
-                        attributeDescriptorCollection: transformAttributeDescriptorCollectionDtoToModel(descColl),
-                    }),
+                map(
+                    (descColl) =>
+                        slice.actions.getConnectorAllAttributesDescriptorsSuccess({
+                            attributeDescriptorCollection: transformAttributeDescriptorCollectionDtoToModel(descColl),
+                        }),
+                    widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorAttributes),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getAllConnectorAllAttributesDescriptorsFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get all connector attributes" }),
+                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorAttributes),
                     ),
                 ),
             ),

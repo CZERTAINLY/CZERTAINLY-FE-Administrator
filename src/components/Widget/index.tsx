@@ -1,5 +1,5 @@
 import cx from "classnames";
-import React from "react";
+import React, { useCallback } from "react";
 
 import Spinner from "components/Spinner";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
@@ -70,17 +70,19 @@ function Widget({
             </div>
         ) : null;
 
-    const renderWidgetButtons = () => {
+    const renderWidgetButtons = useCallback(() => {
+        const updatedWidgetButtons = widgetButtons?.map((button) => ({ ...button, disabled: !!widgetLock })) || [];
+
         if (!widgetButtons) return null;
         if (hideWidgetButtons) return null;
         else {
             return (
                 <div className="ms-auto">
-                    <WidgetButtons buttons={widgetButtons} />
+                    <WidgetButtons buttons={updatedWidgetButtons} />
                 </div>
             );
         }
-    };
+    }, [widgetButtons, hideWidgetButtons, widgetLock]);
 
     return (
         <section className={cx(style.widget, className)}>

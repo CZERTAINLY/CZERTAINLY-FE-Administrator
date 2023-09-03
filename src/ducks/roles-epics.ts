@@ -29,7 +29,6 @@ const list: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get roles list" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfRoles),
                     ),
                 ),
@@ -53,7 +52,6 @@ const getDetail: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getDetailFailure({ error: extractError(err, "Failed to get role detail") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get role detail" }),
                         widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RoleDetails),
                     ),
                 ),

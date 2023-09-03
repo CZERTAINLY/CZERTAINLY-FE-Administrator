@@ -38,7 +38,6 @@ const listLocations: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         pagingActions.listFailure(EntityType.LOCATION),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Location list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.LocationsStore),
                     ),
                 ),
@@ -62,7 +61,6 @@ const getLocationDetail: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getLocationDetailFailure({ error: extractError(error, "Failed to get Location detail") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Location detail" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.LocationDetails),
                     ),
                 ),

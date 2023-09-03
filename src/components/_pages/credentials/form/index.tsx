@@ -19,7 +19,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import { composeValidators, validateAlphaNumeric, validateRequired } from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { FunctionGroupCode, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
@@ -209,7 +209,7 @@ export default function CredentialForm() {
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="name">Credential Name</Label>

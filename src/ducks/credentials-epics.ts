@@ -33,7 +33,6 @@ const listCredentials: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listCredentialsFailure({ error: extractError(error, "Failed to get Credential list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Credential list" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialStore),
                     ),
                 ),
@@ -59,7 +58,6 @@ const getCredentialDetail: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getCredentialDetailFailure({ error: extractError(error, "Failed to get Credential") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Credential" }),
                         widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialDetails),
                     ),
                 ),

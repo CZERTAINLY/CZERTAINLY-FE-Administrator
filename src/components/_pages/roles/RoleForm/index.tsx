@@ -9,7 +9,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { composeValidators, validateAlphaNumeric, validateEmail, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateEmail,
+    validateLength,
+    validateRequired
+} from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
@@ -51,7 +57,7 @@ function RoleForm() {
                         roleRequest: {
                             name: values.name,
                             description: values.description,
-                            email: values.email,
+                            email: values.email ? values.email : undefined,
                             customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
                         },
                     }),
@@ -61,7 +67,7 @@ function RoleForm() {
                     rolesActions.create({
                         name: values.name,
                         description: values.description,
-                        email: values.email,
+                        email: values.email ? values.email : undefined,
                         customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
                     }),
                 );
@@ -96,7 +102,7 @@ function RoleForm() {
                 <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, values, valid }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumeric())}>
+                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="name">Role Name</Label>
@@ -115,7 +121,7 @@ function RoleForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateAlphaNumeric())}>
+                            <Field name="description" validate={composeValidators(validateLength(0,300))} >
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>
