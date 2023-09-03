@@ -89,5 +89,5 @@ export const validateUrlSafe = () => {
 
 export const validateQuartzCronExpression = () => (value: any) => {
     const validationInput = getValueFromObject(value);
-    return !validationInput || cronValidator.isValidCronExpression(validationInput) ? undefined : "Value must be a valid cron expression";
+    return !validationInput || cronValidator.isValidCronExpression(validationInput) ? undefined : "Value must be a valid quartz cron expression";
 };
