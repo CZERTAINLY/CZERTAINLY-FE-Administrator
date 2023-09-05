@@ -6,9 +6,10 @@ interface Props {
     id?: string;
     fileType?: string;
     showContent?: boolean;
+    editable?: boolean;
 }
 
-export default function FileUpload({ id = "", fileType = "", onFileContentLoaded, showContent = true }: Props) {
+export default function FileUpload({ id = "", fileType = "", editable, onFileContentLoaded, showContent = true }: Props) {
     const [fileContent, setFileContent] = useState("");
     const [fileName, setFileName] = useState("");
     const [contentType, setContentType] = useState("");
@@ -106,8 +107,12 @@ export default function FileUpload({ id = "", fileType = "", onFileContentLoaded
                         type="textarea"
                         rows={10}
                         placeholder={`Select or drag & drop ${fileType} file.`}
-                        readOnly={true}
+                        readOnly={!editable}
                         value={fileContent}
+                        onChange={(e) => {
+                            const base64Content = btoa(e.target.value);
+                            setFileContent(base64Content);
+                        }}
                     />
                 </FormGroup>
             )}
