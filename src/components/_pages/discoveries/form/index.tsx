@@ -22,15 +22,8 @@ import { FunctionGroupCode, Resource } from "types/openapi";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
-import { getCronExpression } from "utils/dateUtil";
 
-import {
-    composeValidators,
-    validateAlphaNumericWithSpecialChars,
-    validateLength,
-    validateQuartzCronExpression,
-    validateRequired
-} from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from "utils/validators";
 
 interface FormValues {
     name: string | undefined;
@@ -175,11 +168,15 @@ export default function DiscoveryForm() {
                     >
                         {values.scheduled && (
                             <>
-                                <TextField id="jobName" label="Job Name" validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
+                                <TextField
+                                    id="jobName"
+                                    label="Job Name"
+                                    validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
+                                />
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
-                                    validators={[validateRequired(), validateQuartzCronExpression()]}
+                                    validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
                                     // description={getCronExpression(values.cronExpression)}
                                 />
                                 <SwitchField id="oneTime" label="One Time Only" />
