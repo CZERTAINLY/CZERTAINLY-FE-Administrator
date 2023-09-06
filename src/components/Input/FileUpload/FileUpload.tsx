@@ -110,8 +110,9 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
                         readOnly={!editable}
                         value={fileContent}
                         onChange={(e) => {
+                            setFileContent(e.target.value);
                             const base64Content = btoa(e.target.value);
-                            setFileContent(base64Content);
+                            onFileContentLoaded(base64Content);
                         }}
                     />
                 </FormGroup>
