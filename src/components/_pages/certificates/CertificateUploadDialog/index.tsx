@@ -67,6 +67,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                 <BootstrapForm onSubmit={handleSubmit}>
                     <div>
                         <FileUpload
+                            editable
                             fileType={"certificate"}
                             onFileContentLoaded={(fileContent) => {
                                 setFileContent(fileContent);

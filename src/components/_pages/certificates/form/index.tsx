@@ -280,7 +280,7 @@ export default function CertificateForm() {
                         {values.uploadCsr?.value && values.raProfile ? (
                             <>
                                 <FileUpload
-                                    editable={true}
+                                    editable
                                     fileType={"CSR"}
                                     onFileContentLoaded={(fileContent) => {
                                         setFileContent(fileContent);

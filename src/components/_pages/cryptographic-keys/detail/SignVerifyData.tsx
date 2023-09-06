@@ -126,6 +126,7 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                     <Label for="data">Data</Label>
                                     <FileUpload
                                         id="data"
+                                        editable
                                         fileType={"data"}
                                         onFileContentLoaded={(fileContent) => setFileContent(fileContent)}
                                         showContent={false}
@@ -140,6 +141,7 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                     <FormGroup>
                                         <Label for="signatureFileName">Signature</Label>
                                         <FileUpload
+                                            editable
                                             id="signature"
                                             fileType={"signature"}
                                             onFileContentLoaded={(fileContent) => setSignatureContent(fileContent)}

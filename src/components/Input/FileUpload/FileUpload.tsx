@@ -120,7 +120,7 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
                         id={`${id}__fileUpload__fileContent`}
                         type="textarea"
                         rows={10}
-                        placeholder={`Select or drag & drop ${fileType} file or paste file content to text area.`}
+                        placeholder={`Select or drag & drop ${fileType} file or paste file content in the text area.`}
                         readOnly={!editable}
                         value={fileContent}
                         onChange={onFileInputTextChanged}
@@ -136,7 +136,7 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
             </FormGroup>
 
             <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
-                Select or drag &amp; drop {fileType} file to drop zone or paste file content to text area.
+                Select or drag &amp; drop {fileType} file to drop zone or paste file content in the text area.
             </div>
         </div>
     );
