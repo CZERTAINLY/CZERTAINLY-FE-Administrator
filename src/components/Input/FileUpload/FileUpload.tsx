@@ -1,3 +1,4 @@
+import debounce from "lodash.debounce";
 import React, { useCallback, useState } from "react";
 import { Col, FormGroup, Input, Label, Row } from "reactstrap";
 
@@ -62,6 +63,19 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
 
     const onFileDragOver = useCallback((e: React.DragEvent<HTMLInputElement>) => e.preventDefault(), []);
 
+    const onFileInputTextChanged = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const fileContentLatest = e.target.value;
+            setFileContent(fileContentLatest);
+
+            if (!fileContentLatest.length || fileContentLatest === fileContent) return;
+
+            const base64Content = btoa(fileContentLatest);
+            debounce(() => onFileContentLoaded(base64Content), 1000)();
+        },
+        [onFileContentLoaded],
+    );
+
     return (
         <div
             className="border border-light rounded mb-0"
@@ -106,14 +120,10 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
                         id={`${id}__fileUpload__fileContent`}
                         type="textarea"
                         rows={10}
-                        placeholder={`Select or drag & drop ${fileType} file.`}
+                        placeholder={`Select or drag & drop ${fileType} file or paste file content to text area.`}
                         readOnly={!editable}
                         value={fileContent}
-                        onChange={(e) => {
-                            setFileContent(e.target.value);
-                            const base64Content = btoa(e.target.value);
-                            onFileContentLoaded(base64Content);
-                        }}
+                        onChange={onFileInputTextChanged}
                     />
                 </FormGroup>
             )}
@@ -126,7 +136,7 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
             </FormGroup>
 
             <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
-                Select or drag &amp; drop {fileType} file to drop zone.
+                Select or drag &amp; drop {fileType} file to drop zone or paste file content to text area.
             </div>
         </div>
     );
