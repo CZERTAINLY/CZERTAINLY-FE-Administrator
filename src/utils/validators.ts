@@ -87,7 +87,25 @@ export const validateUrlSafe = () => {
     return validatePattern(/^[a-zA-Z0-9-._~]+$/, "Value can only contain numbers or letters, dash, underscore, dot or tilde.");
 };
 
-export const validateQuartzCronExpression = () => (value: any) => {
+export const validateQuartzCronExpression = (cronExpression: string | undefined) => (value: string) => {
     const validationInput = getValueFromObject(value);
-    return !validationInput || cronValidator.isValidCronExpression(validationInput) ? undefined : "Value must be a valid quartz cron expression";
+
+    try {
+        let validObj: { isValid: boolean; errorMessage: Array<string> } = cronValidator.isValidCronExpression(validationInput, {
+            error: true,
+        });
+        let uniqueErrors: string[] = [];
+
+        if (Array.isArray(validObj.errorMessage)) {
+            uniqueErrors = validObj.errorMessage?.splice(0, validObj?.errorMessage?.length);
+        }
+
+        return !validationInput || validObj.isValid
+            ? undefined
+            : Array.isArray(validObj.errorMessage)
+            ? uniqueErrors.join(", ")
+            : validObj.errorMessage;
+    } catch (error) {
+        return "Unknown error, please check the cron expression.";
+    }
 };
