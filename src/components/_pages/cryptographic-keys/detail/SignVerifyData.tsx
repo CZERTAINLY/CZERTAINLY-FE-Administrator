@@ -129,7 +129,6 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                         editable
                                         fileType={"data"}
                                         onFileContentLoaded={(fileContent) => setFileContent(fileContent)}
-                                        showContent={false}
                                     />
                                 </FormGroup>
                             )}
@@ -145,7 +144,6 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                             id="signature"
                                             fileType={"signature"}
                                             onFileContentLoaded={(fileContent) => setSignatureContent(fileContent)}
-                                            showContent={false}
                                         />
                                     </FormGroup>
                                 )}
