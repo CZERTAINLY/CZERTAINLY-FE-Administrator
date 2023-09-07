@@ -65,6 +65,7 @@ export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onR
             {!allowWithoutFile || uploadCsr ? (
                 <>
                     <FileUpload
+                        editable
                         fileType={"CSR"}
                         onFileContentLoaded={(fileContent) => {
                             setFileContent(fileContent);

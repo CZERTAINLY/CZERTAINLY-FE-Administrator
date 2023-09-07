@@ -1,3 +1,4 @@
+import debounce from "lodash.debounce";
 import React, { useCallback, useState } from "react";
 import { Col, FormGroup, Input, Label, Row } from "reactstrap";
 
@@ -6,9 +7,10 @@ interface Props {
     id?: string;
     fileType?: string;
     showContent?: boolean;
+    editable?: boolean;
 }
 
-export default function FileUpload({ id = "", fileType = "", onFileContentLoaded, showContent = true }: Props) {
+export default function FileUpload({ id = "", fileType = "", editable, onFileContentLoaded, showContent = true }: Props) {
     const [fileContent, setFileContent] = useState("");
     const [fileName, setFileName] = useState("");
     const [contentType, setContentType] = useState("");
@@ -61,6 +63,19 @@ export default function FileUpload({ id = "", fileType = "", onFileContentLoaded
 
     const onFileDragOver = useCallback((e: React.DragEvent<HTMLInputElement>) => e.preventDefault(), []);
 
+    const onFileInputTextChanged = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const fileContentLatest = e.target.value;
+            setFileContent(fileContentLatest);
+
+            if (!fileContentLatest.length || fileContentLatest === fileContent) return;
+
+            const base64Content = btoa(fileContentLatest);
+            debounce(() => onFileContentLoaded(base64Content), 1000)();
+        },
+        [onFileContentLoaded],
+    );
+
     return (
         <div
             className="border border-light rounded mb-0"
@@ -105,9 +120,10 @@ export default function FileUpload({ id = "", fileType = "", onFileContentLoaded
                         id={`${id}__fileUpload__fileContent`}
                         type="textarea"
                         rows={10}
-                        placeholder={`Select or drag & drop ${fileType} file.`}
-                        readOnly={true}
+                        placeholder={`Select or drag & drop ${fileType} file or paste file content in the text area.`}
+                        readOnly={!editable}
                         value={fileContent}
+                        onChange={onFileInputTextChanged}
                     />
                 </FormGroup>
             )}
@@ -120,7 +136,7 @@ export default function FileUpload({ id = "", fileType = "", onFileContentLoaded
             </FormGroup>
 
             <div className="text-muted" style={{ textAlign: "center", flexBasis: "100%", marginTop: "1rem" }}>
-                Select or drag &amp; drop {fileType} file to drop zone.
+                Select or drag &amp; drop {fileType} file to drop zone or paste file content in the text area.
             </div>
         </div>
     );
