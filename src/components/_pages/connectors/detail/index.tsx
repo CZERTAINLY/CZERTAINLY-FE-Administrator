@@ -14,11 +14,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Col, Container, Row, Table } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { FunctionGroupModel, HealthModel } from "types/connectors";
+import { FunctionGroupModel } from "types/connectors";
 
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
-import { ConnectorStatus, PlatformEnum, Resource } from "../../../../types/openapi";
+import { ConnectorStatus, HealthStatus, PlatformEnum, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 import { LockWidgetNameEnum } from "types/widget-locks";
@@ -269,24 +269,44 @@ export default function ConnectorDetail() {
         </div>
     );
 
-    const healthBody = (parts?: HealthModel[]) => {
-        if (!parts) return <></>;
+    const renderStatusBadge = useCallback(
+        (status?: HealthStatus) => {
+            if (!status) return <Badge color="light">Unknown</Badge>;
+            switch (status) {
+                case HealthStatus.Ok:
+                    return <Badge color="success">{status}</Badge>;
+                case HealthStatus.Nok:
+                    return <Badge color="danger">{status}</Badge>;
+                case HealthStatus.Unknown:
+                    return <Badge color="light">{status}</Badge>;
+                default:
+                    return <Badge color="warning">{status}</Badge>;
+            }
+        },
+        [health],
+    );
 
-        return Object.entries(parts).map(([key, value]) =>
+    const healthBody = useCallback(() => {
+        if (!health?.parts) return <></>;
+
+        return Object.entries(health?.parts).map(([key, value]) =>
             ["ok", "failed", "down", "nok", "unknown"].includes(value.status) ? (
                 <tr>
-                    <td>{<Badge color="warning">{key}</Badge>}</td>
-                    <td>{value.description}</td>
+                    <td>{key}</td>
+                    <td>{renderStatusBadge(value.status)}</td>
+                    <td>{value?.description || ""}</td>
                 </tr>
             ) : (
                 <tr>
-                    <td>{<Badge color="success">{key}</Badge>}</td>
-                    <td>{value.description || "OK"}</td>
+                    <td>{key}</td>
+                    <td>
+                        <Badge color="success">{value.status || "OK"}</Badge>
+                    </td>
+                    <td>{value?.description || ""}</td>
                 </tr>
             ),
         );
-    };
-
+    }, [health]);
     const endPointsHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -356,12 +376,19 @@ export default function ConnectorDetail() {
                         refreshAction={getFreshConnectorHealth}
                     >
                         <Table className="table-hover" size="sm">
+                            <thead>
+                                <tr>
+                                    <th>Part</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <tr key="healthCheckStatus">
-                                    <td>Status</td>
-                                    <td>{health?.status || "unknown"}</td>
+                                    <td className="fw-bold">Overall Health</td>
+                                    <td>{renderStatusBadge(health?.status)}</td>
+                                    <td>{health?.description || ""}</td>
                                 </tr>
-
                                 {healthBody()}
                             </tbody>
                         </Table>
