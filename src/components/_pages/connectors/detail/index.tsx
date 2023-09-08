@@ -385,7 +385,7 @@ export default function ConnectorDetail() {
                             </thead>
                             <tbody>
                                 <tr key="healthCheckStatus">
-                                    <td>Overall Health</td>
+                                    <td className="fw-bold">Overall Health</td>
                                     <td>{renderStatusBadge(health?.status)}</td>
                                     <td>{health?.description || ""}</td>
                                 </tr>
