@@ -500,7 +500,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "cubes",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Rejected || certificate?.status !== CertStatus.New,
+                disabled: (!certificate?.raProfile && certificate?.status === CertStatus.New) || certificate?.status !== CertStatus.New,
                 tooltip: "Issue",
                 onClick: () => {
                     dispatch(
@@ -514,7 +514,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "retweet",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
                 tooltip: "Renew",
                 onClick: () => {
                     setRenew(true);
@@ -522,7 +522,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "rekey",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
+                disabled: !certificate?.raProfile || certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
                 tooltip: "Rekey",
                 onClick: () => {
                     setRekey(true);
@@ -530,7 +530,11 @@ export default function CertificateDetail() {
             },
             {
                 icon: "minus-square",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
+                disabled:
+                    certificate?.status === CertStatus.New ||
+                    certificate?.status === CertStatus.Rejected ||
+                    certificate?.status === CertStatus.Revoked ||
+                    certificate?.status === CertStatus.Expired,
                 tooltip: "Revoke",
                 onClick: () => {
                     setRevoke(true);
