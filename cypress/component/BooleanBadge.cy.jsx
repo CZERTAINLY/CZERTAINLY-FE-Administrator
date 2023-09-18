@@ -1,9 +1,11 @@
 import BooleanBadge from "../../src/components/BooleanBadge/BooleanBadge.tsx";
+import "../../src/resources/styles/theme.scss";
 
-describe("BooleanBadge.cy.jsx", () => {
+describe("Boolean badge component", () => {
     it("should render 'Yes' for true value", () => {
         cy.mount(<BooleanBadge value={true} />);
         cy.get("span").should("have.text", "Yes");
+        cy.wait(500);
     });
 });
 
