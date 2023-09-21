@@ -80,7 +80,6 @@
         ]
     },
     "devDependencies": {
-        "@cypress/react": "^8.0.0",
         "cypress": "^12.17.4"
     }
 }
