@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useState } from "react";
-import CustomTable from "../../src/components/CustomTable/index.tsx";
+import CustomTable, { TableHeader } from "components/CustomTable/index";
+import { useCallback, useMemo, useState } from "react";
 import "../../src/resources/styles/theme.scss";
 
-const detailHeaders = [
+const detailHeaders: TableHeader[] = [
     {
         id: "columnOne",
         content: "Column One",
@@ -28,7 +28,7 @@ const CustomTableTest = () => {
     const [pageSize, setPageSize] = useState(10);
 
     const onPageSizeChanged = useCallback(
-        (pageSize) => {
+        (pageSize: number) => {
             setPageSize(pageSize);
             setPage(1);
         },

@@ -1,7 +1,5 @@
-import React from "react";
+import TabLayout from "components/Layout/TabLayout";
 import "../../src/resources/styles/theme.scss";
-
-import TabLayout from "../../src/components/Layout/TabLayout";
 
 const TestTabLayout = () => {
     return (

@@ -1,4 +1,4 @@
-import BooleanBadge from "../../src/components/BooleanBadge/BooleanBadge.tsx";
+import BooleanBadge from "components/BooleanBadge/BooleanBadge";
 import "../../src/resources/styles/theme.scss";
 
 describe("Boolean badge component with true value", () => {

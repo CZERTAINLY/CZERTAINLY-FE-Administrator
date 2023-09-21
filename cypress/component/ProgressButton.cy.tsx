@@ -1,5 +1,5 @@
+import ProgressButton from "components/ProgressButton/index";
 import { useState } from "react";
-import ProgressButton from "../../src/components/ProgressButton/index";
 import "../../src/resources/styles/theme.scss";
 
 const TestProgressButton = () => {

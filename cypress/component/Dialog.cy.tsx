@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Dialog from "../../src/components/Dialog/index.tsx";
+import Dialog from "components/Dialog/index";
+import { useState } from "react";
 import "../../src/resources/styles/theme.scss";
 
 const TestDialog = () => {

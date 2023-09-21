@@ -1,7 +1,7 @@
 describe("Navigation", {}, () => {
     it("passes", () => {
         /* ==== Generated with Cypress Studio ==== */
-        cy.visit("http://localhost:3000/#/dashboard");
+        cy.visit(Cypress.env("ADMIN_URL") + "#/dashboard");
         cy.get(".Sidebar_nav__gd3tY > :nth-child(1) > :nth-child(2) > a").click();
         cy.get(".Sidebar_nav__gd3tY > :nth-child(1) > :nth-child(3) > a").click();
         cy.get(".Sidebar_nav__gd3tY > :nth-child(1) > :nth-child(4) > a > div > .LinksGroup_menuLabel__c8UvS").click();

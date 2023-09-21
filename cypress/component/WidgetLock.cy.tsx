@@ -1,4 +1,4 @@
-import WidgetLock from "../../src/components/WidgetLock/index";
+import WidgetLock from "components/WidgetLock/index";
 import "../../src/resources/styles/theme.scss";
 
 describe("Widget Lock component", () => {

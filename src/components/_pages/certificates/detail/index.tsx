@@ -170,6 +170,10 @@ export default function CertificateDetail() {
         certLocations,
         raProfileSelected,
     );
+
+    console.log("certificateNodes", certificateNodes);
+    console.log("certificateEdges", certificateEdges);
+
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
 
@@ -1433,7 +1437,7 @@ export default function CertificateDetail() {
         }));
     }, [approvals, navigate]);
 
-    const defaultViewPort = useMemo(
+    const defaultViewport = useMemo(
         () => ({
             zoom: 0.5,
             x: deviceType === DeviceType.Tablet ? -50 : deviceType === DeviceType.Mobile ? -150 : 300,
@@ -1651,7 +1655,7 @@ export default function CertificateDetail() {
                                 flowChartTitle="Certificate Flow"
                                 flowChartEdges={certificateEdges}
                                 flowChartNodes={certificateNodes}
-                                defaultViewport={defaultViewPort}
+                                defaultViewport={defaultViewport}
                             />
                         ) : (
                             // Todo: Add a placeholder for the flow chart
