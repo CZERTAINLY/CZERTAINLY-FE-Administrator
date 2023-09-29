@@ -6,7 +6,6 @@ const TestProgressButton = () => {
     const [inProgress, setInProgress] = useState(false);
 
     const toggleProgress = () => {
-        console.log("toggleProgress");
         setInProgress(!inProgress);
 
         setTimeout(() => {

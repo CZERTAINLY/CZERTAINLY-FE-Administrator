@@ -1,77 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { store } from "index";
 import { createSelector } from "reselect";
-import { MessageModel } from "types/alerts";
 import { createFeatureSelector } from "utils/ducks";
+import { alertsSlice, State } from "./alert-slice";
 
-export type State = {
-    messages: MessageModel[];
-    msgId: number;
-};
-
-export const initialState: State = {
-    messages: [],
-    msgId: 0,
-};
-
-export const slice = createSlice({
-    name: "alerts",
-
-    initialState,
-
-    reducers: {
-        error: {
-            prepare: (message: string) => ({ payload: message }),
-
-            reducer: (state, action: PayloadAction<string>) => {
-                state.messages.push({
-                    id: state.msgId,
-                    time: Date.now(),
-                    message: action.payload,
-                    color: "danger",
-                });
-                state.msgId++;
-            },
-        },
-
-        success: {
-            prepare: (message: string) => ({ payload: message }),
-
-            reducer: (state, action: PayloadAction<string>) => {
-                state.messages.push({
-                    id: state.msgId,
-                    time: Date.now(),
-                    message: action.payload,
-                    color: "success",
-                });
-                state.msgId++;
-            },
-        },
-
-        hide: {
-            prepare: (id: number) => ({ payload: id }),
-
-            reducer: (state, action: PayloadAction<number>) => {
-                const msgIndex = state.messages.findIndex((message) => message.id === action.payload);
-                if (msgIndex < 0) return;
-                state.messages[msgIndex].isHiding = true;
-            },
-        },
-
-        dismiss: {
-            prepare: (messageId: number) => ({ payload: messageId }),
-
-            reducer: (state, action: PayloadAction<number>) => {
-                const messageIndex = state.messages.findIndex((message) => message.id === action.payload);
-                if (messageIndex === -1) return;
-
-                state.messages.splice(messageIndex, 1);
-            },
-        },
-    },
-});
-
-const selectState = createFeatureSelector<State>(slice.name);
+const selectState = createFeatureSelector<State>(alertsSlice.name);
 
 const selectMessages = createSelector(selectState, (state) => state.messages);
 
@@ -80,7 +12,7 @@ export const selectors = {
     selectMessages,
 };
 
-export const actions = slice.actions;
+export const actions = alertsSlice.actions;
 
 setInterval(() => {
     const alerts = store.getState().alerts;
@@ -95,4 +27,4 @@ setInterval(() => {
     });
 }, 1000);
 
-export default slice.reducer;
+export default alertsSlice.reducer;

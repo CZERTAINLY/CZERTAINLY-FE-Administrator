@@ -6,7 +6,6 @@ const TestDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleDialog = () => {
-        console.log("toggleDialog");
         setIsOpen(!isOpen);
     };
 

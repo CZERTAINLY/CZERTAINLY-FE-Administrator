@@ -171,9 +171,6 @@ export default function CertificateDetail() {
         raProfileSelected,
     );
 
-    console.log("certificateNodes", certificateNodes);
-    console.log("certificateEdges", certificateEdges);
-
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
 
