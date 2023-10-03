@@ -39,7 +39,8 @@ const WidgetLock = ({
         { "fa-house-laptop": lockType === LockTypeEnum.CLIENT },
         { "fa-lock": lockType === LockTypeEnum.PERMISSION },
         { "fa-wifi": lockType === LockTypeEnum.NETWORK },
-        { "fa-database": lockType === LockTypeEnum.SERVER_ERROR || lockType === LockTypeEnum.SERVICE_ERROR },
+        { "fa-database": lockType === LockTypeEnum.SERVICE_ERROR },
+        { "fa-server": lockType === LockTypeEnum.SERVER_ERROR },
     );
 
     const renderPopOver = () => {

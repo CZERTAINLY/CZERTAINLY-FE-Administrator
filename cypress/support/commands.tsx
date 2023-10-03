@@ -3,6 +3,7 @@ import { mount } from "cypress/react18";
 import { reducers } from "ducks/reducers";
 import React from "react";
 import { Provider } from "react-redux";
+import { HashRouter } from "react-router-dom";
 
 Cypress.Commands.add("mount", (component, options = {}) => {
     // Use the default store if one is not provided
@@ -20,7 +21,9 @@ Cypress.Commands.add("mount", (component, options = {}) => {
     // const reduxStore = configure();
     const wrapped = (
         <React.Fragment>
-            <Provider store={reduxStore}>{component}</Provider>
+            <Provider store={reduxStore}>
+                <HashRouter>{component}</HashRouter>
+            </Provider>
         </React.Fragment>
     );
     return mount(wrapped, mountOptions);
