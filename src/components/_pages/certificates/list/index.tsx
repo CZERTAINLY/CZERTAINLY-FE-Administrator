@@ -313,7 +313,11 @@ export default function CertificateList({
                         certificate.serialNumber || "",
                         certificate.signatureAlgorithm,
                         certificate.publicKeyAlgorithm,
-                        certificate.issuerCommonName || "",
+                        certificate.issuerCommonName ? (
+                            <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                        ) : (
+                            ""
+                        ),
                         certificate.certificateType ? (
                             <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>
                                 {getEnumLabel(certificateTypeEnum, certificate.certificateType)}

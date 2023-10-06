@@ -50,7 +50,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
-        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 40 : nodeHeight;
+        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
         dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
     });
 

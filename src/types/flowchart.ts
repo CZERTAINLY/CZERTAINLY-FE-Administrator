@@ -1,15 +1,16 @@
 import { CustomNode } from "components/FlowChart";
+import React from "react";
 import { Edge, NodeProps } from "reactflow";
 import { CertificateStatus } from "./openapi";
 
 export interface OtherProperties {
     propertyName: string;
-    propertyValue: string;
+    propertyValue: string | React.ReactNode;
 }
 
 export interface CustomNodeData {
     isMainNode?: boolean;
-    entityType: string;
+    customNodeCardTitle: string;
     entityLabel: string;
     redirectUrl?: string;
     icon?: string;

@@ -17,7 +17,9 @@
     text-align: left;
     max-width: 515px;
     z-index: 1;
-    box-shadow: 2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15), 1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
+    box-shadow:
+        2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),
+        1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
         0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
 }
 
@@ -42,7 +44,7 @@
     background-color: #eee;
 }
 
-.entityType {
+.customNodeCardTitle {
     color: $gray-500;
     font-weight: bold;
     font-size: medium;

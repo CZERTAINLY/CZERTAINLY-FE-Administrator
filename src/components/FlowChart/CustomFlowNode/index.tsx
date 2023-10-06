@@ -85,7 +85,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 <div className="d-flex my-1">
                     <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
 
-                    <h6 className={cx(style.entityType, "my-auto ms-2")}>{data.entityType}</h6>
+                    <h6 className={cx(style.customNodeCardTitle, "my-auto ms-2")}>{data.customNodeCardTitle}</h6>
                 </div>
 
                 {data.redirectUrl ? (

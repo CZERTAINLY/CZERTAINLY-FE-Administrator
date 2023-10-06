@@ -14,7 +14,7 @@ const nodes: CustomNode[] = [
         width: 350,
         height: 100,
         data: {
-            entityType: "Certificate",
+            customNodeCardTitle: "Certificate",
             entityLabel: "demo.3key.test",
             icon: "fa fa-certificate",
             isMainNode: true,
@@ -51,7 +51,7 @@ const nodes: CustomNode[] = [
         width: 350,
         height: 100,
         data: {
-            entityType: "Certificate Issuer",
+            customNodeCardTitle: "Certificate Issuer",
             icon: "fa fa fa fa-stamp",
             entityLabel: "Demo MS Sub CA",
             otherProperties: [
@@ -78,7 +78,7 @@ const nodes: CustomNode[] = [
         width: 350,
         height: 100,
         data: {
-            entityType: "RA Profile",
+            customNodeCardTitle: "RA Profile",
             icon: "fa fa fa-address-card",
             entityLabel: "ms-adcs-webserver",
             otherProperties: [
@@ -101,7 +101,7 @@ const nodes: CustomNode[] = [
         width: 350,
         height: 100,
         data: {
-            entityType: "Authority",
+            customNodeCardTitle: "Authority",
             icon: "fa fa fa-stamp",
             entityLabel: "ms-adcs-lab02-authority",
             otherProperties: [

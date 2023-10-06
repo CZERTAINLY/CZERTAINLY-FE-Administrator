@@ -60,8 +60,9 @@ import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import cx from "classnames";
-import FlowChart from "components/FlowChart";
+import FlowChart, { CustomNode } from "components/FlowChart";
 import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
+import { Edge } from "reactflow";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
@@ -72,6 +73,7 @@ export default function CertificateDetail() {
     const { id } = useParams();
 
     const certificate = useSelector(selectors.certificateDetail);
+    const certificateChain = useSelector(selectors.certificateChain);
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
@@ -86,6 +88,9 @@ export default function CertificateDetail() {
     const locations = useSelector(locationSelectors.locations);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
+    const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
 
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
@@ -164,13 +169,21 @@ export default function CertificateDetail() {
         ],
     );
 
-    const { nodes: certificateNodes, edges: certificateEdges } = transformCertifacetObjectToNodesAndEdges(
-        certificate,
-        users,
-        certLocations,
-        raProfileSelected,
-    );
+    const transformCertificate = useCallback(() => {
+        const { nodes, edges } = transformCertifacetObjectToNodesAndEdges(
+            certificate,
+            users,
+            certLocations,
+            raProfileSelected,
+            certificateChain,
+        );
+        setCertificateNodes(nodes);
+        setCertificateEdges(edges);
+    }, [certificate, users, certLocations, raProfileSelected, certificateChain]);
 
+    useEffect(() => {
+        transformCertificate();
+    }, [transformCertificate]);
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
 
@@ -211,6 +224,11 @@ export default function CertificateDetail() {
         dispatch(actions.listCertificateApprovals({ uuid: id, paginationRequestDto: {} }));
     }, [dispatch, id]);
 
+    const getCertificateChainDetails = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getCertificateChain({ uuid: id, withEndCertificate: true }));
+    }, [dispatch, id]);
+
     useEffect(() => {
         getFreshCertificateLocations();
     }, [getFreshCertificateLocations]);
@@ -222,6 +240,7 @@ export default function CertificateDetail() {
         dispatch(actions.getCertificateHistory({ uuid: id }));
         getFreshApprovalList();
         getFreshCertificateLocations();
+        getCertificateChainDetails();
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -1130,7 +1149,17 @@ export default function CertificateDetail() {
                   },
                   {
                       id: "issuerCommonName",
-                      columns: ["Issuer Common Name", certificate.issuerCommonName || ""],
+                      columns: [
+                          "Issuer Common Name",
+                          certificate.issuerCommonName ? (
+                              <Link to={`../certificates/detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                          ) : (
+                              ""
+                          ),
+                          //   certificate.issuerCommonName
+
+                          //   || ""
+                      ],
                   },
                   {
                       id: "issuerDN",
