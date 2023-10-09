@@ -261,7 +261,7 @@ export class CertificateInventoryApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (withEndCertificate != null) {
-            Object.assign(query, withEndCertificate);
+            query["withEndCertificate"] = withEndCertificate;
         }
 
         return this.request<CertificateChainDownloadResponseDto>(
@@ -314,7 +314,7 @@ export class CertificateInventoryApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (withEndCertificate != null) {
-            Object.assign(query, withEndCertificate);
+            query["withEndCertificate"] = withEndCertificate;
         }
 
         return this.request<CertificateChainResponseDto>(

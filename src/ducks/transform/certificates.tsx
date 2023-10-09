@@ -200,19 +200,23 @@ export function transformCertifacetObjectToNodesAndEdges(
         width: nodeWidth,
         height: nodeHeight,
         data: {
-            customNodeCardTitle: "Current Detail Certificate",
+            customNodeCardTitle: "Current CA",
             entityLabel: certificate.commonName,
             icon: "fa fa-certificate",
             isMainNode: true,
             certificateNodeStatus: certificate.status,
             otherProperties: [
                 {
-                    propertyName: "Certificate uuid",
-                    propertyValue: certificate?.uuid || "NA",
+                    propertyName: "Serial Number",
+                    propertyValue: certificate?.serialNumber || "NA",
                 },
                 {
-                    propertyName: "Issuer Certificate uuid",
-                    propertyValue: certificate?.issuerCertificateUuid || "NA",
+                    propertyName: "Fingerprint",
+                    propertyValue: certificate?.fingerprint || "NA",
+                },
+                {
+                    propertyName: "Subject DN",
+                    propertyValue: certificate?.subjectDn || "NA",
                 },
                 {
                     propertyName: "Issuer Certificate common name",
@@ -222,18 +226,6 @@ export function transformCertifacetObjectToNodesAndEdges(
                         ) : (
                             "NA"
                         ),
-                },
-                {
-                    propertyName: "Serial Number",
-                    propertyValue: certificate?.serialNumber || "NA",
-                },
-                {
-                    propertyName: "Subject DN",
-                    propertyValue: certificate?.subjectDn || "NA",
-                },
-                {
-                    propertyName: "certificateType",
-                    propertyValue: certificate?.certificateType || "NA",
                 },
                 {
                     propertyName: "Status",
@@ -247,6 +239,52 @@ export function transformCertifacetObjectToNodesAndEdges(
     if (certificateChain && certificateChain?.certificates?.length) {
         certificateChain.certificates.forEach((chain, index) => {
             const chainLength = certificateChain?.certificates?.length || 0;
+
+            const otherProperties = [
+                {
+                    propertyName: "Serial Number",
+                    propertyValue: chain?.serialNumber || "NA",
+                },
+                {
+                    propertyName: "Fingerprint",
+                    propertyValue: chain?.fingerprint || "NA",
+                },
+                {
+                    propertyName: "Subject DN",
+                    propertyValue: chain?.subjectDn || "NA",
+                },
+                {
+                    propertyName: "Status",
+                    propertyValue: chain?.status || "NA",
+                },
+                {
+                    propertyName: "Issuer Certificate common name",
+                    propertyValue:
+                        chain?.issuerCommonName && chain?.issuerCertificateUuid ? (
+                            <Link to={`../certificates/detail/${chain.issuerCertificateUuid}`}>{chain.issuerCommonName}</Link>
+                        ) : (
+                            "NA"
+                        ),
+                },
+
+                // ...locationProperties,
+            ];
+
+            if (chainLength - 1 === index && !certificateChain?.completeChain) {
+                otherProperties.push({
+                    propertyName: "Issuer Certificate common name",
+                    propertyValue: chain?.issuerCommonName || "NA",
+                });
+                otherProperties.push({
+                    propertyName: "Issuer DN",
+                    propertyValue: chain?.issuerDn || "NA",
+                });
+                otherProperties.push({
+                    propertyName: "Issuer Sr. No.",
+                    propertyValue: chain?.issuerSerialNumber || "NA",
+                });
+            }
+
             nodes.push({
                 id: `chain-${index}`,
                 type: "customFlowNode",
@@ -255,51 +293,14 @@ export function transformCertifacetObjectToNodesAndEdges(
                 height: nodeHeight,
                 data: {
                     // customNodeCardTitle: `Chain Certificate ${index + 1}`,
-                    customNodeCardTitle:
-                        chainLength - 1 === index && certificateChain?.completeChain
-                            ? `Chain Certificate ${chainLength - index} (Root)`
-                            : `Chain Certificate ${chainLength - index}`,
+                    customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
+                    redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
                     entityLabel: chain.commonName,
                     // icon: "fa fa-certificate",
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? "fa fa-medal" : "fa fa-certificate",
                     isMainNode: true,
                     certificateNodeStatus: chain.status,
-                    otherProperties: [
-                        {
-                            propertyName: "Certificate uuid",
-                            propertyValue: chain?.uuid || "NA",
-                        },
-                        {
-                            propertyName: "Issuer Certificate uuid",
-                            propertyValue: chain?.issuerCertificateUuid || "",
-                        },
-                        {
-                            propertyName: "Issuer Certificate common name",
-                            propertyValue:
-                                chain?.issuerCommonName && chain?.issuerCertificateUuid ? (
-                                    <Link to={`../certificates/detail/${chain.issuerCertificateUuid}`}>{chain.issuerCommonName}</Link>
-                                ) : (
-                                    "NA"
-                                ),
-                        },
-                        {
-                            propertyName: "Serial Number",
-                            propertyValue: chain?.serialNumber || "NA",
-                        },
-                        {
-                            propertyName: "Subject DN",
-                            propertyValue: chain?.subjectDn || "NA",
-                        },
-                        {
-                            propertyName: "certificateType",
-                            propertyValue: chain?.certificateType || "NA",
-                        },
-                        {
-                            propertyName: "Status",
-                            propertyValue: chain?.status || "NA",
-                        },
-                        // ...locationProperties,
-                    ],
+                    otherProperties: otherProperties,
                 },
             });
             edges.push({
@@ -485,10 +486,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 height: nodeHeight,
                 data: {
                     customNodeCardTitle: "Authority",
-                    // <i class="fa-solid fa-stamp"></i>
                     icon: "fa fa fa-stamp",
                     entityLabel: raProfileSelected.authorityInstanceName || "",
-                    // /authorities/detail/4b893a50-c5a8-4e5c-b3ec-ea8eddf540b6
                     redirectUrl: `/authorities/detail/${raProfileSelected.authorityInstanceUuid}`,
                     otherProperties: [
                         {
@@ -504,9 +503,9 @@ export function transformCertifacetObjectToNodesAndEdges(
                 },
             });
             edges.push({
-                id: "e5-7",
-                target: "5",
-                source: "7",
+                id: "e7-5",
+                target: "7",
+                source: "5",
                 type: "floating",
                 markerEnd: { type: MarkerType.Arrow },
             });

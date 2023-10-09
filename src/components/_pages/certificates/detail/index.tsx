@@ -113,6 +113,7 @@ export default function CertificateDetail() {
     const isRenewing = useSelector(selectors.isRenewing);
     const isRekeying = useSelector(selectors.isRekeying);
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
+    const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
@@ -155,6 +156,7 @@ export default function CertificateDetail() {
             isRevoking ||
             isRenewing ||
             isRekeying ||
+            isFetchingCertificateChain ||
             isFetchingApprovals,
         [
             isFetching,
@@ -165,6 +167,7 @@ export default function CertificateDetail() {
             isRevoking,
             isRenewing,
             isRekeying,
+            isFetchingCertificateChain,
             isFetchingApprovals,
         ],
     );
@@ -226,7 +229,7 @@ export default function CertificateDetail() {
 
     const getCertificateChainDetails = useCallback(() => {
         if (!id) return;
-        dispatch(actions.getCertificateChain({ uuid: id, withEndCertificate: true }));
+        dispatch(actions.getCertificateChain({ uuid: id, withEndCertificate: false }));
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -240,7 +243,7 @@ export default function CertificateDetail() {
         dispatch(actions.getCertificateHistory({ uuid: id }));
         getFreshApprovalList();
         getFreshCertificateLocations();
-        getCertificateChainDetails();
+        // getCertificateChainDetails();
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -1151,14 +1154,13 @@ export default function CertificateDetail() {
                       id: "issuerCommonName",
                       columns: [
                           "Issuer Common Name",
-                          certificate.issuerCommonName ? (
+                          certificate?.issuerCommonName && certificate?.issuerCertificateUuid ? (
                               <Link to={`../certificates/detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                          ) : certificate?.issuerCommonName ? (
+                              certificate.issuerCommonName
                           ) : (
                               ""
                           ),
-                          //   certificate.issuerCommonName
-
-                          //   || ""
                       ],
                   },
                   {
@@ -1676,8 +1678,10 @@ export default function CertificateDetail() {
                     },
                     {
                         title: "Flow",
+                        onClick: getCertificateChainDetails,
                         content: certificateNodes.length ? (
                             <FlowChart
+                                busy={isBusy}
                                 flowChartTitle="Certificate Flow"
                                 flowChartEdges={certificateEdges}
                                 flowChartNodes={certificateNodes}

@@ -9,13 +9,12 @@
     display: flex;
     flex-direction: column;
     align-items: start;
-    min-width: 350px;
+    width: 350px;
     min-height: 55px;
     border-style: solid;
     border-color: #3754a566;
     border-width: 2px;
     text-align: left;
-    max-width: 515px;
     z-index: 1;
     box-shadow:
         2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),

@@ -93,7 +93,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                         <h6>Entity Name :</h6>
                         &nbsp;
                         <Link to={data.redirectUrl}>
-                            <h6>{data.entityLabel}</h6>
+                            <h6 className="text-wrap">{data.entityLabel}</h6>
                         </Link>
                     </div>
                 ) : (

@@ -641,6 +641,7 @@ const isFetchingCsrAttributes = createSelector(state, (state) => state.isFetchin
 const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttributeDescriptors);
 
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
+const isFetchingCertificateChain = createSelector(state, (state) => state.isFetchingCertificateChain);
 
 export const selectors = {
     state,
@@ -655,6 +656,7 @@ export const selectors = {
     isFetchingDetail,
     isFetchingHistory,
     isFetchingLocations,
+    isFetchingCertificateChain,
     isIssuing,
     isRevoking,
     isRenewing,
