@@ -43,7 +43,7 @@ const edgeTypes = {
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-export const nodeWidth = 350;
+export const nodeWidth = 400;
 export const nodeHeight = 100;
 
 const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB") => {

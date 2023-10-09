@@ -92,6 +92,7 @@ export default function CertificateDetail() {
     const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
     const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
 
+    const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
@@ -233,6 +234,11 @@ export default function CertificateDetail() {
     }, [dispatch, id]);
 
     useEffect(() => {
+        if (!id && isFlowTabOpenend) return;
+        getCertificateChainDetails();
+    }, [isFlowTabOpenend, id]);
+
+    useEffect(() => {
         getFreshCertificateLocations();
     }, [getFreshCertificateLocations]);
 
@@ -243,7 +249,6 @@ export default function CertificateDetail() {
         dispatch(actions.getCertificateHistory({ uuid: id }));
         getFreshApprovalList();
         getFreshCertificateLocations();
-        // getCertificateChainDetails();
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -1678,7 +1683,10 @@ export default function CertificateDetail() {
                     },
                     {
                         title: "Flow",
-                        onClick: getCertificateChainDetails,
+                        onClick: () => {
+                            setIsFlowTabOpenend(true);
+                            getCertificateChainDetails();
+                        },
                         content: certificateNodes.length ? (
                             <FlowChart
                                 busy={isBusy}

@@ -1,11 +1,11 @@
 import { CustomNode } from "components/FlowChart";
-import React from "react";
 import { Edge, NodeProps } from "reactflow";
 import { CertificateStatus } from "./openapi";
 
 export interface OtherProperties {
     propertyName: string;
-    propertyValue: string | React.ReactNode;
+    propertyValue: string;
+    copyable?: boolean;
 }
 
 export interface CustomNodeData {

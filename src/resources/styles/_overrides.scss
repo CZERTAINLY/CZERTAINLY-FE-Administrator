@@ -255,6 +255,12 @@ pre {
             border-top: none;
         }
     }
+    i {
+        color: $gray-600;
+        &:active {
+            color: $gray-500;
+        }
+    }
 }
 
 .btn-sm {

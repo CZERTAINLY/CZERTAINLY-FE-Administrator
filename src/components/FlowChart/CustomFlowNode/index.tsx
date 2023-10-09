@@ -120,6 +120,14 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                         <li key={index} className="list-group-item text-wrap p-0 ">
                                             <span className={style.propertyName}>{property.propertyName} : </span>
                                             <span className={style.propertyValue}>{property.propertyValue}</span>
+                                            {property?.copyable && (
+                                                <i
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(property.propertyValue);
+                                                    }}
+                                                    className="fa fa-copy ms-2"
+                                                ></i>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>

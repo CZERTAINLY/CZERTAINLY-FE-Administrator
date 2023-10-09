@@ -1,5 +1,4 @@
 import { CustomNode, nodeHeight, nodeWidth } from "components/FlowChart";
-import { Link } from "react-router-dom";
 import { Edge, MarkerType } from "reactflow";
 import {
     CertificateBulkDeleteRequestDto,
@@ -43,6 +42,7 @@ import {
     SearchRequestDto,
     SearchRequestModel,
 } from "types/certificate";
+import { OtherProperties } from "types/flowchart";
 import { LocationResponseModel } from "types/locations";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
@@ -193,6 +193,49 @@ export function transformCertifacetObjectToNodesAndEdges(
         return { nodes, edges };
     }
 
+    const otherPropertiesCurrentCertificate: OtherProperties[] = [
+        {
+            propertyName: "Status",
+            propertyValue: certificate.status,
+        },
+        {
+            propertyName: "Subject DN",
+            propertyValue: certificate.subjectDn,
+            copyable: true,
+        },
+    ];
+
+    if (certificate?.serialNumber) {
+        otherPropertiesCurrentCertificate.push({
+            propertyName: "Serial Number",
+            propertyValue: certificate.serialNumber,
+            copyable: true,
+        });
+    }
+    if (certificate?.fingerprint) {
+        otherPropertiesCurrentCertificate.push({
+            propertyName: "Fingerprint",
+            propertyValue: certificate.fingerprint,
+            copyable: true,
+        });
+    }
+
+    if (!certificateChain?.certificates?.length && !certificateChain?.completeChain) {
+        if (certificate?.issuerDn) {
+            otherPropertiesCurrentCertificate.push({
+                propertyName: "Issuer DN",
+                propertyValue: certificate.issuerDn,
+                copyable: true,
+            });
+        }
+        if (certificate?.issuerSerialNumber) {
+            otherPropertiesCurrentCertificate.push({
+                propertyName: "Issuer Sr. No.",
+                propertyValue: certificate.issuerSerialNumber,
+                copyable: true,
+            });
+        }
+    }
     nodes.push({
         id: "1",
         type: "customFlowNode",
@@ -200,39 +243,12 @@ export function transformCertifacetObjectToNodesAndEdges(
         width: nodeWidth,
         height: nodeHeight,
         data: {
-            customNodeCardTitle: "Current CA",
+            customNodeCardTitle: "Current Certificate",
             entityLabel: certificate.commonName,
             icon: "fa fa-certificate",
             isMainNode: true,
             certificateNodeStatus: certificate.status,
-            otherProperties: [
-                {
-                    propertyName: "Serial Number",
-                    propertyValue: certificate?.serialNumber || "NA",
-                },
-                {
-                    propertyName: "Fingerprint",
-                    propertyValue: certificate?.fingerprint || "NA",
-                },
-                {
-                    propertyName: "Subject DN",
-                    propertyValue: certificate?.subjectDn || "NA",
-                },
-                {
-                    propertyName: "Issuer Certificate common name",
-                    propertyValue:
-                        certificate?.issuerCommonName && certificate?.issuerCertificateUuid ? (
-                            <Link to={`../certificates/detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
-                        ) : (
-                            "NA"
-                        ),
-                },
-                {
-                    propertyName: "Status",
-                    propertyValue: certificate?.status || "NA",
-                },
-                // ...locationProperties,
-            ],
+            otherProperties: otherPropertiesCurrentCertificate,
         },
     });
 
@@ -240,49 +256,49 @@ export function transformCertifacetObjectToNodesAndEdges(
         certificateChain.certificates.forEach((chain, index) => {
             const chainLength = certificateChain?.certificates?.length || 0;
 
-            const otherProperties = [
+            const otherProperties: OtherProperties[] = [
                 {
-                    propertyName: "Serial Number",
-                    propertyValue: chain?.serialNumber || "NA",
-                },
-                {
-                    propertyName: "Fingerprint",
-                    propertyValue: chain?.fingerprint || "NA",
+                    propertyName: "Status",
+                    propertyValue: chain.status,
                 },
                 {
                     propertyName: "Subject DN",
-                    propertyValue: chain?.subjectDn || "NA",
+                    propertyValue: chain.subjectDn,
+                    copyable: true,
                 },
-                {
-                    propertyName: "Status",
-                    propertyValue: chain?.status || "NA",
-                },
-                {
-                    propertyName: "Issuer Certificate common name",
-                    propertyValue:
-                        chain?.issuerCommonName && chain?.issuerCertificateUuid ? (
-                            <Link to={`../certificates/detail/${chain.issuerCertificateUuid}`}>{chain.issuerCommonName}</Link>
-                        ) : (
-                            "NA"
-                        ),
-                },
-
-                // ...locationProperties,
             ];
 
+            if (chain?.serialNumber) {
+                otherProperties.push({
+                    propertyName: "Serial Number",
+                    propertyValue: chain?.serialNumber,
+                    copyable: true,
+                });
+            }
+
+            if (chain?.fingerprint) {
+                otherProperties.push({
+                    propertyName: "Fingerprint",
+                    propertyValue: chain.fingerprint,
+                    copyable: true,
+                });
+            }
+
             if (chainLength - 1 === index && !certificateChain?.completeChain) {
-                otherProperties.push({
-                    propertyName: "Issuer Certificate common name",
-                    propertyValue: chain?.issuerCommonName || "NA",
-                });
-                otherProperties.push({
-                    propertyName: "Issuer DN",
-                    propertyValue: chain?.issuerDn || "NA",
-                });
-                otherProperties.push({
-                    propertyName: "Issuer Sr. No.",
-                    propertyValue: chain?.issuerSerialNumber || "NA",
-                });
+                if (chain?.issuerDn) {
+                    otherProperties.push({
+                        propertyName: "Issuer DN",
+                        propertyValue: chain.issuerDn,
+                        copyable: true,
+                    });
+                }
+                if (chain?.issuerSerialNumber) {
+                    otherProperties.push({
+                        propertyName: "Issuer Sr. No.",
+                        propertyValue: chain.issuerSerialNumber,
+                        copyable: true,
+                    });
+                }
             }
 
             nodes.push({
@@ -292,11 +308,9 @@ export function transformCertifacetObjectToNodesAndEdges(
                 width: nodeWidth,
                 height: nodeHeight,
                 data: {
-                    // customNodeCardTitle: `Chain Certificate ${index + 1}`,
                     customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
                     redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
                     entityLabel: chain.commonName,
-                    // icon: "fa fa-certificate",
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? "fa fa-medal" : "fa fa-certificate",
                     isMainNode: true,
                     certificateNodeStatus: chain.status,
@@ -318,6 +332,27 @@ export function transformCertifacetObjectToNodesAndEdges(
     if (users?.length) {
         const user = users.find((u) => u.username === certificate?.owner);
         if (user) {
+            const userOtherProperties: OtherProperties[] = [
+                {
+                    propertyName: "Username",
+                    propertyValue: user.username,
+                    copyable: true,
+                },
+                { propertyName: "User UUID", propertyValue: user.uuid, copyable: true },
+                {
+                    propertyName: "User Enabled",
+                    propertyValue: user.enabled ? "Yes" : "No",
+                },
+            ];
+
+            if (user?.email) {
+                userOtherProperties.push({
+                    propertyName: "Email",
+                    propertyValue: user.email,
+                    copyable: true,
+                });
+            }
+
             nodes.push({
                 id: "2",
                 type: "customFlowNode",
@@ -330,16 +365,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     entityLabel: user?.username || "",
                     description: user?.description || "",
                     redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
-                    otherProperties: [
-                        {
-                            propertyName: "User Email",
-                            propertyValue: user?.email || "NA",
-                        },
-                        {
-                            propertyName: "User Enabled",
-                            propertyValue: user?.enabled !== undefined ? (user?.enabled ? "Yes" : "No") : "NA",
-                        },
-                    ],
+                    otherProperties: userOtherProperties,
                 },
             });
             edges.push({
@@ -353,6 +379,23 @@ export function transformCertifacetObjectToNodesAndEdges(
     }
 
     if (certificate?.key) {
+        const keyOtherProperties: OtherProperties[] = [];
+
+        if (certificate?.key?.owner) {
+            keyOtherProperties.push({
+                propertyName: "Key Owner",
+                propertyValue: certificate.key.owner,
+                copyable: true,
+            });
+        }
+
+        if (certificate?.key?.tokenProfileName) {
+            keyOtherProperties.push({
+                propertyName: "Key Token ProfileName",
+                propertyValue: certificate.key.tokenProfileName,
+                copyable: true,
+            });
+        }
         nodes.push({
             id: "4",
             type: "customFlowNode",
@@ -368,16 +411,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     certificate?.key?.uuid && certificate?.key?.tokenInstanceUuid
                         ? `/keys/detail/${certificate.key.tokenInstanceUuid}/${certificate.key.uuid}`
                         : undefined,
-                otherProperties: [
-                    {
-                        propertyName: "Key Owner",
-                        propertyValue: certificate?.key?.owner || "NA",
-                    },
-                    {
-                        propertyName: "Key Token ProfileName",
-                        propertyValue: certificate?.key?.tokenProfileName || "NA",
-                    },
-                ],
+                otherProperties: keyOtherProperties,
             },
         });
         edges.push({
@@ -388,38 +422,6 @@ export function transformCertifacetObjectToNodesAndEdges(
             markerEnd: { type: MarkerType.Arrow },
         });
     }
-
-    // if (certificate?.issuerCommonName) {
-    //     nodes.push({
-    //         id: "6",
-    //         type: "customFlowNode",
-    //         position: { x: 0, y: 0 },
-    //         width: nodeWidth,
-    //         height: nodeHeight,
-    //         data: {
-    //             customNodeCardTitle: "Certificate Issuer",
-    //             icon: "fa fa fa fa-stamp",
-    //             entityLabel: certificate?.issuerCommonName || "",
-    //             otherProperties: [
-    //                 {
-    //                     propertyName: "Issuer DN",
-    //                     propertyValue: certificate?.issuerDn || "NA",
-    //                 },
-    //                 {
-    //                     propertyName: "Issuer Sr. No.",
-    //                     propertyValue: certificate?.issuerSerialNumber || "NA",
-    //                 },
-    //             ],
-    //         },
-    //     });
-    //     edges.push({
-    //         id: "e1-6",
-    //         source: "6",
-    //         target: "1",
-    //         type: "floating",
-    //         markerEnd: { type: MarkerType.Arrow },
-    //     });
-    // }
 
     if (certificate?.group) {
         nodes.push({
@@ -446,6 +448,15 @@ export function transformCertifacetObjectToNodesAndEdges(
     }
 
     if (certificate?.raProfile) {
+        const raProfileOtherProperties: OtherProperties[] = [];
+
+        if (certificate?.raProfile?.enabled) {
+            raProfileOtherProperties.push({
+                propertyName: "RA Profile Enabled",
+                propertyValue: certificate.raProfile.enabled ? "Yes" : "No",
+            });
+        }
+
         nodes.push({
             id: "5",
             type: "customFlowNode",
@@ -460,13 +471,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     certificate?.raProfile?.uuid && certificate?.raProfile.authorityInstanceUuid
                         ? `/raProfiles/detail/${certificate.raProfile.authorityInstanceUuid}/${certificate.raProfile.uuid}`
                         : undefined,
-                otherProperties: [
-                    {
-                        propertyName: "RA Profile Enabled",
-                        propertyValue:
-                            certificate?.raProfile?.enabled !== undefined ? (certificate?.raProfile?.enabled ? "Yes" : "No") : "NA",
-                    },
-                ],
+                otherProperties: raProfileOtherProperties,
             },
         });
         edges.push({
@@ -492,12 +497,14 @@ export function transformCertifacetObjectToNodesAndEdges(
                     otherProperties: [
                         {
                             propertyName: "Authority Instance Name",
-                            propertyValue: raProfileSelected.authorityInstanceName || "NA",
+                            propertyValue: raProfileSelected.authorityInstanceName,
+                            copyable: true,
                         },
 
                         {
                             propertyName: "Authority UUID",
-                            propertyValue: raProfileSelected.authorityInstanceUuid || "NA",
+                            propertyValue: raProfileSelected.authorityInstanceUuid,
+                            copyable: true,
                         },
                     ],
                 },
@@ -513,6 +520,18 @@ export function transformCertifacetObjectToNodesAndEdges(
     }
     if (locations?.length) {
         locations.forEach((location) => {
+            const otherPropertiesLocation: OtherProperties[] = [
+                {
+                    propertyName: "Location Enabled",
+                    propertyValue: location.enabled ? "Yes" : "No",
+                },
+            ];
+            if (location?.description) {
+                otherPropertiesLocation.push({
+                    propertyName: "Description",
+                    propertyValue: location?.description,
+                });
+            }
             nodes.push({
                 id: location?.uuid || "",
                 type: "customFlowNode",
@@ -524,16 +543,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     icon: "fa fa fa-map-marker",
                     entityLabel: location?.name || "",
                     redirectUrl: location?.uuid ? `/locations/detail/${certificate?.uuid}/${location?.uuid}` : undefined,
-                    otherProperties: [
-                        {
-                            propertyName: "Location Description",
-                            propertyValue: location?.description || "NA",
-                        },
-                        {
-                            propertyName: "Location Enabled",
-                            propertyValue: location?.enabled ? "Yes" : "No",
-                        },
-                    ],
+                    otherProperties: otherPropertiesLocation,
                 },
             });
             edges.push({
