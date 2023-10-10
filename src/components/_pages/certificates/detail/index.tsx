@@ -60,8 +60,9 @@ import CertificateRekeyDialog from "../CertificateRekeyDialog";
 import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import cx from "classnames";
-import FlowChart from "components/FlowChart";
+import FlowChart, { CustomNode } from "components/FlowChart";
 import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
+import { Edge } from "reactflow";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
@@ -72,6 +73,7 @@ export default function CertificateDetail() {
     const { id } = useParams();
 
     const certificate = useSelector(selectors.certificateDetail);
+    const certificateChain = useSelector(selectors.certificateChain);
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
@@ -87,6 +89,10 @@ export default function CertificateDetail() {
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
+    const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
+    const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
+
+    const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
@@ -108,6 +114,7 @@ export default function CertificateDetail() {
     const isRenewing = useSelector(selectors.isRenewing);
     const isRekeying = useSelector(selectors.isRekeying);
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
+    const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
@@ -150,6 +157,7 @@ export default function CertificateDetail() {
             isRevoking ||
             isRenewing ||
             isRekeying ||
+            isFetchingCertificateChain ||
             isFetchingApprovals,
         [
             isFetching,
@@ -160,17 +168,26 @@ export default function CertificateDetail() {
             isRevoking,
             isRenewing,
             isRekeying,
+            isFetchingCertificateChain,
             isFetchingApprovals,
         ],
     );
 
-    const { nodes: certificateNodes, edges: certificateEdges } = transformCertifacetObjectToNodesAndEdges(
-        certificate,
-        users,
-        certLocations,
-        raProfileSelected,
-    );
+    const transformCertificate = useCallback(() => {
+        const { nodes, edges } = transformCertifacetObjectToNodesAndEdges(
+            certificate,
+            users,
+            certLocations,
+            raProfileSelected,
+            certificateChain,
+        );
+        setCertificateNodes(nodes);
+        setCertificateEdges(edges);
+    }, [certificate, users, certLocations, raProfileSelected, certificateChain]);
 
+    useEffect(() => {
+        transformCertificate();
+    }, [transformCertificate]);
     const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
 
@@ -210,6 +227,16 @@ export default function CertificateDetail() {
         if (!id) return;
         dispatch(actions.listCertificateApprovals({ uuid: id, paginationRequestDto: {} }));
     }, [dispatch, id]);
+
+    const getCertificateChainDetails = useCallback(() => {
+        if (!id) return;
+        dispatch(actions.getCertificateChain({ uuid: id, withEndCertificate: false }));
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        if (!id && isFlowTabOpenend) return;
+        getCertificateChainDetails();
+    }, [isFlowTabOpenend, id]);
 
     useEffect(() => {
         getFreshCertificateLocations();
@@ -1130,7 +1157,16 @@ export default function CertificateDetail() {
                   },
                   {
                       id: "issuerCommonName",
-                      columns: ["Issuer Common Name", certificate.issuerCommonName || ""],
+                      columns: [
+                          "Issuer Common Name",
+                          certificate?.issuerCommonName && certificate?.issuerCertificateUuid ? (
+                              <Link to={`../certificates/detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                          ) : certificate?.issuerCommonName ? (
+                              certificate.issuerCommonName
+                          ) : (
+                              ""
+                          ),
+                      ],
                   },
                   {
                       id: "issuerDN",
@@ -1647,8 +1683,13 @@ export default function CertificateDetail() {
                     },
                     {
                         title: "Flow",
+                        onClick: () => {
+                            setIsFlowTabOpenend(true);
+                            getCertificateChainDetails();
+                        },
                         content: certificateNodes.length ? (
                             <FlowChart
+                                busy={isBusy}
                                 flowChartTitle="Certificate Flow"
                                 flowChartEdges={certificateEdges}
                                 flowChartNodes={certificateNodes}

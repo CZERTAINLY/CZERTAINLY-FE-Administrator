@@ -3,6 +3,7 @@ import { CertificateGroupResponseModel } from "./certificateGroups";
 import { LocationResponseModel, MetadataModel } from "./locations";
 import {
     BulkOperationResponse,
+    CertificateChainResponseDto,
     CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
     CertificateContentDto,
@@ -107,3 +108,8 @@ export type CertificateComplianceCheckModel = CertificateComplianceCheckDto;
 
 export type CertificateContentResponseDto = CertificateContentDto;
 export type CertificateContentResponseModel = CertificateContentResponseDto;
+
+export type ChainCertificateResponseDto = CertificateChainResponseDto;
+export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "certificates"> & {
+    certificates?: Array<CertificateDetailResponseModel>;
+};

@@ -4,6 +4,7 @@ import {
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseModel,
     CertificateBulkObjectModel,
+    CertificateChainResponseModel,
     CertificateComplianceCheckModel,
     CertificateContentResponseModel,
     CertificateDetailResponseModel,
@@ -38,6 +39,7 @@ export type State = {
     revocationAttributes: AttributeDescriptorModel[];
     validationResult: { [key: string]: CertificateValidationModel };
     approvals?: ApprovalDto[];
+    certificateChain?: CertificateChainResponseModel;
 
     isFetchingValidationResult: boolean;
 
@@ -45,6 +47,7 @@ export type State = {
     isFetchingHistory: boolean;
     isFetchingLocations: boolean;
     isFetchingApprovals: boolean;
+    isFetchingCertificateChain: boolean;
 
     isIssuing: boolean;
     isRevoking: boolean;
@@ -92,6 +95,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingHistory: false,
     isFetchingLocations: false,
+    isFetchingCertificateChain: false,
 
     isIssuing: false,
     isRevoking: false,
@@ -574,6 +578,19 @@ export const slice = createSlice({
         listCertificateApprovalsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingApprovals = false;
         },
+
+        getCertificateChain: (state, action: PayloadAction<{ uuid: string; withEndCertificate: boolean }>) => {
+            state.isFetchingCertificateChain = true;
+        },
+
+        getCertificateChainSuccess: (state, action: PayloadAction<{ certificateChain: CertificateChainResponseModel }>) => {
+            state.isFetchingCertificateChain = false;
+            state.certificateChain = action.payload.certificateChain;
+        },
+
+        getCertificateChainFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingCertificateChain = false;
+        },
     },
 });
 
@@ -582,6 +599,7 @@ const state = createFeatureSelector<State>(slice.name);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 
 const certificates = createSelector(state, (state) => state.certificates);
+const certificateChain = createSelector(state, (state) => state.certificateChain);
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
 const certificateHistory = createSelector(state, (state) => state.certificateHistory);
@@ -623,6 +641,7 @@ const isFetchingCsrAttributes = createSelector(state, (state) => state.isFetchin
 const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttributeDescriptors);
 
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
+const isFetchingCertificateChain = createSelector(state, (state) => state.isFetchingCertificateChain);
 
 export const selectors = {
     state,
@@ -637,6 +656,7 @@ export const selectors = {
     isFetchingDetail,
     isFetchingHistory,
     isFetchingLocations,
+    isFetchingCertificateChain,
     isIssuing,
     isRevoking,
     isRenewing,
@@ -658,6 +678,7 @@ export const selectors = {
     csrAttributeDescriptors,
     isFetchingContents,
     isFetchingApprovals,
+    certificateChain,
 };
 
 export const actions = slice.actions;

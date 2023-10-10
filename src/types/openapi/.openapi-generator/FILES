@@ -92,6 +92,8 @@ models/BulkKeyItemUsageRequestDto.ts
 models/BulkKeyUsageRequestDto.ts
 models/BulkOperationResponse.ts
 models/BulkTokenProfileKeyUsageRequestDto.ts
+models/CertificateChainDownloadResponseDto.ts
+models/CertificateChainResponseDto.ts
 models/CertificateComplianceCheckDto.ts
 models/CertificateComplianceResultDto.ts
 models/CertificateContentDto.ts

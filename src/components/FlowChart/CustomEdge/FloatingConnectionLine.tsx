@@ -23,7 +23,7 @@ function FloatingConnectionLine({ toX, toY, fromPosition, toPosition, fromNode }
         width: nodeWidth,
         height: nodeHeight,
         data: {
-            entityType: "NA",
+            customNodeCardTitle: "NA",
             entityLabel: "NA",
         },
     };

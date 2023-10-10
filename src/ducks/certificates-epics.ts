@@ -772,6 +772,26 @@ const listCertificateApprovals: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const getCertificateChain: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getCertificateChain.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.getCertificateChain(action.payload).pipe(
+                map((response) => slice.actions.getCertificateChainSuccess({ certificateChain: response })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.getCertificateChainFailure({
+                            error: extractError(error, "Failed to get certificate chain"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to get certificate chain" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCertificates,
     getCertificateDetail,
@@ -798,6 +818,7 @@ const epics = [
     getCsrAttributes,
     getCertificateContent,
     listCertificateApprovals,
+    getCertificateChain,
 ];
 
 export default epics;

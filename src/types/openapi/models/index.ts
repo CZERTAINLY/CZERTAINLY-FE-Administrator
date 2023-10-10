@@ -53,6 +53,8 @@ export * from "./BulkKeyItemUsageRequestDto";
 export * from "./BulkKeyUsageRequestDto";
 export * from "./BulkOperationResponse";
 export * from "./BulkTokenProfileKeyUsageRequestDto";
+export * from "./CertificateChainDownloadResponseDto";
+export * from "./CertificateChainResponseDto";
 export * from "./CertificateComplianceCheckDto";
 export * from "./CertificateComplianceResultDto";
 export * from "./CertificateContentDto";

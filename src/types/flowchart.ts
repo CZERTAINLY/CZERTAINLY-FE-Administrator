@@ -5,11 +5,12 @@ import { CertificateStatus } from "./openapi";
 export interface OtherProperties {
     propertyName: string;
     propertyValue: string;
+    copyable?: boolean;
 }
 
 export interface CustomNodeData {
     isMainNode?: boolean;
-    entityType: string;
+    customNodeCardTitle: string;
     entityLabel: string;
     redirectUrl?: string;
     icon?: string;

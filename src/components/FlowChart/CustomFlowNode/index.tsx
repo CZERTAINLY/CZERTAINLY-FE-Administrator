@@ -85,7 +85,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 <div className="d-flex my-1">
                     <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
 
-                    <h6 className={cx(style.entityType, "my-auto ms-2")}>{data.entityType}</h6>
+                    <h6 className={cx(style.customNodeCardTitle, "my-auto ms-2")}>{data.customNodeCardTitle}</h6>
                 </div>
 
                 {data.redirectUrl ? (
@@ -93,7 +93,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                         <h6>Entity Name :</h6>
                         &nbsp;
                         <Link to={data.redirectUrl}>
-                            <h6>{data.entityLabel}</h6>
+                            <h6 className="text-wrap">{data.entityLabel}</h6>
                         </Link>
                     </div>
                 ) : (
@@ -120,6 +120,14 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                         <li key={index} className="list-group-item text-wrap p-0 ">
                                             <span className={style.propertyName}>{property.propertyName} : </span>
                                             <span className={style.propertyValue}>{property.propertyValue}</span>
+                                            {property?.copyable && (
+                                                <i
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(property.propertyValue);
+                                                    }}
+                                                    className="fa fa-copy ms-2"
+                                                ></i>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
