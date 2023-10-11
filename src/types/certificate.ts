@@ -3,6 +3,8 @@ import { CertificateGroupResponseModel } from "./certificateGroups";
 import { LocationResponseModel, MetadataModel } from "./locations";
 import {
     BulkOperationResponse,
+    CertificateChainDownloadResponseDto,
+    CertificateChainDownloadResponseDtoFormatEnum,
     CertificateChainResponseDto,
     CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
@@ -112,4 +114,9 @@ export type CertificateContentResponseModel = CertificateContentResponseDto;
 export type ChainCertificateResponseDto = CertificateChainResponseDto;
 export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "certificates"> & {
     certificates?: Array<CertificateDetailResponseModel>;
+};
+
+export type CertificateChainDownloadResponseModel = CertificateChainDownloadResponseDto;
+export type CertificateChainDownloadResponseDtoModel = Omit<CertificateChainDownloadResponseModel, "format"> & {
+    format: CertificateChainDownloadResponseDtoFormatEnum;
 };

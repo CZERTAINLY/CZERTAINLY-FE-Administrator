@@ -4,6 +4,7 @@ import {
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseModel,
     CertificateBulkObjectModel,
+    CertificateChainDownloadResponseModel,
     CertificateChainResponseModel,
     CertificateComplianceCheckModel,
     CertificateContentResponseModel,
@@ -21,7 +22,7 @@ import {
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
-import { ApprovalDto, ListCertificateApprovalsRequest } from "types/openapi";
+import { ApprovalDto, DownloadCertificateChainRequest, ListCertificateApprovalsRequest } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
 import { downloadFileZip } from "utils/download";
@@ -40,6 +41,7 @@ export type State = {
     validationResult: { [key: string]: CertificateValidationModel };
     approvals?: ApprovalDto[];
     certificateChain?: CertificateChainResponseModel;
+    certificateChainDownloadContent?: CertificateChainDownloadResponseModel;
 
     isFetchingValidationResult: boolean;
 
@@ -48,6 +50,7 @@ export type State = {
     isFetchingLocations: boolean;
     isFetchingApprovals: boolean;
     isFetchingCertificateChain: boolean;
+    isFetchingCertificateChainDownloadContent: boolean;
 
     isIssuing: boolean;
     isRevoking: boolean;
@@ -96,6 +99,7 @@ export const initialState: State = {
     isFetchingHistory: false,
     isFetchingLocations: false,
     isFetchingCertificateChain: false,
+    isFetchingCertificateChainDownloadContent: false,
 
     isIssuing: false,
     isRevoking: false,
@@ -591,6 +595,23 @@ export const slice = createSlice({
         getCertificateChainFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingCertificateChain = false;
         },
+
+        downloadCertificateChain: (state, action: PayloadAction<DownloadCertificateChainRequest>) => {
+            state.certificateChainDownloadContent = undefined;
+            state.isFetchingCertificateChainDownloadContent = true;
+        },
+
+        downloadCertificateChainSuccess: (
+            state,
+            action: PayloadAction<{ certificateChainDownloadContent: CertificateChainDownloadResponseModel }>,
+        ) => {
+            state.isFetchingCertificateChainDownloadContent = false;
+            state.certificateChainDownloadContent = action.payload.certificateChainDownloadContent;
+        },
+
+        downloadCertificateChainFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingCertificateChainDownloadContent = false;
+        },
     },
 });
 
@@ -602,6 +623,8 @@ const certificates = createSelector(state, (state) => state.certificates);
 const certificateChain = createSelector(state, (state) => state.certificateChain);
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
+const certificateChainDownloadContent = createSelector(state, (state) => state.certificateChainDownloadContent);
+
 const certificateHistory = createSelector(state, (state) => state.certificateHistory);
 const certificateLocations = createSelector(state, (state) => state.certificateLocations);
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
@@ -648,6 +671,7 @@ export const selectors = {
     deleteErrorMessage,
     certificates,
     certificateDetail,
+    certificateChainDownloadContent,
     certificateHistory,
     certificateLocations,
     issuanceAttributes,
