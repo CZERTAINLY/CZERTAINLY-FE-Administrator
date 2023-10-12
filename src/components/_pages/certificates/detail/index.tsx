@@ -570,7 +570,7 @@ export default function CertificateDetail() {
                             downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pkcs7);
                         }}
                     >
-                        PKCS (.p7b)
+                        PKCS#7 (.p7b)
                     </DropdownItem>
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
