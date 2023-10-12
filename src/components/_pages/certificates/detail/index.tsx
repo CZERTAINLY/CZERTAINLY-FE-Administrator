@@ -20,7 +20,7 @@ import { actions as locationActions, selectors as locationSelectors } from "duck
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { selectors as settingSelectors } from "ducks/settings";
 
-import { CertificateStatus as CertStatus } from "../../../../types/openapi";
+import { CertificateStatus as CertStatus, DownloadCertificateChainCertificateFormatEnum } from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -67,6 +67,12 @@ import { LockWidgetNameEnum } from "types/widget-locks";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
 import styles from "./certificateDetail.module.scss";
+
+interface ChainDownloadSwitchState {
+    isDownloadTriggered: boolean;
+    certificateFormat?: DownloadCertificateChainCertificateFormatEnum;
+}
+
 export default function CertificateDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -74,6 +80,7 @@ export default function CertificateDetail() {
 
     const certificate = useSelector(selectors.certificateDetail);
     const certificateChain = useSelector(selectors.certificateChain);
+    const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
@@ -91,6 +98,7 @@ export default function CertificateDetail() {
 
     const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
     const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
+    const [chainDownloadSwitch, setTriggerChainDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
 
     const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
@@ -173,6 +181,21 @@ export default function CertificateDetail() {
         ],
     );
 
+    const downloadCertificateChainContent = useCallback(
+        (certificateFormat: DownloadCertificateChainCertificateFormatEnum) => {
+            if (!certificate) return;
+            dispatch(
+                actions.downloadCertificateChain({
+                    certificateFormat: certificateFormat,
+                    uuid: certificate.uuid,
+                    withEndCertificate: true,
+                }),
+            );
+            setTriggerChainDownload({ isDownloadTriggered: true, certificateFormat: certificateFormat });
+        },
+        [certificate],
+    );
+
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertifacetObjectToNodesAndEdges(
             certificate,
@@ -184,6 +207,14 @@ export default function CertificateDetail() {
         setCertificateNodes(nodes);
         setCertificateEdges(edges);
     }, [certificate, users, certLocations, raProfileSelected, certificateChain]);
+
+    useEffect(() => {
+        if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
+
+        const fileExtension = chainDownloadSwitch.certificateFormat === DownloadCertificateChainCertificateFormatEnum.Pem ? ".pem" : ".p7b";
+        downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + fileExtension);
+        setTriggerChainDownload({ isDownloadTriggered: false });
+    }, [certificateChainDownloadContent, chainDownloadSwitch]);
 
     useEffect(() => {
         transformCertificate();
@@ -490,7 +521,7 @@ export default function CertificateDetail() {
     const downloadDropDown = useMemo(
         () => (
             <UncontrolledButtonDropdown>
-                <DropdownToggle color="light" caret className="btn btn-link" title="Download">
+                <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate">
                     <i className="fa fa-download" aria-hidden="true" />
                 </DropdownToggle>
 
@@ -509,6 +540,37 @@ export default function CertificateDetail() {
                         }
                     >
                         DER (.cer)
+                    </DropdownItem>
+                </DropdownMenu>
+            </UncontrolledButtonDropdown>
+        ),
+        [certificate, fileNameToDownload],
+    );
+
+    const certificateChainDownloadDropDown = useMemo(
+        () => (
+            <UncontrolledButtonDropdown>
+                <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate Chain">
+                    <i className="fa fa-link" aria-hidden="true" />
+                </DropdownToggle>
+
+                <DropdownMenu>
+                    <DropdownItem
+                        key="pem"
+                        onClick={() => {
+                            downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pem);
+                        }}
+                    >
+                        PEM (.pem)
+                    </DropdownItem>
+
+                    <DropdownItem
+                        key="pkcs7"
+                        onClick={() => {
+                            downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pkcs7);
+                        }}
+                    >
+                        PKCS#7 (.p7b)
                     </DropdownItem>
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
@@ -579,9 +641,18 @@ export default function CertificateDetail() {
             {
                 icon: "download",
                 disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
-                tooltip: "Download",
                 custom:
                     certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected ? undefined : downloadDropDown,
+                onClick: () => {},
+            },
+
+            {
+                icon: "link",
+                disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
+                custom:
+                    certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected
+                        ? undefined
+                        : certificateChainDownloadDropDown,
                 onClick: () => {},
             },
         ],
@@ -630,7 +701,7 @@ export default function CertificateDetail() {
             {
                 icon: "download",
                 disabled: false,
-                tooltip: "Download",
+                tooltip: "Download CSR",
                 custom: downloadCSRDropDown,
                 onClick: () => {},
             },

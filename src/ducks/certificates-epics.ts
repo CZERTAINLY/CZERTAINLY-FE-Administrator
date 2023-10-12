@@ -792,6 +792,26 @@ const getCertificateChain: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const downloadCertificateChain: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.downloadCertificateChain.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.downloadCertificateChain(action.payload).pipe(
+                map((response) => slice.actions.downloadCertificateChainSuccess({ certificateChainDownloadContent: response })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.downloadCertificateChainFailure({
+                            error: extractError(error, "Failed to download certificate chain"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to download certificate chain" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCertificates,
     getCertificateDetail,
@@ -819,6 +839,7 @@ const epics = [
     getCertificateContent,
     listCertificateApprovals,
     getCertificateChain,
+    downloadCertificateChain,
 ];
 
 export default epics;
