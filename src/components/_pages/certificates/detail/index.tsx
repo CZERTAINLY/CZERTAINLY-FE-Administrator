@@ -188,7 +188,7 @@ export default function CertificateDetail() {
                 actions.downloadCertificateChain({
                     certificateFormat: certificateFormat,
                     uuid: certificate.uuid,
-                    withEndCertificate: false,
+                    withEndCertificate: true,
                 }),
             );
             setTriggerChainDownload({ isDownloadTriggered: true, certificateFormat: certificateFormat });
@@ -521,8 +521,8 @@ export default function CertificateDetail() {
     const downloadDropDown = useMemo(
         () => (
             <UncontrolledButtonDropdown>
-                <DropdownToggle color="light" caret className="btn btn-link" title="Download">
-                    <i className="fa fa-certificate" aria-hidden="true" />
+                <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate">
+                    <i className="fa fa-download" aria-hidden="true" />
                 </DropdownToggle>
 
                 <DropdownMenu>
@@ -550,7 +550,7 @@ export default function CertificateDetail() {
     const certificateChainDownloadDropDown = useMemo(
         () => (
             <UncontrolledButtonDropdown>
-                <DropdownToggle color="light" caret className="btn btn-link" title="Download">
+                <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate Chain">
                     <i className="fa fa-link" aria-hidden="true" />
                 </DropdownToggle>
 
@@ -641,7 +641,6 @@ export default function CertificateDetail() {
             {
                 icon: "download",
                 disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
-                tooltip: "Download Certificate",
                 custom:
                     certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected ? undefined : downloadDropDown,
                 onClick: () => {},
@@ -650,7 +649,6 @@ export default function CertificateDetail() {
             {
                 icon: "link",
                 disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
-                tooltip: "Download Certificate Chain",
                 custom:
                     certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected
                         ? undefined
@@ -703,7 +701,7 @@ export default function CertificateDetail() {
             {
                 icon: "download",
                 disabled: false,
-                tooltip: "Download",
+                tooltip: "Download CSR",
                 custom: downloadCSRDropDown,
                 onClick: () => {},
             },
