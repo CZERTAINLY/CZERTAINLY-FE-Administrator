@@ -1,6 +1,7 @@
 import { Col, Container, Row } from "reactstrap";
 
 import Spinner from "components/Spinner";
+import { selectors as enumSelectors } from "ducks/enums";
 import { EntityType } from "ducks/filters";
 import { actions, selectors } from "ducks/statisticsDashboard";
 import { useEffect } from "react";
@@ -18,6 +19,7 @@ const getDateInString = (daysOffset: number) => {
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
     const isFetching = useSelector(selectors.isFetching);
+    const platformEnums = useSelector(enumSelectors.platformEnums);
 
     const dispatch = useDispatch();
 
@@ -222,8 +224,11 @@ function Dashboard() {
                         title={"Certificates by Compliance"}
                         data={dashboard?.certificateStatByComplianceStatus}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(index, labels) =>
-                            labels[index] === "Not Checked"
+                        onSetFilter={(index, labels) => {
+                            const complianceStatusEnum = platformEnums?.ComplianceStatus;
+                            const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
+                            const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
+                            return labels[index] === "Not Checked"
                                 ? [
                                       {
                                           searchGroup: SearchGroup.Property,
@@ -237,10 +242,10 @@ function Dashboard() {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Equals,
                                           fieldIdentifier: "COMPLIANCE_STATUS",
-                                          value: JSON.parse(JSON.stringify(labels[index])),
+                                          value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [""],
                                       },
-                                  ]
-                        }
+                                  ];
+                        }}
                         redirect="../certificates"
                     />
                 </Col>
