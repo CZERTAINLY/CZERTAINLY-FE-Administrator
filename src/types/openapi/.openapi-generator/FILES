@@ -106,7 +106,9 @@ models/CertificateResponseDto.ts
 models/CertificateStatus.ts
 models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts
-models/CertificateValidationDto.ts
+models/CertificateValidationCheck.ts
+models/CertificateValidationCheckDto.ts
+models/CertificateValidationResultDto.ts
 models/CertificateValidationStatus.ts
 models/CipherDataRequestDto.ts
 models/CipherRequestData.ts
