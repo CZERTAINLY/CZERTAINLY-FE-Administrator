@@ -336,11 +336,11 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 ? `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`
                                 : Array.isArray(f.value) && f.value.length > 1
                                 ? `(${f.value
-                                      .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v].label : v}'`)
+                                      .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
                                       .join(" OR ")})`
                                 : f.value
                                 ? `'${
-                                      field?.platformEnum ? platformEnums[field.platformEnum][f.value as unknown as string].label : f.value
+                                      field?.platformEnum ? platformEnums[field.platformEnum][f.value as unknown as string]?.label : f.value
                                   }'`
                                 : "";
                         return (
