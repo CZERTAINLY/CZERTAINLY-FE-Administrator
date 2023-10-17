@@ -313,10 +313,10 @@ export default function CertificateList({
                         certificate.serialNumber || "",
                         certificate.signatureAlgorithm,
                         certificate.publicKeyAlgorithm,
-                        certificate.issuerCommonName ? (
+                        certificate.issuerCommonName && certificate?.issuerCertificateUuid ? (
                             <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
                         ) : (
-                            ""
+                            certificate.issuerCommonName || ""
                         ),
                         certificate.certificateType ? (
                             <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>
