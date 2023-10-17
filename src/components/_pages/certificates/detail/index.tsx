@@ -1272,11 +1272,8 @@ export default function CertificateDetail() {
                       columns: ["Signature Algorithm", certificate.signatureAlgorithm],
                   },
                   {
-                      // TODO: update if validation result is
-                      //   validationResult?.resultStatus
                       id: "certStatus",
-                      //   columns: ["Status", <CertificateStatus status={certificate.status} />],
-                      columns: ["Status", "a"],
+                      columns: ["Status", <CertificateStatus status={certificate.status} />],
                   },
                   {
                       id: "complianceStatus",
@@ -1686,7 +1683,26 @@ export default function CertificateDetail() {
                                 >
                                     {/* <CustomTable headers={detailHeaders} data={detailData} /> */}
                                     <br />
-                                    <CustomTable headers={validationHeaders} data={validationData} />
+                                    <CustomTable
+                                        headers={validationHeaders}
+                                        data={[
+                                            ...validationData,
+                                            {
+                                                id: "validationtStatus",
+                                                columns: [
+                                                    // TODO: update if validation result is
+                                                    //   validationResult?.resultStatus
+                                                    <span className="fw-bold">Validation Result</span>,
+                                                    validationResult?.resultStatus ? (
+                                                        <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus>
+                                                    ) : (
+                                                        <></>
+                                                    ),
+                                                    <></>,
+                                                ],
+                                            },
+                                        ]}
+                                    />
                                 </Widget>
                                 <Widget
                                     title="Compliance Status"
