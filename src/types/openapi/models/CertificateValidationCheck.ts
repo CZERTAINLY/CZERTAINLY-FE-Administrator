@@ -12,17 +12,16 @@
  */
 
 /**
- * Certificate validation check result status
+ * Certificate validation check type
  * @export
  * @enum {string}
  */
-export enum CertificateValidationStatus {
-    Success = "success",
-    Failed = "failed",
-    Warning = "warning",
-    Revoked = "revoked",
-    NotChecked = "not_checked",
-    Invalid = "invalid",
-    Expiring = "expiring",
-    Expired = "expired",
+export enum CertificateValidationCheck {
+    CertificateChain = "certificate_chain",
+    Signature = "signature",
+    CertificateValidity = "certificate_validity",
+    OcspVerification = "ocsp_verification",
+    CrlVerification = "crl_verification",
+    BasicConstraints = "basic_constraints",
+    KeyUsage = "key_usage",
 }

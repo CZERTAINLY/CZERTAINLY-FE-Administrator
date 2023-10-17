@@ -47,10 +47,6 @@ export interface BulkUpdateCertificateObjectsRequest {
     multipleCertificateObjectUpdateDto: MultipleCertificateObjectUpdateDto;
 }
 
-export interface CheckRequest {
-    uuid: string;
-}
-
 export interface CheckCertificatesComplianceRequest {
     certificateComplianceCheckDto: CertificateComplianceCheckDto;
 }
@@ -171,23 +167,6 @@ export class CertificateInventoryApi extends BaseAPI {
                 method: "PATCH",
                 headers,
                 body: multipleCertificateObjectUpdateDto,
-            },
-            opts?.responseOpts,
-        );
-    }
-
-    /**
-     * Initiate Certificate validation
-     */
-    check({ uuid }: CheckRequest): Observable<void>;
-    check({ uuid }: CheckRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
-    check({ uuid }: CheckRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "check");
-
-        return this.request<void>(
-            {
-                url: "/v1/certificates/{uuid}/validate".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
             },
             opts?.responseOpts,
         );

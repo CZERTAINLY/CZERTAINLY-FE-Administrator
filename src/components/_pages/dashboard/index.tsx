@@ -6,7 +6,7 @@ import { EntityType } from "ducks/filters";
 import { actions, selectors } from "ducks/statisticsDashboard";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SearchCondition, SearchGroup } from "types/openapi";
+import { PlatformEnum, SearchCondition, SearchGroup } from "types/openapi";
 import CountBadge from "./DashboardItem/CountBadge";
 import DonutChart from "./DashboardItem/DonutChart";
 
@@ -19,7 +19,7 @@ const getDateInString = (daysOffset: number) => {
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
     const isFetching = useSelector(selectors.isFetching);
-    const platformEnums = useSelector(enumSelectors.platformEnums);
+    const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
 
     const dispatch = useDispatch();
 
@@ -225,7 +225,6 @@ function Dashboard() {
                         data={dashboard?.certificateStatByComplianceStatus}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => {
-                            const complianceStatusEnum = platformEnums?.ComplianceStatus;
                             const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
                             const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
                             return labels[index] === "Not Checked"

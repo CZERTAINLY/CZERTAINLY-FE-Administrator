@@ -109,6 +109,7 @@ export default function CertificateDetail() {
     const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
+    const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
 
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
@@ -924,7 +925,7 @@ export default function CertificateDetail() {
         () => [
             {
                 id: "validationType",
-                content: "Validation Type",
+                content: "Validation check",
             },
             {
                 id: "status",
@@ -933,6 +934,7 @@ export default function CertificateDetail() {
             {
                 id: "message",
                 content: "Message",
+                width: "70%",
             },
         ],
         [],
@@ -1162,14 +1164,14 @@ export default function CertificateDetail() {
 
     const validationData: TableDataRow[] = useMemo(
         () =>
-            !certificate
+            !certificate && validationResult?.validationChecks
                 ? []
-                : Object.entries(validationResult || {}).map(function ([key, value]) {
+                : Object.entries(validationResult?.validationChecks || {}).map(function ([key, value]) {
                       return {
                           id: key,
                           columns: [
-                              key,
-                              <CertificateStatus status={value.status} />,
+                              getEnumLabel(certificateValidationCheck, key),
+                              value?.status ? <CertificateStatus status={value.status} /> : "",
                               <div style={{ wordBreak: "break-all" }}>
                                   {value.message?.split("\n").map((str: string) => (
                                       <div key={str}>
@@ -1270,8 +1272,11 @@ export default function CertificateDetail() {
                       columns: ["Signature Algorithm", certificate.signatureAlgorithm],
                   },
                   {
+                      // TODO: update if validation result is
+                      //   validationResult?.resultStatus
                       id: "certStatus",
-                      columns: ["Status", <CertificateStatus status={certificate.status} />],
+                      //   columns: ["Status", <CertificateStatus status={certificate.status} />],
+                      columns: ["Status", "a"],
                   },
                   {
                       id: "complianceStatus",
@@ -1329,7 +1334,7 @@ export default function CertificateDetail() {
             });
         }
         return certDetail;
-    }, [certificate, health]);
+    }, [certificate, health, validationResult]);
 
     const locationsHeaders: TableHeader[] = useMemo(
         () => [
@@ -1679,6 +1684,7 @@ export default function CertificateDetail() {
                                     refreshAction={certificate && getFreshCertificateValidations}
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
+                                    {/* <CustomTable headers={detailHeaders} data={detailData} /> */}
                                     <br />
                                     <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
