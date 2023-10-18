@@ -542,27 +542,13 @@ export default function CertificateDetail() {
                     >
                         DER (.cer)
                     </DropdownItem>
-                </DropdownMenu>
-            </UncontrolledButtonDropdown>
-        ),
-        [certificate, fileNameToDownload],
-    );
-
-    const certificateChainDownloadDropDown = useMemo(
-        () => (
-            <UncontrolledButtonDropdown>
-                <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate Chain">
-                    <i className="fa fa-link" aria-hidden="true" />
-                </DropdownToggle>
-
-                <DropdownMenu>
                     <DropdownItem
                         key="pem"
                         onClick={() => {
                             downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pem);
                         }}
                     >
-                        PEM (.pem)
+                        PEM with chain (.pem)
                     </DropdownItem>
 
                     <DropdownItem
@@ -571,7 +557,7 @@ export default function CertificateDetail() {
                             downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pkcs7);
                         }}
                     >
-                        PKCS#7 (.p7b)
+                        PKCS#7 with chain (.p7b)
                     </DropdownItem>
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
@@ -644,16 +630,6 @@ export default function CertificateDetail() {
                 disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
                 custom:
                     certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected ? undefined : downloadDropDown,
-                onClick: () => {},
-            },
-
-            {
-                icon: "link",
-                disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
-                custom:
-                    certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected
-                        ? undefined
-                        : certificateChainDownloadDropDown,
                 onClick: () => {},
             },
         ],

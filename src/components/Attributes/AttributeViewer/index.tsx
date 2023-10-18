@@ -100,7 +100,7 @@ export default function AttributeViewer({
         (attribute: AttributeResponseModel | MetadataItemModel) => ({
             id: attribute.uuid || "",
             columns: [
-                attribute.label || "",
+                attribute.label || attribute.name || "",
                 getEnumLabel(contentTypeEnum, attribute.contentType),
                 getContent(attribute.contentType, attribute.content),
             ],
