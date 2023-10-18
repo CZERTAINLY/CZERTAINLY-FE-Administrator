@@ -1249,7 +1249,14 @@ export default function CertificateDetail() {
                   },
                   {
                       id: "certStatus",
-                      columns: ["Status", <CertificateStatus status={certificate.status} />],
+                      columns: [
+                          "Status",
+                          validationResult?.resultStatus ? (
+                              <CertificateStatus status={validationResult?.resultStatus} />
+                          ) : (
+                              <CertificateStatus status={certificate.status} />
+                          ),
+                      ],
                   },
                   {
                       id: "complianceStatus",
@@ -1657,7 +1664,6 @@ export default function CertificateDetail() {
                                     refreshAction={certificate && getFreshCertificateValidations}
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
-                                    {/* <CustomTable headers={detailHeaders} data={detailData} /> */}
                                     <br />
                                     <CustomTable
                                         headers={validationHeaders}
@@ -1666,8 +1672,6 @@ export default function CertificateDetail() {
                                             {
                                                 id: "validationtStatus",
                                                 columns: [
-                                                    // TODO: update if validation result is
-                                                    //   validationResult?.resultStatus
                                                     <span className="fw-bold">Validation Result</span>,
                                                     validationResult?.resultStatus ? (
                                                         <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus>

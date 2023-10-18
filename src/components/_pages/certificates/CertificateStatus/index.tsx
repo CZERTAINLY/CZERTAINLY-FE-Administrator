@@ -18,8 +18,7 @@ interface Props {
         | CertificateEventHistoryDtoStatusEnum
         | ComplianceStatus
         | ComplianceRuleStatus
-        | undefined
-        | any;
+        | undefined;
     asIcon?: boolean;
 }
 

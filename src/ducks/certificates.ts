@@ -17,8 +17,8 @@ import {
     CertificateRevokeRequestModel,
     CertificateSignRequestModel,
     CertificateUploadModel,
-    CertificateValidationModel,
     SearchRequestModel,
+    ValidationCertificateResultModel,
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
@@ -38,7 +38,7 @@ export type State = {
     certificateLocations?: LocationResponseModel[];
     issuanceAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
     revocationAttributes: AttributeDescriptorModel[];
-    validationResult: { [key: string]: CertificateValidationModel };
+    validationResult?: ValidationCertificateResultModel;
     approvals?: ApprovalDto[];
     certificateChain?: CertificateChainResponseModel;
     certificateChainDownloadContent?: CertificateChainDownloadResponseModel;
@@ -89,7 +89,6 @@ export const initialState: State = {
 
     issuanceAttributes: {},
     revocationAttributes: [],
-    validationResult: {},
     approvals: [],
 
     isFetchingValidationResult: false,
@@ -176,11 +175,11 @@ export const slice = createSlice({
         },
 
         getCertificateValidationResult: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.validationResult = {};
+            state.validationResult = undefined;
             state.isFetchingValidationResult = true;
         },
 
-        getCertificateValidationResultSuccess: (state, action: PayloadAction<{ [key: string]: CertificateValidationModel }>) => {
+        getCertificateValidationResultSuccess: (state, action: PayloadAction<ValidationCertificateResultModel>) => {
             state.isFetchingValidationResult = false;
             state.validationResult = action.payload;
         },
