@@ -25,7 +25,7 @@ import type {
     CertificateEventHistoryDto,
     CertificateResponseDto,
     CertificateUpdateObjectsDto,
-    CertificateValidationDto,
+    CertificateValidationResultDto,
     ClientCertificateRequestDto,
     LocationDto,
     MultipleCertificateObjectUpdateDto,
@@ -361,20 +361,18 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * Get Certificate Validation Result
      */
-    getCertificateValidationResult({
-        uuid,
-    }: GetCertificateValidationResultRequest): Observable<{ [key: string]: CertificateValidationDto }>;
+    getCertificateValidationResult({ uuid }: GetCertificateValidationResultRequest): Observable<CertificateValidationResultDto>;
     getCertificateValidationResult(
         { uuid }: GetCertificateValidationResultRequest,
         opts?: OperationOpts,
-    ): Observable<AjaxResponse<{ [key: string]: CertificateValidationDto }>>;
+    ): Observable<AjaxResponse<CertificateValidationResultDto>>;
     getCertificateValidationResult(
         { uuid }: GetCertificateValidationResultRequest,
         opts?: OperationOpts,
-    ): Observable<{ [key: string]: CertificateValidationDto } | AjaxResponse<{ [key: string]: CertificateValidationDto }>> {
+    ): Observable<CertificateValidationResultDto | AjaxResponse<CertificateValidationResultDto>> {
         throwIfNullOrUndefined(uuid, "uuid", "getCertificateValidationResult");
 
-        return this.request<{ [key: string]: CertificateValidationDto }>(
+        return this.request<CertificateValidationResultDto>(
             {
                 url: "/v1/certificates/{uuid}/validate".replace("{uuid}", encodeURI(uuid)),
                 method: "GET",
