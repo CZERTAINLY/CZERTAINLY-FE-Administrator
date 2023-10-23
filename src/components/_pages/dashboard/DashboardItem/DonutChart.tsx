@@ -7,15 +7,25 @@ import { SearchFilterModel } from "types/certificate";
 import { DashboardDict } from "types/statisticsDashboard";
 import { getLabels, getValues } from "utils/dashboard";
 
+export interface ColorOptions {
+    // fill: {
+    //     solid: {
+    //         gradientToColors: string[];
+    //     };
+    // };
+    colors: string[];
+}
+
 interface Props {
     title: string;
     data?: DashboardDict;
     entity: EntityType;
     redirect: string;
     onSetFilter: (index: number, labels: string[]) => SearchFilterModel[];
+    colorOptions?: ColorOptions;
 }
 
-function DonutChart({ title, data = {}, entity, redirect, onSetFilter: onLegendClick }: Props) {
+function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFilter: onLegendClick }: Props) {
     const labels = getLabels(data);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -49,6 +59,10 @@ function DonutChart({ title, data = {}, entity, redirect, onSetFilter: onLegendC
             },
         },
     };
+
+    if (colorOptions) {
+        options.colors = colorOptions.colors;
+    }
 
     return (
         <Widget title={title} titleBoldness="bold">
