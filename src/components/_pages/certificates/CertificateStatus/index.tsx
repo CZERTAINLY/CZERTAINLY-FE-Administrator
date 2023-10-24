@@ -36,11 +36,11 @@ function CertificateStatus({ status, asIcon = false }: Props) {
                 case Status.Revoked:
                     return { color: "dark", text: getEnumLabel(certificateStatusEnum, Status.Revoked) };
                 case Status.Invalid:
-                    return { color: "danger", text: getEnumLabel(certificateStatusEnum, Status.Invalid) };
+                    return { color: "#800000", text: getEnumLabel(certificateStatusEnum, Status.Invalid) };
                 case Status.Expiring:
                     return { color: "warning", text: getEnumLabel(certificateStatusEnum, Status.Expiring) };
                 case Status.Expired:
-                    return { color: "danger", text: getEnumLabel(certificateStatusEnum, Status.Expired) };
+                    return { color: "#FF6347", text: getEnumLabel(certificateStatusEnum, Status.Expired) };
                 case Status.Unknown:
                     return { color: "secondary", text: getEnumLabel(certificateStatusEnum, Status.Unknown) };
                 case Status.New:
@@ -93,7 +93,11 @@ function CertificateStatus({ status, asIcon = false }: Props) {
 
     const { color, text } = status ? getStatusColorAndText(status) || _default : _default;
 
-    return asIcon ? <i title={text} className={`fa fa-circle text-${color}`} /> : <Badge color={color}>{text}</Badge>;
+    return asIcon ? (
+        <i title={text} className={`fa fa-circle text-${color}`} style={{ color: color }} />
+    ) : (
+        <Badge color={color}>{text}</Badge>
+    );
 }
 
 export default CertificateStatus;

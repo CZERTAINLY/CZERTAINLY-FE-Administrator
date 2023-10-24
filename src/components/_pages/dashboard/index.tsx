@@ -4,9 +4,10 @@ import Spinner from "components/Spinner";
 import { selectors as enumSelectors } from "ducks/enums";
 import { EntityType } from "ducks/filters";
 import { actions, selectors } from "ducks/statisticsDashboard";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { PlatformEnum, SearchCondition, SearchGroup } from "types/openapi";
+import { getCertificateDonutChartColorsByCompliance, getCertificateDonutChartColorsByStatus } from "utils/dashboard";
 import CountBadge from "./DashboardItem/CountBadge";
 import DonutChart from "./DashboardItem/DonutChart";
 
@@ -26,6 +27,14 @@ function Dashboard() {
     useEffect(() => {
         dispatch(actions.getDashboard());
     }, [dispatch]);
+
+    const certificatesStatusColorOptions = useMemo(() => {
+        return getCertificateDonutChartColorsByStatus(dashboard?.certificateStatByStatus);
+    }, [dashboard?.certificateStatByStatus]);
+
+    const certificateComplianceColorOptions = useMemo(() => {
+        return getCertificateDonutChartColorsByCompliance(dashboard?.certificateStatByComplianceStatus);
+    }, [dashboard?.certificateStatByComplianceStatus]);
 
     return (
         <Container className="themed-container" fluid={true}>
@@ -50,6 +59,7 @@ function Dashboard() {
             <Row xs="1" sm="1" md="2" lg="2" xl="3">
                 <Col>
                     <DonutChart
+                        colorOptions={certificatesStatusColorOptions}
                         title={"Certificates by Status"}
                         data={dashboard?.certificateStatByStatus}
                         entity={EntityType.CERTIFICATE}
@@ -223,6 +233,7 @@ function Dashboard() {
                     <DonutChart
                         title={"Certificates by Compliance"}
                         data={dashboard?.certificateStatByComplianceStatus}
+                        colorOptions={certificateComplianceColorOptions}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => {
                             const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
