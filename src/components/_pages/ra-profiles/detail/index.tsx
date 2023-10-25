@@ -854,7 +854,7 @@ export default function RaProfileDetail() {
 
             <Dialog
                 isOpen={confirmDeassociateApprovalProfileDialog?.isDialogOpen || false}
-                caption={`disassociate Approval Profile`}
+                caption={`Disassociate Approval Profile`}
                 body={
                     <div>
                         <p>
