@@ -854,17 +854,17 @@ export default function RaProfileDetail() {
 
             <Dialog
                 isOpen={confirmDeassociateApprovalProfileDialog?.isDialogOpen || false}
-                caption={`Deassociate Approval Profile`}
+                caption={`disassociate Approval Profile`}
                 body={
                     <div>
                         <p>
-                            You are about to deassociate approval profile
+                            You are about to disassociate approval profile
                             <b>{` ${confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileName} `}</b>
                             from RA profile {raProfile?.name}. Is this what you want to do?
                         </p>
                         <p>
-                            <b className="text-danger">Warning:</b> This will remove all authorizations for this approval profile from all
-                            clients.
+                            <b className="text-danger">Warning:</b> This will remove approval process for all certificate actions on this RA
+                            profile.
                         </p>
                     </div>
                 }
