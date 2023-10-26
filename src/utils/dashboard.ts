@@ -79,6 +79,9 @@ function updateColorObjectByCompliance(compliance: string, colorObject: ColorOpt
         case "Not Checked":
             color = "#D1D1D1";
             break;
+        case "Not Applicable":
+            color = "grey";
+            break;
         default:
             break;
     }
@@ -124,7 +127,7 @@ export function getCertificateDonutChartColorsByCompliance(certificateStatByComp
     if (arrayOfStatuses.length === 0) {
         return colorsObject;
     }
-    console.log("arrayOfStatuses", arrayOfStatuses);
+
     const updatedColorObject = arrayOfStatuses.reduce((acc, { status }) => updateColorObjectByCompliance(status, acc), colorsObject);
 
     return updatedColorObject;
