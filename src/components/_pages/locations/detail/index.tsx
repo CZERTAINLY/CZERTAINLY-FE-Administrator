@@ -479,50 +479,84 @@ export default function LocationDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="Location Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshLocationDetails}
-                widgetLockName={LockWidgetNameEnum.LocationDetails}
-            >
-                <br />
+            <TabLayout
+                tabs={[
+                    {
+                        title: "Details",
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Location Properties"
+                                    busy={isBusy}
+                                    widgetButtons={buttons}
+                                    titleSize="large"
+                                    refreshAction={getFreshLocationDetails}
+                                    widgetLockName={LockWidgetNameEnum.LocationDetails}
+                                >
+                                    <br />
 
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+                                    <CustomTable headers={detailHeaders} data={detailData} />
+                                </Widget>
 
-            <Widget title="Attributes" titleSize="large">
-                <br />
+                                <Widget
+                                    title="Location Certificates"
+                                    titleSize="large"
+                                    widgetButtons={certButtons}
+                                    busy={
+                                        isRenewingCertificate ||
+                                        isPushingCertificate ||
+                                        isRemovingCertificate ||
+                                        isSyncing ||
+                                        isIssuingCertificate
+                                    }
+                                >
+                                    <br />
 
-                <Label>Location Attributes</Label>
-                <AttributeViewer attributes={location?.attributes} />
-            </Widget>
-            {location && (
-                <CustomAttributeWidget resource={Resource.Locations} resourceUuid={location.uuid} attributes={location.customAttributes} />
-            )}
+                                    <Label>Location certificates</Label>
 
-            <Widget
-                title="Location Certificates"
-                titleSize="large"
-                widgetButtons={certButtons}
-                busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}
-            >
-                <br />
+                                    <CustomTable
+                                        headers={certHeaders}
+                                        data={certData}
+                                        hasCheckboxes={true}
+                                        multiSelect={false}
+                                        onCheckedRowsChanged={(rows) => {
+                                            setCertCheckedRows(rows as string[]);
+                                        }}
+                                        hasDetails={true}
+                                    />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Attributes",
+                        content: (
+                            <Widget>
+                                <Widget title="Attributes" titleSize="large">
+                                    <br />
 
-                <Label>Location certificates</Label>
+                                    <Label>Location Attributes</Label>
+                                    <AttributeViewer attributes={location?.attributes} />
+                                </Widget>
+                                {location && (
+                                    <CustomAttributeWidget
+                                        resource={Resource.Locations}
+                                        resourceUuid={location.uuid}
+                                        attributes={location.customAttributes}
+                                    />
+                                )}
 
-                <CustomTable
-                    headers={certHeaders}
-                    data={certData}
-                    hasCheckboxes={true}
-                    multiSelect={false}
-                    onCheckedRowsChanged={(rows) => {
-                        setCertCheckedRows(rows as string[]);
-                    }}
-                    hasDetails={true}
-                />
-            </Widget>
+                                <Widget title="Metadata" titleSize="large">
+                                    <br />
+                                    {location?.metadata && (
+                                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={location.metadata} />
+                                    )}
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={confirmDelete}
