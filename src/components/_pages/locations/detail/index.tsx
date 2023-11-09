@@ -27,7 +27,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { validateRequired } from "utils/validators";
-import { CertificateStatus, Resource } from "../../../../types/openapi";
+import { CertificateState, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
 import CertificateStatusBadge from "../../../_pages/certificates/CertificateStatus";
@@ -312,7 +312,7 @@ export default function LocationDetail() {
             },
             {
                 icon: "retweet",
-                disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.status === CertificateStatus.New,
+                disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.state === CertificateState.Requested,
                 tooltip: "Renew",
                 onClick: () => {
                     onRenewClick();
@@ -427,13 +427,13 @@ export default function LocationDetail() {
                       id: cert.certificateUuid,
                       columns: [
                           <Link
-                              className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                              className={cx({ [style.newCertificateColumn]: cert.state === CertificateState.Requested })}
                               key={cert.certificateUuid}
                               to={`../../../certificates/detail/${cert.certificateUuid}`}
                           >
                               {cert.commonName || "empty"}
                           </Link>,
-                          <CertificateStatusBadge status={cert.status} />,
+                          <CertificateStatusBadge status={cert.state} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                           !cert.metadata || cert.metadata.length === 0 ? (
@@ -441,7 +441,7 @@ export default function LocationDetail() {
                           ) : (
                               <div
                                   style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}
-                                  className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                                  className={cx({ [style.newCertificateColumn]: cert.state === CertificateState.Requested })}
                               >
                                   {cert.metadata.map((atr) => atr.connectorName + " (" + atr.items.length + ")").join(", ")}
                               </div>

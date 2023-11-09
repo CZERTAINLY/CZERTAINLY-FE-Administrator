@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateStatus, MetadataResponseDto, ResponseAttributeDto } from "./";
+import type { CertificateState, CertificateValidationStatus, MetadataResponseDto, ResponseAttributeDto } from "./";
 
 /**
  * List of Certificates in Location
@@ -26,10 +26,15 @@ export interface CertificateInLocationDto {
      */
     certificateUuid: string;
     /**
-     * @type {CertificateStatus}
+     * @type {CertificateState}
      * @memberof CertificateInLocationDto
      */
-    status: CertificateStatus;
+    state: CertificateState;
+    /**
+     * @type {CertificateValidationStatus}
+     * @memberof CertificateInLocationDto
+     */
+    validationStatus: CertificateValidationStatus;
     /**
      * Common Name of the Subject DN field of the Certificate
      * @type {string}

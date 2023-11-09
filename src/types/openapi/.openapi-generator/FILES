@@ -103,7 +103,7 @@ models/CertificateEventHistoryDto.ts
 models/CertificateInLocationDto.ts
 models/CertificateRequestDto.ts
 models/CertificateResponseDto.ts
-models/CertificateStatus.ts
+models/CertificateState.ts
 models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts
 models/CertificateValidationCheck.ts

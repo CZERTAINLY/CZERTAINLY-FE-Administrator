@@ -15,8 +15,9 @@ import type {
     CertificateComplianceResultDto,
     CertificateDto,
     CertificateRequestDto,
-    CertificateStatus,
+    CertificateState,
     CertificateType,
+    CertificateValidationStatus,
     ComplianceStatus,
     GroupDto,
     KeyDto,
@@ -98,10 +99,15 @@ export interface CertificateDetailDto {
      */
     keySize: number;
     /**
-     * @type {CertificateStatus}
+     * @type {CertificateState}
      * @memberof CertificateDetailDto
      */
-    status: CertificateStatus;
+    state: CertificateState;
+    /**
+     * @type {CertificateValidationStatus}
+     * @memberof CertificateDetailDto
+     */
+    validationStatus: CertificateValidationStatus;
     /**
      * @type {SimplifiedRaProfileDto}
      * @memberof CertificateDetailDto

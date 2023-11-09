@@ -8,11 +8,6 @@ import { DashboardDict } from "types/statisticsDashboard";
 import { getLabels, getValues } from "utils/dashboard";
 
 export interface ColorOptions {
-    // fill: {
-    //     solid: {
-    //         gradientToColors: string[];
-    //     };
-    // };
     colors: string[];
 }
 

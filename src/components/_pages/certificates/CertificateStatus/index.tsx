@@ -4,99 +4,101 @@ import { useSelector } from "react-redux";
 import { Badge } from "reactstrap";
 import {
     CertificateEventHistoryDtoStatusEnum,
+    CertificateState,
     CertificateValidationStatus,
     ComplianceRuleStatus,
     ComplianceStatus,
     PlatformEnum,
-    CertificateStatus as Status,
 } from "types/openapi";
+import { getCertificateStatusColor } from "utils/certificate";
 
 interface Props {
-    status:
-        | Status
-        | CertificateValidationStatus
-        | CertificateEventHistoryDtoStatusEnum
-        | ComplianceStatus
-        | ComplianceRuleStatus
-        | undefined;
+    status: CertificateState | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus;
     asIcon?: boolean;
 }
 
 function CertificateStatus({ status, asIcon = false }: Props) {
-    const certificateStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateStatus));
+    const certificateStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateState));
     const certificateValidationStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationStatus));
     const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
     const complianceRuleStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceRuleStatus));
 
-    const getStatusColorAndText = useCallback(
-        (status: Status | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus) => {
+    const getStatusText = useCallback(
+        (
+            status:
+                | CertificateState
+                | CertificateValidationStatus
+                | CertificateEventHistoryDtoStatusEnum
+                | ComplianceStatus
+                | ComplianceRuleStatus,
+        ) => {
             switch (status) {
-                case Status.Valid:
-                    return { color: "success", text: getEnumLabel(certificateStatusEnum, Status.Valid) };
-                case Status.Revoked:
-                    return { color: "dark", text: getEnumLabel(certificateStatusEnum, Status.Revoked) };
-                case Status.Invalid:
-                    return { color: "#800000", text: getEnumLabel(certificateStatusEnum, Status.Invalid) };
-                case Status.Expiring:
-                    return { color: "warning", text: getEnumLabel(certificateStatusEnum, Status.Expiring) };
-                case Status.Expired:
-                    return { color: "#FF6347", text: getEnumLabel(certificateStatusEnum, Status.Expired) };
-                case Status.Unknown:
-                    return { color: "secondary", text: getEnumLabel(certificateStatusEnum, Status.Unknown) };
-                case Status.New:
-                    return { color: "primary", text: getEnumLabel(certificateStatusEnum, Status.New) };
-                case Status.Rejected:
-                    return { color: "danger", text: getEnumLabel(certificateStatusEnum, Status.Rejected) };
-                case CertificateValidationStatus.Success:
-                    return { color: "success", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Success) };
-                case CertificateValidationStatus.Failed:
-                    return { color: "danger", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Failed) };
-                case CertificateValidationStatus.Warning:
-                    return { color: "warning", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Warning) };
-                case CertificateValidationStatus.Revoked:
-                    return { color: "dark", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Revoked) };
-                case CertificateValidationStatus.NotChecked:
-                    return {
-                        color: "secondary",
-                        text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.NotChecked),
-                    };
+                case CertificateValidationStatus.Valid:
+                    return getEnumLabel(certificateStatusEnum, CertificateValidationStatus.Valid);
                 case CertificateValidationStatus.Invalid:
-                    return { color: "danger", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Invalid) };
+                    return getEnumLabel(certificateStatusEnum, CertificateValidationStatus.Invalid);
                 case CertificateValidationStatus.Expiring:
-                    return { color: "warning", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Expiring) };
+                    return getEnumLabel(certificateStatusEnum, CertificateValidationStatus.Expiring);
                 case CertificateValidationStatus.Expired:
-                    return { color: "danger", text: getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Expired) };
+                    return getEnumLabel(certificateStatusEnum, CertificateValidationStatus.Expired);
+                case CertificateValidationStatus.Revoked:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Revoked);
+                case CertificateValidationStatus.NotChecked:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.NotChecked);
+                case CertificateValidationStatus.Inactive:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Inactive);
+                case CertificateValidationStatus.Failed:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateValidationStatus.Failed);
+
+                case CertificateState.Revoked:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateState.Archived:
+                    return getEnumLabel(certificateStatusEnum, CertificateState.Archived);
+                case CertificateState.Requested:
+                    return getEnumLabel(certificateStatusEnum, CertificateState.Requested);
+                case CertificateState.Rejected:
+                    return getEnumLabel(certificateStatusEnum, CertificateState.Rejected);
+                case CertificateState.Issued:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateState.Issued);
+                case CertificateState.PendingIssue:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateState.PendingIssue);
+                case CertificateState.PendingRevoke:
+                    return getEnumLabel(certificateValidationStatusEnum, CertificateState.PendingRevoke);
+
                 case CertificateEventHistoryDtoStatusEnum.Success:
-                    return { color: "success", text: "Success" };
+                    return "Success";
                 case CertificateEventHistoryDtoStatusEnum.Failed:
-                    return { color: "danger", text: "Failed" };
+                    return "Failed";
+
                 case ComplianceStatus.Ok:
-                    return { color: "success", text: getEnumLabel(complianceStatusEnum, ComplianceStatus.Ok) };
+                    return getEnumLabel(complianceStatusEnum, ComplianceStatus.Ok);
                 case ComplianceStatus.Nok:
-                    return { color: "danger", text: getEnumLabel(complianceStatusEnum, ComplianceStatus.Nok) };
+                    return getEnumLabel(complianceStatusEnum, ComplianceStatus.Nok);
                 case ComplianceStatus.Na:
-                    return { color: "secondary", text: getEnumLabel(complianceStatusEnum, ComplianceStatus.Na) };
+                    return getEnumLabel(complianceStatusEnum, ComplianceStatus.Na);
                 case ComplianceRuleStatus.Ok:
-                    return { color: "success", text: getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Ok) };
+                    return getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Ok);
                 case ComplianceRuleStatus.Nok:
-                    return { color: "danger", text: getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Nok) };
+                    return getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Nok);
                 case ComplianceRuleStatus.Na:
-                    return { color: "secondary", text: getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Na) };
+                    return getEnumLabel(complianceRuleStatusEnum, ComplianceRuleStatus.Na);
+
                 default:
-                    return { color: "secondary", text: "Unknown" };
+                    return "Unknown";
             }
         },
         [certificateStatusEnum, certificateValidationStatusEnum, complianceStatusEnum, complianceRuleStatusEnum],
     );
 
-    const _default = { color: "secondary", text: "Unknown" };
-
-    const { color, text } = status ? getStatusColorAndText(status) || _default : _default;
+    const color = getCertificateStatusColor(status);
+    const text = getStatusText(status);
 
     return asIcon ? (
-        <i title={text} className={`fa fa-circle text-${color}`} style={{ color: color }} />
+        <i title={text} className={`fa fa-circle`} style={{ color: color }} />
     ) : (
-        <Badge color={color}>{text}</Badge>
+        <Badge color={color} style={{ background: color }}>
+            {text.charAt(0).toUpperCase() + text.slice(1)}
+        </Badge>
     );
 }
 

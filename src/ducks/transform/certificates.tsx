@@ -1,4 +1,5 @@
 import { CustomNode, nodeHeight, nodeWidth } from "components/FlowChart";
+import CertificateStatus from "components/_pages/certificates/CertificateStatus";
 import { Edge, MarkerType } from "reactflow";
 import {
     CertificateBulkDeleteRequestDto,
@@ -195,15 +196,23 @@ export function transformCertifacetObjectToNodesAndEdges(
 
     const otherPropertiesCurrentCertificate: OtherProperties[] = [
         {
-            propertyName: "Status",
-            propertyValue: certificate.status,
-        },
-        {
-            propertyName: "Subject DN",
-            propertyValue: certificate.subjectDn,
-            copyable: true,
+            propertyName: "State",
+            propertyContent: <CertificateStatus status={certificate.state} />,
         },
     ];
+
+    if (certificate?.validationStatus) {
+        otherPropertiesCurrentCertificate.push({
+            propertyName: "Validation Status",
+            propertyContent: <CertificateStatus status={certificate.validationStatus} />,
+        });
+    }
+
+    otherPropertiesCurrentCertificate.push({
+        propertyName: "Subject DN",
+        propertyValue: certificate.subjectDn,
+        copyable: true,
+    });
 
     if (certificate?.serialNumber) {
         otherPropertiesCurrentCertificate.push({
@@ -247,7 +256,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             entityLabel: certificate.commonName,
             icon: "fa fa-certificate",
             isMainNode: true,
-            certificateNodeStatus: certificate.status,
+            certificateNodeStatus: certificate.state,
+            certificateNodeValidationStatus: certificate.validationStatus,
             otherProperties: otherPropertiesCurrentCertificate,
         },
     });
@@ -258,8 +268,12 @@ export function transformCertifacetObjectToNodesAndEdges(
 
             const otherProperties: OtherProperties[] = [
                 {
-                    propertyName: "Status",
-                    propertyValue: chain.status,
+                    propertyName: "State",
+                    propertyContent: <CertificateStatus status={chain.state} />,
+                },
+                {
+                    propertyName: "Validation Status",
+                    propertyContent: <CertificateStatus status={chain.validationStatus} />,
                 },
                 {
                     propertyName: "Subject DN",
@@ -313,7 +327,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                     entityLabel: chain.commonName,
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? "fa fa-medal" : "fa fa-certificate",
                     isMainNode: true,
-                    certificateNodeStatus: chain.status,
+                    certificateNodeStatus: chain.state,
+                    certificateNodeValidationStatus: chain.validationStatus,
                     otherProperties: otherProperties,
                 },
             });

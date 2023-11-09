@@ -26,6 +26,10 @@ const certificateIcon: CertificateComplianceIcon = {
         color: "grey",
         message: "Not Applicable",
     },
+    [ComplianceStatus.NotChecked]: {
+        color: "#D1D1D1",
+        message: "Not Checked",
+    },
     unknown: {
         color: "#D1D1D1",
         message: "Not Checked",

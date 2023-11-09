@@ -12,17 +12,18 @@
  */
 
 /**
- * Current validation status of the certificate
+ * State of the Certificate
  * @export
  * @enum {string}
  */
-export enum CertificateValidationStatus {
-    NotChecked = "not_checked",
+export enum CertificateState {
+    Requested = "requested",
+    Rejected = "rejected",
+    PendingApproval = "pending_approval",
+    PendingIssue = "pending_issue",
+    PendingRevoke = "pending_revoke",
     Failed = "failed",
-    Inactive = "inactive",
-    Invalid = "invalid",
-    Valid = "valid",
+    Issued = "issued",
     Revoked = "revoked",
-    Expiring = "expiring",
-    Expired = "expired",
+    Archived = "archived",
 }
