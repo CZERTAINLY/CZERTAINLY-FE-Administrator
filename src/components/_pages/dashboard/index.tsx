@@ -1,12 +1,11 @@
 import { Col, Container, Row } from "reactstrap";
 
 import Spinner from "components/Spinner";
-import { selectors as enumSelectors } from "ducks/enums";
 import { EntityType } from "ducks/filters";
 import { actions, selectors } from "ducks/statisticsDashboard";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PlatformEnum, SearchCondition, SearchGroup } from "types/openapi";
+import { SearchCondition, SearchGroup } from "types/openapi";
 import { getCertificateDonutChartColors } from "utils/dashboard";
 import CountBadge from "./DashboardItem/CountBadge";
 import DonutChart from "./DashboardItem/DonutChart";
@@ -20,7 +19,6 @@ const getDateInString = (daysOffset: number) => {
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
     const isFetching = useSelector(selectors.isFetching);
-    const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
 
     const dispatch = useDispatch();
 
@@ -104,8 +102,6 @@ function Dashboard() {
                         colorOptions={certificateComplianceColorOptions}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => {
-                            const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
-                            const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
                             return labels[index] === "Not Checked"
                                 ? [
                                       {
