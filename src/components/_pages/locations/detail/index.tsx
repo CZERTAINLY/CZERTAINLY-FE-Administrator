@@ -394,7 +394,13 @@ export default function LocationDetail() {
             },
             {
                 id: "cs",
-                content: "Status",
+                content: "State",
+                sortable: true,
+                width: "15%",
+            },
+            {
+                id: "vs",
+                content: "Validation Status",
                 sortable: true,
                 width: "15%",
             },
@@ -434,6 +440,7 @@ export default function LocationDetail() {
                               {cert.commonName || "empty"}
                           </Link>,
                           <CertificateStatusBadge status={cert.state} />,
+                          <CertificateStatusBadge status={cert.validationStatus} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                           !cert.metadata || cert.metadata.length === 0 ? (

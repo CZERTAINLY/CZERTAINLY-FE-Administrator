@@ -1,3 +1,6 @@
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
+import { useCallback } from "react";
+import { useSelector } from "react-redux";
 import { CertificateDetailResponseModel } from "types/certificate";
 import {
     CertificateEventHistoryDtoStatusEnum,
@@ -6,6 +9,7 @@ import {
     CertificateValidationStatus,
     ComplianceRuleStatus,
     ComplianceStatus,
+    PlatformEnum,
 } from "types/openapi";
 
 export const emptyCertificate: CertificateDetailResponseModel = {
@@ -128,6 +132,86 @@ export function getCertificateStatusColor(
         default:
             return "#6c757d";
     }
+}
+
+export function useGetStatusText(
+    status: CertificateState | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus,
+) {
+    const certificateStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateState));
+    const certificateValidationStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationStatus));
+    const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
+    const complianceRuleStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceRuleStatus));
+
+    const getStatusText = useCallback(
+        (
+            status:
+                | CertificateState
+                | CertificateValidationStatus
+                | CertificateEventHistoryDtoStatusEnum
+                | ComplianceStatus
+                | ComplianceRuleStatus,
+        ) => {
+            // ...rest of the code
+
+            switch (status) {
+                case CertificateValidationStatus.Valid:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateValidationStatus.Invalid:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateValidationStatus.Expiring:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateValidationStatus.Expired:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateValidationStatus.Revoked:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+                case CertificateValidationStatus.NotChecked:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+                case CertificateValidationStatus.Inactive:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+                case CertificateValidationStatus.Failed:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+
+                case CertificateState.Revoked:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateState.Archived:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateState.Requested:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateState.Rejected:
+                    return getEnumLabel(certificateStatusEnum, status);
+                case CertificateState.Issued:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+                case CertificateState.PendingIssue:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+                case CertificateState.PendingRevoke:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+
+                case CertificateEventHistoryDtoStatusEnum.Success:
+                    return "Success";
+                case CertificateEventHistoryDtoStatusEnum.Failed:
+                    return "Failed";
+
+                case ComplianceStatus.Ok:
+                    return getEnumLabel(complianceStatusEnum, status);
+                case ComplianceStatus.Nok:
+                    return getEnumLabel(complianceStatusEnum, status);
+                case ComplianceStatus.Na:
+                    return getEnumLabel(complianceStatusEnum, status);
+                case ComplianceRuleStatus.Ok:
+                    return getEnumLabel(complianceRuleStatusEnum, status);
+                case ComplianceRuleStatus.Nok:
+                    return getEnumLabel(complianceRuleStatusEnum, status);
+                case ComplianceRuleStatus.Na:
+                    return getEnumLabel(complianceRuleStatusEnum, status);
+
+                default:
+                    return "Unknown";
+            }
+        },
+        [certificateStatusEnum, certificateValidationStatusEnum, complianceStatusEnum, complianceRuleStatusEnum],
+    );
+
+    return getStatusText(status);
 }
 
 /*

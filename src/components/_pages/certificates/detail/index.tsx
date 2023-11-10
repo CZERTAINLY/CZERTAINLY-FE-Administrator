@@ -525,7 +525,7 @@ export default function CertificateDetail() {
 
     const downloadDropDown = useMemo(
         () => (
-            <UncontrolledButtonDropdown>
+            <UncontrolledButtonDropdown disabled={!certificate?.certificateContent}>
                 <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate">
                     <i className="fa fa-download" aria-hidden="true" />
                 </DropdownToggle>
@@ -547,7 +547,7 @@ export default function CertificateDetail() {
                         DER (.cer)
                     </DropdownItem>
                     <DropdownItem
-                        key="pem"
+                        key="chainPem"
                         onClick={() => {
                             downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pem);
                         }}
@@ -595,7 +595,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "retweet",
-                disabled: !certificate?.raProfile || certificate?.state === CertStatus.Issued,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
                 tooltip: "Renew",
                 onClick: () => {
                     setRenew(true);
@@ -603,7 +603,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "rekey",
-                disabled: !certificate?.raProfile || certificate?.state === CertStatus.Issued,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
                 tooltip: "Rekey",
                 onClick: () => {
                     setRekey(true);
@@ -611,7 +611,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "minus-square",
-                disabled: !certificate?.raProfile || certificate?.state === CertStatus.Issued,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
                 tooltip: "Revoke",
                 onClick: () => {
                     setRevoke(true);
@@ -628,10 +628,7 @@ export default function CertificateDetail() {
             {
                 icon: "download",
                 disabled: !certificate?.certificateContent,
-                custom:
-                    certificate?.state === CertStatus.Requested || certificate?.state === CertStatus.Rejected
-                        ? undefined
-                        : downloadDropDown,
+                custom: !certificate?.certificateContent ? undefined : downloadDropDown,
                 onClick: () => {},
             },
         ],
@@ -1151,8 +1148,8 @@ export default function CertificateDetail() {
                               getEnumLabel(certificateValidationCheck, key),
                               value?.status ? <CertificateStatus status={value.status} /> : "",
                               <div style={{ wordBreak: "break-all" }}>
-                                  {value.message?.split("\n").map((str: string) => (
-                                      <div key={str}>
+                                  {value.message?.split("\n").map((str: string, i) => (
+                                      <div key={i}>
                                           {str}
                                           <br />
                                       </div>
@@ -1254,9 +1251,9 @@ export default function CertificateDetail() {
                       columns: ["State", <CertificateStatus status={certificate.state} />],
                   },
                   {
-                      id: "validationResult",
+                      id: "validationStatus",
                       columns: [
-                          "Validation Result",
+                          "Validation Status",
                           validationResult?.resultStatus ? (
                               <CertificateStatus status={validationResult?.resultStatus} />
                           ) : (
