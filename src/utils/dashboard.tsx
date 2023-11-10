@@ -1,4 +1,5 @@
 import { ColorOptions } from "components/_pages/dashboard/DashboardItem/DonutChart";
+import { useMemo } from "react";
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
@@ -7,7 +8,7 @@ import {
     ComplianceStatus,
 } from "types/openapi";
 import { DashboardDict } from "types/statisticsDashboard";
-import { getCertificateStatusColor } from "./certificate";
+import { getCertificateStatusColor, useGetStatusText } from "./certificate";
 
 type Status =
     | CertificateState
@@ -16,17 +17,26 @@ type Status =
     | ComplianceStatus
     | ComplianceRuleStatus;
 
-export function getLabels(data: DashboardDict) {
-    let labels: string[] = [];
+export function useGetLabels(data: DashboardDict) {
+    const getStatusText = useGetStatusText();
 
-    for (let i of Object.entries(data)) {
-        const splitValue = i[0].split("=");
-        labels.push(splitValue[splitValue.length - 1]);
-    }
+    const labels = useMemo(() => {
+        let result: string[] = [];
+
+        for (let i of Object.entries(data)) {
+            if (getStatusText(i[0] as Status) === "Unknown") {
+                const splitValue = i[0].split("=");
+                result.push(splitValue[splitValue.length - 1]);
+            } else {
+                result.push(getStatusText(i[0] as Status));
+            }
+        }
+
+        return result;
+    }, [data, getStatusText]);
 
     return labels;
 }
-
 export function getDefaultColors() {
     return ["#1473b5", "#3fb24d", "#2c7c35", "#438fc3", "#73b514"];
 }

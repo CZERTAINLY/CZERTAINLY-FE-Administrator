@@ -1,6 +1,5 @@
 import Widget from "components/Widget";
 import { EntityType, actions } from "ducks/filters";
-import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -13,9 +12,7 @@ import {
     ComplianceStatus,
 } from "types/openapi";
 import { DashboardDict } from "types/statisticsDashboard";
-import { useGetStatusText } from "utils/certificate";
-import { capitalize } from "utils/common-utils";
-import { getLabels, getValues } from "utils/dashboard";
+import { getValues, useGetLabels } from "utils/dashboard";
 
 export interface ColorOptions {
     colors: string[];
@@ -37,25 +34,12 @@ interface Props {
 }
 
 function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFilter: onLegendClick }: Props) {
-    const labels = getLabels(data);
-    const getStatusText = useGetStatusText();
-
-    const [enumsLabel, setEnumsLabel] = useState<string[]>([]);
-
-    useEffect(() => {
-        let enumsLabel = [];
-        enumsLabel = labels.map((labels) => {
-            let enumLabel = getStatusText(labels as Status) !== "NOT_APPLICABLE" ? getStatusText(labels as Status) : labels;
-            return capitalize(enumLabel);
-        });
-        setEnumsLabel(enumsLabel);
-    }, [labels]);
-
+    const labels = useGetLabels(data);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const options: ApexCharts.ApexOptions = {
-        labels: enumsLabel,
+        labels: labels,
         fill: {
             type: "gradient",
         },
