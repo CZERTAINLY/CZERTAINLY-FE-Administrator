@@ -20,7 +20,11 @@ import { actions as locationActions, selectors as locationSelectors } from "duck
 import { actions as raProfileAction, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { selectors as settingSelectors } from "ducks/settings";
 
-import { CertificateStatus as CertStatus, DownloadCertificateChainCertificateFormatEnum } from "../../../../types/openapi";
+import {
+    CertificateState as CertStatus,
+    CertificateValidationStatus,
+    DownloadCertificateChainCertificateFormatEnum,
+} from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -290,7 +294,7 @@ export default function CertificateDetail() {
     const getFreshCertificateValidations = useCallback(() => {
         // TODO: Add toast for no certificate
         if (!certificate) return;
-        if (certificate.status === CertStatus.New) return;
+        if (certificate.state === CertStatus.Requested) return;
         dispatch(actions.getCertificateValidationResult({ uuid: certificate.uuid }));
     }, [dispatch, certificate]);
 
@@ -521,7 +525,7 @@ export default function CertificateDetail() {
 
     const downloadDropDown = useMemo(
         () => (
-            <UncontrolledButtonDropdown>
+            <UncontrolledButtonDropdown disabled={!certificate?.certificateContent}>
                 <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate">
                     <i className="fa fa-download" aria-hidden="true" />
                 </DropdownToggle>
@@ -543,7 +547,7 @@ export default function CertificateDetail() {
                         DER (.cer)
                     </DropdownItem>
                     <DropdownItem
-                        key="pem"
+                        key="chainPem"
                         onClick={() => {
                             downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pem);
                         }}
@@ -577,7 +581,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "cubes",
-                disabled: (!certificate?.raProfile && certificate?.status === CertStatus.New) || certificate?.status !== CertStatus.New,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Requested,
                 tooltip: "Issue",
                 onClick: () => {
                     dispatch(
@@ -591,7 +595,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "retweet",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
                 tooltip: "Renew",
                 onClick: () => {
                     setRenew(true);
@@ -599,7 +603,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "rekey",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
                 tooltip: "Rekey",
                 onClick: () => {
                     setRekey(true);
@@ -607,11 +611,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "minus-square",
-                disabled:
-                    certificate?.status === CertStatus.New ||
-                    certificate?.status === CertStatus.Rejected ||
-                    certificate?.status === CertStatus.Revoked ||
-                    certificate?.status === CertStatus.Expired,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
                 tooltip: "Revoke",
                 onClick: () => {
                     setRevoke(true);
@@ -619,7 +619,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: "gavel",
-                disabled: !certificate?.raProfile || certificate?.status === CertStatus.Revoked || certificate?.status === CertStatus.New,
+                disabled: !certificate?.raProfile || !certificate?.certificateContent,
                 tooltip: "Check Compliance",
                 onClick: () => {
                     onComplianceCheck();
@@ -627,9 +627,8 @@ export default function CertificateDetail() {
             },
             {
                 icon: "download",
-                disabled: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
-                custom:
-                    certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected ? undefined : downloadDropDown,
+                disabled: !certificate?.certificateContent,
+                custom: !certificate?.certificateContent ? undefined : downloadDropDown,
                 onClick: () => {},
             },
         ],
@@ -772,8 +771,8 @@ export default function CertificateDetail() {
     }, [setRevokeReason, certificateRevokeReasonOptions]);
 
     const certificateTitle = useMemo(
-        () => (certificate?.status === CertStatus.New ? "CSR Properties" : "Certificate Properties"),
-        [certificate?.status],
+        () => (certificate?.state === CertStatus.Requested ? "CSR Properties" : "Certificate Properties"),
+        [certificate?.state],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -1149,8 +1148,8 @@ export default function CertificateDetail() {
                               getEnumLabel(certificateValidationCheck, key),
                               value?.status ? <CertificateStatus status={value.status} /> : "",
                               <div style={{ wordBreak: "break-all" }}>
-                                  {value.message?.split("\n").map((str: string) => (
-                                      <div key={str}>
+                                  {value.message?.split("\n").map((str: string, i) => (
+                                      <div key={i}>
                                           {str}
                                           <br />
                                       </div>
@@ -1173,7 +1172,7 @@ export default function CertificateDetail() {
                           c.serialNumber ?? "",
                           c.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(c.notBefore)}</span> : "",
                           c.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(c.notAfter)}</span> : "",
-                          <CertificateStatus status={c.status} />,
+                          <CertificateStatus status={c.state} />,
                       ],
                   })),
         [certificate?.relatedCertificates],
@@ -1248,13 +1247,17 @@ export default function CertificateDetail() {
                       columns: ["Signature Algorithm", certificate.signatureAlgorithm],
                   },
                   {
-                      id: "certStatus",
+                      id: "certState",
+                      columns: ["State", <CertificateStatus status={certificate.state} />],
+                  },
+                  {
+                      id: "validationStatus",
                       columns: [
-                          "Status",
+                          "Validation Status",
                           validationResult?.resultStatus ? (
                               <CertificateStatus status={validationResult?.resultStatus} />
                           ) : (
-                              <CertificateStatus status={certificate.status} />
+                              <CertificateStatus status={CertificateValidationStatus.NotChecked} />
                           ),
                       ],
                   },
@@ -1307,7 +1310,7 @@ export default function CertificateDetail() {
                       columns: ["Basic Constraint", certificate.basicConstraints],
                   },
               ];
-        if (certificate?.status !== CertStatus.New) {
+        if (certificate?.state !== CertStatus.Requested) {
             certDetail.push({
                 id: "asn1structure",
                 columns: ["ASN.1 Structure", certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
@@ -1352,10 +1355,17 @@ export default function CertificateDetail() {
                 width: "auto",
             },
             {
-                content: "Status",
+                content: "State",
                 align: "center",
                 sortable: true,
-                id: "Status",
+                id: "state",
+                width: "15%",
+            },
+            {
+                content: "Validation Status",
+                align: "center",
+                sortable: true,
+                id: "validationStatus",
                 width: "15%",
             },
         ],
@@ -1380,7 +1390,9 @@ export default function CertificateDetail() {
 
                           location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
-                          <StatusBadge enabled={location.enabled} />,
+                          certificate?.state ? <CertificateStatus status={certificate?.state} /> : "",
+
+                          certificate?.validationStatus ? <CertificateStatus status={certificate?.validationStatus} /> : "",
                       ],
                   })),
         [certLocations],
@@ -1654,7 +1666,7 @@ export default function CertificateDetail() {
                     },
                     {
                         title: "Validation",
-                        hidden: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
+                        hidden: !certificate?.certificateContent,
                         content: (
                             <Widget>
                                 <Widget
@@ -1715,7 +1727,6 @@ export default function CertificateDetail() {
                     },
                     {
                         title: "Locations",
-                        hidden: certificate?.status === CertStatus.New || certificate?.status === CertStatus.Rejected,
                         content: (
                             <Widget>
                                 <Widget

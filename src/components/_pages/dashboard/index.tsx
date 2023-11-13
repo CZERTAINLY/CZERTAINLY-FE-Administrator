@@ -6,11 +6,10 @@ import { EntityType } from "ducks/filters";
 import { actions, selectors } from "ducks/statisticsDashboard";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PlatformEnum, SearchCondition, SearchGroup } from "types/openapi";
-import { getCertificateDonutChartColorsByCompliance, getCertificateDonutChartColorsByStatus } from "utils/dashboard";
+import { SearchCondition, SearchGroup } from "types/openapi";
+import { getCertificateDonutChartColors } from "utils/dashboard";
 import CountBadge from "./DashboardItem/CountBadge";
 import DonutChart from "./DashboardItem/DonutChart";
-
 const getDateInString = (daysOffset: number) => {
     const date = new Date();
     date.setDate(date.getDate() + daysOffset);
@@ -20,7 +19,7 @@ const getDateInString = (daysOffset: number) => {
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
     const isFetching = useSelector(selectors.isFetching);
-    const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
+    const platformEnums = useSelector(enumSelectors.platformEnums);
 
     const dispatch = useDispatch();
 
@@ -28,13 +27,17 @@ function Dashboard() {
         dispatch(actions.getDashboard());
     }, [dispatch]);
 
-    const certificatesStatusColorOptions = useMemo(() => {
-        return getCertificateDonutChartColorsByStatus(dashboard?.certificateStatByStatus);
-    }, [dashboard?.certificateStatByStatus]);
+    const certificatesStateColorOptions = useMemo(() => {
+        return getCertificateDonutChartColors(dashboard?.certificateStatByState);
+    }, [dashboard?.certificateStatByState]);
 
     const certificateComplianceColorOptions = useMemo(() => {
-        return getCertificateDonutChartColorsByCompliance(dashboard?.certificateStatByComplianceStatus);
+        return getCertificateDonutChartColors(dashboard?.certificateStatByComplianceStatus);
     }, [dashboard?.certificateStatByComplianceStatus]);
+
+    const certofocateValidationStatusColorOptions = useMemo(() => {
+        return getCertificateDonutChartColors(dashboard?.certificateStatByValidationStatus);
+    }, [dashboard?.certificateStatByValidationStatus]);
 
     return (
         <Container className="themed-container" fluid={true}>
@@ -59,74 +62,73 @@ function Dashboard() {
             <Row xs="1" sm="1" md="2" lg="2" xl="3">
                 <Col>
                     <DonutChart
-                        colorOptions={certificatesStatusColorOptions}
-                        title={"Certificates by Status"}
-                        data={dashboard?.certificateStatByStatus}
+                        colorOptions={certificatesStateColorOptions}
+                        title={"Certificates by State"}
+                        data={dashboard?.certificateStatByState}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(index, labels) => [
-                            {
-                                searchGroup: SearchGroup.Property,
-                                condition: SearchCondition.Equals,
-                                fieldIdentifier: "STATUS",
-                                value: JSON.parse(JSON.stringify(labels[index])),
-                            },
-                        ]}
+                        onSetFilter={(index, labels) => {
+                            const certificateStateEnum = platformEnums?.CertificateState;
+                            const certificateStateList = Object.keys(certificateStateEnum).map((key) => certificateStateEnum[key]);
+                            const selectedCertificateState = certificateStateList.find((status) => status.label === labels[index]);
+                            return [
+                                {
+                                    searchGroup: SearchGroup.Property,
+                                    condition: SearchCondition.Equals,
+                                    fieldIdentifier: "CERTIFICATE_STATE",
+                                    value: selectedCertificateState?.code ? [selectedCertificateState?.code] : [""],
+                                },
+                            ];
+                        }}
                         redirect="../certificates"
                     />
                 </Col>
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Group"}
-                        data={dashboard?.groupStatByCertificateCount}
+                        colorOptions={certofocateValidationStatusColorOptions}
+                        title={"Certificates by Validation"}
+                        data={dashboard?.certificateStatByValidationStatus}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(index, labels) =>
-                            labels[index] === "Unknown"
-                                ? [
-                                      {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Empty,
-                                          fieldIdentifier: "GROUP_NAME",
-                                          value: JSON.parse(JSON.stringify("")),
-                                      },
-                                  ]
-                                : [
-                                      {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Equals,
-                                          fieldIdentifier: "GROUP_NAME",
-                                          value: JSON.parse(JSON.stringify(labels[index])),
-                                      },
-                                  ]
-                        }
+                        onSetFilter={(index, labels) => {
+                            const certificateValidationStatusEnum = platformEnums?.CertificateValidationStatus;
+                            const certificateValidationStatusList = Object.keys(certificateValidationStatusEnum).map(
+                                (key) => certificateValidationStatusEnum[key],
+                            );
+                            const selectedCertificateValidationStatus = certificateValidationStatusList.find(
+                                (status) => status.label === labels[index],
+                            );
+                            return [
+                                {
+                                    searchGroup: SearchGroup.Property,
+                                    condition: SearchCondition.Equals,
+                                    fieldIdentifier: "CERTIFICATE_VALIDATION_STATUS",
+                                    value: selectedCertificateValidationStatus?.code ? [selectedCertificateValidationStatus?.code] : [""],
+                                },
+                            ];
+                        }}
                         redirect="../certificates"
                     />
                 </Col>
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by RA Profile"}
-                        data={dashboard?.raProfileStatByCertificateCount}
+                        title={"Certificates by Compliance"}
+                        data={dashboard?.certificateStatByComplianceStatus}
+                        colorOptions={certificateComplianceColorOptions}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(index, labels) =>
-                            labels[index] === "Unknown"
-                                ? [
-                                      {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Empty,
-                                          fieldIdentifier: "RA_PROFILE_NAME",
-                                          value: JSON.parse(JSON.stringify("")),
-                                      },
-                                  ]
-                                : [
-                                      {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Equals,
-                                          fieldIdentifier: "RA_PROFILE_NAME",
-                                          value: JSON.parse(JSON.stringify(labels[index])),
-                                      },
-                                  ]
-                        }
+                        onSetFilter={(index, labels) => {
+                            const complianceStatusEnum = platformEnums?.ComplianceStatus;
+                            const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
+                            const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
+                            return [
+                                {
+                                    searchGroup: SearchGroup.Property,
+                                    condition: SearchCondition.Equals,
+                                    fieldIdentifier: "COMPLIANCE_STATUS",
+                                    value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [""],
+                                },
+                            ];
+                        }}
                         redirect="../certificates"
                     />
                 </Col>
@@ -221,29 +223,16 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Constraints"}
-                        data={dashboard?.certificateStatByBasicConstraints}
+                        title={"Certificates by RA Profile"}
+                        data={dashboard?.raProfileStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(_index, _labels) => []}
-                        redirect="../certificates"
-                    />
-                </Col>
-
-                <Col>
-                    <DonutChart
-                        title={"Certificates by Compliance"}
-                        data={dashboard?.certificateStatByComplianceStatus}
-                        colorOptions={certificateComplianceColorOptions}
-                        entity={EntityType.CERTIFICATE}
-                        onSetFilter={(index, labels) => {
-                            const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
-                            const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
-                            return labels[index] === "Not Checked"
+                        onSetFilter={(index, labels) =>
+                            labels[index] === "Unknown"
                                 ? [
                                       {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Empty,
-                                          fieldIdentifier: "COMPLIANCE_STATUS",
+                                          fieldIdentifier: "RA_PROFILE_NAME",
                                           value: JSON.parse(JSON.stringify("")),
                                       },
                                   ]
@@ -251,11 +240,49 @@ function Dashboard() {
                                       {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Equals,
-                                          fieldIdentifier: "COMPLIANCE_STATUS",
-                                          value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [""],
+                                          fieldIdentifier: "RA_PROFILE_NAME",
+                                          value: JSON.parse(JSON.stringify(labels[index])),
                                       },
-                                  ];
-                        }}
+                                  ]
+                        }
+                        redirect="../certificates"
+                    />
+                </Col>
+
+                <Col>
+                    <DonutChart
+                        title={"Certificates by Group"}
+                        data={dashboard?.groupStatByCertificateCount}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) =>
+                            labels[index] === "Unknown"
+                                ? [
+                                      {
+                                          searchGroup: SearchGroup.Property,
+                                          condition: SearchCondition.Empty,
+                                          fieldIdentifier: "GROUP_NAME",
+                                          value: JSON.parse(JSON.stringify("")),
+                                      },
+                                  ]
+                                : [
+                                      {
+                                          searchGroup: SearchGroup.Property,
+                                          condition: SearchCondition.Equals,
+                                          fieldIdentifier: "GROUP_NAME",
+                                          value: JSON.parse(JSON.stringify(labels[index])),
+                                      },
+                                  ]
+                        }
+                        redirect="../certificates"
+                    />
+                </Col>
+
+                <Col>
+                    <DonutChart
+                        title={"Certificates by Constraints"}
+                        data={dashboard?.certificateStatByBasicConstraints}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(_index, _labels) => []}
                         redirect="../certificates"
                     />
                 </Col>

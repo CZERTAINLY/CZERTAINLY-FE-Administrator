@@ -107,11 +107,17 @@ export interface StatisticsDto {
      */
     certificateStatByBasicConstraints?: { [key: string]: number };
     /**
-     * Map of Certificate count by status
+     * Map of Certificate count by state
      * @type {{ [key: string]: number; }}
      * @memberof StatisticsDto
      */
-    certificateStatByStatus?: { [key: string]: number };
+    certificateStatByState?: { [key: string]: number };
+    /**
+     * Map of Certificate count by validationStatus
+     * @type {{ [key: string]: number; }}
+     * @memberof StatisticsDto
+     */
+    certificateStatByValidationStatus?: { [key: string]: number };
     /**
      * Map of Certificate count by compliance status
      * @type {{ [key: string]: number; }}

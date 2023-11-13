@@ -50,7 +50,6 @@ export enum ClientCertificateRevocationDtoReasonEnum {
     Superseded = "superseded",
     CessationOfOperation = "cessationOfOperation",
     CertificateHold = "certificateHold",
-    RemoveFromCrl = "removeFromCRL",
     PrivilegeWithdrawn = "privilegeWithdrawn",
     AACompromise = "aACompromise",
 }

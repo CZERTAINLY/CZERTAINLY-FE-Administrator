@@ -11,7 +11,14 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateStatus, CertificateType, ComplianceStatus, GroupDto, SimplifiedRaProfileDto } from "./";
+import type {
+    CertificateState,
+    CertificateType,
+    CertificateValidationStatus,
+    ComplianceStatus,
+    GroupDto,
+    SimplifiedRaProfileDto,
+} from "./";
 
 /**
  * CA Certificate for the SCEP Profile
@@ -86,10 +93,15 @@ export interface CertificateDto {
      */
     keySize: number;
     /**
-     * @type {CertificateStatus}
+     * @type {CertificateState}
      * @memberof CertificateDto
      */
-    status: CertificateStatus;
+    state: CertificateState;
+    /**
+     * @type {CertificateValidationStatus}
+     * @memberof CertificateDto
+     */
+    validationStatus: CertificateValidationStatus;
     /**
      * @type {SimplifiedRaProfileDto}
      * @memberof CertificateDto

@@ -21,7 +21,6 @@ import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";
-import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
 import CertificateGroupDialog from "../CertificateGroupDialog";
 import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
@@ -192,10 +191,15 @@ export default function CertificateList({
     const certificatesRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Status",
-                //sortable: true,
+                content: "State",
                 align: "center",
-                id: "status",
+                id: "state",
+                width: "5%",
+            },
+            {
+                content: "Validation",
+                align: "center",
+                id: "validation",
                 width: "5%",
             },
             {
@@ -290,11 +294,10 @@ export default function CertificateList({
                 return {
                     id: certificate.uuid,
                     columns: [
-                        <CertificateStatus status={certificate.status} asIcon={true} />,
-                        <CertificateComplianceStatusIcon
-                            status={certificate.complianceStatus}
-                            id={`compliance-${certificate.fingerprint || certificate.serialNumber}`}
-                        />,
+                        <CertificateStatus status={certificate.state} asIcon={true} />,
+                        <CertificateStatus status={certificate.validationStatus} asIcon={true} />,
+                        certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : "",
+
                         certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : "",
                         selectCertsOnly ? (
                             certificate.commonName || "(empty)"
