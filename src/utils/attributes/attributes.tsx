@@ -198,14 +198,16 @@ export function collectFormAttributes(
             //       continue;
             //
             // }
-            const attr: AttributeRequestModel = {
-                name: attributeName,
-                content: Array.isArray(content) ? content : [content],
-            };
+            if (typeof content.data !== "undefined" || Array.isArray(content)) {
+                const attr: AttributeRequestModel = {
+                    name: attributeName,
+                    content: Array.isArray(content) ? content : [content],
+                };
 
-            if (attributeUuid) attr.uuid = attributeUuid;
+                if (attributeUuid) attr.uuid = attributeUuid;
 
-            attrs.push(attr);
+                attrs.push(attr);
+            }
         }
     }
 
