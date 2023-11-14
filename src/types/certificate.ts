@@ -12,7 +12,6 @@ import {
     CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
     CertificateDto,
     CertificateEventHistoryDto,
-    CertificateStatus,
     CertificateUpdateObjectsDto,
     CertificateValidationCheck,
     CertificateValidationCheckDto,
@@ -32,6 +31,7 @@ import {
     SimplifiedRaProfileDto,
     UploadCertificateRequestDto,
 } from "./openapi";
+// import { CertificateValidationDto as CertificateValidationDtoOpenApi } from "./openapi/models/CertificateValidationDto";
 
 export type ValidationCertificateCheckDto = CertificateValidationCheckDto;
 export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto, "validationCheck | status | message"> & {
@@ -41,11 +41,11 @@ export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto
 };
 
 export type ValidationCertificateResultDto = CertificateValidationResultDto;
-export type ValidationCertificateResultModel = Omit<ValidationCertificateResultDto, "resultStatus | validationCheckResults "> & {
-    resultStatus: CertificateStatus;
+
+export type ValidationCertificateResultModel = Omit<ValidationCertificateResultDto, "resultStatus" | "validationCheckResults"> & {
+    resultStatus: CertificateValidationStatus;
     validationCheckResults?: Array<ValidationCertificateCheckModel>;
 };
-
 export type SearchFilterDto = SearchFilterRequestDto;
 export type SearchFilterModel = SearchFilterDto;
 

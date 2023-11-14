@@ -32,7 +32,7 @@ import {
     validateUrlSafe,
 } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
+import { CertificateState as CertStatus, Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
@@ -192,7 +192,7 @@ function UserForm() {
 
     useEffect(() => {
         const fpc = certificates
-            .filter((pagedCert) => !["expired", "revoked", "invalid"].includes(pagedCert.status))
+            .filter((pagedCert) => !["expired", "revoked", "invalid"].includes(pagedCert.state))
             .filter((pagedCert) => loadedCerts.find((loadedCert) => loadedCert.uuid === pagedCert.uuid) === undefined);
 
         if (fpc.length === 0) return;
@@ -208,7 +208,7 @@ function UserForm() {
     useEffect(() => {
         setOptionsForCertificate(
             loadedCerts
-                .filter((e) => e.status !== CertStatus.New)
+                .filter((e) => e.state !== CertStatus.Requested)
                 .map((loadedCert) => ({
                     label:
                         loadedCert.commonName && loadedCert.serialNumber

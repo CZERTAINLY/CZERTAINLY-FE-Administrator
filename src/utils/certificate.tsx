@@ -1,5 +1,16 @@
+import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
+import { useCallback } from "react";
+import { useSelector } from "react-redux";
 import { CertificateDetailResponseModel } from "types/certificate";
-import { CertificateStatus, CertificateType } from "types/openapi";
+import {
+    CertificateEventHistoryDtoStatusEnum,
+    CertificateState,
+    CertificateType,
+    CertificateValidationStatus,
+    ComplianceRuleStatus,
+    ComplianceStatus,
+    PlatformEnum,
+} from "types/openapi";
 
 export const emptyCertificate: CertificateDetailResponseModel = {
     uuid: "",
@@ -17,7 +28,8 @@ export const emptyCertificate: CertificateDetailResponseModel = {
     keyUsage: [],
     extendedKeyUsage: [],
     basicConstraints: "",
-    status: CertificateStatus.Unknown,
+    state: CertificateState.PendingIssue,
+    validationStatus: CertificateValidationStatus.NotChecked,
     fingerprint: "",
     certificateType: CertificateType.X509,
     issuerSerialNumber: "",
@@ -54,6 +66,131 @@ export function downloadFile(content: any, fileName: string) {
     element.download = fileName;
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
+}
+
+export function getCertificateStatusColor(
+    status: CertificateState | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus,
+) {
+    switch (status) {
+        case CertificateState.Requested:
+            return "#3754a5";
+        case CertificateState.Archived:
+            return "#6c757d";
+        case CertificateState.Rejected:
+            return "#eb3349";
+        case CertificateState.Issued:
+            return "#1ab394";
+        case CertificateState.Failed:
+            return "#c7182c";
+        case CertificateState.PendingApproval:
+            return "#3754a5";
+        case CertificateState.PendingIssue:
+            return "#3782a5";
+        case CertificateState.PendingRevoke:
+            return "#eb3f33";
+        case CertificateState.Revoked:
+            return "#632828";
+
+        case CertificateValidationStatus.Valid:
+            return "#1ab394";
+        case CertificateValidationStatus.Expired:
+            return "#eb3349";
+        case CertificateValidationStatus.Revoked:
+            return "#632828";
+        case CertificateValidationStatus.Expiring:
+            return "#f37d63";
+        case CertificateValidationStatus.Invalid:
+            return "#131212";
+        case CertificateValidationStatus.Inactive:
+            return "#6c757d";
+        case CertificateValidationStatus.NotChecked:
+            return "#7fa2c1";
+        case CertificateValidationStatus.Failed:
+            return "#9c0012";
+
+        case ComplianceStatus.Na:
+            return "#6c757d";
+        case ComplianceStatus.Nok:
+            return "#eb3349";
+        case ComplianceStatus.Ok:
+            return "#1ab394";
+        case ComplianceStatus.NotChecked:
+            return "#7fa2c1";
+
+        case ComplianceRuleStatus.Na:
+            return "#6c757d";
+        case ComplianceRuleStatus.Nok:
+            return "#eb3349";
+        case ComplianceRuleStatus.Ok:
+            return "#1ab394";
+
+        case CertificateEventHistoryDtoStatusEnum.Failed:
+            return "#eb3349";
+        case CertificateEventHistoryDtoStatusEnum.Success:
+            return "#1ab394";
+
+        default:
+            return "#6c757d";
+    }
+}
+
+export function useGetStatusText() {
+    const certificateStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateState));
+    const certificateValidationStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationStatus));
+    const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
+    const complianceRuleStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceRuleStatus));
+
+    return useCallback(
+        (
+            status:
+                | CertificateState
+                | CertificateValidationStatus
+                | CertificateEventHistoryDtoStatusEnum
+                | ComplianceStatus
+                | ComplianceRuleStatus,
+        ) => {
+            switch (status) {
+                case CertificateValidationStatus.Valid:
+                case CertificateValidationStatus.Invalid:
+                case CertificateValidationStatus.Expiring:
+                case CertificateValidationStatus.Expired:
+                case CertificateValidationStatus.Revoked:
+                case CertificateValidationStatus.NotChecked:
+                case CertificateValidationStatus.Inactive:
+                case CertificateValidationStatus.Failed:
+                    return getEnumLabel(certificateValidationStatusEnum, status);
+
+                case CertificateState.Revoked:
+                case CertificateState.Archived:
+                case CertificateState.Requested:
+                case CertificateState.Rejected:
+                case CertificateState.Issued:
+                case CertificateState.PendingIssue:
+                case CertificateState.PendingRevoke:
+                    return getEnumLabel(certificateStatusEnum, status);
+
+                case CertificateEventHistoryDtoStatusEnum.Success:
+                    return "Success";
+                case CertificateEventHistoryDtoStatusEnum.Failed:
+                    return "Failed";
+
+                case ComplianceStatus.Ok:
+                case ComplianceStatus.Nok:
+                case ComplianceStatus.Na:
+                case ComplianceStatus.NotChecked:
+                    return getEnumLabel(complianceStatusEnum, status);
+
+                case ComplianceRuleStatus.Ok:
+                case ComplianceRuleStatus.Nok:
+                case ComplianceRuleStatus.Na:
+                    return getEnumLabel(complianceRuleStatusEnum, status);
+
+                default:
+                    return "Unknown";
+            }
+        },
+        [certificateStatusEnum, certificateValidationStatusEnum, complianceStatusEnum, complianceRuleStatusEnum],
+    );
 }
 
 /*

@@ -282,7 +282,7 @@ export default function ScepProfileDetail() {
                       },
                       {
                           id: "status",
-                          columns: ["Status", <CertificateStatus status={scepProfile.caCertificate.status} />],
+                          columns: ["Status", <CertificateStatus status={scepProfile.caCertificate.state} />],
                       },
                   ],
         [scepProfile],

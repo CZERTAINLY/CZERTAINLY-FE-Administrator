@@ -175,7 +175,7 @@ export default function DiscoveryDetail() {
                 </Col>
             </Row>
 
-            {id && <DiscoveryCertificates id={id} />}
+            {discovery?.uuid && <DiscoveryCertificates id={discovery.uuid} />}
 
             <Dialog
                 isOpen={confirmDelete}

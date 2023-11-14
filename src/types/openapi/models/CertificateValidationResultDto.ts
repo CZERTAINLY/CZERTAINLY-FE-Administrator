@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateStatus, CertificateValidationCheckDto } from "./";
+import type { CertificateValidationCheckDto, CertificateValidationStatus } from "./";
 
 /**
  * @export
@@ -19,10 +19,10 @@ import type { CertificateStatus, CertificateValidationCheckDto } from "./";
  */
 export interface CertificateValidationResultDto {
     /**
-     * @type {CertificateStatus}
+     * @type {CertificateValidationStatus}
      * @memberof CertificateValidationResultDto
      */
-    resultStatus: CertificateStatus;
+    resultStatus: CertificateValidationStatus;
     /**
      * Certificate validation check results
      * @type {{ [key: string]: CertificateValidationCheckDto; }}
