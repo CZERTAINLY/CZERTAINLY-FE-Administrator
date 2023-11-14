@@ -198,8 +198,7 @@ export function collectFormAttributes(
             //       continue;
             //
             // }
-
-            if (typeof content === "undefined" || typeof content.data !== "undefined") {
+            if (typeof content.data !== "undefined" || Array.isArray(content)) {
                 const attr: AttributeRequestModel = {
                     name: attributeName,
                     content: Array.isArray(content) ? content : [content],
