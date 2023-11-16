@@ -18,7 +18,7 @@ import { Col, Container, Label, Row } from "reactstrap";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import AssociateApprovalProfileDialogBody from "../AssociateApprovalProfileDialogBody";
 import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
 import ProtocolActivationDialogBody, { Protocol } from "../ProtocolActivationDialogBody";

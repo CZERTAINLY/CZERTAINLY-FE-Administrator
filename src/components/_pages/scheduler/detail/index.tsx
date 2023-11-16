@@ -14,7 +14,7 @@ import { Badge, Container } from "reactstrap";
 
 import SwitchField from "components/Input/SwitchField";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { getCronExpressionString } from "utils/dateUtil";
 import SchedulerJobHistory from "./SchedulerJobHistory";
 

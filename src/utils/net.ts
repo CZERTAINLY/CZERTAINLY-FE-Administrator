@@ -1,5 +1,5 @@
 import { AjaxError } from "rxjs/ajax";
-import { ErrorCodeDetailMap, ErrorCodeTexteMap, ErrorMessageObjectModel, LockTypeEnum } from "types/widget-locks";
+import { ErrorCodeDetailMap, ErrorCodeTexteMap, LockTypeEnum, WidgetLockErrorModel } from "types/user-interface";
 
 export function extractError(err: Error, headline: string): string {
     if (!err) return headline;
@@ -18,7 +18,7 @@ function getLockEnumFromStatus(status: number): LockTypeEnum {
     return LockTypeEnum.GENERIC;
 }
 
-export function getLockWidgetObject(error: AjaxError): ErrorMessageObjectModel {
+export function getLockWidgetObject(error: AjaxError): WidgetLockErrorModel {
     if (error?.response?.message && error.response.code) {
         const lockTitle = ErrorCodeTexteMap[error.response.code as keyof typeof ErrorCodeTexteMap] || "Something went wrong";
         return {

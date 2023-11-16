@@ -16,7 +16,7 @@ import Select from "react-select";
 import { Badge, Container } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
 import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";

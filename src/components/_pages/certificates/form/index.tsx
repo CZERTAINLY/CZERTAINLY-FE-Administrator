@@ -15,7 +15,7 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import Select, { MenuProps, SingleValue, components } from "react-select";
+import Select, { SingleValue } from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
 import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
@@ -24,13 +24,15 @@ import { TokenProfileResponseModel } from "types/token-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
-import Dialog from "components/Dialog";
+import CustomSelectComponent from "components/CustomSelectComponent";
 import CryptographicKeyForm from "components/_pages/cryptographic-keys/form";
+import TokenProfileForm from "components/_pages/token-profiles/form";
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
@@ -41,9 +43,6 @@ import CertificateAttributes from "../../../CertificateAttributes";
 import FileUpload from "../../../Input/FileUpload/FileUpload";
 import TabLayout from "../../../Layout/TabLayout";
 
-interface CustomMenuProps extends MenuProps {
-    onAddNew: () => void;
-}
 interface FormValues {
     raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
     pkcs10: File | null;
@@ -75,7 +74,6 @@ export default function CertificateForm() {
     const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [fileContent, setFileContent] = useState<string>("");
-    const [showAddNewKeyDialog, setShowAddNewKeyDialog] = useState<boolean>(false);
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
     const health = useSelector(utilsActuatorSelectors.health);
@@ -232,20 +230,6 @@ export default function CertificateForm() {
         [],
     );
 
-    const CustomMenu: React.FC<CustomMenuProps> = ({ onAddNew, ...props }) => {
-        return (
-            <components.Menu {...props}>
-                {props.children}
-                <div className="d-flex justify-content-start ps-2 py-2">
-                    <Button className="p-2" color="primary" outline size="sm" onClick={onAddNew}>
-                        <span className="p-1 fs-6">Add new</span>
-                        <i className="fa fa-add mx-2" />
-                    </Button>
-                </div>
-            </components.Menu>
-        );
-    };
-
     return (
         <>
             <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
@@ -345,6 +329,23 @@ export default function CertificateForm() {
                                                         onTokenProfileChange(e);
                                                         input.onChange(e);
                                                     }}
+                                                    components={{
+                                                        Menu: (props) => (
+                                                            <CustomSelectComponent
+                                                                onAddNew={() => {
+                                                                    dispatch(
+                                                                        userInterfaceActions.showGlobalModal({
+                                                                            content: <TokenProfileForm usesGlobalModal={true} />,
+                                                                            isOpen: true,
+                                                                            size: "lg",
+                                                                            title: "Add New Token Profile",
+                                                                        }),
+                                                                    );
+                                                                }}
+                                                                {...props}
+                                                            />
+                                                        ),
+                                                    }}
                                                 />
 
                                                 <FormFeedback>{meta.error}</FormFeedback>
@@ -371,9 +372,16 @@ export default function CertificateForm() {
                                                         }}
                                                         components={{
                                                             Menu: (props) => (
-                                                                <CustomMenu
+                                                                <CustomSelectComponent
                                                                     onAddNew={() => {
-                                                                        setShowAddNewKeyDialog(true);
+                                                                        dispatch(
+                                                                            userInterfaceActions.showGlobalModal({
+                                                                                content: <CryptographicKeyForm usesGlobalModal={true} />,
+                                                                                isOpen: true,
+                                                                                size: "lg",
+                                                                                title: "Add New Key",
+                                                                            }),
+                                                                        );
                                                                     }}
                                                                     {...props}
                                                                 />
@@ -425,72 +433,58 @@ export default function CertificateForm() {
                             )}
                         </Widget>
 
-                        {!showAddNewKeyDialog && (
-                            <Widget title="Other Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                                <br />
-                                <TabLayout
-                                    tabs={[
-                                        {
-                                            title: "Connector Attributes",
-                                            content: (
-                                                <AttributeEditor
-                                                    id="issuance_attributes"
-                                                    attributeDescriptors={
-                                                        issuanceAttributeDescriptors[values.raProfile?.value.uuid || "unknown"] || []
-                                                    }
-                                                    callbackParentUuid={values.raProfile?.value.authorityInstanceUuid}
-                                                    callbackResource={Resource.RaProfiles}
-                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                />
-                                            ),
-                                        },
-                                        {
-                                            title: "Custom Attributes",
-                                            content: (
-                                                <AttributeEditor
-                                                    id="customCertificate"
-                                                    attributeDescriptors={resourceCustomAttributes}
-                                                    attributes={values.raProfile?.value.customAttributes}
-                                                />
-                                            ),
-                                        },
-                                    ]}
-                                />
+                        <Widget title="Other Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            <br />
+                            <TabLayout
+                                tabs={[
+                                    {
+                                        title: "Connector Attributes",
+                                        content: (
+                                            <AttributeEditor
+                                                id="issuance_attributes"
+                                                attributeDescriptors={
+                                                    issuanceAttributeDescriptors[values.raProfile?.value.uuid || "unknown"] || []
+                                                }
+                                                callbackParentUuid={values.raProfile?.value.authorityInstanceUuid}
+                                                callbackResource={Resource.RaProfiles}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        title: "Custom Attributes",
+                                        content: (
+                                            <AttributeEditor
+                                                id="customCertificate"
+                                                attributeDescriptors={resourceCustomAttributes}
+                                                attributes={values.raProfile?.value.customAttributes}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
 
-                                <br />
+                            <br />
 
-                                <div className="d-flex justify-content-end">
-                                    <ButtonGroup>
-                                        <ProgressButton
-                                            title="Create"
-                                            inProgressTitle="Creating"
-                                            inProgress={submitting || issuingCertificate}
-                                            disabled={!valid}
-                                        />
+                            <div className="d-flex justify-content-end">
+                                <ButtonGroup>
+                                    <ProgressButton
+                                        title="Create"
+                                        inProgressTitle="Creating"
+                                        inProgress={submitting || issuingCertificate}
+                                        disabled={!valid}
+                                    />
 
-                                        <Button color="default" onClick={onCancel} disabled={submitting}>
-                                            Cancel
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            </Widget>
-                        )}
+                                    <Button color="default" onClick={onCancel} disabled={submitting}>
+                                        Cancel
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
+                        </Widget>
                     </BootstrapForm>
                 )}
             </Form>
-
-            <Dialog
-                isOpen={showAddNewKeyDialog}
-                caption="Add New Key"
-                body={
-                    <CryptographicKeyForm
-                        onCreateCancel={() => setShowAddNewKeyDialog(false)}
-                        onCreateCallback={() => setShowAddNewKeyDialog(false)}
-                    />
-                }
-                toggle={() => setShowAddNewKeyDialog(false)}
-            />
         </>
     );
 }

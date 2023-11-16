@@ -10,7 +10,7 @@ import { ApiClients } from "api";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import DiscoveryStatus from "../DiscoveryStatus";
 
 function DiscoveryList() {

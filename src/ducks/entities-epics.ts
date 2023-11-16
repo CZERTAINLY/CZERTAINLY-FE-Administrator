@@ -9,10 +9,10 @@ import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./entities";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import { FunctionGroupCode } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
@@ -82,14 +82,14 @@ const listEntities: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.listEntitiesSuccess(entityResponse.entities.map(transformEntityResponseDtoToModel)),
                             pagingActions.listSuccess({ entity: EntityType.ENTITY, totalItems: entityResponse.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.EntityStore),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.EntityStore),
                         ),
                     ),
 
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.ENTITY),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityStore),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.EntityStore),
                         ),
                     ),
                 );
@@ -105,14 +105,14 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((entity) =>
                     of(
                         slice.actions.getEntityDetailSuccess({ entity: transformEntityResponseDtoToModel(entity) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.EntityDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.EntityDetails),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getEntityDetailFailure({ error: extractError(error, "Failed to get Entity detail") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.EntityDetails),
                     ),
                 ),
             ),

@@ -12,7 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 export default function CustomAttributesList() {
     const dispatch = useDispatch();

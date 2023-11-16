@@ -10,7 +10,7 @@ import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import { EntityType } from "ducks/filters";
 import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function EntityList() {
     const dispatch = useDispatch();

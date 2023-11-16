@@ -2,7 +2,7 @@ import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { FunctionGroupCode } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
@@ -14,7 +14,7 @@ import {
     transformCredentialEditRequestModelToDto,
     transformCredentialResponseDtoToModel,
 } from "./transform/credentials";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const listCredentials: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -26,14 +26,14 @@ const listCredentials: AppEpic = (action$, state, deps) => {
                         slice.actions.listCredentialsSuccess({
                             credentialList: credentials.map(transformCredentialResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CredentialStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CredentialStore),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listCredentialsFailure({ error: extractError(error, "Failed to get Credential list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialStore),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialStore),
                     ),
                 ),
             ),
@@ -51,14 +51,14 @@ const getCredentialDetail: AppEpic = (action$, state, deps) => {
                         slice.actions.getCredentialDetailSuccess({
                             credential: transformCredentialResponseDtoToModel(credential),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CredentialDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CredentialDetails),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getCredentialDetailFailure({ error: extractError(error, "Failed to get Credential") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.CredentialDetails),
                     ),
                 ),
             ),

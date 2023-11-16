@@ -2,8 +2,8 @@ import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { ErrorMessageObjectModel, LockTypeEnum, LockWidgetNameEnum } from "types/widget-locks";
-import { actions as widgetLockActions } from "../../src/ducks/widget-locks";
+import { LockTypeEnum, LockWidgetNameEnum, WidgetLockErrorModel } from "types/user-interface";
+import { actions as userInterfaceActions } from "../../src/ducks/user-interface";
 import "../../src/resources/styles/theme.scss";
 const buttons: WidgetButtonProps[] = [
     {
@@ -65,13 +65,13 @@ const TestWidgetLockedGeneric = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         if (isBusy) {
-            const err: ErrorMessageObjectModel = {
+            const err: WidgetLockErrorModel = {
                 lockText: "Test lock generic error",
                 lockType: LockTypeEnum.GENERIC,
                 lockTitle: "Test lock error",
                 lockDetails: "Test lock details error",
             };
-            dispatch(widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
+            dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
         }
     }, [isBusy]);
 
@@ -114,13 +114,13 @@ const TestWidgetLockedClient = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         if (isBusy) {
-            const err: ErrorMessageObjectModel = {
+            const err: WidgetLockErrorModel = {
                 lockText: "Test lock client error",
                 lockType: LockTypeEnum.CLIENT,
                 lockTitle: "Test lock client error",
                 lockDetails: "Test lock details client error",
             };
-            dispatch(widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
+            dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
         }
     }, [isBusy]);
 
@@ -201,13 +201,13 @@ const TestWidgetLockedService = () => {
     const [isBusy, setIsBusy] = useState(false);
     const dispatch = useDispatch();
     useEffect(() => {
-        const err: ErrorMessageObjectModel = {
+        const err: WidgetLockErrorModel = {
             lockText: "Test lock service error",
             lockType: LockTypeEnum.SERVICE_ERROR,
             lockTitle: "Test lock service error",
             lockDetails: "Test lock details service error",
         };
-        dispatch(widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
+        dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
     }, [isBusy]);
 
     const refreshAction = () => {
@@ -251,13 +251,13 @@ const TestWidgetLockedServer = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const err: ErrorMessageObjectModel = {
+        const err: WidgetLockErrorModel = {
             lockText: "Test lock server error",
             lockType: LockTypeEnum.SERVER_ERROR,
             lockTitle: "Test lock server error",
             lockDetails: "Test lock details server error",
         };
-        dispatch(widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
+        dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
     }, [isBusy]);
 
     const refreshAction = () => {
@@ -301,13 +301,13 @@ const TestWidgetLockedNetwork = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const err: ErrorMessageObjectModel = {
+        const err: WidgetLockErrorModel = {
             lockText: "Test lock network error",
             lockType: LockTypeEnum.NETWORK,
             lockTitle: "Test lock network error",
             lockDetails: "Test lock details network error",
         };
-        dispatch(widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
+        dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
     }, [isBusy]);
 
     const refreshAction = () => {

@@ -17,7 +17,7 @@ import Select from "react-select";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { Badge, Col, Container, Label, Row } from "reactstrap";
 import { KeyUsage, PlatformEnum, Resource } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 
 export default function TokenProfileDetail() {

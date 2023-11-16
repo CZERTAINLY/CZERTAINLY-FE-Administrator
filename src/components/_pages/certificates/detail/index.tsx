@@ -67,7 +67,7 @@ import cx from "classnames";
 import FlowChart, { CustomNode } from "components/FlowChart";
 import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
 import { Edge } from "reactflow";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
 import styles from "./certificateDetail.module.scss";

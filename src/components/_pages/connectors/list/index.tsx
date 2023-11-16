@@ -11,7 +11,7 @@ import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 
 import { FunctionGroupModel } from "types/connectors";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { attributeFieldNameTransform } from "utils/attributes/attributes";
 import { inventoryStatus } from "utils/connector";
 

@@ -10,7 +10,7 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
 
 function TokenList() {

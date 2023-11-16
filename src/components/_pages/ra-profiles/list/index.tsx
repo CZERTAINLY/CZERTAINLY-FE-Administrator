@@ -10,7 +10,7 @@ import Dialog from "components/Dialog";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function RaProfileList() {
     const dispatch = useDispatch();

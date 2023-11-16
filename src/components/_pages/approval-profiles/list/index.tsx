@@ -9,7 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 export default function ApprovalProfilesList() {
     const dispatch = useDispatch();

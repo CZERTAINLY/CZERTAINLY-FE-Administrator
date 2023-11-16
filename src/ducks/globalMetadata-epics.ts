@@ -7,9 +7,9 @@ import { Resource } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./globalMetadata";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import {
     transformConnectorMetadataResponseDtoToModel,
     transformGlobalMetadataCreateRequestModelToDto,
@@ -27,13 +27,13 @@ const listGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 switchMap((list) =>
                     of(
                         slice.actions.listGlobalMetadataSuccess(list.map(transformGlobalMetadataResponseDtoToModel)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfGlobalMetadata),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfGlobalMetadata),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.listGlobalMetadataFailure({ error: extractError(err, "Failed to get Global Metadata list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGlobalMetadata),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGlobalMetadata),
                     ),
                 ),
             ),
@@ -104,13 +104,13 @@ const getGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 switchMap((globalMetadataDetail) =>
                     of(
                         slice.actions.getGlobalMetadataSuccess(transformGlobalMetadataDetailResponseDtoToModel(globalMetadataDetail)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.GlobalMetadataDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.GlobalMetadataDetails),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getGlobalMetadataFailure({ error: extractError(err, "Failed to get global metadata detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GlobalMetadataDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.GlobalMetadataDetails),
                     ),
                 ),
             ),

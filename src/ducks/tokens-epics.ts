@@ -8,9 +8,9 @@ import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./tokens";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformConnectorResponseDtoToModel } from "./transform/connectors";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import {
     transformTokenDetailResponseDtoToModel,
     transformTokenRequestModelToDto,
@@ -27,14 +27,14 @@ const listTokens: AppEpic = (action$, state$, deps) => {
                         slice.actions.listTokensSuccess({
                             tokenList: tokens.map(transformTokenResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.TokenStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.TokenStore),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listTokensFailure({ error: extractError(err, "Failed to get Tokens list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenStore),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.TokenStore),
                     ),
                 ),
             ),
@@ -51,14 +51,14 @@ const getTokenDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((tokenDto) =>
                     of(
                         slice.actions.getTokenDetailSuccess({ token: transformTokenDetailResponseDtoToModel(tokenDto) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.TokenDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.TokenDetails),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getTokenDetailFailure({ error: extractError(err, "Failed to get Token detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.TokenDetails),
                     ),
                 ),
             ),

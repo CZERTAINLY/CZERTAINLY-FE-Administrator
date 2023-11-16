@@ -9,7 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function AuthorityList() {
     const dispatch = useDispatch();

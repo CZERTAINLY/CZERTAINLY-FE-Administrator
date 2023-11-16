@@ -26,11 +26,11 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 import { KeyRequestType, PlatformEnum, Resource } from "../../../../types/openapi";
 
 interface CryptographicKeyFormProps {
-    onCreateCallback?: () => void;
-    onCreateCancel?: () => void;
+    usesGlobalModal?: boolean;
 }
 
 interface FormValues {
@@ -42,7 +42,7 @@ interface FormValues {
     owner?: string | undefined;
 }
 
-export default function CryptographicKeyForm({ onCreateCallback, onCreateCancel }: CryptographicKeyFormProps) {
+export default function CryptographicKeyForm({ usesGlobalModal = false }: CryptographicKeyFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -168,6 +168,7 @@ export default function CryptographicKeyForm({ onCreateCallback, onCreateCancel 
                             ),
                             customAttributes: collectFormAttributes("customCryptographicKey", resourceCustomAttributes, values),
                         },
+                        usesGlobalModal,
                     }),
                 );
             }
@@ -444,7 +445,11 @@ export default function CryptographicKeyForm({ onCreateCallback, onCreateCancel 
                                     disabled={pristine || submitting || !valid}
                                 />
 
-                                <Button color="default" onClick={onCreateCancel ? onCreateCancel : onCancelClick} disabled={submitting}>
+                                <Button
+                                    color="default"
+                                    onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
+                                    disabled={submitting}
+                                >
                                     Cancel
                                 </Button>
                             </ButtonGroup>

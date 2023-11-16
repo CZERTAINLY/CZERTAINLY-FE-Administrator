@@ -3,7 +3,7 @@ import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { slice } from "./acme-profiles";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
@@ -13,7 +13,7 @@ import {
     transformAcmeProfileListResponseDtoToModel,
     transformAcmeProfileResponseDtoToModel,
 } from "./transform/acme-profiles";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -25,14 +25,14 @@ const listAcmeProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listAcmeProfilesSuccess({
                             acmeProfileList: acmeProfiles.map(transformAcmeProfileListResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfACMEProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfACMEProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeProfilesFailure({ error: extractError(error, "Failed to get ACME Profiles list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEProfiles),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEProfiles),
                     ),
                 ),
             ),
@@ -49,7 +49,7 @@ const getAcmeProfileDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((detail) =>
                     of(
                         slice.actions.getAcmeProfileSuccess({ acmeProfile: transformAcmeProfileResponseDtoToModel(detail) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ACMEProfileDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ACMEProfileDetails),
                     ),
                 ),
 
@@ -57,7 +57,7 @@ const getAcmeProfileDetail: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.getAcmeProfileFailure({ error: extractError(error, "Failed to get ACME Profile details") }),
                         appRedirectActions.fetchError({ error, message: "Failed to get ACME Profile details" }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEProfileDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEProfileDetails),
                     ),
                 ),
             ),

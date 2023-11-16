@@ -13,7 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Badge, Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { getAttributeContent } from "utils/attributes/attributes";
 
 export default function CustomAttributeDetail() {

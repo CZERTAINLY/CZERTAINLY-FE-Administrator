@@ -6,9 +6,9 @@ import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./ra-profiles";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { transformProfileApprovalDtoToModel } from "./transform/approval-profiles";
 import {
     transformComplianceProfileSimplifiedDtoToModel,
@@ -31,14 +31,14 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listRaProfilesSuccess({
                             raProfiles: list.map(transformRaProfileResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfRAProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfRAProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listRaProfilesFailure({ error: extractError(error, "Failed to get RA profiles list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfRAProfiles),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfRAProfiles),
                     ),
                 ),
             ),
@@ -58,14 +58,14 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
                             slice.actions.getRaProfileDetailSuccess({
                                 raProfile: transformRaProfileResponseDtoToModel(profileDto),
                             }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RaProfileDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.RaProfileDetails),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
                         ),
                     ),
                 ),
@@ -581,7 +581,7 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
                             slice.actions.getComplianceProfilesForRaProfileSuccess({
                                 complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel),
                             }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RaProfileComplianceDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.RaProfileComplianceDetails),
                         ),
                     ),
 
@@ -590,7 +590,7 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
                             slice.actions.getComplianceProfilesForRaProfileFailure({
                                 error: extractError(err, "Failed to get associated Compliance Profiles"),
                             }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
                         ),
                     ),
                 ),
@@ -608,7 +608,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.getAssociatedApprovalProfilesSuccess({
                             associatedApprovalProfiles: approvalProfiles.map(transformProfileApprovalDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
                     ),
                 ),
 
@@ -617,7 +617,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.getAssociatedApprovalProfilesFailure({
                             error: extractError(err, "Failed to get associated Approval Profiles"),
                         }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
                     ),
                 ),
             ),

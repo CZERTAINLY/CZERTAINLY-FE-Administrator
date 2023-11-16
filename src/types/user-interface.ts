@@ -89,9 +89,19 @@ export interface WidgetLockModel {
     lockType: LockTypeEnum;
 }
 
-export interface ErrorMessageObjectModel {
+export interface WidgetLockErrorModel {
     lockTitle: string;
     lockText: string;
     lockDetails?: string;
     lockType: LockTypeEnum;
+}
+
+export interface GloablModalModel {
+    title?: string;
+    size?: "sm" | "lg";
+    // lg and sm
+    // content?: string;
+    content: string | JSX.Element | undefined;
+    type?: "success" | "error" | "warning" | "info" | "confirm" | "question";
+    isOpen: boolean;
 }

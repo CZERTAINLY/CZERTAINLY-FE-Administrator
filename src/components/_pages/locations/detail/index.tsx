@@ -25,7 +25,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { validateRequired } from "utils/validators";
 import { CertificateState, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";

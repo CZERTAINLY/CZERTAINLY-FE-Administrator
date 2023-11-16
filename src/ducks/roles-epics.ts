@@ -5,11 +5,11 @@ import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import * as slice from "./roles";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { transformRoleResponseDtoToModel } from "./transform/auth";
 import { transformRoleDetailDtoToModel, transformRoleRequestModelToDto, transformSubjectPermissionsDtoToModel } from "./transform/roles";
 import { transformUserResponseDtoToModel } from "./transform/users";
@@ -22,14 +22,14 @@ const list: AppEpic = (action$, state, deps) => {
                 switchMap((list) =>
                     of(
                         slice.actions.listSuccess({ roles: list.map((role) => transformRoleResponseDtoToModel(role)) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfRoles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfRoles),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfRoles),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfRoles),
                     ),
                 ),
             ),
@@ -45,14 +45,14 @@ const getDetail: AppEpic = (action$, state, deps) => {
                 switchMap((role) =>
                     of(
                         slice.actions.getDetailSuccess({ role: transformRoleDetailDtoToModel(role) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.RoleDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.RoleDetails),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getDetailFailure({ error: extractError(err, "Failed to get role detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.RoleDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RoleDetails),
                     ),
                 ),
             ),
