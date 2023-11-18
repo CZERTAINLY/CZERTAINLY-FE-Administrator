@@ -255,7 +255,7 @@ function Dashboard() {
                         data={dashboard?.groupStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) =>
-                            labels[index] === "Unknown"
+                            labels[index] === "Unassigned"
                                 ? [
                                       {
                                           searchGroup: SearchGroup.Property,
