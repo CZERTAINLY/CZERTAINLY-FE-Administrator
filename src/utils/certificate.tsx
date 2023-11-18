@@ -165,6 +165,7 @@ export function useGetStatusText() {
                 case CertificateState.Requested:
                 case CertificateState.Rejected:
                 case CertificateState.Issued:
+                case CertificateState.PendingApproval:
                 case CertificateState.PendingIssue:
                 case CertificateState.PendingRevoke:
                     return getEnumLabel(certificateStatusEnum, status);
