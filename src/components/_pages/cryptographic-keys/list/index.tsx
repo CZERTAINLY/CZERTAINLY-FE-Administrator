@@ -15,11 +15,12 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Container } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
-import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
+import {KeyCompromiseReason, KeyUsage, PlatformEnum} from "types/openapi";
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
+
 function CryptographicKeyList() {
     const dispatch = useDispatch();
 
@@ -233,38 +234,49 @@ function CryptographicKeyList() {
         [],
     );
 
-    const profilesTableData = (): TableDataRow[] => {
-        var responseList: TableDataRow[] = [];
-        for (let key in cryptographicKeys) {
-            responseList.push({
-                id: cryptographicKeys[key].uuid,
-                columns: [
-                    <KeyStatusCircle status={cryptographicKeys[key].enabled} />,
-                    <KeyStateCircle state={cryptographicKeys[key].state} />,
-                    <span style={{ whiteSpace: "nowrap" }}>
-                        <Link
-                            to={`./detail/${cryptographicKeys[key].tokenInstanceUuid || "unknown"}/${
-                                cryptographicKeys[key].keyWrapperUuid
-                            }/${cryptographicKeys[key].uuid}`}
-                        >
-                            {cryptographicKeys[key].name}
-                        </Link>
-                    </span>,
-                    <Badge color="secondary">{getEnumLabel(keyTypeEnum, cryptographicKeys[key].type)}</Badge>,
-                    cryptographicKeys[key].keyAlgorithm,
-                    cryptographicKeys[key].length?.toString() || "unknown",
-                    cryptographicKeys[key].format || "unknown",
-                    <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKeys[key].creationTime) || ""}</span>,
-                    cryptographicKeys[key].group?.name || "",
-                    cryptographicKeys[key].owner || "",
-                    <Badge color="secondary">{cryptographicKeys[key].tokenProfileName}</Badge>,
-                    <Badge color="primary">{cryptographicKeys[key].tokenInstanceName}</Badge>,
-                    cryptographicKeys[key].associations?.toString() || "",
-                ],
-            });
-        }
-        return responseList;
-    };
+    const cryptographicKeysList: TableDataRow[] = useMemo(
+        () =>
+            cryptographicKeys.map((cryptographicKey) => {
+                return {
+                    id: cryptographicKey.uuid,
+                    columns: [
+                        <KeyStatusCircle status={cryptographicKey.enabled} />,
+                        <KeyStateCircle state={cryptographicKey.state} />,
+                        <span style={{whiteSpace: "nowrap"}}>
+                            <Link
+                                to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/
+                                ${cryptographicKey.keyWrapperUuid}/${cryptographicKey.uuid}`}
+                            >
+                            {cryptographicKey.name}
+                            </Link>
+                        </span>,
+                        <Badge color="secondary">{getEnumLabel(keyTypeEnum, cryptographicKey.type)}</Badge>,
+                        cryptographicKey.keyAlgorithm,
+                        cryptographicKey.length?.toString() || "unknown",
+                        cryptographicKey.format || "unknown",
+                        <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKey.creationTime) || ""}</span>,
+                        cryptographicKey.group? (
+                            <Link to={`../groups/detail/${cryptographicKey.group?.uuid}`}>{cryptographicKey.group.name ?? "Unassigned"}</Link>
+                        ) : (
+                            cryptographicKey.group ?? "Unassigned"
+                        ),
+                        cryptographicKey.owner || "Unassigned",
+                        cryptographicKey.tokenProfileName? (
+                            <Link to={`../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>{cryptographicKey.tokenProfileName ?? "Unassigned"}</Link>
+                        ) : (
+                        cryptographicKey.tokenProfileName ?? "Unassigned"
+                        ),
+                        cryptographicKey.tokenInstanceName? (
+                            <Link to={`../tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>{cryptographicKey.tokenInstanceName ?? "Unassigned"}</Link>
+                        ) : (
+                            cryptographicKey.tokenInstanceName ?? "Unassigned"
+                        ),
+                        cryptographicKey.associations?.toString() || "",
+                    ],
+                };
+            }),
+        [cryptographicKeys, keyTypeEnum],
+    );
 
     const optionForCompromise = useMemo(() => {
         var options = [];
@@ -291,7 +303,7 @@ function CryptographicKeyList() {
                 )}
                 additionalButtons={buttons}
                 headers={cryptographicKeysTableHeaders}
-                data={profilesTableData()}
+                data={cryptographicKeysList}
                 isBusy={isBusy}
                 title="List of Keys"
                 pageWidgetLockName={LockWidgetNameEnum.ListOfKeys}

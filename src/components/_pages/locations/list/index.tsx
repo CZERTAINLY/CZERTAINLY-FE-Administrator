@@ -114,7 +114,11 @@ function LocationList() {
                 columns: [
                     <Link to={`./detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
                     location.description || "",
-                    <Badge color="primary">{location.entityInstanceName}</Badge>,
+                    location.entityInstanceName? (
+                        <Link to={`../entities/detail/${location.entityInstanceUuid}`}>{location.entityInstanceName ?? "Unassigned"}</Link>
+                    ) : (
+                        location.entityInstanceName ?? "Unassigned"
+                    ),
                     location.supportMultipleEntries ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
                     location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
                     <StatusBadge enabled={location.enabled} />,

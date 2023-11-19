@@ -148,7 +148,11 @@ export default function AcmeAccountList() {
                     columns: [
                         <Link to={`./detail/${acmeAccount.acmeProfileUuid}/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
 
-                        <Badge color="info">{acmeAccount.acmeProfileName}</Badge>,
+                        acmeAccount.acmeProfileName? (
+                            <Link to={`../acmeprofiles/detail/${acmeAccount.acmeProfileUuid}`}>{acmeAccount.acmeProfileName ?? "Unassigned"}</Link>
+                        ) : (
+                            acmeAccount.acmeProfileName ?? "Unassigned"
+                        ),
 
                         <Badge color="info">{acmeAccount.raProfileName}</Badge>,
 
