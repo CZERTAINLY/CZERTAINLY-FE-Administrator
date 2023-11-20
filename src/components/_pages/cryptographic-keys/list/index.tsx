@@ -244,8 +244,7 @@ function CryptographicKeyList() {
                         <KeyStateCircle state={cryptographicKey.state} />,
                         <span style={{whiteSpace: "nowrap"}}>
                             <Link
-                                to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/
-                                ${cryptographicKey.keyWrapperUuid}/${cryptographicKey.uuid}`}
+                                to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/${cryptographicKey.keyWrapperUuid}/${cryptographicKey.uuid}`}
                             >
                             {cryptographicKey.name}
                             </Link>
