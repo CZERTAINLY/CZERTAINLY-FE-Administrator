@@ -2,7 +2,6 @@ import cx from "classnames";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Handle, Position } from "reactflow";
-import "reactflow/dist/style.css";
 import { Button, Collapse } from "reactstrap";
 import { EntityNodeProps } from "types/flowchart";
 import { CertificateValidationStatus } from "types/openapi";

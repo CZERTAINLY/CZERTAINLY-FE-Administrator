@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
+import "reactflow/dist/style.css";
 import AppRouter from "./components/AppRouter";
 import reportWebVitals from "./reportWebVitals";
 import configureStore from "./store";

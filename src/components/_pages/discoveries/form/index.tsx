@@ -20,9 +20,11 @@ import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode, Resource } from "types/openapi";
 
+import Cron from "react-cron-generator";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { getCronExpression } from "utils/dateUtil";
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from "utils/validators";
 
 interface FormValues {
@@ -43,7 +45,7 @@ export default function DiscoveryForm() {
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
-
+    const [cronValue, setCronValue] = useState("");
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
     const isFetchingAttributeDescriptors = useSelector(discoverySelectors.isFetchingDiscoveryProviderAttributeDescriptors);
@@ -173,11 +175,20 @@ export default function DiscoveryForm() {
                                     label="Job Name"
                                     validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
                                 />
+                                <Cron
+                                    onChange={(e) => {
+                                        setCronValue(e);
+                                    }}
+                                    value={cronValue}
+                                    showResultText={true}
+                                    showResultCron={true}
+                                />
+
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
                                     validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                    // description={getCronExpression(values.cronExpression)}
+                                    description={getCronExpression(values.cronExpression)}
                                 />
                                 <SwitchField id="oneTime" label="One Time Only" />
                             </>
