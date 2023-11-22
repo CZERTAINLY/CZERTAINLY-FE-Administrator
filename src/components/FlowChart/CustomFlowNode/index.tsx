@@ -135,7 +135,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                                         }
                                                     }}
                                                     className="fa fa-copy ms-2"
-                                                ></i>
+                                                />
                                             )}
                                             {property?.propertyContent && <>{property.propertyContent}</>}
                                         </li>
