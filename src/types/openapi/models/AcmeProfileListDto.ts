@@ -11,6 +11,8 @@
  * Do not edit the class manually.
  */
 
+import type { SimplifiedRaProfileDto } from "./";
+
 /**
  * @export
  * @interface AcmeProfileListDto
@@ -41,17 +43,10 @@ export interface AcmeProfileListDto {
      */
     description?: string;
     /**
-     * Name of the RA Profile
-     * @type {string}
+     * @type {SimplifiedRaProfileDto}
      * @memberof AcmeProfileListDto
      */
-    raProfileName?: string;
-    /**
-     * UUID of RA Profile
-     * @type {string}
-     * @memberof AcmeProfileListDto
-     */
-    raProfileUuid?: string;
+    raProfile?: SimplifiedRaProfileDto;
     /**
      * URL of the ACME Directory
      * @type {string}

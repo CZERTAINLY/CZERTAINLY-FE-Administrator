@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { RaProfileDto, ResponseAttributeDto } from "./";
+import type { ResponseAttributeDto, SimplifiedRaProfileDto } from "./";
 
 /**
  * @export
@@ -67,10 +67,10 @@ export interface AcmeProfileDto {
      */
     dnsResolverPort?: string;
     /**
-     * @type {RaProfileDto}
+     * @type {SimplifiedRaProfileDto}
      * @memberof AcmeProfileDto
      */
-    raProfile?: RaProfileDto;
+    raProfile?: SimplifiedRaProfileDto;
     /**
      * Retry interval for ACME client requests
      * @type {number}

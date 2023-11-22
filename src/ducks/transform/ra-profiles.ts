@@ -15,8 +15,14 @@ import {
     RaProfileResponseModel,
     RaProfileScepDetailResponseDto,
     RaProfileScepDetailResponseModel,
+    RaProfileSimplifiedDto,
+    RaProfileSimplifiedModel,
 } from "types/ra-profiles";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+
+export function transformRaProfileSimplifiedDtoToModel(raProfile: RaProfileSimplifiedDto): RaProfileSimplifiedModel {
+    return { ...raProfile };
+}
 
 export function transformRaProfileResponseDtoToModel(raResponse: RaProfileResponseDto): RaProfileResponseModel {
     return {

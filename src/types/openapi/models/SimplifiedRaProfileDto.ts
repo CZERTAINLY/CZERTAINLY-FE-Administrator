@@ -40,5 +40,5 @@ export interface SimplifiedRaProfileDto {
      * @type {string}
      * @memberof SimplifiedRaProfileDto
      */
-    authorityInstanceUuid?: string;
+    authorityInstanceUuid: string;
 }

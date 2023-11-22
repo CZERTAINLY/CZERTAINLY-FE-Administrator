@@ -31,12 +31,6 @@ export interface KeyRequestDto {
      */
     description: string;
     /**
-     * Key Owner
-     * @type {string}
-     * @memberof KeyRequestDto
-     */
-    owner?: string;
-    /**
      * UUID of the group
      * @type {string}
      * @memberof KeyRequestDto

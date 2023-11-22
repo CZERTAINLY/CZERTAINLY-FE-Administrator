@@ -37,11 +37,11 @@ export interface EditKeyRequestDto {
      */
     description: string;
     /**
-     * Key Owner
+     * Key Owner UUID
      * @type {string}
      * @memberof EditKeyRequestDto
      */
-    owner?: string;
+    ownerUuid?: string;
     /**
      * UUID of the group
      * @type {string}

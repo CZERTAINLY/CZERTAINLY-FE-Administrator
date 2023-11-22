@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AccountStatus } from "./";
+import type { AccountStatus, SimplifiedRaProfileDto } from "./";
 
 /**
  * @export
@@ -48,11 +48,10 @@ export interface AcmeAccountListResponseDto {
      */
     status: AccountStatus;
     /**
-     * Name of the RA Profile
-     * @type {string}
+     * @type {SimplifiedRaProfileDto}
      * @memberof AcmeAccountListResponseDto
      */
-    raProfileName: string;
+    raProfile: SimplifiedRaProfileDto;
     /**
      * Name of the ACME Profile
      * @type {string}

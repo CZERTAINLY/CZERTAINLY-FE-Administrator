@@ -14,7 +14,6 @@
 import type { ResponseAttributeDto } from "./";
 
 /**
- * RA Profile
  * @export
  * @interface RaProfileDto
  */
