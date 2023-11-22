@@ -5,3 +5,16 @@
         padding: 0 !important;
     }
 }
+
+.copyButton {
+    margin: 0.5rem;
+    cursor: pointer;
+    color: $gray-500;
+    &:hover {
+        color: $gray-600;
+    }
+
+    &:active {
+        color: $gray-700;
+    }
+}
