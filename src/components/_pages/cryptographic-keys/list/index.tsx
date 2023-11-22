@@ -259,7 +259,11 @@ function CryptographicKeyList() {
                         ) : (
                             cryptographicKey.group ?? "Unassigned"
                         ),
-                        cryptographicKey.owner || "Unassigned",
+                        cryptographicKey.ownerUuid? (
+                            <Link to={`../users/detail/${cryptographicKey.ownerUuid}`}>{cryptographicKey.owner ?? "Unassigned"}</Link>
+                        ) : (
+                            cryptographicKey.owner ?? "Unassigned"
+                        ),
                         cryptographicKey.tokenProfileName? (
                             <Link to={`../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>{cryptographicKey.tokenProfileName ?? "Unassigned"}</Link>
                         ) : (

@@ -154,7 +154,11 @@ export default function AcmeAccountList() {
                             acmeAccount.acmeProfileName ?? "Unassigned"
                         ),
 
-                        <Badge color="info">{acmeAccount.raProfileName}</Badge>,
+                        acmeAccount.raProfile? (
+                            <Link to={`../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}>{acmeAccount.raProfile.name ?? "Unassigned"}</Link>
+                        ) : (
+                            acmeAccount.raProfile ?? "Unassigned"
+                        ),
 
                         <StatusBadge enabled={acmeAccount.enabled} />,
 

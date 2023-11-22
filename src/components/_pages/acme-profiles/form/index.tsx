@@ -18,7 +18,7 @@ import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from "types/acme-profiles";
 import { AttributeDescriptorModel } from "types/attributes";
-import { RaProfileResponseModel } from "types/ra-profiles";
+import { RaProfileSimplifiedModel } from "types/ra-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -77,7 +77,7 @@ export default function AcmeProfileForm() {
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     const [acmeProfile, setAcmeProfile] = useState<AcmeProfileResponseModel>();
-    const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
+    const [raProfile, setRaProfile] = useState<RaProfileSimplifiedModel>();
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
 

@@ -5,7 +5,7 @@ import {
     AcmeProfileListDto,
     AcmeProfileRequestDto,
 } from "./openapi";
-import { RaProfileResponseModel } from "./ra-profiles";
+import { RaProfileSimplifiedModel } from "./ra-profiles";
 
 export type AcmeProfileAddRequestDto = AcmeProfileRequestDto;
 export type AcmeProfileAddRequestModel = Omit<
@@ -32,7 +32,7 @@ export type AcmeProfileResponseModel = Omit<
     AcmeProfileResponseDto,
     "raProfile | issueCertificateAttributes | revokeCertificateAttributes | customAttributes "
 > & {
-    raProfile?: RaProfileResponseModel;
+    raProfile?: RaProfileSimplifiedModel;
     issueCertificateAttributes?: Array<AttributeResponseModel>;
     revokeCertificateAttributes?: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;

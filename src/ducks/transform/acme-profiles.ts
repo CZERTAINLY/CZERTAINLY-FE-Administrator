@@ -9,7 +9,7 @@ import {
     AcmeProfileResponseModel,
 } from "types/acme-profiles";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-import { transformRaProfileResponseDtoToModel } from "./ra-profiles";
+import { transformRaProfileSimplifiedDtoToModel } from "./ra-profiles";
 
 export function transformAcmeProfileListResponseDtoToModel(acme: AcmeProfileListResponseDto): AcmeProfileListResponseModel {
     return { ...acme };
@@ -18,7 +18,7 @@ export function transformAcmeProfileListResponseDtoToModel(acme: AcmeProfileList
 export function transformAcmeProfileResponseDtoToModel(acme: AcmeProfileResponseDto): AcmeProfileResponseModel {
     return {
         ...acme,
-        raProfile: acme.raProfile ? transformRaProfileResponseDtoToModel(acme.raProfile) : undefined,
+        raProfile: acme.raProfile ? transformRaProfileSimplifiedDtoToModel(acme.raProfile) : undefined,
         issueCertificateAttributes: acme.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         revokeCertificateAttributes: acme.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         customAttributes: acme.customAttributes?.map(transformAttributeResponseDtoToModel),
