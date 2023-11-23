@@ -11,6 +11,8 @@
  * Do not edit the class manually.
  */
 
+import type { SimplifiedRaProfileDto } from "./";
+
 /**
  * @export
  * @interface ScepProfileDto
@@ -41,17 +43,10 @@ export interface ScepProfileDto {
      */
     description?: string;
     /**
-     * Name of the RA Profile
-     * @type {string}
+     * @type {SimplifiedRaProfileDto}
      * @memberof ScepProfileDto
      */
-    raProfileName?: string;
-    /**
-     * UUID of RA Profile
-     * @type {string}
-     * @memberof ScepProfileDto
-     */
-    raProfileUuid?: string;
+    raProfile?: SimplifiedRaProfileDto;
     /**
      * Include CA certificate in the SCEP response
      * @type {boolean}

@@ -233,7 +233,11 @@ function TokenProfileList() {
 
                     <>{getTokenProfileUsages(tokenProfile)}</>,
 
-                    <Badge color="info">{tokenProfile.tokenInstanceName}</Badge>,
+                    tokenProfile.tokenInstanceName? (
+                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>{tokenProfile.tokenInstanceName ?? "Unassigned"}</Link>
+                    ) : (
+                        tokenProfile.tokenInstanceName ?? "Unassigned"
+                    ),
 
                     <TokenStatusBadge status={tokenProfile.tokenInstanceStatus} />,
 

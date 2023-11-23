@@ -19,7 +19,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { RaProfileResponseModel } from "types/ra-profiles";
+import { RaProfileSimplifiedModel } from "types/ra-profiles";
 import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from "types/scep-profiles";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
@@ -76,7 +76,7 @@ export default function ScepProfileForm() {
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     const [scepProfile, setScepProfile] = useState<ScepProfileResponseModel>();
-    const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
+    const [raProfile, setRaProfile] = useState<RaProfileSimplifiedModel>();
     const [intune, setIntune] = useState(false);
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);

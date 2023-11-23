@@ -103,6 +103,7 @@ export default function CertificateDetail() {
     const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
     const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
     const [chainDownloadSwitch, setTriggerChainDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
+    const [copyCertificateChainPEMTrigger, setCopyCertificateChainPEMTrigger] = useState<boolean>(false);
 
     const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
@@ -216,8 +217,12 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
 
-        const fileExtension = chainDownloadSwitch.certificateFormat === DownloadCertificateChainCertificateFormatEnum.Pem ? ".pem" : ".p7b";
-        downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + fileExtension);
+        if (chainDownloadSwitch.certificateFormat === DownloadCertificateChainCertificateFormatEnum.Pem) {
+            downloadFile(formatPEM(certificateChainDownloadContent.content ?? ""), fileNameToDownload + "_chain" + ".pem");
+        } else {
+            downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + ".p7b");
+        }
+
         setTriggerChainDownload({ isDownloadTriggered: false });
     }, [certificateChainDownloadContent, chainDownloadSwitch]);
 
@@ -531,13 +536,21 @@ export default function CertificateDetail() {
                 </DropdownToggle>
 
                 <DropdownMenu>
-                    <DropdownItem
-                        key="pem"
-                        onClick={() => downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")}
-                    >
-                        PEM (.pem)
-                    </DropdownItem>
-
+                    <div className="d-flex">
+                        <DropdownItem
+                            key="pem"
+                            onClick={() => downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")}
+                        >
+                            PEM (.pem)
+                        </DropdownItem>
+                        <i
+                            className={cx("fa fa-copy", styles.copyButton)}
+                            onClick={() => {
+                                if (!certificate?.certificateContent) return;
+                                navigator.clipboard.writeText(formatPEM(certificate?.certificateContent ?? ""));
+                            }}
+                        />
+                    </div>
                     <DropdownItem
                         key="der"
                         onClick={() =>

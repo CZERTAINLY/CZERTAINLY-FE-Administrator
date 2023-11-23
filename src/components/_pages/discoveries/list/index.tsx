@@ -69,7 +69,11 @@ function DiscoveryList() {
                 id: discovery.uuid,
                 columns: [
                     <Link to={`./detail/${discovery.uuid}`}>{discovery.name}</Link>,
-                    <Badge color="primary">{discovery.connectorName}</Badge>,
+                    discovery.connectorName? (
+                        <Link to={`../connectors/detail/${discovery.connectorUuid}`}>{discovery.connectorName ?? "Unassigned"}</Link>
+                    ) : (
+                        discovery.connectorName ?? "Unassigned"
+                    ),
                     <Badge color="secondary">{discovery.kind}</Badge>,
                     <DiscoveryStatus status={discovery.status} />,
                     discovery.totalCertificatesDiscovered?.toString() || "0",

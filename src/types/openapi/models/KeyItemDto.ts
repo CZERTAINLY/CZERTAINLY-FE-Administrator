@@ -80,6 +80,12 @@ export interface KeyItemDto {
      */
     owner?: string;
     /**
+     * UUID of the owner of the Key
+     * @type {string}
+     * @memberof KeyItemDto
+     */
+    ownerUuid?: string;
+    /**
      * @type {GroupDto}
      * @memberof KeyItemDto
      */
