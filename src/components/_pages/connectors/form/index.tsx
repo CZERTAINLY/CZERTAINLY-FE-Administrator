@@ -336,7 +336,7 @@ export default function ConnectorForm() {
                                 <div className="d-flex justify-content-end">
                                     <ButtonGroup>
                                         <Button
-                                            color="success"
+                                            color="primary"
                                             onClick={() => onConnectClick(values)}
                                             disabled={submitting || isConnecting || isReconnecting}
                                         >
@@ -416,7 +416,10 @@ export default function ConnectorForm() {
 
                                     {connectionDetails && connectionDetails.length > 0 ? (
                                         <div>
-                                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
+                                            <Field
+                                                name="name"
+                                                validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}
+                                            >
                                                 {({ input, meta }) => (
                                                     <FormGroup>
                                                         <Label for="name">Connector Name</Label>
