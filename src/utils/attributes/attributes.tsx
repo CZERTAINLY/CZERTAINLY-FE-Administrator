@@ -6,7 +6,7 @@ import {
     isCustomAttributeModel,
     isDataAttributeModel,
 } from "types/attributes";
-import { AttributeContentType } from "types/openapi";
+import { AttributeContentType, FileAttributeContentData } from "types/openapi";
 import CodeBlock from "../../components/Attributes/CodeBlock";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -50,7 +50,19 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
         return undefined;
     };
 
-    return content.map((content) => mapping(content) ?? "Unknown data type").join(", ");
+    const isFileAttributeContentData = (data: any): data is FileAttributeContentData => {
+        return typeof data === "object" && data !== null && "fileName" in data && "mimeType" in data;
+    };
+
+    const checkFileNameAndMimeType = (content: BaseAttributeContentModel): string | undefined => {
+        if (isFileAttributeContentData(content.data)) {
+            return `${content.data.fileName} (${content.data.mimeType})`;
+        } else {
+            return "Unknown data type";
+        }
+    };
+
+    return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(", ");
 };
 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
@@ -186,8 +198,7 @@ export function collectFormAttributes(
             //       continue;
             //
             // }
-
-            if (typeof content === "undefined" || typeof content.data !== "undefined") {
+            if (typeof content.data !== "undefined" || Array.isArray(content)) {
                 const attr: AttributeRequestModel = {
                     name: attributeName,
                     content: Array.isArray(content) ? content : [content],

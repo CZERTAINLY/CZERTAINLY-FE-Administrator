@@ -98,9 +98,9 @@ export default function AttributeViewer({
 
     const getAttributesTableData = useCallback(
         (attribute: AttributeResponseModel | MetadataItemModel) => ({
-            id: attribute.uuid || "",
+            id: attribute.uuid || attribute.name,
             columns: [
-                attribute.label || "",
+                attribute.label || attribute.name || "",
                 getEnumLabel(contentTypeEnum, attribute.contentType),
                 getContent(attribute.contentType, attribute.content),
             ],

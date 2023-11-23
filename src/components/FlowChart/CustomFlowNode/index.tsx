@@ -1,11 +1,13 @@
 import cx from "classnames";
+import { actions as alertActions } from "ducks/alerts";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { Handle, Position } from "reactflow";
 import "reactflow/dist/style.css";
 import { Button, Collapse } from "reactstrap";
 import { EntityNodeProps } from "types/flowchart";
-import { CertificateStatus } from "types/openapi";
+import { CertificateValidationStatus } from "types/openapi";
 import style from "./customFlowNode.module.scss";
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }: EntityNodeProps) {
     const [collapse, setCollapse] = useState(false);
@@ -14,48 +16,53 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
     // TODO: Use this during dynamic flowchart updates
     // const onEntering = () => setStatus("Opening...");
     // const onExiting = () => setStatus("Closing...");
-
+    const dispatch = useDispatch();
     const onEntered = () => setStatus("-");
     const onExited = () => setStatus("+");
     const toggle = () => setCollapse(!collapse);
 
     const getStatusClasses = () => {
-        switch (data.certificateNodeStatus) {
-            case CertificateStatus.Valid:
+        switch (data.certificateNodeValidationStatus) {
+            case CertificateValidationStatus.Valid:
                 return style.validStatus;
-            case CertificateStatus.Expired:
+            case CertificateValidationStatus.Expired:
                 return style.expiredStatus;
-            case CertificateStatus.Revoked:
+            case CertificateValidationStatus.Revoked:
                 return style.revokedStatus;
-            case CertificateStatus.Expiring:
-                return style.expiringStatus;
-            case CertificateStatus.Invalid:
+            case CertificateValidationStatus.Invalid:
                 return style.invalidStatus;
-            case CertificateStatus.Unknown:
-                return style.unknownStatus;
-            case CertificateStatus.New:
-                return style.newStatus;
+            case CertificateValidationStatus.NotChecked:
+                return style.notCheckedStatus;
+            case CertificateValidationStatus.Inactive:
+                return style.inactiveStatus;
+            case CertificateValidationStatus.Expiring:
+                return style.expiringStatus;
+            case CertificateValidationStatus.Failed:
+                return style.failedStatus;
+
             default:
                 return style.unknownStatus;
         }
     };
 
     const getExpandButtonStatusClasses = () => {
-        switch (data.certificateNodeStatus) {
-            case CertificateStatus.Valid:
+        switch (data.certificateNodeValidationStatus) {
+            case CertificateValidationStatus.Valid:
                 return style.expandButtonValid;
-            case CertificateStatus.Expired:
+            case CertificateValidationStatus.Expired:
                 return style.expandButtonExpired;
-            case CertificateStatus.Revoked:
+            case CertificateValidationStatus.Revoked:
                 return style.expandButtonRevoked;
-            case CertificateStatus.Expiring:
+            case CertificateValidationStatus.Expiring:
                 return style.expandButtonExpiring;
-            case CertificateStatus.Invalid:
+            case CertificateValidationStatus.Invalid:
                 return style.expandButtonInvalid;
-            case CertificateStatus.Unknown:
-                return style.expandButtonUnknown;
-            case CertificateStatus.New:
-                return style.expandButtonNew;
+            case CertificateValidationStatus.NotChecked:
+                return style.expandButtonNotChecked;
+            case CertificateValidationStatus.Failed:
+                return style.expandButtonFailed;
+            case CertificateValidationStatus.Inactive:
+                return style.expandButtonInactive;
             default:
                 return style.expandButtonUnknown;
         }
@@ -85,7 +92,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 <div className="d-flex my-1">
                     <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
 
-                    <h6 className={cx(style.entityType, "my-auto ms-2")}>{data.entityType}</h6>
+                    <h6 className={cx(style.customNodeCardTitle, "my-auto ms-2")}>{data.customNodeCardTitle}</h6>
                 </div>
 
                 {data.redirectUrl ? (
@@ -93,7 +100,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                         <h6>Entity Name :</h6>
                         &nbsp;
                         <Link to={data.redirectUrl}>
-                            <h6>{data.entityLabel}</h6>
+                            <h6 className="text-wrap">{data.entityLabel}</h6>
                         </Link>
                     </div>
                 ) : (
@@ -119,7 +126,37 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                     {data.otherProperties.map((property, index) => (
                                         <li key={index} className="list-group-item text-wrap p-0 ">
                                             <span className={style.propertyName}>{property.propertyName} : </span>
-                                            <span className={style.propertyValue}>{property.propertyValue}</span>
+                                            {property?.propertyValue && (
+                                                <span className={style.propertyValue}>{property.propertyValue}</span>
+                                            )}
+                                            {property?.copyable && property?.propertyValue && (
+                                                <i
+                                                    onClick={() => {
+                                                        if (typeof property.propertyValue === "string") {
+                                                            navigator.clipboard
+                                                                .writeText(property.propertyValue)
+                                                                .then(
+                                                                    () =>
+                                                                        dispatch?.(
+                                                                            alertActions.success?.(
+                                                                                `${property.propertyName} copied to clipboard`,
+                                                                            ),
+                                                                        ),
+                                                                )
+                                                                .catch(
+                                                                    () =>
+                                                                        dispatch?.(
+                                                                            alertActions.error?.(
+                                                                                `Failed to copy ${property.propertyName} to clipboard`,
+                                                                            ),
+                                                                        ),
+                                                                );
+                                                        }
+                                                    }}
+                                                    className="fa fa-copy ms-2"
+                                                />
+                                            )}
+                                            {property?.propertyContent && <>{property.propertyContent}</>}
                                         </li>
                                     ))}
                                 </ul>

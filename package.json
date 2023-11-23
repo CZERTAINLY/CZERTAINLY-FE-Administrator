@@ -1,6 +1,6 @@
 {
     "name": "czertainly-administrator",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "homepage": ".",
     "private": true,
     "dependencies": {
@@ -80,6 +80,6 @@
         ]
     },
     "devDependencies": {
-        "cypress": "^12.17.4"
+        "cypress": "^13.1.0"
     }
 }

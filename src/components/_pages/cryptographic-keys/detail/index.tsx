@@ -309,11 +309,20 @@ export default function CryptographicKeyDetail() {
                       },
                       {
                           id: "tokenProfileUuid",
-                          columns: ["Token Profile UUID", cryptographicKey.tokenProfileUuid || ""],
+                          columns: ["Token Profile UUID", cryptographicKey.tokenProfileUuid || "Unassigned"],
                       },
                       {
                           id: "owner",
-                          columns: ["Owner", cryptographicKey.owner || ""],
+                          columns: [
+                            "Owner",
+                            cryptographicKey.ownerUuid? (
+                                <Link to={`${relativePath}/users/detail/${cryptographicKey.ownerUuid}`}>
+                                    {cryptographicKey.owner ?? "Unassigned"}
+                                </Link>
+                            ) : (
+                                cryptographicKey.owner || "Unassigned"
+                            ),
+                          ],
                       },
                       {
                           id: "groupName",

@@ -21,7 +21,6 @@ import { LockWidgetNameEnum } from "types/widget-locks";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";
-import CertificateComplianceStatusIcon from "../CertificateComplianceStatusIcon";
 import CertificateGroupDialog from "../CertificateGroupDialog";
 import CertificateOwnerDialog from "../CertificateOwnerDialog";
 import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
@@ -192,10 +191,15 @@ export default function CertificateList({
     const certificatesRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Status",
-                //sortable: true,
+                content: "State",
                 align: "center",
-                id: "status",
+                id: "state",
+                width: "5%",
+            },
+            {
+                content: "Validation",
+                align: "center",
+                id: "validation",
                 width: "5%",
             },
             {
@@ -290,11 +294,10 @@ export default function CertificateList({
                 return {
                     id: certificate.uuid,
                     columns: [
-                        <CertificateStatus status={certificate.status} asIcon={true} />,
-                        <CertificateComplianceStatusIcon
-                            status={certificate.complianceStatus}
-                            id={`compliance-${certificate.fingerprint || certificate.serialNumber}`}
-                        />,
+                        <CertificateStatus status={certificate.state} asIcon={true} />,
+                        <CertificateStatus status={certificate.validationStatus} asIcon={true} />,
+                        certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : "",
+
                         certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : "",
                         selectCertsOnly ? (
                             certificate.commonName || "(empty)"
@@ -303,8 +306,18 @@ export default function CertificateList({
                         ),
                         certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
                         certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
-                        certificate.group?.name || "Unassigned",
-                        <span style={{ whiteSpace: "nowrap" }}>{certificate.raProfile?.name || "Unassigned"}</span>,
+                        certificate.group? (
+                            <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? "Unassigned"}</Link>
+                        ) : (
+                            certificate.group ?? "Unassigned"
+                        ),
+                        <span style={{ whiteSpace: "nowrap" }}>
+                            {certificate.raProfile? (
+                                <Link to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}>{certificate.raProfile.name ?? "Unassigned"}</Link>
+                            ) : (
+                                certificate.raProfile ?? "Unassigned"
+                            )}
+                        </span>,
                         certificate?.ownerUuid ? (
                             <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
                         ) : (
@@ -313,7 +326,11 @@ export default function CertificateList({
                         certificate.serialNumber || "",
                         certificate.signatureAlgorithm,
                         certificate.publicKeyAlgorithm,
-                        certificate.issuerCommonName || "",
+                        certificate.issuerCommonName && certificate?.issuerCertificateUuid ? (
+                            <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                        ) : (
+                            certificate.issuerCommonName || ""
+                        ),
                         certificate.certificateType ? (
                             <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>
                                 {getEnumLabel(certificateTypeEnum, certificate.certificateType)}

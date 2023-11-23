@@ -6,7 +6,7 @@ import {
     ScepProfileEditRequestDto as ScepProfileEditRequestDtoOpenApi,
     ScepProfileRequestDto,
 } from "./openapi";
-import { RaProfileResponseModel } from "./ra-profiles";
+import { RaProfileSimplifiedModel } from "./ra-profiles";
 
 export type ScepProfileAddRequestDto = ScepProfileRequestDto;
 export type ScepProfileAddRequestModel = Omit<ScepProfileAddRequestDto, "issueCertificateAttributes | customAttributes"> & {
@@ -25,7 +25,7 @@ export type ScepProfileResponseModel = Omit<
     ScepProfileResponseDto,
     "raProfile | issueCertificateAttributes | customAttributes | caCertificate"
 > & {
-    raProfile?: RaProfileResponseModel;
+    raProfile?: RaProfileSimplifiedModel;
     issueCertificateAttributes?: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
     caCertificate?: CertificateListResponseModel;

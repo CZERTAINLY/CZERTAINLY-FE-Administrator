@@ -9,15 +9,16 @@
     display: flex;
     flex-direction: column;
     align-items: start;
-    min-width: 350px;
+    width: 400px;
     min-height: 55px;
     border-style: solid;
     border-color: #3754a566;
     border-width: 2px;
     text-align: left;
-    max-width: 515px;
     z-index: 1;
-    box-shadow: 2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15), 1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
+    box-shadow:
+        2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),
+        1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
         0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
 }
 
@@ -42,7 +43,7 @@
     background-color: #eee;
 }
 
-.entityType {
+.customNodeCardTitle {
     color: $gray-500;
     font-weight: bold;
     font-size: medium;
@@ -77,7 +78,7 @@
 }
 
 .listStyle {
-    max-width: 300px;
+    max-width: 375px;
 }
 
 .propertyName {
@@ -88,6 +89,7 @@
 .propertyValue {
     font-weight: 500;
     color: $gray-600;
+    word-wrap: break-word;
 }
 .mainNodeBody {
     border-width: 3px;
@@ -109,73 +111,127 @@
 }
 
 .expiringStatus {
-    color: #ffc107;
-    border-color: #ffc107;
+    color: #f37d63;
+    border-color: #f37d63;
 }
 
 .expandButtonExpiring {
-    background-color: #ffc107a6 !important;
+    background-color: #f37d63a6 !important;
     border: none !important;
     &:hover {
-        background-color: #fabd05ec !important;
+        background-color: #f37d63ec !important;
         border: none;
     }
     &:active {
-        background-color: #fabd05d8 !important;
+        background-color: #f37d63d8 !important;
         border: none;
     }
 }
 
 .expiredStatus {
-    color: #dc3545 !important;
-    border-color: #dc3545 !important;
+    color: #eb3349 !important;
+    border-color: #eb3349 !important;
 }
 
 .expandButtonExpired {
-    background-color: #dc3546a4 !important;
+    background-color: #eb3349a4 !important;
     border: none !important;
     &:hover {
-        background-color: #dc3545 !important;
+        background-color: #eb3349 !important;
         border: none;
     }
     &:active {
-        background-color: #dc3545 !important;
+        background-color: #eb3349 !important;
         border: none;
     }
 }
 
 .validStatus {
-    color: #6ad984e1 !important;
-    border-color: #6ad984e1 !important;
+    color: #1ab394e1 !important;
+    border-color: #1ab394e1 !important;
 }
 
 .expandButtonValid {
-    background-color: #6ad9849f !important;
+    background-color: #1ab3949f !important;
     border: none !important;
     &:hover {
-        background-color: #5cb85cec !important;
+        background-color: #1ab394ec !important;
         border: none;
     }
     &:active {
-        background-color: #5cb85cd8 !important;
+        background-color: #1ab394d8 !important;
         border: none;
     }
 }
 
 .invalidStatus {
-    color: #ff8080 !important;
-    border-color: #ff8080 !important;
+    color: #131212 !important;
+    border-color: #131212 !important;
 }
 
 .expandButtonInvalid {
-    background-color: #ff8080a3 !important;
+    background-color: #131212a3 !important;
     border: none !important;
     &:hover {
-        background-color: #ff8080ec !important;
+        background-color: #131212ec !important;
         border: none;
     }
     &:active {
-        background-color: #ff8080d8 !important;
+        background-color: #131212d8 !important;
+        border: none;
+    }
+}
+
+.notCheckedStatus {
+    color: #7fa2c1 !important;
+    border-color: #7fa2c1 !important;
+}
+
+.expandButtonNotChecked {
+    background-color: #7fa2c1a1 !important;
+    border: none !important;
+    &:hover {
+        background-color: #7fa2c1ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #7fa2c1d8 !important;
+        border: none;
+    }
+}
+
+.inactiveStatus {
+    color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+.expandButtonInactive {
+    background-color: #6c757da0 !important;
+    border: none !important;
+    &:hover {
+        background-color: #6c757dec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #6c757dd8 !important;
+        border: none;
+    }
+}
+
+.failedStatus {
+    color: #9c0012 !important;
+    border-color: #9c0012 !important;
+}
+
+.expandButtonFailed {
+    background-color: #9c0012a2 !important;
+    border: none !important;
+    &:hover {
+        background-color: #9c0012ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #9c0012d8 !important;
         border: none;
     }
 }
@@ -199,19 +255,19 @@
 }
 
 .revokedStatus {
-    color: #343a40;
-    border-color: #343a40;
+    color: #632828;
+    border-color: #632828;
 }
 
 .expandButtonRevoked {
-    background-color: #343a40b7 !important;
+    background-color: #632828b7 !important;
     border: none !important;
     &:hover {
-        background-color: #343a40 !important;
+        background-color: #632828 !important;
         border: none;
     }
     &:active {
-        background-color: #343a40 !important;
+        background-color: #632828 !important;
         border: none;
     }
 }

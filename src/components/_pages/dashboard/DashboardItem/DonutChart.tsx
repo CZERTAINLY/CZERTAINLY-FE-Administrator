@@ -4,24 +4,42 @@ import ReactApexChart from "react-apexcharts";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SearchFilterModel } from "types/certificate";
+import {
+    CertificateEventHistoryDtoStatusEnum,
+    CertificateState,
+    CertificateValidationStatus,
+    ComplianceRuleStatus,
+    ComplianceStatus,
+} from "types/openapi";
 import { DashboardDict } from "types/statisticsDashboard";
-import { getLabels, getValues } from "utils/dashboard";
+import { getValues, useGetLabels } from "utils/dashboard";
 
+export interface ColorOptions {
+    colors: string[];
+}
+
+type Status =
+    | CertificateState
+    | CertificateValidationStatus
+    | CertificateEventHistoryDtoStatusEnum
+    | ComplianceStatus
+    | ComplianceRuleStatus;
 interface Props {
     title: string;
     data?: DashboardDict;
     entity: EntityType;
     redirect: string;
     onSetFilter: (index: number, labels: string[]) => SearchFilterModel[];
+    colorOptions?: ColorOptions;
 }
 
-function DonutChart({ title, data = {}, entity, redirect, onSetFilter: onLegendClick }: Props) {
-    const labels = getLabels(data);
+function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFilter: onLegendClick }: Props) {
+    const labels = useGetLabels(data);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const options: ApexCharts.ApexOptions = {
-        labels,
+        labels: labels,
         fill: {
             type: "gradient",
         },
@@ -49,6 +67,10 @@ function DonutChart({ title, data = {}, entity, redirect, onSetFilter: onLegendC
             },
         },
     };
+
+    if (colorOptions) {
+        options.colors = colorOptions.colors;
+    }
 
     return (
         <Widget title={title} titleBoldness="bold">

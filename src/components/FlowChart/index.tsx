@@ -34,6 +34,7 @@ export interface FlowChartProps {
     flowChartNodes: CustomNode[];
     flowChartEdges: Edge[];
     defaultViewport?: Viewport | undefined;
+    busy?: boolean;
 }
 
 const edgeTypes = {
@@ -42,7 +43,7 @@ const edgeTypes = {
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-export const nodeWidth = 350;
+export const nodeWidth = 400;
 export const nodeHeight = 100;
 
 const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB") => {
@@ -50,7 +51,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
-        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 40 : nodeHeight;
+        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
         dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
     });
 
@@ -76,7 +77,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB
     return { nodes, edges };
 };
 
-const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport }: FlowChartProps) => {
+const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport, busy }: FlowChartProps) => {
     const [nodes, setNodes] = useState(flowChartNodes);
     const [edges, setEdges] = useState(flowChartEdges);
     const defaultEdgeOptions = { animated: true };
@@ -93,7 +94,7 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
     }, [flowChartEdges, flowChartNodes]);
 
     return (
-        <Widget className={style.flowWidget}>
+        <Widget className={style.flowWidget} busy={busy}>
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
             <div className={cx(style.flowChartContainer, style.floatingedges)}>
                 <ReactFlow

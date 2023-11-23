@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { AjaxError } from "rxjs/ajax";
-import { LockWidgetNameEnum, WidgetLockModel } from "types/widget-locks";
+import { ErrorMessageObjectModel, LockWidgetNameEnum, WidgetLockModel } from "types/widget-locks";
 import { createFeatureSelector } from "utils/ducks";
 import { getLockWidgetObject } from "utils/net";
 
@@ -20,12 +20,20 @@ export const slice = createSlice({
 
     reducers: {
         insertWidgetLock: {
-            prepare: (error: AjaxError, lockWidgetName: LockWidgetNameEnum) => {
-                const widgetLockObject = getLockWidgetObject(error);
-                let payload: WidgetLockModel = {
-                    widgetName: lockWidgetName,
-                    ...widgetLockObject,
-                };
+            prepare: (error: AjaxError | ErrorMessageObjectModel, lockWidgetName: LockWidgetNameEnum) => {
+                let payload;
+                if (error instanceof AjaxError) {
+                    const widgetLockObject = getLockWidgetObject(error);
+                    payload = {
+                        widgetName: lockWidgetName,
+                        ...widgetLockObject,
+                    };
+                } else {
+                    payload = {
+                        widgetName: lockWidgetName,
+                        ...error,
+                    };
+                }
                 return { payload };
             },
             reducer: (state, action: PayloadAction<WidgetLockModel>) => {

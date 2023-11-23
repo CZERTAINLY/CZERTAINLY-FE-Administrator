@@ -28,10 +28,11 @@ import {
     validateAlphaNumericWithSpecialChars,
     validateEmail,
     validateLength,
-    validateRequired, validateUrlSafe
+    validateRequired,
+    validateUrlSafe,
 } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { CertificateStatus as CertStatus, Resource } from "../../../../types/openapi";
+import { CertificateState as CertStatus, Resource } from "../../../../types/openapi";
 import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "../../../../utils/attributes/attributes";
 import AttributeEditor from "../../../Attributes/AttributeEditor";
@@ -191,7 +192,7 @@ function UserForm() {
 
     useEffect(() => {
         const fpc = certificates
-            .filter((pagedCert) => !["expired", "revoked", "invalid"].includes(pagedCert.status))
+            .filter((pagedCert) => !["expired", "revoked", "invalid"].includes(pagedCert.state))
             .filter((pagedCert) => loadedCerts.find((loadedCert) => loadedCert.uuid === pagedCert.uuid) === undefined);
 
         if (fpc.length === 0) return;
@@ -207,7 +208,7 @@ function UserForm() {
     useEffect(() => {
         setOptionsForCertificate(
             loadedCerts
-                .filter((e) => e.status !== CertStatus.New)
+                .filter((e) => e.state !== CertStatus.Requested)
                 .map((loadedCert) => ({
                     label:
                         loadedCert.commonName && loadedCert.serialNumber
@@ -237,8 +238,7 @@ function UserForm() {
                                         ? values.certificate.value
                                         : undefined
                                     : undefined,
-                            certificateData:
-                                values.inputType?.value === "upload" ? certToUpload?.certificateContent ?? certFileContent : undefined,
+                            certificateData: values.inputType?.value === "upload" && certToUpload ? certFileContent : undefined,
                             customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
                         },
                     }),
@@ -255,8 +255,7 @@ function UserForm() {
                             email: values.email || undefined,
                             groupUuid: values.group?.value ?? undefined,
                             enabled: values.enabled,
-                            certificateData:
-                                values.inputType?.value === "upload" ? certToUpload?.certificateContent ?? certFileContent : undefined,
+                            certificateData: values.inputType?.value === "upload" && certToUpload ? certFileContent : undefined,
                             certificateUuid:
                                 values.inputType?.value === "select"
                                     ? values.certificate
@@ -401,7 +400,7 @@ function UserForm() {
                             }
                             widgetExtraTopNode={enableCheckButton}
                         >
-                            <Field name="username" validate={composeValidators(validateRequired(),validateUrlSafe())}>
+                            <Field name="username" validate={composeValidators(validateRequired(), validateUrlSafe())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="username">Username</Label>
@@ -436,7 +435,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>

@@ -71,7 +71,7 @@ function Widget({
         ) : null;
 
     const renderWidgetButtons = useCallback(() => {
-        const updatedWidgetButtons = widgetButtons?.map((button) => ({ ...button, disabled: !!widgetLock })) || [];
+        const updatedWidgetButtons = widgetButtons?.map((button) => ({ ...button, disabled: widgetLock ? true : button.disabled })) || [];
 
         if (!widgetButtons) return null;
         if (hideWidgetButtons) return null;

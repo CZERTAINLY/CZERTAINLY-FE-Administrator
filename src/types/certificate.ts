@@ -3,6 +3,9 @@ import { CertificateGroupResponseModel } from "./certificateGroups";
 import { LocationResponseModel, MetadataModel } from "./locations";
 import {
     BulkOperationResponse,
+    CertificateChainDownloadResponseDto,
+    CertificateChainDownloadResponseDtoFormatEnum,
+    CertificateChainResponseDto,
     CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
     CertificateContentDto,
@@ -10,7 +13,11 @@ import {
     CertificateDto,
     CertificateEventHistoryDto,
     CertificateUpdateObjectsDto,
+    CertificateValidationCheck,
+    CertificateValidationCheckDto,
     CertificateValidationDto as CertificateValidationDtoOpenApi,
+    CertificateValidationResultDto,
+    CertificateValidationStatus,
     ClientCertificateRekeyRequestDto,
     ClientCertificateRenewRequestDto,
     ClientCertificateRevocationDto,
@@ -24,7 +31,21 @@ import {
     SimplifiedRaProfileDto,
     UploadCertificateRequestDto,
 } from "./openapi";
+// import { CertificateValidationDto as CertificateValidationDtoOpenApi } from "./openapi/models/CertificateValidationDto";
 
+export type ValidationCertificateCheckDto = CertificateValidationCheckDto;
+export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto, "validationCheck | status | message"> & {
+    validationCheck: CertificateValidationCheck;
+    status: CertificateValidationStatus;
+    message?: string;
+};
+
+export type ValidationCertificateResultDto = CertificateValidationResultDto;
+
+export type ValidationCertificateResultModel = Omit<ValidationCertificateResultDto, "resultStatus" | "validationCheckResults"> & {
+    resultStatus: CertificateValidationStatus;
+    validationCheckResults?: Array<ValidationCertificateCheckModel>;
+};
 export type SearchFilterDto = SearchFilterRequestDto;
 export type SearchFilterModel = SearchFilterDto;
 
@@ -107,3 +128,13 @@ export type CertificateComplianceCheckModel = CertificateComplianceCheckDto;
 
 export type CertificateContentResponseDto = CertificateContentDto;
 export type CertificateContentResponseModel = CertificateContentResponseDto;
+
+export type ChainCertificateResponseDto = CertificateChainResponseDto;
+export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "certificates"> & {
+    certificates?: Array<CertificateDetailResponseModel>;
+};
+
+export type CertificateChainDownloadResponseModel = CertificateChainDownloadResponseDto;
+export type CertificateChainDownloadResponseDtoModel = Omit<CertificateChainDownloadResponseModel, "format"> & {
+    format: CertificateChainDownloadResponseDtoFormatEnum;
+};

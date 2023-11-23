@@ -220,6 +220,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                             <>
                                 <FileUpload
                                     fileType={"CSR"}
+                                    editable
                                     onFileContentLoaded={(fileContent) => {
                                         setFileContent(fileContent);
                                         if (health) {

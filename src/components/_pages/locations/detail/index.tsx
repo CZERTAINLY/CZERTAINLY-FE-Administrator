@@ -27,7 +27,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 
 import { LockWidgetNameEnum } from "types/widget-locks";
 import { validateRequired } from "utils/validators";
-import { CertificateStatus, Resource } from "../../../../types/openapi";
+import { CertificateState, Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TabLayout from "../../../Layout/TabLayout";
 import CertificateStatusBadge from "../../../_pages/certificates/CertificateStatus";
@@ -312,7 +312,7 @@ export default function LocationDetail() {
             },
             {
                 icon: "retweet",
-                disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.status === CertificateStatus.New,
+                disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.state === CertificateState.Requested,
                 tooltip: "Renew",
                 onClick: () => {
                     onRenewClick();
@@ -394,7 +394,13 @@ export default function LocationDetail() {
             },
             {
                 id: "cs",
-                content: "Status",
+                content: "State",
+                sortable: true,
+                width: "15%",
+            },
+            {
+                id: "vs",
+                content: "Validation Status",
                 sortable: true,
                 width: "15%",
             },
@@ -427,13 +433,14 @@ export default function LocationDetail() {
                       id: cert.certificateUuid,
                       columns: [
                           <Link
-                              className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                              className={cx({ [style.newCertificateColumn]: cert.state === CertificateState.Requested })}
                               key={cert.certificateUuid}
                               to={`../../../certificates/detail/${cert.certificateUuid}`}
                           >
                               {cert.commonName || "empty"}
                           </Link>,
-                          <CertificateStatusBadge status={cert.status} />,
+                          <CertificateStatusBadge status={cert.state} />,
+                          <CertificateStatusBadge status={cert.validationStatus} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                           !cert.metadata || cert.metadata.length === 0 ? (
@@ -441,7 +448,7 @@ export default function LocationDetail() {
                           ) : (
                               <div
                                   style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}
-                                  className={cx({ [style.newCertificateColumn]: cert.status === CertificateStatus.New })}
+                                  className={cx({ [style.newCertificateColumn]: cert.state === CertificateState.Requested })}
                               >
                                   {cert.metadata.map((atr) => atr.connectorName + " (" + atr.items.length + ")").join(", ")}
                               </div>
@@ -479,50 +486,84 @@ export default function LocationDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="Location Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshLocationDetails}
-                widgetLockName={LockWidgetNameEnum.LocationDetails}
-            >
-                <br />
+            <TabLayout
+                tabs={[
+                    {
+                        title: "Details",
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Location Properties"
+                                    busy={isBusy}
+                                    widgetButtons={buttons}
+                                    titleSize="large"
+                                    refreshAction={getFreshLocationDetails}
+                                    widgetLockName={LockWidgetNameEnum.LocationDetails}
+                                >
+                                    <br />
 
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+                                    <CustomTable headers={detailHeaders} data={detailData} />
+                                </Widget>
 
-            <Widget title="Attributes" titleSize="large">
-                <br />
+                                <Widget
+                                    title="Location Certificates"
+                                    titleSize="large"
+                                    widgetButtons={certButtons}
+                                    busy={
+                                        isRenewingCertificate ||
+                                        isPushingCertificate ||
+                                        isRemovingCertificate ||
+                                        isSyncing ||
+                                        isIssuingCertificate
+                                    }
+                                >
+                                    <br />
 
-                <Label>Location Attributes</Label>
-                <AttributeViewer attributes={location?.attributes} />
-            </Widget>
-            {location && (
-                <CustomAttributeWidget resource={Resource.Locations} resourceUuid={location.uuid} attributes={location.customAttributes} />
-            )}
+                                    <Label>Location certificates</Label>
 
-            <Widget
-                title="Location Certificates"
-                titleSize="large"
-                widgetButtons={certButtons}
-                busy={isRenewingCertificate || isPushingCertificate || isRemovingCertificate || isSyncing || isIssuingCertificate}
-            >
-                <br />
+                                    <CustomTable
+                                        headers={certHeaders}
+                                        data={certData}
+                                        hasCheckboxes={true}
+                                        multiSelect={false}
+                                        onCheckedRowsChanged={(rows) => {
+                                            setCertCheckedRows(rows as string[]);
+                                        }}
+                                        hasDetails={true}
+                                    />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: "Attributes",
+                        content: (
+                            <Widget>
+                                <Widget title="Attributes" titleSize="large">
+                                    <br />
 
-                <Label>Location certificates</Label>
+                                    <Label>Location Attributes</Label>
+                                    <AttributeViewer attributes={location?.attributes} />
+                                </Widget>
+                                {location && (
+                                    <CustomAttributeWidget
+                                        resource={Resource.Locations}
+                                        resourceUuid={location.uuid}
+                                        attributes={location.customAttributes}
+                                    />
+                                )}
 
-                <CustomTable
-                    headers={certHeaders}
-                    data={certData}
-                    hasCheckboxes={true}
-                    multiSelect={false}
-                    onCheckedRowsChanged={(rows) => {
-                        setCertCheckedRows(rows as string[]);
-                    }}
-                    hasDetails={true}
-                />
-            </Widget>
+                                <Widget title="Metadata" titleSize="large">
+                                    <br />
+                                    {location?.metadata && (
+                                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={location.metadata} />
+                                    )}
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={confirmDelete}

@@ -117,7 +117,13 @@ export default function AcmeAccountDetail() {
             },
             {
                 id: "raProfileName",
-                columns: ["RA Profile Name", acmeAccount.raProfileName],
+                columns: ["RA Profile Name",
+                    acmeAccount.raProfile ? (
+                        <Link to={`../../../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}>{acmeAccount?.raProfile.name ?? "Unassigned"}</Link>
+                    ) : (
+                        ""
+                    ),
+                ],
             },
             {
                 id: "acmeProfileName",

@@ -204,7 +204,11 @@ export default function ScepProfiles() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{scepProfile.description || ""}</span>,
 
-                    <Badge color="info">{scepProfile.raProfileName}</Badge>,
+                    scepProfile.raProfile? (
+                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>{scepProfile.raProfile.name ?? "Unassigned"}</Link>
+                    ) : (
+                        scepProfile.raProfile ?? "Unassigned"
+                    ),
 
                     <StatusBadge enabled={scepProfile.enabled} />,
                     <span style={{ whiteSpace: "nowrap" }}>{scepProfile.scepUrl || ""}</span>,

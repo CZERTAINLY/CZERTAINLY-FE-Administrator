@@ -92,6 +92,8 @@ models/BulkKeyItemUsageRequestDto.ts
 models/BulkKeyUsageRequestDto.ts
 models/BulkOperationResponse.ts
 models/BulkTokenProfileKeyUsageRequestDto.ts
+models/CertificateChainDownloadResponseDto.ts
+models/CertificateChainResponseDto.ts
 models/CertificateComplianceCheckDto.ts
 models/CertificateComplianceResultDto.ts
 models/CertificateContentDto.ts
@@ -101,10 +103,12 @@ models/CertificateEventHistoryDto.ts
 models/CertificateInLocationDto.ts
 models/CertificateRequestDto.ts
 models/CertificateResponseDto.ts
-models/CertificateStatus.ts
+models/CertificateState.ts
 models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts
-models/CertificateValidationDto.ts
+models/CertificateValidationCheck.ts
+models/CertificateValidationCheckDto.ts
+models/CertificateValidationResultDto.ts
 models/CertificateValidationStatus.ts
 models/CipherDataRequestDto.ts
 models/CipherRequestData.ts

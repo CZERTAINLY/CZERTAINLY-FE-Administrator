@@ -158,7 +158,7 @@ export const slice = createSlice({
 
             const approvalDetails = state.approvalDetails;
             if (approvalDetails?.approvalUuid === action.payload.uuid) {
-                approvalDetails.status = ApprovalDetailDtoStatusEnum.Rejected;
+                approvalDetails.status = ApprovalDetailDtoStatusEnum.Approved;
             }
             state.isApproving = false;
         },

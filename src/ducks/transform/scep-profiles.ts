@@ -10,7 +10,7 @@ import {
 } from "types/scep-profiles";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateListResponseDtoToModel } from "./certificates";
-import { transformRaProfileResponseDtoToModel } from "./ra-profiles";
+import { transformRaProfileSimplifiedDtoToModel } from "./ra-profiles";
 
 export function transformScepProfileListResponseDtoToModel(scep: ScepProfileListResponseDto): ScepProfileListResponseModel {
     return { ...scep };
@@ -19,7 +19,7 @@ export function transformScepProfileListResponseDtoToModel(scep: ScepProfileList
 export function transformScepProfileResponseDtoToModel(scep: ScepProfileResponseDto): ScepProfileResponseModel {
     return {
         ...scep,
-        raProfile: scep.raProfile ? transformRaProfileResponseDtoToModel(scep.raProfile) : undefined,
+        raProfile: scep.raProfile ? transformRaProfileSimplifiedDtoToModel(scep.raProfile) : undefined,
         issueCertificateAttributes: scep.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         customAttributes: scep.customAttributes?.map(transformAttributeResponseDtoToModel),
         caCertificate: scep.caCertificate ? transformCertificateListResponseDtoToModel(scep.caCertificate) : undefined,

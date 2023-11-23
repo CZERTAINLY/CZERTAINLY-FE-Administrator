@@ -772,6 +772,46 @@ const listCertificateApprovals: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const getCertificateChain: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getCertificateChain.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.getCertificateChain(action.payload).pipe(
+                map((response) => slice.actions.getCertificateChainSuccess({ certificateChain: response })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.getCertificateChainFailure({
+                            error: extractError(error, "Failed to get certificate chain"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to get certificate chain" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const downloadCertificateChain: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.downloadCertificateChain.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.downloadCertificateChain(action.payload).pipe(
+                map((response) => slice.actions.downloadCertificateChainSuccess({ certificateChainDownloadContent: response })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.downloadCertificateChainFailure({
+                            error: extractError(error, "Failed to download certificate chain"),
+                        }),
+                        appRedirectActions.fetchError({ error, message: "Failed to download certificate chain" }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCertificates,
     getCertificateDetail,
@@ -798,6 +838,8 @@ const epics = [
     getCsrAttributes,
     getCertificateContent,
     listCertificateApprovals,
+    getCertificateChain,
+    downloadCertificateChain,
 ];
 
 export default epics;

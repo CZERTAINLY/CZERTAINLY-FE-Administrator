@@ -1,4 +1,4 @@
-const { defineConfig } = require('cypress')
+const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
     e2e: {
@@ -8,8 +8,14 @@ module.exports = defineConfig({
         },
     },
     env: {
-        ADMIN_URL: 'http://localhost:3000/',
-        ADMIN_USERNAME: 'czertainly-admin',
-        ADMIN_PASSWORD: 'your-strong-password'
-    }
-})
+        ADMIN_URL: "http://localhost:3000/",
+        ADMIN_USERNAME: "czertainly-admin",
+        ADMIN_PASSWORD: "your-strong-password",
+    },
+    component: {
+        devServer: {
+            framework: "create-react-app",
+            bundler: "webpack",
+        },
+    },
+});
