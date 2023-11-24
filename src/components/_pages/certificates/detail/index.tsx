@@ -7,6 +7,7 @@ import Dialog from "components/Dialog";
 import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
+import { actions as alertActions } from "ducks/alerts";
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 
 import Widget from "components/Widget";
@@ -547,7 +548,10 @@ export default function CertificateDetail() {
                             className={cx("fa fa-copy", styles.copyButton)}
                             onClick={() => {
                                 if (!certificate?.certificateContent) return;
-                                navigator.clipboard.writeText(formatPEM(certificate?.certificateContent ?? ""));
+                                navigator.clipboard
+                                    .writeText(formatPEM(certificate?.certificateContent ?? ""))
+                                    .then(() => dispatch?.(alertActions.success?.("Certificate content was copied to clipboard")))
+                                    .catch(() => dispatch?.(alertActions.error?.("Failed to copy certificate content to clipboard")));
                             }}
                         />
                     </div>
@@ -656,17 +660,31 @@ export default function CertificateDetail() {
                 </DropdownToggle>
 
                 <DropdownMenu>
-                    <DropdownItem
-                        key="pem"
-                        onClick={() =>
-                            downloadFile(
-                                formatPEM(certificate?.certificateRequest?.content ?? "", true),
-                                fileNameToDownload + "_CSR" + ".pem",
-                            )
-                        }
-                    >
-                        PEM (.pem)
-                    </DropdownItem>
+                    <div className="d-flex">
+                        <DropdownItem
+                            key="pem"
+                            onClick={() =>
+                                downloadFile(
+                                    formatPEM(certificate?.certificateRequest?.content ?? "", true),
+                                    fileNameToDownload + "_CSR" + ".pem",
+                                )
+                            }
+                        >
+                            PEM (.pem)
+                        </DropdownItem>
+                        <i
+                            className={cx("fa fa-copy", styles.copyButton)}
+                            onClick={() => {
+                                if (!certificate?.certificateRequest?.content) return;
+                                navigator.clipboard
+                                    .writeText(formatPEM(certificate?.certificateRequest?.content ?? "", true))
+                                    .then(() => dispatch?.(alertActions.success?.("Certificate request content was copied to clipboard")))
+                                    .catch(
+                                        () => dispatch?.(alertActions.error?.("Failed to copy certificate request content to clipboard")),
+                                    );
+                            }}
+                        />
+                    </div>
 
                     <DropdownItem
                         key="req"
