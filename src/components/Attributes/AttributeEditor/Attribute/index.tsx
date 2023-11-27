@@ -1,7 +1,7 @@
 import * as DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { marked } from "marked";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Field, useForm, useFormState } from "react-final-form";
 
 import Select from "react-select";
@@ -19,7 +19,11 @@ import {
 } from "types/attributes";
 import { AttributeConstraintType, AttributeContentType } from "types/openapi";
 
+import CustomSelectComponent from "components/CustomSelectComponent";
+import { useDispatch } from "react-redux";
+import { AddNewAttributeList, AddNewAttributeType } from "types/user-interface";
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 import { getAttributeContent } from "../../../../utils/attributes/attributes";
 import { getHighLightedCode } from "../../CodeBlock";
 
@@ -32,6 +36,14 @@ interface Props {
 export function Attribute({ name, descriptor, options }: Props): JSX.Element {
     const form = useForm();
     const formState = useFormState();
+    const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
+    const dispatch = useDispatch();
+    useEffect(() => {
+        if (descriptor?.name) {
+            const addNewAttributeValue = AddNewAttributeList.find((a) => a.name === descriptor.name);
+            setIsAddNewAttributeValue(addNewAttributeValue);
+        }
+    }, [descriptor]);
 
     const onFileLoaded = useCallback(
         (data: ProgressEvent<FileReader>, fileName: string) => {
@@ -146,23 +158,58 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
                             <></>
                         )}
 
-                        <Select
-                            {...input}
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={options}
-                            placeholder={`Select ${descriptor.properties.label}`}
-                            styles={{
-                                control: (provided) =>
-                                    meta.touched && meta.invalid
-                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
-                                        : { ...provided },
-                            }}
-                            isDisabled={descriptor.properties.readOnly}
-                            isMulti={descriptor.properties.multiSelect}
-                            isClearable={!descriptor.properties.required}
-                        />
-
+                        {!addNewAttributeValue ? (
+                            <Select
+                                {...input}
+                                maxMenuHeight={140}
+                                menuPlacement="auto"
+                                options={options}
+                                placeholder={`Select ${descriptor.properties.label}`}
+                                styles={{
+                                    control: (provided) =>
+                                        meta.touched && meta.invalid
+                                            ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                            : { ...provided },
+                                }}
+                                isDisabled={descriptor.properties.readOnly}
+                                isMulti={descriptor.properties.multiSelect}
+                                isClearable={!descriptor.properties.required}
+                            />
+                        ) : (
+                            <Select
+                                {...input}
+                                maxMenuHeight={140}
+                                menuPlacement="auto"
+                                options={options}
+                                placeholder={`Select ${descriptor.properties.label}`}
+                                styles={{
+                                    control: (provided) =>
+                                        meta.touched && meta.invalid
+                                            ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                            : { ...provided },
+                                }}
+                                isDisabled={descriptor.properties.readOnly}
+                                isMulti={descriptor.properties.multiSelect}
+                                isClearable={!descriptor.properties.required}
+                                components={{
+                                    Menu: (props) => (
+                                        <CustomSelectComponent
+                                            onAddNew={() => {
+                                                dispatch(
+                                                    userInterfaceActions.showGlobalModal({
+                                                        content: addNewAttributeValue.content,
+                                                        isOpen: true,
+                                                        size: "lg",
+                                                        title: `Add New ${descriptor.name}`,
+                                                    }),
+                                                );
+                                            }}
+                                            {...props}
+                                        />
+                                    ),
+                                }}
+                            />
+                        )}
                         {descriptor.properties.visible ? (
                             <>
                                 <FormText color={descriptor.properties.required ? "dark" : undefined} style={{ marginTop: "0.2em" }}>

@@ -147,37 +147,27 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                     keyRequestDto: transformCryptographicKeyAddRequestModelToDto(action.payload.cryptographicKeyAddRequest),
                 })
                 .pipe(
-                    mergeMap(
-                        (obj) =>
-                            iif(
-                                () => !!action.payload.usesGlobalModal,
-                                of(
-                                    slice.actions.createCryptographicKeySuccess({
-                                        uuid: obj.uuid,
-                                        tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                                    }),
-                                    userInterfaceActions.hideGlobalModal(),
-                                    slice.actions.listCryptographicKeyPairs({
-                                        // tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                                        tokenProfileUuid: action.payload.tokenProfileUuid,
-                                    }),
-                                    // appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
-                                ),
-                                of(
-                                    slice.actions.createCryptographicKeySuccess({
-                                        uuid: obj.uuid,
-                                        tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                                    }),
-                                    appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
-                                ),
+                    mergeMap((obj) =>
+                        iif(
+                            () => !!action.payload.usesGlobalModal,
+                            of(
+                                slice.actions.createCryptographicKeySuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                userInterfaceActions.hideGlobalModal(),
+                                slice.actions.listCryptographicKeyPairs({
+                                    tokenProfileUuid: action.payload.tokenProfileUuid,
+                                }),
                             ),
-                        // of(
-                        //     slice.actions.createCryptographicKeySuccess({
-                        //         uuid: obj.uuid,
-                        //         tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                        //     }),
-                        //     // appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
-                        // ),
+                            of(
+                                slice.actions.createCryptographicKeySuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                            ),
+                        ),
                     ),
 
                     catchError((err) =>

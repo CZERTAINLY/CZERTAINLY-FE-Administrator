@@ -335,7 +335,7 @@ export default function CertificateForm() {
                                                                 onAddNew={() => {
                                                                     dispatch(
                                                                         userInterfaceActions.showGlobalModal({
-                                                                            content: <TokenProfileForm usesGlobalModal={true} />,
+                                                                            content: <TokenProfileForm usesGlobalModal />,
                                                                             isOpen: true,
                                                                             size: "lg",
                                                                             title: "Add New Token Profile",
@@ -376,7 +376,7 @@ export default function CertificateForm() {
                                                                     onAddNew={() => {
                                                                         dispatch(
                                                                             userInterfaceActions.showGlobalModal({
-                                                                                content: <CryptographicKeyForm usesGlobalModal={true} />,
+                                                                                content: <CryptographicKeyForm usesGlobalModal />,
                                                                                 isOpen: true,
                                                                                 size: "lg",
                                                                                 title: "Add New Key",

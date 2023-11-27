@@ -1,5 +1,5 @@
 import { AppEpic } from "ducks";
-import { of } from "rxjs";
+import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { FunctionGroupCode } from "types/openapi";
 import { LockWidgetNameEnum } from "types/user-interface";
@@ -128,12 +128,16 @@ const createCredential: AppEpic = (action$, state, deps) => {
         filter(slice.actions.createCredential.match),
         switchMap((action) =>
             deps.apiClients.credentials
-                .createCredential({ credentialRequestDto: transformCredentialCreateRequestModelToDto(action.payload) })
+                .createCredential({ credentialRequestDto: transformCredentialCreateRequestModelToDto(action.payload.credentialRequest) })
                 .pipe(
                     mergeMap((obj) =>
-                        of(
-                            slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                        iif(
+                            () => !!action.payload.usesGlobalModal,
+                            of(slice.actions.createCredentialSuccess({ uuid: obj.uuid }), userInterfaceActions.hideGlobalModal()),
+                            of(
+                                slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
+                                appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            ),
                         ),
                     ),
 

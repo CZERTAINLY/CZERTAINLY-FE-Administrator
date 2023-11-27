@@ -21,8 +21,13 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 import { FunctionGroupCode, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
+
+interface CredentialFormProps {
+    usesGlobalModal?: boolean;
+}
 
 interface FormValues {
     name: string | undefined;
@@ -30,7 +35,7 @@ interface FormValues {
     storeKind: { value: string; label: string } | undefined;
 }
 
-export default function CredentialForm() {
+export default function CredentialForm({ usesGlobalModal = false }: CredentialFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -145,15 +150,18 @@ export default function CredentialForm() {
             } else {
                 dispatch(
                     actions.createCredential({
-                        name: values.name!,
-                        connectorUuid: values.credentialProvider!.value,
-                        kind: values.storeKind?.value!,
-                        attributes: collectFormAttributes(
-                            "credential",
-                            [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                            values,
-                        ),
-                        customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values),
+                        usesGlobalModal,
+                        credentialRequest: {
+                            name: values.name!,
+                            connectorUuid: values.credentialProvider!.value,
+                            kind: values.storeKind?.value!,
+                            attributes: collectFormAttributes(
+                                "credential",
+                                [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                values,
+                            ),
+                            customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values),
+                        },
                     }),
                 );
             }
@@ -374,7 +382,11 @@ export default function CredentialForm() {
                                         disabled={(editMode ? pristine : false) || !valid}
                                     />
 
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
+                                    <Button
+                                        color="default"
+                                        onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancel())}
+                                        disabled={submitting}
+                                    >
                                         Cancel
                                     </Button>
                                 </ButtonGroup>
