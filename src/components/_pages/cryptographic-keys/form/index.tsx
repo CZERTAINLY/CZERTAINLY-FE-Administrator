@@ -3,9 +3,10 @@ import TabLayout from "components/Layout/TabLayout";
 import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
+import { selectors as authSelectors } from "ducks/auth";
 import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as userActions, selectors as userSelectors } from "ducks/users";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as userActions, selectors as userSelectors } from "ducks/users";
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from "ducks/cryptographic-keys";
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
@@ -25,7 +26,7 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { KeyRequestType, PlatformEnum, Resource } from "../../../../types/openapi";
 
@@ -50,6 +51,7 @@ export default function CryptographicKeyForm() {
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const users = useSelector(userSelectors.users);
+    const auth = useSelector(authSelectors.profile);
     const keyRequestTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyRequestType));
 
     const tokenProfiles = useSelector(tokenProfilesSelectors.tokenProfiles);
@@ -307,7 +309,7 @@ export default function CryptographicKeyForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -326,7 +328,7 @@ export default function CryptographicKeyForm() {
                                 </FormGroup>
                             )}
                         </Field>
-                        
+
                         {editMode ? (
                             <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
@@ -353,7 +355,7 @@ export default function CryptographicKeyForm() {
                                         <FormFeedback>{meta.error}</FormFeedback>
                                     </FormGroup>
                                 )}
-                            </Field>    
+                            </Field>
                         ) : (
                             <Field name="owner">
                                 {({ input, meta }) => (
@@ -367,6 +369,7 @@ export default function CryptographicKeyForm() {
                                             className="form-control"
                                             placeholder="Enter Key Owner"
                                             disabled={!editMode}
+                                            value={auth?.username || ""}
                                             valid={!meta.touched || !meta.error}
                                             invalid={meta.touched && meta.error}
                                         />
