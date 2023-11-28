@@ -17,12 +17,6 @@
  */
 export interface CertificateUpdateObjectsDto {
     /**
-     * RA Profile UUID
-     * @type {string}
-     * @memberof CertificateUpdateObjectsDto
-     */
-    raProfileUuid?: string;
-    /**
      * Group UUID
      * @type {string}
      * @memberof CertificateUpdateObjectsDto
@@ -34,4 +28,10 @@ export interface CertificateUpdateObjectsDto {
      * @memberof CertificateUpdateObjectsDto
      */
     ownerUuid?: string;
+    /**
+     * RA Profile UUID
+     * @type {string}
+     * @memberof CertificateUpdateObjectsDto
+     */
+    raProfileUuid?: string;
 }

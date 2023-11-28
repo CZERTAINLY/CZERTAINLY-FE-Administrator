@@ -187,7 +187,11 @@ function RaProfileList() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{raProfile.description || ""}</span>,
 
-                    <Badge color="info">{raProfile.authorityInstanceName}</Badge>,
+                    raProfile.authorityInstanceName? (
+                        <Link to={`../authorities/detail/${raProfile.authorityInstanceUuid}`}>{raProfile.authorityInstanceName ?? "Unassigned"}</Link>
+                    ) : (
+                        raProfile.authorityInstanceName ?? "Unassigned"
+                    ),
 
                     getProtocolsForDisplay(raProfile.enabledProtocols),
 

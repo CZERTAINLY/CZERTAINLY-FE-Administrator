@@ -1,5 +1,7 @@
 import cx from "classnames";
+import { actions as alertActions } from "ducks/alerts";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { Handle, Position } from "reactflow";
 import { Button, Collapse } from "reactstrap";
@@ -13,7 +15,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
     // TODO: Use this during dynamic flowchart updates
     // const onEntering = () => setStatus("Opening...");
     // const onExiting = () => setStatus("Closing...");
-
+    const dispatch = useDispatch();
     const onEntered = () => setStatus("-");
     const onExited = () => setStatus("+");
     const toggle = () => setCollapse(!collapse);
@@ -130,11 +132,28 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                                 <i
                                                     onClick={() => {
                                                         if (typeof property.propertyValue === "string") {
-                                                            navigator.clipboard.writeText(property.propertyValue);
+                                                            navigator.clipboard
+                                                                .writeText(property.propertyValue)
+                                                                .then(
+                                                                    () =>
+                                                                        dispatch?.(
+                                                                            alertActions.success?.(
+                                                                                `${property.propertyName} copied to clipboard`,
+                                                                            ),
+                                                                        ),
+                                                                )
+                                                                .catch(
+                                                                    () =>
+                                                                        dispatch?.(
+                                                                            alertActions.error?.(
+                                                                                `Failed to copy ${property.propertyName} to clipboard`,
+                                                                            ),
+                                                                        ),
+                                                                );
                                                         }
                                                     }}
                                                     className="fa fa-copy ms-2"
-                                                ></i>
+                                                />
                                             )}
                                             {property?.propertyContent && <>{property.propertyContent}</>}
                                         </li>

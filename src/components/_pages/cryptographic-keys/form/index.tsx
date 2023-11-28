@@ -4,6 +4,7 @@ import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
 import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
+import { actions as userActions, selectors as userSelectors } from "ducks/users";
 import { actions as connectorActions } from "ducks/connectors";
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from "ducks/cryptographic-keys";
@@ -34,7 +35,7 @@ interface FormValues {
     tokenProfile: { value: TokenProfileResponseModel; label: string } | undefined;
     type?: { value: KeyRequestType; label: string } | undefined;
     group?: { value: CertificateGroupResponseModel; label: string } | undefined;
-    owner?: string | undefined;
+    owner?: { value: string; label: string } | undefined;
 }
 
 export default function CryptographicKeyForm() {
@@ -48,6 +49,7 @@ export default function CryptographicKeyForm() {
     const keyDetail = useSelector(cryptographicKeysSelectors.cryptographicKey);
 
     const groups = useSelector(groupSelectors.certificateGroups);
+    const users = useSelector(userSelectors.users);
     const keyRequestTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyRequestType));
 
     const tokenProfiles = useSelector(tokenProfilesSelectors.tokenProfiles);
@@ -76,7 +78,10 @@ export default function CryptographicKeyForm() {
         dispatch(tokenProfilesActions.listTokenProfiles({}));
         dispatch(connectorActions.clearCallbackData());
         dispatch(groupActions.listGroups());
-        if (editMode) dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId!, uuid: id! }));
+        if (editMode) {
+            dispatch(userActions.list());
+            dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId!, uuid: id! }));
+        }
     }, [dispatch, editMode, id, tokenId]);
 
     useEffect(() => {
@@ -139,7 +144,7 @@ export default function CryptographicKeyForm() {
                         cryptographicKeyEditRequest: {
                             description: values.description,
                             tokenProfileUuid: values.tokenProfile!.value.uuid,
-                            owner: values.owner ? values.owner : undefined,
+                            ownerUuid: values.owner ? values.owner.value : undefined,
                             groupUuid: values.group ? values.group.value.uuid : undefined,
                             name: values.name,
                         },
@@ -153,7 +158,6 @@ export default function CryptographicKeyForm() {
                         type: values.type!.value,
                         cryptographicKeyAddRequest: {
                             groupUuid: values.group?.value.uuid,
-                            owner: values.owner ? values.owner : "",
                             name: values.name,
                             description: values.description,
                             attributes: collectFormAttributes(
@@ -177,6 +181,15 @@ export default function CryptographicKeyForm() {
                 label: token.name,
             })),
         [tokenProfiles],
+    );
+
+    const optionsForUsers = useMemo(
+        () =>
+            users.map((user) => ({
+                value: user.uuid,
+                label: user.username,
+            })),
+        [groups],
     );
 
     const optionsForGroups = useMemo(
@@ -258,7 +271,11 @@ export default function CryptographicKeyForm() {
                     ? { value: keyDetail.group, label: keyDetail.group?.name }
                     : undefined
                 : undefined,
-            owner: editMode ? (keyDetail && keyDetail.owner ? keyDetail.owner : undefined) : undefined,
+            owner: editMode
+                ? keyDetail && keyDetail.ownerUuid && keyDetail.owner
+                    ? { value: keyDetail.ownerUuid, label: keyDetail.owner }
+                    : undefined
+                : undefined,
             type: undefined,
         }),
         [editMode, optionsForKeys, keyDetail],
@@ -309,26 +326,56 @@ export default function CryptographicKeyForm() {
                                 </FormGroup>
                             )}
                         </Field>
+                        
+                        {editMode ? (
+                            <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="owner">Owner</Label>
 
-                        <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="owner">Owner</Label>
+                                        <Select
+                                            {...input}
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={optionsForUsers}
+                                            placeholder="Select Owner"
+                                            onChange={(event) => {
+                                                input.onChange(event);
+                                            }}
+                                            styles={{
+                                                control: (provided) =>
+                                                    meta.touched && meta.invalid
+                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        : { ...provided },
+                                            }}
+                                        />
 
-                                    <Input
-                                        {...input}
-                                        id="owner"
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Enter Key Owner"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>    
+                        ) : (
+                            <Field name="owner">
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="owner">Owner</Label>
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
+                                        <Input
+                                            {...input}
+                                            id="owner"
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Enter Key Owner"
+                                            disabled={!editMode}
+                                            valid={!meta.touched || !meta.error}
+                                            invalid={meta.touched && meta.error}
+                                        />
+
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
+                        )}
 
                         <Field name="group">
                             {({ input, meta }) => (

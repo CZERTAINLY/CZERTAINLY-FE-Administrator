@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateDto, RaProfileDto, ResponseAttributeDto } from "./";
+import type { CertificateDto, ResponseAttributeDto, SimplifiedRaProfileDto } from "./";
 
 /**
  * @export
@@ -43,17 +43,10 @@ export interface ScepProfileDetailDto {
      */
     description?: string;
     /**
-     * Name of the RA Profile
-     * @type {string}
+     * @type {SimplifiedRaProfileDto}
      * @memberof ScepProfileDetailDto
      */
-    raProfileName?: string;
-    /**
-     * UUID of RA Profile
-     * @type {string}
-     * @memberof ScepProfileDetailDto
-     */
-    raProfileUuid?: string;
+    raProfile?: SimplifiedRaProfileDto;
     /**
      * Include CA certificate in the SCEP response
      * @type {boolean}
@@ -84,11 +77,6 @@ export interface ScepProfileDetailDto {
      * @memberof ScepProfileDetailDto
      */
     enableIntune?: boolean;
-    /**
-     * @type {RaProfileDto}
-     * @memberof ScepProfileDetailDto
-     */
-    raProfile?: RaProfileDto;
     /**
      * List of Attributes to issue a Certificate
      * @type {Array<ResponseAttributeDto>}

@@ -85,6 +85,12 @@ export interface KeyDetailDto {
      */
     owner?: string;
     /**
+     * UUID of the owner of the Key
+     * @type {string}
+     * @memberof KeyDetailDto
+     */
+    ownerUuid?: string;
+    /**
      * @type {GroupDto}
      * @memberof KeyDetailDto
      */

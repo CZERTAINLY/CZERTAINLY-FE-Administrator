@@ -19,12 +19,6 @@ import type { SearchFilterRequestDto } from "./";
  */
 export interface MultipleCertificateObjectUpdateDto {
     /**
-     * UUID of the RA Profile
-     * @type {string}
-     * @memberof MultipleCertificateObjectUpdateDto
-     */
-    raProfileUuid?: string;
-    /**
      * UUID of the Certificate Group
      * @type {string}
      * @memberof MultipleCertificateObjectUpdateDto
@@ -36,6 +30,12 @@ export interface MultipleCertificateObjectUpdateDto {
      * @memberof MultipleCertificateObjectUpdateDto
      */
     ownerUuid?: string;
+    /**
+     * UUID of the RA Profile
+     * @type {string}
+     * @memberof MultipleCertificateObjectUpdateDto
+     */
+    raProfileUuid?: string;
     /**
      * List of Certificate UUIDs
      * @type {Array<string>}

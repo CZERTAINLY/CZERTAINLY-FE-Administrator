@@ -8,6 +8,7 @@ import {
     RaProfileDto,
     RaProfileScepDetailResponseDto as RaProfileScepDetailResponseDtoOpenApi,
     SimplifiedComplianceProfileDto,
+    SimplifiedRaProfileDto
 } from "./openapi";
 
 export type RaProfileActivateAcmeRequestDto = ActivateAcmeForRaProfileRequestDto;
@@ -43,6 +44,9 @@ export type RaProfileEditRequestModel = Omit<RaProfileEditRequestDto, "attribute
     attributes: Array<AttributeRequestModel>;
     customAttributes?: Array<AttributeRequestModel>;
 };
+
+export type RaProfileSimplifiedDto = SimplifiedRaProfileDto;
+export type RaProfileSimplifiedModel = RaProfileSimplifiedDto;
 
 export type RaProfileResponseDto = RaProfileDto;
 export type RaProfileResponseModel = Omit<RaProfileResponseDto, "attributes | customAttributes"> & {
