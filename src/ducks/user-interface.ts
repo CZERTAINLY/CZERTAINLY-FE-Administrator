@@ -8,6 +8,7 @@ import { getLockWidgetObject } from "utils/net";
 export type State = {
     widgetLocks: WidgetLockModel[];
     globalModal: GloablModalModel;
+    initiateAttributeCallback: boolean;
 };
 
 export const initialState: State = {
@@ -19,6 +20,7 @@ export const initialState: State = {
         type: undefined,
         isOpen: false,
     },
+    initiateAttributeCallback: false,
 };
 
 export const slice = createSlice({
@@ -60,6 +62,10 @@ export const slice = createSlice({
         hideGlobalModal: (state) => {
             state.globalModal = initialState.globalModal;
         },
+
+        setInitiateAttributeCallback: (state, action: PayloadAction<boolean>) => {
+            state.initiateAttributeCallback = action.payload;
+        },
     },
 });
 
@@ -67,11 +73,13 @@ const selectState = createFeatureSelector<State>(slice.name);
 
 const selectWidgetLocks = createSelector(selectState, (state) => state.widgetLocks);
 const selectGlobalModal = createSelector(selectState, (state) => state.globalModal);
+const selectInitiateAttributeCallback = createSelector(selectState, (state) => state.initiateAttributeCallback);
 
 export const selectors = {
     selectState,
     selectWidgetLocks,
     selectGlobalModal,
+    selectInitiateAttributeCallback,
 };
 
 export const actions = slice.actions;

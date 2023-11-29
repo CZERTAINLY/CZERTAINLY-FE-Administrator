@@ -133,7 +133,11 @@ const createCredential: AppEpic = (action$, state, deps) => {
                     mergeMap((obj) =>
                         iif(
                             () => !!action.payload.usesGlobalModal,
-                            of(slice.actions.createCredentialSuccess({ uuid: obj.uuid }), userInterfaceActions.hideGlobalModal()),
+                            of(
+                                slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
+                                userInterfaceActions.hideGlobalModal(),
+                                userInterfaceActions.setInitiateAttributeCallback(true),
+                            ),
                             of(
                                 slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
                                 appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
