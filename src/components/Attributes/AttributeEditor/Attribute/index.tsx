@@ -20,10 +20,10 @@ import {
 import { AttributeConstraintType, AttributeContentType } from "types/openapi";
 
 import CustomSelectComponent from "components/CustomSelectComponent";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddNewAttributeList, AddNewAttributeType } from "types/user-interface";
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
 import { getAttributeContent } from "../../../../utils/attributes/attributes";
 import { getHighLightedCode } from "../../CodeBlock";
 
@@ -37,6 +37,8 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
     const form = useForm();
     const formState = useFormState();
     const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
+    const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
+    const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     const dispatch = useDispatch();
     useEffect(() => {
         if (descriptor?.name) {
@@ -92,6 +94,17 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
     const onFileDragOver = useCallback((e: React.DragEvent<HTMLInputElement>) => {
         e.preventDefault();
     }, []);
+
+    useEffect(() => {
+        if (initiateAttributeCallback && attributeCallbackValue && options) {
+            const newOption = options.find((option) => option.label === attributeCallbackValue);
+            if (newOption) {
+                form.change(name, newOption);
+                dispatch(userInterfaceActions.clearAttributeCallbackValue());
+                dispatch(userInterfaceActions.setInitiateAttributeCallback(false));
+            }
+        }
+    }, [attributeCallbackValue, dispatch, options, form, initiateAttributeCallback]);
 
     if (!descriptor) return <></>;
 

@@ -10,7 +10,7 @@ import { actions as cryptographyOperationActions, selectors as cryptographyOpera
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
+import { Field, Form, useForm } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +32,7 @@ import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
@@ -61,6 +61,9 @@ export default function CertificateForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const csrAttributeDescriptors = useSelector(certificateSelectors.csrAttributeDescriptors);
     const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
+    const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
+    const formCallbackValue = useSelector(userInterfaceSelectors.selectCallbackValue);
+    const initiateFormCallback = useSelector(userInterfaceSelectors.selectInitiateFormCallback);
 
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
@@ -230,6 +233,64 @@ export default function CertificateForm() {
         [],
     );
 
+    const RenderRequestKey = ({ values }: { values: FormValues }) => {
+        const form = useForm();
+        useEffect(() => {
+            if (initiateFormCallback && formCallbackValue) {
+                const newOption = keyOptions.find((option) => option.label === formCallbackValue);
+                if (newOption) {
+                    form.change("key", newOption);
+                    dispatch(userInterfaceActions.clearFormCallbackValue());
+                    dispatch(userInterfaceActions.setInitiateFormCallback(false));
+                }
+            }
+        }, [initiateFormCallback, formCallbackValue, dispatch, keyOptions]);
+
+        return values.tokenProfile ? (
+            <Field name="key" validate={validateRequired()}>
+                {({ input, meta, onChange }) => (
+                    <FormGroup>
+                        <Label for="key">Key</Label>
+
+                        <Select
+                            {...input}
+                            id="key"
+                            maxMenuHeight={140}
+                            menuPlacement="auto"
+                            options={keyOptions}
+                            placeholder="Select Key"
+                            onChange={(e) => {
+                                onKeyChange(e);
+                                input.onChange(e);
+                            }}
+                            components={{
+                                Menu: (props) => (
+                                    <CustomSelectComponent
+                                        onAddNew={() => {
+                                            dispatch(
+                                                userInterfaceActions.showGlobalModal({
+                                                    content: <CryptographicKeyForm usesGlobalModal />,
+                                                    isOpen: true,
+                                                    size: "lg",
+                                                    title: "Add New Key",
+                                                }),
+                                            );
+                                        }}
+                                        {...props}
+                                    />
+                                ),
+                            }}
+                        />
+
+                        <FormFeedback>{meta.error}</FormFeedback>
+                    </FormGroup>
+                )}
+            </Field>
+        ) : (
+            <></>
+        );
+    };
+
     return (
         <>
             <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
@@ -353,49 +414,7 @@ export default function CertificateForm() {
                                         )}
                                     </Field>
 
-                                    {values.tokenProfile ? (
-                                        <Field name="key" validate={validateRequired()}>
-                                            {({ input, meta, onChange }) => (
-                                                <FormGroup>
-                                                    <Label for="key">Key</Label>
-
-                                                    <Select
-                                                        {...input}
-                                                        id="key"
-                                                        maxMenuHeight={140}
-                                                        menuPlacement="auto"
-                                                        options={keyOptions}
-                                                        placeholder="Select Key"
-                                                        onChange={(e) => {
-                                                            onKeyChange(e);
-                                                            input.onChange(e);
-                                                        }}
-                                                        components={{
-                                                            Menu: (props) => (
-                                                                <CustomSelectComponent
-                                                                    onAddNew={() => {
-                                                                        dispatch(
-                                                                            userInterfaceActions.showGlobalModal({
-                                                                                content: <CryptographicKeyForm usesGlobalModal />,
-                                                                                isOpen: true,
-                                                                                size: "lg",
-                                                                                title: "Add New Key",
-                                                                            }),
-                                                                        );
-                                                                    }}
-                                                                    {...props}
-                                                                />
-                                                            ),
-                                                        }}
-                                                    />
-
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
-                                            )}
-                                        </Field>
-                                    ) : (
-                                        <></>
-                                    )}
+                                    <RenderRequestKey values={values} />
 
                                     {values.tokenProfile && values.key ? (
                                         <TabLayout

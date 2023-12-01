@@ -1,7 +1,7 @@
 import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "ducks/user-interface";
+import { selectors as userInterfaceSelectors } from "ducks/user-interface";
 import debounce from "lodash.debounce";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useFormState } from "react-final-form";
@@ -62,7 +62,7 @@ export default function AttributeEditor({
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
-
+    const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 
@@ -554,16 +554,7 @@ export default function AttributeEditor({
                 }
             }
         });
-        dispatch(userInterfaceActions.setInitiateAttributeCallback(false));
-    }, [
-        initiateAttributeCallback,
-        id,
-        attributeDescriptors,
-        groupAttributesCallbackAttributes,
-        attributes,
-        dispatch,
-        buildCallbackMappings,
-    ]);
+    }, [initiateAttributeCallback]);
 
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly

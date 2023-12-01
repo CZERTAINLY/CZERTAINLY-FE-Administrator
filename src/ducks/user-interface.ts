@@ -8,7 +8,10 @@ import { getLockWidgetObject } from "utils/net";
 export type State = {
     widgetLocks: WidgetLockModel[];
     globalModal: GloablModalModel;
-    initiateAttributeCallback: boolean;
+    initiateAttributeCallback?: boolean;
+    attributeCallbackValue?: string;
+    initiateFormCallback?: boolean;
+    formCallbackValue?: string;
 };
 
 export const initialState: State = {
@@ -20,7 +23,6 @@ export const initialState: State = {
         type: undefined,
         isOpen: false,
     },
-    initiateAttributeCallback: false,
 };
 
 export const slice = createSlice({
@@ -66,6 +68,26 @@ export const slice = createSlice({
         setInitiateAttributeCallback: (state, action: PayloadAction<boolean>) => {
             state.initiateAttributeCallback = action.payload;
         },
+
+        setAttributeCallbackValue: (state, action: PayloadAction<string>) => {
+            state.attributeCallbackValue = action.payload;
+        },
+
+        clearAttributeCallbackValue: (state) => {
+            state.attributeCallbackValue = undefined;
+        },
+
+        setInitiateFormCallback: (state, action: PayloadAction<boolean>) => {
+            state.initiateFormCallback = action.payload;
+        },
+
+        setFormCallbackValue: (state, action: PayloadAction<string>) => {
+            state.formCallbackValue = action.payload;
+        },
+
+        clearFormCallbackValue: (state) => {
+            state.formCallbackValue = undefined;
+        },
     },
 });
 
@@ -74,12 +96,18 @@ const selectState = createFeatureSelector<State>(slice.name);
 const selectWidgetLocks = createSelector(selectState, (state) => state.widgetLocks);
 const selectGlobalModal = createSelector(selectState, (state) => state.globalModal);
 const selectInitiateAttributeCallback = createSelector(selectState, (state) => state.initiateAttributeCallback);
+const selectAttributeCallbackValue = createSelector(selectState, (state) => state.attributeCallbackValue);
+const selectCallbackValue = createSelector(selectState, (state) => state.formCallbackValue);
+const selectInitiateFormCallback = createSelector(selectState, (state) => state.initiateFormCallback);
 
 export const selectors = {
     selectState,
     selectWidgetLocks,
     selectGlobalModal,
     selectInitiateAttributeCallback,
+    selectAttributeCallbackValue,
+    selectCallbackValue,
+    selectInitiateFormCallback,
 };
 
 export const actions = slice.actions;

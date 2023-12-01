@@ -4,8 +4,8 @@ import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
 import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as userActions, selectors as userSelectors } from "ducks/users";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as userActions, selectors as userSelectors } from "ducks/users";
 
 import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from "ducks/cryptographic-keys";
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
@@ -20,6 +20,7 @@ import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, In
 import { AttributeDescriptorModel } from "types/attributes";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { TokenProfileResponseModel } from "types/token-profiles";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
@@ -27,7 +28,6 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 import { KeyRequestType, PlatformEnum, Resource } from "../../../../types/openapi";
 
 interface CryptographicKeyFormProps {
@@ -332,7 +332,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                 </FormGroup>
                             )}
                         </Field>
-                        
+
                         {editMode ? (
                             <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
@@ -359,7 +359,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                         <FormFeedback>{meta.error}</FormFeedback>
                                     </FormGroup>
                                 )}
-                            </Field>    
+                            </Field>
                         ) : (
                             <Field name="owner">
                                 {({ input, meta }) => (

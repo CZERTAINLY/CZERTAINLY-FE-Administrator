@@ -137,6 +137,7 @@ const createCredential: AppEpic = (action$, state, deps) => {
                                 slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
                                 userInterfaceActions.hideGlobalModal(),
                                 userInterfaceActions.setInitiateAttributeCallback(true),
+                                userInterfaceActions.setAttributeCallbackValue(action.payload.credentialRequest.name),
                             ),
                             of(
                                 slice.actions.createCredentialSuccess({ uuid: obj.uuid }),

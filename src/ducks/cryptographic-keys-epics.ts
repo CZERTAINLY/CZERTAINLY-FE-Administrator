@@ -159,6 +159,8 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                                 slice.actions.listCryptographicKeyPairs({
                                     tokenProfileUuid: action.payload.tokenProfileUuid,
                                 }),
+                                userInterfaceActions.setInitiateFormCallback(true),
+                                userInterfaceActions.setFormCallbackValue(action.payload.cryptographicKeyAddRequest.name),
                             ),
                             of(
                                 slice.actions.createCryptographicKeySuccess({
