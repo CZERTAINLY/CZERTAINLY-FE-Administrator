@@ -10,7 +10,7 @@ import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoTo
 import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 import { store } from "index";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
 import {
@@ -32,7 +32,7 @@ import {
 } from "./transform/certificates";
 import { transformLocationResponseDtoToModel } from "./transform/locations";
 import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -46,14 +46,14 @@ const listCertificates: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.listCertificatesSuccess(list.certificates.map(transformCertificateListResponseDtoToModel)),
                             pagingActions.listSuccess({ entity: EntityType.CERTIFICATE, totalItems: list.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfCertificates),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCertificates),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.CERTIFICATE),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCertificates),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCertificates),
                         ),
                     ),
                 );
@@ -71,13 +71,13 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
                         slice.actions.getCertificateDetailSuccess({
                             certificate: transformCertificateDetailResponseDtoToModel(certificate),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificateDetailsWidget),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CertificateDetailsWidget),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
                     ),
                 ),
             ),
@@ -265,14 +265,14 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
                         slice.actions.getCertificateHistorySuccess({
                             certificateHistory: records.map((record) => transformCertificateHistoryDtoToModel(record)),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificateEventHistory),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CertificateEventHistory),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateHistoryFailure({ error: extractError(err, "Failed to get certificate history") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateEventHistory),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateEventHistory),
                     ),
                 ),
             ),
@@ -290,14 +290,14 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
                         slice.actions.listCertificateLocationsSuccess({
                             certificateLocations: locations.map((location) => transformLocationResponseDtoToModel(location)),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificationLocations),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CertificationLocations),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationLocations),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationLocations),
                     ),
                 ),
             ),

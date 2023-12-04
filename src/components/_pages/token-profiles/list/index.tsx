@@ -15,7 +15,7 @@ import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import Select from "react-select";
 import { KeyUsage, PlatformEnum } from "types/openapi";
 import { TokenProfileResponseModel } from "types/token-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function TokenProfileList() {
     const dispatch = useDispatch();

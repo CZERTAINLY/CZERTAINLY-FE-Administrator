@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
 
 export default function GlobalMetadataList() {

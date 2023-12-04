@@ -12,7 +12,7 @@ import {
     Row,
     UncontrolledPopover,
 } from "reactstrap";
-import { LockTypeEnum } from "types/widget-locks";
+import { LockTypeEnum } from "types/user-interface";
 import styles from "./WidgetLock.module.scss";
 interface Props {
     size?: "small" | "normal" | "large";

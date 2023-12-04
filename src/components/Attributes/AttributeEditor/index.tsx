@@ -1,6 +1,7 @@
 import Widget from "components/Widget";
 
 import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
+import { selectors as userInterfaceSelectors } from "ducks/user-interface";
 import debounce from "lodash.debounce";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useFormState } from "react-final-form";
@@ -60,7 +61,8 @@ export default function AttributeEditor({
     const formState = useFormState();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
-
+    const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
+    const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 
@@ -516,6 +518,43 @@ export default function AttributeEditor({
     useEffect(() => {
         ref.current(doCallbacks);
     }, [doCallbacks]);
+
+    useEffect(() => {
+        if (!initiateAttributeCallback) return;
+        let newOptions: { [attributeName: string]: { label: string; value: any }[] } = {};
+        const descriptorsToLoad = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+        setPrevGroupDescriptors(groupAttributesCallbackAttributes);
+        setPrevDescriptors(attributeDescriptors);
+        setPrevAttributes(attributes);
+        descriptorsToLoad.forEach((descriptor) => {
+            if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+
+                if (
+                    (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
+                    descriptor.properties.list &&
+                    Array.isArray(descriptor.content)
+                ) {
+                    newOptions = {
+                        ...newOptions,
+                        [formAttributeName]: descriptor.content.map((data) => ({
+                            label: data.reference ?? data.data.toString(),
+                            value: data,
+                        })),
+                    };
+                }
+
+                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                    if (descriptor.attributeCallback) {
+                        let mappings = buildCallbackMappings(descriptor);
+                        if (mappings) {
+                            executeCallback(mappings, descriptor, formAttributeName);
+                        }
+                    }
+                }
+            }
+        });
+    }, [initiateAttributeCallback]);
 
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly

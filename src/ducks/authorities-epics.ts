@@ -7,9 +7,9 @@ import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./authorities";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import {
     transformAuthorityRequestModelToDto,
     transformAuthorityResponseDtoToModel,
@@ -27,13 +27,13 @@ const listAuthorities: AppEpic = (action$, state$, deps) => {
                         slice.actions.listAuthoritiesSuccess({
                             authorityList: authorities.map(transformAuthorityResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.AuthorityStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.AuthorityStore),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.listAuthoritiesFailure({ error: extractError(err, "Failed to get Authorities list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.AuthorityStore),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.AuthorityStore),
                     ),
                 ),
             ),
@@ -50,14 +50,14 @@ const getAuthorityDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((authorityDto) =>
                     of(
                         slice.actions.getAuthorityDetailSuccess({ authority: transformAuthorityResponseDtoToModel(authorityDto) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CertificationAuthorityDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CertificationAuthorityDetails),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getAuthorityDetailFailure({ error: extractError(err, "Failed to get Authority detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationAuthorityDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationAuthorityDetails),
                     ),
                 ),
             ),

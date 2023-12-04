@@ -1,11 +1,11 @@
 import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import { slice } from "./connectors";
 
@@ -35,12 +35,15 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                         slice.actions.listConnectorsSuccess({
                             connectorList: list.map(transformConnectorResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
 
                 catchError((error) =>
-                    of(slice.actions.listConnectorsFailure(), widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore)),
+                    of(
+                        slice.actions.listConnectorsFailure(),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
+                    ),
                 ),
             ),
         ),
@@ -55,13 +58,13 @@ const getConnectorDetail: AppEpic = (action$, state, deps) => {
                 mergeMap((detail) =>
                     of(
                         slice.actions.getConnectorDetailSuccess({ connector: transformConnectorResponseDtoToModel(detail) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),
                 catchError((error) =>
                     of(
                         slice.actions.getConnectorDetailFailure(),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorDetails),
                     ),
                 ),
             ),
@@ -109,13 +112,13 @@ const getConnectorAllAttributesDescriptors: AppEpic = (action$, state, deps) => 
                         slice.actions.getConnectorAllAttributesDescriptorsSuccess({
                             attributeDescriptorCollection: transformAttributeDescriptorCollectionDtoToModel(descColl),
                         }),
-                    widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ConnectorAttributes),
+                    userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorAttributes),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getAllConnectorAllAttributesDescriptorsFailure(),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorAttributes),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorAttributes),
                     ),
                 ),
             ),

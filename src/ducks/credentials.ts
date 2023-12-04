@@ -129,7 +129,10 @@ export const slice = createSlice({
             state.isFetchingDetail = false;
         },
 
-        createCredential: (state, action: PayloadAction<CredentialCreateRequestModel>) => {
+        createCredential: (
+            state,
+            action: PayloadAction<{ credentialRequest: CredentialCreateRequestModel; usesGlobalModal?: boolean }>,
+        ) => {
             state.isCreating = true;
         },
 

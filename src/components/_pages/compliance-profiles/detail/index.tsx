@@ -19,7 +19,7 @@ import {
     ComplianceProfileResponseRuleRuleModel,
     ComplianceProfileRuleListResponseRuleModel,
 } from "types/complianceProfiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";

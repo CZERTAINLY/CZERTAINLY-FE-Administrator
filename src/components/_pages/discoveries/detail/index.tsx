@@ -12,7 +12,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Col, Container, Label, Row } from "reactstrap";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter } from "utils/dateUtil";
 import { Resource } from "../../../../types/openapi";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";

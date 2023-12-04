@@ -13,7 +13,7 @@ import PagedList from "components/PagedList/PagedList";
 import StatusBadge from "components/StatusBadge";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function LocationList() {
     const dispatch = useDispatch();

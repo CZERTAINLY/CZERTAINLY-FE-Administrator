@@ -5,9 +5,9 @@ import { RaProfileSimplifiedModel } from "types/certificate";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { slice } from "./compliance-profiles";
 import {
     transformComplianceProfileGroupListResponseDtoToModel,
@@ -31,7 +31,7 @@ const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listComplianceProfilesSuccess({
                             complianceProfileList: complianceProfiles.map(transformComplianceProfileListModelToDto),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfComplianceProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfComplianceProfiles),
                     ),
                 ),
                 catchError((error) =>
@@ -39,7 +39,7 @@ const listComplianceProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listComplianceProfilesFailed({
                             error: extractError(error, "Failed to get Compliance Profiles list"),
                         }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfComplianceProfiles),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfComplianceProfiles),
                     ),
                 ),
             ),
@@ -58,7 +58,7 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
                         slice.actions.getComplianceProfileSuccess({
                             complianceProfile: transformComplianceProfileResponseDtoToModel(detail),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ComplianceProfileDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
 
@@ -67,7 +67,7 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
                         slice.actions.getComplianceProfileFailed({
                             error: extractError(error, "Failed to get Compliance Profile details"),
                         }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
             ),
@@ -402,7 +402,7 @@ const getRules: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listComplianceRulesFailed({ error: extractError(error, "Failed to get compliance rules") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
             ),
@@ -422,7 +422,7 @@ const getGroups: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listComplianceGroupsFailed({ error: extractError(error, "Failed to get compliance groups") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
                 ),
             ),

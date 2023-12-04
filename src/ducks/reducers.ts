@@ -9,7 +9,7 @@ import { alertsSlice } from "./alert-slice";
 import { slice as appRedirectSlice } from "./app-redirect";
 import { slice as auditLogsSlice } from "./auditLogs";
 import { slice as authSlice } from "./auth";
-import { slice as widgetLockSlice } from "./widget-locks";
+import { slice as userInterfaceSlice } from "./user-interface";
 
 import { slice as profileApprovalSlice } from "./approval-profiles";
 
@@ -47,7 +47,7 @@ import { slice as utilsCertificateRequestSlice } from "./utilsCertificateRequest
 import { slice as utilsOidSlice } from "./utilsOid";
 export const reducers = combineReducers<typeof initialState, any>({
     [alertsSlice.name]: alertsSlice.reducer,
-    [widgetLockSlice.name]: widgetLockSlice.reducer,
+    [userInterfaceSlice.name]: userInterfaceSlice.reducer,
     [appRedirectSlice.name]: appRedirectSlice.reducer,
     [authSlice.name]: authSlice.reducer,
     [dashboardSlice.name]: dashboardSlice.reducer,

@@ -2,9 +2,9 @@ import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, map, switchMap } from "rxjs/operators";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { extractError } from "utils/net";
 import { slice } from "./approval-profiles";
 import {
@@ -27,14 +27,14 @@ const getApprovalProfile: AppEpic = (action$, state$, deps) => {
                     switchMap((response) =>
                         of(
                             slice.actions.getApprovalProfileSuccess(transformProfileApprovalDetailDtoToModel(response)),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ApprovalProfileDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ApprovalProfileDetails),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getApprovalProfileFailure({ error: extractError(err, "Failed to get Approval Profile details") }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ApprovalProfileDetails),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ApprovalProfileDetails),
                         ),
                     ),
                 ),
@@ -77,13 +77,13 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
                 switchMap((response) =>
                     of(
                         slice.actions.listApprovalProfilesSuccess(response),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
                         slice.actions.listApprovalProfilesFailure({ error: extractError(err, "Failed to get Approval Profiles list") }),
                     ),
                 ),

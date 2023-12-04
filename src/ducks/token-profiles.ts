@@ -115,6 +115,7 @@ export const slice = createSlice({
             action: PayloadAction<{
                 tokenInstanceUuid: string;
                 tokenProfileAddRequest: TokenProfileAddRequestModel;
+                usesGlobalModal: boolean;
             }>,
         ) => {
             state.isCreating = true;

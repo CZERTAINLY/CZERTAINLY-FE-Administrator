@@ -1,14 +1,14 @@
 import { AppEpic } from "ducks";
 import { iif, of } from "rxjs";
 import { catchError, concatMap, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./cryptographic-keys";
 import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
 import { transformSearchRequestModelToDto } from "./transform/certificates";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import { store } from "index";
 import { EntityType } from "./filters";
@@ -39,14 +39,14 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                                 list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
                             ),
                             pagingActions.listSuccess({ entity: EntityType.KEY, totalItems: list.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfKeys),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
 
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.KEY),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
                 );
@@ -88,14 +88,14 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
                             slice.actions.getCryptographicKeyDetailSuccess({
                                 cryptographicKey: transformCryptographicKeyDetailResponseDtoToModel(profileDto),
                             }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.keyDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.keyDetails),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getCryptographicKeyDetailFailure({ error: extractError(err, "Failed to get Key detail") }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.keyDetails),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.keyDetails),
                         ),
                     ),
                 ),
@@ -148,12 +148,27 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap((obj) =>
-                        of(
-                            slice.actions.createCryptographicKeySuccess({
-                                uuid: obj.uuid,
-                                tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                            }),
-                            appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                        iif(
+                            () => !!action.payload.usesGlobalModal,
+                            of(
+                                slice.actions.createCryptographicKeySuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                userInterfaceActions.hideGlobalModal(),
+                                slice.actions.listCryptographicKeyPairs({
+                                    tokenProfileUuid: action.payload.tokenProfileUuid,
+                                }),
+                                userInterfaceActions.setInitiateFormCallback(true),
+                                userInterfaceActions.setFormCallbackValue(action.payload.cryptographicKeyAddRequest.name),
+                            ),
+                            of(
+                                slice.actions.createCryptographicKeySuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                            ),
                         ),
                     ),
 

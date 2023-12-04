@@ -5,9 +5,9 @@ import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./token-profiles";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import {
     transformTokenProfileAddRequestModelToDto,
     transformTokenProfileDetailResponseDtoToModel,
@@ -25,14 +25,14 @@ const listTokenProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listTokenProfilesSuccess({
                             tokenProfiles: list.map(transformTokenProfileResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfTokenProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listTokenProfilesFailure({ error: extractError(error, "Failed to get Token profiles list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),
             ),
@@ -52,14 +52,14 @@ const getTokenProfileDetail: AppEpic = (action$, state$, deps) => {
                             slice.actions.getTokenProfileDetailSuccess({
                                 tokenProfile: transformTokenProfileDetailResponseDtoToModel(profileDto),
                             }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.TokenProfileDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.TokenProfileDetails),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.getTokenProfileDetailFailure({ error: extractError(err, "Failed to get Token Profile detail") }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenProfileDetails),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.TokenProfileDetails),
                         ),
                     ),
                 ),
@@ -79,12 +79,23 @@ const createTokenProfile: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap((obj) =>
-                        of(
-                            slice.actions.createTokenProfileSuccess({
-                                uuid: obj.uuid,
-                                tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                            }),
-                            appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                        iif(
+                            () => !!action.payload.usesGlobalModal,
+                            of(
+                                slice.actions.createTokenProfileSuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                userInterfaceActions.hideGlobalModal(),
+                                slice.actions.listTokenProfiles({ enabled: true }),
+                            ),
+                            of(
+                                slice.actions.createTokenProfileSuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                            ),
                         ),
                     ),
 

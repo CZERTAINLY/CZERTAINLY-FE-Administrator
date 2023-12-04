@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container } from "reactstrap";
 import { Resource } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();

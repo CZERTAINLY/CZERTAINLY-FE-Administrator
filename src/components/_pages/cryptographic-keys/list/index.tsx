@@ -15,8 +15,8 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Badge, Container } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
-import {KeyCompromiseReason, KeyUsage, PlatformEnum} from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter } from "utils/dateUtil";
 import KeyStateCircle from "../KeyStateCircle";
 import KeyStatusCircle from "../KeyStatusCircle";
@@ -242,11 +242,13 @@ function CryptographicKeyList() {
                     columns: [
                         <KeyStatusCircle status={cryptographicKey.enabled} />,
                         <KeyStateCircle state={cryptographicKey.state} />,
-                        <span style={{whiteSpace: "nowrap"}}>
+                        <span style={{ whiteSpace: "nowrap" }}>
                             <Link
-                                to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/${cryptographicKey.keyWrapperUuid}/${cryptographicKey.uuid}`}
+                                to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/${cryptographicKey.keyWrapperUuid}/${
+                                    cryptographicKey.uuid
+                                }`}
                             >
-                            {cryptographicKey.name}
+                                {cryptographicKey.name}
                             </Link>
                         </span>,
                         <Badge color="secondary">{getEnumLabel(keyTypeEnum, cryptographicKey.type)}</Badge>,
@@ -254,23 +256,29 @@ function CryptographicKeyList() {
                         cryptographicKey.length?.toString() || "unknown",
                         cryptographicKey.format || "unknown",
                         <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKey.creationTime) || ""}</span>,
-                        cryptographicKey.group? (
-                            <Link to={`../groups/detail/${cryptographicKey.group?.uuid}`}>{cryptographicKey.group.name ?? "Unassigned"}</Link>
+                        cryptographicKey.group ? (
+                            <Link to={`../groups/detail/${cryptographicKey.group?.uuid}`}>
+                                {cryptographicKey.group.name ?? "Unassigned"}
+                            </Link>
                         ) : (
                             cryptographicKey.group ?? "Unassigned"
                         ),
-                        cryptographicKey.ownerUuid? (
+                        cryptographicKey.ownerUuid ? (
                             <Link to={`../users/detail/${cryptographicKey.ownerUuid}`}>{cryptographicKey.owner ?? "Unassigned"}</Link>
                         ) : (
                             cryptographicKey.owner ?? "Unassigned"
                         ),
-                        cryptographicKey.tokenProfileName? (
-                            <Link to={`../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>{cryptographicKey.tokenProfileName ?? "Unassigned"}</Link>
+                        cryptographicKey.tokenProfileName ? (
+                            <Link to={`../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>
+                                {cryptographicKey.tokenProfileName ?? "Unassigned"}
+                            </Link>
                         ) : (
-                        cryptographicKey.tokenProfileName ?? "Unassigned"
+                            cryptographicKey.tokenProfileName ?? "Unassigned"
                         ),
-                        cryptographicKey.tokenInstanceName? (
-                            <Link to={`../tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>{cryptographicKey.tokenInstanceName ?? "Unassigned"}</Link>
+                        cryptographicKey.tokenInstanceName ? (
+                            <Link to={`../tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
+                                {cryptographicKey.tokenInstanceName ?? "Unassigned"}
+                            </Link>
                         ) : (
                             cryptographicKey.tokenInstanceName ?? "Unassigned"
                         ),

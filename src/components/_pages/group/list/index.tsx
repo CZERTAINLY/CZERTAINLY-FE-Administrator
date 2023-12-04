@@ -9,7 +9,7 @@ import Dialog from "components/Dialog";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 export default function GroupList() {
     const dispatch = useDispatch();
@@ -94,7 +94,7 @@ export default function GroupList() {
                 sortable: true,
                 sort: "asc",
                 width: "15%",
-            }
+            },
         ],
         [],
     );

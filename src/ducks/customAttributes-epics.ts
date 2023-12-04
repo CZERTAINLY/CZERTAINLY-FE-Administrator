@@ -7,9 +7,9 @@ import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./customAttributes";
 import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToModel } from "./transform/attributes";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import {
     transformCustomAttributeCreateRequestModelToDto,
     transformCustomAttributeDetailResponseDtoToModel,
@@ -25,13 +25,13 @@ const listCustomAttributes: AppEpic = (action$, state$, deps) => {
                 switchMap((list) =>
                     of(
                         slice.actions.listCustomAttributesSuccess(list.map(transformCustomAttributeResponseDtoToModel)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfCustomAttributes),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCustomAttributes),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.listCustomAttributesFailure({ error: extractError(err, "Failed to get Custom Attributes list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCustomAttributes),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfCustomAttributes),
                     ),
                 ),
             ),
@@ -224,13 +224,13 @@ const getCustomAttribute: AppEpic = (action$, state$, deps) => {
                 switchMap((customAttributeDetail) =>
                     of(
                         slice.actions.getCustomAttributeSuccess(transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.CustomAttributeDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CustomAttributeDetails),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getCustomAttributeFailure({ error: extractError(err, "Failed to get custom attribute detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.CustomAttributeDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CustomAttributeDetails),
                     ),
                 ),
             ),

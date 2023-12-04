@@ -12,7 +12,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { ApprovalDtoStatusEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter } from "utils/dateUtil";
 
 export default function ApprovalsList() {

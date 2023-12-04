@@ -4,11 +4,11 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { slice } from "./acme-accounts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { transformAcmeAccountListResponseDtoToModel, transformAcmeAccountResponseDtoToModel } from "./transform/acme-accounts";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -20,13 +20,13 @@ const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
                         slice.actions.listAcmeAccountsSuccess({
                             acmeAccounts: accounts.map(transformAcmeAccountListResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfACMEAccounts),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfACMEAccounts),
                     ),
                 ),
                 catchError((error) =>
                     of(
                         slice.actions.listAcmeAccountsFailed({ error: extractError(error, "Failed to get ACME Accounts list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEAccounts),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEAccounts),
                     ),
                 ),
             ),
@@ -44,14 +44,14 @@ const getAccountDetail: AppEpic = (action$, state$, deps) => {
                     switchMap((detail) =>
                         of(
                             slice.actions.getAcmeAccountSuccess({ acmeAccount: transformAcmeAccountResponseDtoToModel(detail) }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ACMEAccountDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ACMEAccountDetails),
                         ),
                     ),
 
                     catchError((error) =>
                         of(
                             slice.actions.getAcmeAccountFailed({ error: extractError(error, "Failed to get ACME Account details") }),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEAccountDetails),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEAccountDetails),
                         ),
                     ),
                 ),

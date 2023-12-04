@@ -1,3 +1,5 @@
+import CredentialForm from "components/_pages/credentials/form";
+
 export enum LockTypeEnum {
     GENERIC,
     NETWORK,
@@ -89,9 +91,29 @@ export interface WidgetLockModel {
     lockType: LockTypeEnum;
 }
 
-export interface ErrorMessageObjectModel {
+export interface WidgetLockErrorModel {
     lockTitle: string;
     lockText: string;
     lockDetails?: string;
     lockType: LockTypeEnum;
 }
+
+export interface GloablModalModel {
+    title?: string;
+    size?: "sm" | "lg";
+    content: string | JSX.Element | undefined;
+    type?: "success" | "error" | "warning" | "info" | "confirm" | "question";
+    isOpen: boolean;
+}
+
+export interface AddNewAttributeType {
+    name: string;
+    content: JSX.Element;
+}
+
+export const AddNewAttributeList: AddNewAttributeType[] = [
+    {
+        name: "credential",
+        content: <CredentialForm usesGlobalModal />,
+    },
+];

@@ -2,9 +2,9 @@ import { AppEpic } from "ducks";
 import { from, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import * as slice from "./auditLogs";
 import { transformAuditLogDtoToModel, transformAuditLogFilterModelToDto, transformPageableModelToDto } from "./transform/auditLogs";
 
@@ -27,12 +27,12 @@ const listLogs: AppEpic = (action$, state, deps) => {
                             totalPages: auditLogModel.totalPages,
                             totalItems: auditLogModel.totalItems,
                         });
-                        return [action, widgetLockActions.removeWidgetLock(LockWidgetNameEnum.AuditLogs)];
+                        return [action, userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.AuditLogs)];
                     }),
                     switchMap((actions) => from(actions)),
 
                     catchError((error) =>
-                        of(slice.actions.listLogsFailure(), widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.AuditLogs)),
+                        of(slice.actions.listLogsFailure(), userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.AuditLogs)),
                     ),
                 ),
         ),

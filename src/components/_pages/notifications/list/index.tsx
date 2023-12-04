@@ -11,7 +11,7 @@ import { WidgetButtonProps } from "components/WidgetButtons";
 import { useNavigate } from "react-router-dom";
 import { Button, Container } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter } from "utils/dateUtil";
 
 function NotificationsList() {

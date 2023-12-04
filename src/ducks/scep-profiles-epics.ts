@@ -3,7 +3,7 @@ import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./scep-profiles";
@@ -14,7 +14,7 @@ import {
     transformScepProfileListResponseDtoToModel,
     transformScepProfileResponseDtoToModel,
 } from "./transform/scep-profiles";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const listScepProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -26,14 +26,14 @@ const listScepProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listScepProfilesSuccess({
                             scepProfileList: scepProfiles.map(transformScepProfileListResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfSCEPProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSCEPProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listScepProfilesFailure({ error: extractError(error, "Failed to get SCEP Profiles list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSCEPProfiles),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSCEPProfiles),
                     ),
                 ),
             ),
@@ -74,14 +74,14 @@ const getScepProfileDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((detail) =>
                     of(
                         slice.actions.getScepProfileSuccess({ scepProfile: transformScepProfileResponseDtoToModel(detail) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.SCEPProfileDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.SCEPProfileDetails),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.getScepProfileFailure({ error: extractError(error, "Failed to get SCEP Profile details") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.SCEPProfileDetails),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.SCEPProfileDetails),
                     ),
                 ),
             ),
