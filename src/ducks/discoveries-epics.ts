@@ -5,10 +5,10 @@ import { extractError } from "utils/net";
 import { FunctionGroupCode, UuidDto } from "../types/openapi";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import { store } from "index";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { slice } from "./discoveries";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
@@ -32,14 +32,14 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listDiscoveriesSuccess(discoveryResponse.discoveries.map(transformDiscoveryResponseDtoToModel)),
                         pagingActions.listSuccess({ entity: EntityType.DISCOVERY, totalItems: discoveryResponse.totalItems }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.DiscoveriesStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         pagingActions.listFailure(EntityType.DISCOVERY),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveriesStore),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
             );
@@ -56,13 +56,13 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((discoveryDto) =>
                     of(
                         slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDetailDtoToModel(discoveryDto) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.DiscoveryDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.DiscoveryDetails),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getDiscoveryDetailFailure({ error: extractError(err, "Failed to get Discovery detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveryDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveryDetails),
                     ),
                 ),
             ),

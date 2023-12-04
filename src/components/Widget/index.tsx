@@ -4,10 +4,10 @@ import React, { useCallback } from "react";
 import Spinner from "components/Spinner";
 import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
 import WidgetLock from "components/WidgetLock";
-import { selectors } from "ducks/widget-locks";
+import { selectors } from "ducks/user-interface";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import style from "./Widget.module.scss";
 
 interface Props {

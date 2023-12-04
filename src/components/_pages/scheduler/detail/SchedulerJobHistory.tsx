@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge, Button } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter, timeFormatter } from "utils/dateUtil";
 
 interface Props {

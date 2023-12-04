@@ -4,12 +4,12 @@ import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import { AnyAction } from "@reduxjs/toolkit";
 import { store } from "index";
 import { FunctionGroupCode } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { EntityType } from "./filters";
 import { slice } from "./notifications";
 import { actions as pagingActions } from "./paging";
@@ -30,7 +30,7 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                 mergeMap((response) =>
                     of(
                         slice.actions.listOverviewNotificationsSuccess(response.items.map(transformNotificationDtoToModel)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.NotificationsOverview),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),
 
@@ -39,7 +39,7 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                         slice.actions.listOverviewNotificationsFailure({
                             error: extractError(err, "Failed to list overview notification"),
                         }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),
             ),
@@ -61,14 +61,14 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.listNotificationsSuccess(response.items.map(transformNotificationDtoToModel)),
                             pagingActions.listSuccess({ entity: EntityType.NOTIFICATIONS, totalItems: response.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfNotifications),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfNotifications),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.NOTIFICATIONS),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfNotifications),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfNotifications),
                         ),
                     ),
                 );
@@ -127,7 +127,7 @@ const listNotificationInstances: AppEpic = (action$, state$, deps) => {
                 mergeMap((res) =>
                     of(
                         slice.actions.listNotificationInstancesSuccess(res.map(transformNotificationInstanceDtoToModel)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.NotificationStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.NotificationStore),
                     ),
                 ),
 
@@ -136,7 +136,7 @@ const listNotificationInstances: AppEpic = (action$, state$, deps) => {
                         slice.actions.listNotificationInstancesFailure({
                             error: extractError(err, "Failed to list notification instances"),
                         }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationStore),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationStore),
                     ),
                 ),
             ),

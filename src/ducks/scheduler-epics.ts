@@ -3,10 +3,10 @@ import { iif, of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 import { extractError } from "utils/net";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 import { store } from "index";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { EntityType } from "./filters";
 import { actions as pagingActions } from "./paging";
 import { slice } from "./scheduler";
@@ -27,14 +27,14 @@ const listSchedulerJobs: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listSchedulerJobsSuccess(response.scheduledJobs.map(transformSchedulerJobDtoToModel)),
                         pagingActions.listSuccess({ entity: EntityType.SCHEDULER, totalItems: response.totalItems }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfScheduler),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfScheduler),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         pagingActions.listFailure(EntityType.SCHEDULER),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfScheduler),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfScheduler),
                     ),
                 ),
             );
@@ -51,14 +51,14 @@ const getSchedulerJob: AppEpic = (action$, state$, deps) => {
                 switchMap((response) =>
                     of(
                         slice.actions.getSchedulerJobDetailSuccess(transformSchedulerJobDetailDtoToModel(response)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.SchedulerJobDetail),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.SchedulerJobDetail),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getSchedulerJobDetailFailure({ error: extractError(err, "Failed to get Scheduled Job detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.SchedulerJobDetail),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.SchedulerJobDetail),
                     ),
                 ),
             ),
@@ -83,14 +83,14 @@ const listSchedulerJobHistory: AppEpic = (action$, state$, deps) => {
                                 response.scheduledJobHistory.map(transformSchedulerJobHistoryDtoToModel),
                             ),
                             pagingActions.listSuccess({ entity: EntityType.SCHEDULER_HISTORY, totalItems: response.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfSchedulerHistory),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSchedulerHistory),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.SCHEDULER_HISTORY),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfSchedulerHistory),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfSchedulerHistory),
                         ),
                     ),
                 );

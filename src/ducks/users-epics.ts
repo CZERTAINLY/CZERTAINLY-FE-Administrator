@@ -5,10 +5,10 @@ import { AppEpic } from "ducks";
 import { extractError } from "utils/net";
 
 import { actions as appRedirectActions } from "./app-redirect";
+import { actions as userInterfaceActions } from "./user-interface";
 import { slice } from "./users";
-import { actions as widgetLockActions } from "./widget-locks";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { transformRoleResponseDtoToModel, transformUserDetailDtoToModel, transformUserUpdateRequestModelToDto } from "./transform/auth";
 import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from "./transform/users";
 
@@ -22,14 +22,14 @@ const list: AppEpic = (action$, state, deps) => {
                         slice.actions.listSuccess({
                             users: list.map(transformUserResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfUsers),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfUsers),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listFailure({ error: extractError(err, "Failed to get user list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfUsers),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfUsers),
                     ),
                 ),
             ),
@@ -47,13 +47,13 @@ const getDetail: AppEpic = (action$, state, deps) => {
                         slice.actions.getDetailSuccess({
                             user: transformUserDetailDtoToModel(detail),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.UserDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.UserDetails),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getDetailFailure({ error: extractError(err, "Failed to load user detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.UserDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.UserDetails),
                     ),
                 ),
             ),

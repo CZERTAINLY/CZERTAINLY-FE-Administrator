@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container, Label } from "reactstrap";
 import { Resource, TokenInstanceStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
 import TokenActivationDialogBody from "../TokenActivationDialogBody";
 import RandomDataGeneration from "./RandomDataGeneration";

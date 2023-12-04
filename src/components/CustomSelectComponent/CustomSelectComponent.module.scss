@@ -1,0 +1,15 @@
+.customSelectAddIcon {
+    color: #296292;
+}
+
+.customSelectAddButton {
+    &:hover {
+        border-color: #296292 !important;
+    }
+    &:focus {
+        border-color: #296292 !important;
+    }
+    &:active {
+        border-color: #1c496e !important;
+    }
+}

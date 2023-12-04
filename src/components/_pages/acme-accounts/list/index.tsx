@@ -11,7 +11,7 @@ import StatusBadge from "components/StatusBadge";
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { acmeAccountStatus } from "../acmeAccountStatus";
 
 export default function AcmeAccountList() {

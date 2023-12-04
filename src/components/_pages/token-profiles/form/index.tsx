@@ -3,6 +3,7 @@ import ProgressButton from "components/ProgressButton";
 
 import Widget from "components/Widget";
 import { actions as connectorActions } from "ducks/connectors";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
 import { actions as tokensActions, selectors as tokensSelectors } from "ducks/tokens";
@@ -21,11 +22,14 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { KeyUsage, PlatformEnum, Resource } from "../../../../types/openapi";
 import TabLayout from "../../../Layout/TabLayout";
 
+interface TokenProfileFormFormProps {
+    usesGlobalModal?: boolean;
+}
 interface FormValues {
     name: string;
     description: string;
@@ -33,7 +37,7 @@ interface FormValues {
     usages: { value: KeyUsage; label: string }[];
 }
 
-export default function TokenProfileForm() {
+export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfileFormFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -124,6 +128,7 @@ export default function TokenProfileForm() {
                 dispatch(
                     tokenProfilesActions.createTokenProfile({
                         tokenInstanceUuid: values.token!.value,
+                        usesGlobalModal,
                         tokenProfileAddRequest: {
                             name: values.name,
                             description: values.description,
@@ -211,7 +216,7 @@ export default function TokenProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -335,8 +340,11 @@ export default function TokenProfileForm() {
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />
-
-                                <Button color="default" onClick={onCancelClick} disabled={submitting}>
+                                <Button
+                                    color="default"
+                                    onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
+                                    disabled={submitting}
+                                >
                                     Cancel
                                 </Button>
                             </ButtonGroup>

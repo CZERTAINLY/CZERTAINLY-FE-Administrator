@@ -7,7 +7,7 @@ import { alertsSlice, initialState as initialAlertsState } from "./alert-slice";
 import { slice as appRedirectSlice, initialState as initialAppRedirectState } from "./app-redirect";
 import { slice as auditLogsSlice, initialState as initialAuditLogsState } from "./auditLogs";
 import { slice as authSlice, initialState as initialAuthState } from "./auth";
-import { initialState as initialWidgetLockState, slice as widgetLockSlice } from "./widget-locks";
+import { initialState as initialWidgetLockState, slice as widgetLockSlice } from "./user-interface";
 
 import { initialState as initialProfileApprovalState, slice as profileApprovalSlice } from "./approval-profiles";
 

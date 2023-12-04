@@ -171,6 +171,19 @@ export const slice = createSlice({
                 tokenProfileUuid: string;
                 type: KeyRequestType;
                 cryptographicKeyAddRequest: CryptographicKeyAddRequestModel;
+                usesGlobalModal: boolean;
+            }>,
+        ) => {
+            state.isCreating = true;
+        },
+
+        createCryptographicKeyFromGlobalModal: (
+            state,
+            action: PayloadAction<{
+                tokenInstanceUuid: string;
+                tokenProfileUuid: string;
+                type: KeyRequestType;
+                cryptographicKeyAddRequest: CryptographicKeyAddRequestModel;
             }>,
         ) => {
             state.isCreating = true;

@@ -10,7 +10,7 @@ import { WidgetButtonProps } from "components/WidgetButtons";
 
 import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
 import Dialog from "components/Dialog";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function CredentialList() {
     const dispatch = useDispatch();

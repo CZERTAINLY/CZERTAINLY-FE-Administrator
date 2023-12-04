@@ -17,7 +17,7 @@ import { ApiClients } from "api";
 import PagedList from "components/PagedList/PagedList";
 import { actions as userAction, selectors as userSelectors } from "ducks/users";
 import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { dateFormatter } from "utils/dateUtil";
 import { AttributeRequestModel } from "../../../../types/attributes";
 import { CertificateType, PlatformEnum } from "../../../../types/openapi";

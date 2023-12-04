@@ -12,7 +12,7 @@ import { IconName, WidgetButtonProps } from "components/WidgetButtons";
 import { actions, selectors } from "ducks/paging";
 import { Observable } from "rxjs";
 import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 interface Props {
     entity: EntityType;

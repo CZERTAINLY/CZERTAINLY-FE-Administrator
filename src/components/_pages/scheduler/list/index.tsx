@@ -14,7 +14,7 @@ import PagedList from "components/PagedList/PagedList";
 import { WidgetButtonProps } from "components/WidgetButtons";
 import { SearchRequestModel } from "types/certificate";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 
 function SchedulerJobsList() {
     const dispatch = useDispatch();

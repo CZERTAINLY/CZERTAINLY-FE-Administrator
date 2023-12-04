@@ -6,9 +6,9 @@ import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./certificateGroups";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
 
 const listGroups: AppEpic = (action$, state$, deps) => {
@@ -21,14 +21,14 @@ const listGroups: AppEpic = (action$, state$, deps) => {
                         slice.actions.listGroupsSuccess({
                             groups: list.map(transformCertificateGroupResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfGroups),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.listGroupsFailure({ error: extractError(err, "Failed to get Group list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),
             ),
@@ -46,14 +46,14 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
                         slice.actions.getGroupDetailSuccess({
                             group: transformCertificateGroupResponseDtoToModel(groupDto),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.GroupDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.GroupDetails),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         slice.actions.getGroupDetailFailure({ error: extractError(err, "Failed to get Group detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
                     ),
                 ),
             ),

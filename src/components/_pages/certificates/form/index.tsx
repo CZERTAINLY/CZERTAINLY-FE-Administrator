@@ -10,7 +10,7 @@ import { actions as cryptographyOperationActions, selectors as cryptographyOpera
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
+import { Field, Form, useForm } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -24,11 +24,15 @@ import { TokenProfileResponseModel } from "types/token-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import CustomSelectComponent from "components/CustomSelectComponent";
+import CryptographicKeyForm from "components/_pages/cryptographic-keys/form";
+import TokenProfileForm from "components/_pages/token-profiles/form";
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
@@ -57,6 +61,9 @@ export default function CertificateForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const csrAttributeDescriptors = useSelector(certificateSelectors.csrAttributeDescriptors);
     const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
+    const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
+    const formCallbackValue = useSelector(userInterfaceSelectors.selectCallbackValue);
+    const initiateFormCallback = useSelector(userInterfaceSelectors.selectInitiateFormCallback);
 
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
@@ -226,127 +233,179 @@ export default function CertificateForm() {
         [],
     );
 
-    return (
-        <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
-            {({ handleSubmit, valid, submitting, values, form }) => (
-                <BootstrapForm onSubmit={handleSubmit}>
-                    <Widget title="Add new Certificate" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                        <Field name="raProfile" validate={validateRequired()}>
-                            {({ input, meta, onChange }) => (
-                                <FormGroup>
-                                    <Label for="raProfile">RA Profile</Label>
+    const RenderRequestKey = ({ values }: { values: FormValues }) => {
+        const form = useForm();
+        useEffect(() => {
+            if (initiateFormCallback && formCallbackValue) {
+                const newOption = keyOptions.find((option) => option.label === formCallbackValue);
+                if (newOption) {
+                    form.change("key", newOption);
+                    dispatch(userInterfaceActions.clearFormCallbackValue());
+                    dispatch(userInterfaceActions.setInitiateFormCallback(false));
+                }
+            }
+        }, [initiateFormCallback, formCallbackValue, dispatch, keyOptions]);
 
-                                    <Select
-                                        {...input}
-                                        id="raProfile"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={options}
-                                        placeholder="Select RA Profile"
-                                        onChange={(e) => {
-                                            onRaProfileChange(e);
-                                            input.onChange(e);
-                                        }}
-                                    />
+        return values.tokenProfile ? (
+            <Field name="key" validate={validateRequired()}>
+                {({ input, meta, onChange }) => (
+                    <FormGroup>
+                        <Label for="key">Key</Label>
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="uploadCsr">
-                            {({ input, meta, onChange }) => (
-                                <FormGroup>
-                                    <Label for="uploadCsr">Key Source</Label>
-                                    <Select
-                                        {...input}
-                                        id="uploadCsr"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={inputOptions}
-                                        placeholder="Select Key Source"
-                                        onChange={(e) => {
-                                            input.onChange(e);
-                                        }}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-                    </Widget>
-
-                    <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                        {values.uploadCsr?.value && values.raProfile ? (
-                            <>
-                                <FileUpload
-                                    editable
-                                    fileType={"CSR"}
-                                    onFileContentLoaded={(fileContent) => {
-                                        setFileContent(fileContent);
-                                        if (health) {
+                        <Select
+                            {...input}
+                            id="key"
+                            maxMenuHeight={140}
+                            menuPlacement="auto"
+                            options={keyOptions}
+                            placeholder="Select Key"
+                            onChange={(e) => {
+                                onKeyChange(e);
+                                input.onChange(e);
+                            }}
+                            components={{
+                                Menu: (props) => (
+                                    <CustomSelectComponent
+                                        onAddNew={() => {
                                             dispatch(
-                                                utilsCertificateRequestActions.parseCertificateRequest({
-                                                    content: fileContent,
-                                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                userInterfaceActions.showGlobalModal({
+                                                    content: <CryptographicKeyForm usesGlobalModal />,
+                                                    isOpen: true,
+                                                    size: "lg",
+                                                    title: "Add New Key",
                                                 }),
                                             );
-                                        }
-                                    }}
-                                />
+                                        }}
+                                        {...props}
+                                    />
+                                ),
+                            }}
+                        />
 
-                                {certificate && (
-                                    <>
-                                        <br />
-                                        <CertificateAttributes csr={true} certificate={certificate} />
-                                    </>
+                        <FormFeedback>{meta.error}</FormFeedback>
+                    </FormGroup>
+                )}
+            </Field>
+        ) : (
+            <></>
+        );
+    };
+
+    return (
+        <>
+            <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
+                {({ handleSubmit, valid, submitting, values, form }) => (
+                    <BootstrapForm onSubmit={handleSubmit}>
+                        <Widget title="Add new Certificate" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            <Field name="raProfile" validate={validateRequired()}>
+                                {({ input, meta, onChange }) => (
+                                    <FormGroup>
+                                        <Label for="raProfile">RA Profile</Label>
+
+                                        <Select
+                                            {...input}
+                                            id="raProfile"
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={options}
+                                            placeholder="Select RA Profile"
+                                            onChange={(e) => {
+                                                onRaProfileChange(e);
+                                                input.onChange(e);
+                                            }}
+                                        />
+
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
                                 )}
-                            </>
-                        ) : (
-                            <></>
-                        )}
+                            </Field>
 
-                        {values.uploadCsr && !values.uploadCsr?.value && values.raProfile ? (
-                            <>
-                                <Field name="tokenProfile" validate={validateRequired()}>
-                                    {({ input, meta, onChange }) => (
-                                        <FormGroup>
-                                            <Label for="tokenProfile">Token Profile</Label>
+                            <Field name="uploadCsr">
+                                {({ input, meta, onChange }) => (
+                                    <FormGroup>
+                                        <Label for="uploadCsr">Key Source</Label>
+                                        <Select
+                                            {...input}
+                                            id="uploadCsr"
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={inputOptions}
+                                            placeholder="Select Key Source"
+                                            onChange={(e) => {
+                                                input.onChange(e);
+                                            }}
+                                        />
 
-                                            <Select
-                                                {...input}
-                                                id="tokenProfile"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                options={tokenProfileOptions}
-                                                placeholder="Select Token Profile"
-                                                onChange={(e) => {
-                                                    onTokenProfileChange(e);
-                                                    input.onChange(e);
-                                                }}
-                                            />
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
+                        </Widget>
 
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
+                        <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            {values.uploadCsr?.value && values.raProfile ? (
+                                <>
+                                    <FileUpload
+                                        editable
+                                        fileType={"CSR"}
+                                        onFileContentLoaded={(fileContent) => {
+                                            setFileContent(fileContent);
+                                            if (health) {
+                                                dispatch(
+                                                    utilsCertificateRequestActions.parseCertificateRequest({
+                                                        content: fileContent,
+                                                        requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                    }),
+                                                );
+                                            }
+                                        }}
+                                    />
+
+                                    {certificate && (
+                                        <>
+                                            <br />
+                                            <CertificateAttributes csr={true} certificate={certificate} />
+                                        </>
                                     )}
-                                </Field>
+                                </>
+                            ) : (
+                                <></>
+                            )}
 
-                                {values.tokenProfile ? (
-                                    <Field name="key" validate={validateRequired()}>
+                            {values.uploadCsr && !values.uploadCsr?.value && values.raProfile ? (
+                                <>
+                                    <Field name="tokenProfile" validate={validateRequired()}>
                                         {({ input, meta, onChange }) => (
                                             <FormGroup>
-                                                <Label for="key">Key</Label>
+                                                <Label for="tokenProfile">Token Profile</Label>
 
                                                 <Select
                                                     {...input}
-                                                    id="key"
+                                                    id="tokenProfile"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
-                                                    options={keyOptions}
-                                                    placeholder="Select Key"
+                                                    options={tokenProfileOptions}
+                                                    placeholder="Select Token Profile"
                                                     onChange={(e) => {
-                                                        onKeyChange(e);
+                                                        onTokenProfileChange(e);
                                                         input.onChange(e);
+                                                    }}
+                                                    components={{
+                                                        Menu: (props) => (
+                                                            <CustomSelectComponent
+                                                                onAddNew={() => {
+                                                                    dispatch(
+                                                                        userInterfaceActions.showGlobalModal({
+                                                                            content: <TokenProfileForm usesGlobalModal />,
+                                                                            isOpen: true,
+                                                                            size: "lg",
+                                                                            title: "Add New Token Profile",
+                                                                        }),
+                                                                    );
+                                                                }}
+                                                                {...props}
+                                                            />
+                                                        ),
                                                     }}
                                                 />
 
@@ -354,97 +413,97 @@ export default function CertificateForm() {
                                             </FormGroup>
                                         )}
                                     </Field>
-                                ) : (
-                                    <></>
-                                )}
 
-                                {values.tokenProfile && values.key ? (
-                                    <TabLayout
-                                        tabs={[
-                                            {
-                                                title: "Request Attributes",
-                                                content: (
-                                                    <AttributeEditor
-                                                        id="csrAttributes"
-                                                        attributeDescriptors={csrAttributeDescriptors || []}
-                                                        groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
-                                                    />
-                                                ),
-                                            },
-                                            {
-                                                title: "Signature Attributes",
-                                                content: (
-                                                    <AttributeEditor
-                                                        id="signatureAttributes"
-                                                        attributeDescriptors={signatureAttributeDescriptors || []}
-                                                        groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                                    />
-                                                ),
-                                            },
-                                        ]}
+                                    <RenderRequestKey values={values} />
+
+                                    {values.tokenProfile && values.key ? (
+                                        <TabLayout
+                                            tabs={[
+                                                {
+                                                    title: "Request Attributes",
+                                                    content: (
+                                                        <AttributeEditor
+                                                            id="csrAttributes"
+                                                            attributeDescriptors={csrAttributeDescriptors || []}
+                                                            groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
+                                                        />
+                                                    ),
+                                                },
+                                                {
+                                                    title: "Signature Attributes",
+                                                    content: (
+                                                        <AttributeEditor
+                                                            id="signatureAttributes"
+                                                            attributeDescriptors={signatureAttributeDescriptors || []}
+                                                            groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
+                                                        />
+                                                    ),
+                                                },
+                                            ]}
+                                        />
+                                    ) : (
+                                        <></>
+                                    )}
+                                </>
+                            ) : (
+                                <></>
+                            )}
+                        </Widget>
+
+                        <Widget title="Other Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            <br />
+                            <TabLayout
+                                tabs={[
+                                    {
+                                        title: "Connector Attributes",
+                                        content: (
+                                            <AttributeEditor
+                                                id="issuance_attributes"
+                                                attributeDescriptors={
+                                                    issuanceAttributeDescriptors[values.raProfile?.value.uuid || "unknown"] || []
+                                                }
+                                                callbackParentUuid={values.raProfile?.value.authorityInstanceUuid}
+                                                callbackResource={Resource.RaProfiles}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        title: "Custom Attributes",
+                                        content: (
+                                            <AttributeEditor
+                                                id="customCertificate"
+                                                attributeDescriptors={resourceCustomAttributes}
+                                                attributes={values.raProfile?.value.customAttributes}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
+
+                            <br />
+
+                            <div className="d-flex justify-content-end">
+                                <ButtonGroup>
+                                    <ProgressButton
+                                        title="Create"
+                                        inProgressTitle="Creating"
+                                        inProgress={submitting || issuingCertificate}
+                                        disabled={!valid}
                                     />
-                                ) : (
-                                    <></>
-                                )}
-                            </>
-                        ) : (
-                            <></>
-                        )}
-                    </Widget>
 
-                    <Widget title="Other Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                        <br />
-                        <TabLayout
-                            tabs={[
-                                {
-                                    title: "Connector Attributes",
-                                    content: (
-                                        <AttributeEditor
-                                            id="issuance_attributes"
-                                            attributeDescriptors={
-                                                issuanceAttributeDescriptors[values.raProfile?.value.uuid || "unknown"] || []
-                                            }
-                                            callbackParentUuid={values.raProfile?.value.authorityInstanceUuid}
-                                            callbackResource={Resource.RaProfiles}
-                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                        />
-                                    ),
-                                },
-                                {
-                                    title: "Custom Attributes",
-                                    content: (
-                                        <AttributeEditor
-                                            id="customCertificate"
-                                            attributeDescriptors={resourceCustomAttributes}
-                                            attributes={values.raProfile?.value.customAttributes}
-                                        />
-                                    ),
-                                },
-                            ]}
-                        />
-
-                        <br />
-
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title="Create"
-                                    inProgressTitle="Creating"
-                                    inProgress={submitting || issuingCertificate}
-                                    disabled={!valid}
-                                />
-
-                                <Button color="default" onClick={onCancel} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </Widget>
-                </BootstrapForm>
-            )}
-        </Form>
+                                    <Button color="default" onClick={onCancel} disabled={submitting}>
+                                        Cancel
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
+                        </Widget>
+                    </BootstrapForm>
+                )}
+            </Form>
+        </>
     );
 }

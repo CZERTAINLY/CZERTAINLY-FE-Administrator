@@ -2,14 +2,14 @@ import { AppEpic } from "ducks";
 import { of } from "rxjs";
 import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { extractError } from "utils/net";
 import { updateBackendUtilsClients } from "../api";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
 import { slice } from "./settings";
 import { transformSettingsPlatformDtoToModel } from "./transform/settings";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const getPlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -21,13 +21,13 @@ const getPlatformSettings: AppEpic = (action$, state$, deps) => {
                     updateBackendUtilsClients(platformSettingsModel.utils.utilsServiceUrl);
                     return of(
                         slice.actions.getPlatformSettingsSuccess(platformSettingsModel),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
                     );
                 }),
                 catchError((err) =>
                     of(
                         slice.actions.getPlatformSettingsFailure({ error: extractError(err, "Failed to get platform settings") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.PlatformSettings),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.PlatformSettings),
                     ),
                 ),
             ),

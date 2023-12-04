@@ -12,7 +12,7 @@ import { dateFormatter } from "utils/dateUtil";
 
 import styles from "./auditLogs.module.scss";
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from "types/user-interface";
 import AuditLogsFilters from "./AuditLogsFilters";
 import ObjectValues from "./ObjectValues";
 
