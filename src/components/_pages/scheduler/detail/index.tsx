@@ -15,7 +15,8 @@ import { Badge, Container } from "reactstrap";
 import SwitchField from "components/Input/SwitchField";
 import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
 import { LockWidgetNameEnum } from "types/user-interface";
-import { getCronExpressionString } from "utils/dateUtil";
+import { getStrongFromCronExpression } from "utils/dateUtil";
+
 import SchedulerJobHistory from "./SchedulerJobHistory";
 
 export default function SchedulerJobDetail() {
@@ -147,7 +148,7 @@ export default function SchedulerJobDetail() {
                               "Cron Expression",
                               <>
                                   {schedulerJob.cronExpression}&nbsp;
-                                  <i className="fa fa-info-circle" title={getCronExpressionString(schedulerJob.cronExpression)}></i>
+                                  <i className="fa fa-info-circle" title={getStrongFromCronExpression(schedulerJob.cronExpression)}></i>
                               </>,
                           ],
                       },

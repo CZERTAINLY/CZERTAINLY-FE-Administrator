@@ -23,6 +23,7 @@
         "classnames": "^2.3.2",
         "cron-expression-validator": "^1.0.20",
         "cron-parser": "^4.8.1",
+        "cronstrue": "^2.47.0",
         "dagre": "^0.8.5",
         "dompurify": "^3.0.0",
         "file-saver": "^2.0.5",

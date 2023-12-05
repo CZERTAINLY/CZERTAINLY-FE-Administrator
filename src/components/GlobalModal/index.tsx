@@ -1,6 +1,6 @@
 import { actions, selectors } from "ducks/user-interface";
 import { useDispatch, useSelector } from "react-redux";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
 interface DialogButton {
     color: string;
@@ -34,7 +34,28 @@ export default function GlobalModal() {
 
             <ModalBody>{globalModal.content}</ModalBody>
 
-            <ModalFooter></ModalFooter>
+            <ModalFooter>
+                {globalModal.showOkButton && (
+                    <Button
+                        color="primary"
+                        onClick={() =>
+                            globalModal?.okButtonCallback ? globalModal.okButtonCallback() : dispatch(actions.hideGlobalModal())
+                        }
+                    >
+                        Ok
+                    </Button>
+                )}
+                {globalModal.showCancelButton && (
+                    <Button
+                        color="secondary"
+                        onClick={() => {
+                            dispatch(actions.hideGlobalModal());
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                )}
+            </ModalFooter>
         </Modal>
     );
 }

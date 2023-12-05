@@ -1,4 +1,5 @@
 import { parseExpression } from "cron-parser";
+import cronstrue from "cronstrue";
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
@@ -85,6 +86,15 @@ export const getCronExpression = (cronExpression: string | undefined) => {
 export const getCronExpressionString = (cronExpression: string | undefined) => {
     const times = getCronTimes(cronExpression);
     return times ? `Next five executions:\n${times.map((t, i) => (i > 0 ? "\n" : "") + dateFormatter(t)).join("")}` : "";
+};
+
+export const getStrongFromCronExpression = (cronExpression: string | undefined) => {
+    if (cronExpression) {
+        try {
+            return cronstrue.toString(cronExpression);
+        } catch (err) {}
+    }
+    return undefined;
 };
 
 export const formatTimeAgo = (input: any) => {
