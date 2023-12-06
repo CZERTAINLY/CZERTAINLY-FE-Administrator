@@ -51,7 +51,7 @@ export default function DiscoveryForm() {
     const isCreating = useSelector(discoverySelectors.isCreating);
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-
+    const [cronExpression, setCronExpression] = useState<string | undefined>();
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
     const isBusy = useMemo(
@@ -154,6 +154,8 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
+    console.log("cronExpression", cronExpression);
+
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, pristine, submitting, values, valid, form }) => (
@@ -186,28 +188,32 @@ export default function DiscoveryForm() {
                                             dispatch(
                                                 userInterfaceActions.showGlobalModal({
                                                     content: (
-                                                        <div className="d-flex justify-content-center">
-                                                            <Cron
-                                                                value={values.cronExpression}
-                                                                onChange={(e) => {
-                                                                    form.mutators.setAttribute("cronExpression", e);
-                                                                }}
-                                                                showResultText={true}
-                                                                showResultCron={true}
-                                                            />
+                                                        <div>
+                                                            <div className="d-flex justify-content-center">
+                                                                <Cron
+                                                                    value={values.cronExpression}
+                                                                    onChange={(e) => {
+                                                                        setCronExpression(e);
+                                                                        dispatch(
+                                                                            userInterfaceActions.setOkButtonCallback(() => {
+                                                                                dispatch(userInterfaceActions.hideGlobalModal());
+                                                                                setCronExpression(undefined);
+                                                                                form.mutators.setAttribute("cronExpression", e);
+                                                                            }),
+                                                                        );
+                                                                    }}
+                                                                    showResultText={true}
+                                                                    showResultCron={true}
+                                                                />
+                                                            </div>
                                                         </div>
                                                     ),
                                                     showCancelButton: true,
-                                                    showOkButton: true,
                                                     okButtonCallback: () => {
                                                         dispatch(userInterfaceActions.hideGlobalModal());
+                                                        setCronExpression(undefined);
                                                     },
-                                                    cancelButtonCallback: () => {
-                                                        if (values.cronExpression === undefined || values.cronExpression === "")
-                                                            form.mutators.setAttribute("cronExpression", undefined);
-
-                                                        dispatch(userInterfaceActions.hideGlobalModal());
-                                                    },
+                                                    showOkButton: true,
                                                     isOpen: true,
                                                     size: "lg",
                                                     title: "Select Cron timings",
