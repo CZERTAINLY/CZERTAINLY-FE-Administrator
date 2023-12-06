@@ -107,6 +107,7 @@ export interface GloablModalModel {
     showCancelButton?: boolean;
     showOkButton?: boolean;
     okButtonCallback?: () => void;
+    cancelButtonCallback?: () => void;
 }
 
 export interface AddNewAttributeType {

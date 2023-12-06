@@ -49,7 +49,6 @@ export default function DiscoveryForm() {
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
     const isFetchingAttributeDescriptors = useSelector(discoverySelectors.isFetchingDiscoveryProviderAttributeDescriptors);
     const isCreating = useSelector(discoverySelectors.isCreating);
-    const [cronExpression, setCronExpression] = useState("");
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
@@ -189,9 +188,9 @@ export default function DiscoveryForm() {
                                                     content: (
                                                         <div className="d-flex justify-content-center">
                                                             <Cron
-                                                                value={values.cronExpression || ""}
+                                                                value={values.cronExpression}
                                                                 onChange={(e) => {
-                                                                    setCronExpression(e);
+                                                                    form.mutators.setAttribute("cronExpression", e);
                                                                 }}
                                                                 showResultText={true}
                                                                 showResultCron={true}
@@ -201,8 +200,12 @@ export default function DiscoveryForm() {
                                                     showCancelButton: true,
                                                     showOkButton: true,
                                                     okButtonCallback: () => {
-                                                        form.mutators.setAttribute("cronExpression", cronExpression);
-                                                        setCronExpression("");
+                                                        dispatch(userInterfaceActions.hideGlobalModal());
+                                                    },
+                                                    cancelButtonCallback: () => {
+                                                        if (values.cronExpression === undefined || values.cronExpression === "")
+                                                            form.mutators.setAttribute("cronExpression", undefined);
+
                                                         dispatch(userInterfaceActions.hideGlobalModal());
                                                     },
                                                     isOpen: true,

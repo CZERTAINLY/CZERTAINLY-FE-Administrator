@@ -20,36 +20,32 @@ interface Props {
 
 export default function GlobalModal() {
     const globalModal = useSelector(selectors.selectGlobalModal);
+    const { isOpen, size, title, content, showCancelButton, showOkButton, okButtonCallback, cancelButtonCallback } = globalModal;
     const dispatch = useDispatch();
 
     return (
-        <Modal size={globalModal.size || undefined} isOpen={globalModal.isOpen} toggle={() => {}}>
+        <Modal size={size || undefined} isOpen={isOpen} toggle={() => {}}>
             <ModalHeader
                 toggle={() => {
                     dispatch(actions.hideGlobalModal());
                 }}
             >
-                {globalModal.title}
+                {title}
             </ModalHeader>
 
-            <ModalBody>{globalModal.content}</ModalBody>
+            <ModalBody>{content}</ModalBody>
 
             <ModalFooter>
-                {globalModal.showOkButton && (
-                    <Button
-                        color="primary"
-                        onClick={() =>
-                            globalModal?.okButtonCallback ? globalModal.okButtonCallback() : dispatch(actions.hideGlobalModal())
-                        }
-                    >
+                {showOkButton && (
+                    <Button color="primary" onClick={() => (okButtonCallback ? okButtonCallback() : dispatch(actions.hideGlobalModal()))}>
                         Ok
                     </Button>
                 )}
-                {globalModal.showCancelButton && (
+                {showCancelButton && (
                     <Button
                         color="secondary"
                         onClick={() => {
-                            dispatch(actions.hideGlobalModal());
+                            cancelButtonCallback ? cancelButtonCallback() : dispatch(actions.hideGlobalModal());
                         }}
                     >
                         Cancel
