@@ -104,6 +104,10 @@ export interface GloablModalModel {
     content: string | JSX.Element | undefined;
     type?: "success" | "error" | "warning" | "info" | "confirm" | "question";
     isOpen: boolean;
+    showCancelButton?: boolean;
+    showOkButton?: boolean;
+    okButtonCallback?: () => void;
+    cancelButtonCallback?: () => void;
 }
 
 export interface AddNewAttributeType {

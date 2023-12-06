@@ -1,6 +1,6 @@
 import { actions, selectors } from "ducks/user-interface";
 import { useDispatch, useSelector } from "react-redux";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
 interface DialogButton {
     color: string;
@@ -20,21 +20,38 @@ interface Props {
 
 export default function GlobalModal() {
     const globalModal = useSelector(selectors.selectGlobalModal);
+    const { isOpen, size, title, content, showCancelButton, showOkButton, okButtonCallback, cancelButtonCallback } = globalModal;
     const dispatch = useDispatch();
 
     return (
-        <Modal size={globalModal.size || undefined} isOpen={globalModal.isOpen} toggle={() => {}}>
+        <Modal size={size || undefined} isOpen={isOpen} toggle={() => {}}>
             <ModalHeader
                 toggle={() => {
                     dispatch(actions.hideGlobalModal());
                 }}
             >
-                {globalModal.title}
+                {title}
             </ModalHeader>
 
-            <ModalBody>{globalModal.content}</ModalBody>
+            <ModalBody>{content}</ModalBody>
 
-            <ModalFooter></ModalFooter>
+            <ModalFooter>
+                {showOkButton && (
+                    <Button color="primary" onClick={() => (okButtonCallback ? okButtonCallback() : dispatch(actions.hideGlobalModal()))}>
+                        Ok
+                    </Button>
+                )}
+                {showCancelButton && (
+                    <Button
+                        color="secondary"
+                        onClick={() => {
+                            cancelButtonCallback ? cancelButtonCallback() : dispatch(actions.hideGlobalModal());
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                )}
+            </ModalFooter>
         </Modal>
     );
 }

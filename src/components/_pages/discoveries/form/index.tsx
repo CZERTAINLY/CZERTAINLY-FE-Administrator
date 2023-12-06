@@ -9,6 +9,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 
 import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,11 +21,12 @@ import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode, Resource } from "types/openapi";
 
+import Cron from "react-cron-generator";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import { getStrongFromCronExpression } from "utils/dateUtil";
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from "utils/validators";
-
 interface FormValues {
     name: string | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
@@ -43,15 +45,13 @@ export default function DiscoveryForm() {
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
-
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
     const isFetchingAttributeDescriptors = useSelector(discoverySelectors.isFetchingDiscoveryProviderAttributeDescriptors);
     const isCreating = useSelector(discoverySelectors.isCreating);
-
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-
+    const [cronExpression, setCronExpression] = useState<string | undefined>();
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
     const isBusy = useMemo(
@@ -154,6 +154,8 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
+    console.log("cronExpression", cronExpression);
+
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, pristine, submitting, values, valid, form }) => (
@@ -173,12 +175,54 @@ export default function DiscoveryForm() {
                                     label="Job Name"
                                     validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
                                 />
+
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
                                     validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
                                     // description={getCronExpression(values.cronExpression)}
+                                    description={getStrongFromCronExpression(values.cronExpression)}
+                                    inputGroupIcon={{
+                                        icon: "fa fa-stopwatch",
+                                        onClick: () => {
+                                            dispatch(
+                                                userInterfaceActions.showGlobalModal({
+                                                    content: (
+                                                        <div>
+                                                            <div className="d-flex justify-content-center">
+                                                                <Cron
+                                                                    value={values.cronExpression}
+                                                                    onChange={(e) => {
+                                                                        setCronExpression(e);
+                                                                        dispatch(
+                                                                            userInterfaceActions.setOkButtonCallback(() => {
+                                                                                dispatch(userInterfaceActions.hideGlobalModal());
+                                                                                setCronExpression(undefined);
+                                                                                form.mutators.setAttribute("cronExpression", e);
+                                                                            }),
+                                                                        );
+                                                                    }}
+                                                                    showResultText={true}
+                                                                    showResultCron={true}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ),
+                                                    showCancelButton: true,
+                                                    okButtonCallback: () => {
+                                                        dispatch(userInterfaceActions.hideGlobalModal());
+                                                        setCronExpression(undefined);
+                                                    },
+                                                    showOkButton: true,
+                                                    isOpen: true,
+                                                    size: "lg",
+                                                    title: "Select Cron timings",
+                                                }),
+                                            );
+                                        },
+                                    }}
                                 />
+
                                 <SwitchField id="oneTime" label="One Time Only" />
                             </>
                         )}
