@@ -66,6 +66,7 @@ import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import cx from "classnames";
 import FlowChart, { CustomNode } from "components/FlowChart";
+import SwitchWidget from "components/SwitchWidget";
 import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
 import { Edge } from "reactflow";
 import { LockWidgetNameEnum } from "types/user-interface";
@@ -1209,6 +1210,32 @@ export default function CertificateDetail() {
         [certificate?.relatedCertificates],
     );
 
+    const switchCallback = useCallback(() => {
+        if (!certificate) return;
+
+        if (certificate?.trustedCa) {
+            dispatch(
+                actions.updateCertificateTrustedStatus({
+                    uuid: certificate.uuid,
+                    updateCertificateTrustedStatusRequest: {
+                        ...certificate,
+                        trustedCa: false,
+                    },
+                }),
+            );
+        } else {
+            dispatch(
+                actions.updateCertificateTrustedStatus({
+                    uuid: certificate.uuid,
+                    updateCertificateTrustedStatusRequest: {
+                        ...certificate,
+                        trustedCa: true,
+                    },
+                }),
+            );
+        }
+    }, [certificate]);
+
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
             ? []
@@ -1295,6 +1322,17 @@ export default function CertificateDetail() {
                   {
                       id: "complianceStatus",
                       columns: ["Compliance Status", <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na} />],
+                  },
+                  {
+                      id: "trusted",
+                      columns: [
+                          "Trusted",
+                          <SwitchWidget
+                              disabled={certificate.trustedCa == null}
+                              checked={certificate.trustedCa ?? false}
+                              onClick={switchCallback}
+                          />,
+                      ],
                   },
                   {
                       id: "fingerprint",

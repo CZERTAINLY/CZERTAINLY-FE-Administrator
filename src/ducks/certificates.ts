@@ -63,6 +63,7 @@ export type State = {
     isUpdatingGroup: boolean;
     isUpdatingRaProfile: boolean;
     isUpdatingOwner: boolean;
+    isUpdatingTrustedStatus: boolean;
 
     isBulkUpdatingGroup: boolean;
     isBulkUpdatingRaProfile: boolean;
@@ -111,6 +112,7 @@ export const initialState: State = {
     isUpdatingGroup: false,
     isUpdatingRaProfile: false,
     isUpdatingOwner: false,
+    isUpdatingTrustedStatus: false,
 
     isBulkUpdatingGroup: false,
     isBulkUpdatingRaProfile: false,
@@ -362,6 +364,28 @@ export const slice = createSlice({
 
         updateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingGroup = false;
+        },
+
+        updateCertificateTrustedStatus: (
+            state,
+            action: PayloadAction<{ uuid: string; updateCertificateTrustedStatusRequest: CertificateObjectModel }>,
+        ) => {
+            state.isUpdatingTrustedStatus = true;
+        },
+
+        updateCertificateTrustedStatusSuccess: (state, action: PayloadAction<{ uuid: string; trustedCa?: boolean }>) => {
+            state.isUpdatingTrustedStatus = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].trustedCa = action.payload.trustedCa ?? false;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid)
+                state.certificateDetail.trustedCa = action.payload.trustedCa ?? false;
+        },
+
+        updateCertificateTrustedStatusFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingTrustedStatus = false;
         },
 
         updateRaProfile: (
