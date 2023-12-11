@@ -9,8 +9,8 @@ interface Props {
 
 const SwitchWidget = ({ label, disabled, onClick, checked = false }: Props) => {
     return (
-        <FormGroup className="my-2" switch>
-            {label && <Label className="my-1">Switch label</Label>}
+        <FormGroup switch>
+            {label && <Label className="my-1">{label}</Label>}
             <Input className="my-2" type="switch" checked={checked} disabled={disabled} onClick={onClick} />
         </FormGroup>
     );

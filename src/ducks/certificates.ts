@@ -670,6 +670,7 @@ const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isUpdatingGroup = createSelector(state, (state) => state.isUpdatingGroup);
 const isUpdatingRaProfile = createSelector(state, (state) => state.isUpdatingRaProfile);
 const isUpdatingOwner = createSelector(state, (state) => state.isUpdatingOwner);
+const isUpdatingTrustedStatus = createSelector(state, (state) => state.isUpdatingTrustedStatus);
 
 const isBulkUpdatingGroup = createSelector(state, (state) => state.isBulkUpdatingGroup);
 const isBulkUpdatingRaProfile = createSelector(state, (state) => state.isBulkUpdatingRaProfile);
@@ -710,6 +711,7 @@ export const selectors = {
     isRekeying,
     isDeleting,
     isBulkDeleting,
+    isUpdatingTrustedStatus,
     isUpdatingGroup,
     isUpdatingRaProfile,
     isUpdatingOwner,

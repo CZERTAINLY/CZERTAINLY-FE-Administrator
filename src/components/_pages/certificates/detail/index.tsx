@@ -131,6 +131,7 @@ export default function CertificateDetail() {
     const isRekeying = useSelector(selectors.isRekeying);
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
     const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
+    const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
@@ -1212,6 +1213,7 @@ export default function CertificateDetail() {
 
     const switchCallback = useCallback(() => {
         if (!certificate) return;
+        if (isUpdatingTrustedStatus) return;
 
         if (certificate?.trustedCa) {
             dispatch(
@@ -1232,7 +1234,7 @@ export default function CertificateDetail() {
                 }),
             );
         }
-    }, [certificate]);
+    }, [certificate, isUpdatingTrustedStatus]);
 
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
@@ -1322,17 +1324,6 @@ export default function CertificateDetail() {
                       columns: ["Compliance Status", <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na} />],
                   },
                   {
-                      id: "trusted",
-                      columns: [
-                          "Trusted",
-                          <SwitchWidget
-                              disabled={certificate.trustedCa == null}
-                              checked={certificate.trustedCa ?? false}
-                              onClick={switchCallback}
-                          />,
-                      ],
-                  },
-                  {
                       id: "fingerprint",
                       columns: ["Fingerprint", certificate.fingerprint || ""],
                   },
@@ -1383,6 +1374,17 @@ export default function CertificateDetail() {
                 columns: ["ASN.1 Structure", certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
             });
         }
+
+        if (certificate?.trustedCa !== undefined) {
+            certDetail.unshift({
+                id: "trustedCa",
+                columns: [
+                    "Trusted CA",
+                    <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
+                ],
+            });
+        }
+
         return certDetail;
     }, [certificate, health, validationResult]);
 
