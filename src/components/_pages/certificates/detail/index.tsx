@@ -1218,7 +1218,6 @@ export default function CertificateDetail() {
                 actions.updateCertificateTrustedStatus({
                     uuid: certificate.uuid,
                     updateCertificateTrustedStatusRequest: {
-                        ...certificate,
                         trustedCa: false,
                     },
                 }),
@@ -1228,7 +1227,6 @@ export default function CertificateDetail() {
                 actions.updateCertificateTrustedStatus({
                     uuid: certificate.uuid,
                     updateCertificateTrustedStatusRequest: {
-                        ...certificate,
                         trustedCa: true,
                     },
                 }),
