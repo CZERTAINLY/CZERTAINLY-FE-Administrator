@@ -35,6 +35,7 @@ export const emptyCertificate: CertificateDetailResponseModel = {
     issuerSerialNumber: "",
     subjectAlternativeNames: {},
     privateKeyAvailability: false,
+    trustedCa: false,
 };
 
 export function formatPEM(pemString: string, csr?: boolean) {

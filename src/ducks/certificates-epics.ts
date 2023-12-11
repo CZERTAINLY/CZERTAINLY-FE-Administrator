@@ -450,6 +450,39 @@ const updateOwner: AppEpic = (action$, state, deps) => {
     );
 };
 
+const updateCertificateTrustedStatus: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateCertificateTrustedStatus.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .updateCertificateObjects({
+                    uuid: action.payload.uuid,
+                    certificateUpdateObjectsDto: action.payload.updateCertificateTrustedStatusRequest,
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateCertificateTrustedStatusSuccess({
+                                uuid: action.payload.uuid,
+                                trustedCa: action.payload.updateCertificateTrustedStatusRequest.trustedCa,
+                            }),
+                            slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateCertificateTrustedStatusFailure({
+                                error: extractError(err, "Failed to update certificate trusted status"),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to update certificate trusted status" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkUpdateGroup.match),
@@ -826,6 +859,7 @@ const epics = [
     deleteCertificate,
     updateGroup,
     updateRaProfile,
+    updateCertificateTrustedStatus,
     updateOwner,
     bulkUpdateGroup,
     bulkUpdateRaProfile,

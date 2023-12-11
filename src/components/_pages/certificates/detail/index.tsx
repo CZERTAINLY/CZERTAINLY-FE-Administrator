@@ -65,6 +65,7 @@ import CertificateRenewDialog from "../CertificateRenewDialog";
 
 import cx from "classnames";
 import FlowChart, { CustomNode } from "components/FlowChart";
+import SwitchWidget from "components/SwitchWidget";
 import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certificates";
 import { Edge } from "reactflow";
 import { LockWidgetNameEnum } from "types/user-interface";
@@ -129,6 +130,7 @@ export default function CertificateDetail() {
     const isRekeying = useSelector(selectors.isRekeying);
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
     const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
+    const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
@@ -1208,6 +1210,31 @@ export default function CertificateDetail() {
         [certificate?.relatedCertificates],
     );
 
+    const switchCallback = useCallback(() => {
+        if (!certificate) return;
+        if (isUpdatingTrustedStatus) return;
+
+        if (certificate?.trustedCa) {
+            dispatch(
+                actions.updateCertificateTrustedStatus({
+                    uuid: certificate.uuid,
+                    updateCertificateTrustedStatusRequest: {
+                        trustedCa: false,
+                    },
+                }),
+            );
+        } else {
+            dispatch(
+                actions.updateCertificateTrustedStatus({
+                    uuid: certificate.uuid,
+                    updateCertificateTrustedStatusRequest: {
+                        trustedCa: true,
+                    },
+                }),
+            );
+        }
+    }, [certificate, isUpdatingTrustedStatus]);
+
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
             ? []
@@ -1346,6 +1373,17 @@ export default function CertificateDetail() {
                 columns: ["ASN.1 Structure", certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
             });
         }
+
+        if (certificate?.trustedCa !== undefined) {
+            certDetail.unshift({
+                id: "trustedCa",
+                columns: [
+                    "Trusted CA",
+                    <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
+                ],
+            });
+        }
+
         return certDetail;
     }, [certificate, health, validationResult]);
 

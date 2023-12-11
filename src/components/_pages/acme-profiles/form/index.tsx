@@ -25,11 +25,11 @@ import { collectFormAttributes } from "utils/attributes/attributes";
 
 import {
     composeValidators,
-    validateAlphaNumericWithSpecialChars,
     validateAlphaNumericWithoutAccents,
     validateCustomIp,
     validateCustomUrl,
-    validateInteger, validateLength,
+    validateInteger,
+    validateLength,
     validateRequired,
 } from "utils/validators";
 import { Resource } from "../../../../types/openapi";
@@ -98,7 +98,7 @@ export default function AcmeProfileForm() {
     }, [dispatch]);
 
     useEffect(() => {
-        if (raProfile) {
+        if (raProfile && raProfile.authorityInstanceUuid) {
             dispatch(
                 raProfileActions.listIssuanceAttributeDescriptors({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }),
             );
@@ -245,7 +245,7 @@ export default function AcmeProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
