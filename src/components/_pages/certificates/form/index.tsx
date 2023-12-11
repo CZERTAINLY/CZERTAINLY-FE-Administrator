@@ -64,6 +64,8 @@ export default function CertificateForm() {
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     const formCallbackValue = useSelector(userInterfaceSelectors.selectCallbackValue);
     const initiateFormCallback = useSelector(userInterfaceSelectors.selectInitiateFormCallback);
+    const isFetchingKeyPairs = useSelector(keySelectors.isFetchingKeyPairs);
+    const isFetchingTokenProfileList = useSelector(tokenProfileSelectors.isFetchingTokenProfileList);
 
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
@@ -266,6 +268,8 @@ export default function CertificateForm() {
                             components={{
                                 Menu: (props) => (
                                     <CustomSelectComponent
+                                        title="Add New Key"
+                                        disabled={isFetchingKeyPairs}
                                         onAddNew={() => {
                                             dispatch(
                                                 userInterfaceActions.showGlobalModal({
@@ -393,6 +397,8 @@ export default function CertificateForm() {
                                                     components={{
                                                         Menu: (props) => (
                                                             <CustomSelectComponent
+                                                                disabled={isFetchingTokenProfileList}
+                                                                title="Add New Token Profile"
                                                                 onAddNew={() => {
                                                                     dispatch(
                                                                         userInterfaceActions.showGlobalModal({

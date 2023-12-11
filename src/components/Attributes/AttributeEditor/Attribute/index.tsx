@@ -22,6 +22,7 @@ import { AttributeConstraintType, AttributeContentType } from "types/openapi";
 import CustomSelectComponent from "components/CustomSelectComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { AddNewAttributeList, AddNewAttributeType } from "types/user-interface";
+import { capitalize } from "utils/common-utils";
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
 import { getAttributeContent } from "../../../../utils/attributes/attributes";
@@ -207,6 +208,7 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
                                 components={{
                                     Menu: (props) => (
                                         <CustomSelectComponent
+                                            title={`Add New ${capitalize(descriptor.name)}`}
                                             onAddNew={() => {
                                                 dispatch(
                                                     userInterfaceActions.showGlobalModal({

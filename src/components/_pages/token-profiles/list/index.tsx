@@ -24,7 +24,7 @@ function TokenProfileList() {
     const checkedRows = useSelector(selectors.checkedRows);
     const tokenProfiles = useSelector(selectors.tokenProfiles);
 
-    const isFetching = useSelector(selectors.isFetchingList);
+    const isFetching = useSelector(selectors.isFetchingTokenProfileList);
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
@@ -233,8 +233,10 @@ function TokenProfileList() {
 
                     <>{getTokenProfileUsages(tokenProfile)}</>,
 
-                    tokenProfile.tokenInstanceName? (
-                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>{tokenProfile.tokenInstanceName ?? "Unassigned"}</Link>
+                    tokenProfile.tokenInstanceName ? (
+                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>
+                            {tokenProfile.tokenInstanceName ?? "Unassigned"}
+                        </Link>
                     ) : (
                         tokenProfile.tokenInstanceName ?? "Unassigned"
                     ),

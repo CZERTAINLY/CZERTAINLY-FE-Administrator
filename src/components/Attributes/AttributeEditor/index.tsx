@@ -62,7 +62,7 @@ export default function AttributeEditor({
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
-    const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
+
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 

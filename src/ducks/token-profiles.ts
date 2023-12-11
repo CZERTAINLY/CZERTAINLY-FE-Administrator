@@ -20,7 +20,7 @@ export type State = {
     tokenProfile?: TokenProfileDetailResponseModel;
     tokenProfiles: TokenProfileResponseModel[];
 
-    isFetchingList: boolean;
+    isFetchingTokenProfileList: boolean;
     isFetchingDetail: boolean;
     isFetchingAttributes: boolean;
     isUpdatingKeyUsage: boolean;
@@ -44,7 +44,7 @@ export const initialState: State = {
 
     tokenProfiles: [],
 
-    isFetchingList: false,
+    isFetchingTokenProfileList: false,
     isFetchingDetail: false,
     isFetchingAttributes: false,
     isUpdatingKeyUsage: false,
@@ -84,16 +84,16 @@ export const slice = createSlice({
 
         listTokenProfiles: (state, action: PayloadAction<{ enabled?: boolean }>) => {
             state.tokenProfiles = [];
-            state.isFetchingList = true;
+            state.isFetchingTokenProfileList = true;
         },
 
         listTokenProfilesSuccess: (state, action: PayloadAction<{ tokenProfiles: TokenProfileResponseModel[] }>) => {
             state.tokenProfiles = action.payload.tokenProfiles;
-            state.isFetchingList = false;
+            state.isFetchingTokenProfileList = false;
         },
 
         listTokenProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingList = false;
+            state.isFetchingTokenProfileList = false;
         },
 
         getTokenProfileDetail: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string }>) => {
@@ -297,7 +297,7 @@ const checkedRows = createSelector(state, (state: State) => state.checkedRows);
 const tokenProfile = createSelector(state, (state: State) => state.tokenProfile);
 const tokenProfiles = createSelector(state, (state: State) => state.tokenProfiles);
 
-const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
+const isFetchingTokenProfileList = createSelector(state, (state: State) => state.isFetchingTokenProfileList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
@@ -319,7 +319,7 @@ export const selectors = {
     tokenProfile,
     tokenProfiles,
 
-    isFetchingList,
+    isFetchingTokenProfileList,
     isFetchingDetail,
     isFetchingAttributes,
     isCreating,

@@ -21,10 +21,10 @@ import { AttributeDescriptorModel } from "types/attributes";
 import { ConnectorResponseModel } from "types/connectors";
 import { FunctionGroupCode, Resource } from "types/openapi";
 
-import Cron from "react-cron-generator";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
+import CronWidget from "components/CronWidget";
 import { getStrongFromCronExpression } from "utils/dateUtil";
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from "utils/validators";
 interface FormValues {
@@ -154,8 +154,6 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
-    console.log("cronExpression", cronExpression);
-
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, pristine, submitting, values, valid, form }) => (
@@ -188,24 +186,22 @@ export default function DiscoveryForm() {
                                             dispatch(
                                                 userInterfaceActions.showGlobalModal({
                                                     content: (
-                                                        <div>
-                                                            <div className="d-flex justify-content-center">
-                                                                <Cron
-                                                                    value={values.cronExpression}
-                                                                    onChange={(e) => {
-                                                                        setCronExpression(e);
-                                                                        dispatch(
-                                                                            userInterfaceActions.setOkButtonCallback(() => {
-                                                                                dispatch(userInterfaceActions.hideGlobalModal());
-                                                                                setCronExpression(undefined);
-                                                                                form.mutators.setAttribute("cronExpression", e);
-                                                                            }),
-                                                                        );
-                                                                    }}
-                                                                    showResultText={true}
-                                                                    showResultCron={true}
-                                                                />
-                                                            </div>
+                                                        <div className="d-flex justify-content-center">
+                                                            <CronWidget
+                                                                onChange={(e) => {
+                                                                    setCronExpression(e);
+                                                                    dispatch(
+                                                                        userInterfaceActions.setOkButtonCallback(() => {
+                                                                            dispatch(userInterfaceActions.hideGlobalModal());
+                                                                            setCronExpression(undefined);
+                                                                            form.mutators.setAttribute("cronExpression", e);
+                                                                        }),
+                                                                    );
+                                                                }}
+                                                                showResultText={true}
+                                                                showResultCron={true}
+                                                                value={values.cronExpression}
+                                                            />
                                                         </div>
                                                     ),
                                                     showCancelButton: true,
