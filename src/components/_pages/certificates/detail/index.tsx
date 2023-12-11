@@ -28,13 +28,14 @@ import {
 } from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
+import "reactflow/dist/style.css";
 
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
 import {
     Badge,
     Form as BootstrapForm,
