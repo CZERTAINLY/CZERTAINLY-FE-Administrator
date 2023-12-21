@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.16.0"
 
       - name: Build
         run: |
@@ -76,12 +79,12 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     needs: install
-    strategy:
+    #strategy:
       # don't fail the entire matrix on failure
-      fail-fast: false
-      matrix:
+      #fail-fast: false
+      #matrix:
         # run copies of the current job in parallel
-        containers: [ 1, 2, 3 ]
+        #containers: [ 1, 2, 3 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -91,9 +94,6 @@ jobs:
         with:
           name: build
           path: build
-
-      - name: Node info
-        run: node -v
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
@@ -108,16 +108,13 @@ jobs:
   ui-firefox-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    container:
-      image: cypress/browsers:node-18.16.0-chrome-114.0.5735.133-1-ff-114.0.2-edge-114.0.1823.51-1
-      options: --user 1001
     needs: install
-    strategy:
+    #strategy:
       # don't fail the entire matrix on failure
-      fail-fast: false
-      matrix:
+      #fail-fast: false
+      #matrix:
         # run copies of the current job in parallel
-        containers: [ 1, 2, 3 ]
+        #containers: [ 1, 2, 3 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -142,12 +139,12 @@ jobs:
     timeout-minutes: 40
     runs-on: windows-2022
     needs: install-windows
-    strategy:
+    #strategy:
       # don't fail the entire matrix on failure
-      fail-fast: false
-      matrix:
+      #fail-fast: false
+      #matrix:
         # run copies of the current job in parallel
-        containers: [ 1, 2, 3 ]
+        #containers: [ 1, 2, 3 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
