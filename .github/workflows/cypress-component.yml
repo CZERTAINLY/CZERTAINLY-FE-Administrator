@@ -101,8 +101,8 @@ jobs:
           start: npm start
           browser: chrome
           #record: true
-          parallel: true
-          group: "UI - Chrome"
+          #parallel: true
+          #group: "UI - Chrome"
           component: true
 
   ui-firefox-tests:
@@ -134,8 +134,8 @@ jobs:
           start: npm start
           browser: firefox
           #record: true
-          parallel: true
-          group: "UI - Firefox"
+          #parallel: true
+          #group: "UI - Firefox"
           component: true
 
   ui-windows-tests:
@@ -166,6 +166,6 @@ jobs:
         with:
           start: npm start
           #record: true
-          parallel: true
-          group: "UI - Electron - Windows"
+          #parallel: true
+          #group: "UI - Electron - Windows"
           component: true
