@@ -17,9 +17,11 @@ jobs:
 
       - name: Cypress install
         uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_CI: false
         with:
           runTests: false
-          build: CI='' npm run build
+          build: npm run build
 
       # report machine parameters
       - run: yarn cypress info
@@ -44,9 +46,11 @@ jobs:
 
       - name: Cypress install
         uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_CI: false
         with:
           runTests: false
-          build: CI='' npm run build
+          build: npm run build
 
       # report machine parameters
       - run: yarn cypress info
