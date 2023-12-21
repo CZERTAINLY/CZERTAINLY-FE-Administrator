@@ -15,13 +15,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - run: export CI=false
+      - name: Build
+        run: |
+          npm install
+          npm run build
+        env:
+          CI: false
 
       - name: Cypress install
         uses: cypress-io/github-action@v6
         with:
           runTests: false
-          build: npm run build
 
       # report machine parameters
       - run: yarn cypress info
@@ -44,13 +48,17 @@ jobs:
         with:
           node-version: "18.16.0"
 
-      - run: export CI=false
+      - name: Build
+        run: |
+          npm install
+          npm run build
+        env:
+          CI: false
 
       - name: Cypress install
         uses: cypress-io/github-action@v6
         with:
           runTests: false
-          build: npm run build
 
       # report machine parameters
       - run: yarn cypress info
