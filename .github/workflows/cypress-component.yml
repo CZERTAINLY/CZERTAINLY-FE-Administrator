@@ -19,14 +19,12 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           runTests: false
+          build: npm run build
+
       # report machine parameters
       - run: yarn cypress info
       - run: node --version
       - run: node -p 'os.cpus()'
-      - run: yarn types
-      - run: yarn lint
-      - run: yarn test:unit:ci
-      - run: yarn build:ci
 
       - name: Save build folder
         uses: actions/upload-artifact@v3
@@ -48,13 +46,12 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           runTests: false
+          build: npm run build
+
       # report machine parameters
       - run: yarn cypress info
+      - run: node --version
       - run: node -p 'os.cpus()'
-      - run: yarn types
-      - run: yarn lint
-      - run: yarn test:unit:ci
-      - run: yarn build:ci
 
       - name: Save build folder
         uses: actions/upload-artifact@v3
@@ -68,14 +65,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: install
     strategy:
-      # when one test fails, DO NOT cancel the other
-      # containers, because this will kill Cypress processes
-      # leaving Cypress Cloud hanging ...
-      # https://github.com/cypress-io/github-action/issues/48
+      # don't fail the entire matrix on failure
       fail-fast: false
       matrix:
         # run copies of the current job in parallel
-        containers: [ 1, 2, 3, 4, 5 ]
+        containers: [ 1, 2, 3 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -89,30 +83,15 @@ jobs:
       - name: Node info
         run: node -v
 
-      - name: __e Dir
-        run: ls /__e
-
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
         with:
-          build: yarn cypress info
-          start: yarn start:ci
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
+          start: npm start
           browser: chrome
-          record: true
+          #record: true
           parallel: true
           group: "UI - Chrome"
-          #spec: cypress/tests/ui/*
-          config-file: cypress.config.ts
           component: true
-        env:
-          # CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-          # CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # Recommended: pass the GitHub token lets this action correctly
-          # determine the unique run id necessary to re-run the checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEBUG: "cypress:server:args"
 
   ui-firefox-tests:
     timeout-minutes: 15
@@ -122,14 +101,11 @@ jobs:
       options: --user 1001
     needs: install
     strategy:
-      # when one test fails, DO NOT cancel the other
-      # containers, because this will kill Cypress processes
-      # leaving Cypress Cloud hanging ...
-      # https://github.com/cypress-io/github-action/issues/48
+      # don't fail the entire matrix on failure
       fail-fast: false
       matrix:
         # run copies of the current job in parallel
-        containers: [ 1, 2, 3, 4, 5 ]
+        containers: [ 1, 2, 3 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -143,36 +119,23 @@ jobs:
       - name: "UI Tests - Firefox"
         uses: cypress-io/github-action@v6
         with:
-          start: yarn start:ci
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
+          start: npm start
           browser: firefox
-          record: true
+          #record: true
           parallel: true
           group: "UI - Firefox"
-          #spec: cypress/tests/ui/*
-          config-file: cypress.config.ts
           component: true
-        env:
-          # CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-          # CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # Recommended: pass the GitHub token lets this action correctly
-          # determine the unique run id necessary to re-run the checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   ui-windows-tests:
     timeout-minutes: 40
     runs-on: windows-2022
     needs: install-windows
     strategy:
-      # when one test fails, DO NOT cancel the other
-      # containers, because this will kill Cypress processes
-      # leaving Cypress Cloud hanging ...
-      # https://github.com/cypress-io/github-action/issues/48
+      # don't fail the entire matrix on failure
       fail-fast: false
       matrix:
         # run copies of the current job in parallel
-        containers: [ 1, 2, 3, 4, 5 ]
+        containers: [ 1, 2, 3 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -189,18 +152,8 @@ jobs:
       - name: "UI Tests - Electron - Windows"
         uses: cypress-io/github-action@v6
         with:
-          start: yarn start:ci
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
-          record: true
+          start: npm start
+          #record: true
           parallel: true
           group: "UI - Electron - Windows"
-          #spec: cypress/tests/ui/*
-          config-file: cypress.config.ts
           component: true
-        env:
-          # CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-          # CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # Recommended: pass the GitHub token lets this action correctly
-          # determine the unique run id necessary to re-run the checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
