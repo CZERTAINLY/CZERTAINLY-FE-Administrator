@@ -40,7 +40,7 @@ jobs:
         with:
           name: build-ubuntu
           if-no-files-found: error
-          path: install-ubuntu
+          path: build
 
   install-windows:
     runs-on: windows-2022
@@ -73,7 +73,7 @@ jobs:
         with:
           name: build-windows
           if-no-files-found: error
-          path: install-windows
+          path: build
 
   ui-chrome-tests:
     timeout-minutes: 15
@@ -93,7 +93,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-ubuntu
-          path: build-ubuntu
+          path: build
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
@@ -123,7 +123,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-ubuntu
-          path: build-ubuntu
+          path: build
 
       - name: "UI Tests - Firefox"
         uses: cypress-io/github-action@v6
@@ -156,7 +156,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-windows
-          path: build-windows
+          path: build
 
       - name: "UI Tests - Electron - Windows"
         uses: cypress-io/github-action@v6
