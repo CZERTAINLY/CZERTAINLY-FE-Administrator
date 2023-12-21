@@ -15,10 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - run: export CI=false
+
       - name: Cypress install
         uses: cypress-io/github-action@v6
-        env:
-          CYPRESS_CI: false
         with:
           runTests: false
           build: npm run build
@@ -44,10 +44,10 @@ jobs:
         with:
           node-version: "18.16.0"
 
+      - run: export CI=false
+
       - name: Cypress install
         uses: cypress-io/github-action@v6
-        env:
-          CYPRESS_CI: false
         with:
           runTests: false
           build: npm run build
