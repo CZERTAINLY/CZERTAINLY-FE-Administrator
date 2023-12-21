@@ -59,6 +59,7 @@ export * from "./CertificateComplianceCheckDto";
 export * from "./CertificateComplianceResultDto";
 export * from "./CertificateContentDto";
 export * from "./CertificateDetailDto";
+export * from "./CertificateDownloadResponseDto";
 export * from "./CertificateDto";
 export * from "./CertificateEventHistoryDto";
 export * from "./CertificateInLocationDto";

@@ -9,6 +9,7 @@ import {
     CertificateComplianceCheckModel,
     CertificateContentResponseModel,
     CertificateDetailResponseModel,
+    CertificateDownloadResponseModel,
     CertificateHistoryModel,
     CertificateListResponseModel,
     CertificateObjectModel,
@@ -42,6 +43,7 @@ export type State = {
     approvals?: ApprovalDto[];
     certificateChain?: CertificateChainResponseModel;
     certificateChainDownloadContent?: CertificateChainDownloadResponseModel;
+    certificateDownloadContent?: CertificateDownloadResponseModel;
 
     isFetchingValidationResult: boolean;
 
@@ -635,6 +637,12 @@ export const slice = createSlice({
         downloadCertificateChainFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingCertificateChainDownloadContent = false;
         },
+
+        downloadCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.certificateDownloadContent = undefined;
+        },
+
+        // downloadCertificate
     },
 });
 

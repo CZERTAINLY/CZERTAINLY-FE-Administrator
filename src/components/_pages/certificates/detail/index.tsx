@@ -25,6 +25,7 @@ import {
     CertificateState as CertStatus,
     CertificateValidationStatus,
     DownloadCertificateChainCertificateFormatEnum,
+    DownloadCertificateChainEncodingEnum,
 } from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -75,7 +76,7 @@ import styles from "./certificateDetail.module.scss";
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
-    certificateFormat?: DownloadCertificateChainCertificateFormatEnum;
+    certificateEncoding?: DownloadCertificateChainEncodingEnum;
 }
 
 export default function CertificateDetail() {
@@ -190,16 +191,17 @@ export default function CertificateDetail() {
     );
 
     const downloadCertificateChainContent = useCallback(
-        (certificateFormat: DownloadCertificateChainCertificateFormatEnum) => {
+        (certificateFormat: DownloadCertificateChainCertificateFormatEnum, certificateEncoding: DownloadCertificateChainEncodingEnum) => {
             if (!certificate) return;
             dispatch(
                 actions.downloadCertificateChain({
                     certificateFormat: certificateFormat,
                     uuid: certificate.uuid,
                     withEndCertificate: true,
+                    encoding: certificateEncoding,
                 }),
             );
-            setTriggerChainDownload({ isDownloadTriggered: true, certificateFormat: certificateFormat });
+            setTriggerChainDownload({ isDownloadTriggered: true, certificateEncoding: certificateEncoding });
         },
         [certificate],
     );
@@ -219,11 +221,8 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
 
-        if (chainDownloadSwitch.certificateFormat === DownloadCertificateChainCertificateFormatEnum.Pem) {
-            downloadFile(formatPEM(certificateChainDownloadContent.content ?? ""), fileNameToDownload + "_chain" + ".pem");
-        } else {
-            downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + ".p7b");
-        }
+        const extensionFormat = chainDownloadSwitch.certificateEncoding === DownloadCertificateChainEncodingEnum.Pem ? ".pem" : ".p7b";
+        downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + extensionFormat);
 
         setTriggerChainDownload({ isDownloadTriggered: false });
     }, [certificateChainDownloadContent, chainDownloadSwitch]);
@@ -567,19 +566,36 @@ export default function CertificateDetail() {
                     <DropdownItem
                         key="chainPem"
                         onClick={() => {
-                            downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pem);
+                            downloadCertificateChainContent(
+                                DownloadCertificateChainCertificateFormatEnum.Raw,
+                                DownloadCertificateChainEncodingEnum.Pem,
+                            );
                         }}
                     >
-                        PEM with chain (.pem)
+                        PEM with chain (Format:Raw) (.pem)
                     </DropdownItem>
 
                     <DropdownItem
                         key="pkcs7"
                         onClick={() => {
-                            downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pkcs7);
+                            downloadCertificateChainContent(
+                                DownloadCertificateChainCertificateFormatEnum.Pkcs7,
+                                DownloadCertificateChainEncodingEnum.Pem,
+                            );
                         }}
                     >
-                        PKCS#7 with chain (.p7b)
+                        PKCS#7 with chain as PEM (Format:pkcs7) (.p7b)
+                    </DropdownItem>
+                    <DropdownItem
+                        key="pkcs7"
+                        onClick={() => {
+                            downloadCertificateChainContent(
+                                DownloadCertificateChainCertificateFormatEnum.Pkcs7,
+                                DownloadCertificateChainEncodingEnum.Der,
+                            );
+                        }}
+                    >
+                        PKCS#7 with chain as Der (Format:pkcs7) (.p7b)
                     </DropdownItem>
                 </DropdownMenu>
             </UncontrolledButtonDropdown>

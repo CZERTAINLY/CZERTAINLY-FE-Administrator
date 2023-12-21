@@ -13,40 +13,34 @@
 
 /**
  * @export
- * @interface CertificateChainDownloadResponseDto
+ * @interface CertificateDownloadResponseDto
  */
-export interface CertificateChainDownloadResponseDto {
+export interface CertificateDownloadResponseDto {
     /**
      * Format of the downloaded content
      * @type {string}
-     * @memberof CertificateChainDownloadResponseDto
+     * @memberof CertificateDownloadResponseDto
      */
-    format: CertificateChainDownloadResponseDtoFormatEnum;
+    format: CertificateDownloadResponseDtoFormatEnum;
     /**
      * Encoding of the downloaded content
      * @type {string}
-     * @memberof CertificateChainDownloadResponseDto
+     * @memberof CertificateDownloadResponseDto
      */
-    encoding: CertificateChainDownloadResponseDtoEncodingEnum;
+    encoding: CertificateDownloadResponseDtoEncodingEnum;
     /**
      * Base64 encoded content in the specified format and encoding
      * @type {string}
-     * @memberof CertificateChainDownloadResponseDto
+     * @memberof CertificateDownloadResponseDto
      */
     content: string;
-    /**
-     * Indicator whether the chain returned is complete
-     * @type {boolean}
-     * @memberof CertificateChainDownloadResponseDto
-     */
-    completeChain: boolean;
 }
 
 /**
  * @export
  * @enum {string}
  */
-export enum CertificateChainDownloadResponseDtoFormatEnum {
+export enum CertificateDownloadResponseDtoFormatEnum {
     Raw = "raw",
     Pkcs7 = "pkcs7",
 }
@@ -54,7 +48,7 @@ export enum CertificateChainDownloadResponseDtoFormatEnum {
  * @export
  * @enum {string}
  */
-export enum CertificateChainDownloadResponseDtoEncodingEnum {
+export enum CertificateDownloadResponseDtoEncodingEnum {
     Pem = "pem",
     Der = "der",
 }

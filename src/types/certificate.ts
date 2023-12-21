@@ -10,6 +10,8 @@ import {
     CertificateComplianceResultDto,
     CertificateContentDto,
     CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
+    CertificateDownloadResponseDto,
+    CertificateDownloadResponseDtoFormatEnum,
     CertificateDto,
     CertificateEventHistoryDto,
     CertificateUpdateObjectsDto,
@@ -137,4 +139,9 @@ export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "c
 export type CertificateChainDownloadResponseModel = CertificateChainDownloadResponseDto;
 export type CertificateChainDownloadResponseDtoModel = Omit<CertificateChainDownloadResponseModel, "format"> & {
     format: CertificateChainDownloadResponseDtoFormatEnum;
+};
+
+export type CertificateDownloadResponseModel = CertificateDownloadResponseDto;
+export type CertificateDownloadResponseDtoModel = Omit<CertificateDownloadResponseModel, "format"> & {
+    format: CertificateDownloadResponseDtoFormatEnum;
 };
