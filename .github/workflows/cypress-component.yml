@@ -38,9 +38,9 @@ jobs:
       - name: Save build folder
         uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: build-ubuntu
           if-no-files-found: error
-          path: build
+          path: install-ubuntu
 
   install-windows:
     runs-on: windows-2022
@@ -71,9 +71,9 @@ jobs:
       - name: Save build folder
         uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: build-windows
           if-no-files-found: error
-          path: build
+          path: install-windows
 
   ui-chrome-tests:
     timeout-minutes: 15
@@ -92,8 +92,8 @@ jobs:
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
+          name: build-ubuntu
+          path: build-ubuntu
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
@@ -122,8 +122,8 @@ jobs:
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
+          name: build-ubuntu
+          path: build-ubuntu
 
       - name: "UI Tests - Firefox"
         uses: cypress-io/github-action@v6
@@ -155,8 +155,8 @@ jobs:
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
+          name: build-windows
+          path: build-windows
 
       - name: "UI Tests - Electron - Windows"
         uses: cypress-io/github-action@v6
