@@ -19,7 +19,8 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           runTests: false
-          build: CI=false npm run build
+          build: npm run build
+          env: CI=false
 
       # report machine parameters
       - run: yarn cypress info
@@ -46,7 +47,8 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           runTests: false
-          build: CI=false npm run build
+          build: npm run build
+          env: CI=false
 
       # report machine parameters
       - run: yarn cypress info
