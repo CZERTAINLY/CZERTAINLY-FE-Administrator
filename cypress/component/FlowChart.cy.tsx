@@ -1,6 +1,6 @@
 import FlowChart, { CustomNode } from "components/FlowChart";
 import { Edge, MarkerType, Position } from "reactflow";
-import { CertificateStatus } from "types/openapi";
+import { CertificateState, CertificateValidationStatus } from "types/openapi";
 import "../../src/resources/styles/theme.scss";
 
 const nodes: CustomNode[] = [
@@ -18,7 +18,9 @@ const nodes: CustomNode[] = [
             entityLabel: "demo.3key.test",
             icon: "fa fa-certificate",
             isMainNode: true,
-            certificateNodeStatus: CertificateStatus.Valid,
+            certificateNodeStatus: CertificateState.Issued,
+            certificateNodeValidationStatus: CertificateValidationStatus.Valid,
+            description: "This is a description",
             otherProperties: [
                 {
                     propertyName: "Serial Number",
