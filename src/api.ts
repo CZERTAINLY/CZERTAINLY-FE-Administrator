@@ -42,7 +42,8 @@ import {
 } from "types/openapi/utils";
 import { OIDUtilsAPIApi } from "./types/openapi/utils";
 
-const configuration = new Configuration({ basePath: (window as any).__ENV__.API_URL });
+const apiUrl = (window as any).__ENV__?.API_URL || "/api";
+const configuration = new Configuration({ basePath: apiUrl });
 
 export interface ApiClients {
     auth: AuthenticationManagementApi;
