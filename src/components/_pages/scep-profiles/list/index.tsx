@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { Container, Table } from "reactstrap";
 
 import { actions, selectors } from "ducks/scep-profiles";
 
@@ -204,8 +204,10 @@ export default function ScepProfiles() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{scepProfile.description || ""}</span>,
 
-                    scepProfile.raProfile? (
-                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>{scepProfile.raProfile.name ?? "Unassigned"}</Link>
+                    scepProfile.raProfile ? (
+                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>
+                            {scepProfile.raProfile.name ?? "Unassigned"}
+                        </Link>
                     ) : (
                         scepProfile.raProfile ?? "Unassigned"
                     ),

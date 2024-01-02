@@ -104,7 +104,7 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
                 dispatch(userInterfaceActions.setInitiateAttributeCallback(false));
             }
         }
-    }, [attributeCallbackValue, dispatch, options, form, initiateAttributeCallback]);
+    }, [attributeCallbackValue, dispatch, options, form, initiateAttributeCallback, name]);
 
     if (!descriptor) return <></>;
 

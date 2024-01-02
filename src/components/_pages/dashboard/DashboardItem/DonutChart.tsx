@@ -4,13 +4,6 @@ import ReactApexChart from "react-apexcharts";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SearchFilterModel } from "types/certificate";
-import {
-    CertificateEventHistoryDtoStatusEnum,
-    CertificateState,
-    CertificateValidationStatus,
-    ComplianceRuleStatus,
-    ComplianceStatus,
-} from "types/openapi";
 import { DashboardDict } from "types/statisticsDashboard";
 import { getValues, useGetLabels } from "utils/dashboard";
 
@@ -18,12 +11,6 @@ export interface ColorOptions {
     colors: string[];
 }
 
-type Status =
-    | CertificateState
-    | CertificateValidationStatus
-    | CertificateEventHistoryDtoStatusEnum
-    | ComplianceStatus
-    | ComplianceRuleStatus;
 interface Props {
     title: string;
     data?: DashboardDict;

@@ -29,7 +29,7 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
         if (!visible) return;
 
         dispatch(approvalProfileActions.listApprovalProfiles());
-    }, []);
+    }, [dispatch, visible]);
 
     const optionsForApprovalProfiles = useMemo(
         () =>

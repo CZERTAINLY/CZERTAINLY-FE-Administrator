@@ -195,7 +195,7 @@ export default function ApprovalsList() {
                         </Button>
                     </>
                 ) || "",
-                approval.creatorUsername? (
+                approval.creatorUsername ? (
                     <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? "Unassigned"}</Link>
                 ) : (
                     approval.creatorUsername ?? "Unassigned"
@@ -206,7 +206,7 @@ export default function ApprovalsList() {
                 approval.closedAt ? dateFormatter(approval.closedAt) : "",
             ],
         }));
-    }, [approvals, userApprovals, showAllApprovals]);
+    }, [approvals, userApprovals, showAllApprovals, navigate]);
 
     return (
         <Container className="themed-container" fluid>

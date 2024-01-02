@@ -179,7 +179,15 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                 );
             }
         },
-        [dispatch, editMode, id, cryptographicKeyAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+        [
+            dispatch,
+            editMode,
+            id,
+            cryptographicKeyAttributeDescriptors,
+            groupAttributesCallbackAttributes,
+            resourceCustomAttributes,
+            usesGlobalModal,
+        ],
     );
 
     const optionsForKeys = useMemo(
@@ -197,7 +205,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                 value: user.uuid,
                 label: user.username,
             })),
-        [groups],
+        [users],
     );
 
     const optionsForGroups = useMemo(

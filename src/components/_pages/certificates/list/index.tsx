@@ -185,7 +185,7 @@ export default function CertificateList({
                           onClick: () => {},
                       },
                   ],
-        [checkedRows.length, downloadDropDown, selectCertsOnly],
+        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList],
     );
 
     const certificatesRowHeaders: TableHeader[] = useMemo(
@@ -306,14 +306,18 @@ export default function CertificateList({
                         ),
                         certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
                         certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
-                        certificate.group? (
+                        certificate.group ? (
                             <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? "Unassigned"}</Link>
                         ) : (
                             certificate.group ?? "Unassigned"
                         ),
                         <span style={{ whiteSpace: "nowrap" }}>
-                            {certificate.raProfile? (
-                                <Link to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}>{certificate.raProfile.name ?? "Unassigned"}</Link>
+                            {certificate.raProfile ? (
+                                <Link
+                                    to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
+                                >
+                                    {certificate.raProfile.name ?? "Unassigned"}
+                                </Link>
                             ) : (
                                 certificate.raProfile ?? "Unassigned"
                             )}
