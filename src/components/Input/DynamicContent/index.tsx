@@ -4,7 +4,13 @@ import { useSelector } from "react-redux";
 import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
 import { InputType } from "reactstrap/types/lib/Input";
 import { AttributeContentType, PlatformEnum } from "types/openapi";
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateFloat, validateInteger, validateRequired } from "utils/validators";
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateFloat,
+    validateInteger,
+    validateRequired,
+} from "utils/validators";
 import ContentDescriptorField from "./ContentDescriptorField";
 
 const AllowedAttributeContentType = [

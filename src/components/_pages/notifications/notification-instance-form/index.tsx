@@ -21,7 +21,7 @@ import {
     validateAlphaNumericWithSpecialChars,
     validateAlphaNumericWithoutAccents,
     validateLength,
-    validateRequired
+    validateRequired,
 } from "utils/validators";
 
 interface SelectChangeValue {
@@ -308,7 +308,7 @@ const NotificationInstanceForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>

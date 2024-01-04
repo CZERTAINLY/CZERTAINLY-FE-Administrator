@@ -12,7 +12,8 @@ import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactst
 import { ApprovalStepRequestModel, ApproverType } from "types/approval-profiles";
 import {
     composeValidators,
-    validateAlphaNumericWithSpecialChars, validateLength,
+    validateAlphaNumericWithSpecialChars,
+    validateLength,
     validateNonZeroInteger,
     validatePositiveInteger,
     validateRequired,
@@ -198,7 +199,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
 
                     <Row>
                         <Col>
-                            <Field name={`approvalSteps[${index}].description`} validate={composeValidators(validateLength(0,300))}>
+                            <Field name={`approvalSteps[${index}].description`} validate={composeValidators(validateLength(0, 300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label htmlFor="stepDescription" className={styles.textInputLabel}>

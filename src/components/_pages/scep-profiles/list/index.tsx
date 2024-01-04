@@ -204,8 +204,10 @@ export default function ScepProfiles() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{scepProfile.description || ""}</span>,
 
-                    scepProfile.raProfile? (
-                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>{scepProfile.raProfile.name ?? "Unassigned"}</Link>
+                    scepProfile.raProfile ? (
+                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>
+                            {scepProfile.raProfile.name ?? "Unassigned"}
+                        </Link>
                     ) : (
                         scepProfile.raProfile ?? "Unassigned"
                     ),

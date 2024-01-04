@@ -55,7 +55,7 @@ function EntityList() {
                 id: entity.uuid,
                 columns: [
                     <Link to={`./detail/${entity.uuid}`}>{entity.name}</Link>,
-                    entity.connectorName? (
+                    entity.connectorName ? (
                         <Link to={`../connectors/detail/${entity.connectorUuid}`}>{entity.connectorName ?? "Unassigned"}</Link>
                     ) : (
                         entity.connectorName ?? "Unassigned"

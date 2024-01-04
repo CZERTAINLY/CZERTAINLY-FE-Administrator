@@ -114,7 +114,7 @@ function LocationList() {
                 columns: [
                     <Link to={`./detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
                     location.description || "",
-                    location.entityInstanceName? (
+                    location.entityInstanceName ? (
                         <Link to={`../entities/detail/${location.entityInstanceUuid}`}>{location.entityInstanceName ?? "Unassigned"}</Link>
                     ) : (
                         location.entityInstanceName ?? "Unassigned"

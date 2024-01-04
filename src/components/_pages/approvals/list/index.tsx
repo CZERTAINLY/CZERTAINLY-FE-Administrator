@@ -195,7 +195,7 @@ export default function ApprovalsList() {
                         </Button>
                     </>
                 ) || "",
-                approval.creatorUsername? (
+                approval.creatorUsername ? (
                     <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? "Unassigned"}</Link>
                 ) : (
                     approval.creatorUsername ?? "Unassigned"

@@ -153,7 +153,7 @@ function TokenList() {
                 columns: [
                     <Link to={`./detail/${token.uuid}`}>{token.name}</Link>,
 
-                    token.connectorName? (
+                    token.connectorName ? (
                         <Link to={`../connectors/detail/${token.connectorUuid}`}>{token.connectorName ?? "Unassigned"}</Link>
                     ) : (
                         token.connectorName ?? "Unassigned"

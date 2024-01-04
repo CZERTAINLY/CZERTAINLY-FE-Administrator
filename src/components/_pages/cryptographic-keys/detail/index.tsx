@@ -314,14 +314,14 @@ export default function CryptographicKeyDetail() {
                       {
                           id: "owner",
                           columns: [
-                            "Owner",
-                            cryptographicKey.ownerUuid? (
-                                <Link to={`${relativePath}/users/detail/${cryptographicKey.ownerUuid}`}>
-                                    {cryptographicKey.owner ?? "Unassigned"}
-                                </Link>
-                            ) : (
-                                cryptographicKey.owner || "Unassigned"
-                            ),
+                              "Owner",
+                              cryptographicKey.ownerUuid ? (
+                                  <Link to={`${relativePath}/users/detail/${cryptographicKey.ownerUuid}`}>
+                                      {cryptographicKey.owner ?? "Unassigned"}
+                                  </Link>
+                              ) : (
+                                  cryptographicKey.owner || "Unassigned"
+                              ),
                           ],
                       },
                       {

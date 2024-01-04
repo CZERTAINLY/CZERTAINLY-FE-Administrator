@@ -196,8 +196,10 @@ export default function AdministratorsList() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{acmeProfile.description || ""}</span>,
 
-                    acmeProfile.raProfile? (
-                        <Link to={`../raprofiles/detail/${acmeProfile?.raProfile.authorityInstanceUuid}/${acmeProfile?.raProfile.uuid}`}>{acmeProfile.raProfile.name ?? "Unassigned"}</Link>
+                    acmeProfile.raProfile ? (
+                        <Link to={`../raprofiles/detail/${acmeProfile?.raProfile.authorityInstanceUuid}/${acmeProfile?.raProfile.uuid}`}>
+                            {acmeProfile.raProfile.name ?? "Unassigned"}
+                        </Link>
                     ) : (
                         acmeProfile.raProfile ?? "Unassigned"
                     ),
