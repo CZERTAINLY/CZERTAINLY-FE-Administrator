@@ -62,7 +62,7 @@ export default function ApprovalDetails() {
             }),
         );
         setRecipientRejectDialog(false);
-    }, [dispatch, approvalDetails, setRecipientApproveDialog, comment]);
+    }, [dispatch, approvalDetails, comment]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -230,7 +230,7 @@ export default function ApprovalDetails() {
         }
     }, []);
 
-    const renderRecipiensDetails = (approvalStep: DetailApprovalStepModel) => {
+    const renderRecipiensDetails = useCallback((approvalStep: DetailApprovalStepModel) => {
         const data = approvalStep.approvalStepRecipients.map((recipient, i) => ({
             id: recipient.approvalRecipientUuid,
             columns: [
@@ -261,7 +261,7 @@ export default function ApprovalDetails() {
         ];
 
         return <CustomTable data={data} headers={headers} />;
-    };
+    }, []);
 
     const stepsRows: TableDataRow[] = useMemo(
         () =>

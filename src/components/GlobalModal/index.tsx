@@ -2,22 +2,6 @@ import { actions, selectors } from "ducks/user-interface";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
-interface DialogButton {
-    color: string;
-    body: string | JSX.Element;
-    onClick: (formData?: any) => void;
-    disabled?: boolean;
-}
-
-interface Props {
-    isOpen: boolean;
-    toggle?: () => void;
-    caption?: string | JSX.Element;
-    body?: string | JSX.Element;
-    buttons?: DialogButton[];
-    size?: "sm" | "lg" | "xl";
-}
-
 export default function GlobalModal() {
     const globalModal = useSelector(selectors.selectGlobalModal);
     const { isOpen, size, title, content, showCancelButton, showOkButton, okButtonCallback, cancelButtonCallback } = globalModal;

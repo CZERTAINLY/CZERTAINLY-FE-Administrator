@@ -152,6 +152,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
             tokenProfileAttributeDescriptors,
             groupAttributesCallbackAttributes,
             resourceCustomAttributes,
+            usesGlobalModal,
         ],
     );
 

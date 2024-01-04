@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { Container, Table } from "reactstrap";
 
 import { actions, selectors } from "ducks/acme-profiles";
 
@@ -196,8 +196,10 @@ export default function AdministratorsList() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{acmeProfile.description || ""}</span>,
 
-                    acmeProfile.raProfile? (
-                        <Link to={`../raprofiles/detail/${acmeProfile?.raProfile.authorityInstanceUuid}/${acmeProfile?.raProfile.uuid}`}>{acmeProfile.raProfile.name ?? "Unassigned"}</Link>
+                    acmeProfile.raProfile ? (
+                        <Link to={`../raprofiles/detail/${acmeProfile?.raProfile.authorityInstanceUuid}/${acmeProfile?.raProfile.uuid}`}>
+                            {acmeProfile.raProfile.name ?? "Unassigned"}
+                        </Link>
                     ) : (
                         acmeProfile.raProfile ?? "Unassigned"
                     ),

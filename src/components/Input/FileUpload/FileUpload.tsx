@@ -73,7 +73,7 @@ export default function FileUpload({ id = "", fileType = "", editable, onFileCon
             const base64Content = btoa(fileContentLatest);
             debounce(() => onFileContentLoaded(base64Content), 1000)();
         },
-        [onFileContentLoaded],
+        [onFileContentLoaded, fileContent],
     );
 
     return (

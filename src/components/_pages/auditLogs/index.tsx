@@ -96,6 +96,8 @@ function AuditLogs() {
                 <Button color={"default"} onClick={exportCallback}>
                     Export
                 </Button>
+                {/* Added eslint-disable-next-line because the anchor tag is blank and is used to download the file */}
+                {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
                 <a id={"exportLink"} href={exportUrl} download="auditLogs.zip" hidden={true} />
                 <Button type="submit" color="primary" onClick={purgeCallback}>
                     Purge
@@ -109,8 +111,6 @@ function AuditLogs() {
         () => [
             {
                 content: "Id",
-                // sortable: true,
-                // sortType: "numeric",
                 align: "left",
                 id: "id",
                 width: "5%",

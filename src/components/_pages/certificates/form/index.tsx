@@ -5,12 +5,12 @@ import Widget from "components/Widget";
 
 import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
 import { actions as connectorActions } from "ducks/connectors";
-import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
-import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
+import { actions as keyActions } from "ducks/cryptographic-keys";
+import { selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
 import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form, useForm } from "react-final-form";
+import { Field, Form } from "react-final-form";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -25,25 +25,25 @@ import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 
 import CustomSelectComponent from "components/CustomSelectComponent";
-import CryptographicKeyForm from "components/_pages/cryptographic-keys/form";
 import TokenProfileForm from "components/_pages/token-profiles/form";
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
 import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
 import { validateRequired } from "utils/validators";
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
-import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
 } from "../../../../ducks/utilsCertificateRequest";
 import { CertificateDetailResponseModel } from "../../../../types/certificate";
-import { KeyType, Resource } from "../../../../types/openapi";
+import { Resource } from "../../../../types/openapi";
 import CertificateAttributes from "../../../CertificateAttributes";
 import FileUpload from "../../../Input/FileUpload/FileUpload";
 import TabLayout from "../../../Layout/TabLayout";
+import RenderRequestKey from "./RenderRequestKey";
 
-interface FormValues {
+export interface FormValues {
     raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
     pkcs10: File | null;
     uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
@@ -61,13 +61,8 @@ export default function CertificateForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const csrAttributeDescriptors = useSelector(certificateSelectors.csrAttributeDescriptors);
     const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
-    const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
-    const formCallbackValue = useSelector(userInterfaceSelectors.selectCallbackValue);
-    const initiateFormCallback = useSelector(userInterfaceSelectors.selectInitiateFormCallback);
 
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
-
-    const keys = useSelector(keySelectors.cryptographicKeyPairs);
 
     const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
@@ -163,26 +158,6 @@ export default function CertificateForm() {
         [dispatch],
     );
 
-    const onKeyChange = useCallback(
-        (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>) => {
-            if (!event) return;
-            if (!event.value.tokenProfileUuid) return;
-            if (!event.value.tokenInstanceUuid) return;
-            if (event.value.items.filter((e) => e.type === KeyType.Private).length === 0) return;
-            dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors());
-            dispatch(
-                cryptographyOperationActions.listSignatureAttributeDescriptors({
-                    uuid: event.value.uuid,
-                    tokenProfileUuid: event.value.tokenInstanceUuid,
-                    tokenInstanceUuid: event.value.tokenInstanceUuid,
-                    keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
-                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
-                }),
-            );
-        },
-        [dispatch],
-    );
-
     const onCancel = useCallback(() => {
         navigate(-1);
     }, [navigate]);
@@ -205,15 +180,6 @@ export default function CertificateForm() {
         [tokenProfiles],
     );
 
-    const keyOptions = useMemo(
-        () =>
-            keys.map((key) => ({
-                label: key.name,
-                value: key,
-            })),
-        [keys],
-    );
-
     const defaultValues: FormValues = useMemo(
         () => ({
             raProfile: null,
@@ -232,64 +198,6 @@ export default function CertificateForm() {
         ],
         [],
     );
-
-    const RenderRequestKey = ({ values }: { values: FormValues }) => {
-        const form = useForm();
-        useEffect(() => {
-            if (initiateFormCallback && formCallbackValue) {
-                const newOption = keyOptions.find((option) => option.label === formCallbackValue);
-                if (newOption) {
-                    form.change("key", newOption);
-                    dispatch(userInterfaceActions.clearFormCallbackValue());
-                    dispatch(userInterfaceActions.setInitiateFormCallback(false));
-                }
-            }
-        }, [initiateFormCallback, formCallbackValue, dispatch, keyOptions]);
-
-        return values.tokenProfile ? (
-            <Field name="key" validate={validateRequired()}>
-                {({ input, meta, onChange }) => (
-                    <FormGroup>
-                        <Label for="key">Key</Label>
-
-                        <Select
-                            {...input}
-                            id="key"
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={keyOptions}
-                            placeholder="Select Key"
-                            onChange={(e) => {
-                                onKeyChange(e);
-                                input.onChange(e);
-                            }}
-                            components={{
-                                Menu: (props) => (
-                                    <CustomSelectComponent
-                                        onAddNew={() => {
-                                            dispatch(
-                                                userInterfaceActions.showGlobalModal({
-                                                    content: <CryptographicKeyForm usesGlobalModal />,
-                                                    isOpen: true,
-                                                    size: "lg",
-                                                    title: "Add New Key",
-                                                }),
-                                            );
-                                        }}
-                                        {...props}
-                                    />
-                                ),
-                            }}
-                        />
-
-                        <FormFeedback>{meta.error}</FormFeedback>
-                    </FormGroup>
-                )}
-            </Field>
-        ) : (
-            <></>
-        );
-    };
 
     return (
         <>

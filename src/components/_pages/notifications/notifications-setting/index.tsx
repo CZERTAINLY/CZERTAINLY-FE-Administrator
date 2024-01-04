@@ -41,7 +41,7 @@ const NotificationsSetting = () => {
 
     useEffect(() => {
         dispatch(notificationActions.listNotificationInstances());
-    }, []);
+    });
 
     const isBusy = useMemo(
         () => isFetchingInstances || isUpdatingNotificationsSetting || isFetchingNotificationsSetting,
@@ -69,11 +69,14 @@ const NotificationsSetting = () => {
         if (!notificationsSettings) return {};
         const notificationsMapping = Object.entries(notificationsSettings.notificationsMapping)
             .filter(([key, value]) => notificationsOptions.find((option) => option.value === value)?.label !== undefined)
-            .reduce((acc, [key, value]) => {
-                const option = notificationsOptions.find((option) => option.value === value);
-                acc[key] = { value, label: option?.label ?? "" };
-                return acc;
-            }, {} as { [key: string]: { value: string; label: string } });
+            .reduce(
+                (acc, [key, value]) => {
+                    const option = notificationsOptions.find((option) => option.value === value);
+                    acc[key] = { value, label: option?.label ?? "" };
+                    return acc;
+                },
+                {} as { [key: string]: { value: string; label: string } },
+            );
 
         return { notificationsMapping };
     }, [notificationsSettings, notificationsOptions]);
@@ -84,15 +87,21 @@ const NotificationsSetting = () => {
 
             const filteredValues = Object.entries(values.notificationsMapping)
                 .filter(([key, value]) => value?.value != null)
-                .reduce((acc, [key, value]) => {
-                    acc[key] = value.value;
-                    return acc;
-                }, {} as { [key: string]: string });
+                .reduce(
+                    (acc, [key, value]) => {
+                        acc[key] = value.value;
+                        return acc;
+                    },
+                    {} as { [key: string]: string },
+                );
 
-            const submitValues = Object.entries(filteredValues).reduce((acc, [key, value]) => {
-                acc[key] = value.toString();
-                return acc;
-            }, {} as { [key: string]: string });
+            const submitValues = Object.entries(filteredValues).reduce(
+                (acc, [key, value]) => {
+                    acc[key] = value.toString();
+                    return acc;
+                },
+                {} as { [key: string]: string },
+            );
 
             dispatch(settingsActions.updateNotificationsSettings({ notificationsMapping: submitValues }));
         },
