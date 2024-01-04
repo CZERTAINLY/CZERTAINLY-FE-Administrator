@@ -6,7 +6,7 @@ describe("Footer component", () => {
         cy.mount(<Footer />);
         cy.get("footer").should("exist");
         cy.get("footer").should("contain", "© 2018-");
-        cy.get("footer").should("contain", "2023");
+        cy.get("footer").should("contain", new Date().getFullYear());
         cy.get("footer").should("contain", "CZERTAINLY s.r.o.");
         cy.get("a").eq(0).should("have.attr", "href").and("include", "https://docs.czertainly.com/docs");
         cy.get("footer").should("contain", "Support");
