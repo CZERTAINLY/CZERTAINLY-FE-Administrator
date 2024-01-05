@@ -8,7 +8,7 @@ import {
     RaProfileDto,
     RaProfileScepDetailResponseDto as RaProfileScepDetailResponseDtoOpenApi,
     SimplifiedComplianceProfileDto,
-    SimplifiedRaProfileDto
+    SimplifiedRaProfileDto,
 } from "./openapi";
 
 export type RaProfileActivateAcmeRequestDto = ActivateAcmeForRaProfileRequestDto;
