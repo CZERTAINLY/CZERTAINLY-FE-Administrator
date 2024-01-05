@@ -233,8 +233,10 @@ function TokenProfileList() {
 
                     <>{getTokenProfileUsages(tokenProfile)}</>,
 
-                    tokenProfile.tokenInstanceName? (
-                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>{tokenProfile.tokenInstanceName ?? "Unassigned"}</Link>
+                    tokenProfile.tokenInstanceName ? (
+                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>
+                            {tokenProfile.tokenInstanceName ?? "Unassigned"}
+                        </Link>
                     ) : (
                         tokenProfile.tokenInstanceName ?? "Unassigned"
                     ),

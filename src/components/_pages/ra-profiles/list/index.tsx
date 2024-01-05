@@ -187,8 +187,10 @@ function RaProfileList() {
 
                     <span style={{ whiteSpace: "nowrap" }}>{raProfile.description || ""}</span>,
 
-                    raProfile.authorityInstanceName? (
-                        <Link to={`../authorities/detail/${raProfile.authorityInstanceUuid}`}>{raProfile.authorityInstanceName ?? "Unassigned"}</Link>
+                    raProfile.authorityInstanceName ? (
+                        <Link to={`../authorities/detail/${raProfile.authorityInstanceUuid}`}>
+                            {raProfile.authorityInstanceName ?? "Unassigned"}
+                        </Link>
                     ) : (
                         raProfile.authorityInstanceName ?? "Unassigned"
                     ),

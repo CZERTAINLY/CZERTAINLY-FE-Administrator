@@ -124,7 +124,7 @@ function AuthorityList() {
                 columns: [
                     <Link to={`./detail/${authority.uuid}`}>{authority.name}</Link>,
 
-                    authority.connectorName? (
+                    authority.connectorName ? (
                         <Link to={`../connectors/detail/${authority.connectorUuid}`}>{authority.connectorName ?? "Unassigned"}</Link>
                     ) : (
                         authority.connectorName ?? "Unassigned"

@@ -11,12 +11,12 @@
  * Do not edit the class manually.
  */
 
-import { of } from 'rxjs';
-import type { Observable } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import type { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
-import { map, concatMap } from 'rxjs/operators';
-import { servers } from './servers';
+import { of } from "rxjs";
+import type { Observable } from "rxjs";
+import { ajax } from "rxjs/ajax";
+import type { AjaxConfig, AjaxResponse } from "rxjs/ajax";
+import { map, concatMap } from "rxjs/operators";
+import { servers } from "./servers";
 
 export const BASE_PATH = servers[0].getUrl();
 
@@ -50,12 +50,12 @@ export class Configuration {
 
     get apiKey(): ((name: string) => string) | undefined {
         const { apiKey } = this.configuration;
-        return apiKey ? (typeof apiKey === 'string' ? () => apiKey : apiKey) : undefined;
+        return apiKey ? (typeof apiKey === "string" ? () => apiKey : apiKey) : undefined;
     }
 
     get accessToken(): ((name: string, scopes?: string[]) => string) | undefined {
         const { accessToken } = this.configuration;
-        return accessToken ? (typeof accessToken === 'string' ? () => accessToken : accessToken) : undefined;
+        return accessToken ? (typeof accessToken === "string" ? () => accessToken : accessToken) : undefined;
     }
 }
 
@@ -75,23 +75,21 @@ export class BaseAPI {
         return next;
     };
 
-    withPreMiddleware = (preMiddlewares: Array<Middleware['pre']>) =>
-        this.withMiddleware(preMiddlewares.map((pre) => ({ pre })));
+    withPreMiddleware = (preMiddlewares: Array<Middleware["pre"]>) => this.withMiddleware(preMiddlewares.map((pre) => ({ pre })));
 
-    withPostMiddleware = (postMiddlewares: Array<Middleware['post']>) =>
-        this.withMiddleware(postMiddlewares.map((post) => ({ post })));
+    withPostMiddleware = (postMiddlewares: Array<Middleware["post"]>) => this.withMiddleware(postMiddlewares.map((post) => ({ post })));
 
-    protected request<T>(requestOpts: RequestOpts): Observable<T>
-    protected request<T>(requestOpts: RequestOpts, responseOpts?: ResponseOpts): Observable<AjaxResponse<T>>
+    protected request<T>(requestOpts: RequestOpts): Observable<T>;
+    protected request<T>(requestOpts: RequestOpts, responseOpts?: ResponseOpts): Observable<AjaxResponse<T>>;
     protected request<T>(requestOpts: RequestOpts, responseOpts?: ResponseOpts): Observable<T | AjaxResponse<T>> {
         return this.rxjsRequest<T>(this.createRequestArgs(requestOpts)).pipe(
             map((res) => {
                 const { status, response } = res;
                 if (status >= 200 && status < 300) {
-                    return responseOpts?.response === 'raw' ? res : response;
+                    return responseOpts?.response === "raw" ? res : response;
                 }
                 throw res;
-            })
+            }),
         );
     }
 
@@ -99,16 +97,16 @@ export class BaseAPI {
         // only add the queryString to the URL if there are query parameters.
         // this is done to avoid urls ending with a '?' character which buggy webservers
         // do not handle correctly sometimes.
-        const url = `${this.configuration.basePath}${baseUrl}${query && Object.keys(query).length ? `?${queryString(query)}`: ''}`;
+        const url = `${this.configuration.basePath}${baseUrl}${query && Object.keys(query).length ? `?${queryString(query)}` : ""}`;
 
         return {
             url,
             method,
             headers,
             body: body instanceof FormData ? body : JSON.stringify(body),
-            responseType: responseType ?? 'json',
+            responseType: responseType ?? "json",
         };
-    }
+    };
 
     private rxjsRequest = <T>(params: AjaxConfig): Observable<AjaxResponse<T>> =>
         of(params).pipe(
@@ -121,17 +119,16 @@ export class BaseAPI {
                     map((response) => {
                         this.middleware.filter((item) => item.post).forEach((mw) => (response = mw.post!(response)));
                         return response;
-                    })
-                )
-            )
+                    }),
+                ),
+            ),
         );
 
     /**
      * Create a shallow clone of `this` by constructing a new instance
      * and then shallow cloning data members.
      */
-    private clone = (): this =>
-        Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+    private clone = (): this => Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 }
 
 /**
@@ -139,18 +136,18 @@ export class BaseAPI {
  * export for not being a breaking change
  */
 export class RequiredError extends Error {
-    override name: 'RequiredError' = 'RequiredError';
+    override name: "RequiredError" = "RequiredError";
 }
 
 export const COLLECTION_FORMATS = {
-    csv: ',',
-    ssv: ' ',
-    tsv: '\t',
-    pipes: '|',
+    csv: ",",
+    ssv: " ",
+    tsv: "\t",
+    pipes: "|",
 };
 
 export type Json = any;
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD';
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";
 export type HttpHeaders = { [key: string]: string };
 export type HttpQuery = Partial<{ [key: string]: string | number | null | boolean | Array<string | number | null | boolean> }>; // partial is needed for strict mode
 export type HttpBody = Json | FormData;
@@ -165,7 +162,7 @@ export interface RequestOpts extends AjaxConfig {
 }
 
 export interface ResponseOpts {
-    response?: 'raw';
+    response?: "raw";
 }
 
 export interface OperationOpts {
@@ -174,12 +171,14 @@ export interface OperationOpts {
 
 export const encodeURI = (value: any) => encodeURIComponent(`${value}`);
 
-const queryString = (params: HttpQuery): string => Object.entries(params)
-    .map(([key, value]) => value instanceof Array
-        ? value.map((val) => `${encodeURI(key)}=${encodeURI(val)}`).join('&')
-        : `${encodeURI(key)}=${encodeURI(value)}`
-    )
-    .join('&');
+const queryString = (params: HttpQuery): string =>
+    Object.entries(params)
+        .map(([key, value]) =>
+            value instanceof Array
+                ? value.map((val) => `${encodeURI(key)}=${encodeURI(val)}`).join("&")
+                : `${encodeURI(key)}=${encodeURI(value)}`,
+        )
+        .join("&");
 
 export const throwIfNullOrUndefined = (value: any, paramName: string, nickname: string) => {
     if (value == null) {

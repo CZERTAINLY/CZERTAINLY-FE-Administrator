@@ -43,7 +43,11 @@ export default function CodeBlock({ content }: Props) {
                                 fontSize: 14,
                             }}
                         >
-                            {parse(DOMPurify.sanitize(getHighLightedCode(content.data.code != null ? atob(content.data.code) : "", content.data.language)))}
+                            {parse(
+                                DOMPurify.sanitize(
+                                    getHighLightedCode(content.data.code != null ? atob(content.data.code) : "", content.data.language),
+                                ),
+                            )}
                         </code>
                     </pre>
                 }

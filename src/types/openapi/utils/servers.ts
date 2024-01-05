@@ -5,7 +5,11 @@
  *
  */
 export class ServerConfiguration<T extends { [key: string]: string }> {
-    public constructor(private url: string, private variableConfiguration: T, private description: string) {}
+    public constructor(
+        private url: string,
+        private variableConfiguration: T,
+        private description: string,
+    ) {}
 
     /**
      * Sets the value of the variables of this server.

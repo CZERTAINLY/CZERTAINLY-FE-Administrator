@@ -69,7 +69,7 @@ function DiscoveryList() {
                 id: discovery.uuid,
                 columns: [
                     <Link to={`./detail/${discovery.uuid}`}>{discovery.name}</Link>,
-                    discovery.connectorName? (
+                    discovery.connectorName ? (
                         <Link to={`../connectors/detail/${discovery.connectorUuid}`}>{discovery.connectorName ?? "Unassigned"}</Link>
                     ) : (
                         discovery.connectorName ?? "Unassigned"
