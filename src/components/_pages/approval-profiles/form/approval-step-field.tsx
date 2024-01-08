@@ -10,13 +10,7 @@ import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
 import { ApprovalStepRequestModel, ApproverType } from "types/approval-profiles";
-import {
-    composeValidators,
-    validateAlphaNumericWithSpecialChars, validateLength,
-    validateNonZeroInteger,
-    validatePositiveInteger,
-    validateRequired,
-} from "utils/validators";
+import { composeValidators, validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from "utils/validators";
 import styles from "./approvalProfile.module.scss";
 
 type Props = {
@@ -58,13 +52,16 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         dispatch(rolesActions.list());
     }, [dispatch]);
 
-    const updateAppoverAfterRemove = (index: number) => {
-        const newSelectedApprovalTypeList = selectedApprovalTypeList?.filter((_, i) => i !== index);
-        setselectedApprovalTypeList(newSelectedApprovalTypeList);
+    const updateAppoverAfterRemove = useCallback(
+        (index: number) => {
+            const newSelectedApprovalTypeList = selectedApprovalTypeList?.filter((_, i) => i !== index);
+            setselectedApprovalTypeList(newSelectedApprovalTypeList);
 
-        const newSelectedApproverList = selectedApproverList?.filter((_, i) => i !== index);
-        setSelectedApproverList(newSelectedApproverList);
-    };
+            const newSelectedApproverList = selectedApproverList?.filter((_, i) => i !== index);
+            setSelectedApproverList(newSelectedApproverList);
+        },
+        [selectedApprovalTypeList, selectedApproverList],
+    );
 
     useEffect(() => {
         if (editMode && profileApprovalDetail?.approvalSteps.length) {
@@ -99,42 +96,51 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         }
     }, [profileApprovalDetail, editMode, users, roles, groups, setSelectedApproverList, setselectedApprovalTypeList]);
 
-    const resetFormUuids = (index: number) => {
-        form.change(`approvalSteps[${index}].${ApproverType.User.toLocaleLowerCase()}Uuid`, undefined);
-        form.change(`approvalSteps[${index}].${ApproverType.Group.toLocaleLowerCase()}Uuid`, undefined);
-        form.change(`approvalSteps[${index}].${ApproverType.Role.toLocaleLowerCase()}Uuid`, undefined);
-    };
+    const resetFormUuids = useCallback(
+        (index: number) => {
+            form.change(`approvalSteps[${index}].${ApproverType.User.toLocaleLowerCase()}Uuid`, undefined);
+            form.change(`approvalSteps[${index}].${ApproverType.Group.toLocaleLowerCase()}Uuid`, undefined);
+            form.change(`approvalSteps[${index}].${ApproverType.Role.toLocaleLowerCase()}Uuid`, undefined);
+        },
+        [form],
+    );
 
-    const handleApprovalTypeChange = (e: SelectOptionApprover, index: number) => {
-        if (!e || e.value === selectedApprovalTypeList?.[index]?.value) return;
+    const handleApprovalTypeChange = useCallback(
+        (e: SelectOptionApprover, index: number) => {
+            if (!e || e.value === selectedApprovalTypeList?.[index]?.value) return;
 
-        const newSelectedApprovalTypeList = [...(selectedApprovalTypeList ?? [])];
-        newSelectedApprovalTypeList[index] = e;
-        setselectedApprovalTypeList(newSelectedApprovalTypeList);
+            const newSelectedApprovalTypeList = [...(selectedApprovalTypeList ?? [])];
+            newSelectedApprovalTypeList[index] = e;
+            setselectedApprovalTypeList(newSelectedApprovalTypeList);
 
-        const newSelectedApproverList = [...(selectedApproverList ?? [])];
-        newSelectedApproverList[index] = null;
-        setSelectedApproverList(newSelectedApproverList);
+            const newSelectedApproverList = [...(selectedApproverList ?? [])];
+            newSelectedApproverList[index] = null;
+            setSelectedApproverList(newSelectedApproverList);
 
-        resetFormUuids(index);
+            resetFormUuids(index);
 
-        if (e.label === ApproverType.User) {
-            form.change(`approvalSteps[${index}].requiredApprovals`, 1);
-        }
-    };
+            if (e.label === ApproverType.User) {
+                form.change(`approvalSteps[${index}].requiredApprovals`, 1);
+            }
+        },
+        [selectedApprovalTypeList, selectedApproverList, form, resetFormUuids],
+    );
 
-    const handleApproverChange = (e: SelectOptionApprover, index: number) => {
-        if (!e || !selectedApprovalTypeList || e.value === selectedApproverList?.[index]?.value) return;
+    const handleApproverChange = useCallback(
+        (e: SelectOptionApprover, index: number) => {
+            if (!e || !selectedApprovalTypeList || e.value === selectedApproverList?.[index]?.value) return;
 
-        resetFormUuids(index);
-        form.change(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`, e.value);
+            resetFormUuids(index);
+            form.change(`approvalSteps[${index}].${selectedApprovalTypeList[index].value}`, e.value);
 
-        setSelectedApproverList((prevList) => {
-            const newList = [...(prevList ?? [])];
-            newList[index] = e;
-            return newList;
-        });
-    };
+            setSelectedApproverList((prevList) => {
+                const newList = [...(prevList ?? [])];
+                newList[index] = e;
+                return newList;
+            });
+        },
+        [selectedApprovalTypeList, selectedApproverList, form, setSelectedApproverList, resetFormUuids],
+    );
 
     const getApproverOptions = useCallback(
         (approverType: string) => {
@@ -198,7 +204,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
 
                     <Row>
                         <Col>
-                            <Field name={`approvalSteps[${index}].description`} validate={composeValidators(validateLength(0,300))}>
+                            <Field name={`approvalSteps[${index}].description`} validate={composeValidators(validateLength(0, 300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label htmlFor="stepDescription" className={styles.textInputLabel}>
@@ -292,7 +298,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                 </div>
             );
         },
-        [selectedApprovalTypeList, handleApprovalTypeChange, selectedApproverList, handleApproverChange],
+        [selectedApprovalTypeList, handleApprovalTypeChange, selectedApproverList, handleApproverChange, getApproverOptions],
     );
 
     const tabs = useMemo(

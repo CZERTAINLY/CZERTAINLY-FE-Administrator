@@ -62,7 +62,6 @@ export default function AttributeEditor({
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
-    const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 
@@ -554,6 +553,8 @@ export default function AttributeEditor({
                 }
             }
         });
+        // This effect should only be called if the initiateAttributeCallback value is updated
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initiateAttributeCallback]);
 
     /**

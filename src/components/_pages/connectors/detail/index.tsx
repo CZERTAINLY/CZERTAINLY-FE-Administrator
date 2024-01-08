@@ -39,7 +39,6 @@ export default function ConnectorDetail() {
     const isFetchingAllAttributes = useSelector(selectors.isFetchingAllAttributes);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingHealth = useSelector(selectors.isFetchingHealth);
-    const isFetchingAttributes = useSelector(selectors.isFetchingAttributes);
     const isReconnecting = useSelector(selectors.isReconnecting);
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isAuthorizing = useSelector(selectors.isAuthorizing);
@@ -269,22 +268,19 @@ export default function ConnectorDetail() {
         </div>
     );
 
-    const renderStatusBadge = useCallback(
-        (status?: HealthStatus) => {
-            if (!status) return <Badge color="light">Unknown</Badge>;
-            switch (status) {
-                case HealthStatus.Ok:
-                    return <Badge color="success">{status}</Badge>;
-                case HealthStatus.Nok:
-                    return <Badge color="danger">{status}</Badge>;
-                case HealthStatus.Unknown:
-                    return <Badge color="light">{status}</Badge>;
-                default:
-                    return <Badge color="warning">{status}</Badge>;
-            }
-        },
-        [health],
-    );
+    const renderStatusBadge = useCallback((status?: HealthStatus) => {
+        if (!status) return <Badge color="light">Unknown</Badge>;
+        switch (status) {
+            case HealthStatus.Ok:
+                return <Badge color="success">{status}</Badge>;
+            case HealthStatus.Nok:
+                return <Badge color="danger">{status}</Badge>;
+            case HealthStatus.Unknown:
+                return <Badge color="light">{status}</Badge>;
+            default:
+                return <Badge color="warning">{status}</Badge>;
+        }
+    }, []);
 
     const healthBody = useCallback(() => {
         if (!health?.parts) return <></>;
@@ -306,7 +302,8 @@ export default function ConnectorDetail() {
                 </tr>
             ),
         );
-    }, [health]);
+    }, [health, renderStatusBadge]);
+
     const endPointsHeaders: TableHeader[] = useMemo(
         () => [
             {

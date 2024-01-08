@@ -250,7 +250,7 @@ function RolePermissionsEditor({
                         sortable: false,
                         align: "center",
                         width: "5em",
-                    } as TableHeader),
+                    }) as TableHeader,
             ) || []),
         ],
         [currentResource],

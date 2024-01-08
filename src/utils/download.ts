@@ -7,24 +7,23 @@ import JSZip from "jszip";
 import { CertificateContentResponseModel, CertificateDetailResponseModel } from "types/certificate";
 
 export function downloadFile(content: any, fileName: string, type?: string) {
-   const element = document.createElement("a");
+    const element = document.createElement("a");
 
-   var byteNumbers = new Array(content.length);
-   for (var i = 0; i < content.length; i++) {
-       byteNumbers[i] = content.charCodeAt(i);
-   }
-   var byteArray = new Uint8Array(byteNumbers);
+    var byteNumbers = new Array(content.length);
+    for (var i = 0; i < content.length; i++) {
+        byteNumbers[i] = content.charCodeAt(i);
+    }
+    var byteArray = new Uint8Array(byteNumbers);
 
-   if(!type) {
-       type = "text/plain";
-   } 
+    if (!type) {
+        type = "text/plain";
+    }
 
-   const file = new Blob([byteArray], { type: type });
-   element.href = URL.createObjectURL(file);
-   element.download = fileName;
-   document.body.appendChild(element); // Required for this to work in FireFox
-   element.click();
-
+    const file = new Blob([byteArray], { type: type });
+    element.href = URL.createObjectURL(file);
+    element.download = fileName;
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
 }
 
 export function downloadFileZip(

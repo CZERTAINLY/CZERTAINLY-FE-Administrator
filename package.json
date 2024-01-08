@@ -57,6 +57,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "lint": "eslint && prettier --check \"**/**.{ts,js,tsx}\" \"*.{json,md,yml}\"",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
@@ -82,6 +83,6 @@
         ]
     },
     "devDependencies": {
-        "cypress": "^13.1.0"
+        "cypress": "^13.6.1"
     }
 }

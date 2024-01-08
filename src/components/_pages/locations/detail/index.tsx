@@ -327,7 +327,7 @@ export default function LocationDetail() {
                 },
             },
         ],
-        [certCheckedRows.length, location, onRenewClick, onSyncClick],
+        [certCheckedRows.length, location, onRenewClick, onSyncClick, selectedCertificateDetails?.state],
     );
 
     const detailHeaders: TableHeader[] = useMemo(

@@ -10,8 +10,6 @@ import {
     CertificateComplianceResultDto,
     CertificateContentDto,
     CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
-    CertificateDownloadResponseDto,
-    CertificateDownloadResponseDtoFormatEnum,
     CertificateDto,
     CertificateEventHistoryDto,
     CertificateUpdateObjectsDto,
@@ -33,7 +31,6 @@ import {
     SimplifiedRaProfileDto,
     UploadCertificateRequestDto,
 } from "./openapi";
-// import { CertificateValidationDto as CertificateValidationDtoOpenApi } from "./openapi/models/CertificateValidationDto";
 
 export type ValidationCertificateCheckDto = CertificateValidationCheckDto;
 export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto, "validationCheck | status | message"> & {
@@ -139,9 +136,4 @@ export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "c
 export type CertificateChainDownloadResponseModel = CertificateChainDownloadResponseDto;
 export type CertificateChainDownloadResponseDtoModel = Omit<CertificateChainDownloadResponseModel, "format"> & {
     format: CertificateChainDownloadResponseDtoFormatEnum;
-};
-
-export type CertificateDownloadResponseModel = CertificateDownloadResponseDto;
-export type CertificateDownloadResponseDtoModel = Omit<CertificateDownloadResponseModel, "format"> & {
-    format: CertificateDownloadResponseDtoFormatEnum;
 };

@@ -148,14 +148,20 @@ export default function AcmeAccountList() {
                     columns: [
                         <Link to={`./detail/${acmeAccount.acmeProfileUuid}/${acmeAccount.uuid}`}>{acmeAccount.accountId}</Link>,
 
-                        acmeAccount.acmeProfileName? (
-                            <Link to={`../acmeprofiles/detail/${acmeAccount.acmeProfileUuid}`}>{acmeAccount.acmeProfileName ?? "Unassigned"}</Link>
+                        acmeAccount.acmeProfileName ? (
+                            <Link to={`../acmeprofiles/detail/${acmeAccount.acmeProfileUuid}`}>
+                                {acmeAccount.acmeProfileName ?? "Unassigned"}
+                            </Link>
                         ) : (
                             acmeAccount.acmeProfileName ?? "Unassigned"
                         ),
 
-                        acmeAccount.raProfile? (
-                            <Link to={`../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}>{acmeAccount.raProfile.name ?? "Unassigned"}</Link>
+                        acmeAccount.raProfile ? (
+                            <Link
+                                to={`../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}
+                            >
+                                {acmeAccount.raProfile.name ?? "Unassigned"}
+                            </Link>
                         ) : (
                             acmeAccount.raProfile ?? "Unassigned"
                         ),

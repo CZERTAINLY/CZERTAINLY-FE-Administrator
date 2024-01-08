@@ -297,7 +297,7 @@ export default function RaProfileDetail() {
                 },
             },
         ],
-        [],
+        [getFreshAllApprovalProfiles],
     );
 
     const approvalProfilesHeaders: TableHeader[] = useMemo(

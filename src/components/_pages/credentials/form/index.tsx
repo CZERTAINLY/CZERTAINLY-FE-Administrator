@@ -166,7 +166,15 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                 );
             }
         },
-        [editMode, dispatch, id, credentialProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+        [
+            editMode,
+            dispatch,
+            id,
+            credentialProviderAttributeDescriptors,
+            groupAttributesCallbackAttributes,
+            resourceCustomAttributes,
+            usesGlobalModal,
+        ],
     );
 
     const onCancel = useCallback(() => {

@@ -35,7 +35,7 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
                 {memoizedTabs.map((t, i) => (
                     <NavItem key={`nav-${i}`}>
                         <NavLink
-                            className={cx({ ["active"]: activeTab === i }, { ["p-0"]: selectedTab !== undefined })}
+                            className={cx({ active: activeTab === i, "p-0": selectedTab !== undefined })}
                             onClick={() => {
                                 if (t.disabled) {
                                     return;

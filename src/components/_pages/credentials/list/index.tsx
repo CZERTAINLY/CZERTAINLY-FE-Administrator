@@ -112,7 +112,7 @@ function CredentialList() {
 
                     <Badge color="primary">{credential.kind}</Badge>,
 
-                    credential.connectorName? (
+                    credential.connectorName ? (
                         <Link to={`../connectors/detail/${credential.connectorUuid}`}>{credential.connectorName ?? "Unassigned"}</Link>
                     ) : (
                         credential.connectorName ?? "Unassigned"

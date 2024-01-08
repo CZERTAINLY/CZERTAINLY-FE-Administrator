@@ -8,7 +8,7 @@ import ProgressButton from "components/ProgressButton";
 import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
 import { actions as alertActions } from "ducks/alerts";
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
+import { actions as utilsActuatorActions } from "ducks/utilsActuator";
 
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
@@ -32,7 +32,7 @@ import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
@@ -73,6 +73,8 @@ import { LockWidgetNameEnum } from "types/user-interface";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
 import styles from "./certificateDetail.module.scss";
+// Adding eslint supress no-useless concat warning
+/* eslint-disable no-useless-concat */
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -81,7 +83,6 @@ interface ChainDownloadSwitchState {
 
 export default function CertificateDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const { id } = useParams();
 
     const certificate = useSelector(selectors.certificateDetail);
@@ -105,7 +106,6 @@ export default function CertificateDetail() {
     const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
     const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
     const [chainDownloadSwitch, setTriggerChainDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
-    const [copyCertificateChainPEMTrigger, setCopyCertificateChainPEMTrigger] = useState<boolean>(false);
 
     const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
@@ -203,7 +203,7 @@ export default function CertificateDetail() {
             );
             setTriggerChainDownload({ isDownloadTriggered: true, certificateEncoding: certificateEncoding });
         },
-        [certificate],
+        [certificate, dispatch],
     );
 
     const transformCertificate = useCallback(() => {
@@ -218,6 +218,8 @@ export default function CertificateDetail() {
         setCertificateEdges(edges);
     }, [certificate, users, certLocations, raProfileSelected, certificateChain]);
 
+    const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
+
     useEffect(() => {
         if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
 
@@ -225,12 +227,11 @@ export default function CertificateDetail() {
         downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + extensionFormat);
 
         setTriggerChainDownload({ isDownloadTriggered: false });
-    }, [certificateChainDownloadContent, chainDownloadSwitch]);
+    }, [certificateChainDownloadContent, chainDownloadSwitch, fileNameToDownload]);
 
     useEffect(() => {
         transformCertificate();
     }, [transformCertificate]);
-    const health = useSelector(utilsActuatorSelectors.health);
     const settings = useSelector(settingSelectors.platformSettings);
 
     const getFreshRaProfileDetail = useCallback(() => {
@@ -246,7 +247,7 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!id) return;
         getFreshRaProfileDetail();
-    }, [dispatch, id, certificate]);
+    }, [dispatch, id, certificate, getFreshRaProfileDetail]);
 
     useEffect(() => {
         if (!settings?.utils.utilsServiceUrl) return;
@@ -278,7 +279,7 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!id && isFlowTabOpenend) return;
         getCertificateChainDetails();
-    }, [isFlowTabOpenend, id]);
+    }, [isFlowTabOpenend, id, getCertificateChainDetails]);
 
     useEffect(() => {
         getFreshCertificateLocations();
@@ -291,7 +292,7 @@ export default function CertificateDetail() {
         dispatch(actions.getCertificateHistory({ uuid: id }));
         getFreshApprovalList();
         getFreshCertificateLocations();
-    }, [dispatch, id]);
+    }, [dispatch, id, getFreshApprovalList, getFreshCertificateLocations]);
 
     useEffect(() => {
         getFreshCertificateDetail();
@@ -527,8 +528,6 @@ export default function CertificateDetail() {
         });
     }, [dispatch, certificate, locationsCheckedRows, locationToEntityMap]);
 
-    const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
-
     const downloadDropDown = useMemo(
         () => (
             <UncontrolledButtonDropdown disabled={!certificate?.certificateContent}>
@@ -600,7 +599,7 @@ export default function CertificateDetail() {
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
         ),
-        [certificate, fileNameToDownload],
+        [certificate, fileNameToDownload, dispatch, downloadCertificateChainContent],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -717,7 +716,7 @@ export default function CertificateDetail() {
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
         ),
-        [certificate, fileNameToDownload],
+        [certificate, fileNameToDownload, dispatch],
     );
 
     const buttonsCSR: WidgetButtonProps[] = useMemo(
@@ -1118,7 +1117,7 @@ export default function CertificateDetail() {
                       columns: ["Type", certificate.certificateType || "", ""],
                   },
               ];
-    }, [certificate]);
+    }, [certificate, getGroupList, getRaProfileList, getUserList]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];
@@ -1206,7 +1205,7 @@ export default function CertificateDetail() {
                           ],
                       };
                   }),
-        [certificate, validationResult],
+        [certificate, validationResult, certificateValidationCheck],
     );
 
     const relatedCertificatesData: TableDataRow[] = useMemo(
@@ -1249,7 +1248,7 @@ export default function CertificateDetail() {
                 }),
             );
         }
-    }, [certificate, isUpdatingTrustedStatus]);
+    }, [certificate, isUpdatingTrustedStatus, dispatch]);
 
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
@@ -1401,7 +1400,7 @@ export default function CertificateDetail() {
         }
 
         return certDetail;
-    }, [certificate, health, validationResult]);
+    }, [certificate, validationResult, isUpdatingTrustedStatus, switchCallback]);
 
     const locationsHeaders: TableHeader[] = useMemo(
         () => [
@@ -1479,7 +1478,7 @@ export default function CertificateDetail() {
                           certificate?.validationStatus ? <CertificateStatus status={certificate?.validationStatus} /> : "",
                       ],
                   })),
-        [certLocations],
+        [certLocations, certificate?.state, certificate?.validationStatus],
     );
 
     const selectLocationsHeaders: TableHeader[] = useMemo(
@@ -1620,7 +1619,7 @@ export default function CertificateDetail() {
                 approval.closedAt ? dateFormatter(approval.closedAt) : "",
             ],
         }));
-    }, [approvals, navigate]);
+    }, [approvals]);
 
     const defaultViewport = useMemo(
         () => ({

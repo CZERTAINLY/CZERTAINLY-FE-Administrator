@@ -10,7 +10,7 @@ import Widget from "components/Widget";
 
 import { actions, selectors } from "ducks/auth";
 
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength} from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from "utils/validators";
 
 interface FormValues {
     description: string;
@@ -68,7 +68,7 @@ export default function UserProfileForm() {
                 <Form onSubmit={onSubmit} initialValues={defaultValues}>
                     {({ handleSubmit, pristine, submitting, values, valid }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>
