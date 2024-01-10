@@ -1,13 +1,7 @@
 import CertificateAttributes from "components/CertificateAttributes";
 import Widget from "components/Widget";
 import { CertificateDetailResponseModel } from "types/certificate";
-import {
-    CertificateRequestDtoCertificateRequestFormatEnum,
-    CertificateState,
-    CertificateType,
-    CertificateValidationStatus,
-    ComplianceStatus,
-} from "types/openapi";
+import { CertificateRequestFormat, CertificateState, CertificateType, CertificateValidationStatus, ComplianceStatus } from "types/openapi";
 import "../../src/resources/styles/theme.scss";
 const cert: CertificateDetailResponseModel = {
     uuid: "9681f2d6-ba06-4d71-81f0-8d8d63d7b494",
@@ -60,7 +54,7 @@ const cert: CertificateDetailResponseModel = {
     customAttributes: [],
     certificateRequest: {
         certificateType: CertificateType.X509,
-        certificateRequestFormat: CertificateRequestDtoCertificateRequestFormatEnum.Pkcs10,
+        certificateRequestFormat: CertificateRequestFormat.Pkcs10,
         publicKeyAlgorithm: "RSA",
         signatureAlgorithm: "SHA256withRSA",
         content:
