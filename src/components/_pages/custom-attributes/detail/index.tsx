@@ -78,8 +78,8 @@ export default function CustomAttributeDetail() {
                     customAttribute?.enabled
                         ? dispatch(actions.disableCustomAttribute(customAttribute?.uuid))
                         : customAttribute
-                        ? dispatch(actions.enableCustomAttribute(customAttribute?.uuid))
-                        : {},
+                          ? dispatch(actions.enableCustomAttribute(customAttribute?.uuid))
+                          : {},
             },
         ],
         [onEditClick, customAttribute, dispatch, isDisabling, isEnabling],

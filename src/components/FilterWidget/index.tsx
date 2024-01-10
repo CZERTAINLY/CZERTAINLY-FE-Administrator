@@ -160,8 +160,8 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                 ? typeof filterValue === "string"
                     ? filterValue
                     : Array.isArray(filterValue)
-                    ? filterValue.map((v) => (v as any).value)
-                    : (filterValue as any).value
+                      ? filterValue.map((v) => (v as any).value)
+                      : (filterValue as any).value
                 : "",
         };
         const newFilters =
@@ -335,14 +335,16 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                             field && field.type === SearchableFieldType.Boolean
                                 ? `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`
                                 : Array.isArray(f.value) && f.value.length > 1
-                                ? `(${f.value
-                                      .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
-                                      .join(" OR ")})`
-                                : f.value
-                                ? `'${
-                                      field?.platformEnum ? platformEnums[field.platformEnum][f.value as unknown as string]?.label : f.value
-                                  }'`
-                                : "";
+                                  ? `(${f.value
+                                        .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
+                                        .join(" OR ")})`
+                                  : f.value
+                                    ? `'${
+                                          field?.platformEnum
+                                              ? platformEnums[field.platformEnum][f.value as unknown as string]?.label
+                                              : f.value
+                                      }'`
+                                    : "";
                         return (
                             <Badge
                                 className={styles.filterBadge}

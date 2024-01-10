@@ -128,8 +128,8 @@ function SchedulerJobsList() {
                             schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
                                 ? "danger"
                                 : schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Succeeded
-                                ? "success"
-                                : "primary"
+                                  ? "success"
+                                  : "primary"
                         }
                     >
                         {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}
