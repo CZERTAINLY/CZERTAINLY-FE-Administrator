@@ -9,6 +9,7 @@ import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
 import { actions as alertActions } from "ducks/alerts";
 import { actions as utilsActuatorActions } from "ducks/utilsActuator";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
@@ -24,8 +25,10 @@ import { selectors as settingSelectors } from "ducks/settings";
 import {
     CertificateState as CertStatus,
     CertificateValidationStatus,
+    DownloadCertificateCertificateFormatEnum,
     DownloadCertificateChainCertificateFormatEnum,
     DownloadCertificateChainEncodingEnum,
+    DownloadCertificateEncodingEnum,
 } from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -71,6 +74,7 @@ import { transformCertifacetObjectToNodesAndEdges } from "ducks/transform/certif
 import { Edge } from "reactflow";
 import { LockWidgetNameEnum } from "types/user-interface";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
+import DropDownForm from "../../../DropDownForm";
 import CertificateStatus from "../CertificateStatus";
 import styles from "./certificateDetail.module.scss";
 // Adding eslint supress no-useless concat warning
@@ -78,7 +82,8 @@ import styles from "./certificateDetail.module.scss";
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
-    certificateEncoding?: DownloadCertificateChainEncodingEnum;
+    certificateEncoding?: DownloadCertificateChainEncodingEnum | DownloadCertificateEncodingEnum;
+    isCopyTriggered?: boolean;
 }
 
 export default function CertificateDetail() {
@@ -88,6 +93,7 @@ export default function CertificateDetail() {
     const certificate = useSelector(selectors.certificateDetail);
     const certificateChain = useSelector(selectors.certificateChain);
     const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
+    const certificateDownloadContent = useSelector(selectors.certificateDownloadContent);
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
@@ -106,6 +112,7 @@ export default function CertificateDetail() {
     const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
     const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
     const [chainDownloadSwitch, setTriggerChainDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
+    const [certificateDownloadSwitch, setCertificateDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
 
     const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
@@ -114,10 +121,11 @@ export default function CertificateDetail() {
     const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
     const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
+    const certificateFormatEncodingEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormatEncoding));
+
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
-
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -164,6 +172,20 @@ export default function CertificateDetail() {
 
     const isFetchingLocationPushAttributeDescriptors = useSelector(locationSelectors.isFetchingPushAttributeDescriptors);
 
+    const certificateFormatOptions = Object.values(certificateRequestFormatEnum).map((item) => {
+        return {
+            label: item.label,
+            value: item.code,
+        };
+    });
+
+    const certificateEncodingOptions = Object.values(certificateFormatEncodingEnum).map((item) => {
+        return {
+            label: item.label,
+            value: item.code,
+        };
+    });
+
     const isBusy = useMemo(
         () =>
             isFetching ||
@@ -206,6 +228,29 @@ export default function CertificateDetail() {
         [certificate, dispatch],
     );
 
+    const downloadCertificateContent = useCallback(
+        (
+            certificateFormat: DownloadCertificateCertificateFormatEnum,
+            certificateEncoding: DownloadCertificateEncodingEnum,
+            // isCopyTriggered?: boolean,
+        ) => {
+            if (!certificate) return;
+            dispatch(
+                actions.downloadCertificate({
+                    certificateFormat: certificateFormat,
+                    uuid: certificate.uuid,
+                    encoding: certificateEncoding,
+                }),
+            );
+            setCertificateDownload({
+                isDownloadTriggered: true,
+                certificateEncoding: certificateEncoding,
+                // isCopyTriggered: isCopyTriggered,
+            });
+        },
+        [certificate, dispatch],
+    );
+
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertifacetObjectToNodesAndEdges(
             certificate,
@@ -228,6 +273,19 @@ export default function CertificateDetail() {
 
         setTriggerChainDownload({ isDownloadTriggered: false });
     }, [certificateChainDownloadContent, chainDownloadSwitch, fileNameToDownload]);
+
+    useEffect(() => {
+        if (!certificateDownloadContent || !certificateDownloadSwitch.isDownloadTriggered) return;
+        if (certificateDownloadSwitch.isCopyTriggered) {
+            setCertificateDownload({ isDownloadTriggered: false });
+            return;
+        }
+
+        const extensionFormat = certificateDownloadSwitch.certificateEncoding === DownloadCertificateEncodingEnum.Pem ? ".pem" : ".cer";
+        downloadFile(Buffer.from(certificateDownloadContent.content ?? "", "base64"), fileNameToDownload + extensionFormat);
+
+        setCertificateDownload({ isDownloadTriggered: false });
+    }, [certificateDownloadContent, certificateDownloadSwitch, fileNameToDownload]);
 
     useEffect(() => {
         transformCertificate();
@@ -530,76 +588,122 @@ export default function CertificateDetail() {
 
     const downloadDropDown = useMemo(
         () => (
-            <UncontrolledButtonDropdown disabled={!certificate?.certificateContent}>
+            <UncontrolledButtonDropdown>
                 <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate">
                     <i className="fa fa-download" aria-hidden="true" />
                 </DropdownToggle>
 
                 <DropdownMenu>
-                    <div className="d-flex">
-                        <DropdownItem
-                            key="pem"
-                            onClick={() => downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")}
-                        >
-                            PEM (.pem)
-                        </DropdownItem>
-                        <i
-                            className={cx("fa fa-copy", styles.copyButton)}
-                            onClick={() => {
-                                if (!certificate?.certificateContent) return;
-                                navigator.clipboard
-                                    .writeText(formatPEM(certificate?.certificateContent ?? ""))
-                                    .then(() => dispatch?.(alertActions.success?.("Certificate content was copied to clipboard")))
-                                    .catch(() => dispatch?.(alertActions.error?.("Failed to copy certificate content to clipboard")));
-                            }}
-                        />
-                    </div>
                     <DropdownItem
-                        key="der"
-                        onClick={() =>
-                            downloadFile(Buffer.from(certificate?.certificateContent ?? "", "base64"), fileNameToDownload + ".cer")
-                        }
-                    >
-                        DER (.cer)
-                    </DropdownItem>
-                    <DropdownItem
-                        key="chainPem"
+                        key="certificateDownload"
                         onClick={() => {
-                            downloadCertificateChainContent(
-                                DownloadCertificateChainCertificateFormatEnum.Raw,
-                                DownloadCertificateChainEncodingEnum.Pem,
-                            );
-                        }}
-                    >
-                        PEM with chain (Format:Raw) (.pem)
-                    </DropdownItem>
+                            dispatch(
+                                userInterfaceActions.showGlobalModal({
+                                    content: (
+                                        <>
+                                            <DropDownForm
+                                                onClose={() => {
+                                                    console.log("cancel");
 
-                    <DropdownItem
-                        key="pkcs7"
-                        onClick={() => {
-                            downloadCertificateChainContent(
-                                DownloadCertificateChainCertificateFormatEnum.Pkcs7,
-                                DownloadCertificateChainEncodingEnum.Pem,
+                                                    dispatch(userInterfaceActions.hideGlobalModal());
+                                                }}
+                                                onSubmit={(values) => {
+                                                    console.log("vals from parent", values);
+
+                                                    if (values.certificateFormat && values.certificateEncoding && certificate?.uuid) {
+                                                        downloadCertificateContent(
+                                                            values.certificateFormat.value,
+                                                            values.certificateEncoding.value,
+                                                        );
+                                                    }
+                                                }}
+                                                dropDownOptionsList={[
+                                                    {
+                                                        formLabel: "Certificate Format",
+                                                        formValue: "certificateFormat",
+                                                        options: certificateFormatOptions,
+                                                    },
+                                                    {
+                                                        formLabel: "Certificate Encoding",
+                                                        formValue: "certificateEncoding",
+
+                                                        options: certificateEncodingOptions,
+                                                    },
+                                                ]}
+                                            />
+                                        </>
+                                    ),
+                                    isOpen: true,
+                                    size: "lg",
+                                    title: "Download Certificate",
+                                }),
                             );
                         }}
                     >
-                        PKCS#7 with chain as PEM (Format:pkcs7) (.p7b)
+                        Certificate Download
                     </DropdownItem>
                     <DropdownItem
-                        key="pkcs7"
+                        key="certificateChainDownload"
                         onClick={() => {
-                            downloadCertificateChainContent(
-                                DownloadCertificateChainCertificateFormatEnum.Pkcs7,
-                                DownloadCertificateChainEncodingEnum.Der,
+                            dispatch(
+                                userInterfaceActions.showGlobalModal({
+                                    content: (
+                                        <>
+                                            <DropDownForm
+                                                onClose={() => {
+                                                    console.log("cancel");
+                                                    dispatch(userInterfaceActions.hideGlobalModal());
+                                                }}
+                                                onSubmit={(values) => {
+                                                    console.log("vals from parent", values);
+
+                                                    if (
+                                                        values.certificateChainFormat &&
+                                                        values.certificateChainEncoding &&
+                                                        certificate?.uuid
+                                                    ) {
+                                                        downloadCertificateChainContent(
+                                                            values.certificateChainFormat.value,
+                                                            values.certificateChainEncoding.value,
+                                                        );
+                                                    }
+                                                }}
+                                                dropDownOptionsList={[
+                                                    {
+                                                        formLabel: "Certificate Chain Format",
+                                                        formValue: "certificateChainFormat",
+                                                        options: certificateFormatOptions,
+                                                    },
+                                                    {
+                                                        formLabel: "Certificate Chain Encoding",
+                                                        formValue: "certificateChainEncoding",
+
+                                                        options: certificateEncodingOptions,
+                                                    },
+                                                ]}
+                                            />
+                                        </>
+                                    ),
+                                    isOpen: true,
+                                    size: "lg",
+                                    title: "Download Certificate",
+                                }),
                             );
                         }}
                     >
-                        PKCS#7 with chain as Der (Format:pkcs7) (.p7b)
+                        Certificate Chain Download
                     </DropdownItem>
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
         ),
-        [certificate, fileNameToDownload, dispatch, downloadCertificateChainContent],
+        [
+            certificate,
+            certificateDownloadContent,
+            fileNameToDownload,
+            dispatch,
+            downloadCertificateChainContent,
+            downloadCertificateContent,
+        ],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -663,6 +767,17 @@ export default function CertificateDetail() {
                 disabled: !certificate?.certificateContent,
                 custom: !certificate?.certificateContent ? undefined : downloadDropDown,
                 onClick: () => {},
+            },
+            {
+                icon: "copy",
+                disabled: !certificate?.certificateContent,
+                tooltip: "Copy certificate content",
+                onClick: () => {
+                    navigator.clipboard
+                        .writeText(formatPEM(certificate?.certificateContent ?? ""))
+                        .then(() => dispatch?.(alertActions.success?.("Certificate content was copied to clipboard")))
+                        .catch(() => dispatch?.(alertActions.error?.("Failed to copy certificate content to clipboard")));
+                },
             },
         ],
         [certificate, downloadDropDown, onComplianceCheck, dispatch],

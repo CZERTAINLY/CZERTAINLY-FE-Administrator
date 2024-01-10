@@ -65,6 +65,10 @@ export const slice = createSlice({
             state.globalModal = initialState.globalModal;
         },
 
+        updateModalContent: (state, action: PayloadAction<string>) => {
+            state.globalModal.content = action.payload;
+        },
+
         setOkButtonCallback: (state, action: PayloadAction<() => void>) => {
             state.globalModal.okButtonCallback = action.payload;
         },
