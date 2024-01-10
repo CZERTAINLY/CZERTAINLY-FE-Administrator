@@ -692,8 +692,6 @@ export default function CertificateDetail() {
         ),
         [
             certificate,
-            certificateDownloadContent,
-            fileNameToDownload,
             dispatch,
             downloadCertificateChainContent,
             downloadCertificateContent,
