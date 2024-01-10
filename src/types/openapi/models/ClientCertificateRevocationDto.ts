@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { RequestAttributeDto } from "./";
+import type { CertificateRevocationReason, RequestAttributeDto } from "./";
 
 /**
  * @export
@@ -19,11 +19,10 @@ import type { RequestAttributeDto } from "./";
  */
 export interface ClientCertificateRevocationDto {
     /**
-     * Reason for revocation
-     * @type {string}
+     * @type {CertificateRevocationReason}
      * @memberof ClientCertificateRevocationDto
      */
-    reason?: ClientCertificateRevocationDtoReasonEnum;
+    reason?: CertificateRevocationReason;
     /**
      * List of Attributes to revoke Certificate
      * @type {Array<RequestAttributeDto>}
@@ -36,20 +35,4 @@ export interface ClientCertificateRevocationDto {
      * @memberof ClientCertificateRevocationDto
      */
     destroyKey?: boolean;
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum ClientCertificateRevocationDtoReasonEnum {
-    Unspecified = "unspecified",
-    KeyCompromise = "keyCompromise",
-    CACompromise = "cACompromise",
-    AffiliationChanged = "affiliationChanged",
-    Superseded = "superseded",
-    CessationOfOperation = "cessationOfOperation",
-    CertificateHold = "certificateHold",
-    PrivilegeWithdrawn = "privilegeWithdrawn",
-    AACompromise = "aACompromise",
 }

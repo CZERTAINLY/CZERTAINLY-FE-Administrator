@@ -24,6 +24,8 @@ import type {
     CertificateDetailDto,
     CertificateDownloadResponseDto,
     CertificateEventHistoryDto,
+    CertificateFormat,
+    CertificateFormatEncoding,
     CertificateResponseDto,
     CertificateUpdateObjectsDto,
     CertificateValidationResultDto,
@@ -58,14 +60,14 @@ export interface DeleteCertificateRequest {
 
 export interface DownloadCertificateRequest {
     uuid: string;
-    certificateFormat: DownloadCertificateCertificateFormatEnum;
-    encoding: DownloadCertificateEncodingEnum;
+    certificateFormat: CertificateFormat;
+    encoding: CertificateFormatEncoding;
 }
 
 export interface DownloadCertificateChainRequest {
     uuid: string;
-    certificateFormat: DownloadCertificateChainCertificateFormatEnum;
-    encoding: DownloadCertificateChainEncodingEnum;
+    certificateFormat: CertificateFormat;
+    encoding: CertificateFormatEncoding;
     withEndCertificate?: boolean;
 }
 
@@ -620,37 +622,4 @@ export class CertificateInventoryApi extends BaseAPI {
             opts?.responseOpts,
         );
     }
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum DownloadCertificateCertificateFormatEnum {
-    Raw = "raw",
-    Pkcs7 = "pkcs7",
-}
-/**
- * @export
- * @enum {string}
- */
-export enum DownloadCertificateEncodingEnum {
-    Pem = "pem",
-    Der = "der",
-}
-/**
- * @export
- * @enum {string}
- */
-export enum DownloadCertificateChainCertificateFormatEnum {
-    Raw = "raw",
-    Pkcs7 = "pkcs7",
-}
-/**
- * @export
- * @enum {string}
- */
-export enum DownloadCertificateChainEncodingEnum {
-    Pem = "pem",
-    Der = "der",
 }

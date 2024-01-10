@@ -24,11 +24,10 @@ import { selectors as settingSelectors } from "ducks/settings";
 
 import {
     CertificateState as CertStatus,
+    CertificateFormat,
+    CertificateFormatEncoding,
+    CertificateRevocationReason,
     CertificateValidationStatus,
-    DownloadCertificateCertificateFormatEnum,
-    DownloadCertificateChainCertificateFormatEnum,
-    DownloadCertificateChainEncodingEnum,
-    DownloadCertificateEncodingEnum,
 } from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -54,7 +53,7 @@ import {
     UncontrolledButtonDropdown,
 } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus, Resource } from "types/openapi";
+import { ComplianceStatus, Resource } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { downloadFile, formatPEM } from "utils/certificate";
@@ -82,7 +81,7 @@ import styles from "./certificateDetail.module.scss";
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
-    certificateEncoding?: DownloadCertificateChainEncodingEnum | DownloadCertificateEncodingEnum;
+    certificateEncoding?: CertificateFormatEncoding;
     isCopyTriggered?: boolean;
 }
 
@@ -155,7 +154,7 @@ export default function CertificateDetail() {
     const [ownerUuid, setOwnerUuid] = useState<string>();
     const [raProfile, setRaProfile] = useState<string>();
     const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
-    const [revokeReason, setRevokeReason] = useState<ClientCertificateRevocationDtoReasonEnum>();
+    const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
     const [locationsCheckedRows, setLocationCheckedRows] = useState<string[]>([]);
     const [selectLocationsCheckedRows, setSelectLocationCheckedRows] = useState<string[]>([]);
@@ -213,7 +212,7 @@ export default function CertificateDetail() {
     );
 
     const downloadCertificateChainContent = useCallback(
-        (certificateFormat: DownloadCertificateChainCertificateFormatEnum, certificateEncoding: DownloadCertificateChainEncodingEnum) => {
+        (certificateFormat: CertificateFormat, certificateEncoding: CertificateFormatEncoding) => {
             if (!certificate) return;
             dispatch(
                 actions.downloadCertificateChain({
@@ -229,11 +228,7 @@ export default function CertificateDetail() {
     );
 
     const downloadCertificateContent = useCallback(
-        (
-            certificateFormat: DownloadCertificateCertificateFormatEnum,
-            certificateEncoding: DownloadCertificateEncodingEnum,
-            // isCopyTriggered?: boolean,
-        ) => {
+        (certificateFormat: CertificateFormat, certificateEncoding: CertificateFormatEncoding) => {
             if (!certificate) return;
             dispatch(
                 actions.downloadCertificate({
@@ -245,7 +240,6 @@ export default function CertificateDetail() {
             setCertificateDownload({
                 isDownloadTriggered: true,
                 certificateEncoding: certificateEncoding,
-                // isCopyTriggered: isCopyTriggered,
             });
         },
         [certificate, dispatch],
@@ -268,7 +262,7 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
 
-        const extensionFormat = chainDownloadSwitch.certificateEncoding === DownloadCertificateChainEncodingEnum.Pem ? ".pem" : ".p7b";
+        const extensionFormat = chainDownloadSwitch.certificateEncoding === CertificateFormatEncoding.Pem ? ".pem" : ".p7b";
         downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + extensionFormat);
 
         setTriggerChainDownload({ isDownloadTriggered: false });
@@ -281,7 +275,7 @@ export default function CertificateDetail() {
             return;
         }
 
-        const extensionFormat = certificateDownloadSwitch.certificateEncoding === DownloadCertificateEncodingEnum.Pem ? ".pem" : ".cer";
+        const extensionFormat = certificateDownloadSwitch.certificateEncoding === CertificateFormatEncoding.Pem ? ".pem" : ".cer";
         downloadFile(Buffer.from(certificateDownloadContent.content ?? "", "base64"), fileNameToDownload + extensionFormat);
 
         setCertificateDownload({ isDownloadTriggered: false });
@@ -515,7 +509,7 @@ export default function CertificateDetail() {
         dispatch(
             actions.revokeCertificate({
                 uuid: certificate.uuid,
-                revokeRequest: { reason: revokeReason || ClientCertificateRevocationDtoReasonEnum.Unspecified, attributes: [] },
+                revokeRequest: { reason: revokeReason || CertificateRevocationReason.Unspecified, attributes: [] },
                 raProfileUuid: certificate.raProfile?.uuid || "",
                 authorityUuid: certificate.raProfile?.authorityInstanceUuid || "",
             }),
@@ -926,7 +920,7 @@ export default function CertificateDetail() {
                     menuPlacement="auto"
                     options={certificateRevokeReasonOptions}
                     placeholder={`Select Revocation Reason`}
-                    onChange={(event: any) => setRevokeReason(event?.value as ClientCertificateRevocationDtoReasonEnum)}
+                    onChange={(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
                 />
             </div>
         );

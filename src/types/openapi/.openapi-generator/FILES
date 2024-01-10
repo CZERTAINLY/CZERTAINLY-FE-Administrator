@@ -101,9 +101,13 @@ models/CertificateDetailDto.ts
 models/CertificateDownloadResponseDto.ts
 models/CertificateDto.ts
 models/CertificateEventHistoryDto.ts
+models/CertificateFormat.ts
+models/CertificateFormatEncoding.ts
 models/CertificateInLocationDto.ts
 models/CertificateRequestDto.ts
+models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
+models/CertificateRevocationReason.ts
 models/CertificateState.ts
 models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts

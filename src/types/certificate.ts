@@ -15,7 +15,6 @@ import {
     CertificateUpdateObjectsDto,
     CertificateValidationCheck,
     CertificateValidationCheckDto,
-    CertificateValidationDto as CertificateValidationDtoOpenApi,
     CertificateValidationResultDto,
     CertificateValidationStatus,
     ClientCertificateRekeyRequestDto,
@@ -74,9 +73,6 @@ export type CertificateDetailResponseModel = Omit<
 
 export type CertificateListResponseDto = CertificateDto;
 export type CertificateListResponseModel = CertificateListResponseDto;
-
-export type CertificateValidationDto = CertificateValidationDtoOpenApi;
-export type CertificateValidationModel = CertificateValidationDto;
 
 export type CertificateSignRequestDto = ClientCertificateSignRequestDto;
 export type CertificateSignRequestModel = Omit<

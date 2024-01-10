@@ -11,44 +11,27 @@
  * Do not edit the class manually.
  */
 
+import type { CertificateFormat, CertificateFormatEncoding } from "./";
+
 /**
  * @export
  * @interface CertificateDownloadResponseDto
  */
 export interface CertificateDownloadResponseDto {
     /**
-     * Format of the downloaded content
-     * @type {string}
+     * @type {CertificateFormat}
      * @memberof CertificateDownloadResponseDto
      */
-    format: CertificateDownloadResponseDtoFormatEnum;
+    format: CertificateFormat;
     /**
-     * Encoding of the downloaded content
-     * @type {string}
+     * @type {CertificateFormatEncoding}
      * @memberof CertificateDownloadResponseDto
      */
-    encoding: CertificateDownloadResponseDtoEncodingEnum;
+    encoding: CertificateFormatEncoding;
     /**
      * Base64 encoded content in the specified format and encoding
      * @type {string}
      * @memberof CertificateDownloadResponseDto
      */
     content: string;
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateDownloadResponseDtoFormatEnum {
-    Raw = "raw",
-    Pkcs7 = "pkcs7",
-}
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateDownloadResponseDtoEncodingEnum {
-    Pem = "pem",
-    Der = "der",
 }

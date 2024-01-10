@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateType, ResponseAttributeDto } from "./";
+import type { CertificateRequestFormat, CertificateType, ResponseAttributeDto } from "./";
 
 /**
  * Certificate request data
@@ -25,11 +25,10 @@ export interface CertificateRequestDto {
      */
     certificateType?: CertificateType;
     /**
-     * Certificate request format
-     * @type {string}
+     * @type {CertificateRequestFormat}
      * @memberof CertificateRequestDto
      */
-    certificateRequestFormat?: CertificateRequestDtoCertificateRequestFormatEnum;
+    certificateRequestFormat?: CertificateRequestFormat;
     /**
      * Public key algorithm
      * @type {string}
@@ -78,12 +77,4 @@ export interface CertificateRequestDto {
      * @memberof CertificateRequestDto
      */
     signatureAttributes?: Array<ResponseAttributeDto>;
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum CertificateRequestDtoCertificateRequestFormatEnum {
-    Pkcs10 = "pkcs10",
 }
