@@ -1,12 +1,13 @@
 import { Buffer } from "buffer";
 import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 
+import { actions as alertActions } from "ducks/alerts";
 import { actions, selectors } from "ducks/certificates";
 
 import { CertificateFormat, CertificateFormatEncoding } from "../../../../types/openapi";
 
 import { selectors as enumSelectors } from "ducks/enums";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { downloadFile } from "utils/certificate";
@@ -15,7 +16,7 @@ import { PlatformEnum } from "types/openapi";
 
 import DropDownListForm from "components/DropDownForm";
 import SwitchWidget from "components/SwitchWidget";
-import { Container } from "reactstrap";
+import { Container, Label } from "reactstrap";
 
 // Adding eslint supress no-useless concat warning
 /* eslint-disable no-useless-concat */
@@ -23,6 +24,7 @@ import { Container } from "reactstrap";
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
     certificateEncoding?: CertificateFormatEncoding;
+    certificateFormat?: CertificateFormat;
     isCopyTriggered?: boolean;
 }
 
@@ -41,6 +43,32 @@ const CertificateDownloadForm = () => {
     const [isDownloadFormCertificateChain, setIsDownloadFormCertificateChain] = useState<boolean>(false);
 
     const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
+
+    const certificateFormatEncodingMap = useMemo(() => {
+        return {
+            [CertificateFormat.Raw]: {
+                [CertificateFormatEncoding.Pem]: ".pem",
+                [CertificateFormatEncoding.Der]: ".cer",
+            },
+            [CertificateFormat.Pkcs7]: {
+                [CertificateFormatEncoding.Pem]: ".p7c",
+                [CertificateFormatEncoding.Der]: ".p7b",
+            },
+        };
+    }, []);
+
+    const certificateChainFormatEncodingMap = useMemo(() => {
+        return {
+            [CertificateFormat.Raw]: {
+                [CertificateFormatEncoding.Pem]: ".pem",
+                [CertificateFormatEncoding.Der]: null,
+            },
+            [CertificateFormat.Pkcs7]: {
+                [CertificateFormatEncoding.Pem]: ".p7c",
+                [CertificateFormatEncoding.Der]: ".p7b",
+            },
+        };
+    }, []);
 
     const certificateFormatOptions = Object.values(certificateRequestFormatEnum).map((item) => {
         return {
@@ -67,7 +95,11 @@ const CertificateDownloadForm = () => {
                     encoding: certificateEncoding,
                 }),
             );
-            setTriggerChainDownload({ isDownloadTriggered: true, certificateEncoding: certificateEncoding });
+            setTriggerChainDownload({
+                isDownloadTriggered: true,
+                certificateEncoding: certificateEncoding,
+                certificateFormat: certificateFormat,
+            });
         },
         [certificate, dispatch],
     );
@@ -85,38 +117,68 @@ const CertificateDownloadForm = () => {
             setCertificateDownload({
                 isDownloadTriggered: true,
                 certificateEncoding: certificateEncoding,
+                certificateFormat: certificateFormat,
             });
         },
         [certificate, dispatch],
     );
 
     useEffect(() => {
-        if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
+        if (
+            !certificateChainDownloadContent ||
+            !chainDownloadSwitch.isDownloadTriggered ||
+            !chainDownloadSwitch.certificateFormat ||
+            !chainDownloadSwitch.certificateEncoding
+        )
+            return;
 
-        const extensionFormat = chainDownloadSwitch.certificateEncoding === CertificateFormatEncoding.Pem ? ".pem" : ".p7b";
+        let extensionFormat;
+
+        extensionFormat =
+            certificateChainFormatEncodingMap[chainDownloadSwitch.certificateFormat]?.[chainDownloadSwitch.certificateEncoding];
+
+        if (!extensionFormat) {
+            dispatch(alertActions.error("There was some error with the extension format."));
+            return;
+        }
+
         downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + extensionFormat);
 
         setTriggerChainDownload({ isDownloadTriggered: false });
-    }, [certificateChainDownloadContent, chainDownloadSwitch, fileNameToDownload]);
+    }, [certificateChainDownloadContent, chainDownloadSwitch, fileNameToDownload, certificateChainFormatEncodingMap, dispatch]);
 
     useEffect(() => {
-        if (!certificateDownloadContent || !certificateDownloadSwitch.isDownloadTriggered) return;
+        if (
+            !certificateDownloadContent ||
+            !certificateDownloadSwitch.isDownloadTriggered ||
+            !certificateDownloadSwitch.certificateFormat ||
+            !certificateDownloadSwitch.certificateEncoding
+        )
+            return;
         if (certificateDownloadSwitch.isCopyTriggered) {
             setCertificateDownload({ isDownloadTriggered: false });
             return;
         }
 
-        const extensionFormat = certificateDownloadSwitch.certificateEncoding === CertificateFormatEncoding.Pem ? ".pem" : ".cer";
+        let extensionFormat;
+
+        extensionFormat =
+            certificateFormatEncodingMap[certificateDownloadSwitch.certificateFormat]?.[certificateDownloadSwitch.certificateEncoding];
+
+        if (!extensionFormat) {
+            dispatch(alertActions.error("There was some error with the extension format."));
+        }
+
         downloadFile(Buffer.from(certificateDownloadContent.content ?? "", "base64"), fileNameToDownload + extensionFormat);
 
         setCertificateDownload({ isDownloadTriggered: false });
-    }, [certificateDownloadContent, certificateDownloadSwitch, fileNameToDownload]);
+    }, [certificateDownloadContent, certificateDownloadSwitch, fileNameToDownload, certificateFormatEncodingMap, dispatch]);
 
     return (
         <>
-            <Container>
-                <div className="d-flex justify-content-center">
-                    <span className="my-1 me-1">Certificate Chain : </span>
+            <Container className="ps-5 mb-3">
+                <div className="d-flex">
+                    <Label className="my-1 me-2">Certificate Chain :</Label>
                     <SwitchWidget
                         checked={isDownloadFormCertificateChain ?? false}
                         onClick={() => setIsDownloadFormCertificateChain(!isDownloadFormCertificateChain)}
