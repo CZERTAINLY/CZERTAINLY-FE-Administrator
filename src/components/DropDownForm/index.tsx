@@ -22,9 +22,9 @@ interface Props {
     dropDownOptionsList: DropDownOptionsData[];
     onSubmit: (values: Record<string, any>) => void;
     onClose: () => void;
+    isBusy?: boolean;
 }
-const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList }: Props) => {
-    console.log("OptionsOrGroups", dropDownOptionsList);
+const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = false }: Props) => {
     return (
         <Container className={style.certificateDownloadContainer}>
             <Form onSubmit={onSubmit}>
@@ -53,15 +53,15 @@ const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList }: Props) => 
                         <div className="d-flex">
                             <ButtonGroup className="ms-auto">
                                 <ProgressButton
-                                    inProgress={false}
-                                    title="Submit"
+                                    inProgress={isBusy}
+                                    title={isBusy ? "Submitting" : "Submit"}
                                     type="submit"
                                     color="primary"
-                                    disabled={pristine || submitting || !valid}
+                                    disabled={pristine || isBusy || !valid}
                                     onClick={handleSubmit}
                                 />
 
-                                <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
+                                <Button type="button" color="secondary" disabled={isBusy} onClick={onClose}>
                                     Close
                                 </Button>
                             </ButtonGroup>

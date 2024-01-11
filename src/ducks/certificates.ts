@@ -709,12 +709,17 @@ const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttrib
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
 const isFetchingCertificateChain = createSelector(state, (state) => state.isFetchingCertificateChain);
 
+const isFetchingCertificateDownloadContent = createSelector(state, (state) => state.isFetchingCertificateDownloadContent);
+const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
+
 export const selectors = {
     state,
     deleteErrorMessage,
     certificates,
     certificateDetail,
     certificateChainDownloadContent,
+    isFetchingCertificateDownloadContent,
+    isFetchingCertificateChainDownloadContent,
     certificateDownloadContent,
     certificateHistory,
     certificateLocations,
