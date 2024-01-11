@@ -119,7 +119,7 @@ export default function CertificateDetail() {
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
-    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
+    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormat));
     const certificateFormatEncodingEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormatEncoding));
 
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
