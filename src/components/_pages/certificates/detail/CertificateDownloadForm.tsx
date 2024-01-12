@@ -178,7 +178,7 @@ const CertificateDownloadForm = () => {
         <>
             <Container className="ps-5 mb-3">
                 <div className="d-flex">
-                    <Label className="my-1 me-2">Certificate Chain :</Label>
+                    <Label className="my-1 me-2">Certificate Chain</Label>
                     <SwitchWidget
                         checked={isDownloadFormCertificateChain ?? false}
                         onClick={() => setIsDownloadFormCertificateChain(!isDownloadFormCertificateChain)}
