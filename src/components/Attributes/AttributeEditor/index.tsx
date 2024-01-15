@@ -263,7 +263,6 @@ export default function AttributeEditor({
     const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } =
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
-
             [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach((descriptor) => {
                 if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || "__";
@@ -567,9 +566,22 @@ export default function AttributeEditor({
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
 
-            // Update options
             if (Array.isArray(callbackData[callbackId])) {
                 const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
+                // Check if there are any other attributes in the callback data before setting it as empty
+                if (!groupCallbackAttributes.length) {
+                    const callbackDataArray = Object.values(callbackData);
+                    for (let i = 0; i < callbackDataArray.length; i++) {
+                        if (Array.isArray(callbackDataArray[i])) {
+                            const groupCallbackAttributesOther: AttributeDescriptorModel[] =
+                                callbackDataArray[i].filter(isAttributeDescriptorModel);
+
+                            if (groupCallbackAttributesOther.length) {
+                                groupCallbackAttributes.push(groupCallbackAttributesOther[i]);
+                            }
+                        }
+                    }
+                }
                 setGroupAttributesCallbackAttributes(groupCallbackAttributes);
 
                 const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
@@ -619,13 +631,13 @@ export default function AttributeEditor({
 
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
-
         for (const group in groupedAttributesDescriptors)
             attrs.push(
                 <Widget key={group} title={group === "__" ? "" : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
                         <div key={descriptor.name}>
                             <Attribute
+                                busy={isRunningCb}
                                 name={`__attributes__${id}__.${descriptor.name}`}
                                 descriptor={descriptor}
                                 options={options[`__attributes__${id}__.${descriptor.name}`]}

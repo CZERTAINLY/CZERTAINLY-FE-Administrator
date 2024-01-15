@@ -31,9 +31,10 @@ interface Props {
     name: string;
     descriptor: DataAttributeModel | InfoAttributeModel | CustomAttributeModel | undefined;
     options?: { label: string; value: any }[];
+    busy?: boolean;
 }
 
-export function Attribute({ name, descriptor, options }: Props): JSX.Element {
+export function Attribute({ name, descriptor, options, busy = false }: Props): JSX.Element {
     const form = useForm();
     const formState = useFormState();
     const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
@@ -184,7 +185,7 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
                                             ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
                                             : { ...provided },
                                 }}
-                                isDisabled={descriptor.properties.readOnly}
+                                isDisabled={descriptor.properties.readOnly || busy}
                                 isMulti={descriptor.properties.multiSelect}
                                 isClearable={!descriptor.properties.required}
                             />
@@ -402,7 +403,7 @@ export function Attribute({ name, descriptor, options }: Props): JSX.Element {
                             invalid={!!meta.error && meta.touched}
                             type={descriptor.properties.visible ? getFormType(descriptor.contentType) : "hidden"}
                             placeholder={`Enter ${descriptor.properties.label}`}
-                            disabled={descriptor.properties.readOnly}
+                            disabled={descriptor.properties.readOnly || busy}
                         />
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (
