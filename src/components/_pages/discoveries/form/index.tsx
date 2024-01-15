@@ -51,7 +51,6 @@ export default function DiscoveryForm() {
     const isCreating = useSelector(discoverySelectors.isCreating);
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [cronExpression, setCronExpression] = useState<string | undefined>();
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
     const isBusy = useMemo(
@@ -154,8 +153,6 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
-    console.log("cronExpression", cronExpression);
-
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, pristine, submitting, values, valid, form }) => (
@@ -193,11 +190,9 @@ export default function DiscoveryForm() {
                                                                 <Cron
                                                                     value={values.cronExpression}
                                                                     onChange={(e) => {
-                                                                        setCronExpression(e);
                                                                         dispatch(
                                                                             userInterfaceActions.setOkButtonCallback(() => {
                                                                                 dispatch(userInterfaceActions.hideGlobalModal());
-                                                                                setCronExpression(undefined);
                                                                                 form.mutators.setAttribute("cronExpression", e);
                                                                             }),
                                                                         );
@@ -211,7 +206,6 @@ export default function DiscoveryForm() {
                                                     showCancelButton: true,
                                                     okButtonCallback: () => {
                                                         dispatch(userInterfaceActions.hideGlobalModal());
-                                                        setCronExpression(undefined);
                                                     },
                                                     showOkButton: true,
                                                     isOpen: true,

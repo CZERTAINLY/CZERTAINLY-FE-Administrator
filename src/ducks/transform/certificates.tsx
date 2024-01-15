@@ -47,7 +47,7 @@ import { OtherProperties } from "types/flowchart";
 import { LocationResponseModel } from "types/locations";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
-import { CertificateComplianceCheckDto } from "../../types/openapi";
+import { CertificateChainResponseDto, CertificateComplianceCheckDto } from "../../types/openapi";
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
 import { transformCertificateGroupResponseDtoToModel } from "./certificateGroups";
 import { transformLocationResponseDtoToModel, transformMetadataDtoToModel } from "./locations";
@@ -572,4 +572,14 @@ export function transformCertifacetObjectToNodesAndEdges(
     }
 
     return { nodes, edges };
+}
+
+export function transformCertificateChainDownloadResponseDtoToCertificateChainResponseModel(
+    certificateChain: CertificateChainResponseDto,
+): CertificateChainResponseModel {
+    return {
+        ...certificateChain,
+        certificates: certificateChain.certificates?.map(transformCertificateDetailResponseDtoToModel),
+        completeChain: certificateChain.completeChain,
+    };
 }

@@ -11,11 +11,12 @@
  * Do not edit the class manually.
  */
 
-import { of } from "rxjs";
 import type { Observable } from "rxjs";
-import { ajax } from "rxjs/ajax";
+import { of } from "rxjs";
+
 import type { AjaxConfig, AjaxResponse } from "rxjs/ajax";
-import { map, concatMap } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
+import { concatMap, map } from "rxjs/operators";
 import { servers } from "./servers";
 
 export const BASE_PATH = servers[0].getUrl();

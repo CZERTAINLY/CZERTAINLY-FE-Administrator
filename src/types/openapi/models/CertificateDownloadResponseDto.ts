@@ -15,29 +15,23 @@ import type { CertificateFormat, CertificateFormatEncoding } from "./";
 
 /**
  * @export
- * @interface CertificateChainDownloadResponseDto
+ * @interface CertificateDownloadResponseDto
  */
-export interface CertificateChainDownloadResponseDto {
+export interface CertificateDownloadResponseDto {
     /**
      * @type {CertificateFormat}
-     * @memberof CertificateChainDownloadResponseDto
+     * @memberof CertificateDownloadResponseDto
      */
     format: CertificateFormat;
     /**
      * @type {CertificateFormatEncoding}
-     * @memberof CertificateChainDownloadResponseDto
+     * @memberof CertificateDownloadResponseDto
      */
     encoding: CertificateFormatEncoding;
     /**
      * Base64 encoded content in the specified format and encoding
      * @type {string}
-     * @memberof CertificateChainDownloadResponseDto
+     * @memberof CertificateDownloadResponseDto
      */
     content: string;
-    /**
-     * Indicator whether the chain returned is complete
-     * @type {boolean}
-     * @memberof CertificateChainDownloadResponseDto
-     */
-    completeChain: boolean;
 }

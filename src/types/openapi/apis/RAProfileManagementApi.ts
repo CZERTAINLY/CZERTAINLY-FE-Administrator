@@ -22,6 +22,7 @@ import type {
     ApprovalProfileDto,
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
+    CertificateDetailDto,
     EditRaProfileRequestDto,
     ErrorMessageDto,
     RaProfileAcmeDetailResponseDto,
@@ -124,6 +125,11 @@ export interface GetAssociatedApprovalProfilesRequest {
 }
 
 export interface GetAssociatedComplianceProfilesRequest {
+    authorityUuid: string;
+    raProfileUuid: string;
+}
+
+export interface GetAuthorityCertificateChainRequest {
     authorityUuid: string;
     raProfileUuid: string;
 }
@@ -262,7 +268,7 @@ export class RAProfileManagementApi extends BaseAPI {
 
         return this.request<void>(
             {
-                url: "/v1/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
                     .replace("{authorityUuid}", encodeURI(authorityUuid))
                     .replace("{raProfileUuid}", encodeURI(raProfileUuid))
                     .replace("{approvalProfileUuid}", encodeURI(approvalProfileUuid)),
@@ -540,7 +546,7 @@ export class RAProfileManagementApi extends BaseAPI {
 
         return this.request<void>(
             {
-                url: "/v1/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
                     .replace("{authorityUuid}", encodeURI(authorityUuid))
                     .replace("{raProfileUuid}", encodeURI(raProfileUuid))
                     .replace("{approvalProfileUuid}", encodeURI(approvalProfileUuid)),
@@ -649,7 +655,7 @@ export class RAProfileManagementApi extends BaseAPI {
 
         return this.request<Array<ApprovalProfileDto>>(
             {
-                url: "/v1/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles"
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles"
                     .replace("{authorityUuid}", encodeURI(authorityUuid))
                     .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
                 method: "GET",
@@ -679,6 +685,35 @@ export class RAProfileManagementApi extends BaseAPI {
         return this.request<Array<SimplifiedComplianceProfileDto>>(
             {
                 url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/complianceProfiles"
+                    .replace("{authorityUuid}", encodeURI(authorityUuid))
+                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
+                method: "GET",
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
+     * Retrieve certificates of authority belonging to RA profile
+     */
+    getAuthorityCertificateChain({
+        authorityUuid,
+        raProfileUuid,
+    }: GetAuthorityCertificateChainRequest): Observable<Array<CertificateDetailDto>>;
+    getAuthorityCertificateChain(
+        { authorityUuid, raProfileUuid }: GetAuthorityCertificateChainRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<Array<CertificateDetailDto>>>;
+    getAuthorityCertificateChain(
+        { authorityUuid, raProfileUuid }: GetAuthorityCertificateChainRequest,
+        opts?: OperationOpts,
+    ): Observable<Array<CertificateDetailDto> | AjaxResponse<Array<CertificateDetailDto>>> {
+        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAuthorityCertificateChain");
+        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAuthorityCertificateChain");
+
+        return this.request<Array<CertificateDetailDto>>(
+            {
+                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/caCertificates"
                     .replace("{authorityUuid}", encodeURI(authorityUuid))
                     .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
                 method: "GET",

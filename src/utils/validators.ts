@@ -103,8 +103,8 @@ export const validateQuartzCronExpression = (cronExpression: string | undefined)
         return !validationInput || validObj.isValid
             ? undefined
             : Array.isArray(validObj.errorMessage)
-            ? uniqueErrors.join(", ")
-            : validObj.errorMessage;
+              ? uniqueErrors.join(", ")
+              : validObj.errorMessage;
     } catch (error) {
         return "Unknown error, please check the cron expression.";
     }

@@ -4,7 +4,6 @@ import {
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseModel,
     CertificateBulkObjectModel,
-    CertificateChainDownloadResponseModel,
     CertificateChainResponseModel,
     CertificateComplianceCheckModel,
     CertificateContentResponseModel,
@@ -17,12 +16,14 @@ import {
     CertificateRevokeRequestModel,
     CertificateSignRequestModel,
     CertificateUploadModel,
+    DownloadCertificateChainResponseModel,
+    DownloadCertificateResponseModel,
     SearchRequestModel,
     ValidationCertificateResultModel,
 } from "types/certificate";
 import { CertificateGroupResponseModel } from "types/certificateGroups";
 import { LocationResponseModel } from "types/locations";
-import { ApprovalDto, DownloadCertificateChainRequest, ListCertificateApprovalsRequest } from "types/openapi";
+import { ApprovalDto, DownloadCertificateChainRequest, DownloadCertificateRequest, ListCertificateApprovalsRequest } from "types/openapi";
 import { RaProfileResponseModel } from "types/ra-profiles";
 import { UserResponseModel } from "types/users";
 import { downloadFileZip } from "utils/download";
@@ -41,7 +42,8 @@ export type State = {
     validationResult?: ValidationCertificateResultModel;
     approvals?: ApprovalDto[];
     certificateChain?: CertificateChainResponseModel;
-    certificateChainDownloadContent?: CertificateChainDownloadResponseModel;
+    certificateChainDownloadContent?: DownloadCertificateChainResponseModel;
+    certificateDownloadContent?: DownloadCertificateResponseModel;
 
     isFetchingValidationResult: boolean;
 
@@ -50,6 +52,7 @@ export type State = {
     isFetchingLocations: boolean;
     isFetchingApprovals: boolean;
     isFetchingCertificateChain: boolean;
+    isFetchingCertificateDownloadContent: boolean;
     isFetchingCertificateChainDownloadContent: boolean;
 
     isIssuing: boolean;
@@ -99,6 +102,7 @@ export const initialState: State = {
     isFetchingHistory: false,
     isFetchingLocations: false,
     isFetchingCertificateChain: false,
+    isFetchingCertificateDownloadContent: false,
     isFetchingCertificateChainDownloadContent: false,
 
     isIssuing: false,
@@ -626,7 +630,7 @@ export const slice = createSlice({
 
         downloadCertificateChainSuccess: (
             state,
-            action: PayloadAction<{ certificateChainDownloadContent: CertificateChainDownloadResponseModel }>,
+            action: PayloadAction<{ certificateChainDownloadContent: DownloadCertificateChainResponseModel }>,
         ) => {
             state.isFetchingCertificateChainDownloadContent = false;
             state.certificateChainDownloadContent = action.payload.certificateChainDownloadContent;
@@ -634,6 +638,21 @@ export const slice = createSlice({
 
         downloadCertificateChainFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingCertificateChainDownloadContent = false;
+        },
+
+        downloadCertificate: (state, action: PayloadAction<DownloadCertificateRequest>) => {
+            state.certificateDownloadContent = undefined;
+            state.isFetchingCertificateDownloadContent = true;
+        },
+
+        downloadCertificateSuccess: (state, action: PayloadAction<{ certificateDownloadContent: DownloadCertificateResponseModel }>) => {
+            state.certificateDownloadContent = action.payload.certificateDownloadContent;
+            state.isFetchingCertificateDownloadContent = false;
+        },
+
+        downloadCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.certificateDownloadContent = undefined;
+            state.isFetchingCertificateDownloadContent = false;
         },
     },
 });
@@ -647,7 +666,7 @@ const certificateChain = createSelector(state, (state) => state.certificateChain
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
 const certificateChainDownloadContent = createSelector(state, (state) => state.certificateChainDownloadContent);
-
+const certificateDownloadContent = createSelector(state, (state) => state.certificateDownloadContent);
 const certificateHistory = createSelector(state, (state) => state.certificateHistory);
 const certificateLocations = createSelector(state, (state) => state.certificateLocations);
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
@@ -690,12 +709,18 @@ const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttrib
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
 const isFetchingCertificateChain = createSelector(state, (state) => state.isFetchingCertificateChain);
 
+const isFetchingCertificateDownloadContent = createSelector(state, (state) => state.isFetchingCertificateDownloadContent);
+const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
+
 export const selectors = {
     state,
     deleteErrorMessage,
     certificates,
     certificateDetail,
     certificateChainDownloadContent,
+    isFetchingCertificateDownloadContent,
+    isFetchingCertificateChainDownloadContent,
+    certificateDownloadContent,
     certificateHistory,
     certificateLocations,
     issuanceAttributes,

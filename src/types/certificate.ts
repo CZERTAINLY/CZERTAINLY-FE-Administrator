@@ -4,18 +4,17 @@ import { LocationResponseModel, MetadataModel } from "./locations";
 import {
     BulkOperationResponse,
     CertificateChainDownloadResponseDto,
-    CertificateChainDownloadResponseDtoFormatEnum,
     CertificateChainResponseDto,
     CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
     CertificateContentDto,
     CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
+    CertificateDownloadResponseDto,
     CertificateDto,
     CertificateEventHistoryDto,
     CertificateUpdateObjectsDto,
     CertificateValidationCheck,
     CertificateValidationCheckDto,
-    CertificateValidationDto as CertificateValidationDtoOpenApi,
     CertificateValidationResultDto,
     CertificateValidationStatus,
     ClientCertificateRekeyRequestDto,
@@ -31,7 +30,6 @@ import {
     SimplifiedRaProfileDto,
     UploadCertificateRequestDto,
 } from "./openapi";
-// import { CertificateValidationDto as CertificateValidationDtoOpenApi } from "./openapi/models/CertificateValidationDto";
 
 export type ValidationCertificateCheckDto = CertificateValidationCheckDto;
 export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto, "validationCheck | status | message"> & {
@@ -75,9 +73,6 @@ export type CertificateDetailResponseModel = Omit<
 
 export type CertificateListResponseDto = CertificateDto;
 export type CertificateListResponseModel = CertificateListResponseDto;
-
-export type CertificateValidationDto = CertificateValidationDtoOpenApi;
-export type CertificateValidationModel = CertificateValidationDto;
 
 export type CertificateSignRequestDto = ClientCertificateSignRequestDto;
 export type CertificateSignRequestModel = Omit<
@@ -134,7 +129,8 @@ export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "c
     certificates?: Array<CertificateDetailResponseModel>;
 };
 
-export type CertificateChainDownloadResponseModel = CertificateChainDownloadResponseDto;
-export type CertificateChainDownloadResponseDtoModel = Omit<CertificateChainDownloadResponseModel, "format"> & {
-    format: CertificateChainDownloadResponseDtoFormatEnum;
-};
+export type DownloadChainCertificateResponseDto = CertificateChainDownloadResponseDto;
+export type DownloadCertificateChainResponseModel = DownloadChainCertificateResponseDto;
+
+export type DownloadCertificateResponseDto = CertificateDownloadResponseDto;
+export type DownloadCertificateResponseModel = DownloadCertificateResponseDto;
