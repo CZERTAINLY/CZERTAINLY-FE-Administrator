@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
 import { PlatformEnum } from "types/openapi";
-import { removeNullValues } from "utils/common-utils";
+import { isObjectSame, removeNullValues } from "utils/common-utils";
 import NotificationInstanceList from "../notifications-instances";
 
 type FormValues = {
@@ -111,8 +111,8 @@ const NotificationsSetting = () => {
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             const nonNullValues = removeNullValues(values);
-            const isObjectSame = JSON.stringify(nonNullValues) === JSON.stringify(initialValues);
-            return isObjectSame;
+            const areValuesSame = isObjectSame(nonNullValues, initialValues);
+            return areValuesSame;
         },
         [initialValues],
     );

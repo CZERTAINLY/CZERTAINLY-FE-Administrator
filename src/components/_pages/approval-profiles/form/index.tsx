@@ -12,6 +12,7 @@ import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGrou
 
 import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from "types/approval-profiles";
 import { mutators } from "utils/attributes/attributeEditorMutators";
+import { isObjectSame } from "utils/common-utils";
 import {
     composeValidators,
     validateAlphaNumericWithSpecialChars,
@@ -62,8 +63,8 @@ function ApprovalProfileForm() {
 
     const areDefaultValuesSame = useCallback(
         (values: ProfileApprovalRequestModel) => {
-            const isObjectSame = JSON.stringify(values) === JSON.stringify(defaultValues);
-            return isObjectSame;
+            const areValuesSame = isObjectSame(values, defaultValues);
+            return areValuesSame;
         },
         [defaultValues],
     );
