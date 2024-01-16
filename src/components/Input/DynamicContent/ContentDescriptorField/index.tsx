@@ -1,5 +1,5 @@
 import WidgetButtons from "components/WidgetButtons";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { Field, useForm, useFormState } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
@@ -22,6 +22,15 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
             form.change("content", contentValues.slice(0, 1));
         }
     }, [isList, contentValues, form]);
+
+    const stepValue = useMemo(() => {
+        const configType = ContentFieldConfiguration[contentType].type;
+        if (configType === AttributeContentType.Datetime || configType === AttributeContentType.Time || configType === "datetime-local") {
+            return 1;
+        } else {
+            return undefined;
+        }
+    }, [contentType]);
 
     return (
         <>
@@ -48,6 +57,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         invalid={!!meta.error && meta.touched}
                                         type={ContentFieldConfiguration[contentType].type}
                                         id={name}
+                                        step={stepValue}
                                         placeholder="Default Content"
                                     />
                                 );
