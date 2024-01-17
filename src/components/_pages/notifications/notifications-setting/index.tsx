@@ -41,7 +41,7 @@ const NotificationsSetting = () => {
 
     useEffect(() => {
         dispatch(notificationActions.listNotificationInstances());
-    });
+    }, [dispatch]);
 
     const isBusy = useMemo(
         () => isFetchingInstances || isUpdatingNotificationsSetting || isFetchingNotificationsSetting,

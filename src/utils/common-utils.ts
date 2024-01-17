@@ -49,3 +49,11 @@ export const isObjectSame = (obj1: Record<string, unknown>, obj2: Record<string,
 
     return true;
 };
+
+export const utf8ToBase64 = (str: string): string => {
+    return btoa(
+        encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+            return String.fromCharCode(parseInt(p1, 16));
+        }),
+    );
+};
