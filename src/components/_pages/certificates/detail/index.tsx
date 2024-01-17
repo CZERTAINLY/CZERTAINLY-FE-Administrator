@@ -9,6 +9,7 @@ import Spinner from "components/Spinner";
 import StatusBadge from "components/StatusBadge";
 import { actions as alertActions } from "ducks/alerts";
 import { actions as utilsActuatorActions } from "ducks/utilsActuator";
+import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
 
 import Widget from "components/Widget";
 import { WidgetButtonProps } from "components/WidgetButtons";
@@ -23,8 +24,9 @@ import { selectors as settingSelectors } from "ducks/settings";
 
 import {
     CertificateState as CertStatus,
+    CertificateFormatEncoding,
+    CertificateRevocationReason,
     CertificateValidationStatus,
-    DownloadCertificateChainCertificateFormatEnum,
 } from "../../../../types/openapi";
 
 import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
@@ -50,7 +52,7 @@ import {
     UncontrolledButtonDropdown,
 } from "reactstrap";
 import { AttributeDescriptorModel } from "types/attributes";
-import { ClientCertificateRevocationDtoReasonEnum, ComplianceStatus, Resource } from "types/openapi";
+import { ComplianceStatus, Resource } from "types/openapi";
 import { mutators } from "utils/attributes/attributeEditorMutators";
 import { collectFormAttributes } from "utils/attributes/attributes";
 import { downloadFile, formatPEM } from "utils/certificate";
@@ -71,13 +73,15 @@ import { Edge } from "reactflow";
 import { LockWidgetNameEnum } from "types/user-interface";
 import { DeviceType, useDeviceType } from "utils/common-hooks";
 import CertificateStatus from "../CertificateStatus";
+import CertificateDownloadForm from "./CertificateDownloadForm";
 import styles from "./certificateDetail.module.scss";
 // Adding eslint supress no-useless concat warning
 /* eslint-disable no-useless-concat */
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
-    certificateFormat?: DownloadCertificateChainCertificateFormatEnum;
+    certificateEncoding?: CertificateFormatEncoding;
+    isCopyTriggered?: boolean;
 }
 
 export default function CertificateDetail() {
@@ -87,6 +91,7 @@ export default function CertificateDetail() {
     const certificate = useSelector(selectors.certificateDetail);
     const certificateChain = useSelector(selectors.certificateChain);
     const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
+    const certificateDownloadContent = useSelector(selectors.certificateDownloadContent);
 
     const groups = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
@@ -105,6 +110,7 @@ export default function CertificateDetail() {
     const [certificateNodes, setCertificateNodes] = useState<CustomNode[]>([]);
     const [certificateEdges, setCertificateEdges] = useState<Edge[]>([]);
     const [chainDownloadSwitch, setTriggerChainDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
+    const [certificateDownloadSwitch, setCertificateDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
 
     const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
     const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
@@ -112,11 +118,11 @@ export default function CertificateDetail() {
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
-    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRequestFormat));
+    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormat));
+
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
-
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -146,7 +152,7 @@ export default function CertificateDetail() {
     const [ownerUuid, setOwnerUuid] = useState<string>();
     const [raProfile, setRaProfile] = useState<string>();
     const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
-    const [revokeReason, setRevokeReason] = useState<ClientCertificateRevocationDtoReasonEnum>();
+    const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
     const [locationsCheckedRows, setLocationCheckedRows] = useState<string[]>([]);
     const [selectLocationsCheckedRows, setSelectLocationCheckedRows] = useState<string[]>([]);
@@ -189,21 +195,6 @@ export default function CertificateDetail() {
         ],
     );
 
-    const downloadCertificateChainContent = useCallback(
-        (certificateFormat: DownloadCertificateChainCertificateFormatEnum) => {
-            if (!certificate) return;
-            dispatch(
-                actions.downloadCertificateChain({
-                    certificateFormat: certificateFormat,
-                    uuid: certificate.uuid,
-                    withEndCertificate: true,
-                }),
-            );
-            setTriggerChainDownload({ isDownloadTriggered: true, certificateFormat: certificateFormat });
-        },
-        [certificate, dispatch],
-    );
-
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertifacetObjectToNodesAndEdges(
             certificate,
@@ -221,14 +212,24 @@ export default function CertificateDetail() {
     useEffect(() => {
         if (!certificateChainDownloadContent || !chainDownloadSwitch.isDownloadTriggered) return;
 
-        if (chainDownloadSwitch.certificateFormat === DownloadCertificateChainCertificateFormatEnum.Pem) {
-            downloadFile(formatPEM(certificateChainDownloadContent.content ?? ""), fileNameToDownload + "_chain" + ".pem");
-        } else {
-            downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + ".p7b");
-        }
+        const extensionFormat = chainDownloadSwitch.certificateEncoding === CertificateFormatEncoding.Pem ? ".pem" : ".p7b";
+        downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + extensionFormat);
 
         setTriggerChainDownload({ isDownloadTriggered: false });
     }, [certificateChainDownloadContent, chainDownloadSwitch, fileNameToDownload]);
+
+    useEffect(() => {
+        if (!certificateDownloadContent || !certificateDownloadSwitch.isDownloadTriggered) return;
+        if (certificateDownloadSwitch.isCopyTriggered) {
+            setCertificateDownload({ isDownloadTriggered: false });
+            return;
+        }
+
+        const extensionFormat = certificateDownloadSwitch.certificateEncoding === CertificateFormatEncoding.Pem ? ".pem" : ".cer";
+        downloadFile(Buffer.from(certificateDownloadContent.content ?? "", "base64"), fileNameToDownload + extensionFormat);
+
+        setCertificateDownload({ isDownloadTriggered: false });
+    }, [certificateDownloadContent, certificateDownloadSwitch, fileNameToDownload]);
 
     useEffect(() => {
         transformCertificate();
@@ -458,7 +459,7 @@ export default function CertificateDetail() {
         dispatch(
             actions.revokeCertificate({
                 uuid: certificate.uuid,
-                revokeRequest: { reason: revokeReason || ClientCertificateRevocationDtoReasonEnum.Unspecified, attributes: [] },
+                revokeRequest: { reason: revokeReason || CertificateRevocationReason.Unspecified, attributes: [] },
                 raProfileUuid: certificate.raProfile?.uuid || "",
                 authorityUuid: certificate.raProfile?.authorityInstanceUuid || "",
             }),
@@ -529,62 +530,16 @@ export default function CertificateDetail() {
         });
     }, [dispatch, certificate, locationsCheckedRows, locationToEntityMap]);
 
-    const downloadDropDown = useMemo(
-        () => (
-            <UncontrolledButtonDropdown disabled={!certificate?.certificateContent}>
-                <DropdownToggle color="light" caret className="btn btn-link" title="Download Certificate">
-                    <i className="fa fa-download" aria-hidden="true" />
-                </DropdownToggle>
-
-                <DropdownMenu>
-                    <div className="d-flex">
-                        <DropdownItem
-                            key="pem"
-                            onClick={() => downloadFile(formatPEM(certificate?.certificateContent ?? ""), fileNameToDownload + ".pem")}
-                        >
-                            PEM (.pem)
-                        </DropdownItem>
-                        <i
-                            className={cx("fa fa-copy", styles.copyButton)}
-                            onClick={() => {
-                                if (!certificate?.certificateContent) return;
-                                navigator.clipboard
-                                    .writeText(formatPEM(certificate?.certificateContent ?? ""))
-                                    .then(() => dispatch?.(alertActions.success?.("Certificate content was copied to clipboard")))
-                                    .catch(() => dispatch?.(alertActions.error?.("Failed to copy certificate content to clipboard")));
-                            }}
-                        />
-                    </div>
-                    <DropdownItem
-                        key="der"
-                        onClick={() =>
-                            downloadFile(Buffer.from(certificate?.certificateContent ?? "", "base64"), fileNameToDownload + ".cer")
-                        }
-                    >
-                        DER (.cer)
-                    </DropdownItem>
-                    <DropdownItem
-                        key="chainPem"
-                        onClick={() => {
-                            downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pem);
-                        }}
-                    >
-                        PEM with chain (.pem)
-                    </DropdownItem>
-
-                    <DropdownItem
-                        key="pkcs7"
-                        onClick={() => {
-                            downloadCertificateChainContent(DownloadCertificateChainCertificateFormatEnum.Pkcs7);
-                        }}
-                    >
-                        PKCS#7 with chain (.p7b)
-                    </DropdownItem>
-                </DropdownMenu>
-            </UncontrolledButtonDropdown>
-        ),
-        [certificate, fileNameToDownload, dispatch, downloadCertificateChainContent],
-    );
+    const onDownloadClick = useCallback(() => {
+        dispatch(
+            userInterfaceActions.showGlobalModal({
+                content: <CertificateDownloadForm />,
+                isOpen: true,
+                size: "lg",
+                title: "Download",
+            }),
+        );
+    }, [dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -645,11 +600,23 @@ export default function CertificateDetail() {
             {
                 icon: "download",
                 disabled: !certificate?.certificateContent,
-                custom: !certificate?.certificateContent ? undefined : downloadDropDown,
-                onClick: () => {},
+                onClick: () => {
+                    onDownloadClick();
+                },
+            },
+            {
+                icon: "copy",
+                disabled: !certificate?.certificateContent,
+                tooltip: "Copy certificate content",
+                onClick: () => {
+                    navigator.clipboard
+                        .writeText(formatPEM(certificate?.certificateContent ?? ""))
+                        .then(() => dispatch?.(alertActions.success?.("Certificate content was copied to clipboard")))
+                        .catch(() => dispatch?.(alertActions.error?.("Failed to copy certificate content to clipboard")));
+                },
             },
         ],
-        [certificate, downloadDropDown, onComplianceCheck, dispatch],
+        [certificate, onComplianceCheck, dispatch, onDownloadClick],
     );
 
     const downloadCSRDropDown = useMemo(
@@ -795,7 +762,7 @@ export default function CertificateDetail() {
                     menuPlacement="auto"
                     options={certificateRevokeReasonOptions}
                     placeholder={`Select Revocation Reason`}
-                    onChange={(event: any) => setRevokeReason(event?.value as ClientCertificateRevocationDtoReasonEnum)}
+                    onChange={(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
                 />
             </div>
         );

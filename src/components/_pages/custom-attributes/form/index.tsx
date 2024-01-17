@@ -14,6 +14,7 @@ import Select from "react-select";
 import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from "types/customAttributes";
 import { AttributeContentType, PlatformEnum } from "types/openapi";
+import { isObjectSame } from "utils/common-utils";
 import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
 
 export default function CustomAttributeForm() {
@@ -63,6 +64,18 @@ export default function CustomAttributeForm() {
                   }
                 : defaultValuesCreate,
         [customAttributeDetail, defaultValuesCreate, resourceEnum],
+    );
+    const areDefaultValuesSame = useCallback(
+        (values: FormValues) => {
+            if (editMode) {
+                const areValuesSame = isObjectSame(values, defaultValuesUpdate);
+                return areValuesSame;
+            } else {
+                const areValuesSame = isObjectSame(values, defaultValuesCreate);
+                return areValuesSame;
+            }
+        },
+        [editMode, defaultValuesUpdate, defaultValuesCreate],
     );
 
     const onSubmitCreate = useCallback(
@@ -137,16 +150,15 @@ export default function CustomAttributeForm() {
                             onChange={(value) => (!value ? form.change("multiSelect", false) : false)}
                         />
                         <CheckboxField label={"Multi Select"} id={"multiSelect"} disabled={!values["list"]} />
-
+                        {values?.content ? values.content.length : 0}
                         <DynamicContent editable={!editMode} isList={!!values["list"]} />
-
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
                                     title={editMode ? "Update" : "Create"}
                                     inProgressTitle={editMode ? "Updating..." : "Creating..."}
                                     inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
+                                    disabled={submitting || !valid || areDefaultValuesSame(values)}
                                 />
                                 <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
                                     Cancel

@@ -19,19 +19,19 @@ import type { SearchFilterRequestDto } from "./";
  */
 export interface MultipleCertificateObjectUpdateDto {
     /**
-     * UUID of the Certificate Group
+     * Certificate Group UUID (set to empty string to remove certificate from group)
      * @type {string}
      * @memberof MultipleCertificateObjectUpdateDto
      */
     groupUuid?: string;
     /**
-     * Certificate Owner UUID
+     * Certificate owner user UUID (set to empty string to remove owner of certificate)
      * @type {string}
      * @memberof MultipleCertificateObjectUpdateDto
      */
     ownerUuid?: string;
     /**
-     * UUID of the RA Profile
+     * RA Profile UUID (set to empty string to remove certificate from RA profile)
      * @type {string}
      * @memberof MultipleCertificateObjectUpdateDto
      */

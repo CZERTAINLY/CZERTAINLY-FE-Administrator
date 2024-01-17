@@ -1,13 +1,7 @@
 import CertificateAttributes from "components/CertificateAttributes";
 import Widget from "components/Widget";
 import { CertificateDetailResponseModel } from "types/certificate";
-import {
-    CertificateRequestDtoCertificateRequestFormatEnum,
-    CertificateState,
-    CertificateType,
-    CertificateValidationStatus,
-    ComplianceStatus,
-} from "types/openapi";
+import { CertificateState, CertificateType, CertificateValidationStatus, ComplianceStatus } from "types/openapi";
 import "../../src/resources/styles/theme.scss";
 const cert: CertificateDetailResponseModel = {
     uuid: "9681f2d6-ba06-4d71-81f0-8d8d63d7b494",
@@ -24,7 +18,6 @@ const cert: CertificateDetailResponseModel = {
     trustedCa: true,
     state: CertificateState.Issued,
     validationStatus: CertificateValidationStatus.Valid,
-    // status: CertificateStatus.Valid,
     raProfile: {
         uuid: "cee6bfee-850f-4033-87e5-2708d13c3bcb",
         name: "ms-adcs-webserver",
@@ -37,7 +30,6 @@ const cert: CertificateDetailResponseModel = {
     certificateType: CertificateType.X509,
     issuerSerialNumber: "656879dc6dfcc35c431488317ddb331f486a3847",
     complianceStatus: ComplianceStatus.Ok,
-    // issuerCertificateUuid: "14406aa5-99c0-44d8-bd70-c4b00e4f6489",
     privateKeyAvailability: false,
     extendedKeyUsage: ["1.3.6.1.5.5.7.3.1"],
     keyUsage: ["digitalSignature", "keyEncipherment"],
@@ -60,7 +52,6 @@ const cert: CertificateDetailResponseModel = {
     customAttributes: [],
     certificateRequest: {
         certificateType: CertificateType.X509,
-        certificateRequestFormat: CertificateRequestDtoCertificateRequestFormatEnum.Pkcs10,
         publicKeyAlgorithm: "RSA",
         signatureAlgorithm: "SHA256withRSA",
         content:

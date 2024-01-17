@@ -22,7 +22,10 @@ import type {
     CertificateComplianceCheckDto,
     CertificateContentDto,
     CertificateDetailDto,
+    CertificateDownloadResponseDto,
     CertificateEventHistoryDto,
+    CertificateFormat,
+    CertificateFormatEncoding,
     CertificateResponseDto,
     CertificateUpdateObjectsDto,
     CertificateValidationResultDto,
@@ -55,9 +58,16 @@ export interface DeleteCertificateRequest {
     uuid: string;
 }
 
+export interface DownloadCertificateRequest {
+    uuid: string;
+    certificateFormat: CertificateFormat;
+    encoding: CertificateFormatEncoding;
+}
+
 export interface DownloadCertificateChainRequest {
     uuid: string;
-    certificateFormat: DownloadCertificateChainCertificateFormatEnum;
+    certificateFormat: CertificateFormat;
+    encoding: CertificateFormatEncoding;
     withEndCertificate?: boolean;
 }
 
@@ -219,25 +229,64 @@ export class CertificateInventoryApi extends BaseAPI {
     }
 
     /**
+     * Download Certificate
+     */
+    downloadCertificate({ uuid, certificateFormat, encoding }: DownloadCertificateRequest): Observable<CertificateDownloadResponseDto>;
+    downloadCertificate(
+        { uuid, certificateFormat, encoding }: DownloadCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<AjaxResponse<CertificateDownloadResponseDto>>;
+    downloadCertificate(
+        { uuid, certificateFormat, encoding }: DownloadCertificateRequest,
+        opts?: OperationOpts,
+    ): Observable<CertificateDownloadResponseDto | AjaxResponse<CertificateDownloadResponseDto>> {
+        throwIfNullOrUndefined(uuid, "uuid", "downloadCertificate");
+        throwIfNullOrUndefined(certificateFormat, "certificateFormat", "downloadCertificate");
+        throwIfNullOrUndefined(encoding, "encoding", "downloadCertificate");
+
+        const query: HttpQuery = {};
+
+        if (encoding != null) {
+            query["encoding"] = encoding;
+        }
+        return this.request<CertificateDownloadResponseDto>(
+            {
+                url: "/v1/certificates/{uuid}/{certificateFormat}"
+                    .replace("{uuid}", encodeURI(uuid))
+                    .replace("{certificateFormat}", encodeURI(certificateFormat)),
+                method: "GET",
+                query,
+            },
+            opts?.responseOpts,
+        );
+    }
+
+    /**
      * Download Certificate Chain in chosen format
      */
     downloadCertificateChain({
         uuid,
         certificateFormat,
+        encoding,
         withEndCertificate,
     }: DownloadCertificateChainRequest): Observable<CertificateChainDownloadResponseDto>;
     downloadCertificateChain(
-        { uuid, certificateFormat, withEndCertificate }: DownloadCertificateChainRequest,
+        { uuid, certificateFormat, encoding, withEndCertificate }: DownloadCertificateChainRequest,
         opts?: OperationOpts,
     ): Observable<AjaxResponse<CertificateChainDownloadResponseDto>>;
     downloadCertificateChain(
-        { uuid, certificateFormat, withEndCertificate }: DownloadCertificateChainRequest,
+        { uuid, certificateFormat, encoding, withEndCertificate }: DownloadCertificateChainRequest,
         opts?: OperationOpts,
     ): Observable<CertificateChainDownloadResponseDto | AjaxResponse<CertificateChainDownloadResponseDto>> {
         throwIfNullOrUndefined(uuid, "uuid", "downloadCertificateChain");
         throwIfNullOrUndefined(certificateFormat, "certificateFormat", "downloadCertificateChain");
+        throwIfNullOrUndefined(encoding, "encoding", "downloadCertificateChain");
 
         const query: HttpQuery = {};
+
+        if (encoding != null) {
+            query["encoding"] = encoding;
+        }
 
         if (withEndCertificate != null) {
             query["withEndCertificate"] = withEndCertificate;
@@ -573,13 +622,4 @@ export class CertificateInventoryApi extends BaseAPI {
             opts?.responseOpts,
         );
     }
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum DownloadCertificateChainCertificateFormatEnum {
-    Pkcs7 = "pkcs7",
-    Pem = "pem",
 }

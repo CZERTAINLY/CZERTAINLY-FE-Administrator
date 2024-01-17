@@ -75,8 +75,8 @@ function SchedulerJobHistory({ uuid }: Props) {
                                 history.status === SchedulerJobExecutionStatus.Failed
                                     ? "danger"
                                     : history.status === SchedulerJobExecutionStatus.Succeeded
-                                    ? "success"
-                                    : "primary"
+                                      ? "success"
+                                      : "primary"
                             }
                         >
                             {getEnumLabel(schedulerJobExecutionStatusEnum, history.status)}

@@ -17,19 +17,19 @@
  */
 export interface CertificateUpdateObjectsDto {
     /**
-     * Group UUID
+     * Certificate Group UUID (set to empty string to remove certificate from group)
      * @type {string}
      * @memberof CertificateUpdateObjectsDto
      */
     groupUuid?: string;
     /**
-     * Certificate Owner UUID
+     * Certificate owner user UUID (set to empty string to remove owner of certificate)
      * @type {string}
      * @memberof CertificateUpdateObjectsDto
      */
     ownerUuid?: string;
     /**
-     * RA Profile UUID
+     * RA Profile UUID (set to empty string to remove certificate from RA profile)
      * @type {string}
      * @memberof CertificateUpdateObjectsDto
      */

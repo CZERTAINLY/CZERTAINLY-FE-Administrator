@@ -5,7 +5,7 @@ import { Field, useForm, useFormState } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
 import { AttributeContentType } from "types/openapi";
 import { getStepValue } from "utils/common-utils";
-import { composeValidators } from "utils/validators";
+import { composeValidators, validateRequired } from "utils/validators";
 import { ContentFieldConfiguration } from "../index";
 
 type Props = {
@@ -41,7 +41,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                             name={name}
                             validate={
                                 ContentFieldConfiguration[contentType].validators
-                                    ? composeValidators(...(ContentFieldConfiguration[contentType].validators ?? []))
+                                    ? composeValidators(...(ContentFieldConfiguration[contentType].validators ?? []), validateRequired())
                                     : undefined
                             }
                             type={ContentFieldConfiguration[contentType].type}

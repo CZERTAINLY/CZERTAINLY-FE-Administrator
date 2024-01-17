@@ -31,6 +31,7 @@ export enum PlatformEnum {
     CertificateState = "CertificateState",
     CertificateValidationStatus = "CertificateValidationStatus",
     CertificateFormat = "CertificateFormat",
+    CertificateFormatEncoding = "CertificateFormatEncoding",
     CertificateValidationCheck = "CertificateValidationCheck",
     CertificateRevocationReason = "CertificateRevocationReason",
     CertificateRequestFormat = "CertificateRequestFormat",

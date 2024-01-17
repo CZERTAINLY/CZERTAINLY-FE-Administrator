@@ -3,6 +3,7 @@ import { Button, ButtonProps } from "reactstrap";
 
 export type IconName =
     | "plus"
+    | "copy"
     | "trash"
     | "times"
     | "check"
@@ -54,6 +55,7 @@ interface Props {
 
 const colors = {
     plus: "auto",
+    copy: "auto",
     trash: "red",
     times: "red",
     check: "green",
@@ -92,6 +94,7 @@ const colors = {
 
 const classNames = {
     plus: "fa fa-plus",
+    copy: "fa fa-copy",
     trash: "fa fa-trash",
     times: "fa fa-times",
     check: "fa fa-check",
