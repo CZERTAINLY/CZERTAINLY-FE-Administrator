@@ -24,3 +24,9 @@ export const removeNullValues = (obj: any): any => {
 export const capitalize = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const getStepValue = (type: string) => {
+    if (type === "datetime" || type === "time" || type === "datetime-local") {
+        return 1;
+    } else return undefined;
+};

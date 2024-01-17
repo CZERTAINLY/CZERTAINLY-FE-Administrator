@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { Field, useForm, useFormState } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
 import { AttributeContentType } from "types/openapi";
+import { getStepValue } from "utils/common-utils";
 import { composeValidators } from "utils/validators";
 import { ContentFieldConfiguration } from "../index";
 
@@ -23,13 +24,9 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
         }
     }, [isList, contentValues, form]);
 
-    const stepValue = useMemo(() => {
-        const configType = ContentFieldConfiguration[contentType].type;
-        if (configType === AttributeContentType.Datetime || configType === AttributeContentType.Time || configType === "datetime-local") {
-            return 1;
-        } else {
-            return undefined;
-        }
+    const fieldStepValue = useMemo(() => {
+        const stepValue = getStepValue(ContentFieldConfiguration[contentType].type);
+        return stepValue;
     }, [contentType]);
 
     return (
@@ -57,7 +54,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         invalid={!!meta.error && meta.touched}
                                         type={ContentFieldConfiguration[contentType].type}
                                         id={name}
-                                        step={stepValue}
+                                        step={fieldStepValue}
                                         placeholder="Default Content"
                                     />
                                 );

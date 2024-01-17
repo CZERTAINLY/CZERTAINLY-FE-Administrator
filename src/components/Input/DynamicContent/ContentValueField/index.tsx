@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { Field, useForm } from "react-final-form";
 import Select from "react-select";
 import { Col, FormFeedback, FormGroup, Input, InputGroup } from "reactstrap";
+import { getStepValue } from "utils/common-utils";
 import { BaseAttributeContentModel, CustomAttributeModel } from "../../../../types/attributes";
 import { AttributeContentType } from "../../../../types/openapi";
 import { composeValidators, validateRequired } from "../../../../utils/validators";
@@ -36,17 +37,9 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
         form.change(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
     }, [descriptor, form, initialContent, options]);
 
-    const stepValue = useMemo(() => {
-        const configType = descriptor.contentType;
-        if (
-            configType === AttributeContentType.Datetime ||
-            configType === AttributeContentType.Time ||
-            configType === ("datetime-local" as AttributeContentType)
-        ) {
-            return 1;
-        } else {
-            return undefined;
-        }
+    const fieldStepValue = useMemo(() => {
+        const stepValue = getStepValue(descriptor.contentType);
+        return stepValue;
     }, [descriptor]);
 
     const beforeOnSubmit = useCallback(
@@ -146,7 +139,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                         invalid={!!meta.error && meta.touched}
                         type={ContentFieldConfiguration[descriptor.contentType].type}
                         id={descriptor.name}
-                        step={stepValue}
+                        step={fieldStepValue}
                     />
                 );
                 const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;
