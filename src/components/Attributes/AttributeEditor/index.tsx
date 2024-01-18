@@ -23,7 +23,7 @@ import {
 } from "types/attributes";
 import { CallbackAttributeModel } from "types/connectors";
 import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from "types/openapi";
-import { utf8ToBase64 } from "utils/common-utils";
+import { base64ToUtf8 } from "utils/common-utils";
 import { Attribute } from "./Attribute";
 
 // same empty array is used to prevent re-rendering of the component
@@ -405,7 +405,7 @@ export default function AttributeEditor({
                         (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
                     ) {
                         formAttributeValue = {
-                            code: utf8ToBase64((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                            code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
                             language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
                         };
                     }
