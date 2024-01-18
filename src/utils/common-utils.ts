@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 export const removeNullValues = (obj: any): any => {
     if (obj === null || obj === undefined) {
         return null;
@@ -48,4 +50,14 @@ export const isObjectSame = (obj1: Record<string, unknown>, obj2: Record<string,
     }
 
     return true;
+};
+
+export const utf8ToBase64 = (str: string): string => {
+    // Return the Base64 string
+    return Buffer.from(str, "utf8").toString("base64");
+};
+
+export const base64ToUtf8 = (str: string): string => {
+    // Return the utf string
+    return Buffer.from(str, "base64").toString("utf8");
 };
