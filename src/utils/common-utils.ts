@@ -56,3 +56,8 @@ export const utf8ToBase64 = (str: string): string => {
     // Return the Base64 string
     return Buffer.from(str, "utf8").toString("base64");
 };
+
+export const base64ToUtf8 = (str: string): string => {
+    // Return the Base64 string
+    return Buffer.from(str, "base64").toString("utf8");
+};

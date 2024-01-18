@@ -7,7 +7,7 @@ import {
     isDataAttributeModel,
 } from "types/attributes";
 import { AttributeContentType, FileAttributeContentData } from "types/openapi";
-import { utf8ToBase64 } from "utils/common-utils";
+import { base64ToUtf8 } from "utils/common-utils";
 import CodeBlock from "../../components/Attributes/CodeBlock";
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -71,7 +71,7 @@ const getAttributeFormValue = (contentType: AttributeContentType, item: any) => 
         return item.value ? new Date(item.value).toISOString() : { data: new Date(item).toISOString() };
     }
     if (contentType === AttributeContentType.Codeblock) {
-        return { data: { code: utf8ToBase64(item.code), language: item.language } };
+        return { data: { code: base64ToUtf8(item.code), language: item.language } };
     }
 
     return item.value ?? { data: item };
