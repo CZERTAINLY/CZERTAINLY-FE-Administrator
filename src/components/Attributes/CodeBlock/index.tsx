@@ -4,7 +4,7 @@ import "highlight.js/styles/github.css";
 import parse from "html-react-parser";
 import { useState } from "react";
 import { Button } from "reactstrap";
-import { base64ToUtf8 } from "utils/common-utils";
+import { utf8ToBase64 } from "utils/common-utils";
 import { CodeBlockAttributeContentModel } from "../../../types/attributes";
 import { ProgrammingLanguageEnum } from "../../../types/openapi";
 import Dialog from "../../Dialog";
@@ -47,7 +47,7 @@ export default function CodeBlock({ content }: Props) {
                             {parse(
                                 DOMPurify.sanitize(
                                     getHighLightedCode(
-                                        content.data.code != null ? base64ToUtf8(content.data.code) : "",
+                                        content.data.code != null ? utf8ToBase64(content.data.code) : "",
                                         content.data.language,
                                     ),
                                 ),
