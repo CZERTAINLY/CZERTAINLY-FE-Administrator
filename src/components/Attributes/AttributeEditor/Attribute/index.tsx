@@ -148,7 +148,9 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
             if (isDataAttributeModel(descriptor)) {
                 const regexValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.RegExp);
                 if (regexValidator) {
-                    validators.push(validatePattern(new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "")));
+                    const pattern = new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? "");
+                    const errorMessage = regexValidator.errorMessage;
+                    validators.push(validatePattern(pattern, errorMessage));
                 }
             }
         }
