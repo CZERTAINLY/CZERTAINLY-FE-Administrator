@@ -66,8 +66,11 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 };
 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
-    if (contentType === AttributeContentType.Datetime || contentType === AttributeContentType.Date) {
+    if (contentType === AttributeContentType.Datetime) {
         return item.value ? new Date(item.value).toISOString() : { data: new Date(item).toISOString() };
+    }
+    if (contentType === AttributeContentType.Date) {
+        return item.value ? new Date(item.value).toISOString().slice(0, 10) : { data: new Date(item).toISOString().slice(0, 10) };
     }
     if (contentType === AttributeContentType.Codeblock) {
         return { data: { code: btoa(item.code), language: item.language } };

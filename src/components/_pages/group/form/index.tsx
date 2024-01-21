@@ -82,7 +82,7 @@ export default function GroupForm() {
         if (editMode && groupSelector && groupSelector.uuid !== group?.uuid) {
             setGroup(groupSelector);
         }
-    }, [dispatch, editMode, group?.uuid, groupSelector]);
+    }, [dispatch, editMode, group?.uuid, groupSelector, id]);
 
     const defaultValues: FormValues = useMemo(
         () => ({
