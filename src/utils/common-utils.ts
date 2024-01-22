@@ -27,6 +27,12 @@ export const capitalize = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+export const getStepValue = (type: string) => {
+    if (type === "datetime" || type === "time" || type === "datetime-local") {
+        return 1;
+    } else return undefined;
+};
+
 export const isObjectSame = (obj1: Record<string, unknown>, obj2: Record<string, unknown>): boolean => {
     if (obj1 === obj2) {
         return true;

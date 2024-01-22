@@ -124,8 +124,8 @@ export default function CustomAttributesList() {
                     getEnumLabel(attributeContentTypeEnum, customAttribute.contentType),
                     customAttribute.description,
                     <>
-                        {customAttribute.resources.map((r) => (
-                            <Badge style={{ margin: "1px" }} color="secondary">
+                        {customAttribute.resources.map((r, i) => (
+                            <Badge style={{ margin: "1px" }} color="secondary" key={i}>
                                 {getEnumLabel(resourcesEnum, r)}
                             </Badge>
                         ))}

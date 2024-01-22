@@ -1,9 +1,10 @@
 import WidgetButtons from "components/WidgetButtons";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { Field, useForm, useFormState } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
 import { AttributeContentType } from "types/openapi";
+import { getStepValue } from "utils/common-utils";
 import { composeValidators, validateRequired } from "utils/validators";
 import { ContentFieldConfiguration } from "../index";
 
@@ -22,6 +23,11 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
             form.change("content", contentValues.slice(0, 1));
         }
     }, [isList, contentValues, form]);
+
+    const fieldStepValue = useMemo(() => {
+        const stepValue = getStepValue(ContentFieldConfiguration[contentType].type);
+        return stepValue;
+    }, [contentType]);
 
     return (
         <>
@@ -48,6 +54,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         invalid={!!meta.error && meta.touched}
                                         type={ContentFieldConfiguration[contentType].type}
                                         id={name}
+                                        step={fieldStepValue}
                                         placeholder="Default Content"
                                     />
                                 );

@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Field, useForm } from "react-final-form";
 import Select from "react-select";
 import { Col, FormFeedback, FormGroup, Input, InputGroup } from "reactstrap";
+import { getStepValue } from "utils/common-utils";
 import { BaseAttributeContentModel, CustomAttributeModel } from "../../../../types/attributes";
 import { AttributeContentType } from "../../../../types/openapi";
 import { composeValidators, validateRequired } from "../../../../utils/validators";
@@ -35,6 +36,36 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
 
         form.change(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
     }, [descriptor, form, initialContent, options]);
+
+    const fieldStepValue = useMemo(() => {
+        const stepValue = getStepValue(descriptor.contentType);
+        return stepValue;
+    }, [descriptor]);
+
+    const beforeOnSubmit = useCallback(
+        (attributeUuid: string, content: BaseAttributeContentModel[]) => {
+            const updatedContent = content.map((contentObject) => {
+                if (descriptor.contentType === "date") {
+                    const updatedDate = new Date(contentObject.data as string);
+                    const formattedDate = updatedDate.toISOString().slice(0, 10);
+                    return { ...contentObject, data: formattedDate };
+                }
+                if (descriptor.contentType === "time") {
+                    const timeString = contentObject.data as string;
+                    const timeStringSplit = timeString.split(":");
+                    if (timeStringSplit.length === 2) {
+                        return { ...contentObject, data: timeString + ":00" };
+                    }
+                    return contentObject;
+                } else {
+                    return contentObject;
+                }
+            });
+
+            onSubmit(attributeUuid, updatedContent);
+        },
+        [onSubmit, descriptor],
+    );
 
     const transformObjectContent = (contentType: AttributeContentType, value: BaseAttributeContentModel) => {
         if (contentType === AttributeContentType.Datetime || contentType === AttributeContentType.Date) {
@@ -108,6 +139,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                         invalid={!!meta.error && meta.touched}
                         type={ContentFieldConfiguration[descriptor.contentType].type}
                         id={descriptor.name}
+                        step={fieldStepValue}
                     />
                 );
                 const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;
@@ -122,7 +154,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                                         icon: "plus",
                                         disabled: !inputContent || !meta.valid,
                                         tooltip: "Save",
-                                        onClick: () => onSubmit(descriptor.uuid, inputContent),
+                                        onClick: () => beforeOnSubmit(descriptor.uuid, inputContent),
                                     },
                                 ]}
                             />

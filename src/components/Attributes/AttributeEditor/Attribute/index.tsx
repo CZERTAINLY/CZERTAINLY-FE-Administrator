@@ -22,6 +22,7 @@ import { AttributeConstraintType, AttributeContentType } from "types/openapi";
 import CustomSelectComponent from "components/CustomSelectComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { AddNewAttributeList, AddNewAttributeType } from "types/user-interface";
+import { getStepValue } from "utils/common-utils";
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from "utils/validators";
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
 import { getAttributeContent } from "../../../../utils/attributes/attributes";
@@ -406,6 +407,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             type={descriptor.properties.visible ? getFormType(descriptor.contentType) : "hidden"}
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
+                            step={getStepValue(descriptor.contentType)}
                         />
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (
