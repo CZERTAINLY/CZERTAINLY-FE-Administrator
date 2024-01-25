@@ -214,7 +214,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                                         content: addNewAttributeValue.content,
                                                         isOpen: true,
                                                         size: "lg",
-                                                        title: `Add New ${descriptor.name}`,
+                                                        title: `Adds New ${descriptor.name}`,
                                                     }),
                                                 );
                                             }}

@@ -179,9 +179,14 @@ export default function AttributeEditor({
             );
             const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
 
-            const groupDescriptor = groupAttributesCallbackAttributes.find(
-                (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
-            );
+            const groupDescriptor = usesGlobalModal
+                ? groupAttributesCallbackAttributesGlobalModal.find(
+                      (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
+                  )
+                : groupAttributesCallbackAttributes.find(
+                      (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
+                  );
+
             const groupDescriptorValue = groupDescriptor
                 ? getObjectPropertyValue(groupDescriptor, `content.${formMappingPath}`)
                 : undefined;
@@ -191,51 +196,8 @@ export default function AttributeEditor({
 
         [
             attributeDescriptors,
+            usesGlobalModal,
             groupAttributesCallbackAttributes,
-            attributes,
-            formState.values,
-            getAttributeValue,
-            getObjectPropertyValue,
-            id,
-        ],
-    );
-
-    const getCurrentFromMappingValueGlobalModal = useCallback(
-        (mapping: AttributeCallbackMappingModel): any => {
-            const attributeFromValue = getAttributeValue(attributes, mapping.from);
-
-            const formAttributes = !formState.values[`__attributes__${id}__`] ? undefined : formState.values[`__attributes__${id}__`];
-            const formMappingName = mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : "";
-            const formAttribute = formAttributes
-                ? Object.keys(formAttributes).find((key) => key.startsWith(`${formMappingName}`))
-                : undefined;
-
-            // only lists are supported now, because of this the 'value' is added to the path as the list selected option is { label: "", value: "" }
-            const formMappingPath = mapping.from
-                ? mapping.from.includes(".")
-                    ? "value." + mapping.from.split(".").slice(1).join(".")
-                    : "value"
-                : "value";
-            const currentContent = formAttribute
-                ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) ?? formAttributes[formAttribute]
-                : undefined;
-
-            const depDescriptor = attributeDescriptors.find(
-                (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
-            );
-            const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
-
-            const groupDescriptor = groupAttributesCallbackAttributesGlobalModal.find(
-                (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
-            );
-            const groupDescriptorValue = groupDescriptor
-                ? getObjectPropertyValue(groupDescriptor, `content.${formMappingPath}`)
-                : undefined;
-
-            return currentContent || attributeFromValue || depDescriptorValue || groupDescriptorValue;
-        },
-        [
-            attributeDescriptors,
             groupAttributesCallbackAttributesGlobalModal,
             attributes,
             formState.values,
@@ -853,7 +815,8 @@ export default function AttributeEditor({
 
     useEffect(() => {
         if (!initiateAttributeCallback) return;
-        if (usesGlobalModal === undefined) return;
+        if (usesGlobalModal === undefined || usesGlobalModal === false) return;
+
         let newOptions: { [attributeName: string]: { label: string; value: any }[] } = {};
         const descriptorsToLoad = [...attributeDescriptors, ...groupAttributesCallbackAttributesGlobalModal];
         setPrevGroupDescriptorsGlobalModal(groupAttributesCallbackAttributesGlobalModal);
@@ -887,7 +850,7 @@ export default function AttributeEditor({
                 }
             }
         });
-        // This effect should only be called if the initiateAttributeCallback value is updated
+        // This effect should only be called if the initiateAttributeCallback or usesGlobalModal value is updated
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initiateAttributeCallback, usesGlobalModal]);
 
@@ -1017,7 +980,7 @@ export default function AttributeEditor({
 
                 setOptionsGlobalModal({ ...options, ...opts });
 
-                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributesGlobalModal];
                 const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
                 if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
                     form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);

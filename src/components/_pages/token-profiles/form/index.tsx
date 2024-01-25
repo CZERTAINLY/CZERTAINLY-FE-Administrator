@@ -60,6 +60,9 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
     const isUpdating = useSelector(tokenProfilesSelectors.isUpdating);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [groupAttributesCallbackAttributesGlobalModal, setGroupAttributesCallbackAttributesGlobalModal] = useState<
+        AttributeDescriptorModel[]
+    >([]);
 
     const [tokenProfile, setTokenProfile] = useState<TokenProfileDetailResponseModel>();
 
@@ -91,6 +94,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         (tokenUuid: string, form: FormApi<FormValues>) => {
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
+            setGroupAttributesCallbackAttributesGlobalModal([]);
             form.mutators.clearAttributes("ra-profile");
             if (tokenProfile) setTokenProfile({ ...tokenProfile });
             dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
@@ -106,6 +110,9 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (editMode) {
+                const groupAttributesCallbackAttributesArray = usesGlobalModal
+                    ? [...groupAttributesCallbackAttributesGlobalModal]
+                    : [...groupAttributesCallbackAttributes];
                 dispatch(
                     tokenProfilesActions.updateTokenProfile({
                         profileUuid: id!,
@@ -116,7 +123,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                             description: values.description,
                             attributes: collectFormAttributes(
                                 "token-profile",
-                                [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributesArray],
                                 values,
                             ),
                             customAttributes: collectFormAttributes("customTokenProfile", resourceCustomAttributes, values),
@@ -151,6 +158,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
             tokenProfile,
             tokenProfileAttributeDescriptors,
             groupAttributesCallbackAttributes,
+            groupAttributesCallbackAttributesGlobalModal,
             resourceCustomAttributes,
             usesGlobalModal,
         ],
@@ -190,6 +198,50 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
             });
         }
         return options;
+    };
+
+    const tokenProfileAttributeTabs = (form: FormApi<FormValues>) => {
+        let attributeProps;
+        if (usesGlobalModal) {
+            attributeProps = {
+                groupAttributesCallbackAttributes: groupAttributesCallbackAttributes,
+                setGroupAttributesCallbackAttributes: setGroupAttributesCallbackAttributes,
+                usesGlobalModal: usesGlobalModal,
+            };
+        } else {
+            attributeProps = {
+                groupAttributesCallbackAttributes: groupAttributesCallbackAttributes,
+                setGroupAttributesCallbackAttributes: setGroupAttributesCallbackAttributes,
+            };
+        }
+
+        return [
+            {
+                title: "Connector Attributes",
+                content: !tokenProfileAttributeDescriptors ? (
+                    <></>
+                ) : (
+                    <AttributeEditor
+                        id="token-profile"
+                        callbackParentUuid={tokenProfile?.tokenInstanceUuid || form.getFieldState("token")?.value?.value}
+                        callbackResource={Resource.TokenProfiles}
+                        attributeDescriptors={tokenProfileAttributeDescriptors}
+                        attributes={tokenProfile?.attributes}
+                        {...attributeProps}
+                    />
+                ),
+            },
+            {
+                title: "Custom Attributes",
+                content: (
+                    <AttributeEditor
+                        id="customTokenProfile"
+                        attributeDescriptors={resourceCustomAttributes}
+                        attributes={tokenProfile?.customAttributes}
+                    />
+                ),
+            },
+        ];
     };
 
     return (
@@ -300,38 +352,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                         </Field>
 
                         <br />
-                        <TabLayout
-                            tabs={[
-                                {
-                                    title: "Connector Attributes",
-                                    content: !tokenProfileAttributeDescriptors ? (
-                                        <></>
-                                    ) : (
-                                        <AttributeEditor
-                                            id="token-profile"
-                                            callbackParentUuid={
-                                                tokenProfile?.tokenInstanceUuid || form.getFieldState("token")?.value?.value
-                                            }
-                                            callbackResource={Resource.TokenProfiles}
-                                            attributeDescriptors={tokenProfileAttributeDescriptors}
-                                            attributes={tokenProfile?.attributes}
-                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                        />
-                                    ),
-                                },
-                                {
-                                    title: "Custom Attributes",
-                                    content: (
-                                        <AttributeEditor
-                                            id="customTokenProfile"
-                                            attributeDescriptors={resourceCustomAttributes}
-                                            attributes={tokenProfile?.customAttributes}
-                                        />
-                                    ),
-                                },
-                            ]}
-                        />
+                        <TabLayout tabs={tokenProfileAttributeTabs(form)} />
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

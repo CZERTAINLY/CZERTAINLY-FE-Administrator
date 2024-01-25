@@ -2,6 +2,7 @@ import AttributeEditor from "components/Attributes/AttributeEditor";
 import ProgressButton from "components/ProgressButton";
 import Widget from "components/Widget";
 import { actions as connectorActions, actions as connectorsActions } from "ducks/connectors";
+import { FormApi } from "final-form";
 
 import { actions, selectors } from "ducks/credentials";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -56,6 +57,9 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
     const isUpdating = useSelector(selectors.isUpdating);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [groupAttributesCallbackAttributesGlobalModal, setGroupAttributesCallbackAttributesGlobalModal] = useState<
+        AttributeDescriptorModel[]
+    >([]);
 
     const [credential, setCredential] = useState<CredentialResponseModel>();
     const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
@@ -113,6 +117,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
             if (!event.value || !credentialProviders) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
+            setGroupAttributesCallbackAttributesGlobalModal([]);
             const provider = credentialProviders.find((p) => p.uuid === event.value);
 
             if (!provider) return;
@@ -126,6 +131,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
             if (!event.value || !credentialProvider) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
+            setGroupAttributesCallbackAttributesGlobalModal([]);
             dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialProvider.uuid, kind: event.value }));
         },
         [dispatch, credentialProvider],
@@ -133,6 +139,10 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
 
     const onSubmit = useCallback(
         (values: FormValues, form: any) => {
+            const groupAttributesCallbackAttributesArray = usesGlobalModal
+                ? [...groupAttributesCallbackAttributesGlobalModal]
+                : [...groupAttributesCallbackAttributes];
+
             if (editMode) {
                 dispatch(
                     actions.updateCredential({
@@ -140,7 +150,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                         credentialRequest: {
                             attributes: collectFormAttributes(
                                 "credential",
-                                [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributesArray],
                                 values,
                             ),
                             customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values),
@@ -157,7 +167,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                             kind: values.storeKind?.value!,
                             attributes: collectFormAttributes(
                                 "credential",
-                                [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributesArray],
                                 values,
                             ),
                             customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values),
@@ -172,6 +182,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
             id,
             credentialProviderAttributeDescriptors,
             groupAttributesCallbackAttributes,
+            groupAttributesCallbackAttributesGlobalModal,
             resourceCustomAttributes,
             usesGlobalModal,
         ],
@@ -220,10 +231,57 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
 
     const title = useMemo(() => (editMode ? "Edit Credential" : "Create Credential"), [editMode]);
 
+    const credentialAttributeTabs = (form: FormApi<FormValues>) => {
+        const values = form.getState().values;
+        let attributeProps;
+        if (usesGlobalModal) {
+            attributeProps = {
+                groupAttributesCallbackAttributesGlobalModal: groupAttributesCallbackAttributesGlobalModal,
+                setGroupAttributesCallbackAttributesGlobalModal: setGroupAttributesCallbackAttributesGlobalModal,
+                usesGlobalModal,
+            };
+        } else {
+            attributeProps = {
+                groupAttributesCallbackAttributes: groupAttributesCallbackAttributesGlobalModal,
+                setGroupAttributesCallbackAttributes: setGroupAttributesCallbackAttributesGlobalModal,
+                usesGlobalModal,
+            };
+        }
+        return [
+            {
+                title: "Connector Attributes",
+                content:
+                    credentialProvider &&
+                    values.storeKind &&
+                    credentialProviderAttributeDescriptors &&
+                    credentialProviderAttributeDescriptors.length > 0 ? (
+                        <AttributeEditor
+                            id="credential"
+                            attributeDescriptors={credentialProviderAttributeDescriptors}
+                            attributes={credential?.attributes}
+                            {...attributeProps}
+                        />
+                    ) : (
+                        <></>
+                    ),
+            },
+            {
+                title: "Custom Attributes",
+                content: (
+                    <AttributeEditor
+                        id="customCredential"
+                        attributeDescriptors={resourceCustomAttributes}
+                        attributes={credential?.customAttributes}
+                    />
+                ),
+            },
+        ];
+    };
+
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid }) => (
+                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
@@ -346,38 +404,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
 
                         <>
                             <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: "Connector Attributes",
-                                        content:
-                                            credentialProvider &&
-                                            values.storeKind &&
-                                            credentialProviderAttributeDescriptors &&
-                                            credentialProviderAttributeDescriptors.length > 0 ? (
-                                                <AttributeEditor
-                                                    id="credential"
-                                                    attributeDescriptors={credentialProviderAttributeDescriptors}
-                                                    attributes={credential?.attributes}
-                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                />
-                                            ) : (
-                                                <></>
-                                            ),
-                                    },
-                                    {
-                                        title: "Custom Attributes",
-                                        content: (
-                                            <AttributeEditor
-                                                id="customCredential"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={credential?.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
+                            <TabLayout tabs={credentialAttributeTabs(form)} />
                         </>
 
                         {
