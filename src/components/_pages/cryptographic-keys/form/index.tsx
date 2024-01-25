@@ -71,6 +71,9 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
     const isUpdating = useSelector(cryptographicKeysSelectors.isUpdating);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [groupAttributesCallbackAttributesGlobalModal, setGroupAttributesCallbackAttributesGlobalModal] = useState<
+        AttributeDescriptorModel[]
+    >([]);
 
     const [tokenProfile, setTokenProfile] = useState<TokenProfileResponseModel>();
 
@@ -82,6 +85,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
     useEffect(() => {
         dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
         setGroupAttributesCallbackAttributes([]);
+        setGroupAttributesCallbackAttributesGlobalModal([]);
         dispatch(tokenProfilesActions.listTokenProfiles({}));
         dispatch(connectorActions.clearCallbackData());
         dispatch(groupActions.listGroups());
@@ -106,7 +110,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
             dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-
+            setGroupAttributesCallbackAttributesGlobalModal([]);
             if (!event.value || !tokenProfiles) return;
             const provider = tokenProfiles.find((p) => p.uuid === event.value?.uuid);
 
@@ -123,6 +127,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
             if (!type) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
+            setGroupAttributesCallbackAttributesGlobalModal([]);
             form.mutators.clearAttributes("cryptographicKey");
             dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
             dispatch(
@@ -158,6 +163,9 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                     }),
                 );
             } else {
+                const groupAttributesCallbackAttributesArray = usesGlobalModal
+                    ? [...groupAttributesCallbackAttributesGlobalModal]
+                    : [...groupAttributesCallbackAttributes];
                 dispatch(
                     cryptographicKeysActions.createCryptographicKey({
                         tokenInstanceUuid: values.tokenProfile!.value.tokenInstanceUuid,
@@ -169,7 +177,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             description: values.description,
                             attributes: collectFormAttributes(
                                 "cryptographicKey",
-                                [...(cryptographicKeyAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                [...(cryptographicKeyAttributeDescriptors ?? []), ...groupAttributesCallbackAttributesArray],
                                 values,
                             ),
                             customAttributes: collectFormAttributes("customCryptographicKey", resourceCustomAttributes, values),
@@ -185,6 +193,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
             id,
             cryptographicKeyAttributeDescriptors,
             groupAttributesCallbackAttributes,
+            groupAttributesCallbackAttributesGlobalModal,
             resourceCustomAttributes,
             usesGlobalModal,
         ],
@@ -230,6 +239,20 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
 
     const attributeTabs = (form: FormApi<FormValues>) => {
         if (!editMode) {
+            let attributeProps;
+            if (usesGlobalModal) {
+                attributeProps = {
+                    groupAttributesCallbackAttributesGlobalModal: groupAttributesCallbackAttributesGlobalModal,
+                    setGroupAttributesCallbackAttributesGlobalModal: setGroupAttributesCallbackAttributesGlobalModal,
+                    usesGlobalModal: usesGlobalModal,
+                };
+            } else {
+                attributeProps = {
+                    groupAttributesCallbackAttributes: groupAttributesCallbackAttributes,
+                    setGroupAttributesCallbackAttributes: setGroupAttributesCallbackAttributes,
+                    usesGlobalModal: usesGlobalModal,
+                };
+            }
             return [
                 {
                     title: "Connector Attributes",
@@ -241,8 +264,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             callbackParentUuid={keyDetail?.tokenProfileUuid || form.getFieldState("tokenProfile")?.value?.value.uuid || ""}
                             callbackResource={Resource.Keys}
                             attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
-                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                            {...attributeProps}
                         />
                     ),
                 },
