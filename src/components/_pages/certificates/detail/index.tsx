@@ -340,6 +340,12 @@ export default function CertificateDetail() {
         setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ":#" + group.authorityInstanceUuid, label: group.name })));
     }, [dispatch, raProfiles]);
 
+    // useEffect(() => {
+    //     if (!certificate?.ownerUuid) {
+    //         setOwnerUuid(undefined);
+    //     }
+    // }, [certificate?.ownerUuid]);
+
     useEffect(() => {
         if (!certificateRevocationReason) return;
         const certificateRevokeReasonOptions = Object.keys(certificateRevocationReason)
@@ -998,19 +1004,38 @@ export default function CertificateDetail() {
                           ) : (
                               certificate.owner ?? "Unassigned"
                           ),
-                          <Button
-                              className="btn btn-link"
-                              size="sm"
-                              color="secondary"
-                              onClick={() => {
-                                  setOwnerUuid(undefined);
-                                  getUserList();
-                                  setUpdateOwner(true);
-                              }}
-                              title="Update Owner"
-                          >
-                              <i className="fa fa-pencil-square-o" />
-                          </Button>,
+                          <div className="d-flex">
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  onClick={() => {
+                                      setOwnerUuid(undefined);
+                                      getUserList();
+                                      setUpdateOwner(true);
+                                  }}
+                                  title="Update Owner"
+                              >
+                                  <i className="fa fa-pencil-square-o" />
+                              </Button>
+
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  disabled={!certificate?.ownerUuid}
+                                  onClick={() => {
+                                      if (!certificate?.ownerUuid || !id) return;
+                                      dispatch(
+                                          actions.deleteOwner({
+                                              uuid: id,
+                                          }),
+                                      );
+                                  }}
+                              >
+                                  <i className="fa fa-trash text-danger" />
+                              </Button>
+                          </div>,
                       ],
                   },
                   {
@@ -1022,18 +1047,36 @@ export default function CertificateDetail() {
                           ) : (
                               "Unassigned"
                           ),
-                          <Button
-                              className="btn btn-link"
-                              size="sm"
-                              color="secondary"
-                              onClick={() => {
-                                  getGroupList();
-                                  setUpdateGroup(true);
-                              }}
-                              title="Update Group"
-                          >
-                              <i className="fa fa-pencil-square-o" />
-                          </Button>,
+                          <div className="d-flex">
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  onClick={() => {
+                                      getGroupList();
+                                      setUpdateGroup(true);
+                                  }}
+                                  title="Update Group"
+                              >
+                                  <i className="fa fa-pencil-square-o" />
+                              </Button>
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  disabled={!certificate?.group?.uuid}
+                                  onClick={() => {
+                                      if (!certificate?.group?.uuid || !id) return;
+                                      dispatch(
+                                          actions.deleteGroup({
+                                              uuid: id,
+                                          }),
+                                      );
+                                  }}
+                              >
+                                  <i className="fa fa-trash text-danger" />
+                              </Button>
+                          </div>,
                       ],
                   },
                   {
@@ -1049,18 +1092,36 @@ export default function CertificateDetail() {
                           ) : (
                               "Unassigned"
                           ),
-                          <Button
-                              className="btn btn-link"
-                              size="sm"
-                              color="secondary"
-                              onClick={() => {
-                                  getRaProfileList();
-                                  setUpdateRaProfile(true);
-                              }}
-                              title="Update RA Profile"
-                          >
-                              <i className="fa fa-pencil-square-o" />
-                          </Button>,
+                          <div className="d-flex">
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  onClick={() => {
+                                      getRaProfileList();
+                                      setUpdateRaProfile(true);
+                                  }}
+                                  title="Update RA Profile"
+                              >
+                                  <i className="fa fa-pencil-square-o" />
+                              </Button>
+                              <Button
+                                  className="btn btn-link"
+                                  size="sm"
+                                  color="secondary"
+                                  disabled={!certificate?.raProfile?.uuid}
+                                  onClick={() => {
+                                      if (!certificate?.raProfile?.authorityInstanceUuid || !id) return;
+                                      dispatch(
+                                          actions.deleteRaProfile({
+                                              uuid: id,
+                                          }),
+                                      );
+                                  }}
+                              >
+                                  <i className="fa fa-trash text-danger" />
+                              </Button>
+                          </div>,
                       ],
                   },
                   {

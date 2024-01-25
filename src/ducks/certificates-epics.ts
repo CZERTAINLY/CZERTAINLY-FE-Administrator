@@ -371,6 +371,43 @@ const updateGroup: AppEpic = (action$, state, deps) => {
     );
 };
 
+const deleteGroup: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteGroup.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .updateCertificateObjects({
+                    uuid: action.payload.uuid,
+                    certificateUpdateObjectsDto: { groupUuid: "" },
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.deleteGroupSuccess({
+                                uuid: action.payload.uuid,
+                            }),
+                            slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to delete group" }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to delete group" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const updateRaProfile: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.updateRaProfile.match),
@@ -419,6 +456,43 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
     );
 };
 
+const deleteRaProfile: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteRaProfile.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .updateCertificateObjects({
+                    uuid: action.payload.uuid,
+                    certificateUpdateObjectsDto: { raProfileUuid: "" },
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.deleteRaProfileSuccess({
+                                uuid: action.payload.uuid,
+                            }),
+                            slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete RA profile") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to delete RA profile" }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete RA profile") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to delete RA profile" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const updateOwner: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.updateOwner.match),
@@ -443,6 +517,43 @@ const updateOwner: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to update owner") }),
                             appRedirectActions.fetchError({ error: err, message: "Failed to update owner" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const deleteOwner: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteOwner.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .updateCertificateObjects({
+                    uuid: action.payload.uuid,
+                    certificateUpdateObjectsDto: { ownerUuid: "" },
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.deleteOwnerSuccess({
+                                uuid: action.payload.uuid,
+                            }),
+                            slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deleteOwnerFailure({ error: extractError(err, "Failed to delete owner") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to delete owner" }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deleteOwnerFailure({ error: extractError(err, "Failed to delete owner") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to delete owner" }),
                         ),
                     ),
                 ),
@@ -878,9 +989,12 @@ const epics = [
     listCertificateLocations,
     deleteCertificate,
     updateGroup,
+    deleteGroup,
     updateRaProfile,
+    deleteRaProfile,
     updateCertificateTrustedStatus,
     updateOwner,
+    deleteOwner,
     bulkUpdateGroup,
     bulkUpdateRaProfile,
     bulkUpdateOwner,

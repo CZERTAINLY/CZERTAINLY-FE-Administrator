@@ -370,6 +370,24 @@ export const slice = createSlice({
             state.isUpdatingGroup = false;
         },
 
+        deleteGroup: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingGroup = true;
+        },
+
+        deleteGroupSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingGroup = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].group = undefined;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.group = undefined;
+        },
+
+        deleteGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingGroup = false;
+        },
+
         updateCertificateTrustedStatus: (
             state,
             action: PayloadAction<{ uuid: string; updateCertificateTrustedStatusRequest: CertificateObjectModel }>,
@@ -416,6 +434,24 @@ export const slice = createSlice({
             state.isUpdatingRaProfile = false;
         },
 
+        deleteRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingRaProfile = true;
+        },
+
+        deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingRaProfile = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].raProfile = undefined;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.raProfile = undefined;
+        },
+
+        deleteRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingRaProfile = false;
+        },
+
         updateOwner: (
             state,
             action: PayloadAction<{ uuid: string; user: UserResponseModel; updateOwnerRequest: CertificateObjectModel }>,
@@ -430,10 +466,34 @@ export const slice = createSlice({
 
             if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.owner = action.payload.user.username;
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.owner = action.payload.user.username;
+                state.certificateDetail.ownerUuid = action.payload.user.uuid;
+            }
         },
 
         updateOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingOwner = false;
+        },
+
+        deleteOwner: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingOwner = true;
+        },
+
+        deleteOwnerSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingOwner = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].owner = undefined;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.ownerUuid = undefined;
+                state.certificateDetail.owner = undefined;
+            }
+        },
+
+        deleteOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingOwner = false;
         },
 
@@ -489,7 +549,10 @@ export const slice = createSlice({
 
                 if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.owner = action.payload.user.username;
+                if (state.certificateDetail?.uuid === uuid) {
+                    state.certificateDetail.owner = action.payload.user.username;
+                    state.certificateDetail.ownerUuid = action.payload.user.uuid;
+                }
             });
         },
 
