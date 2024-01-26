@@ -430,6 +430,7 @@ function UserForm() {
                                             menuPlacement="auto"
                                             options={optionsForGroup}
                                             placeholder="Select Group"
+                                            isClearable
                                         />
                                     </FormGroup>
                                 )}
