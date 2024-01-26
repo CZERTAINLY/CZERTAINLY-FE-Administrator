@@ -632,6 +632,38 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
     );
 };
 
+const bulkDeleteGroup: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteGroup.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .bulkUpdateCertificateObjects({
+                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
+                        certificateUuids: action.payload.certificateUuids,
+                        groupUuid: "",
+                    }),
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.bulkDeleteGroupSuccess({
+                                uuids: action.payload.certificateUuids!,
+                            }),
+                            alertActions.success("Delete operation for selected certificates groups completed."),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk delete certificates groups") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete certificates groups" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkUpdateRaProfile.match),
@@ -682,6 +714,40 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
     );
 };
 
+const bulkDeleteRaProfile: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteRaProfile.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .bulkUpdateCertificateObjects({
+                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
+                        certificateUuids: action.payload.certificateUuids,
+                        raProfileUuid: "",
+                    }),
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.bulkDeleteRaProfileSuccess({
+                                uuids: action.payload.certificateUuids!,
+                            }),
+                            alertActions.success("Delete operation for selected Certificates RA profiles completed."),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateOwnerFailure({
+                                error: extractError(err, "Failed to bulk delete Certificates RA profiles"),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete Certificates RA profiles" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.bulkUpdateOwner.match),
@@ -702,6 +768,38 @@ const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update owner") }),
                             appRedirectActions.fetchError({ error: err, message: "Failed to bulk update update owner" }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const bulkDeleteOwner: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteOwner.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .bulkUpdateCertificateObjects({
+                    multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
+                        certificateUuids: action.payload.certificateUuids,
+                        ownerUuid: "",
+                    }),
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.bulkDeleteOwnerSuccess({
+                                uuids: action.payload.certificateUuids!,
+                            }),
+                            alertActions.success("Delete operation for selected certificates owners completed."),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk delete certificates owners") }),
+                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete certificates owners" }),
                         ),
                     ),
                 ),
@@ -990,10 +1088,13 @@ const epics = [
     deleteCertificate,
     updateGroup,
     deleteGroup,
+    bulkDeleteGroup,
     updateRaProfile,
     deleteRaProfile,
+    bulkDeleteRaProfile,
     updateCertificateTrustedStatus,
     updateOwner,
+    bulkDeleteOwner,
     deleteOwner,
     bulkUpdateGroup,
     bulkUpdateRaProfile,

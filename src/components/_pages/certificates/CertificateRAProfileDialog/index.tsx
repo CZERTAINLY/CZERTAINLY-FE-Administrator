@@ -28,6 +28,11 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
         dispatch(raProfileActions.listRaProfiles());
     }, [dispatch]);
 
+    const removeRaprofile = useCallback(() => {
+        dispatch(actions.bulkDeleteRaProfile({ certificateUuids: uuids }));
+        onUpdate();
+    }, [dispatch, onUpdate, uuids]);
+
     const updateRaProfile = useCallback(() => {
         if (!selectedRaProfile) return;
         dispatch(
@@ -57,6 +62,10 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
             <div className="d-flex justify-content-end">
                 <ButtonGroup>
+                    <Button color="danger" onClick={removeRaprofile}>
+                        <span className="text-white">Remove</span>
+                    </Button>
+
                     <Button color="primary" onClick={updateRaProfile} disabled={!selectedRaProfile}>
                         Update
                     </Button>

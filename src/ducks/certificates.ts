@@ -516,6 +516,22 @@ export const slice = createSlice({
             });
         },
 
+        bulkDeleteGroup: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
+            state.isBulkUpdatingGroup = true;
+        },
+
+        bulkDeleteGroupSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUpdatingGroup = false;
+
+            action.payload.uuids.forEach((uuid) => {
+                const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
+
+                if (certificateIndex >= 0) state.certificates[certificateIndex].group = undefined;
+
+                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.group = undefined;
+            });
+        },
+
         bulkUpdateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkUpdatingGroup = false;
         },
@@ -536,6 +552,26 @@ export const slice = createSlice({
             });
         },
 
+        bulkDeleteRaProfile: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
+            state.isBulkUpdatingRaProfile = true;
+        },
+
+        bulkDeleteRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUpdatingRaProfile = false;
+
+            action.payload.uuids.forEach((uuid) => {
+                const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
+
+                if (certificateIndex >= 0) state.certificates[certificateIndex].raProfile = undefined;
+
+                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.raProfile = undefined;
+            });
+        },
+
+        bulkDeleteRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUpdatingRaProfile = false;
+        },
+
         bulkUpdateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkUpdatingRaProfile = false;
         },
@@ -550,7 +586,10 @@ export const slice = createSlice({
             action.payload.uuids.forEach((uuid) => {
                 const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
 
-                if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
+                if (certificateIndex >= 0) {
+                    state.certificates[certificateIndex].owner = action.payload.user.username;
+                    state.certificates[certificateIndex].ownerUuid = action.payload.user.uuid;
+                }
 
                 if (state.certificateDetail?.uuid === uuid) {
                     state.certificateDetail.owner = action.payload.user.username;
@@ -560,6 +599,32 @@ export const slice = createSlice({
         },
 
         bulkUpdateOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUpdatingOwner = false;
+        },
+
+        bulkDeleteOwner: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
+            state.isBulkUpdatingOwner = true;
+        },
+
+        bulkDeleteOwnerSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUpdatingOwner = false;
+
+            action.payload.uuids.forEach((uuid) => {
+                const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
+
+                if (certificateIndex >= 0) {
+                    state.certificates[certificateIndex].owner = undefined;
+                    state.certificates[certificateIndex].ownerUuid = undefined;
+                }
+
+                if (state.certificateDetail?.uuid === uuid) {
+                    state.certificateDetail.ownerUuid = undefined;
+                    state.certificateDetail.owner = undefined;
+                }
+            });
+        },
+
+        bulkDeleteOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkUpdatingOwner = false;
         },
 

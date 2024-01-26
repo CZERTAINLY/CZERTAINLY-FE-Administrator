@@ -41,6 +41,11 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
         onUpdate();
     }, [dispatch, onUpdate, ownerUuid, users, uuids]);
 
+    const removeOwner = useCallback(() => {
+        dispatch(actions.bulkDeleteOwner({ certificateUuids: uuids }));
+        onUpdate();
+    }, [dispatch, onUpdate, uuids]);
+
     return (
         <>
             <FormGroup>
@@ -55,6 +60,10 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
 
             <div className="d-flex justify-content-end">
                 <ButtonGroup>
+                    <Button color="danger" onClick={removeOwner}>
+                        <span className="text-white">Remove</span>
+                    </Button>
+
                     <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
                         Update
                     </Button>

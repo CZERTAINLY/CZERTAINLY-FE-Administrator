@@ -34,6 +34,11 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
         onUpdate();
     }, [dispatch, onUpdate, selectedGroup, uuids]);
 
+    const removeGroup = useCallback(() => {
+        dispatch(actions.bulkDeleteGroup({ certificateUuids: uuids }));
+        onUpdate();
+    }, [dispatch, onUpdate, uuids]);
+
     return (
         <>
             <FormGroup>
@@ -49,6 +54,9 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
             <div className="d-flex justify-content-end">
                 <ButtonGroup>
+                    <Button color="danger" onClick={removeGroup}>
+                        <span className="text-white">Remove</span>
+                    </Button>
                     <Button color="primary" onClick={updateGroup} disabled={!selectedGroup}>
                         Update
                     </Button>

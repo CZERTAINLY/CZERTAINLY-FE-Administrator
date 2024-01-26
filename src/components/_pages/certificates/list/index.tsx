@@ -307,50 +307,23 @@ export default function CertificateList({
                         certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
                         certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
                         certificate.group ? (
-                            <div className="d-flex justify-content-between">
-                                <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? "Unassigned"}</Link>
-                                <i
-                                    className="fa fa-trash me-3 text-danger"
-                                    role="button"
-                                    onClick={() => {
-                                        dispatch(actions.deleteGroup({ uuid: certificate.uuid }));
-                                    }}
-                                />
-                            </div>
+                            <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? "Unassigned"}</Link>
                         ) : (
                             certificate.group ?? "Unassigned"
                         ),
                         <span style={{ whiteSpace: "nowrap" }}>
                             {certificate.raProfile ? (
-                                <div className="d-flex justify-content-between">
-                                    <Link
-                                        to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
-                                    >
-                                        {certificate.raProfile.name ?? "Unassigned"}
-                                    </Link>
-                                    <i
-                                        className="fa fa-trash me-3 text-danger"
-                                        role="button"
-                                        onClick={() => {
-                                            dispatch(actions.deleteRaProfile({ uuid: certificate.uuid }));
-                                        }}
-                                    />
-                                </div>
+                                <Link
+                                    to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
+                                >
+                                    {certificate.raProfile.name ?? "Unassigned"}
+                                </Link>
                             ) : (
                                 certificate.raProfile ?? "Unassigned"
                             )}
                         </span>,
                         certificate?.ownerUuid ? (
-                            <div className="d-flex justify-content-between">
-                                <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
-                                <i
-                                    className="fa fa-trash me-3 text-danger"
-                                    role="button"
-                                    onClick={() => {
-                                        dispatch(actions.deleteOwner({ uuid: certificate.uuid }));
-                                    }}
-                                />
-                            </div>
+                            <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
                         ) : (
                             certificate.owner ?? "Unassigned"
                         ),
