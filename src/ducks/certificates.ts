@@ -485,7 +485,10 @@ export const slice = createSlice({
 
             const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
 
-            if (certificateIndex >= 0) state.certificates[certificateIndex].owner = undefined;
+            if (certificateIndex >= 0) {
+                state.certificates[certificateIndex].owner = undefined;
+                state.certificates[certificateIndex].ownerUuid = undefined;
+            }
 
             if (state.certificateDetail?.uuid === action.payload.uuid) {
                 state.certificateDetail.ownerUuid = undefined;
