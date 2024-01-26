@@ -1129,7 +1129,7 @@ export default function CertificateDetail() {
                       columns: ["Type", certificate.certificateType || "", ""],
                   },
               ];
-    }, [certificate, getGroupList, getRaProfileList, getUserList]);
+    }, [certificate, getGroupList, getRaProfileList, getUserList, dispatch, id]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];
