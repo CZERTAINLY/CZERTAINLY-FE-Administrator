@@ -583,7 +583,12 @@ export default function AttributeEditor({
                         }
                     }
                 }
-                setGroupAttributesCallbackAttributes(groupCallbackAttributes);
+                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+                const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
+
+                if (descriptor && `__attributes__${id}__.${descriptor.name}` === callbackId) {
+                    setGroupAttributesCallbackAttributes(groupCallbackAttributes);
+                }
 
                 const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
                     if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
@@ -615,8 +620,6 @@ export default function AttributeEditor({
 
                 setOptions({ ...options, ...opts });
 
-                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
-                const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
                 if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
                     form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
                 }
