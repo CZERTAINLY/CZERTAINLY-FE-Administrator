@@ -8,6 +8,7 @@ import { selectors as pagingSelectors } from "ducks/paging";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import { WidgetButtonProps } from "components/WidgetButtons";
+import { selectors as authSelectors } from "ducks/auth";
 import { useNavigate } from "react-router-dom";
 import { Button, Container } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
@@ -22,6 +23,7 @@ function NotificationsList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isMarking = useSelector(selectors.isMarking);
     const isBusy = isDeleting || isMarking;
+    const profile = useSelector(authSelectors.profile);
 
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.NOTIFICATIONS));
 
@@ -97,9 +99,14 @@ function NotificationsList() {
         [notifications, dispatch, navigate],
     );
 
+    console.log("profile?.uuid", profile?.uuid);
     const onListCallback = useCallback(
-        (pagination: SearchRequestModel) => dispatch(actions.listNotifications({ unread: false, pagination })),
-        [dispatch],
+        (pagination: SearchRequestModel) => {
+            if (profile?.uuid) {
+                dispatch(actions.listNotifications({ unread: false, pagination }));
+            }
+        },
+        [dispatch, profile],
     );
 
     return (
