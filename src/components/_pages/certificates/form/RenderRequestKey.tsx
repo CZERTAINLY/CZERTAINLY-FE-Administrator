@@ -30,17 +30,6 @@ const RenderRequestKey = ({ values }: { values: FormValues }) => {
         [keys],
     );
 
-    useEffect(() => {
-        if (initiateFormCallback && formCallbackValue) {
-            const newOption = keyOptions.find((option) => option.label === formCallbackValue);
-            if (newOption) {
-                form.change("key", newOption);
-                dispatch(userInterfaceActions.clearFormCallbackValue());
-                dispatch(userInterfaceActions.setInitiateFormCallback(false));
-            }
-        }
-    }, [initiateFormCallback, formCallbackValue, dispatch, keyOptions, form]);
-
     const onKeyChange = useCallback(
         (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>) => {
             if (!event) return;
@@ -60,6 +49,18 @@ const RenderRequestKey = ({ values }: { values: FormValues }) => {
         },
         [dispatch],
     );
+
+    useEffect(() => {
+        if (initiateFormCallback && formCallbackValue) {
+            const newOption = keyOptions.find((option) => option.label === formCallbackValue);
+            if (newOption) {
+                form.change("key", newOption);
+                dispatch(userInterfaceActions.clearFormCallbackValue());
+                dispatch(userInterfaceActions.setInitiateFormCallback(false));
+                onKeyChange(newOption);
+            }
+        }
+    }, [initiateFormCallback, onKeyChange, formCallbackValue, dispatch, keyOptions, form]);
 
     return values.tokenProfile ? (
         <Field name="key" validate={validateRequired()}>
