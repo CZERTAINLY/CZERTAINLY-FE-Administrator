@@ -9,6 +9,10 @@ import {
     validateAlphaNumericWithSpecialChars,
     validateFloat,
     validateInteger,
+    validateNonZeroFloat,
+    validateNonZeroInteger,
+    validatePositiveFloat,
+    validatePositiveInteger,
     validateRequired,
 } from "utils/validators";
 import ContentDescriptorField from "./ContentDescriptorField";
@@ -43,28 +47,31 @@ export const ContentFieldConfiguration: {
         initial: "",
     },
     [AttributeContentType.Integer]: {
-        validators: [validateInteger()],
+        validators: [validateInteger(), validatePositiveInteger(), validateNonZeroInteger()],
         type: "number",
-        initial: 0,
+        initial: "1",
     },
     [AttributeContentType.Float]: {
-        validators: [validateFloat()],
+        validators: [validateFloat(), validatePositiveFloat(), validateNonZeroFloat()],
         type: "number",
-        initial: 0,
+        initial: "1.0",
     },
     [AttributeContentType.Boolean]: {
         type: "checkbox",
         initial: false,
     },
     [AttributeContentType.Datetime]: {
+        validators: [validateRequired()],
         type: "datetime-local",
         initial: "",
     },
     [AttributeContentType.Date]: {
+        validators: [validateRequired()],
         type: "date",
         initial: "",
     },
     [AttributeContentType.Time]: {
+        validators: [validateRequired()],
         type: "time",
         initial: "",
     },

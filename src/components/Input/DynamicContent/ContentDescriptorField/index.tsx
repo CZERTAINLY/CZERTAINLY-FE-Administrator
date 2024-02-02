@@ -1,5 +1,5 @@
 import WidgetButtons from "components/WidgetButtons";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { Field, useForm, useFormState } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
@@ -17,6 +17,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
     const form = useForm();
     const formState = useFormState();
     const contentValues = formState.values["content"];
+    const values = form.getState().values;
 
     useEffect(() => {
         if (!isList && contentValues?.length > 1) {
@@ -28,6 +29,14 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
         const stepValue = getStepValue(ContentFieldConfiguration[contentType].type);
         return stepValue;
     }, [contentType]);
+
+    const addContent = useCallback(() => {
+        form.change("content", [...(isList ? contentValues ?? [] : []), { data: ContentFieldConfiguration[contentType].initial }]);
+    }, [form, isList, contentValues, contentType]);
+
+    useEffect(() => {
+        if (values.readOnly) addContent();
+    }, [values, addContent]);
 
     return (
         <>
@@ -106,15 +115,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                 );
             })}
             {(isList || !contentValues || contentValues.length === 0) && (
-                <Button
-                    color={"default"}
-                    onClick={() =>
-                        form.change("content", [
-                            ...(isList ? contentValues ?? [] : []),
-                            { data: ContentFieldConfiguration[contentType].initial },
-                        ])
-                    }
-                >
+                <Button color={"default"} onClick={addContent}>
                     <i className={"fa fa-plus"} />
                     &nbsp;Add Content
                 </Button>
