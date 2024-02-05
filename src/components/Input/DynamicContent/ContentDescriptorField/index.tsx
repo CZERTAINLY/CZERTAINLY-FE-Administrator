@@ -1,7 +1,7 @@
 import WidgetButtons from "components/WidgetButtons";
 import { useCallback, useEffect, useMemo } from "react";
 
-import { Field, useForm, useFormState } from "react-final-form";
+import { Field, useForm } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
 import { AttributeContentType } from "types/openapi";
 import { getStepValue } from "utils/common-utils";
@@ -15,8 +15,8 @@ type Props = {
 
 export default function ContentDescriptorField({ isList, contentType }: Props) {
     const form = useForm();
-    const formState = useFormState();
-    const contentValues = formState.values["content"];
+    const formState = useMemo(() => form.getState(), [form]);
+    const contentValues = useMemo(() => formState.values?.["content"], [formState.values]);
     const values = form.getState().values;
 
     useEffect(() => {
@@ -36,7 +36,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
 
     useEffect(() => {
         if (values.readOnly) addContent();
-    }, [values, addContent]);
+    }, [values.readOnly, addContent]);
 
     return (
         <>

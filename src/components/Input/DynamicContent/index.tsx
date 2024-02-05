@@ -9,10 +9,6 @@ import {
     validateAlphaNumericWithSpecialChars,
     validateFloat,
     validateInteger,
-    validateNonZeroFloat,
-    validateNonZeroInteger,
-    validatePositiveFloat,
-    validatePositiveInteger,
     validateRequired,
 } from "utils/validators";
 import ContentDescriptorField from "./ContentDescriptorField";
@@ -47,14 +43,14 @@ export const ContentFieldConfiguration: {
         initial: "",
     },
     [AttributeContentType.Integer]: {
-        validators: [validateInteger(), validatePositiveInteger(), validateNonZeroInteger()],
+        validators: [validateInteger()],
         type: "number",
-        initial: "1",
+        initial: 0,
     },
     [AttributeContentType.Float]: {
-        validators: [validateFloat(), validatePositiveFloat(), validateNonZeroFloat()],
+        validators: [validateFloat()],
         type: "number",
-        initial: "1.0",
+        initial: 0,
     },
     [AttributeContentType.Boolean]: {
         type: "checkbox",
