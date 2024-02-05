@@ -17,7 +17,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
     const form = useForm();
     const formState = useFormState();
     const contentValues = formState.values["content"];
-    console.log("formState.values", formState.values);
+
     useEffect(() => {
         if (!isList && contentValues?.length > 1) {
             form.change("content", contentValues.slice(0, 1));
