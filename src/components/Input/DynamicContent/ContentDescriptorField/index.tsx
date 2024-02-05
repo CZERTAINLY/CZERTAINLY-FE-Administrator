@@ -31,9 +31,10 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
 
     useEffect(() => {
         if (formState.values.readOnly) {
-            const updatedContent = Array.isArray(contentValues)
-                ? contentValues?.map((content: any) => ({ data: content.data || ContentFieldConfiguration[contentType].initial }))
-                : [{ data: ContentFieldConfiguration[contentType].initial }];
+            const updatedContent =
+                Array.isArray(contentValues) && contentValues?.length
+                    ? contentValues?.map((content: any) => ({ data: content.data || ContentFieldConfiguration[contentType].initial }))
+                    : [{ data: ContentFieldConfiguration[contentType].initial }];
             form.change("content", updatedContent);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +75,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         buttons={[
                                             {
                                                 icon: "trash",
-                                                disabled: false,
+                                                disabled: formState.values.readOnly && contentValues?.length === 1,
                                                 tooltip: "Remove",
                                                 onClick: () => {
                                                     form.change(

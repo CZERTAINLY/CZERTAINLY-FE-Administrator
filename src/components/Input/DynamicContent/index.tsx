@@ -45,12 +45,12 @@ export const ContentFieldConfiguration: {
     [AttributeContentType.Integer]: {
         validators: [validateInteger()],
         type: "number",
-        initial: 0,
+        initial: "0",
     },
     [AttributeContentType.Float]: {
         validators: [validateFloat()],
         type: "number",
-        initial: 0,
+        initial: "0",
     },
     [AttributeContentType.Boolean]: {
         type: "checkbox",
