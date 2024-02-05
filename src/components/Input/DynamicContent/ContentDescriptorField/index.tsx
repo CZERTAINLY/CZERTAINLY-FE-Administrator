@@ -1,5 +1,5 @@
 import WidgetButtons from "components/WidgetButtons";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { Field, useForm, useFormState } from "react-final-form";
 import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
@@ -17,8 +17,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
     const form = useForm();
     const formState = useFormState();
     const contentValues = formState.values["content"];
-    const values = form.getState().values;
-
+    console.log("formState.values", formState.values);
     useEffect(() => {
         if (!isList && contentValues?.length > 1) {
             form.change("content", contentValues.slice(0, 1));
@@ -30,14 +29,15 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
         return stepValue;
     }, [contentType]);
 
-    const addContent = useCallback(() => {
-        const contentValues = form.getState().values["content"];
-        form.change("content", [...(isList ? contentValues ?? [] : []), { data: ContentFieldConfiguration[contentType].initial }]);
-    }, [form, isList, contentType]);
-
     useEffect(() => {
-        if (values.readOnly) addContent();
-    }, [values.readOnly, addContent]);
+        if (formState.values.readOnly) {
+            const updatedContent = Array.isArray(contentValues)
+                ? contentValues?.map((content: any) => ({ data: content.data || ContentFieldConfiguration[contentType].initial }))
+                : [{ data: ContentFieldConfiguration[contentType].initial }];
+            form.change("content", updatedContent);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [formState.values.readOnly, contentType]);
 
     return (
         <>
@@ -116,7 +116,15 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                 );
             })}
             {(isList || !contentValues || contentValues.length === 0) && (
-                <Button color={"default"} onClick={addContent}>
+                <Button
+                    color={"default"}
+                    onClick={() =>
+                        form.change("content", [
+                            ...(isList ? contentValues ?? [] : []),
+                            { data: ContentFieldConfiguration[contentType].initial },
+                        ])
+                    }
+                >
                     <i className={"fa fa-plus"} />
                     &nbsp;Add Content
                 </Button>
