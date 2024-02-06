@@ -45,26 +45,29 @@ export const ContentFieldConfiguration: {
     [AttributeContentType.Integer]: {
         validators: [validateInteger()],
         type: 'number',
-        initial: 0,
+        initial: '0',
     },
     [AttributeContentType.Float]: {
         validators: [validateFloat()],
         type: 'number',
-        initial: 0,
+        initial: '0',
     },
     [AttributeContentType.Boolean]: {
         type: 'checkbox',
         initial: false,
     },
     [AttributeContentType.Datetime]: {
+        validators: [validateRequired()],
         type: 'datetime-local',
         initial: '',
     },
     [AttributeContentType.Date]: {
+        validators: [validateRequired()],
         type: 'date',
         initial: '',
     },
     [AttributeContentType.Time]: {
+        validators: [validateRequired()],
         type: 'time',
         initial: '',
     },
