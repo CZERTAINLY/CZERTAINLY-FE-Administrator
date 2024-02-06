@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateDetailDto } from "./";
+import type { CertificateDetailDto } from './';
 
 /**
  * @export

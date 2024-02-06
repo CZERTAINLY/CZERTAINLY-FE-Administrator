@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AddTokenProfileRequestDto,
     AuthenticationServiceExceptionDto,
@@ -24,7 +24,7 @@ import type {
     TokenProfileDetailDto,
     TokenProfileDto,
     TokenProfileKeyUsageRequestDto,
-} from "../models";
+} from '../models';
 
 export interface CreateTokenProfileRequest {
     tokenInstanceUuid: string;
@@ -103,17 +103,17 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, addTokenProfileRequestDto }: CreateTokenProfileRequest,
         opts?: OperationOpts,
     ): Observable<TokenProfileDetailDto | AjaxResponse<TokenProfileDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "createTokenProfile");
-        throwIfNullOrUndefined(addTokenProfileRequestDto, "addTokenProfileRequestDto", "createTokenProfile");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'createTokenProfile');
+        throwIfNullOrUndefined(addTokenProfileRequestDto, 'addTokenProfileRequestDto', 'createTokenProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<TokenProfileDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles".replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid)),
-                method: "POST",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
+                method: 'POST',
                 headers,
                 body: addTokenProfileRequestDto,
             },
@@ -133,12 +133,12 @@ export class TokenProfileManagementApi extends BaseAPI {
         { uuid }: DeleteRaProfileWithoutTokenInstanceRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteRaProfileWithoutTokenInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteRaProfileWithoutTokenInstance');
 
         return this.request<void>(
             {
-                url: "/v1/tokenProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/tokenProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -153,15 +153,15 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, uuid }: DeleteTokenProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "deleteTokenProfile");
-        throwIfNullOrUndefined(uuid, "uuid", "deleteTokenProfile");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'deleteTokenProfile');
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteTokenProfile');
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -173,16 +173,16 @@ export class TokenProfileManagementApi extends BaseAPI {
     deleteTokenProfiles({ requestBody }: DeleteTokenProfilesRequest): Observable<void>;
     deleteTokenProfiles({ requestBody }: DeleteTokenProfilesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteTokenProfiles({ requestBody }: DeleteTokenProfilesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "deleteTokenProfiles");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'deleteTokenProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokenProfiles",
-                method: "DELETE",
+                url: '/v1/tokenProfiles',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -202,15 +202,15 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, uuid }: DisableTokenProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "disableTokenProfile");
-        throwIfNullOrUndefined(uuid, "uuid", "disableTokenProfile");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'disableTokenProfile');
+        throwIfNullOrUndefined(uuid, 'uuid', 'disableTokenProfile');
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}/disable"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}/disable'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -222,16 +222,16 @@ export class TokenProfileManagementApi extends BaseAPI {
     disableTokenProfiles({ requestBody }: DisableTokenProfilesRequest): Observable<void>;
     disableTokenProfiles({ requestBody }: DisableTokenProfilesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableTokenProfiles({ requestBody }: DisableTokenProfilesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "disableTokenProfiles");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'disableTokenProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokenProfiles/disable",
-                method: "PATCH",
+                url: '/v1/tokenProfiles/disable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -251,20 +251,20 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, uuid, editTokenProfileRequestDto }: EditTokenProfileRequest,
         opts?: OperationOpts,
     ): Observable<TokenProfileDetailDto | AjaxResponse<TokenProfileDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "editTokenProfile");
-        throwIfNullOrUndefined(uuid, "uuid", "editTokenProfile");
-        throwIfNullOrUndefined(editTokenProfileRequestDto, "editTokenProfileRequestDto", "editTokenProfile");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'editTokenProfile');
+        throwIfNullOrUndefined(uuid, 'uuid', 'editTokenProfile');
+        throwIfNullOrUndefined(editTokenProfileRequestDto, 'editTokenProfileRequestDto', 'editTokenProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<TokenProfileDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: editTokenProfileRequestDto,
             },
@@ -281,15 +281,15 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, uuid }: EnableTokenProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "enableTokenProfile");
-        throwIfNullOrUndefined(uuid, "uuid", "enableTokenProfile");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'enableTokenProfile');
+        throwIfNullOrUndefined(uuid, 'uuid', 'enableTokenProfile');
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}/enable"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}/enable'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -301,16 +301,16 @@ export class TokenProfileManagementApi extends BaseAPI {
     enableTokenProfiles({ requestBody }: EnableTokenProfilesRequest): Observable<void>;
     enableTokenProfiles({ requestBody }: EnableTokenProfilesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableTokenProfiles({ requestBody }: EnableTokenProfilesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "enableTokenProfiles");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'enableTokenProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokenProfiles/enable",
-                method: "PATCH",
+                url: '/v1/tokenProfiles/enable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -330,15 +330,15 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, uuid }: GetTokenProfileRequest,
         opts?: OperationOpts,
     ): Observable<TokenProfileDetailDto | AjaxResponse<TokenProfileDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "getTokenProfile");
-        throwIfNullOrUndefined(uuid, "uuid", "getTokenProfile");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'getTokenProfile');
+        throwIfNullOrUndefined(uuid, 'uuid', 'getTokenProfile');
 
         return this.request<TokenProfileDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -356,13 +356,13 @@ export class TokenProfileManagementApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (enabled != null) {
-            query["enabled"] = enabled;
+            query['enabled'] = enabled;
         }
 
         return this.request<Array<TokenProfileDto>>(
             {
-                url: "/v1/tokenProfiles",
-                method: "GET",
+                url: '/v1/tokenProfiles',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -381,20 +381,20 @@ export class TokenProfileManagementApi extends BaseAPI {
         { tokenInstanceUuid, tokenProfileUuid, tokenProfileKeyUsageRequestDto }: UpdateKeyUsagesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "updateKeyUsages");
-        throwIfNullOrUndefined(tokenProfileUuid, "tokenProfileUuid", "updateKeyUsages");
-        throwIfNullOrUndefined(tokenProfileKeyUsageRequestDto, "tokenProfileKeyUsageRequestDto", "updateKeyUsages");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'updateKeyUsages');
+        throwIfNullOrUndefined(tokenProfileUuid, 'tokenProfileUuid', 'updateKeyUsages');
+        throwIfNullOrUndefined(tokenProfileKeyUsageRequestDto, 'tokenProfileKeyUsageRequestDto', 'updateKeyUsages');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/usages"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{tokenProfileUuid}", encodeURI(tokenProfileUuid)),
-                method: "PUT",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/usages'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{tokenProfileUuid}', encodeURI(tokenProfileUuid)),
+                method: 'PUT',
                 headers,
                 body: tokenProfileKeyUsageRequestDto,
             },
@@ -414,16 +414,16 @@ export class TokenProfileManagementApi extends BaseAPI {
         { bulkTokenProfileKeyUsageRequestDto }: UpdateKeysUsagesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(bulkTokenProfileKeyUsageRequestDto, "bulkTokenProfileKeyUsageRequestDto", "updateKeysUsages");
+        throwIfNullOrUndefined(bulkTokenProfileKeyUsageRequestDto, 'bulkTokenProfileKeyUsageRequestDto', 'updateKeysUsages');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/usages",
-                method: "PUT",
+                url: '/v1/tokens/usages',
+                method: 'PUT',
                 headers,
                 body: bulkTokenProfileKeyUsageRequestDto,
             },

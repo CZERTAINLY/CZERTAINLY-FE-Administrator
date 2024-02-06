@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AddLocationRequestDto,
     AuthenticationServiceExceptionDto,
@@ -28,7 +28,7 @@ import type {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface AddLocationRequest {
     entityUuid: string;
@@ -118,17 +118,17 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, addLocationRequestDto }: AddLocationRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "addLocation");
-        throwIfNullOrUndefined(addLocationRequestDto, "addLocationRequestDto", "addLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'addLocation');
+        throwIfNullOrUndefined(addLocationRequestDto, 'addLocationRequestDto', 'addLocation');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations".replace("{entityUuid}", encodeURI(entityUuid)),
-                method: "POST",
+                url: '/v1/entities/{entityUuid}/locations'.replace('{entityUuid}', encodeURI(entityUuid)),
+                method: 'POST',
                 headers,
                 body: addLocationRequestDto,
             },
@@ -142,15 +142,15 @@ export class LocationManagementApi extends BaseAPI {
     deleteLocation({ entityUuid, locationUuid }: DeleteLocationRequest): Observable<void>;
     deleteLocation({ entityUuid, locationUuid }: DeleteLocationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteLocation({ entityUuid, locationUuid }: DeleteLocationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "deleteLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "deleteLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'deleteLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'deleteLocation');
 
         return this.request<void>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "DELETE",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -162,15 +162,15 @@ export class LocationManagementApi extends BaseAPI {
     disableLocation({ entityUuid, locationUuid }: DisableLocationRequest): Observable<void>;
     disableLocation({ entityUuid, locationUuid }: DisableLocationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableLocation({ entityUuid, locationUuid }: DisableLocationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "disableLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "disableLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'disableLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'disableLocation');
 
         return this.request<void>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/disable"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "PATCH",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/disable'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -188,20 +188,20 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid, editLocationRequestDto }: EditLocationRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "editLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "editLocation");
-        throwIfNullOrUndefined(editLocationRequestDto, "editLocationRequestDto", "editLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'editLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'editLocation');
+        throwIfNullOrUndefined(editLocationRequestDto, 'editLocationRequestDto', 'editLocation');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "PUT",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'PUT',
                 headers,
                 body: editLocationRequestDto,
             },
@@ -215,15 +215,15 @@ export class LocationManagementApi extends BaseAPI {
     enableLocation({ entityUuid, locationUuid }: EnableLocationRequest): Observable<void>;
     enableLocation({ entityUuid, locationUuid }: EnableLocationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableLocation({ entityUuid, locationUuid }: EnableLocationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "enableLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "enableLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'enableLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'enableLocation');
 
         return this.request<void>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/enable"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "PATCH",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/enable'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -238,15 +238,15 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid }: GetLocationRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "getLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "getLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'getLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'getLocation');
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "GET",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -262,8 +262,8 @@ export class LocationManagementApi extends BaseAPI {
     ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>(
             {
-                url: "/v1/search",
-                method: "GET",
+                url: '/v1/search',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -285,20 +285,20 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid, issueToLocationRequestDto }: IssueCertificateToLocationRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "issueCertificateToLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "issueCertificateToLocation");
-        throwIfNullOrUndefined(issueToLocationRequestDto, "issueToLocationRequestDto", "issueCertificateToLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'issueCertificateToLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'issueCertificateToLocation');
+        throwIfNullOrUndefined(issueToLocationRequestDto, 'issueToLocationRequestDto', 'issueCertificateToLocation');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/certificates"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "POST",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/certificates'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'POST',
                 headers,
                 body: issueToLocationRequestDto,
             },
@@ -318,15 +318,15 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid }: ListCsrAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "listCsrAttributes");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "listCsrAttributes");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'listCsrAttributes');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'listCsrAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/attributes/issue"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "GET",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/attributes/issue'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -341,16 +341,16 @@ export class LocationManagementApi extends BaseAPI {
         { searchRequestDto }: ListLocationsRequest,
         opts?: OperationOpts,
     ): Observable<LocationsResponseDto | AjaxResponse<LocationsResponseDto>> {
-        throwIfNullOrUndefined(searchRequestDto, "searchRequestDto", "listLocations");
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listLocations');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<LocationsResponseDto>(
             {
-                url: "/v1/locations",
-                method: "POST",
+                url: '/v1/locations',
+                method: 'POST',
                 headers,
                 body: searchRequestDto,
             },
@@ -370,15 +370,15 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid }: ListPushAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "listPushAttributes");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "listPushAttributes");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'listPushAttributes');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'listPushAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/attributes/push"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "GET",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/attributes/push'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -401,22 +401,22 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid, certificateUuid, pushToLocationRequestDto }: PushCertificateRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "pushCertificate");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "pushCertificate");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "pushCertificate");
-        throwIfNullOrUndefined(pushToLocationRequestDto, "pushToLocationRequestDto", "pushCertificate");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'pushCertificate');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'pushCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'pushCertificate');
+        throwIfNullOrUndefined(pushToLocationRequestDto, 'pushToLocationRequestDto', 'pushCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/certificates/{certificateUuid}"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "PUT",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/certificates/{certificateUuid}'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'PUT',
                 headers,
                 body: pushToLocationRequestDto,
             },
@@ -436,17 +436,17 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid, certificateUuid }: RemoveCertificateRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "removeCertificate");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "removeCertificate");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "removeCertificate");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'removeCertificate');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'removeCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'removeCertificate');
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/certificates/{certificateUuid}"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "DELETE",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/certificates/{certificateUuid}'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -464,17 +464,17 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid, certificateUuid }: RenewCertificateInLocationRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "renewCertificateInLocation");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "renewCertificateInLocation");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "renewCertificateInLocation");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'renewCertificateInLocation');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'renewCertificateInLocation');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'renewCertificateInLocation');
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/certificates/{certificateUuid}"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "PATCH",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/certificates/{certificateUuid}'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -492,15 +492,15 @@ export class LocationManagementApi extends BaseAPI {
         { entityUuid, locationUuid }: UpdateLocationContentRequest,
         opts?: OperationOpts,
     ): Observable<LocationDto | AjaxResponse<LocationDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "updateLocationContent");
-        throwIfNullOrUndefined(locationUuid, "locationUuid", "updateLocationContent");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'updateLocationContent');
+        throwIfNullOrUndefined(locationUuid, 'locationUuid', 'updateLocationContent');
 
         return this.request<LocationDto>(
             {
-                url: "/v1/entities/{entityUuid}/locations/{locationUuid}/sync"
-                    .replace("{entityUuid}", encodeURI(entityUuid))
-                    .replace("{locationUuid}", encodeURI(locationUuid)),
-                method: "PUT",
+                url: '/v1/entities/{entityUuid}/locations/{locationUuid}/sync'
+                    .replace('{entityUuid}', encodeURI(entityUuid))
+                    .replace('{locationUuid}', encodeURI(locationUuid)),
+                method: 'PUT',
             },
             opts?.responseOpts,
         );

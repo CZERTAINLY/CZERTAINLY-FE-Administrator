@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { TokenInstanceStatus } from "./";
+import type { TokenInstanceStatus } from './';
 
 /**
  * @export

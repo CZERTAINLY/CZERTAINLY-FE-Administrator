@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { KeyAlgorithm, KeyCompromiseReason, KeyFormat, KeyState, KeyType, KeyUsage, MetadataResponseDto } from "./";
+import type { KeyAlgorithm, KeyCompromiseReason, KeyFormat, KeyState, KeyType, KeyUsage, MetadataResponseDto } from './';
 
 /**
  * Key Objects

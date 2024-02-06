@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
-import type { AcmeAccountListResponseDto, AcmeAccountResponseDto, AuthenticationServiceExceptionDto, ErrorMessageDto } from "../models";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
+import type { AcmeAccountListResponseDto, AcmeAccountResponseDto, AuthenticationServiceExceptionDto, ErrorMessageDto } from '../models';
 
 export interface BulkDisableAcmeAccountRequest {
     requestBody: Array<string>;
@@ -59,16 +59,16 @@ export class ACMEAccountManagementApi extends BaseAPI {
     bulkDisableAcmeAccount({ requestBody }: BulkDisableAcmeAccountRequest): Observable<void>;
     bulkDisableAcmeAccount({ requestBody }: BulkDisableAcmeAccountRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDisableAcmeAccount({ requestBody }: BulkDisableAcmeAccountRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDisableAcmeAccount");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableAcmeAccount');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/acmeAccounts/disable",
-                method: "PATCH",
+                url: '/v1/acmeAccounts/disable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -82,16 +82,16 @@ export class ACMEAccountManagementApi extends BaseAPI {
     bulkEnableAcmeAccount({ requestBody }: BulkEnableAcmeAccountRequest): Observable<void>;
     bulkEnableAcmeAccount({ requestBody }: BulkEnableAcmeAccountRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkEnableAcmeAccount({ requestBody }: BulkEnableAcmeAccountRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkEnableAcmeAccount");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableAcmeAccount');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/acmeAccounts/enable",
-                method: "PATCH",
+                url: '/v1/acmeAccounts/enable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -105,16 +105,16 @@ export class ACMEAccountManagementApi extends BaseAPI {
     bulkRevokeAcmeAccount({ requestBody }: BulkRevokeAcmeAccountRequest): Observable<void>;
     bulkRevokeAcmeAccount({ requestBody }: BulkRevokeAcmeAccountRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkRevokeAcmeAccount({ requestBody }: BulkRevokeAcmeAccountRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkRevokeAcmeAccount");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkRevokeAcmeAccount');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/acmeAccounts/revoke",
-                method: "PUT",
+                url: '/v1/acmeAccounts/revoke',
+                method: 'PUT',
                 headers,
                 body: requestBody,
             },
@@ -134,15 +134,15 @@ export class ACMEAccountManagementApi extends BaseAPI {
         { acmeProfileUuid, acmeAccountUuid }: DisableAcmeAccountRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(acmeProfileUuid, "acmeProfileUuid", "disableAcmeAccount");
-        throwIfNullOrUndefined(acmeAccountUuid, "acmeAccountUuid", "disableAcmeAccount");
+        throwIfNullOrUndefined(acmeProfileUuid, 'acmeProfileUuid', 'disableAcmeAccount');
+        throwIfNullOrUndefined(acmeAccountUuid, 'acmeAccountUuid', 'disableAcmeAccount');
 
         return this.request<void>(
             {
-                url: "/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}/disable"
-                    .replace("{acmeProfileUuid}", encodeURI(acmeProfileUuid))
-                    .replace("{acmeAccountUuid}", encodeURI(acmeAccountUuid)),
-                method: "PATCH",
+                url: '/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}/disable'
+                    .replace('{acmeProfileUuid}', encodeURI(acmeProfileUuid))
+                    .replace('{acmeAccountUuid}', encodeURI(acmeAccountUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -160,15 +160,15 @@ export class ACMEAccountManagementApi extends BaseAPI {
         { acmeProfileUuid, acmeAccountUuid }: EnableAcmeAccountRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(acmeProfileUuid, "acmeProfileUuid", "enableAcmeAccount");
-        throwIfNullOrUndefined(acmeAccountUuid, "acmeAccountUuid", "enableAcmeAccount");
+        throwIfNullOrUndefined(acmeProfileUuid, 'acmeProfileUuid', 'enableAcmeAccount');
+        throwIfNullOrUndefined(acmeAccountUuid, 'acmeAccountUuid', 'enableAcmeAccount');
 
         return this.request<void>(
             {
-                url: "/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}/enable"
-                    .replace("{acmeProfileUuid}", encodeURI(acmeProfileUuid))
-                    .replace("{acmeAccountUuid}", encodeURI(acmeAccountUuid)),
-                method: "PATCH",
+                url: '/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}/enable'
+                    .replace('{acmeProfileUuid}', encodeURI(acmeProfileUuid))
+                    .replace('{acmeAccountUuid}', encodeURI(acmeAccountUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -186,15 +186,15 @@ export class ACMEAccountManagementApi extends BaseAPI {
         { acmeProfileUuid, acmeAccountUuid }: GetAcmeAccountRequest,
         opts?: OperationOpts,
     ): Observable<AcmeAccountResponseDto | AjaxResponse<AcmeAccountResponseDto>> {
-        throwIfNullOrUndefined(acmeProfileUuid, "acmeProfileUuid", "getAcmeAccount");
-        throwIfNullOrUndefined(acmeAccountUuid, "acmeAccountUuid", "getAcmeAccount");
+        throwIfNullOrUndefined(acmeProfileUuid, 'acmeProfileUuid', 'getAcmeAccount');
+        throwIfNullOrUndefined(acmeAccountUuid, 'acmeAccountUuid', 'getAcmeAccount');
 
         return this.request<AcmeAccountResponseDto>(
             {
-                url: "/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}"
-                    .replace("{acmeProfileUuid}", encodeURI(acmeProfileUuid))
-                    .replace("{acmeAccountUuid}", encodeURI(acmeAccountUuid)),
-                method: "GET",
+                url: '/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}'
+                    .replace('{acmeProfileUuid}', encodeURI(acmeProfileUuid))
+                    .replace('{acmeAccountUuid}', encodeURI(acmeAccountUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -210,8 +210,8 @@ export class ACMEAccountManagementApi extends BaseAPI {
     ): Observable<Array<AcmeAccountListResponseDto> | AjaxResponse<Array<AcmeAccountListResponseDto>>> {
         return this.request<Array<AcmeAccountListResponseDto>>(
             {
-                url: "/v1/acmeAccounts",
-                method: "GET",
+                url: '/v1/acmeAccounts',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -229,15 +229,15 @@ export class ACMEAccountManagementApi extends BaseAPI {
         { acmeProfileUuid, acmeAccountUuid }: RevokeAcmeAccountRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(acmeProfileUuid, "acmeProfileUuid", "revokeAcmeAccount");
-        throwIfNullOrUndefined(acmeAccountUuid, "acmeAccountUuid", "revokeAcmeAccount");
+        throwIfNullOrUndefined(acmeProfileUuid, 'acmeProfileUuid', 'revokeAcmeAccount');
+        throwIfNullOrUndefined(acmeAccountUuid, 'acmeAccountUuid', 'revokeAcmeAccount');
 
         return this.request<void>(
             {
-                url: "/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}"
-                    .replace("{acmeProfileUuid}", encodeURI(acmeProfileUuid))
-                    .replace("{acmeAccountUuid}", encodeURI(acmeAccountUuid)),
-                method: "POST",
+                url: '/v1/acmeProfiles/{acmeProfileUuid}/acmeAccounts/{acmeAccountUuid}'
+                    .replace('{acmeProfileUuid}', encodeURI(acmeProfileUuid))
+                    .replace('{acmeAccountUuid}', encodeURI(acmeAccountUuid)),
+                method: 'POST',
             },
             opts?.responseOpts,
         );

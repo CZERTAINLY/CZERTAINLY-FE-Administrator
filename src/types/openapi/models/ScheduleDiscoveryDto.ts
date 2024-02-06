@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { DiscoveryDto } from "./";
+import type { DiscoveryDto } from './';
 
 /**
  * @export

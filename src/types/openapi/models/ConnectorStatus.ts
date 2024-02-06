@@ -17,8 +17,8 @@
  * @enum {string}
  */
 export enum ConnectorStatus {
-    WaitingForApproval = "waitingForApproval",
-    Connected = "connected",
-    Failed = "failed",
-    Offline = "offline",
+    WaitingForApproval = 'waitingForApproval',
+    Connected = 'connected',
+    Failed = 'failed',
+    Offline = 'offline',
 }

@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeContentType, AttributeType, AttributeValueTarget } from "./";
+import type { AttributeContentType, AttributeType, AttributeValueTarget } from './';
 
 /**
  * Mappings for the callback method

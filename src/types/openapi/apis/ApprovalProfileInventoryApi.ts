@@ -11,8 +11,8 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
 import type {
     ApprovalProfileDetailDto,
     ApprovalProfileForVersionDto,
@@ -21,9 +21,9 @@ import type {
     ApprovalProfileUpdateRequestDto,
     PaginationRequestDto,
     UuidDto,
-} from "../models";
-import type { HttpHeaders, HttpQuery, OperationOpts } from "../runtime";
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
+} from '../models';
+import type { HttpHeaders, HttpQuery, OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface CreateApprovalProfileRequest {
     approvalProfileRequestDto: ApprovalProfileRequestDto;
@@ -71,16 +71,16 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
         { approvalProfileRequestDto }: CreateApprovalProfileRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(approvalProfileRequestDto, "approvalProfileRequestDto", "createApprovalProfile");
+        throwIfNullOrUndefined(approvalProfileRequestDto, 'approvalProfileRequestDto', 'createApprovalProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/approvalProfiles",
-                method: "POST",
+                url: '/v1/approvalProfiles',
+                method: 'POST',
                 headers,
                 body: approvalProfileRequestDto,
             },
@@ -94,12 +94,12 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
     deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest): Observable<void>;
     deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteApprovalProfile({ uuid }: DeleteApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteApprovalProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteApprovalProfile');
 
         return this.request<void>(
             {
-                url: "/v1/approvalProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -111,12 +111,12 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
     disableApprovalProfile({ uuid }: DisableApprovalProfileRequest): Observable<void>;
     disableApprovalProfile({ uuid }: DisableApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableApprovalProfile({ uuid }: DisableApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "disableApprovalProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'disableApprovalProfile');
 
         return this.request<void>(
             {
-                url: "/v1/approvalProfiles/{uuid}/disable".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/approvalProfiles/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -134,17 +134,17 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
         { uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest,
         opts?: OperationOpts,
     ): Observable<object | AjaxResponse<object>> {
-        throwIfNullOrUndefined(uuid, "uuid", "editApprovalProfile");
-        throwIfNullOrUndefined(approvalProfileUpdateRequestDto, "approvalProfileUpdateRequestDto", "editApprovalProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'editApprovalProfile');
+        throwIfNullOrUndefined(approvalProfileUpdateRequestDto, 'approvalProfileUpdateRequestDto', 'editApprovalProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<object>(
             {
-                url: "/v1/approvalProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: approvalProfileUpdateRequestDto,
             },
@@ -158,12 +158,12 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
     enableApprovalProfile({ uuid }: EnableApprovalProfileRequest): Observable<void>;
     enableApprovalProfile({ uuid }: EnableApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableApprovalProfile({ uuid }: EnableApprovalProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "enableApprovalProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'enableApprovalProfile');
 
         return this.request<void>(
             {
-                url: "/v1/approvalProfiles/{uuid}/enable".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/approvalProfiles/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -181,8 +181,8 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
         { uuid, approvalProfileForVersionDto }: GetApprovalProfileRequest,
         opts?: OperationOpts,
     ): Observable<ApprovalProfileDetailDto | AjaxResponse<ApprovalProfileDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getApprovalProfile");
-        throwIfNullOrUndefined(approvalProfileForVersionDto, "approvalProfileForVersionDto", "getApprovalProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getApprovalProfile');
+        throwIfNullOrUndefined(approvalProfileForVersionDto, 'approvalProfileForVersionDto', 'getApprovalProfile');
 
         const query: HttpQuery = {};
         if (approvalProfileForVersionDto != null) {
@@ -191,8 +191,8 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
 
         return this.request<ApprovalProfileDetailDto>(
             {
-                url: "/v1/approvalProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -211,15 +211,15 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
         { paginationRequestDto }: ListApprovalProfilesRequest,
         opts?: OperationOpts,
     ): Observable<ApprovalProfileResponseDto | AjaxResponse<ApprovalProfileResponseDto>> {
-        throwIfNullOrUndefined(paginationRequestDto, "paginationRequestDto", "listApprovalProfiles");
+        throwIfNullOrUndefined(paginationRequestDto, 'paginationRequestDto', 'listApprovalProfiles');
         const query: HttpQuery = {};
         if (paginationRequestDto != null) {
             Object.assign(query, paginationRequestDto);
         }
         return this.request<ApprovalProfileResponseDto>(
             {
-                url: "/v1/approvalProfiles",
-                method: "GET",
+                url: '/v1/approvalProfiles',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,

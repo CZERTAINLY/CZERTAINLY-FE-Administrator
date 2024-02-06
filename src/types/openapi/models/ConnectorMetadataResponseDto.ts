@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeContentType } from "./";
+import type { AttributeContentType } from './';
 
 /**
  * @export

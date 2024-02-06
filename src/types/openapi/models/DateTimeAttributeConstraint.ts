@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeConstraintType, DateTimeAttributeConstraintData } from "./";
+import type { AttributeConstraintType, DateTimeAttributeConstraintData } from './';
 
 /**
  * @export

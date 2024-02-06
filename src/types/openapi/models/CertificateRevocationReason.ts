@@ -17,13 +17,13 @@
  * @enum {string}
  */
 export enum CertificateRevocationReason {
-    Unspecified = "unspecified",
-    KeyCompromise = "keyCompromise",
-    CACompromise = "cACompromise",
-    AffiliationChanged = "affiliationChanged",
-    Superseded = "superseded",
-    CessationOfOperation = "cessationOfOperation",
-    CertificateHold = "certificateHold",
-    PrivilegeWithdrawn = "privilegeWithdrawn",
-    AACompromise = "aACompromise",
+    Unspecified = 'unspecified',
+    KeyCompromise = 'keyCompromise',
+    CACompromise = 'cACompromise',
+    AffiliationChanged = 'affiliationChanged',
+    Superseded = 'superseded',
+    CessationOfOperation = 'cessationOfOperation',
+    CertificateHold = 'certificateHold',
+    PrivilegeWithdrawn = 'privilegeWithdrawn',
+    AACompromise = 'aACompromise',
 }

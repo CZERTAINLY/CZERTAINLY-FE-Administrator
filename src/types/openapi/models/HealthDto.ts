@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { HealthStatus } from "./";
+import type { HealthStatus } from './';
 
 /**
  * @export

@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ActionDto, Resource } from "./";
+import type { ActionDto, Resource } from './';
 
 /**
  * @export

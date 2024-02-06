@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { GroupDto, KeyAlgorithm, KeyFormat, KeyState, KeyType, KeyUsage } from "./";
+import type { GroupDto, KeyAlgorithm, KeyFormat, KeyState, KeyType, KeyUsage } from './';
 
 /**
  * Cryptographic Keys

@@ -17,12 +17,12 @@
  * @enum {string}
  */
 export enum FunctionGroupCode {
-    CredentialProvider = "credentialProvider",
-    LegacyAuthorityProvider = "legacyAuthorityProvider",
-    AuthorityProvider = "authorityProvider",
-    DiscoveryProvider = "discoveryProvider",
-    EntityProvider = "entityProvider",
-    ComplianceProvider = "complianceProvider",
-    CryptographyProvider = "cryptographyProvider",
-    NotificationProvider = "notificationProvider",
+    CredentialProvider = 'credentialProvider',
+    LegacyAuthorityProvider = 'legacyAuthorityProvider',
+    AuthorityProvider = 'authorityProvider',
+    DiscoveryProvider = 'discoveryProvider',
+    EntityProvider = 'entityProvider',
+    ComplianceProvider = 'complianceProvider',
+    CryptographyProvider = 'cryptographyProvider',
+    NotificationProvider = 'notificationProvider',
 }

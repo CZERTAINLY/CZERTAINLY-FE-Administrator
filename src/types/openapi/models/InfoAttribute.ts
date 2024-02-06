@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeContentType, AttributeType, BaseAttributeContentDto, InfoAttributeProperties } from "./";
+import type { AttributeContentType, AttributeType, BaseAttributeContentDto, InfoAttributeProperties } from './';
 
 /**
  * Info attribute contains content that is for information purpose or represents additional information for object (metadata). Its content can not be edited and is not send in requests to store.

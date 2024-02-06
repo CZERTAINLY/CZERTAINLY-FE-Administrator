@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { GroupDto, KeyAssociationDto, KeyItemDetailDto, ResponseAttributeDto } from "./";
+import type { GroupDto, KeyAssociationDto, KeyItemDetailDto, ResponseAttributeDto } from './';
 
 /**
  * @export

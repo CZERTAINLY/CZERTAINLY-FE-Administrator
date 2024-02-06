@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { SimplifiedRaProfileDto } from "./";
+import type { SimplifiedRaProfileDto } from './';
 
 /**
  * @export

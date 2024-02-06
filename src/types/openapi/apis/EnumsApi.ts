@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI } from "../runtime";
-import type { OperationOpts } from "../runtime";
-import type { EnumItemDto, ErrorMessageDto } from "../models";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI } from '../runtime';
+import type { OperationOpts } from '../runtime';
+import type { EnumItemDto, ErrorMessageDto } from '../models';
 
 /**
  * no description
@@ -31,8 +31,8 @@ export class EnumsApi extends BaseAPI {
     ): Observable<{ [key: string]: { [key: string]: EnumItemDto } } | AjaxResponse<{ [key: string]: { [key: string]: EnumItemDto } }>> {
         return this.request<{ [key: string]: { [key: string]: EnumItemDto } }>(
             {
-                url: "/v1/enums",
-                method: "GET",
+                url: '/v1/enums',
+                method: 'GET',
             },
             opts?.responseOpts,
         );

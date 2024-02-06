@@ -17,9 +17,9 @@
  * @enum {string}
  */
 export enum KeyAlgorithm {
-    Rsa = "RSA",
-    Ecdsa = "ECDSA",
-    Falcon = "FALCON",
-    CrystalsDilithium = "CRYSTALS-Dilithium",
-    Sphincs = "SPHINCS+",
+    Rsa = 'RSA',
+    Ecdsa = 'ECDSA',
+    Falcon = 'FALCON',
+    CrystalsDilithium = 'CRYSTALS-Dilithium',
+    Sphincs = 'SPHINCS+',
 }

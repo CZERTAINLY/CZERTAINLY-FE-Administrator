@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
-import type { AuthenticationServiceExceptionDto, BaseAttributeDto, ErrorMessageDto, RequestAttributeDto } from "../models";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
+import type { AuthenticationServiceExceptionDto, BaseAttributeDto, ErrorMessageDto, RequestAttributeDto } from '../models';
 
 export interface ValidateApiKeyAuthAttributesRequest {
     requestAttributeDto: Array<RequestAttributeDto>;
@@ -45,8 +45,8 @@ export class ConnectorAuthenticationApi extends BaseAPI {
     getApiKeyAuthAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/connectors/auth/attributes/apiKey",
-                method: "GET",
+                url: '/v1/connectors/auth/attributes/apiKey',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -60,8 +60,8 @@ export class ConnectorAuthenticationApi extends BaseAPI {
     getAuthenticationTypes(opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
         return this.request<Array<string>>(
             {
-                url: "/v1/connectors/auth/types",
-                method: "GET",
+                url: '/v1/connectors/auth/types',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -75,8 +75,8 @@ export class ConnectorAuthenticationApi extends BaseAPI {
     getBasicAuthAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/connectors/auth/attributes/basic",
-                method: "GET",
+                url: '/v1/connectors/auth/attributes/basic',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -90,8 +90,8 @@ export class ConnectorAuthenticationApi extends BaseAPI {
     getCertificateAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/connectors/auth/attributes/certificate",
-                method: "GET",
+                url: '/v1/connectors/auth/attributes/certificate',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -105,8 +105,8 @@ export class ConnectorAuthenticationApi extends BaseAPI {
     getJWTAuthAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/connectors/auth/attributes/jwt",
-                method: "GET",
+                url: '/v1/connectors/auth/attributes/jwt',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -124,16 +124,16 @@ export class ConnectorAuthenticationApi extends BaseAPI {
         { requestAttributeDto }: ValidateApiKeyAuthAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateApiKeyAuthAttributes");
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateApiKeyAuthAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/connectors/auth/attributes/apiKey/validate",
-                method: "POST",
+                url: '/v1/connectors/auth/attributes/apiKey/validate',
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },
@@ -153,16 +153,16 @@ export class ConnectorAuthenticationApi extends BaseAPI {
         { requestAttributeDto }: ValidateBasicAuthAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateBasicAuthAttributes");
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateBasicAuthAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/connectors/auth/attributes/basic/validate",
-                method: "POST",
+                url: '/v1/connectors/auth/attributes/basic/validate',
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },
@@ -182,16 +182,16 @@ export class ConnectorAuthenticationApi extends BaseAPI {
         { requestAttributeDto }: ValidateCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateCertificateAttributes");
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateCertificateAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/connectors/auth/attributes/certificate/validate",
-                method: "POST",
+                url: '/v1/connectors/auth/attributes/certificate/validate',
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },
@@ -211,16 +211,16 @@ export class ConnectorAuthenticationApi extends BaseAPI {
         { requestAttributeDto }: ValidateJWTAuthAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateJWTAuthAttributes");
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateJWTAuthAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/connectors/auth/attributes/jwt/validate",
-                method: "POST",
+                url: '/v1/connectors/auth/attributes/jwt/validate',
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },

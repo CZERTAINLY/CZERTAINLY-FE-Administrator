@@ -17,10 +17,10 @@
  * @enum {string}
  */
 export enum SearchableFieldType {
-    String = "string",
-    Number = "number",
-    List = "list",
-    Date = "date",
-    Datetime = "datetime",
-    Boolean = "boolean",
+    String = 'string',
+    Number = 'number',
+    List = 'list',
+    Date = 'date',
+    Datetime = 'datetime',
+    Boolean = 'boolean',
 }

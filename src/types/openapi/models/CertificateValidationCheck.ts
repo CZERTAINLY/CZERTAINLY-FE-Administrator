@@ -17,11 +17,11 @@
  * @enum {string}
  */
 export enum CertificateValidationCheck {
-    CertificateChain = "certificate_chain",
-    Signature = "signature",
-    CertificateValidity = "certificate_validity",
-    OcspVerification = "ocsp_verification",
-    CrlVerification = "crl_verification",
-    BasicConstraints = "basic_constraints",
-    KeyUsage = "key_usage",
+    CertificateChain = 'certificate_chain',
+    Signature = 'signature',
+    CertificateValidity = 'certificate_validity',
+    OcspVerification = 'ocsp_verification',
+    CrlVerification = 'crl_verification',
+    BasicConstraints = 'basic_constraints',
+    KeyUsage = 'key_usage',
 }

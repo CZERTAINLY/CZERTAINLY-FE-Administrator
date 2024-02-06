@@ -17,5 +17,5 @@
  * @enum {string}
  */
 export enum CertificateRequestFormat {
-    Pkcs10 = "pkcs10",
+    Pkcs10 = 'pkcs10',
 }

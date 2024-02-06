@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeContentType, AttributeType, BaseAttributeContentDto, CustomAttributeProperties } from "./";
+import type { AttributeContentType, AttributeType, BaseAttributeContentDto, CustomAttributeProperties } from './';
 
 /**
  * Custom attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.

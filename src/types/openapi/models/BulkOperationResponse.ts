@@ -41,7 +41,7 @@ export interface BulkOperationResponse {
  * @enum {string}
  */
 export enum BulkOperationResponseStatusEnum {
-    Success = "SUCCESS",
-    Failed = "FAILED",
-    Partial = "PARTIAL",
+    Success = 'SUCCESS',
+    Failed = 'FAILED',
+    Partial = 'PARTIAL',
 }

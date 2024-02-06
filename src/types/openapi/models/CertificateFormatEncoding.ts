@@ -17,6 +17,6 @@
  * @enum {string}
  */
 export enum CertificateFormatEncoding {
-    Pem = "pem",
-    Der = "der",
+    Pem = 'pem',
+    Der = 'der',
 }

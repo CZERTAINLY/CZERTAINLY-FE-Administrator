@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     AuthorityInstanceDto,
@@ -26,7 +26,7 @@ import type {
     NameAndIdDto,
     RequestAttributeDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface BulkDeleteAuthorityInstanceRequest {
     requestBody: Array<string>;
@@ -92,16 +92,16 @@ export class AuthorityManagementApi extends BaseAPI {
         { requestBody }: BulkDeleteAuthorityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteAuthorityInstance");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteAuthorityInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<BulkActionMessageDto>>(
             {
-                url: "/v1/authorities",
-                method: "DELETE",
+                url: '/v1/authorities',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -121,16 +121,16 @@ export class AuthorityManagementApi extends BaseAPI {
         { authorityInstanceRequestDto }: CreateAuthorityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(authorityInstanceRequestDto, "authorityInstanceRequestDto", "createAuthorityInstance");
+        throwIfNullOrUndefined(authorityInstanceRequestDto, 'authorityInstanceRequestDto', 'createAuthorityInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/authorities",
-                method: "POST",
+                url: '/v1/authorities',
+                method: 'POST',
                 headers,
                 body: authorityInstanceRequestDto,
             },
@@ -144,12 +144,12 @@ export class AuthorityManagementApi extends BaseAPI {
     deleteAuthorityInstance({ uuid }: DeleteAuthorityInstanceRequest): Observable<void>;
     deleteAuthorityInstance({ uuid }: DeleteAuthorityInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteAuthorityInstance({ uuid }: DeleteAuthorityInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteAuthorityInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteAuthorityInstance');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/authorities/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -167,17 +167,17 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid, authorityInstanceUpdateRequestDto }: EditAuthorityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<AuthorityInstanceDto | AjaxResponse<AuthorityInstanceDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "editAuthorityInstance");
-        throwIfNullOrUndefined(authorityInstanceUpdateRequestDto, "authorityInstanceUpdateRequestDto", "editAuthorityInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'editAuthorityInstance');
+        throwIfNullOrUndefined(authorityInstanceUpdateRequestDto, 'authorityInstanceUpdateRequestDto', 'editAuthorityInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<AuthorityInstanceDto>(
             {
-                url: "/v1/authorities/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/authorities/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: authorityInstanceUpdateRequestDto,
             },
@@ -197,16 +197,16 @@ export class AuthorityManagementApi extends BaseAPI {
         { requestBody }: ForceDeleteAuthorityInstancesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "forceDeleteAuthorityInstances");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'forceDeleteAuthorityInstances');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<BulkActionMessageDto>>(
             {
-                url: "/v1/authorities/force",
-                method: "DELETE",
+                url: '/v1/authorities/force',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -223,12 +223,12 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid }: GetAuthorityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<AuthorityInstanceDto | AjaxResponse<AuthorityInstanceDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getAuthorityInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getAuthorityInstance');
 
         return this.request<AuthorityInstanceDto>(
             {
-                url: "/v1/authorities/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/authorities/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -242,8 +242,8 @@ export class AuthorityManagementApi extends BaseAPI {
     listAuthorityInstances(opts?: OperationOpts): Observable<Array<AuthorityInstanceDto> | AjaxResponse<Array<AuthorityInstanceDto>>> {
         return this.request<Array<AuthorityInstanceDto>>(
             {
-                url: "/v1/authorities",
-                method: "GET",
+                url: '/v1/authorities',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -260,15 +260,15 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid, endEntityProfileId }: ListCAsInProfileRequest,
         opts?: OperationOpts,
     ): Observable<Array<NameAndIdDto> | AjaxResponse<Array<NameAndIdDto>>> {
-        throwIfNullOrUndefined(uuid, "uuid", "listCAsInProfile");
-        throwIfNullOrUndefined(endEntityProfileId, "endEntityProfileId", "listCAsInProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'listCAsInProfile');
+        throwIfNullOrUndefined(endEntityProfileId, 'endEntityProfileId', 'listCAsInProfile');
 
         return this.request<Array<NameAndIdDto>>(
             {
-                url: "/v1/authorities/{uuid}/endentityprofiles/{endEntityProfileId}/cas"
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{endEntityProfileId}", encodeURI(endEntityProfileId)),
-                method: "GET",
+                url: '/v1/authorities/{uuid}/endentityprofiles/{endEntityProfileId}/cas'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{endEntityProfileId}', encodeURI(endEntityProfileId)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -285,15 +285,15 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid, endEntityProfileId }: ListCertificateProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<NameAndIdDto> | AjaxResponse<Array<NameAndIdDto>>> {
-        throwIfNullOrUndefined(uuid, "uuid", "listCertificateProfiles");
-        throwIfNullOrUndefined(endEntityProfileId, "endEntityProfileId", "listCertificateProfiles");
+        throwIfNullOrUndefined(uuid, 'uuid', 'listCertificateProfiles');
+        throwIfNullOrUndefined(endEntityProfileId, 'endEntityProfileId', 'listCertificateProfiles');
 
         return this.request<Array<NameAndIdDto>>(
             {
-                url: "/v1/authorities/{uuid}/endentityprofiles/{endEntityProfileId}/certificateprofiles"
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{endEntityProfileId}", encodeURI(endEntityProfileId)),
-                method: "GET",
+                url: '/v1/authorities/{uuid}/endentityprofiles/{endEntityProfileId}/certificateprofiles'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{endEntityProfileId}', encodeURI(endEntityProfileId)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -307,12 +307,12 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid }: ListEntityProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<NameAndIdDto> | AjaxResponse<Array<NameAndIdDto>>> {
-        throwIfNullOrUndefined(uuid, "uuid", "listEntityProfiles");
+        throwIfNullOrUndefined(uuid, 'uuid', 'listEntityProfiles');
 
         return this.request<Array<NameAndIdDto>>(
             {
-                url: "/v1/authorities/{uuid}/endentityprofiles".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/authorities/{uuid}/endentityprofiles'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -330,12 +330,12 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid }: ListRAProfileAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(uuid, "uuid", "listRAProfileAttributes");
+        throwIfNullOrUndefined(uuid, 'uuid', 'listRAProfileAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/authorities/{uuid}/attributes/raProfile".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/authorities/{uuid}/attributes/raProfile'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -353,17 +353,17 @@ export class AuthorityManagementApi extends BaseAPI {
         { uuid, requestAttributeDto }: ValidateRAProfileAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "validateRAProfileAttributes");
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateRAProfileAttributes");
+        throwIfNullOrUndefined(uuid, 'uuid', 'validateRAProfileAttributes');
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateRAProfileAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{uuid}/attributes/raProfile/validate".replace("{uuid}", encodeURI(uuid)),
-                method: "POST",
+                url: '/v1/authorities/{uuid}/attributes/raProfile/validate'.replace('{uuid}', encodeURI(uuid)),
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },

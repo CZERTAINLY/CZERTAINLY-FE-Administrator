@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateValidationCheckDto, CertificateValidationStatus } from "./";
+import type { CertificateValidationCheckDto, CertificateValidationStatus } from './';
 
 /**
  * @export

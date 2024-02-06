@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AddUserRequestDto,
     AuthenticationServiceExceptionDto,
@@ -24,7 +24,7 @@ import type {
     UserDetailDto,
     UserDto,
     UserIdentificationRequestDto,
-} from "../models";
+} from '../models';
 
 export interface AddRoleRequest {
     userUuid: string;
@@ -88,15 +88,15 @@ export class UserManagementApi extends BaseAPI {
     addRole({ userUuid, roleUuid }: AddRoleRequest): Observable<UserDetailDto>;
     addRole({ userUuid, roleUuid }: AddRoleRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
     addRole({ userUuid, roleUuid }: AddRoleRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "addRole");
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "addRole");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'addRole');
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'addRole');
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}/roles/{roleUuid}"
-                    .replace("{userUuid}", encodeURI(userUuid))
-                    .replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "PUT",
+                url: '/v1/users/{userUuid}/roles/{roleUuid}'
+                    .replace('{userUuid}', encodeURI(userUuid))
+                    .replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'PUT',
             },
             opts?.responseOpts,
         );
@@ -108,16 +108,16 @@ export class UserManagementApi extends BaseAPI {
     createUser({ addUserRequestDto }: CreateUserRequest): Observable<UserDetailDto>;
     createUser({ addUserRequestDto }: CreateUserRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
     createUser({ addUserRequestDto }: CreateUserRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(addUserRequestDto, "addUserRequestDto", "createUser");
+        throwIfNullOrUndefined(addUserRequestDto, 'addUserRequestDto', 'createUser');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users",
-                method: "POST",
+                url: '/v1/users',
+                method: 'POST',
                 headers,
                 body: addUserRequestDto,
             },
@@ -131,12 +131,12 @@ export class UserManagementApi extends BaseAPI {
     deleteUser({ userUuid }: DeleteUserRequest): Observable<void>;
     deleteUser({ userUuid }: DeleteUserRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteUser({ userUuid }: DeleteUserRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "deleteUser");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'deleteUser');
 
         return this.request<void>(
             {
-                url: "/v1/users/{userUuid}".replace("{userUuid}", encodeURI(userUuid)),
-                method: "DELETE",
+                url: '/v1/users/{userUuid}'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -148,12 +148,12 @@ export class UserManagementApi extends BaseAPI {
     disableUser({ userUuid }: DisableUserRequest): Observable<UserDetailDto>;
     disableUser({ userUuid }: DisableUserRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
     disableUser({ userUuid }: DisableUserRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "disableUser");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'disableUser');
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}/disable".replace("{userUuid}", encodeURI(userUuid)),
-                method: "PATCH",
+                url: '/v1/users/{userUuid}/disable'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -165,12 +165,12 @@ export class UserManagementApi extends BaseAPI {
     enableUser({ userUuid }: EnableUserRequest): Observable<UserDetailDto>;
     enableUser({ userUuid }: EnableUserRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
     enableUser({ userUuid }: EnableUserRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "enableUser");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'enableUser');
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}/enable".replace("{userUuid}", encodeURI(userUuid)),
-                method: "PATCH",
+                url: '/v1/users/{userUuid}/enable'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -185,12 +185,12 @@ export class UserManagementApi extends BaseAPI {
         { userUuid }: GetPermissionsRequest,
         opts?: OperationOpts,
     ): Observable<SubjectPermissionsDto | AjaxResponse<SubjectPermissionsDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "getPermissions");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'getPermissions');
 
         return this.request<SubjectPermissionsDto>(
             {
-                url: "/v1/users/{userUuid}/permissions".replace("{userUuid}", encodeURI(userUuid)),
-                method: "GET",
+                url: '/v1/users/{userUuid}/permissions'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -202,12 +202,12 @@ export class UserManagementApi extends BaseAPI {
     getUser({ userUuid }: GetUserRequest): Observable<UserDetailDto>;
     getUser({ userUuid }: GetUserRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
     getUser({ userUuid }: GetUserRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "getUser");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'getUser');
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}".replace("{userUuid}", encodeURI(userUuid)),
-                method: "GET",
+                url: '/v1/users/{userUuid}'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -219,12 +219,12 @@ export class UserManagementApi extends BaseAPI {
     getUserRoles({ userUuid }: GetUserRolesRequest): Observable<Array<RoleDto>>;
     getUserRoles({ userUuid }: GetUserRolesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<RoleDto>>>;
     getUserRoles({ userUuid }: GetUserRolesRequest, opts?: OperationOpts): Observable<Array<RoleDto> | AjaxResponse<Array<RoleDto>>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "getUserRoles");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'getUserRoles');
 
         return this.request<Array<RoleDto>>(
             {
-                url: "/v1/users/{userUuid}/roles".replace("{userUuid}", encodeURI(userUuid)),
-                method: "GET",
+                url: '/v1/users/{userUuid}/roles'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -239,16 +239,16 @@ export class UserManagementApi extends BaseAPI {
         { userIdentificationRequestDto }: IdentifyUserRequest,
         opts?: OperationOpts,
     ): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userIdentificationRequestDto, "userIdentificationRequestDto", "identifyUser");
+        throwIfNullOrUndefined(userIdentificationRequestDto, 'userIdentificationRequestDto', 'identifyUser');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/identify",
-                method: "POST",
+                url: '/v1/users/identify',
+                method: 'POST',
                 headers,
                 body: userIdentificationRequestDto,
             },
@@ -264,8 +264,8 @@ export class UserManagementApi extends BaseAPI {
     listUsers(opts?: OperationOpts): Observable<Array<UserDto> | AjaxResponse<Array<UserDto>>> {
         return this.request<Array<UserDto>>(
             {
-                url: "/v1/users",
-                method: "GET",
+                url: '/v1/users',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -277,15 +277,15 @@ export class UserManagementApi extends BaseAPI {
     removeRole({ userUuid, roleUuid }: RemoveRoleRequest): Observable<UserDetailDto>;
     removeRole({ userUuid, roleUuid }: RemoveRoleRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
     removeRole({ userUuid, roleUuid }: RemoveRoleRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "removeRole");
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "removeRole");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'removeRole');
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'removeRole');
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}/roles/{roleUuid}"
-                    .replace("{userUuid}", encodeURI(userUuid))
-                    .replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "DELETE",
+                url: '/v1/users/{userUuid}/roles/{roleUuid}'
+                    .replace('{userUuid}', encodeURI(userUuid))
+                    .replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -300,17 +300,17 @@ export class UserManagementApi extends BaseAPI {
         { userUuid, requestBody }: UpdateRolesRequest,
         opts?: OperationOpts,
     ): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "updateRoles");
-        throwIfNullOrUndefined(requestBody, "requestBody", "updateRoles");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'updateRoles');
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'updateRoles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}/roles".replace("{userUuid}", encodeURI(userUuid)),
-                method: "PATCH",
+                url: '/v1/users/{userUuid}/roles'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -327,17 +327,17 @@ export class UserManagementApi extends BaseAPI {
         { userUuid, updateUserRequestDto }: UpdateUserRequest,
         opts?: OperationOpts,
     ): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(userUuid, "userUuid", "updateUser");
-        throwIfNullOrUndefined(updateUserRequestDto, "updateUserRequestDto", "updateUser");
+        throwIfNullOrUndefined(userUuid, 'userUuid', 'updateUser');
+        throwIfNullOrUndefined(updateUserRequestDto, 'updateUserRequestDto', 'updateUser');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/users/{userUuid}".replace("{userUuid}", encodeURI(userUuid)),
-                method: "PUT",
+                url: '/v1/users/{userUuid}'.replace('{userUuid}', encodeURI(userUuid)),
+                method: 'PUT',
                 headers,
                 body: updateUserRequestDto,
             },

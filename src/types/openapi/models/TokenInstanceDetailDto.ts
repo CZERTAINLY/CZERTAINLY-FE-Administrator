@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { MetadataResponseDto, ResponseAttributeDto, TokenInstanceStatusDetailDto } from "./";
+import type { MetadataResponseDto, ResponseAttributeDto, TokenInstanceStatusDetailDto } from './';
 
 /**
  * @export

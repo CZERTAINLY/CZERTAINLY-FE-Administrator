@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { EntityInstanceDto } from "./";
+import type { EntityInstanceDto } from './';
 
 /**
  * @export

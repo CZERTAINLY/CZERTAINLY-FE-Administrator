@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     ActivateAcmeForRaProfileRequestDto,
     ActivateScepForRaProfileRequestDto,
@@ -30,7 +30,7 @@ import type {
     RaProfileScepDetailResponseDto,
     SimplifiedComplianceProfileDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface ActivateAcmeForRaProfileRequest {
     authorityUuid: string;
@@ -183,22 +183,22 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid, acmeProfileUuid, activateAcmeForRaProfileRequestDto }: ActivateAcmeForRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileAcmeDetailResponseDto | AjaxResponse<RaProfileAcmeDetailResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "activateAcmeForRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "activateAcmeForRaProfile");
-        throwIfNullOrUndefined(acmeProfileUuid, "acmeProfileUuid", "activateAcmeForRaProfile");
-        throwIfNullOrUndefined(activateAcmeForRaProfileRequestDto, "activateAcmeForRaProfileRequestDto", "activateAcmeForRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'activateAcmeForRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'activateAcmeForRaProfile');
+        throwIfNullOrUndefined(acmeProfileUuid, 'acmeProfileUuid', 'activateAcmeForRaProfile');
+        throwIfNullOrUndefined(activateAcmeForRaProfileRequestDto, 'activateAcmeForRaProfileRequestDto', 'activateAcmeForRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<RaProfileAcmeDetailResponseDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme/activate/{acmeProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{acmeProfileUuid}", encodeURI(acmeProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme/activate/{acmeProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{acmeProfileUuid}', encodeURI(acmeProfileUuid)),
+                method: 'PATCH',
                 headers,
                 body: activateAcmeForRaProfileRequestDto,
             },
@@ -223,22 +223,22 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid, scepProfileUuid, activateScepForRaProfileRequestDto }: ActivateScepForRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileScepDetailResponseDto | AjaxResponse<RaProfileScepDetailResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "activateScepForRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "activateScepForRaProfile");
-        throwIfNullOrUndefined(scepProfileUuid, "scepProfileUuid", "activateScepForRaProfile");
-        throwIfNullOrUndefined(activateScepForRaProfileRequestDto, "activateScepForRaProfileRequestDto", "activateScepForRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'activateScepForRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'activateScepForRaProfile');
+        throwIfNullOrUndefined(scepProfileUuid, 'scepProfileUuid', 'activateScepForRaProfile');
+        throwIfNullOrUndefined(activateScepForRaProfileRequestDto, 'activateScepForRaProfileRequestDto', 'activateScepForRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<RaProfileScepDetailResponseDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep/activate/{scepProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{scepProfileUuid}", encodeURI(scepProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep/activate/{scepProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{scepProfileUuid}', encodeURI(scepProfileUuid)),
+                method: 'PATCH',
                 headers,
                 body: activateScepForRaProfileRequestDto,
             },
@@ -262,17 +262,17 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid, approvalProfileUuid }: AssociateRAProfileWithApprovalProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "associateRAProfileWithApprovalProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "associateRAProfileWithApprovalProfile");
-        throwIfNullOrUndefined(approvalProfileUuid, "approvalProfileUuid", "associateRAProfileWithApprovalProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'associateRAProfileWithApprovalProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'associateRAProfileWithApprovalProfile');
+        throwIfNullOrUndefined(approvalProfileUuid, 'approvalProfileUuid', 'associateRAProfileWithApprovalProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{approvalProfileUuid}", encodeURI(approvalProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{approvalProfileUuid}', encodeURI(approvalProfileUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -284,16 +284,16 @@ export class RAProfileManagementApi extends BaseAPI {
     bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest): Observable<void>;
     bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDeleteRaProfile({ requestBody }: BulkDeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteRaProfile");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/raProfiles",
-                method: "DELETE",
+                url: '/v1/raProfiles',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -307,16 +307,16 @@ export class RAProfileManagementApi extends BaseAPI {
     bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest): Observable<void>;
     bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDisableRaProfile({ requestBody }: BulkDisableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDisableRaProfile");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/raProfiles/disable",
-                method: "PATCH",
+                url: '/v1/raProfiles/disable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -330,16 +330,16 @@ export class RAProfileManagementApi extends BaseAPI {
     bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest): Observable<void>;
     bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkEnableRaProfile({ requestBody }: BulkEnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkEnableRaProfile");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/raProfiles/enable",
-                method: "PATCH",
+                url: '/v1/raProfiles/enable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -356,16 +356,16 @@ export class RAProfileManagementApi extends BaseAPI {
         { requestBody }: CheckRaProfileComplianceRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "checkRaProfileCompliance");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'checkRaProfileCompliance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/raProfiles/compliance",
-                method: "POST",
+                url: '/v1/raProfiles/compliance',
+                method: 'POST',
                 headers,
                 body: requestBody,
             },
@@ -385,17 +385,17 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, addRaProfileRequestDto }: CreateRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "createRaProfile");
-        throwIfNullOrUndefined(addRaProfileRequestDto, "addRaProfileRequestDto", "createRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'createRaProfile');
+        throwIfNullOrUndefined(addRaProfileRequestDto, 'addRaProfileRequestDto', 'createRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles".replace("{authorityUuid}", encodeURI(authorityUuid)),
-                method: "POST",
+                url: '/v1/authorities/{authorityUuid}/raProfiles'.replace('{authorityUuid}', encodeURI(authorityUuid)),
+                method: 'POST',
                 headers,
                 body: addRaProfileRequestDto,
             },
@@ -415,15 +415,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: DeactivateAcmeForRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "deactivateAcmeForRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deactivateAcmeForRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'deactivateAcmeForRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deactivateAcmeForRaProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme/deactivate"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme/deactivate'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -441,15 +441,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: DeactivateScepForRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "deactivateScepForRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deactivateScepForRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'deactivateScepForRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deactivateScepForRaProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep/deactivate"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep/deactivate'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -461,15 +461,15 @@ export class RAProfileManagementApi extends BaseAPI {
     deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest): Observable<void>;
     deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteRaProfile({ authorityUuid, raProfileUuid }: DeleteRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "deleteRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deleteRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'deleteRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deleteRaProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "DELETE",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -487,12 +487,12 @@ export class RAProfileManagementApi extends BaseAPI {
         { raProfileUuid }: DeleteRaProfileWithoutAuthorityRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "deleteRaProfileWithoutAuthority");
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'deleteRaProfileWithoutAuthority');
 
         return this.request<void>(
             {
-                url: "/v1/raProfiles/{raProfileUuid}".replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "DELETE",
+                url: '/v1/raProfiles/{raProfileUuid}'.replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -510,15 +510,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: DisableRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "disableRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "disableRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'disableRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'disableRaProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/disable"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/disable'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -540,17 +540,17 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid, approvalProfileUuid }: DisassociateRAProfileFromApprovalProfileRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "disassociateRAProfileFromApprovalProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "disassociateRAProfileFromApprovalProfile");
-        throwIfNullOrUndefined(approvalProfileUuid, "approvalProfileUuid", "disassociateRAProfileFromApprovalProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'disassociateRAProfileFromApprovalProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'disassociateRAProfileFromApprovalProfile');
+        throwIfNullOrUndefined(approvalProfileUuid, 'approvalProfileUuid', 'disassociateRAProfileFromApprovalProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{approvalProfileUuid}", encodeURI(approvalProfileUuid)),
-                method: "DELETE",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles/{approvalProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{approvalProfileUuid}', encodeURI(approvalProfileUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -568,20 +568,20 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid, editRaProfileRequestDto }: EditRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "editRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "editRaProfile");
-        throwIfNullOrUndefined(editRaProfileRequestDto, "editRaProfileRequestDto", "editRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'editRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'editRaProfile');
+        throwIfNullOrUndefined(editRaProfileRequestDto, 'editRaProfileRequestDto', 'editRaProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<RaProfileDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "PUT",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PUT',
                 headers,
                 body: editRaProfileRequestDto,
             },
@@ -595,15 +595,15 @@ export class RAProfileManagementApi extends BaseAPI {
     enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest): Observable<void>;
     enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableRaProfile({ authorityUuid, raProfileUuid }: EnableRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "enableRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "enableRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'enableRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'enableRaProfile');
 
         return this.request<void>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/enable"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "PATCH",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/enable'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -621,15 +621,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: GetAcmeForRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileAcmeDetailResponseDto | AjaxResponse<RaProfileAcmeDetailResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAcmeForRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAcmeForRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getAcmeForRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getAcmeForRaProfile');
 
         return this.request<RaProfileAcmeDetailResponseDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/acme'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -650,15 +650,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: GetAssociatedApprovalProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<ApprovalProfileDto> | AjaxResponse<Array<ApprovalProfileDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAssociatedApprovalProfiles");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAssociatedApprovalProfiles");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getAssociatedApprovalProfiles');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getAssociatedApprovalProfiles');
 
         return this.request<Array<ApprovalProfileDto>>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/approvalProfiles'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -679,15 +679,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: GetAssociatedComplianceProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<SimplifiedComplianceProfileDto> | AjaxResponse<Array<SimplifiedComplianceProfileDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAssociatedComplianceProfiles");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAssociatedComplianceProfiles");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getAssociatedComplianceProfiles');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getAssociatedComplianceProfiles');
 
         return this.request<Array<SimplifiedComplianceProfileDto>>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/complianceProfiles"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/complianceProfiles'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -708,15 +708,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: GetAuthorityCertificateChainRequest,
         opts?: OperationOpts,
     ): Observable<Array<CertificateDetailDto> | AjaxResponse<Array<CertificateDetailDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getAuthorityCertificateChain");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getAuthorityCertificateChain");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getAuthorityCertificateChain');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getAuthorityCertificateChain');
 
         return this.request<Array<CertificateDetailDto>>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/caCertificates"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/caCertificates'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -731,15 +731,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: GetRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getRaProfile');
 
         return this.request<RaProfileDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -757,12 +757,12 @@ export class RAProfileManagementApi extends BaseAPI {
         { raProfileUuid }: GetRaProfileWithoutAuthorityRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getRaProfileWithoutAuthority");
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getRaProfileWithoutAuthority');
 
         return this.request<RaProfileDto>(
             {
-                url: "/v1/raProfiles/{raProfileUuid}".replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/raProfiles/{raProfileUuid}'.replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -780,15 +780,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: GetScepForRaProfileRequest,
         opts?: OperationOpts,
     ): Observable<RaProfileScepDetailResponseDto | AjaxResponse<RaProfileScepDetailResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "getScepForRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "getScepForRaProfile");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'getScepForRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'getScepForRaProfile');
 
         return this.request<RaProfileScepDetailResponseDto>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -809,15 +809,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: ListRaProfileIssueCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "listRaProfileIssueCertificateAttributes");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "listRaProfileIssueCertificateAttributes");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'listRaProfileIssueCertificateAttributes');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'listRaProfileIssueCertificateAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -838,15 +838,15 @@ export class RAProfileManagementApi extends BaseAPI {
         { authorityUuid, raProfileUuid }: ListRaProfileRevokeCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "listRaProfileRevokeCertificateAttributes");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "listRaProfileRevokeCertificateAttributes");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'listRaProfileRevokeCertificateAttributes');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'listRaProfileRevokeCertificateAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -864,13 +864,13 @@ export class RAProfileManagementApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (enabled != null) {
-            query["enabled"] = enabled;
+            query['enabled'] = enabled;
         }
 
         return this.request<Array<RaProfileDto>>(
             {
-                url: "/v1/raProfiles",
-                method: "GET",
+                url: '/v1/raProfiles',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,

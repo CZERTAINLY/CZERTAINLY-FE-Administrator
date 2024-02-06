@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import type { PaginationRequestDto, ScheduledJobDetailDto, ScheduledJobHistoryResponseDto, ScheduledJobsResponseDto } from "../models";
-import type { HttpQuery, OperationOpts } from "../runtime";
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import type { PaginationRequestDto, ScheduledJobDetailDto, ScheduledJobHistoryResponseDto, ScheduledJobsResponseDto } from '../models';
+import type { HttpQuery, OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface DeleteScheduledJobRequest {
     uuid: string;
@@ -52,12 +52,12 @@ export class ScheduledJobsManagementApi extends BaseAPI {
     deleteScheduledJob({ uuid }: DeleteScheduledJobRequest): Observable<void>;
     deleteScheduledJob({ uuid }: DeleteScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteScheduledJob({ uuid }: DeleteScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteScheduledJob");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteScheduledJob');
 
         return this.request<void>(
             {
-                url: "/v1/scheduler/jobs/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -69,12 +69,12 @@ export class ScheduledJobsManagementApi extends BaseAPI {
     disableScheduledJob({ uuid }: DisableScheduledJobRequest): Observable<void>;
     disableScheduledJob({ uuid }: DisableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableScheduledJob({ uuid }: DisableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "disableScheduledJob");
+        throwIfNullOrUndefined(uuid, 'uuid', 'disableScheduledJob');
 
         return this.request<void>(
             {
-                url: "/v1/scheduler/jobs/{uuid}/disable".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/scheduler/jobs/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -86,12 +86,12 @@ export class ScheduledJobsManagementApi extends BaseAPI {
     enableScheduledJob({ uuid }: EnableScheduledJobRequest): Observable<void>;
     enableScheduledJob({ uuid }: EnableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableScheduledJob({ uuid }: EnableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "enableScheduledJob");
+        throwIfNullOrUndefined(uuid, 'uuid', 'enableScheduledJob');
 
         return this.request<void>(
             {
-                url: "/v1/scheduler/jobs/{uuid}/enable".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/scheduler/jobs/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -106,12 +106,12 @@ export class ScheduledJobsManagementApi extends BaseAPI {
         { uuid }: GetScheduledJobDetailRequest,
         opts?: OperationOpts,
     ): Observable<ScheduledJobDetailDto | AjaxResponse<ScheduledJobDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getScheduledJobDetail");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getScheduledJobDetail');
 
         return this.request<ScheduledJobDetailDto>(
             {
-                url: "/v1/scheduler/jobs/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -129,8 +129,8 @@ export class ScheduledJobsManagementApi extends BaseAPI {
         { pagination, uuid }: GetScheduledJobHistoryRequest,
         opts?: OperationOpts,
     ): Observable<ScheduledJobHistoryResponseDto | AjaxResponse<ScheduledJobHistoryResponseDto>> {
-        throwIfNullOrUndefined(pagination, "pagination", "getScheduledJobHistory");
-        throwIfNullOrUndefined(uuid, "uuid", "getScheduledJobHistory");
+        throwIfNullOrUndefined(pagination, 'pagination', 'getScheduledJobHistory');
+        throwIfNullOrUndefined(uuid, 'uuid', 'getScheduledJobHistory');
 
         const query: HttpQuery = {};
 
@@ -140,8 +140,8 @@ export class ScheduledJobsManagementApi extends BaseAPI {
 
         return this.request<ScheduledJobHistoryResponseDto>(
             {
-                url: "/v1/scheduler/jobs/{uuid}/history".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/scheduler/jobs/{uuid}/history'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -157,7 +157,7 @@ export class ScheduledJobsManagementApi extends BaseAPI {
         { pagination }: ListScheduledJobsRequest,
         opts?: OperationOpts,
     ): Observable<ScheduledJobsResponseDto | AjaxResponse<ScheduledJobsResponseDto>> {
-        throwIfNullOrUndefined(pagination, "pagination", "listScheduledJobs");
+        throwIfNullOrUndefined(pagination, 'pagination', 'listScheduledJobs');
         const query: HttpQuery = {};
 
         if (pagination != null) {
@@ -166,8 +166,8 @@ export class ScheduledJobsManagementApi extends BaseAPI {
 
         return this.request<ScheduledJobsResponseDto>(
             {
-                url: "/v1/scheduler/jobs",
-                method: "GET",
+                url: '/v1/scheduler/jobs',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,

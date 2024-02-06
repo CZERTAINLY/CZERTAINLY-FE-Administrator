@@ -17,9 +17,9 @@
  * @enum {string}
  */
 export enum KeyFormat {
-    Raw = "Raw",
-    SubjectPublicKeyInfo = "SubjectPublicKeyInfo",
-    PrivateKeyInfo = "PrivateKeyInfo",
-    EncryptedPrivateKeyInfo = "EncryptedPrivateKeyInfo",
-    Custom = "Custom",
+    Raw = 'Raw',
+    SubjectPublicKeyInfo = 'SubjectPublicKeyInfo',
+    PrivateKeyInfo = 'PrivateKeyInfo',
+    EncryptedPrivateKeyInfo = 'EncryptedPrivateKeyInfo',
+    Custom = 'Custom',
 }

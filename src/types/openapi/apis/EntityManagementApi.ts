@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     BaseAttributeDto,
     EntityInstanceDto,
@@ -26,7 +26,7 @@ import type {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface CreateEntityInstanceRequest {
     entityInstanceRequestDto: EntityInstanceRequestDto;
@@ -74,16 +74,16 @@ export class EntityManagementApi extends BaseAPI {
         { entityInstanceRequestDto }: CreateEntityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(entityInstanceRequestDto, "entityInstanceRequestDto", "createEntityInstance");
+        throwIfNullOrUndefined(entityInstanceRequestDto, 'entityInstanceRequestDto', 'createEntityInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/entities",
-                method: "POST",
+                url: '/v1/entities',
+                method: 'POST',
                 headers,
                 body: entityInstanceRequestDto,
             },
@@ -97,12 +97,12 @@ export class EntityManagementApi extends BaseAPI {
     deleteEntityInstance({ entityUuid }: DeleteEntityInstanceRequest): Observable<void>;
     deleteEntityInstance({ entityUuid }: DeleteEntityInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteEntityInstance({ entityUuid }: DeleteEntityInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "deleteEntityInstance");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'deleteEntityInstance');
 
         return this.request<void>(
             {
-                url: "/v1/entities/{entityUuid}".replace("{entityUuid}", encodeURI(entityUuid)),
-                method: "DELETE",
+                url: '/v1/entities/{entityUuid}'.replace('{entityUuid}', encodeURI(entityUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -120,17 +120,17 @@ export class EntityManagementApi extends BaseAPI {
         { entityUuid, entityInstanceUpdateRequestDto }: EditEntityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<EntityInstanceDto | AjaxResponse<EntityInstanceDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "editEntityInstance");
-        throwIfNullOrUndefined(entityInstanceUpdateRequestDto, "entityInstanceUpdateRequestDto", "editEntityInstance");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'editEntityInstance');
+        throwIfNullOrUndefined(entityInstanceUpdateRequestDto, 'entityInstanceUpdateRequestDto', 'editEntityInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<EntityInstanceDto>(
             {
-                url: "/v1/entities/{entityUuid}".replace("{entityUuid}", encodeURI(entityUuid)),
-                method: "PUT",
+                url: '/v1/entities/{entityUuid}'.replace('{entityUuid}', encodeURI(entityUuid)),
+                method: 'PUT',
                 headers,
                 body: entityInstanceUpdateRequestDto,
             },
@@ -147,12 +147,12 @@ export class EntityManagementApi extends BaseAPI {
         { entityUuid }: GetEntityInstanceRequest,
         opts?: OperationOpts,
     ): Observable<EntityInstanceDto | AjaxResponse<EntityInstanceDto>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "getEntityInstance");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'getEntityInstance');
 
         return this.request<EntityInstanceDto>(
             {
-                url: "/v1/entities/{entityUuid}".replace("{entityUuid}", encodeURI(entityUuid)),
-                method: "GET",
+                url: '/v1/entities/{entityUuid}'.replace('{entityUuid}', encodeURI(entityUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -168,8 +168,8 @@ export class EntityManagementApi extends BaseAPI {
     ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>(
             {
-                url: "/v1/entities/search",
-                method: "GET",
+                url: '/v1/entities/search',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -187,16 +187,16 @@ export class EntityManagementApi extends BaseAPI {
         { searchRequestDto }: ListEntityInstancesRequest,
         opts?: OperationOpts,
     ): Observable<EntityInstanceResponseDto | AjaxResponse<EntityInstanceResponseDto>> {
-        throwIfNullOrUndefined(searchRequestDto, "searchRequestDto", "listEntityInstances");
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listEntityInstances');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<EntityInstanceResponseDto>(
             {
-                url: "/v1/entities/list",
-                method: "POST",
+                url: '/v1/entities/list',
+                method: 'POST',
                 headers,
                 body: searchRequestDto,
             },
@@ -216,12 +216,12 @@ export class EntityManagementApi extends BaseAPI {
         { entityUuid }: ListLocationAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "listLocationAttributes");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'listLocationAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/entities/{entityUuid}/attributes/location".replace("{entityUuid}", encodeURI(entityUuid)),
-                method: "GET",
+                url: '/v1/entities/{entityUuid}/attributes/location'.replace('{entityUuid}', encodeURI(entityUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -239,17 +239,17 @@ export class EntityManagementApi extends BaseAPI {
         { entityUuid, requestAttributeDto }: ValidateLocationAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(entityUuid, "entityUuid", "validateLocationAttributes");
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateLocationAttributes");
+        throwIfNullOrUndefined(entityUuid, 'entityUuid', 'validateLocationAttributes');
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateLocationAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/entities/{entityUuid}/attributes/location/validate".replace("{entityUuid}", encodeURI(entityUuid)),
-                method: "POST",
+                url: '/v1/entities/{entityUuid}/attributes/location/validate'.replace('{entityUuid}', encodeURI(entityUuid)),
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },

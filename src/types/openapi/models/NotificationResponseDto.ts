@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { NotificationDto } from "./";
+import type { NotificationDto } from './';
 
 /**
  * @export

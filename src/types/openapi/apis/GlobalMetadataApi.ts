@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AttributeDefinitionDto,
     AuthenticationServiceExceptionDto,
@@ -25,7 +25,7 @@ import type {
     GlobalMetadataDefinitionDetailDto,
     GlobalMetadataUpdateRequestDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface BulkDeleteGlobalMetadataRequest {
     requestBody: Array<string>;
@@ -69,16 +69,16 @@ export class GlobalMetadataApi extends BaseAPI {
         { requestBody }: BulkDeleteGlobalMetadataRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteGlobalMetadata");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteGlobalMetadata');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/attributes/metadata",
-                method: "DELETE",
+                url: '/v1/attributes/metadata',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -98,16 +98,16 @@ export class GlobalMetadataApi extends BaseAPI {
         { globalMetadataCreateRequestDto }: CreateGlobalMetadataRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(globalMetadataCreateRequestDto, "globalMetadataCreateRequestDto", "createGlobalMetadata");
+        throwIfNullOrUndefined(globalMetadataCreateRequestDto, 'globalMetadataCreateRequestDto', 'createGlobalMetadata');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/attributes/metadata",
-                method: "POST",
+                url: '/v1/attributes/metadata',
+                method: 'POST',
                 headers,
                 body: globalMetadataCreateRequestDto,
             },
@@ -121,12 +121,12 @@ export class GlobalMetadataApi extends BaseAPI {
     deleteGlobalMetadata({ uuid }: DeleteGlobalMetadataRequest): Observable<void>;
     deleteGlobalMetadata({ uuid }: DeleteGlobalMetadataRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteGlobalMetadata({ uuid }: DeleteGlobalMetadataRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteGlobalMetadata");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteGlobalMetadata');
 
         return this.request<void>(
             {
-                url: "/v1/attributes/metadata/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/attributes/metadata/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -144,17 +144,17 @@ export class GlobalMetadataApi extends BaseAPI {
         { uuid, globalMetadataUpdateRequestDto }: EditGlobalMetadataRequest,
         opts?: OperationOpts,
     ): Observable<GlobalMetadataDefinitionDetailDto | AjaxResponse<GlobalMetadataDefinitionDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "editGlobalMetadata");
-        throwIfNullOrUndefined(globalMetadataUpdateRequestDto, "globalMetadataUpdateRequestDto", "editGlobalMetadata");
+        throwIfNullOrUndefined(uuid, 'uuid', 'editGlobalMetadata');
+        throwIfNullOrUndefined(globalMetadataUpdateRequestDto, 'globalMetadataUpdateRequestDto', 'editGlobalMetadata');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<GlobalMetadataDefinitionDetailDto>(
             {
-                url: "/v1/attributes/metadata/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/attributes/metadata/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: globalMetadataUpdateRequestDto,
             },
@@ -177,13 +177,13 @@ export class GlobalMetadataApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (connectorUuid != null) {
-            query["connectorUuid"] = connectorUuid;
+            query['connectorUuid'] = connectorUuid;
         }
 
         return this.request<Array<ConnectorMetadataResponseDto>>(
             {
-                url: "/v1/attributes/metadata/promote",
-                method: "GET",
+                url: '/v1/attributes/metadata/promote',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -202,12 +202,12 @@ export class GlobalMetadataApi extends BaseAPI {
         { uuid }: GetGlobalMetadataRequest,
         opts?: OperationOpts,
     ): Observable<GlobalMetadataDefinitionDetailDto | AjaxResponse<GlobalMetadataDefinitionDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getGlobalMetadata");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getGlobalMetadata');
 
         return this.request<GlobalMetadataDefinitionDetailDto>(
             {
-                url: "/v1/attributes/metadata/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/attributes/metadata/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -221,8 +221,8 @@ export class GlobalMetadataApi extends BaseAPI {
     listGlobalMetadata(opts?: OperationOpts): Observable<Array<AttributeDefinitionDto> | AjaxResponse<Array<AttributeDefinitionDto>>> {
         return this.request<Array<AttributeDefinitionDto>>(
             {
-                url: "/v1/attributes/metadata",
-                method: "GET",
+                url: '/v1/attributes/metadata',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -242,16 +242,16 @@ export class GlobalMetadataApi extends BaseAPI {
         { connectorMetadataPromotionRequestDto }: PromoteConnectorMetadataRequest,
         opts?: OperationOpts,
     ): Observable<GlobalMetadataDefinitionDetailDto | AjaxResponse<GlobalMetadataDefinitionDetailDto>> {
-        throwIfNullOrUndefined(connectorMetadataPromotionRequestDto, "connectorMetadataPromotionRequestDto", "promoteConnectorMetadata");
+        throwIfNullOrUndefined(connectorMetadataPromotionRequestDto, 'connectorMetadataPromotionRequestDto', 'promoteConnectorMetadata');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<GlobalMetadataDefinitionDetailDto>(
             {
-                url: "/v1/attributes/metadata/promote",
-                method: "POST",
+                url: '/v1/attributes/metadata/promote',
+                method: 'POST',
                 headers,
                 body: connectorMetadataPromotionRequestDto,
             },

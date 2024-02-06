@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { SearchFilterRequestDto } from "./";
+import type { SearchFilterRequestDto } from './';
 
 /**
  * @export

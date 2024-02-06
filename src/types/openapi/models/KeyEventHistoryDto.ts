@@ -71,22 +71,22 @@ export interface KeyEventHistoryDto {
  * @enum {string}
  */
 export enum KeyEventHistoryDtoEventEnum {
-    CreateKey = "Create Key",
-    CompromisedKey = "Compromised Key",
-    DestroyKey = "Destroy Key",
-    UpdateKeyUsages = "Update Key Usages",
-    SignData = "Sign Data",
-    VerifyData = "Verify Data",
-    EncryptData = "Encrypt Data",
-    DecryptData = "Decrypt Data",
-    EnableKey = "Enable Key",
-    DisableKey = "Disable Key",
+    CreateKey = 'Create Key',
+    CompromisedKey = 'Compromised Key',
+    DestroyKey = 'Destroy Key',
+    UpdateKeyUsages = 'Update Key Usages',
+    SignData = 'Sign Data',
+    VerifyData = 'Verify Data',
+    EncryptData = 'Encrypt Data',
+    DecryptData = 'Decrypt Data',
+    EnableKey = 'Enable Key',
+    DisableKey = 'Disable Key',
 }
 /**
  * @export
  * @enum {string}
  */
 export enum KeyEventHistoryDtoStatusEnum {
-    Success = "SUCCESS",
-    Failed = "FAILED",
+    Success = 'SUCCESS',
+    Failed = 'FAILED',
 }

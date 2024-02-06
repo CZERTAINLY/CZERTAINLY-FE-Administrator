@@ -18,7 +18,7 @@ import type {
     BaseAttributeConstraint,
     BaseAttributeContentDto,
     DataAttributeProperties,
-} from "./";
+} from './';
 
 /**
  * Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.

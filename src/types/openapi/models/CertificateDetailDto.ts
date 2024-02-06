@@ -25,7 +25,7 @@ import type {
     MetadataResponseDto,
     ResponseAttributeDto,
     SimplifiedRaProfileDto,
-} from "./";
+} from './';
 
 /**
  * @export

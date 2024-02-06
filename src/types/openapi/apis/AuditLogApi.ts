@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import type { AuditLogFilter, AuditLogResponseDto, Pageable } from "../models";
-import type { HttpQuery, OperationOpts } from "../runtime";
-import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import type { AuditLogFilter, AuditLogResponseDto, Pageable } from '../models';
+import type { HttpQuery, OperationOpts } from '../runtime';
+import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
 
 export interface ExportAuditLogsRequest {
     filter: AuditLogFilter;
@@ -42,8 +42,8 @@ export class AuditLogApi extends BaseAPI {
     exportAuditLogs({ filter, pageable }: ExportAuditLogsRequest): Observable<Blob>;
     exportAuditLogs({ filter, pageable }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<AjaxResponse<Blob>>;
     exportAuditLogs({ filter, pageable }: ExportAuditLogsRequest, opts?: OperationOpts): Observable<Blob | AjaxResponse<Blob>> {
-        throwIfNullOrUndefined(filter, "filter", "exportAuditLogs");
-        throwIfNullOrUndefined(pageable, "pageable", "exportAuditLogs");
+        throwIfNullOrUndefined(filter, 'filter', 'exportAuditLogs');
+        throwIfNullOrUndefined(pageable, 'pageable', 'exportAuditLogs');
         const query: HttpQuery = {};
 
         if (filter != null) {
@@ -55,10 +55,10 @@ export class AuditLogApi extends BaseAPI {
 
         return this.request<Blob>(
             {
-                url: "/v1/auditLogs/export",
-                method: "GET",
+                url: '/v1/auditLogs/export',
+                method: 'GET',
                 query,
-                responseType: "blob",
+                responseType: 'blob',
             },
             opts?.responseOpts,
         );
@@ -73,8 +73,8 @@ export class AuditLogApi extends BaseAPI {
         { filter, pageable }: ListAuditLogsRequest,
         opts?: OperationOpts,
     ): Observable<AuditLogResponseDto | AjaxResponse<AuditLogResponseDto>> {
-        throwIfNullOrUndefined(filter, "filter", "listAuditLogs");
-        throwIfNullOrUndefined(pageable, "pageable", "listAuditLogs");
+        throwIfNullOrUndefined(filter, 'filter', 'listAuditLogs');
+        throwIfNullOrUndefined(pageable, 'pageable', 'listAuditLogs');
         const query: HttpQuery = {};
 
         if (filter != null) {
@@ -86,8 +86,8 @@ export class AuditLogApi extends BaseAPI {
 
         return this.request<AuditLogResponseDto>(
             {
-                url: "/v1/auditLogs",
-                method: "GET",
+                url: '/v1/auditLogs',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -102,8 +102,8 @@ export class AuditLogApi extends BaseAPI {
     listObjects(opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
         return this.request<Array<string>>(
             {
-                url: "/v1/auditLogs/objects",
-                method: "GET",
+                url: '/v1/auditLogs/objects',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -117,8 +117,8 @@ export class AuditLogApi extends BaseAPI {
     listOperationStatuses(opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
         return this.request<Array<string>>(
             {
-                url: "/v1/auditLogs/statuses",
-                method: "GET",
+                url: '/v1/auditLogs/statuses',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -132,8 +132,8 @@ export class AuditLogApi extends BaseAPI {
     listOperations(opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
         return this.request<Array<string>>(
             {
-                url: "/v1/auditLogs/operations",
-                method: "GET",
+                url: '/v1/auditLogs/operations',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -145,8 +145,8 @@ export class AuditLogApi extends BaseAPI {
     purgeAuditLogs({ filter, pageable }: PurgeAuditLogsRequest): Observable<void>;
     purgeAuditLogs({ filter, pageable }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     purgeAuditLogs({ filter, pageable }: PurgeAuditLogsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(filter, "filter", "purgeAuditLogs");
-        throwIfNullOrUndefined(pageable, "pageable", "purgeAuditLogs");
+        throwIfNullOrUndefined(filter, 'filter', 'purgeAuditLogs');
+        throwIfNullOrUndefined(pageable, 'pageable', 'purgeAuditLogs');
         const query: HttpQuery = {};
 
         if (filter != null) {
@@ -158,8 +158,8 @@ export class AuditLogApi extends BaseAPI {
 
         return this.request<void>(
             {
-                url: "/v1/auditLogs/purge",
-                method: "GET",
+                url: '/v1/auditLogs/purge',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,

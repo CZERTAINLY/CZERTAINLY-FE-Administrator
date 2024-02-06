@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateValidationStatus } from "./";
+import type { CertificateValidationStatus } from './';
 
 /**
  * @export

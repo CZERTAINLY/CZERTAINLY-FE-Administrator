@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeConstraintType, RangeAttributeConstraintData } from "./";
+import type { AttributeConstraintType, RangeAttributeConstraintData } from './';
 
 /**
  * @export

@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ScheduledJobDto } from "./";
+import type { ScheduledJobDto } from './';
 
 /**
  * @export

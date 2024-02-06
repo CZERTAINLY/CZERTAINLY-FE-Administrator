@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateRequestFormat, CertificateType, ResponseAttributeDto } from "./";
+import type { CertificateRequestFormat, CertificateType, ResponseAttributeDto } from './';
 
 /**
  * Certificate request data

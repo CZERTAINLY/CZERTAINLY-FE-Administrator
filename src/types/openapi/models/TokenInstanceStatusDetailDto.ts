@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { TokenInstanceStatus, TokenInstanceStatusComponent } from "./";
+import type { TokenInstanceStatus, TokenInstanceStatusComponent } from './';
 
 /**
  * Status Of the Token Instance

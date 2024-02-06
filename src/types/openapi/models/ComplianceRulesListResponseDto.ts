@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ComplianceRulesResponseDto } from "./";
+import type { ComplianceRulesResponseDto } from './';
 
 /**
  * @export

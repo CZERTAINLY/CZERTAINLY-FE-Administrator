@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { SearchCondition, SearchGroup } from "./";
+import type { SearchCondition, SearchGroup } from './';
 
 /**
  * Certificate filter input

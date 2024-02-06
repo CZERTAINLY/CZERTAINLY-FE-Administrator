@@ -17,7 +17,7 @@
  * @enum {string}
  */
 export enum SearchGroup {
-    Meta = "meta",
-    Custom = "custom",
-    Property = "property",
+    Meta = 'meta',
+    Custom = 'custom',
+    Property = 'property',
 }

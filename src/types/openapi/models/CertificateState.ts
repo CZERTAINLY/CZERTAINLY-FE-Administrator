@@ -17,13 +17,13 @@
  * @enum {string}
  */
 export enum CertificateState {
-    Requested = "requested",
-    Rejected = "rejected",
-    PendingApproval = "pending_approval",
-    PendingIssue = "pending_issue",
-    PendingRevoke = "pending_revoke",
-    Failed = "failed",
-    Issued = "issued",
-    Revoked = "revoked",
-    Archived = "archived",
+    Requested = 'requested',
+    Rejected = 'rejected',
+    PendingApproval = 'pending_approval',
+    PendingIssue = 'pending_issue',
+    PendingRevoke = 'pending_revoke',
+    Failed = 'failed',
+    Issued = 'issued',
+    Revoked = 'revoked',
+    Archived = 'archived',
 }

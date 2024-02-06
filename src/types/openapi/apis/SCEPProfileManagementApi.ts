@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
@@ -24,7 +24,7 @@ import type {
     ScepProfileDto,
     ScepProfileEditRequestDto,
     ScepProfileRequestDto,
-} from "../models";
+} from '../models';
 
 export interface BulkDeleteScepProfileRequest {
     requestBody: Array<string>;
@@ -92,16 +92,16 @@ export class SCEPProfileManagementApi extends BaseAPI {
         { requestBody }: BulkDeleteScepProfileRequest,
         opts?: OperationOpts,
     ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteScepProfile");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteScepProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<BulkActionMessageDto>>(
             {
-                url: "/v1/scepProfiles/delete",
-                method: "DELETE",
+                url: '/v1/scepProfiles/delete',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -115,16 +115,16 @@ export class SCEPProfileManagementApi extends BaseAPI {
     bulkDisableScepProfile({ requestBody }: BulkDisableScepProfileRequest): Observable<void>;
     bulkDisableScepProfile({ requestBody }: BulkDisableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDisableScepProfile({ requestBody }: BulkDisableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDisableScepProfile");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableScepProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/scepProfiles/disable",
-                method: "PATCH",
+                url: '/v1/scepProfiles/disable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -138,16 +138,16 @@ export class SCEPProfileManagementApi extends BaseAPI {
     bulkEnableScepProfile({ requestBody }: BulkEnableScepProfileRequest): Observable<void>;
     bulkEnableScepProfile({ requestBody }: BulkEnableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkEnableScepProfile({ requestBody }: BulkEnableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkEnableScepProfile");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableScepProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/scepProfiles/enable",
-                method: "PATCH",
+                url: '/v1/scepProfiles/enable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -167,16 +167,16 @@ export class SCEPProfileManagementApi extends BaseAPI {
         { scepProfileRequestDto }: CreateScepProfileRequest,
         opts?: OperationOpts,
     ): Observable<ScepProfileDetailDto | AjaxResponse<ScepProfileDetailDto>> {
-        throwIfNullOrUndefined(scepProfileRequestDto, "scepProfileRequestDto", "createScepProfile");
+        throwIfNullOrUndefined(scepProfileRequestDto, 'scepProfileRequestDto', 'createScepProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ScepProfileDetailDto>(
             {
-                url: "/v1/scepProfiles",
-                method: "POST",
+                url: '/v1/scepProfiles',
+                method: 'POST',
                 headers,
                 body: scepProfileRequestDto,
             },
@@ -190,12 +190,12 @@ export class SCEPProfileManagementApi extends BaseAPI {
     deleteScepProfile({ uuid }: DeleteScepProfileRequest): Observable<void>;
     deleteScepProfile({ uuid }: DeleteScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteScepProfile({ uuid }: DeleteScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteScepProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteScepProfile');
 
         return this.request<void>(
             {
-                url: "/v1/scepProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/scepProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -207,12 +207,12 @@ export class SCEPProfileManagementApi extends BaseAPI {
     disableScepProfile({ uuid }: DisableScepProfileRequest): Observable<void>;
     disableScepProfile({ uuid }: DisableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableScepProfile({ uuid }: DisableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "disableScepProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'disableScepProfile');
 
         return this.request<void>(
             {
-                url: "/v1/scepProfiles/{uuid}/disable".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/scepProfiles/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -230,17 +230,17 @@ export class SCEPProfileManagementApi extends BaseAPI {
         { uuid, scepProfileEditRequestDto }: EditScepProfileRequest,
         opts?: OperationOpts,
     ): Observable<ScepProfileDetailDto | AjaxResponse<ScepProfileDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "editScepProfile");
-        throwIfNullOrUndefined(scepProfileEditRequestDto, "scepProfileEditRequestDto", "editScepProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'editScepProfile');
+        throwIfNullOrUndefined(scepProfileEditRequestDto, 'scepProfileEditRequestDto', 'editScepProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ScepProfileDetailDto>(
             {
-                url: "/v1/scepProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/scepProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: scepProfileEditRequestDto,
             },
@@ -254,12 +254,12 @@ export class SCEPProfileManagementApi extends BaseAPI {
     enableScepProfile({ uuid }: EnableScepProfileRequest): Observable<void>;
     enableScepProfile({ uuid }: EnableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableScepProfile({ uuid }: EnableScepProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "enableScepProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'enableScepProfile');
 
         return this.request<void>(
             {
-                url: "/v1/scepProfiles/{uuid}/enable".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/scepProfiles/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -277,16 +277,16 @@ export class SCEPProfileManagementApi extends BaseAPI {
         { requestBody }: ForceDeleteScepProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "forceDeleteScepProfiles");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'forceDeleteScepProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<BulkActionMessageDto>>(
             {
-                url: "/v1/scepProfiles/delete/force",
-                method: "DELETE",
+                url: '/v1/scepProfiles/delete/force',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -303,12 +303,12 @@ export class SCEPProfileManagementApi extends BaseAPI {
         { uuid }: GetScepProfileRequest,
         opts?: OperationOpts,
     ): Observable<ScepProfileDetailDto | AjaxResponse<ScepProfileDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getScepProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getScepProfile');
 
         return this.request<ScepProfileDetailDto>(
             {
-                url: "/v1/scepProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/scepProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -326,7 +326,7 @@ export class SCEPProfileManagementApi extends BaseAPI {
         { intuneEnabled }: ListScepCaCertificatesRequest,
         opts?: OperationOpts,
     ): Observable<Array<CertificateDto> | AjaxResponse<Array<CertificateDto>>> {
-        throwIfNullOrUndefined(intuneEnabled, "intuneEnabled", "listScepCaCertificates");
+        throwIfNullOrUndefined(intuneEnabled, 'intuneEnabled', 'listScepCaCertificates');
 
         const query: HttpQuery = {
             // required parameters are used directly since they are already checked by throwIfNullOrUndefined
@@ -335,8 +335,8 @@ export class SCEPProfileManagementApi extends BaseAPI {
 
         return this.request<Array<CertificateDto>>(
             {
-                url: "/v1/scepProfiles/caCertificates",
-                method: "GET",
+                url: '/v1/scepProfiles/caCertificates',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -351,8 +351,8 @@ export class SCEPProfileManagementApi extends BaseAPI {
     listScepProfiles(opts?: OperationOpts): Observable<Array<ScepProfileDto> | AjaxResponse<Array<ScepProfileDto>>> {
         return this.request<Array<ScepProfileDto>>(
             {
-                url: "/v1/scepProfiles",
-                method: "GET",
+                url: '/v1/scepProfiles',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -364,15 +364,15 @@ export class SCEPProfileManagementApi extends BaseAPI {
     updateRaProfile({ uuid, raProfileUuid }: UpdateRaProfileRequest): Observable<void>;
     updateRaProfile({ uuid, raProfileUuid }: UpdateRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     updateRaProfile({ uuid, raProfileUuid }: UpdateRaProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "updateRaProfile");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "updateRaProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'updateRaProfile');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'updateRaProfile');
 
         return this.request<void>(
             {
-                url: "/v1/scepProfiles/{uuid}/raProfiles/{raProfileUuid}"
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "PATCH",
+                url: '/v1/scepProfiles/{uuid}/raProfiles/{raProfileUuid}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );

@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     ObjectPermissionsDto,
@@ -26,7 +26,7 @@ import type {
     RoleRequestDto,
     SubjectPermissionsDto,
     UserDto,
-} from "../models";
+} from '../models';
 
 export interface AddResourcePermissionObjectsRequest {
     roleUuid: string;
@@ -112,20 +112,20 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, resourceUuid, objectPermissionsRequestDto }: AddResourcePermissionObjectsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "addResourcePermissionObjects");
-        throwIfNullOrUndefined(resourceUuid, "resourceUuid", "addResourcePermissionObjects");
-        throwIfNullOrUndefined(objectPermissionsRequestDto, "objectPermissionsRequestDto", "addResourcePermissionObjects");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'addResourcePermissionObjects');
+        throwIfNullOrUndefined(resourceUuid, 'resourceUuid', 'addResourcePermissionObjects');
+        throwIfNullOrUndefined(objectPermissionsRequestDto, 'objectPermissionsRequestDto', 'addResourcePermissionObjects');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects"
-                    .replace("{roleUuid}", encodeURI(roleUuid))
-                    .replace("{resourceUuid}", encodeURI(resourceUuid)),
-                method: "POST",
+                url: '/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects'
+                    .replace('{roleUuid}', encodeURI(roleUuid))
+                    .replace('{resourceUuid}', encodeURI(resourceUuid)),
+                method: 'POST',
                 headers,
                 body: objectPermissionsRequestDto,
             },
@@ -139,16 +139,16 @@ export class RoleManagementApi extends BaseAPI {
     createRole({ roleRequestDto }: CreateRoleRequest): Observable<RoleDetailDto>;
     createRole({ roleRequestDto }: CreateRoleRequest, opts?: OperationOpts): Observable<AjaxResponse<RoleDetailDto>>;
     createRole({ roleRequestDto }: CreateRoleRequest, opts?: OperationOpts): Observable<RoleDetailDto | AjaxResponse<RoleDetailDto>> {
-        throwIfNullOrUndefined(roleRequestDto, "roleRequestDto", "createRole");
+        throwIfNullOrUndefined(roleRequestDto, 'roleRequestDto', 'createRole');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<RoleDetailDto>(
             {
-                url: "/v1/roles",
-                method: "POST",
+                url: '/v1/roles',
+                method: 'POST',
                 headers,
                 body: roleRequestDto,
             },
@@ -162,12 +162,12 @@ export class RoleManagementApi extends BaseAPI {
     deleteRole({ roleUuid }: DeleteRoleRequest): Observable<void>;
     deleteRole({ roleUuid }: DeleteRoleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteRole({ roleUuid }: DeleteRoleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "deleteRole");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'deleteRole');
 
         return this.request<void>(
             {
-                url: "/v1/roles/{roleUuid}".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "DELETE",
+                url: '/v1/roles/{roleUuid}'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -185,15 +185,15 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, resourceUuid }: GetResourcePermissionObjectsRequest,
         opts?: OperationOpts,
     ): Observable<Array<ObjectPermissionsDto> | AjaxResponse<Array<ObjectPermissionsDto>>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "getResourcePermissionObjects");
-        throwIfNullOrUndefined(resourceUuid, "resourceUuid", "getResourcePermissionObjects");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'getResourcePermissionObjects');
+        throwIfNullOrUndefined(resourceUuid, 'resourceUuid', 'getResourcePermissionObjects');
 
         return this.request<Array<ObjectPermissionsDto>>(
             {
-                url: "/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects"
-                    .replace("{roleUuid}", encodeURI(roleUuid))
-                    .replace("{resourceUuid}", encodeURI(resourceUuid)),
-                method: "GET",
+                url: '/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects'
+                    .replace('{roleUuid}', encodeURI(roleUuid))
+                    .replace('{resourceUuid}', encodeURI(resourceUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -205,12 +205,12 @@ export class RoleManagementApi extends BaseAPI {
     getRole({ roleUuid }: GetRoleRequest): Observable<RoleDetailDto>;
     getRole({ roleUuid }: GetRoleRequest, opts?: OperationOpts): Observable<AjaxResponse<RoleDetailDto>>;
     getRole({ roleUuid }: GetRoleRequest, opts?: OperationOpts): Observable<RoleDetailDto | AjaxResponse<RoleDetailDto>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "getRole");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'getRole');
 
         return this.request<RoleDetailDto>(
             {
-                url: "/v1/roles/{roleUuid}".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "GET",
+                url: '/v1/roles/{roleUuid}'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -225,12 +225,12 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid }: GetRolePermissionsRequest,
         opts?: OperationOpts,
     ): Observable<SubjectPermissionsDto | AjaxResponse<SubjectPermissionsDto>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "getRolePermissions");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'getRolePermissions');
 
         return this.request<SubjectPermissionsDto>(
             {
-                url: "/v1/roles/{roleUuid}/permissions".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "GET",
+                url: '/v1/roles/{roleUuid}/permissions'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -248,15 +248,15 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, resourceUuid }: GetRoleResourcePermissionsRequest,
         opts?: OperationOpts,
     ): Observable<ResourcePermissionsDto | AjaxResponse<ResourcePermissionsDto>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "getRoleResourcePermissions");
-        throwIfNullOrUndefined(resourceUuid, "resourceUuid", "getRoleResourcePermissions");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'getRoleResourcePermissions');
+        throwIfNullOrUndefined(resourceUuid, 'resourceUuid', 'getRoleResourcePermissions');
 
         return this.request<ResourcePermissionsDto>(
             {
-                url: "/v1/roles/{roleUuid}/permissions/{resourceUuid}"
-                    .replace("{roleUuid}", encodeURI(roleUuid))
-                    .replace("{resourceUuid}", encodeURI(resourceUuid)),
-                method: "GET",
+                url: '/v1/roles/{roleUuid}/permissions/{resourceUuid}'
+                    .replace('{roleUuid}', encodeURI(roleUuid))
+                    .replace('{resourceUuid}', encodeURI(resourceUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -268,12 +268,12 @@ export class RoleManagementApi extends BaseAPI {
     getRoleUsers({ roleUuid }: GetRoleUsersRequest): Observable<Array<UserDto>>;
     getRoleUsers({ roleUuid }: GetRoleUsersRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<UserDto>>>;
     getRoleUsers({ roleUuid }: GetRoleUsersRequest, opts?: OperationOpts): Observable<Array<UserDto> | AjaxResponse<Array<UserDto>>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "getRoleUsers");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'getRoleUsers');
 
         return this.request<Array<UserDto>>(
             {
-                url: "/v1/roles/{roleUuid}/users".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "GET",
+                url: '/v1/roles/{roleUuid}/users'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -287,8 +287,8 @@ export class RoleManagementApi extends BaseAPI {
     listRoles(opts?: OperationOpts): Observable<Array<RoleDto> | AjaxResponse<Array<RoleDto>>> {
         return this.request<Array<RoleDto>>(
             {
-                url: "/v1/roles",
-                method: "GET",
+                url: '/v1/roles',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -306,17 +306,17 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, resourceUuid, objectUuid }: RemoveResourcePermissionObjectsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "removeResourcePermissionObjects");
-        throwIfNullOrUndefined(resourceUuid, "resourceUuid", "removeResourcePermissionObjects");
-        throwIfNullOrUndefined(objectUuid, "objectUuid", "removeResourcePermissionObjects");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'removeResourcePermissionObjects');
+        throwIfNullOrUndefined(resourceUuid, 'resourceUuid', 'removeResourcePermissionObjects');
+        throwIfNullOrUndefined(objectUuid, 'objectUuid', 'removeResourcePermissionObjects');
 
         return this.request<void>(
             {
-                url: "/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects/{objectUuid}"
-                    .replace("{roleUuid}", encodeURI(roleUuid))
-                    .replace("{resourceUuid}", encodeURI(resourceUuid))
-                    .replace("{objectUuid}", encodeURI(objectUuid)),
-                method: "DELETE",
+                url: '/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects/{objectUuid}'
+                    .replace('{roleUuid}', encodeURI(roleUuid))
+                    .replace('{resourceUuid}', encodeURI(resourceUuid))
+                    .replace('{objectUuid}', encodeURI(objectUuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -334,17 +334,17 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, rolePermissionsRequestDto }: SavePermissionsRequest,
         opts?: OperationOpts,
     ): Observable<SubjectPermissionsDto | AjaxResponse<SubjectPermissionsDto>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "savePermissions");
-        throwIfNullOrUndefined(rolePermissionsRequestDto, "rolePermissionsRequestDto", "savePermissions");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'savePermissions');
+        throwIfNullOrUndefined(rolePermissionsRequestDto, 'rolePermissionsRequestDto', 'savePermissions');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<SubjectPermissionsDto>(
             {
-                url: "/v1/roles/{roleUuid}/permissions".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "POST",
+                url: '/v1/roles/{roleUuid}/permissions'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'POST',
                 headers,
                 body: rolePermissionsRequestDto,
             },
@@ -369,22 +369,22 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, resourceUuid, objectUuid, objectPermissionsRequestDto }: UpdateResourcePermissionObjectsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "updateResourcePermissionObjects");
-        throwIfNullOrUndefined(resourceUuid, "resourceUuid", "updateResourcePermissionObjects");
-        throwIfNullOrUndefined(objectUuid, "objectUuid", "updateResourcePermissionObjects");
-        throwIfNullOrUndefined(objectPermissionsRequestDto, "objectPermissionsRequestDto", "updateResourcePermissionObjects");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'updateResourcePermissionObjects');
+        throwIfNullOrUndefined(resourceUuid, 'resourceUuid', 'updateResourcePermissionObjects');
+        throwIfNullOrUndefined(objectUuid, 'objectUuid', 'updateResourcePermissionObjects');
+        throwIfNullOrUndefined(objectPermissionsRequestDto, 'objectPermissionsRequestDto', 'updateResourcePermissionObjects');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects/{objectUuid}"
-                    .replace("{roleUuid}", encodeURI(roleUuid))
-                    .replace("{resourceUuid}", encodeURI(resourceUuid))
-                    .replace("{objectUuid}", encodeURI(objectUuid)),
-                method: "PUT",
+                url: '/v1/roles/{roleUuid}/permissions/{resourceUuid}/objects/{objectUuid}'
+                    .replace('{roleUuid}', encodeURI(roleUuid))
+                    .replace('{resourceUuid}', encodeURI(resourceUuid))
+                    .replace('{objectUuid}', encodeURI(objectUuid)),
+                method: 'PUT',
                 headers,
                 body: objectPermissionsRequestDto,
             },
@@ -401,17 +401,17 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, roleRequestDto }: UpdateRoleRequest,
         opts?: OperationOpts,
     ): Observable<RoleDetailDto | AjaxResponse<RoleDetailDto>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "updateRole");
-        throwIfNullOrUndefined(roleRequestDto, "roleRequestDto", "updateRole");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'updateRole');
+        throwIfNullOrUndefined(roleRequestDto, 'roleRequestDto', 'updateRole');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<RoleDetailDto>(
             {
-                url: "/v1/roles/{roleUuid}".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "PUT",
+                url: '/v1/roles/{roleUuid}'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'PUT',
                 headers,
                 body: roleRequestDto,
             },
@@ -428,17 +428,17 @@ export class RoleManagementApi extends BaseAPI {
         { roleUuid, requestBody }: UpdateUsersRequest,
         opts?: OperationOpts,
     ): Observable<RoleDetailDto | AjaxResponse<RoleDetailDto>> {
-        throwIfNullOrUndefined(roleUuid, "roleUuid", "updateUsers");
-        throwIfNullOrUndefined(requestBody, "requestBody", "updateUsers");
+        throwIfNullOrUndefined(roleUuid, 'roleUuid', 'updateUsers');
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'updateUsers');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<RoleDetailDto>(
             {
-                url: "/v1/roles/{roleUuid}/users".replace("{roleUuid}", encodeURI(roleUuid)),
-                method: "PATCH",
+                url: '/v1/roles/{roleUuid}/users'.replace('{roleUuid}', encodeURI(roleUuid)),
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },

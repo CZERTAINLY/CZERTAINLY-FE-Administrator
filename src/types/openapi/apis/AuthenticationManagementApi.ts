@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
@@ -23,7 +23,7 @@ import type {
     ResourceDetailDto,
     UpdateUserRequestDto,
     UserDetailDto,
-} from "../models";
+} from '../models';
 
 export interface GetObjectsForResourceRequest {
     resourceName: Resource;
@@ -45,8 +45,8 @@ export class AuthenticationManagementApi extends BaseAPI {
     getAllResources(opts?: OperationOpts): Observable<Array<ResourceDetailDto> | AjaxResponse<Array<ResourceDetailDto>>> {
         return this.request<Array<ResourceDetailDto>>(
             {
-                url: "/v1/auth/resources",
-                method: "GET",
+                url: '/v1/auth/resources',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -64,12 +64,12 @@ export class AuthenticationManagementApi extends BaseAPI {
         { resourceName }: GetObjectsForResourceRequest,
         opts?: OperationOpts,
     ): Observable<Array<NameAndUuidDto> | AjaxResponse<Array<NameAndUuidDto>>> {
-        throwIfNullOrUndefined(resourceName, "resourceName", "getObjectsForResource");
+        throwIfNullOrUndefined(resourceName, 'resourceName', 'getObjectsForResource');
 
         return this.request<Array<NameAndUuidDto>>(
             {
-                url: "/v1/auth/resources/{resourceName}/objects".replace("{resourceName}", encodeURI(resourceName)),
-                method: "GET",
+                url: '/v1/auth/resources/{resourceName}/objects'.replace('{resourceName}', encodeURI(resourceName)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -83,8 +83,8 @@ export class AuthenticationManagementApi extends BaseAPI {
     profile(opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
         return this.request<UserDetailDto>(
             {
-                url: "/v1/auth/profile",
-                method: "GET",
+                url: '/v1/auth/profile',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -99,16 +99,16 @@ export class AuthenticationManagementApi extends BaseAPI {
         { updateUserRequestDto }: UpdateUserProfileRequest,
         opts?: OperationOpts,
     ): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(updateUserRequestDto, "updateUserRequestDto", "updateUserProfile");
+        throwIfNullOrUndefined(updateUserRequestDto, 'updateUserRequestDto', 'updateUserProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UserDetailDto>(
             {
-                url: "/v1/auth/profile",
-                method: "PUT",
+                url: '/v1/auth/profile',
+                method: 'PUT',
                 headers,
                 body: updateUserRequestDto,
             },

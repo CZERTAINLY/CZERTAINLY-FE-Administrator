@@ -25,7 +25,7 @@ import type {
     StringAttributeContent,
     TextAttributeContent,
     TimeAttributeContent,
-} from "./";
+} from './';
 
 /**
  * @type BaseAttributeContentDto

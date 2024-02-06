@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { LocationDto } from "./";
+import type { LocationDto } from './';
 
 /**
  * @export

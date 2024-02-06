@@ -11,8 +11,8 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
 import type {
     ApprovalResponseDto,
     BaseAttributeDto,
@@ -38,9 +38,9 @@ import type {
     SearchRequestDto,
     UploadCertificateRequestDto,
     UuidDto,
-} from "../models";
-import type { HttpHeaders, HttpQuery, OperationOpts } from "../runtime";
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
+} from '../models';
+import type { HttpHeaders, HttpQuery, OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface BulkDeleteCertificateRequest {
     removeCertificateDto: RemoveCertificateDto;
@@ -135,16 +135,16 @@ export class CertificateInventoryApi extends BaseAPI {
         { removeCertificateDto }: BulkDeleteCertificateRequest,
         opts?: OperationOpts,
     ): Observable<BulkOperationResponse | AjaxResponse<BulkOperationResponse>> {
-        throwIfNullOrUndefined(removeCertificateDto, "removeCertificateDto", "bulkDeleteCertificate");
+        throwIfNullOrUndefined(removeCertificateDto, 'removeCertificateDto', 'bulkDeleteCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<BulkOperationResponse>(
             {
-                url: "/v1/certificates/delete",
-                method: "POST",
+                url: '/v1/certificates/delete',
+                method: 'POST',
                 headers,
                 body: removeCertificateDto,
             },
@@ -165,16 +165,16 @@ export class CertificateInventoryApi extends BaseAPI {
         { multipleCertificateObjectUpdateDto }: BulkUpdateCertificateObjectsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(multipleCertificateObjectUpdateDto, "multipleCertificateObjectUpdateDto", "bulkUpdateCertificateObjects");
+        throwIfNullOrUndefined(multipleCertificateObjectUpdateDto, 'multipleCertificateObjectUpdateDto', 'bulkUpdateCertificateObjects');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/certificates",
-                method: "PATCH",
+                url: '/v1/certificates',
+                method: 'PATCH',
                 headers,
                 body: multipleCertificateObjectUpdateDto,
             },
@@ -194,16 +194,16 @@ export class CertificateInventoryApi extends BaseAPI {
         { certificateComplianceCheckDto }: CheckCertificatesComplianceRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(certificateComplianceCheckDto, "certificateComplianceCheckDto", "checkCertificatesCompliance");
+        throwIfNullOrUndefined(certificateComplianceCheckDto, 'certificateComplianceCheckDto', 'checkCertificatesCompliance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/certificates/compliance",
-                method: "POST",
+                url: '/v1/certificates/compliance',
+                method: 'POST',
                 headers,
                 body: certificateComplianceCheckDto,
             },
@@ -217,12 +217,12 @@ export class CertificateInventoryApi extends BaseAPI {
     deleteCertificate({ uuid }: DeleteCertificateRequest): Observable<void>;
     deleteCertificate({ uuid }: DeleteCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteCertificate({ uuid }: DeleteCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteCertificate");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteCertificate');
 
         return this.request<void>(
             {
-                url: "/v1/certificates/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/certificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -240,21 +240,21 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid, certificateFormat, encoding }: DownloadCertificateRequest,
         opts?: OperationOpts,
     ): Observable<CertificateDownloadResponseDto | AjaxResponse<CertificateDownloadResponseDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "downloadCertificate");
-        throwIfNullOrUndefined(certificateFormat, "certificateFormat", "downloadCertificate");
-        throwIfNullOrUndefined(encoding, "encoding", "downloadCertificate");
+        throwIfNullOrUndefined(uuid, 'uuid', 'downloadCertificate');
+        throwIfNullOrUndefined(certificateFormat, 'certificateFormat', 'downloadCertificate');
+        throwIfNullOrUndefined(encoding, 'encoding', 'downloadCertificate');
 
         const query: HttpQuery = {};
 
         if (encoding != null) {
-            query["encoding"] = encoding;
+            query['encoding'] = encoding;
         }
         return this.request<CertificateDownloadResponseDto>(
             {
-                url: "/v1/certificates/{uuid}/{certificateFormat}"
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{certificateFormat}", encodeURI(certificateFormat)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}/{certificateFormat}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{certificateFormat}', encodeURI(certificateFormat)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -278,26 +278,26 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid, certificateFormat, encoding, withEndCertificate }: DownloadCertificateChainRequest,
         opts?: OperationOpts,
     ): Observable<CertificateChainDownloadResponseDto | AjaxResponse<CertificateChainDownloadResponseDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "downloadCertificateChain");
-        throwIfNullOrUndefined(certificateFormat, "certificateFormat", "downloadCertificateChain");
-        throwIfNullOrUndefined(encoding, "encoding", "downloadCertificateChain");
+        throwIfNullOrUndefined(uuid, 'uuid', 'downloadCertificateChain');
+        throwIfNullOrUndefined(certificateFormat, 'certificateFormat', 'downloadCertificateChain');
+        throwIfNullOrUndefined(encoding, 'encoding', 'downloadCertificateChain');
 
         const query: HttpQuery = {};
 
         if (encoding != null) {
-            query["encoding"] = encoding;
+            query['encoding'] = encoding;
         }
 
         if (withEndCertificate != null) {
-            query["withEndCertificate"] = withEndCertificate;
+            query['withEndCertificate'] = withEndCertificate;
         }
 
         return this.request<CertificateChainDownloadResponseDto>(
             {
-                url: "/v1/certificates/{uuid}/chain/{certificateFormat}"
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{certificateFormat}", encodeURI(certificateFormat)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}/chain/{certificateFormat}'
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{certificateFormat}', encodeURI(certificateFormat)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -313,12 +313,12 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid }: GetCertificateRequest,
         opts?: OperationOpts,
     ): Observable<CertificateDetailDto | AjaxResponse<CertificateDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getCertificate");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getCertificate');
 
         return this.request<CertificateDetailDto>(
             {
-                url: "/v1/certificates/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -337,18 +337,18 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid, withEndCertificate }: GetCertificateChainRequest,
         opts?: OperationOpts,
     ): Observable<CertificateChainResponseDto | AjaxResponse<CertificateChainResponseDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getCertificateChain");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getCertificateChain');
 
         const query: HttpQuery = {};
 
         if (withEndCertificate != null) {
-            query["withEndCertificate"] = withEndCertificate;
+            query['withEndCertificate'] = withEndCertificate;
         }
 
         return this.request<CertificateChainResponseDto>(
             {
-                url: "/v1/certificates/{uuid}/chain".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}/chain'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -367,16 +367,16 @@ export class CertificateInventoryApi extends BaseAPI {
         { requestBody }: GetCertificateContentRequest,
         opts?: OperationOpts,
     ): Observable<Array<CertificateContentDto> | AjaxResponse<Array<CertificateContentDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "getCertificateContent");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'getCertificateContent');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<CertificateContentDto>>(
             {
-                url: "/v1/certificates/content",
-                method: "POST",
+                url: '/v1/certificates/content',
+                method: 'POST',
                 headers,
                 body: requestBody,
             },
@@ -396,12 +396,12 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid }: GetCertificateEventHistoryRequest,
         opts?: OperationOpts,
     ): Observable<Array<CertificateEventHistoryDto> | AjaxResponse<Array<CertificateEventHistoryDto>>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getCertificateEventHistory");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getCertificateEventHistory');
 
         return this.request<Array<CertificateEventHistoryDto>>(
             {
-                url: "/v1/certificates/{uuid}/history".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}/history'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -419,12 +419,12 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid }: GetCertificateValidationResultRequest,
         opts?: OperationOpts,
     ): Observable<CertificateValidationResultDto | AjaxResponse<CertificateValidationResultDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getCertificateValidationResult");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getCertificateValidationResult');
 
         return this.request<CertificateValidationResultDto>(
             {
-                url: "/v1/certificates/{uuid}/validate".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}/validate'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -438,8 +438,8 @@ export class CertificateInventoryApi extends BaseAPI {
     getCsrGenerationAttributes(opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/certificates/csr/attributes",
-                method: "GET",
+                url: '/v1/certificates/csr/attributes',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -455,8 +455,8 @@ export class CertificateInventoryApi extends BaseAPI {
     ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>(
             {
-                url: "/v1/certificates/search",
-                method: "GET",
+                url: '/v1/certificates/search',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -474,8 +474,8 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid, paginationRequestDto }: ListCertificateApprovalsRequest,
         opts?: OperationOpts,
     ): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "listCertificateApprovals");
-        throwIfNullOrUndefined(paginationRequestDto, "paginationRequestDto", "listCertificateApprovals");
+        throwIfNullOrUndefined(uuid, 'uuid', 'listCertificateApprovals');
+        throwIfNullOrUndefined(paginationRequestDto, 'paginationRequestDto', 'listCertificateApprovals');
 
         const query: HttpQuery = {};
         if (paginationRequestDto != null) {
@@ -484,8 +484,8 @@ export class CertificateInventoryApi extends BaseAPI {
 
         return this.request<ApprovalResponseDto>(
             {
-                url: "/v1/certificates/{uuid}/approvals".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/certificates/{uuid}/approvals'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -504,12 +504,12 @@ export class CertificateInventoryApi extends BaseAPI {
         { certificateUuid }: ListCertificateLocationsRequest,
         opts?: OperationOpts,
     ): Observable<Array<LocationDto> | AjaxResponse<Array<LocationDto>>> {
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "listCertificateLocations");
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'listCertificateLocations');
 
         return this.request<Array<LocationDto>>(
             {
-                url: "/v1/certificates/{certificateUuid}/locations".replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "GET",
+                url: '/v1/certificates/{certificateUuid}/locations'.replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -524,16 +524,16 @@ export class CertificateInventoryApi extends BaseAPI {
         { searchRequestDto }: ListCertificatesRequest,
         opts?: OperationOpts,
     ): Observable<CertificateResponseDto | AjaxResponse<CertificateResponseDto>> {
-        throwIfNullOrUndefined(searchRequestDto, "searchRequestDto", "listCertificates");
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listCertificates');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<CertificateResponseDto>(
             {
-                url: "/v1/certificates",
-                method: "POST",
+                url: '/v1/certificates',
+                method: 'POST',
                 headers,
                 body: searchRequestDto,
             },
@@ -553,16 +553,16 @@ export class CertificateInventoryApi extends BaseAPI {
         { clientCertificateRequestDto }: SubmitCertificateRequestRequest,
         opts?: OperationOpts,
     ): Observable<CertificateDetailDto | AjaxResponse<CertificateDetailDto>> {
-        throwIfNullOrUndefined(clientCertificateRequestDto, "clientCertificateRequestDto", "submitCertificateRequest");
+        throwIfNullOrUndefined(clientCertificateRequestDto, 'clientCertificateRequestDto', 'submitCertificateRequest');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<CertificateDetailDto>(
             {
-                url: "/v1/certificates/create",
-                method: "POST",
+                url: '/v1/certificates/create',
+                method: 'POST',
                 headers,
                 body: clientCertificateRequestDto,
             },
@@ -582,17 +582,17 @@ export class CertificateInventoryApi extends BaseAPI {
         { uuid, certificateUpdateObjectsDto }: UpdateCertificateObjectsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "updateCertificateObjects");
-        throwIfNullOrUndefined(certificateUpdateObjectsDto, "certificateUpdateObjectsDto", "updateCertificateObjects");
+        throwIfNullOrUndefined(uuid, 'uuid', 'updateCertificateObjects');
+        throwIfNullOrUndefined(certificateUpdateObjectsDto, 'certificateUpdateObjectsDto', 'updateCertificateObjects');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/certificates/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/certificates/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: certificateUpdateObjectsDto,
             },
@@ -606,16 +606,16 @@ export class CertificateInventoryApi extends BaseAPI {
     upload({ uploadCertificateRequestDto }: UploadRequest): Observable<UuidDto>;
     upload({ uploadCertificateRequestDto }: UploadRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
     upload({ uploadCertificateRequestDto }: UploadRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(uploadCertificateRequestDto, "uploadCertificateRequestDto", "upload");
+        throwIfNullOrUndefined(uploadCertificateRequestDto, 'uploadCertificateRequestDto', 'upload');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/certificates/upload",
-                method: "POST",
+                url: '/v1/certificates/upload',
+                method: 'POST',
                 headers,
                 body: uploadCertificateRequestDto,
             },

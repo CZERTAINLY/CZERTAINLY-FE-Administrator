@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ComplianceGroupsDto } from "./";
+import type { ComplianceGroupsDto } from './';
 
 /**
  * List of groups

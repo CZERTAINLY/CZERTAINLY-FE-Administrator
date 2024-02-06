@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ApprovalProfileDto } from "./";
+import type { ApprovalProfileDto } from './';
 
 /**
  * @export

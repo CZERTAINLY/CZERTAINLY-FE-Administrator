@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
-import type { AuthenticationServiceExceptionDto, ErrorMessageDto, NotificationSettingsDto, PlatformSettingsDto } from "../models";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
+import type { AuthenticationServiceExceptionDto, ErrorMessageDto, NotificationSettingsDto, PlatformSettingsDto } from '../models';
 
 export interface UpdateNotificationsSettingsRequest {
     notificationSettingsDto: NotificationSettingsDto;
@@ -37,8 +37,8 @@ export class SettingsApi extends BaseAPI {
     getNotificationsSettings(opts?: OperationOpts): Observable<NotificationSettingsDto | AjaxResponse<NotificationSettingsDto>> {
         return this.request<NotificationSettingsDto>(
             {
-                url: "/v1/settings/notifications",
-                method: "GET",
+                url: '/v1/settings/notifications',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -52,8 +52,8 @@ export class SettingsApi extends BaseAPI {
     getPlatformSettings(opts?: OperationOpts): Observable<PlatformSettingsDto | AjaxResponse<PlatformSettingsDto>> {
         return this.request<PlatformSettingsDto>(
             {
-                url: "/v1/settings/platform",
-                method: "GET",
+                url: '/v1/settings/platform',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -71,16 +71,16 @@ export class SettingsApi extends BaseAPI {
         { notificationSettingsDto }: UpdateNotificationsSettingsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(notificationSettingsDto, "notificationSettingsDto", "updateNotificationsSettings");
+        throwIfNullOrUndefined(notificationSettingsDto, 'notificationSettingsDto', 'updateNotificationsSettings');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/settings/notifications",
-                method: "PUT",
+                url: '/v1/settings/notifications',
+                method: 'PUT',
                 headers,
                 body: notificationSettingsDto,
             },
@@ -100,16 +100,16 @@ export class SettingsApi extends BaseAPI {
         { platformSettingsDto }: UpdatePlatformSettingsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(platformSettingsDto, "platformSettingsDto", "updatePlatformSettings");
+        throwIfNullOrUndefined(platformSettingsDto, 'platformSettingsDto', 'updatePlatformSettings');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/settings/platform",
-                method: "PUT",
+                url: '/v1/settings/platform',
+                method: 'PUT',
                 headers,
                 body: platformSettingsDto,
             },

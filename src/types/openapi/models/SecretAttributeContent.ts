@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { SecretAttributeContentData } from "./";
+import type { SecretAttributeContentData } from './';
 
 /**
  * @export

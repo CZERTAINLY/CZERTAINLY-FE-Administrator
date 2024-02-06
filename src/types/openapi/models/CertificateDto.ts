@@ -18,7 +18,7 @@ import type {
     ComplianceStatus,
     GroupDto,
     SimplifiedRaProfileDto,
-} from "./";
+} from './';
 
 /**
  * CA Certificate for the SCEP Profile

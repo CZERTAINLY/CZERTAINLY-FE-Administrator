@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
@@ -32,7 +32,7 @@ import type {
     RaProfileAssociationRequestDto,
     SimplifiedRaProfileDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface AddGroupRequest {
     uuid: string;
@@ -113,17 +113,17 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     addGroup({ uuid, complianceGroupRequestDto }: AddGroupRequest): Observable<void>;
     addGroup({ uuid, complianceGroupRequestDto }: AddGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     addGroup({ uuid, complianceGroupRequestDto }: AddGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "addGroup");
-        throwIfNullOrUndefined(complianceGroupRequestDto, "complianceGroupRequestDto", "addGroup");
+        throwIfNullOrUndefined(uuid, 'uuid', 'addGroup');
+        throwIfNullOrUndefined(complianceGroupRequestDto, 'complianceGroupRequestDto', 'addGroup');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/{uuid}/groups".replace("{uuid}", encodeURI(uuid)),
-                method: "POST",
+                url: '/v1/complianceProfiles/{uuid}/groups'.replace('{uuid}', encodeURI(uuid)),
+                method: 'POST',
                 headers,
                 body: complianceGroupRequestDto,
             },
@@ -143,17 +143,17 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { uuid, complianceRuleAdditionRequestDto }: AddRuleRequest,
         opts?: OperationOpts,
     ): Observable<ComplianceProfileRuleDto | AjaxResponse<ComplianceProfileRuleDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "addRule");
-        throwIfNullOrUndefined(complianceRuleAdditionRequestDto, "complianceRuleAdditionRequestDto", "addRule");
+        throwIfNullOrUndefined(uuid, 'uuid', 'addRule');
+        throwIfNullOrUndefined(complianceRuleAdditionRequestDto, 'complianceRuleAdditionRequestDto', 'addRule');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ComplianceProfileRuleDto>(
             {
-                url: "/v1/complianceProfiles/{uuid}/rules".replace("{uuid}", encodeURI(uuid)),
-                method: "POST",
+                url: '/v1/complianceProfiles/{uuid}/rules'.replace('{uuid}', encodeURI(uuid)),
+                method: 'POST',
                 headers,
                 body: complianceRuleAdditionRequestDto,
             },
@@ -173,17 +173,17 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { uuid, raProfileAssociationRequestDto }: AssociateProfilesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "associateProfiles");
-        throwIfNullOrUndefined(raProfileAssociationRequestDto, "raProfileAssociationRequestDto", "associateProfiles");
+        throwIfNullOrUndefined(uuid, 'uuid', 'associateProfiles');
+        throwIfNullOrUndefined(raProfileAssociationRequestDto, 'raProfileAssociationRequestDto', 'associateProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/{uuid}/raProfiles/associate".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/complianceProfiles/{uuid}/raProfiles/associate'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: raProfileAssociationRequestDto,
             },
@@ -203,16 +203,16 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { requestBody }: BulkDeleteComplianceProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteComplianceProfiles");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteComplianceProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<BulkActionMessageDto>>(
             {
-                url: "/v1/complianceProfiles",
-                method: "DELETE",
+                url: '/v1/complianceProfiles',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -226,16 +226,16 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     checkCompliance({ requestBody }: CheckComplianceRequest): Observable<void>;
     checkCompliance({ requestBody }: CheckComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     checkCompliance({ requestBody }: CheckComplianceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "checkCompliance");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'checkCompliance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/compliance",
-                method: "POST",
+                url: '/v1/complianceProfiles/compliance',
+                method: 'POST',
                 headers,
                 body: requestBody,
             },
@@ -255,16 +255,16 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { complianceProfileRequestDto }: CreateComplianceProfileRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(complianceProfileRequestDto, "complianceProfileRequestDto", "createComplianceProfile");
+        throwIfNullOrUndefined(complianceProfileRequestDto, 'complianceProfileRequestDto', 'createComplianceProfile');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/complianceProfiles",
-                method: "POST",
+                url: '/v1/complianceProfiles',
+                method: 'POST',
                 headers,
                 body: complianceProfileRequestDto,
             },
@@ -278,12 +278,12 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     deleteComplianceProfile({ uuid }: DeleteComplianceProfileRequest): Observable<void>;
     deleteComplianceProfile({ uuid }: DeleteComplianceProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteComplianceProfile({ uuid }: DeleteComplianceProfileRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteComplianceProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteComplianceProfile');
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -301,17 +301,17 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { uuid, raProfileAssociationRequestDto }: DisassociateProfilesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "disassociateProfiles");
-        throwIfNullOrUndefined(raProfileAssociationRequestDto, "raProfileAssociationRequestDto", "disassociateProfiles");
+        throwIfNullOrUndefined(uuid, 'uuid', 'disassociateProfiles');
+        throwIfNullOrUndefined(raProfileAssociationRequestDto, 'raProfileAssociationRequestDto', 'disassociateProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/{uuid}/raProfiles/disassociate".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/complianceProfiles/{uuid}/raProfiles/disassociate'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: raProfileAssociationRequestDto,
             },
@@ -331,16 +331,16 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { requestBody }: ForceDeleteComplianceProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "forceDeleteComplianceProfiles");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'forceDeleteComplianceProfiles');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<Array<BulkActionMessageDto>>(
             {
-                url: "/v1/complianceProfiles/force",
-                method: "DELETE",
+                url: '/v1/complianceProfiles/force',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -360,12 +360,12 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { uuid }: GetAssociatedRAProfilesRequest,
         opts?: OperationOpts,
     ): Observable<Array<SimplifiedRaProfileDto> | AjaxResponse<Array<SimplifiedRaProfileDto>>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getAssociatedRAProfiles");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getAssociatedRAProfiles');
 
         return this.request<Array<SimplifiedRaProfileDto>>(
             {
-                url: "/v1/complianceProfiles/{uuid}/raProfiles".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/complianceProfiles/{uuid}/raProfiles'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -386,16 +386,16 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (complianceProvider != null) {
-            query["complianceProvider"] = complianceProvider;
+            query['complianceProvider'] = complianceProvider;
         }
         if (kind != null) {
-            query["kind"] = kind;
+            query['kind'] = kind;
         }
 
         return this.request<Array<ComplianceGroupsListResponseDto>>(
             {
-                url: "/v1/complianceProfiles/groups",
-                method: "GET",
+                url: '/v1/complianceProfiles/groups',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -411,12 +411,12 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         { uuid }: GetComplianceProfileRequest,
         opts?: OperationOpts,
     ): Observable<ComplianceProfileDto | AjaxResponse<ComplianceProfileDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getComplianceProfile");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getComplianceProfile');
 
         return this.request<ComplianceProfileDto>(
             {
-                url: "/v1/complianceProfiles/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -441,19 +441,19 @@ export class ComplianceProfileManagementApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (complianceProvider != null) {
-            query["complianceProvider"] = complianceProvider;
+            query['complianceProvider'] = complianceProvider;
         }
         if (kind != null) {
-            query["kind"] = kind;
+            query['kind'] = kind;
         }
         if (certificateType != null) {
-            query["certificateType"] = certificateType;
+            query['certificateType'] = certificateType;
         }
 
         return this.request<Array<ComplianceRulesListResponseDto>>(
             {
-                url: "/v1/complianceProfiles/rules",
-                method: "GET",
+                url: '/v1/complianceProfiles/rules',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -470,8 +470,8 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     ): Observable<Array<ComplianceProfilesListDto> | AjaxResponse<Array<ComplianceProfilesListDto>>> {
         return this.request<Array<ComplianceProfilesListDto>>(
             {
-                url: "/v1/complianceProfiles",
-                method: "GET",
+                url: '/v1/complianceProfiles',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -483,17 +483,17 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     removeGroup({ uuid, complianceGroupRequestDto }: RemoveGroupRequest): Observable<void>;
     removeGroup({ uuid, complianceGroupRequestDto }: RemoveGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     removeGroup({ uuid, complianceGroupRequestDto }: RemoveGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "removeGroup");
-        throwIfNullOrUndefined(complianceGroupRequestDto, "complianceGroupRequestDto", "removeGroup");
+        throwIfNullOrUndefined(uuid, 'uuid', 'removeGroup');
+        throwIfNullOrUndefined(complianceGroupRequestDto, 'complianceGroupRequestDto', 'removeGroup');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/{uuid}/groups".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/complianceProfiles/{uuid}/groups'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
                 headers,
                 body: complianceGroupRequestDto,
             },
@@ -507,17 +507,17 @@ export class ComplianceProfileManagementApi extends BaseAPI {
     removeRule({ uuid, complianceRuleDeletionRequestDto }: RemoveRuleRequest): Observable<void>;
     removeRule({ uuid, complianceRuleDeletionRequestDto }: RemoveRuleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     removeRule({ uuid, complianceRuleDeletionRequestDto }: RemoveRuleRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "removeRule");
-        throwIfNullOrUndefined(complianceRuleDeletionRequestDto, "complianceRuleDeletionRequestDto", "removeRule");
+        throwIfNullOrUndefined(uuid, 'uuid', 'removeRule');
+        throwIfNullOrUndefined(complianceRuleDeletionRequestDto, 'complianceRuleDeletionRequestDto', 'removeRule');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/complianceProfiles/{uuid}/rules".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/complianceProfiles/{uuid}/rules'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
                 headers,
                 body: complianceRuleDeletionRequestDto,
             },

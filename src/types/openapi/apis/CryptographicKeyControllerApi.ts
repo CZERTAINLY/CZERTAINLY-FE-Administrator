@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
@@ -35,7 +35,7 @@ import type {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     UpdateKeyUsageRequestDto,
-} from "../models";
+} from '../models';
 
 export interface CompromiseKeyRequest {
     tokenInstanceUuid: string;
@@ -186,20 +186,20 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, uuid, compromiseKeyRequestDto }: CompromiseKeyRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "compromiseKey");
-        throwIfNullOrUndefined(uuid, "uuid", "compromiseKey");
-        throwIfNullOrUndefined(compromiseKeyRequestDto, "compromiseKeyRequestDto", "compromiseKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'compromiseKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'compromiseKey');
+        throwIfNullOrUndefined(compromiseKeyRequestDto, 'compromiseKeyRequestDto', 'compromiseKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/compromise"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/compromise'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: compromiseKeyRequestDto,
             },
@@ -220,16 +220,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { bulkCompromiseKeyItemRequestDto }: CompromiseKeyItemsRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(bulkCompromiseKeyItemRequestDto, "bulkCompromiseKeyItemRequestDto", "compromiseKeyItems");
+        throwIfNullOrUndefined(bulkCompromiseKeyItemRequestDto, 'bulkCompromiseKeyItemRequestDto', 'compromiseKeyItems');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/items/compromise",
-                method: "PATCH",
+                url: '/v1/keys/items/compromise',
+                method: 'PATCH',
                 headers,
                 body: bulkCompromiseKeyItemRequestDto,
             },
@@ -244,16 +244,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     compromiseKeys({ bulkCompromiseKeyRequestDto }: CompromiseKeysRequest): Observable<void>;
     compromiseKeys({ bulkCompromiseKeyRequestDto }: CompromiseKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     compromiseKeys({ bulkCompromiseKeyRequestDto }: CompromiseKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(bulkCompromiseKeyRequestDto, "bulkCompromiseKeyRequestDto", "compromiseKeys");
+        throwIfNullOrUndefined(bulkCompromiseKeyRequestDto, 'bulkCompromiseKeyRequestDto', 'compromiseKeys');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/compromise",
-                method: "PATCH",
+                url: '/v1/keys/compromise',
+                method: 'PATCH',
                 headers,
                 body: bulkCompromiseKeyRequestDto,
             },
@@ -273,22 +273,22 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, tokenProfileUuid, type, keyRequestDto }: CreateKeyRequest,
         opts?: OperationOpts,
     ): Observable<KeyDetailDto | AjaxResponse<KeyDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "createKey");
-        throwIfNullOrUndefined(tokenProfileUuid, "tokenProfileUuid", "createKey");
-        throwIfNullOrUndefined(type, "type", "createKey");
-        throwIfNullOrUndefined(keyRequestDto, "keyRequestDto", "createKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'createKey');
+        throwIfNullOrUndefined(tokenProfileUuid, 'tokenProfileUuid', 'createKey');
+        throwIfNullOrUndefined(type, 'type', 'createKey');
+        throwIfNullOrUndefined(keyRequestDto, 'keyRequestDto', 'createKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<KeyDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{type}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{tokenProfileUuid}", encodeURI(tokenProfileUuid))
-                    .replace("{type}", encodeURI(type)),
-                method: "POST",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{type}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{tokenProfileUuid}', encodeURI(tokenProfileUuid))
+                    .replace('{type}', encodeURI(type)),
+                method: 'POST',
                 headers,
                 body: keyRequestDto,
             },
@@ -303,19 +303,19 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     deleteKey({ tokenInstanceUuid, uuid, requestBody }: DeleteKeyRequest): Observable<void>;
     deleteKey({ tokenInstanceUuid, uuid, requestBody }: DeleteKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteKey({ tokenInstanceUuid, uuid, requestBody }: DeleteKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "deleteKey");
-        throwIfNullOrUndefined(uuid, "uuid", "deleteKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'deleteKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -329,16 +329,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     deleteKeyItems({ requestBody }: DeleteKeyItemsRequest): Observable<void>;
     deleteKeyItems({ requestBody }: DeleteKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteKeyItems({ requestBody }: DeleteKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "deleteKeyItems");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'deleteKeyItems');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/items",
-                method: "DELETE",
+                url: '/v1/keys/items',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -352,16 +352,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     deleteKeys({ requestBody }: DeleteKeysRequest): Observable<void>;
     deleteKeys({ requestBody }: DeleteKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteKeys({ requestBody }: DeleteKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "deleteKeys");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'deleteKeys');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys",
-                method: "DELETE",
+                url: '/v1/keys',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -376,19 +376,19 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     destroyKey({ tokenInstanceUuid, uuid, requestBody }: DestroyKeyRequest): Observable<void>;
     destroyKey({ tokenInstanceUuid, uuid, requestBody }: DestroyKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     destroyKey({ tokenInstanceUuid, uuid, requestBody }: DestroyKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "destroyKey");
-        throwIfNullOrUndefined(uuid, "uuid", "destroyKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'destroyKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'destroyKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/destroy"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/destroy'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -402,16 +402,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     destroyKeyItems({ requestBody }: DestroyKeyItemsRequest): Observable<void>;
     destroyKeyItems({ requestBody }: DestroyKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     destroyKeyItems({ requestBody }: DestroyKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "destroyKeyItems");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'destroyKeyItems');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/items/destroy",
-                method: "PATCH",
+                url: '/v1/keys/items/destroy',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -425,16 +425,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     destroyKeys({ requestBody }: DestroyKeysRequest): Observable<void>;
     destroyKeys({ requestBody }: DestroyKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     destroyKeys({ requestBody }: DestroyKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "destroyKeys");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'destroyKeys');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/destroy",
-                method: "PATCH",
+                url: '/v1/keys/destroy',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -449,19 +449,19 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     disableKey({ tokenInstanceUuid, uuid, requestBody }: DisableKeyRequest): Observable<void>;
     disableKey({ tokenInstanceUuid, uuid, requestBody }: DisableKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableKey({ tokenInstanceUuid, uuid, requestBody }: DisableKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "disableKey");
-        throwIfNullOrUndefined(uuid, "uuid", "disableKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'disableKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'disableKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/disable"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/disable'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -475,16 +475,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     disableKeyItems({ requestBody }: DisableKeyItemsRequest): Observable<void>;
     disableKeyItems({ requestBody }: DisableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableKeyItems({ requestBody }: DisableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "disableKeyItems");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'disableKeyItems');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/items/disable",
-                method: "PATCH",
+                url: '/v1/keys/items/disable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -498,16 +498,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     disableKeys({ requestBody }: DisableKeysRequest): Observable<void>;
     disableKeys({ requestBody }: DisableKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     disableKeys({ requestBody }: DisableKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "disableKeys");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'disableKeys');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/disable",
-                method: "PATCH",
+                url: '/v1/keys/disable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -524,20 +524,20 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, uuid, editKeyRequestDto }: EditKeyRequest,
         opts?: OperationOpts,
     ): Observable<KeyDetailDto | AjaxResponse<KeyDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "editKey");
-        throwIfNullOrUndefined(uuid, "uuid", "editKey");
-        throwIfNullOrUndefined(editKeyRequestDto, "editKeyRequestDto", "editKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'editKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'editKey');
+        throwIfNullOrUndefined(editKeyRequestDto, 'editKeyRequestDto', 'editKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<KeyDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: editKeyRequestDto,
             },
@@ -552,19 +552,19 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     enableKey({ tokenInstanceUuid, uuid, requestBody }: EnableKeyRequest): Observable<void>;
     enableKey({ tokenInstanceUuid, uuid, requestBody }: EnableKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableKey({ tokenInstanceUuid, uuid, requestBody }: EnableKeyRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "enableKey");
-        throwIfNullOrUndefined(uuid, "uuid", "enableKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'enableKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'enableKey');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/enable"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/enable'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -578,16 +578,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     enableKeyItems({ requestBody }: EnableKeyItemsRequest): Observable<void>;
     enableKeyItems({ requestBody }: EnableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableKeyItems({ requestBody }: EnableKeyItemsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "enableKeyItems");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'enableKeyItems');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/items/enable",
-                method: "PATCH",
+                url: '/v1/keys/items/enable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -601,16 +601,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     enableKeys({ requestBody }: EnableKeysRequest): Observable<void>;
     enableKeys({ requestBody }: EnableKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     enableKeys({ requestBody }: EnableKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "enableKeys");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'enableKeys');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/enable",
-                method: "PATCH",
+                url: '/v1/keys/enable',
+                method: 'PATCH',
                 headers,
                 body: requestBody,
             },
@@ -630,17 +630,17 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, uuid, keyItemUuid }: GetEventHistoryRequest,
         opts?: OperationOpts,
     ): Observable<Array<KeyEventHistoryDto> | AjaxResponse<Array<KeyEventHistoryDto>>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "getEventHistory");
-        throwIfNullOrUndefined(uuid, "uuid", "getEventHistory");
-        throwIfNullOrUndefined(keyItemUuid, "keyItemUuid", "getEventHistory");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'getEventHistory');
+        throwIfNullOrUndefined(uuid, 'uuid', 'getEventHistory');
+        throwIfNullOrUndefined(keyItemUuid, 'keyItemUuid', 'getEventHistory');
 
         return this.request<Array<KeyEventHistoryDto>>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/items/{keyItemUuid}/history"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{keyItemUuid}", encodeURI(keyItemUuid)),
-                method: "GET",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/items/{keyItemUuid}/history'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{keyItemUuid}', encodeURI(keyItemUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -652,15 +652,15 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     getKey({ tokenInstanceUuid, uuid }: GetKeyRequest): Observable<KeyDetailDto>;
     getKey({ tokenInstanceUuid, uuid }: GetKeyRequest, opts?: OperationOpts): Observable<AjaxResponse<KeyDetailDto>>;
     getKey({ tokenInstanceUuid, uuid }: GetKeyRequest, opts?: OperationOpts): Observable<KeyDetailDto | AjaxResponse<KeyDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "getKey");
-        throwIfNullOrUndefined(uuid, "uuid", "getKey");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'getKey');
+        throwIfNullOrUndefined(uuid, 'uuid', 'getKey');
 
         return this.request<KeyDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -678,17 +678,17 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, uuid, keyItemUuid }: GetKeyItemRequest,
         opts?: OperationOpts,
     ): Observable<KeyItemDetailDto | AjaxResponse<KeyItemDetailDto>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "getKeyItem");
-        throwIfNullOrUndefined(uuid, "uuid", "getKeyItem");
-        throwIfNullOrUndefined(keyItemUuid, "keyItemUuid", "getKeyItem");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'getKeyItem');
+        throwIfNullOrUndefined(uuid, 'uuid', 'getKeyItem');
+        throwIfNullOrUndefined(keyItemUuid, 'keyItemUuid', 'getKeyItem');
 
         return this.request<KeyItemDetailDto>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/items/{keyItemUuid}"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid))
-                    .replace("{keyItemUuid}", encodeURI(keyItemUuid)),
-                method: "GET",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/items/{keyItemUuid}'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid))
+                    .replace('{keyItemUuid}', encodeURI(keyItemUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -704,8 +704,8 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>(
             {
-                url: "/v1/keys/search",
-                method: "GET",
+                url: '/v1/keys/search',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -727,17 +727,17 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, tokenProfileUuid, type }: ListCreateKeyAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "listCreateKeyAttributes");
-        throwIfNullOrUndefined(tokenProfileUuid, "tokenProfileUuid", "listCreateKeyAttributes");
-        throwIfNullOrUndefined(type, "type", "listCreateKeyAttributes");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'listCreateKeyAttributes');
+        throwIfNullOrUndefined(tokenProfileUuid, 'tokenProfileUuid', 'listCreateKeyAttributes');
+        throwIfNullOrUndefined(type, 'type', 'listCreateKeyAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{type}/attributes"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{tokenProfileUuid}", encodeURI(tokenProfileUuid))
-                    .replace("{type}", encodeURI(type)),
-                method: "GET",
+                url: '/v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{type}/attributes'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{tokenProfileUuid}', encodeURI(tokenProfileUuid))
+                    .replace('{type}', encodeURI(type)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -755,16 +755,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { searchRequestDto }: ListCryptographicKeysRequest,
         opts?: OperationOpts,
     ): Observable<CryptographicKeyResponseDto | AjaxResponse<CryptographicKeyResponseDto>> {
-        throwIfNullOrUndefined(searchRequestDto, "searchRequestDto", "listCryptographicKeys");
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listCryptographicKeys');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<CryptographicKeyResponseDto>(
             {
-                url: "/v1/keys",
-                method: "POST",
+                url: '/v1/keys',
+                method: 'POST',
                 headers,
                 body: searchRequestDto,
             },
@@ -782,13 +782,13 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         const query: HttpQuery = {};
 
         if (tokenProfileUuid != null) {
-            query["tokenProfileUuid"] = tokenProfileUuid;
+            query['tokenProfileUuid'] = tokenProfileUuid;
         }
 
         return this.request<Array<KeyDto>>(
             {
-                url: "/v1/keys/pairs",
-                method: "GET",
+                url: '/v1/keys/pairs',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -801,12 +801,12 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     syncKeys({ tokenInstanceUuid }: SyncKeysRequest): Observable<void>;
     syncKeys({ tokenInstanceUuid }: SyncKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     syncKeys({ tokenInstanceUuid }: SyncKeysRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "syncKeys");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'syncKeys');
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/sync".replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid)),
-                method: "PATCH",
+                url: '/v1/tokens/{tokenInstanceUuid}/sync'.replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );
@@ -825,16 +825,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { bulkKeyItemUsageRequestDto }: UpdateKeyItemUsagesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(bulkKeyItemUsageRequestDto, "bulkKeyItemUsageRequestDto", "updateKeyItemUsages");
+        throwIfNullOrUndefined(bulkKeyItemUsageRequestDto, 'bulkKeyItemUsageRequestDto', 'updateKeyItemUsages');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/items/usages",
-                method: "PUT",
+                url: '/v1/keys/items/usages',
+                method: 'PUT',
                 headers,
                 body: bulkKeyItemUsageRequestDto,
             },
@@ -855,20 +855,20 @@ export class CryptographicKeyControllerApi extends BaseAPI {
         { tokenInstanceUuid, uuid, updateKeyUsageRequestDto }: UpdateKeyUsages1Request,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(tokenInstanceUuid, "tokenInstanceUuid", "updateKeyUsages1");
-        throwIfNullOrUndefined(uuid, "uuid", "updateKeyUsages1");
-        throwIfNullOrUndefined(updateKeyUsageRequestDto, "updateKeyUsageRequestDto", "updateKeyUsages1");
+        throwIfNullOrUndefined(tokenInstanceUuid, 'tokenInstanceUuid', 'updateKeyUsages1');
+        throwIfNullOrUndefined(uuid, 'uuid', 'updateKeyUsages1');
+        throwIfNullOrUndefined(updateKeyUsageRequestDto, 'updateKeyUsageRequestDto', 'updateKeyUsages1');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/usages"
-                    .replace("{tokenInstanceUuid}", encodeURI(tokenInstanceUuid))
-                    .replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/tokens/{tokenInstanceUuid}/keys/{uuid}/usages'
+                    .replace('{tokenInstanceUuid}', encodeURI(tokenInstanceUuid))
+                    .replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: updateKeyUsageRequestDto,
             },
@@ -883,16 +883,16 @@ export class CryptographicKeyControllerApi extends BaseAPI {
     updateKeysUsages1({ bulkKeyUsageRequestDto }: UpdateKeysUsages1Request): Observable<void>;
     updateKeysUsages1({ bulkKeyUsageRequestDto }: UpdateKeysUsages1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     updateKeysUsages1({ bulkKeyUsageRequestDto }: UpdateKeysUsages1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(bulkKeyUsageRequestDto, "bulkKeyUsageRequestDto", "updateKeysUsages1");
+        throwIfNullOrUndefined(bulkKeyUsageRequestDto, 'bulkKeyUsageRequestDto', 'updateKeysUsages1');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/keys/usages",
-                method: "PUT",
+                url: '/v1/keys/usages',
+                method: 'PUT',
                 headers,
                 body: bulkKeyUsageRequestDto,
             },

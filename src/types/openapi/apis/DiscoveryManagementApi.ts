@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders, HttpQuery } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     DiscoveryCertificateResponseDto,
@@ -26,7 +26,7 @@ import type {
     SearchFieldDataByGroupDto,
     SearchRequestDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface BulkDeleteDiscoveryRequest {
     requestBody: Array<string>;
@@ -69,16 +69,16 @@ export class DiscoveryManagementApi extends BaseAPI {
     bulkDeleteDiscovery({ requestBody }: BulkDeleteDiscoveryRequest): Observable<void>;
     bulkDeleteDiscovery({ requestBody }: BulkDeleteDiscoveryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDeleteDiscovery({ requestBody }: BulkDeleteDiscoveryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteDiscovery");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteDiscovery');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/discoveries",
-                method: "DELETE",
+                url: '/v1/discoveries',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -92,16 +92,16 @@ export class DiscoveryManagementApi extends BaseAPI {
     createDiscovery({ discoveryDto }: CreateDiscoveryRequest): Observable<UuidDto>;
     createDiscovery({ discoveryDto }: CreateDiscoveryRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
     createDiscovery({ discoveryDto }: CreateDiscoveryRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(discoveryDto, "discoveryDto", "createDiscovery");
+        throwIfNullOrUndefined(discoveryDto, 'discoveryDto', 'createDiscovery');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/discoveries",
-                method: "POST",
+                url: '/v1/discoveries',
+                method: 'POST',
                 headers,
                 body: discoveryDto,
             },
@@ -115,12 +115,12 @@ export class DiscoveryManagementApi extends BaseAPI {
     deleteDiscovery({ uuid }: DeleteDiscoveryRequest): Observable<void>;
     deleteDiscovery({ uuid }: DeleteDiscoveryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteDiscovery({ uuid }: DeleteDiscoveryRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteDiscovery");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteDiscovery');
 
         return this.request<void>(
             {
-                url: "/v1/discoveries/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/discoveries/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -135,12 +135,12 @@ export class DiscoveryManagementApi extends BaseAPI {
         { uuid }: GetDiscoveryRequest,
         opts?: OperationOpts,
     ): Observable<DiscoveryHistoryDetailDto | AjaxResponse<DiscoveryHistoryDetailDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getDiscovery");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getDiscovery');
 
         return this.request<DiscoveryHistoryDetailDto>(
             {
-                url: "/v1/discoveries/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/discoveries/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -163,24 +163,24 @@ export class DiscoveryManagementApi extends BaseAPI {
         { uuid, newlyDiscovered, itemsPerPage, pageNumber }: GetDiscoveryCertificatesRequest,
         opts?: OperationOpts,
     ): Observable<DiscoveryCertificateResponseDto | AjaxResponse<DiscoveryCertificateResponseDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getDiscoveryCertificates");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getDiscoveryCertificates');
 
         const query: HttpQuery = {};
 
         if (newlyDiscovered != null) {
-            query["newlyDiscovered"] = newlyDiscovered;
+            query['newlyDiscovered'] = newlyDiscovered;
         }
         if (itemsPerPage != null) {
-            query["itemsPerPage"] = itemsPerPage;
+            query['itemsPerPage'] = itemsPerPage;
         }
         if (pageNumber != null) {
-            query["pageNumber"] = pageNumber;
+            query['pageNumber'] = pageNumber;
         }
 
         return this.request<DiscoveryCertificateResponseDto>(
             {
-                url: "/v1/discoveries/{uuid}/certificates".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/discoveries/{uuid}/certificates'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -197,8 +197,8 @@ export class DiscoveryManagementApi extends BaseAPI {
     ): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>(
             {
-                url: "/v1/discoveries/search",
-                method: "GET",
+                url: '/v1/discoveries/search',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -213,16 +213,16 @@ export class DiscoveryManagementApi extends BaseAPI {
         { searchRequestDto }: ListDiscoveriesRequest,
         opts?: OperationOpts,
     ): Observable<DiscoveryResponseDto | AjaxResponse<DiscoveryResponseDto>> {
-        throwIfNullOrUndefined(searchRequestDto, "searchRequestDto", "listDiscoveries");
+        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listDiscoveries');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<DiscoveryResponseDto>(
             {
-                url: "/v1/discoveries/list",
-                method: "POST",
+                url: '/v1/discoveries/list',
+                method: 'POST',
                 headers,
                 body: searchRequestDto,
             },
@@ -239,16 +239,16 @@ export class DiscoveryManagementApi extends BaseAPI {
         { scheduleDiscoveryDto }: ScheduleDiscoveryRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(scheduleDiscoveryDto, "scheduleDiscoveryDto", "scheduleDiscovery");
+        throwIfNullOrUndefined(scheduleDiscoveryDto, 'scheduleDiscoveryDto', 'scheduleDiscovery');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/discoveries/schedule",
-                method: "POST",
+                url: '/v1/discoveries/schedule',
+                method: 'POST',
                 headers,
                 body: scheduleDiscoveryDto,
             },

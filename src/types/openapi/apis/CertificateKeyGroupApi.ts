@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
-import type { AuthenticationServiceExceptionDto, ErrorMessageDto, GroupDto, GroupRequestDto, UuidDto } from "../models";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
+import type { AuthenticationServiceExceptionDto, ErrorMessageDto, GroupDto, GroupRequestDto, UuidDto } from '../models';
 
 export interface BulkDeleteGroupRequest {
     requestBody: Array<string>;
@@ -48,16 +48,16 @@ export class CertificateKeyGroupApi extends BaseAPI {
     bulkDeleteGroup({ requestBody }: BulkDeleteGroupRequest): Observable<void>;
     bulkDeleteGroup({ requestBody }: BulkDeleteGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     bulkDeleteGroup({ requestBody }: BulkDeleteGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(requestBody, "requestBody", "bulkDeleteGroup");
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteGroup');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v1/groups",
-                method: "DELETE",
+                url: '/v1/groups',
+                method: 'DELETE',
                 headers,
                 body: requestBody,
             },
@@ -71,16 +71,16 @@ export class CertificateKeyGroupApi extends BaseAPI {
     createGroup({ groupRequestDto }: CreateGroupRequest): Observable<UuidDto>;
     createGroup({ groupRequestDto }: CreateGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
     createGroup({ groupRequestDto }: CreateGroupRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(groupRequestDto, "groupRequestDto", "createGroup");
+        throwIfNullOrUndefined(groupRequestDto, 'groupRequestDto', 'createGroup');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/groups",
-                method: "POST",
+                url: '/v1/groups',
+                method: 'POST',
                 headers,
                 body: groupRequestDto,
             },
@@ -94,12 +94,12 @@ export class CertificateKeyGroupApi extends BaseAPI {
     deleteGroup({ uuid }: DeleteGroupRequest): Observable<void>;
     deleteGroup({ uuid }: DeleteGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteGroup({ uuid }: DeleteGroupRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteGroup");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteGroup');
 
         return this.request<void>(
             {
-                url: "/v1/groups/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/groups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -111,17 +111,17 @@ export class CertificateKeyGroupApi extends BaseAPI {
     editGroup({ uuid, groupRequestDto }: EditGroupRequest): Observable<GroupDto>;
     editGroup({ uuid, groupRequestDto }: EditGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<GroupDto>>;
     editGroup({ uuid, groupRequestDto }: EditGroupRequest, opts?: OperationOpts): Observable<GroupDto | AjaxResponse<GroupDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "editGroup");
-        throwIfNullOrUndefined(groupRequestDto, "groupRequestDto", "editGroup");
+        throwIfNullOrUndefined(uuid, 'uuid', 'editGroup');
+        throwIfNullOrUndefined(groupRequestDto, 'groupRequestDto', 'editGroup');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<GroupDto>(
             {
-                url: "/v1/groups/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/groups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: groupRequestDto,
             },
@@ -135,12 +135,12 @@ export class CertificateKeyGroupApi extends BaseAPI {
     getGroup({ uuid }: GetGroupRequest): Observable<GroupDto>;
     getGroup({ uuid }: GetGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<GroupDto>>;
     getGroup({ uuid }: GetGroupRequest, opts?: OperationOpts): Observable<GroupDto | AjaxResponse<GroupDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getGroup");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getGroup');
 
         return this.request<GroupDto>(
             {
-                url: "/v1/groups/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/groups/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -154,8 +154,8 @@ export class CertificateKeyGroupApi extends BaseAPI {
     listGroups(opts?: OperationOpts): Observable<Array<GroupDto> | AjaxResponse<Array<GroupDto>>> {
         return this.request<Array<GroupDto>>(
             {
-                url: "/v1/groups",
-                method: "GET",
+                url: '/v1/groups',
+                method: 'GET',
             },
             opts?.responseOpts,
         );

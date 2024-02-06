@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { X509CertificateAsn1Data, X509CertificateBasicData, X509CertificateExtendedData } from "./";
+import type { X509CertificateAsn1Data, X509CertificateBasicData, X509CertificateExtendedData } from './';
 
 /**
  * @type CertificateData

@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeMappingDto, RequestAttributeDto } from "./";
+import type { AttributeMappingDto, RequestAttributeDto } from './';
 
 /**
  * @export

@@ -17,9 +17,9 @@
  * @enum {string}
  */
 export enum AuthType {
-    None = "none",
-    Basic = "basic",
-    Certificate = "certificate",
-    ApiKey = "apiKey",
-    Jwt = "jwt",
+    None = 'none',
+    Basic = 'basic',
+    Certificate = 'certificate',
+    ApiKey = 'apiKey',
+    Jwt = 'jwt',
 }

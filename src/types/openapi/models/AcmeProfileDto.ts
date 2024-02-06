@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { ResponseAttributeDto, SimplifiedRaProfileDto } from "./";
+import type { ResponseAttributeDto, SimplifiedRaProfileDto } from './';
 
 /**
  * @export

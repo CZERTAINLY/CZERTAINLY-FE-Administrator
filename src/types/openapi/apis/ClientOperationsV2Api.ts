@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     BaseAttributeDto,
@@ -25,7 +25,7 @@ import type {
     ClientCertificateSignRequestDto,
     ErrorMessageDto,
     RequestAttributeDto,
-} from "../models";
+} from '../models';
 
 export interface IssueCertificateRequest {
     authorityUuid: string;
@@ -102,20 +102,20 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, clientCertificateSignRequestDto }: IssueCertificateRequest,
         opts?: OperationOpts,
     ): Observable<ClientCertificateDataResponseDto | AjaxResponse<ClientCertificateDataResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "issueCertificate");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "issueCertificate");
-        throwIfNullOrUndefined(clientCertificateSignRequestDto, "clientCertificateSignRequestDto", "issueCertificate");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'issueCertificate');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'issueCertificate');
+        throwIfNullOrUndefined(clientCertificateSignRequestDto, 'clientCertificateSignRequestDto', 'issueCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ClientCertificateDataResponseDto>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'POST',
                 headers,
                 body: clientCertificateSignRequestDto,
             },
@@ -139,17 +139,17 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, certificateUuid }: IssueNewCertificateRequest,
         opts?: OperationOpts,
     ): Observable<ClientCertificateDataResponseDto | AjaxResponse<ClientCertificateDataResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "issueNewCertificate");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "issueNewCertificate");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "issueNewCertificate");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'issueNewCertificate');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'issueNewCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'issueNewCertificate');
 
         return this.request<ClientCertificateDataResponseDto>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/issue"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/issue'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'POST',
             },
             opts?.responseOpts,
         );
@@ -170,15 +170,15 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid }: ListIssueCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "listIssueCertificateAttributes");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "listIssueCertificateAttributes");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'listIssueCertificateAttributes');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'listIssueCertificateAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -199,15 +199,15 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid }: ListRevokeCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "listRevokeCertificateAttributes");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "listRevokeCertificateAttributes");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'listRevokeCertificateAttributes');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'listRevokeCertificateAttributes');
 
         return this.request<Array<BaseAttributeDto>>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "GET",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -230,22 +230,22 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, certificateUuid, clientCertificateRekeyRequestDto }: RekeyCertificateRequest,
         opts?: OperationOpts,
     ): Observable<ClientCertificateDataResponseDto | AjaxResponse<ClientCertificateDataResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "rekeyCertificate");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "rekeyCertificate");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "rekeyCertificate");
-        throwIfNullOrUndefined(clientCertificateRekeyRequestDto, "clientCertificateRekeyRequestDto", "rekeyCertificate");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'rekeyCertificate');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'rekeyCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'rekeyCertificate');
+        throwIfNullOrUndefined(clientCertificateRekeyRequestDto, 'clientCertificateRekeyRequestDto', 'rekeyCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ClientCertificateDataResponseDto>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/rekey"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/rekey'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'POST',
                 headers,
                 body: clientCertificateRekeyRequestDto,
             },
@@ -270,22 +270,22 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, certificateUuid, clientCertificateRenewRequestDto }: RenewCertificateRequest,
         opts?: OperationOpts,
     ): Observable<ClientCertificateDataResponseDto | AjaxResponse<ClientCertificateDataResponseDto>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "renewCertificate");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "renewCertificate");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "renewCertificate");
-        throwIfNullOrUndefined(clientCertificateRenewRequestDto, "clientCertificateRenewRequestDto", "renewCertificate");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'renewCertificate');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'renewCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'renewCertificate');
+        throwIfNullOrUndefined(clientCertificateRenewRequestDto, 'clientCertificateRenewRequestDto', 'renewCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ClientCertificateDataResponseDto>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/renew"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/renew'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'POST',
                 headers,
                 body: clientCertificateRenewRequestDto,
             },
@@ -310,22 +310,22 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, certificateUuid, clientCertificateRevocationDto }: RevokeCertificateRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "revokeCertificate");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "revokeCertificate");
-        throwIfNullOrUndefined(certificateUuid, "certificateUuid", "revokeCertificate");
-        throwIfNullOrUndefined(clientCertificateRevocationDto, "clientCertificateRevocationDto", "revokeCertificate");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'revokeCertificate');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'revokeCertificate');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'revokeCertificate');
+        throwIfNullOrUndefined(clientCertificateRevocationDto, 'clientCertificateRevocationDto', 'revokeCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/revoke"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid))
-                    .replace("{certificateUuid}", encodeURI(certificateUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/revoke'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid))
+                    .replace('{certificateUuid}', encodeURI(certificateUuid)),
+                method: 'POST',
                 headers,
                 body: clientCertificateRevocationDto,
             },
@@ -349,20 +349,20 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, requestAttributeDto }: ValidateIssueCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "validateIssueCertificateAttributes");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "validateIssueCertificateAttributes");
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateIssueCertificateAttributes");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'validateIssueCertificateAttributes');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'validateIssueCertificateAttributes');
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateIssueCertificateAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue/validate"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue/validate'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },
@@ -386,20 +386,20 @@ export class ClientOperationsV2Api extends BaseAPI {
         { authorityUuid, raProfileUuid, requestAttributeDto }: ValidateRevokeCertificateAttributesRequest,
         opts?: OperationOpts,
     ): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(authorityUuid, "authorityUuid", "validateRevokeCertificateAttributes");
-        throwIfNullOrUndefined(raProfileUuid, "raProfileUuid", "validateRevokeCertificateAttributes");
-        throwIfNullOrUndefined(requestAttributeDto, "requestAttributeDto", "validateRevokeCertificateAttributes");
+        throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'validateRevokeCertificateAttributes');
+        throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'validateRevokeCertificateAttributes');
+        throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'validateRevokeCertificateAttributes');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<void>(
             {
-                url: "/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke/validate"
-                    .replace("{authorityUuid}", encodeURI(authorityUuid))
-                    .replace("{raProfileUuid}", encodeURI(raProfileUuid)),
-                method: "POST",
+                url: '/v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke/validate'
+                    .replace('{authorityUuid}', encodeURI(authorityUuid))
+                    .replace('{raProfileUuid}', encodeURI(raProfileUuid)),
+                method: 'POST',
                 headers,
                 body: requestAttributeDto,
             },
