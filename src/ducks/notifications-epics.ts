@@ -33,12 +33,14 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),
+                // window.location.href = (window as any).__ENV__.LOGOUT_URL;
 
                 catchError((err) =>
                     of(
                         slice.actions.listOverviewNotificationsFailure({
                             error: extractError(err, "Failed to list overview notification"),
                         }),
+                        appRedirectActions.setUnAuthorized(),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),

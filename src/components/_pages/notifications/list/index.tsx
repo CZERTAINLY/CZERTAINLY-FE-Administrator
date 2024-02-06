@@ -98,15 +98,9 @@ function NotificationsList() {
             })),
         [notifications, dispatch, navigate],
     );
-
-    console.log("profile?.uuid", profile?.uuid);
     const onListCallback = useCallback(
-        (pagination: SearchRequestModel) => {
-            if (profile?.uuid) {
-                dispatch(actions.listNotifications({ unread: false, pagination }));
-            }
-        },
-        [dispatch, profile],
+        (pagination: SearchRequestModel) => dispatch(actions.listNotifications({ unread: false, pagination })),
+        [dispatch],
     );
 
     return (
